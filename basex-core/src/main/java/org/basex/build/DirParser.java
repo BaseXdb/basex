@@ -100,35 +100,35 @@ public final class DirParser extends Parser {
     if(archives && input.isArchive()) {
       String name = input.name().toLowerCase(Locale.ENGLISH);
       final Compression compr = Compression.file(name);
-      final InputStream in = input.inputStream();
-      if(name.endsWith(IO.TARSUFFIX) || compr != null && compr.tar(name)) {
-        // process TAR files
-        try(TarInputStream is = new TarInputStream(compr != null ? compr.input(in) : in)) {
-          for(TarEntry te; (te = is.getNextEntry()) != null;) {
-            if(te.isDirectory()) continue;
-            source = newStream(is, te.getName(), input);
-            source.length(te.getSize());
-            parseResource(builder);
+      try(InputStream in = input.inputStream();
+          InputStream cin = compr != null ? compr.input(in) : in) {
+        if(name.endsWith(IO.TARSUFFIX) || compr != null && compr.tar(name)) {
+          // process TAR files
+          try(TarInputStream is = new TarInputStream(cin)) {
+            for(TarEntry te; (te = is.getNextEntry()) != null;) {
+              if(te.isDirectory()) continue;
+              source = newStream(is, te.getName(), input);
+              source.length(te.getSize());
+              parseResource(builder);
+            }
           }
-        }
-      } else if(compr != null) {
-        // process compressed file
-        try(InputStream is = compr.input(in)) {
+        } else if(compr != null) {
+          // process compressed file
           // generate filename (the optional filename cannot be retrieved from the input stream):
           // drop archive suffix, add .xml if no suffix remains
           name = input.name().replaceAll("\\.[^.]+$", "");
           if(!Strings.contains(name, '.')) name += IO.XMLSUFFIX;
-          source = newStream(is, name, input);
+          source = newStream(cin, name, input);
           parseResource(builder);
-        }
-      } else {
-        // process ZIP archive
-        try(ZipInputStream is = new ZipInputStream(in, Strings.CP437)) {
-          for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
-            if(ze.isDirectory()) continue;
-            source = newStream(is, Strings.canonical(ze.getName()), input);
-            source.length(ze.getSize());
-            parseResource(builder);
+        } else {
+          // process ZIP archive
+          try(ZipInputStream is = new ZipInputStream(cin, Strings.CP437)) {
+            for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
+              if(ze.isDirectory()) continue;
+              source = newStream(is, Strings.canonical(ze.getName()), input);
+              source.length(ze.getSize());
+              parseResource(builder);
+            }
           }
         }
       }

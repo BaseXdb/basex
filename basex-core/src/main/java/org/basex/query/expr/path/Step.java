@@ -342,9 +342,9 @@ public abstract class Step extends Preds {
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
   public final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final boolean stats) {
-    // skip steps with predicates
+    // skip steps with selectors and predicates
     final Data data = data();
-    if(data == null || stats && exprs.length != 0) return null;
+    if(data == null || selector != null || stats && exprs.length != 0) return null;
 
     // skip axes that cannot be traversed in the path summary
     if(!axis.down && (stats || !axis.oneOf(PARENT, ANCESTOR, ANCESTOR_OR_SELF, FOLLOWING_SIBLING,

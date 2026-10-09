@@ -40,8 +40,8 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
-    final Type type = st.type.isUntyped() ? BasicType.DOUBLE :
-      st.type.instanceOf(BasicType.INTEGER) ? BasicType.INTEGER : st.type;
+    final BasicType nt = Calc.numType(st.type, st.type);
+    final BasicType type = nt == BasicType.ANY_ATOMIC_TYPE ? BasicType.NUMERIC : nt;
     final Occ occ = st.oneOrMore() && !st.mayBeWrapped() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 

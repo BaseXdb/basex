@@ -482,6 +482,8 @@ public final class QueryContext extends Job implements Closeable {
 
     // locks in main module (can be null if parsing failed)
     boolean local = main == null || main.databases(visitor);
+    // thesaurus databases of the full-text options in the prolog
+    if(local && ftOpt != null) local = ftOpt.accept(visitor);
     // locks in context expression
     if(local && contextValue != null) {
       // check if scope may still be overwritten by dynamic context

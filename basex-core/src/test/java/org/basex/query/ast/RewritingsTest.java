@@ -354,6 +354,10 @@ public final class RewritingsTest extends SandboxTest {
         empty(Unary.class), empty(Cast.class));
 
     check("--xs:byte(" + wrap("-128") + ")", -128, empty(Unary.class), count(Cast.class, 2));
+
+    // non-numeric operand: numeric result
+    check("jtree(1) ! (-. instance of xs:numeric)", true);
+    check("jtree(parse-json('1')) ! jtree(-.) ! (jvalue() instance of xs:numeric)", true);
   }
 
   /** Coerce to expression. */

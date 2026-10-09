@@ -1282,6 +1282,22 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Resolves namespaces that are declared by elements without declaring descendants.
+   */
+  @Test public void leafAncestors() {
+    // the declaring element is the first leaf, or the last leaf of the first block
+    for(final int before : new int[] { 0, 255 }) {
+      final String e = "<e xmlns:b='urn:b'/>";
+      execute(new CreateDB(NAME, "<r xmlns:a='urn:a'>" + e.repeat(before) +
+          "<a:x xmlns:a='urn:aa'><a:k/></a:x>" + e.repeat(5000) + "</r>"));
+      execute(new Close());
+      query(_DB_INSPECT.args(NAME) + "?valid", true);
+      query("rename node " + _DB_GET.args(NAME) + "/r/*:x/* as QName('urn:aa', 'a:m')");
+      query("namespace-uri(" + _DB_GET.args(NAME) + "/r/*:x/*)", "urn:aa");
+    }
+  }
+
+  /**
    * Checks that the namespace storage format switches with the size of the structure.
    */
   @Test public void storageFormat() {

@@ -233,7 +233,7 @@ final class NSEntries {
    */
   int setId(final int pre, final Data data) {
     final int n = find(pre, data);
-    return n == -1 ? 0 : pres[n] == pre ? setIds[n] : leafSetId(n, pre);
+    return n == -1 ? 0 : pres[n] == pre ? setIds[n] : leafSetId(n, pre, null);
   }
 
   /**
@@ -248,7 +248,7 @@ final class NSEntries {
     int n = find(pre, data);
     if(n == -1) return 0;
     if(pres[n] != pre) {
-      final int uriId = sets.uri(leafSetId(n, pre), prefixId);
+      final int uriId = sets.uri(leafSetId(n, pre, data), prefixId);
       if(uriId != 0) return uriId;
     }
     for(; n != -1; n = parents[n]) {
@@ -419,13 +419,22 @@ final class NSEntries {
    * Returns the ID of the set that is declared by a leaf of the specified inner node.
    * @param n reference to the inner node
    * @param pre PRE value
+   * @param data data reference for also accepting a leaf that contains the PRE value
+   *   (can be {@code null})
    * @return set ID ({@code 0}: no namespaces are declared)
    */
-  private int leafSetId(final int n, final int pre) {
+  private int leafSetId(final int n, final int pre, final Data data) {
     if(leaves[n] == 0) return 0;
-    final Block bl = block(n, blockIndex(n, pre));
+    final int b = blockIndex(n, pre);
+    final Block bl = block(n, b);
     final int l = search(bl.pres, pre);
-    return l >= 0 && bl.pres[l] == pre ? bl.sets[l] : 0;
+    if(l == -1 && b == 0) return 0;
+    // no match in the block: the closest preceding leaf is the last one of the previous block
+    final int lpre = l == -1 ? blockPres[blockStarts[n] + b - 1] : bl.pres[l];
+    if(lpre != pre && (data == null || lpre + data.size(lpre, Data.ELEM) <= pre)) return 0;
+    if(l != -1) return bl.sets[l];
+    final int[] sets = block(n, b - 1).sets;
+    return sets[sets.length - 1];
   }
 
   /**

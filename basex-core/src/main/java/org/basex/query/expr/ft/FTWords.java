@@ -431,7 +431,7 @@ public final class FTWords extends FTExpr {
        * conflict with the index options. As a consequence, though, index-based
        * querying might yield other results than sequential scanning. */
       final MetaData md = data.meta;
-      if(ftOpt.cs != null && md.casesens == (ftOpt.cs == FTCase.INSENSITIVE) ||
+      if(ftOpt.cs != null && ftOpt.cs != (md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE) ||
           ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
           ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
           ftOpt.ln != null && !ftOpt.ln.equals(md.language())) return false;
@@ -539,7 +539,8 @@ public final class FTWords extends FTExpr {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return super.accept(visitor) && query.accept(visitor) &&
-        (occ == null || visitAll(visitor, occ)) && (db == null || db.accept(visitor));
+        (occ == null || visitAll(visitor, occ)) && (db == null || db.accept(visitor)) &&
+        (ftOpt == null || ftOpt.accept(visitor));
   }
 
   @Override

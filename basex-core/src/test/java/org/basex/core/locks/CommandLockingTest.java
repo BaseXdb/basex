@@ -202,6 +202,22 @@ public final class CommandLockingTest extends SandboxTest {
         " string(" + _RANDOM_INTEGER.args() + ")"), FILE)), null, NAME_LIST);
   }
 
+  /** Tests that thesaurus databases are only locked if the full-text expression is reachable. */
+  @Test public void thesaurus() {
+    execute(new CreateDB(NAME));
+    try {
+      final String thes = "contains text 'a' using thesaurus at '" + NAME + "'";
+      ckDBs(new XQuery("'a' " + thes), false, NAME_LIST);
+      ckDBs(new XQuery("declare function local:f($s) { $s " + thes + " }; local:f('a')"),
+          false, NAME_LIST);
+      ckDBs(new XQuery("declare function local:f($s) { $s " + thes + " }; 1"), false, NONE);
+      ckDBs(new XQuery("declare ft-option using thesaurus at '" + NAME + "'; 1"), false,
+          NAME_LIST);
+    } finally {
+      execute(new DropDB(NAME));
+    }
+  }
+
   /** Tests that the first operand of a simple map is evaluated in the outer focus. */
   @Test public void simpleMap() {
     execute(new CreateDB(NAME));

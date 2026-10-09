@@ -5,6 +5,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Map that stores its entries in a hash table.
@@ -172,6 +173,17 @@ abstract class XQHashMap extends XQMap {
    * @return integer or {@link Integer#MIN_VALUE}
    */
   static int toInt(final Value value) {
-    return value instanceof final Itr itr ? itr.toInt() : Integer.MIN_VALUE;
+    return value instanceof final Itr itr && itr.type == BasicType.INTEGER ? itr.toInt() :
+      Integer.MIN_VALUE;
+  }
+
+  /**
+   * Returns the index of a numeric key in the specified set.
+   * @param set integer set
+   * @param key key
+   * @return index, or {@code 0} if the key is not found
+   */
+  static int index(final IntSet set, final Item key) {
+    return key instanceof final ANum num ? set.index(num.toInt()) : 0;
   }
 }

@@ -144,10 +144,7 @@ public final class Itr extends ANum {
     return v == value ? this : get(v);
   }
 
-  /**
-   * Returns a 32-bit integer.
-   * @return integer or {@link Integer#MIN_VALUE}
-   */
+  @Override
   public int toInt() {
     final int i = (int) value;
     return value == i ? i : Integer.MIN_VALUE;

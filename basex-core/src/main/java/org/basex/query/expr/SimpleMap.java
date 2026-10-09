@@ -188,8 +188,17 @@ public abstract sealed class SimpleMap extends Mapping
         final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && arith.arg(0) instanceof ContextValue &&
             arith.arg(1) instanceof final Itr itr) {
-          final long diff = itr.itr(), start = rs.itemAt(0).itr() + (plus ? diff : -diff);
-          return RangeSeq.get(start, rs.size(), rs.ascending());
+          final LongBinaryOperator op = plus ? Math::addExact : Math::subtractExact;
+          final long diff = itr.itr();
+          try {
+            // check both bounds for overflow
+            final long start = op.applyAsLong(rs.itemAt(0).itr(), diff);
+            op.applyAsLong(rs.itemAt(rs.size() - 1).itr(), diff);
+            return RangeSeq.get(start, rs.size(), rs.ascending());
+          } catch(final ArithmeticException ex) {
+            // overflow: raise error at runtime
+            Util.debug(ex);
+          }
         }
       }
 
@@ -246,7 +255,7 @@ public abstract sealed class SimpleMap extends Mapping
     } else if(next instanceof final SingleIterPath path) {
       final Step step = path.step(0);
       final Type tp = expr.seqType().type;
-      if(step.axis == Axis.SELF && tp instanceof NodeType &&
+      if(step.axis == Axis.SELF && step.selector == null && tp instanceof NodeType &&
           step.test.subsumes(tp) == Boolean.TRUE) preds = step;
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);

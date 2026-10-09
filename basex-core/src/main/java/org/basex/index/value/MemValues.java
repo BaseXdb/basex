@@ -53,10 +53,8 @@ public final class MemValues extends ValueIndex {
       pres = idRange(range).finish();
       size = pres.length;
     } else {
-      // the token set may contain values of deleted nodes that have no index entries
       final int id = values.index(search.token());
-      if(id == 0 || id >= idsList.size()) return IndexIterator.EMPTY;
-      size = lenList.get(id);
+      size = length(id);
       if(size == 0) return IndexIterator.EMPTY;
       final int[] ids = idsList.get(id);
       if(data.meta.updindex) {
@@ -89,7 +87,7 @@ public final class MemValues extends ValueIndex {
     final IntList pres = new IntList();
     final int s = values.size();
     for(int p = 1; p <= s; p++) {
-      final int len = lenList.get(p);
+      final int len = length(p);
       if(len == 0) continue;
       final byte[] key = values.key(p);
       if(compare(key, range.min()) < (range.mni() ? 0 : 1) ||
@@ -103,7 +101,7 @@ public final class MemValues extends ValueIndex {
   @Override
   public IndexCosts costs(final IndexSearch search) {
     if(search instanceof StringRange) return IndexCosts.get(Math.max(1, data.nodes() / 10));
-    return IndexCosts.exact(lenList.get(values.index(search.token())));
+    return IndexCosts.exact(length(values.index(search.token())));
   }
 
   @Override
@@ -111,14 +109,13 @@ public final class MemValues extends ValueIndex {
     final byte[] token = entries.token();
 
     return new EntryIterator() {
-      // the token set may contain values of deleted nodes that have no index entries
-      final int s = Math.min(values.size(), lenList.size() - 1);
+      final int s = values.size();
       int p;
 
       @Override
       public byte[] next() {
         while(++p <= s) {
-          if(lenList.get(p) == 0) continue;
+          if(length(p) == 0) continue;
           final byte[] key = values.key(p);
           if(startsWith(key, token)) return key;
         }
@@ -141,11 +138,21 @@ public final class MemValues extends ValueIndex {
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     final int s = values.size();
     for(int p = 1; p <= s; p++) {
-      final int oc = lenList.get(p);
+      final int oc = length(p);
       if(oc > 0 && stats.adding(oc)) stats.add(values.key(p), oc);
     }
     stats.print(tb);
     return tb.finish();
+  }
+
+  /**
+   * Returns the number of index entries for the specified key reference.
+   * @param id key reference
+   * @return number of entries
+   */
+  private int length(final int id) {
+    // the token set may contain values that have not been indexed, or values of deleted nodes
+    return id < lenList.size() ? lenList.get(id) : 0;
   }
 
   @Override

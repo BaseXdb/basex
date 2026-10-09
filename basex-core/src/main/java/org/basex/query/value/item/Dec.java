@@ -88,6 +88,13 @@ public final class Dec extends ANum {
   }
 
   @Override
+  public int toInt() {
+    // the double value may be rounded
+    final int i = value.intValue();
+    return value.compareTo(BigDecimal.valueOf(i)) == 0 ? i : Integer.MIN_VALUE;
+  }
+
+  @Override
   public BigDecimal dec(final InputInfo ii) {
     return value;
   }

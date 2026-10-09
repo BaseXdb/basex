@@ -382,6 +382,17 @@ public final class ExprTest extends SandboxTest {
     query("count((1 to 100_000) ! (. to . + 9_999))", 1_000_000_000);
     // ranges with more than 2^63-1 items cannot be materialized
     error("count(-9223372036854775808 to 9223372036854775807)", MAX_SIZE_X_X);
+
+    // no ranges across the 64-bit wrap-around
+    final String max = "9223372036854775807", min = "(-9223372036854775807 - 1)";
+    query("sort((" + max + ", " + min + "))", "-9223372036854775808\n" + max);
+    query("max((" + max + ", " + min + "))", max);
+    query("max(insert-before((" + max + " - 1 to " + max + "), 3, " + min + "))", max);
+    query("max(insert-before((" + min + " to " + min + " + 1), 1, " + max + "))", max);
+    error("(" + max + " - 1 to " + max + ") ! (. + 5)", RANGE_X);
+    error("(" + min + " to " + min + " + 1) ! (. - 5)", RANGE_X);
+    check("(1 to 5) ! (. + 1)", "2\n3\n4\n5\n6", root(RangeSeq.class));
+    error("count((-4611686018427387904 to 0, 1 to 4611686018427387904))", MAX_SIZE_X_X);
     error("head(-9223372036854775808 to 9223372036854775807)", MAX_SIZE_X_X);
     error("count(-9223372036854775808 to 0)", MAX_SIZE_X_X);
     query("count(-9223372036854775808 to -2)", Long.MAX_VALUE);

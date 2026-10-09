@@ -455,6 +455,21 @@ public final class MapTest extends SandboxTest {
         "{1:1,\"2\":\"2\",\"3\":\"3\",4:4,5:5}", root(XQItemValueMap.class));
     check("map:merge(({ 1: 1 }, { '2': '2' }, { 3: 3 }, { 4: 4 }, { 5: 5 }))",
         "{1:1,\"2\":\"2\",3:3,4:4,5:5}", root(XQItemValueMap.class));
+
+    // subtypes, lookups of non-integer keys
+    query("map:build(1 to 10, value := fn { if(. = 10) then xs:byte(.) else . })(10) "
+        + "instance of xs:byte", true);
+    query("map:build(1 to 10, string#1, fn { if(. = 10) then xs:long(.) else . })('10') "
+        + "instance of xs:long", true);
+    query("let $m := map:merge(((1 to 10) ! map:entry(., .), "
+        + "map:entry(xs:byte(11), xs:byte(11)))) "
+        + "return (map:keys($m)[last()], $m(11)) ! (. instance of xs:byte)", "true\ntrue");
+
+    query("map:contains(map:build(1 to 10), 10.0000000000000000001)", false);
+    query("map:build(1 to 10, value := string#1)(10.0000000000000000001)", "");
+    query("map:build(1 to 10, value := fn { (., .) })(10.0000000000000000001)", "");
+    query("map:build(1 to 10)(10.0)", 10);
+    query("map:build(1 to 10)(xs:byte(10))", 10);
   }
 
   /** Tests string maps. */

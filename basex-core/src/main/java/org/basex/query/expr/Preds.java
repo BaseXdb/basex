@@ -144,7 +144,7 @@ public abstract class Preds extends Arr {
     // child::node()[self::*] → child::*
     if(expr instanceof final SingleIterPath path) {
       final Step predStep = (Step) path.steps[0];
-      if(predStep.axis == Axis.SELF && !predStep.mayBePositional() &&
+      if(predStep.axis == Axis.SELF && predStep.selector == null && !predStep.mayBePositional() &&
           root instanceof final Step rootStep && !mayBePositional()) {
         final Test test = rootStep.test.intersect(predStep.test);
         // an intersection may be less specific than the merged tests (e.g., for records)

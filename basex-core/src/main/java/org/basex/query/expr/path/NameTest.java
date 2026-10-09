@@ -147,7 +147,7 @@ public final class NameTest extends Test {
   private TokenList matches(final TokenList names, final Data data) {
     if(scope == Scope.LOCAL) return names;
 
-    final boolean elem = kind == Kind.ELEMENT;
+    final boolean elem = kind != Kind.ATTRIBUTE;
     final byte[] uri = qname.hasURI() ? qname.uri() : elem ? ns : Token.EMPTY;
     final TokenList list = new TokenList(names.size());
     for(final byte[] nm : names) {

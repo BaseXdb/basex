@@ -191,13 +191,13 @@ public final class Optimize extends ACreate {
    */
   private static void optimizeIds(final Data data) throws IOException {
     final MetaData md = data.meta;
-    final int size = md.size;
+    final int size = data.nodes();
     for(int pre = 0; pre < size; pre++) data.id(pre, pre);
-    md.lastid = size - 1;
+    data.lastid = size - 1;
     md.dirty = true;
 
-    if(data.meta.updindex) {
-      data.idmap = new IdPreMap(md.lastid);
+    if(md.updindex) {
+      data.idmap = new IdPreMap(data.lastid);
       for(final IndexType type : IndexType.VALUE_INDEXES) {
         if(md.index(type)) CreateIndex.create(type, data, null);
       }

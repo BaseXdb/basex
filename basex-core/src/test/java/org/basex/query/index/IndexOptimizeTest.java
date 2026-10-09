@@ -145,6 +145,24 @@ public final class IndexOptimizeTest extends SandboxTest {
     indexCheck("//text()[. contains text '1' using language 'German']");
   }
 
+  /** Checks if a case-sensitive full-text index is skipped for conflicting case options. */
+  @Test public void ftTestCase() {
+    set(MainOptions.CASESENS, true);
+    try {
+      execute(new CreateDB(NAME, "<x><t>HELLO</t></x>"));
+      indexCheck("//t[text() contains text 'HELLO']", "<t>HELLO</t>");
+      indexCheck("//t[text() contains text 'HELLO' using case sensitive]", "<t>HELLO</t>");
+      check("//t[text() contains text 'HELLO' using lowercase]", "",
+          empty(FTIndexAccess.class));
+      check("//t[text() contains text 'hello' using uppercase]", "<t>HELLO</t>",
+          empty(FTIndexAccess.class));
+      check("//t[text() contains text 'hello' using case insensitive]", "<t>HELLO</t>",
+          empty(FTIndexAccess.class));
+    } finally {
+      set(MainOptions.CASESENS, false);
+    }
+  }
+
   /** Checks index optimizations inside functions. */
   @Test public void functionInlining() {
     createColl();
@@ -300,6 +318,24 @@ public final class IndexOptimizeTest extends SandboxTest {
     } finally {
       set(MainOptions.TEXTINCLUDE, "");
     }
+  }
+
+  /** Steps with selectors. */
+  @Test public void selectors() {
+    execute(new CreateDB(NAME, "<r><a k='v'>x</a><b k='v'>x</b><c><a>x</a></c></r>"));
+
+    check("//child::{'a'}[text() = 'x'] ! name()", "a\na", empty(ValueAccess.class));
+    check("//*[child::{'zz'}/text() = 'x'] ! name()", "", empty(ValueAccess.class));
+    check("//*[attribute::{'zz'} = 'v'] ! name()", "", empty(ValueAccess.class));
+    query("count(/descendant::{'a'})", 2);
+    query("count(/r/child::{'a'})", 1);
+
+    // selectors must not be merged
+    final String k = "for $k in ('a', 'b')[. = 'a'] return ";
+    query(k + "count(/r/(child::{$k} | child::{$k || 'x'}))", 1);
+    query(k + "count(/r/(child::{$k} except child::{'zz' || $k}))", 1);
+    query(k + "count(/r/node()[self::{$k}])", 1);
+    query(k + "count(reverse(/r/*) ! self::{$k})", 1);
   }
 
   /** Checks if expressions are rewritten for enforced index access. */

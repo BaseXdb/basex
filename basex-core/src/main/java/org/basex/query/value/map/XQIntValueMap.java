@@ -35,15 +35,8 @@ public final class XQIntValueMap extends XQHashMap {
 
   @Override
   public Value getOrNull(final Item key) {
-    if(key instanceof final ANum num) {
-      final double d = num.dbl();
-      final int v = (int) d;
-      if(d == v) {
-        final int i = map.index(v);
-        if(i != 0) return valueAt(i - 1);
-      }
-    }
-    return null;
+    final int i = index(map, key);
+    return i != 0 ? valueAt(i - 1) : null;
   }
 
   @Override

@@ -177,8 +177,8 @@ public abstract class ItrSeq extends NativeSeq {
     for(int v = 1; v < sz && (same || asc || desc); v++) {
       final long i = seq.itrAt(v);
       if(same && i != first) same = false;
-      if(asc  && i != first + v) asc = false;
-      if(desc && i != first - v) desc = false;
+      if(asc  && !(i > first && i - first == v)) asc = false;
+      if(desc && !(i < first && first - i == v)) desc = false;
     }
     return same ? SingletonSeq.get(Itr.get(first, seq.type), sz) :
       asc || desc ? RangeSeq.get(first, sz, asc) : seq;

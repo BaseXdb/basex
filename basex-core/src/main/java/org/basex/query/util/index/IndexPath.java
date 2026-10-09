@@ -43,10 +43,11 @@ class IndexPath extends IndexPred {
   @Override
   Step step() {
     if(path.root != null) return null;
-    // give up if one of the steps contains positional predicates
+    // give up if one of the steps contains positional predicates or a selector
     final int sl = path.steps.length;
     for(int s = 0; s < sl; s++) {
-      if(path.step(s).mayBePositional()) return null;
+      final Step st = path.step(s);
+      if(st.selector != null || st.mayBePositional()) return null;
     }
     // return last step
     return path.step(last);

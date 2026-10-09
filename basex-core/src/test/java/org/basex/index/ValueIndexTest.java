@@ -15,6 +15,7 @@ import org.basex.index.query.*;
 import org.basex.index.value.*;
 import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
@@ -76,6 +77,22 @@ public final class ValueIndexTest extends SandboxTest {
     execute(new Optimize());
     query("count(" + _DB_TEXT.args(NAME, "1") + ')', 0);
     query("count(" + _DB_ATTRIBUTE.args(NAME, "1") + ')', 0);
+  }
+
+  /** Tests main-memory index lookups for values that have not been indexed. */
+  @Test public void notIndexedValues() {
+    set(MainOptions.MAINMEM, true);
+    set(MainOptions.TEXTINCLUDE, "a");
+    try {
+      execute(new CreateDB(NAME, "<r><a>v1</a><a>v2</a><a>v3</a></r>"));
+      query("for $i in 1 to 300 return insert node <b>w{ $i }</b> into /r");
+      query("count(" + _DB_TEXT.args(NAME, "w250") + ')', 0);
+      query("count(" + _DB_TEXT.args(NAME, "v2") + ')', 1);
+      query("count(" + _DB_TEXT_RANGE.args(NAME, "v", "x") + ')', 3);
+      execute(new InfoIndex(IndexType.TEXT));
+    } finally {
+      set(MainOptions.TEXTINCLUDE, "");
+    }
   }
 
   /**

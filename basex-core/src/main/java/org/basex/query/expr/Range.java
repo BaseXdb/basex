@@ -122,7 +122,7 @@ public final class Range extends Arr {
    * @param mx maximum
    * @return result of check
    */
-  private static boolean tooLarge(final long mn, final long mx) {
+  static boolean tooLarge(final long mn, final long mx) {
     return mn <= mx && mx - mn + 1 <= 0;
   }
 

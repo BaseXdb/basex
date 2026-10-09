@@ -188,6 +188,18 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
+   * A token that consists of a combining mark is not indexed, and segments can be merged.
+   */
+  @Test public void combiningMark() {
+    execute(new CreateDB(NAME, "<x><a>one ̋ two</a></x>"));
+    query("insert node <b>three</b> as first into " + _DB_GET.args(NAME) + "/x");
+    execute(new Optimize());
+    assertEquals(1, segments());
+    search("two", "one ̋ two");
+    search("three", "three");
+  }
+
+  /**
    * The same document is replaced repeatedly: segments are written and merged, and the log
    * does not grow.
    */

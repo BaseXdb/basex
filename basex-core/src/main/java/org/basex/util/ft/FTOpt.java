@@ -9,6 +9,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.list.*;
 
@@ -49,6 +50,15 @@ public final class FTOpt extends ExprInfo {
     else if(opt.th != null) th.merge(opt.th);
     if(errors == -1) errors = opt.errors;
     return this;
+  }
+
+  /**
+   * Passes on the thesaurus databases to the visitor.
+   * @param visitor visitor
+   * @return result of check
+   */
+  public boolean accept(final ASTVisitor visitor) {
+    return th == null || th.accept(visitor);
   }
 
   /**

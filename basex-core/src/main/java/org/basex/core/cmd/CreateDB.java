@@ -120,7 +120,12 @@ public final class CreateDB extends ACreate {
       if(!update(data, () -> {
         CreateIndex.create(data, this);
         return info(parser.info() + DB_CREATED_X_X, name, jc().performance);
-      })) return false;
+      })) {
+        // remove incompletely created database
+        Close.close(context);
+        DropDB.drop(data, soptions);
+        return false;
+      }
 
       if(options.get(MainOptions.CREATEONLY)) Close.close(context);
       return true;

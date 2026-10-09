@@ -366,6 +366,10 @@ public final class DbModuleTest extends SandboxTest {
     execute(new CreateDB(NAME, "<w xmlns:p='u'><p:c>A</p:c><c>B</c></w>"));
     query("declare namespace p = 'u'; " + entries(func.args(nodes, " fn { p:c }")), "A=1");
     query(entries(func.args(nodes, " fn { *:c }")), "A=1\nB=1");
+    execute(new CreateDB(NAME, "<r><w><c xmlns='u'>A</c><c>B</c></w></r>"));
+    query(entries(func.args(nodes, " fn($w) { $w/c }")), "B=1");
+    execute(new CreateDB(NAME, "<w xmlns='u'><c>A</c><c>B</c></w>"));
+    query(entries(func.args(" db:get('" + NAME + "')/*", " fn($w) { $w/Q{u}c }")), "A=1\nB=1");
 
     error(func.args(nodes, " fn { c }", " { 'width': 0 }"), INVALIDVALUE_X_X);
     error(func.args(nodes, " fn($a, $b) { $a }"), INVARITY_X_X);

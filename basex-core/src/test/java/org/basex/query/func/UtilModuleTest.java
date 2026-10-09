@@ -282,6 +282,7 @@ public final class UtilModuleTest extends SandboxTest {
     query(func.args(" ()", " ()"), "");
     query(func.args(1, " ()"), 1);
     query(func.args(1, 1), "");
+    query(func.args(" (1.0, 1.00000000000000000001)", 1), "1.00000000000000000001");
     query(func.args("a", ""), "a");
     query(func.args("a", "a"), "");
 

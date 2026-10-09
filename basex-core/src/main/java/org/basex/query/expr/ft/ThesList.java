@@ -3,6 +3,7 @@ package org.basex.query.expr.ft;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
 
@@ -49,6 +50,18 @@ public final class ThesList {
     final TokenList tl = new TokenList();
     for(final ThesAccessor th : list) tl.add(th.find(term, opt, qc));
     return tl.finish();
+  }
+
+  /**
+   * Passes on the thesaurus databases to the visitor.
+   * @param visitor visitor
+   * @return result of check
+   */
+  public boolean accept(final ASTVisitor visitor) {
+    for(final ThesAccessor th : list) {
+      if(!th.accept(visitor)) return false;
+    }
+    return true;
   }
 
   @Override

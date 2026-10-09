@@ -287,6 +287,10 @@ public final class PathTest extends SandboxTest {
         "", exists(IterPosStep.class), empty(VarRef.class), exists(IntPos.class));
     check("let $i := 0 return <a/>/*[position() = 1 to $i]",
         "", empty());
+
+    // positions below 1, maximum integer
+    check("for $i in 0 to 1 return count(<a><b/><b/></a>/b[position() = $i - 5 to "
+        + "$i + 9223372036854775806])", "2\n2", exists(SimplePos.class));
   }
 
   /** Union node tests. */

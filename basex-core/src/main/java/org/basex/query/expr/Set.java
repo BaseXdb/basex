@@ -186,8 +186,8 @@ abstract class Set extends Arr {
         // further operands: abort if root or axis differs
         return null;
       }
-      // do not merge paths with positional predicates
-      if(step.mayBePositional()) return null;
+      // do not merge paths with selectors or positional predicates
+      if(step.selector != null || step.mayBePositional()) return null;
       steps.add(step);
     }
 

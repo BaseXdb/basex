@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.index.thes.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -222,6 +223,15 @@ public final class ThesAccessor {
         if(ent != null) entries.add(ent);
       }
     }
+  }
+
+  /**
+   * Passes on the thesaurus database to the visitor.
+   * @param visitor visitor
+   * @return result of check
+   */
+  boolean accept(final ASTVisitor visitor) {
+    return db == null || visitor.lock(db, false);
   }
 
   @Override

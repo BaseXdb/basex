@@ -4852,11 +4852,10 @@ public class QueryParser extends InputParser {
 
     // optional: resolve URI reference
     final String location = string(stringLiteral());
-    // favor database with the same name, lock it; files require CREATE permission
+    // favor database with the same name; files require CREATE permission
     final String db = Databases.validName(location) &&
         qc.context.soptions.dbExists(location) ? location : null;
-    if(db != null) qc.locks.add(db);
-    else checkCreate(location, info());
+    if(db == null) checkCreate(location, info());
     final IO fl = qc.resources.thesaurus(location, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true, Itr.ZERO);

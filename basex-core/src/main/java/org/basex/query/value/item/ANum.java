@@ -92,6 +92,16 @@ public abstract class ANum extends Item {
   public abstract double dbl();
 
   /**
+   * Returns the 32-bit integer that is equal to this number.
+   * @return integer or {@link Integer#MIN_VALUE}
+   */
+  public int toInt() {
+    final double d = dbl();
+    final int i = (int) d;
+    return d == i ? i : Integer.MIN_VALUE;
+  }
+
+  /**
    * Returns a float representation of the value.
    * @return float value
    */

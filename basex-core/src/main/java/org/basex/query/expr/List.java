@@ -138,7 +138,7 @@ public final class List extends Arr {
           // start new range: 1 - 2
           min = mn;
           max = mx;
-        } else if(mn == max + 1) {
+        } else if(mn == max + 1 && !Range.tooLarge(min, mx)) {
           // extend range: 1 - 2, 3 - 4 → 1 - 4
           max = mx;
         } else {
@@ -310,7 +310,7 @@ public final class List extends Arr {
       }
     }
     // (1 to 3, 3, 4) → 1 to 4
-    return RangeSeq.get(start, end - start + 1, true);
+    return Range.tooLarge(start, end) ? this : RangeSeq.get(start, end - start + 1, true);
   }
 
   @Override

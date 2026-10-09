@@ -102,7 +102,9 @@ final class SimplePos extends Arr implements CmpPos {
     final Item max = exact() ? min : exprs[1].atomItem(qc, info);
     if(max == Empty.VALUE) return Empty.VALUE;
 
-    final long mn = (long) Math.ceil(toDouble(min)), mx = (long) Math.floor(toDouble(max));
+    // positions start at 1
+    final long mn = Math.max(1, (long) Math.ceil(toDouble(min)));
+    final long mx = (long) Math.floor(toDouble(max));
     return RangeSeq.get(mn, mx - mn + 1, true);
   }
 
