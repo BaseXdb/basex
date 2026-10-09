@@ -109,7 +109,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
   /** XML suffixes. */
   public static final StringOption XMLSUFFIXES =
-      new StringOption("XMLSUFFIXES", "xml,xsd,svg,rdf,rss,rng,sch,xhtml");
+      new StringOption("XMLSUFFIXES", "xml,xsd,svg,rdf,rss,rng,sch,xhtml,xht,xpl,xproc,xspec," +
+          "xlf,xliff,dita,ditamap,tei,odd,dbk,atom,wsdl,mml,mathml,kml,gpx");
 
   /** Sort ascending. */
   public static final BooleanOption ASCSORT = new BooleanOption("ASCSORT", true);
