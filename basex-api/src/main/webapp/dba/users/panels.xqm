@@ -16,14 +16,16 @@ declare %private variable $panels:CAT := 'users';
 (:~
  : Creates the contents of the users panel: the users to choose from.
  : @param  $sort  sort key of the user list
+ : @param  $page  number of shown pages of the user list
  : @param  $name  selected user
  : @return panel contents
  :)
 declare function panels:users(
   $sort  as xs:string,
+  $page  as xs:integer,
   $name  as xs:string?
 ) as element()+ {
-  <form method='post' autocomplete='off' data-sort='{ $sort }'>{
+  <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>{
     let $headers := (
       (: the values of a known format get the width they need; the name takes the rest :)
       { 'key': 'name', 'label': 'Name' },
@@ -60,7 +62,8 @@ declare function panels:users(
         title := 'Delete the selected users')
     )
     return table:create($headers, $entries, $buttons, {},
-      { 'sort': $sort, 'presort': 'name', 'sticky': <h2>Users</h2>, 'noun': 'user' })
+      { 'sort': $sort, 'page': $page, 'presort': 'name', 'sticky': <h2>Users</h2>,
+        'noun': 'user' })
   }</form>,
 
   form:dialog('create', 'New User', 'users/create', false(), (

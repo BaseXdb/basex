@@ -21,7 +21,8 @@ function dba:ws-message(
   let $name := string($json?name)
   return switch ($json?type) {
     case 'users'       return utils:ws-panel('users-panel',
-      panels:users(string($json?sort)[.] otherwise 'name', $name))
+      panels:users(string($json?sort)[.] otherwise 'name', xs:integer($json?page otherwise 1),
+        $name))
     (: what is pushed are the contents of the form that submits them; the form itself is the
        panel, and stays where it is :)
     case 'user'        return utils:ws-panel('user-panel', panels:user($name, (), ()))

@@ -46,9 +46,10 @@ function addPattern() {
 /**
  * Requests the users panel.
  * @param {string} sort sort key; if omitted, the shown order is kept
+ * @param {number} page page; if omitted, the first one
  */
-function refreshUsers(sort) {
-  requestPanel(USERS_WS, "users-panel", { type: "users", name: _user }, sort);
+function refreshUsers(sort, page) {
+  requestPanel(USERS_WS, "users-panel", { type: "users", name: _user }, sort, page);
 }
 
 /** The data of a user is edited as XML, and the panel brings a new text area with it. The data

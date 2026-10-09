@@ -664,24 +664,29 @@ function mark(id, value) {
   }
 }
 
+/** Functions that request a list panel again, by panel id; see followPanelLinks. */
+const _panel_requests = {};
+
 /**
- * Follows the sort and page links of the list panels in place: they name what a panel shows,
- * so the panel is asked for it again instead of the page being reloaded.
+ * Follows the sort links of the list panels in place: they name what a panel shows, so the
+ * panel is asked for it again instead of the page being reloaded.
  * @param {object} panels function that requests the panel again, per panel id
  */
 function followPanelLinks(panels) {
+  // the entries that follow a list are asked for by the same functions; see loadMore
+  Object.assign(_panel_requests, panels);
   document.addEventListener("click", event => {
     const link = event.target.closest("a[href]");
     // a link that selects an entry brings its own handler
     if(!link || link.dataset.select) return;
     const panel = link.closest(Object.keys(panels).map(id => `#${id}`).join(", "));
     if(!panel) return;
-    const params = new URL(link.href, window.location.href).searchParams;
-    if(!params.has("sort") && !params.has("page")) return;
+    const sort = new URL(link.href, window.location.href).searchParams.get("sort");
+    if(sort === null) return;
     event.preventDefault();
     // a sort link keeps the number of entries that are shown, and starts at the top
-    if(!params.has("page")) _toTop.add(panel.id);
-    panels[panel.id](params.get("sort") ?? "", Number(params.get("page")) || shownPages(panel.id));
+    _toTop.add(panel.id);
+    panels[panel.id](sort, shownPages(panel.id));
   });
 }
 
@@ -695,19 +700,21 @@ function shownPages(id) {
 }
 
 /**
- * Follows a link that loads more entries once it is scrolled close to view.
- * @param {HTMLElement} link link
+ * Asks for the next page of a list once the block below it is scrolled close to view.
+ * @param {HTMLElement} block block that names the next page
  */
-function loadMore(link) {
+function loadMore(block) {
   // the viewport is the root: a stacked pane grows with its content and would always contain
-  // the link. A pane that scrolls on its own clips the link anyway; scrollMargin extends it
+  // the block. A pane that scrolls on its own clips the block anyway; scrollMargin extends it
   const observer = new IntersectionObserver(entries => {
     if(entries.some(entry => entry.isIntersecting)) {
       observer.disconnect();
-      link.click();
+      // the shown order is kept
+      const id = Object.keys(_panel_requests).find(key => block.closest(`#${key}`));
+      if(id) _panel_requests[id](undefined, Number(block.dataset.more));
     }
   }, { rootMargin: "200px", scrollMargin: "200px" });
-  observer.observe(link);
+  observer.observe(block);
 }
 
 /** Restacks the pinned heads when one of them changes its height. */
@@ -760,7 +767,7 @@ new MutationObserver(mutations => {
   for(const mutation of mutations) {
     for(const node of mutation.addedNodes) {
       if(node.nodeType !== Node.ELEMENT_NODE) continue;
-      for(const link of added(node, ".more a")) loadMore(link);
+      for(const block of added(node, ".more")) loadMore(block);
       hintShortcuts(node);
       const heads = added(node, ".sticky");
       for(const head of heads) _stickyObserver.observe(head);
@@ -1313,9 +1320,9 @@ function selectRow(row) {
   if(row) {
     row.classList.add("current");
     row.scrollIntoView({ block: "nearest" });
-    // a focus in another table would take the keys back to it
-    const focused = document.activeElement?.closest(".content table");
-    if(focused && focused !== row.closest("table")) document.activeElement.blur();
+    // a focus outside the row would take the keys back to it: Space would tick another row
+    const focused = document.activeElement;
+    if(focused?.closest(".content table") && !row.contains(focused)) focused.blur();
   }
 }
 

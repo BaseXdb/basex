@@ -672,9 +672,8 @@ header {
   color: var(--muted);
 }
 
-/* the empty link below a list that loads the entries that follow, as soon as it is in view */
-.more a {
-  display: block;
+/* the empty block below a list that loads the entries that follow, as soon as it is in view */
+.more {
   height: 1px;
 }
 

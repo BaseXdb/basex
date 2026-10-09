@@ -74,6 +74,8 @@ async function refreshActivity(force) {
     type: "panels",
     // every list is sorted as it is shown
     sorts: Object.fromEntries(LISTS.map(id => [ id, sortedList(id)?.dataset.sort ?? "" ])),
+    // and keeps the pages that were loaded
+    pages: Object.fromEntries(LISTS.map(id => [ id, shownPages(id) ])),
     // a folded panel is not rendered; it is asked for once it is opened
     open: PANELS.filter(id => !document.getElementById(id)?.closest(".panel")
       .classList.contains("collapsed")),
@@ -159,11 +161,11 @@ _live_actions.activity = refreshActivity;
 /** A panel that is opened was not refreshed while it was folded: it is asked for at once. */
 _panel_opened = () => refreshActivity(true);
 
-/** The sort links of the lists are followed in place: the list states its new order, and the
-    panels are asked for at once, whether or not the view refreshes itself. */
-followPanelLinks(Object.fromEntries(LISTS.map(id => [ id, sort => {
+/** The sort and page links of the lists are followed in place: the list states its new order
+    and pages, and the panels are asked for at once, whether or not the view refreshes itself. */
+followPanelLinks(Object.fromEntries(LISTS.map(id => [ id, (sort, page) => {
   const list = sortedList(id);
-  if(list) list.dataset.sort = sort;
+  if(list) Object.assign(list.dataset, { sort: sort ?? list.dataset.sort, page });
   refreshActivity(true);
 } ])));
 

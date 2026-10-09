@@ -352,17 +352,19 @@ declare %private function panels:optimize-dialog(
  : of the general data if none is selected.
  : @param  $name  selected database
  : @param  $sort  sort key of the backup list
+ : @param  $page  number of shown pages of the backup list
  : @return panel contents
  :)
 declare function panels:backups(
   $name  as xs:string?,
-  $sort  as xs:string := ''
+  $sort  as xs:string := '',
+  $page  as xs:integer := 1
 ) as element()+ {
   (: both are recovery corners, so the panel opens on demand :)
   (: a selected database supersedes the general backups: its own are what is asked for :)
   if ($name) then (
     <h2>{ 'Backups: ' || $name }</h2>,
-    panels:backup-section($name, $sort)
+    panels:backup-section($name, $sort, $page)
   ) else (
     <h2>General Backups</h2>,
     <div class='note'>
@@ -372,7 +374,7 @@ declare function panels:backups(
          href='https://docs.basex.org/main/Job_Functions#services'>services</a>, and
       <a target='_blank' href='https://docs.basex.org/main/Store_Functions'>stores</a>.
     </div>,
-    panels:backup-section('', $sort)
+    panels:backup-section('', $sort, $page)
   )
 };
 
@@ -689,11 +691,13 @@ declare %private function panels:select(
  : Creates the backups of a database: a facet of it, not a sibling of its resources.
  : @param  $name  database; empty string for the backups of the general data
  : @param  $sort  sort key of the list; empty string for the newest backup first
+ : @param  $page  number of shown pages of the list
  : @return the forms that create, upload and list the backups
  :)
 declare %private function panels:backup-section(
   $name  as xs:string,
-  $sort  as xs:string
+  $sort  as xs:string,
+  $page  as xs:integer
 ) as element()+ {
   (: the two sections of the view never show the same backups, so one function serves both :)
   (: one section is shown at a time, so its fields need no names of their own.
@@ -702,7 +706,7 @@ declare %private function panels:backup-section(
   (: the backups are listed with the newest one first, which is the order of their names :)
   let $presort := 'backup'
   let $sort := $sort[.] otherwise $presort
-  return <form method='post' autocomplete='off' data-sort='{ $sort }'>
+  return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <input type='hidden' name='name' value='{ $name }'/>
     {
         let $headers := (
@@ -741,7 +745,7 @@ declare %private function panels:backup-section(
             title := 'Delete the selected backups')
         )
         return table:create($headers, $entries, $buttons, { 'name': $name },
-          { 'sort': $sort, 'presort': $presort, 'noun': 'backup',
+          { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'backup',
             'empty': 'There are no backups yet.' })
       }
   </form>,

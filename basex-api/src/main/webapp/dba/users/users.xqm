@@ -38,7 +38,7 @@ function dba:users(
   (: the selection is part of the address, so a link reproduces what the panels show :)
   let $user := panels:user($name, $newname, $perm)
   return (
-    html:panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
+    html:panel(panels:users($sort, 1, $name), { 'id': 'users-panel', 'label': 'Users' }),
     (: the form is the pane: its editor takes the height that the fields leave. It outlives
        what it submits, which is replaced when another user is shown :)
     html:panel(

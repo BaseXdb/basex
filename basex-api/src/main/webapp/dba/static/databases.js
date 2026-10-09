@@ -100,9 +100,10 @@ function showDatabase() {
 /**
  * Requests the backups panel: the backups of the selected database, or the general ones.
  * @param {string} sort sort key; if omitted, the shown order is kept
+ * @param {number} page page; if omitted, the first one
  */
-function refreshBackups(sort) {
-  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db }, sort);
+function refreshBackups(sort, page) {
+  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db }, sort, page);
 }
 
 /**

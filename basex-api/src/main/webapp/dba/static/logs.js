@@ -172,7 +172,7 @@ function selectLog(date) {
 /** The sort and page links of the entry table are followed in place: they name what the table
     shows, and the fields that state it are what the next request reads. */
 followPanelLinks({ output: (sort, page) => {
-  document.getElementById("sort").value = sort;
+  if(sort !== undefined) document.getElementById("sort").value = sort;
   document.getElementById("page").value = page;
   logEntries();
 } });

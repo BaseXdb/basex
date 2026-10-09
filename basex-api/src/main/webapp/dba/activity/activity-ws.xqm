@@ -25,15 +25,17 @@ function dba:ws-message(
   let $job := $json?job[.]
   (: the sort key of a list, by the block it is filled into :)
   let $sort := fn($id) { string($json?sorts?($id)) }
+  (: the number of shown pages of a list, by the block it is filled into :)
+  let $page := fn($id) { xs:integer($json?pages?($id) otherwise 1) }
   (: the queries of the DBA itself are only listed on demand :)
   let $dba := $json?dba = true()
   (: every panel is named by the block it is filled into :)
   let $panels := {
-    'jobs-panel'   : fn() { panels:jobs($sort('jobs-panel'), $dba) },
+    'jobs-panel'   : fn() { panels:jobs($sort('jobs-panel'), $page('jobs-panel'), $dba) },
     (: the connection of this view is pointed out in the list of clients :)
     'clients-panel': fn() { panels:clients(ws:id(), $json?idle = true(), $dba) },
-    'db-panel'     : fn() { panels:db-sessions($sort('db-panel')) },
-    'caches-panel' : fn() { panels:caches($sort('caches-panel')) }
+    'db-panel'     : fn() { panels:db-sessions($sort('db-panel'), $page('db-panel')) },
+    'caches-panel' : fn() { panels:caches($sort('caches-panel'), $page('caches-panel')) }
   }
   (: a folded panel is not rendered: it is asked for once it is opened :)
   let $open := if (map:contains($json, 'open')) then $json?open?* else map:keys($panels)

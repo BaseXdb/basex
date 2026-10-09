@@ -310,10 +310,8 @@ declare function table:create(
       (: entries that follow are shown by asking for the next page, up to the limit :)
       if ($last < $entries) {
         if ($last < $config:MAX-SHOWN) then (
-          (: an empty link, followed as soon as it is scrolled to; see js.js :)
-          <div class='more'>{
-            html:link('', '', ($params, { 'page': $page + 1, 'sort': $sort }))
-          }</div>
+          (: an empty block that asks for the next page as soon as it is scrolled to; see js.js :)
+          <div class='more' data-more='{ $page + 1 }'/>
         ) else (
           <div class='note'>{
             ``[Only the first `{ format-integer($last, '#,##0') }` entries are shown. ]``,

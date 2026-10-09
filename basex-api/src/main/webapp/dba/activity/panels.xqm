@@ -40,16 +40,18 @@ declare function panels:dba-job(
 (:~
  : Creates the contents of the jobs panel.
  : @param  $sort  table sort key; empty string for the longest-running jobs first
+ : @param  $page  number of shown pages
  : @param  $dba   whether the jobs of the DBA itself are listed as well
  : @return panel contents
  :)
 declare function panels:jobs(
   $sort  as xs:string := '',
+  $page  as xs:integer := 1,
   $dba   as xs:boolean := false()
 ) as element()+ {
   let $presort := 'duration'
   let $sort := $sort[.] otherwise $presort
-  return <form method='post' autocomplete='off' data-sort='{ $sort }'>
+  return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <h2>Jobs</h2>
     {
       let $headers := (
@@ -115,8 +117,8 @@ declare function panels:jobs(
           }</input>, ` DBA jobs ({ count($jobs[panels:dba-job(@id)]) })`
         }</label>
       )
-      let $options := { 'sort': $sort, 'presort': $presort, 'select': 'id', 'noun': 'job',
-        'empty': 'No jobs are running or scheduled.' }
+      let $options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'select': 'id',
+        'noun': 'job', 'empty': 'No jobs are running or scheduled.' }
       return table:create($headers, $entries, $buttons, {}, $options)
     }
   </form>
@@ -707,16 +709,18 @@ declare %private function panels:attribute-dialog(
  : Creates the contents of the caches panel: what the caches of the server hold, and how often
  : they were of use.
  : @param  $sort  table sort key; empty string for the names
+ : @param  $page  number of shown pages
  : @return panel contents
  :)
 declare function panels:caches(
-  $sort  as xs:string := ''
+  $sort  as xs:string := '',
+  $page  as xs:integer := 1
 ) as element(form) {
   (: a cache is transient and is managed by the server; what can be done with it is to give up
      what it holds :)
   let $presort := 'label'
   let $sort := $sort[.] otherwise $presort
-  return <form method='post' autocomplete='off' data-sort='{ $sort }'>
+  return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     {
       (: the default cache is addressed by an operation that supplies no name :)
       let $names := distinct-values(('', sort(cache:list(), '?lang=en')))
@@ -759,7 +763,7 @@ declare function panels:caches(
       (: the checkbox submits the name: the default cache is addressed by an empty one :)
       return table:create($headers, $entries, $buttons, {},
         { 'sticky': <h2>Caches</h2>, 'select': 'cache', 'sort': $sort, 'presort': $presort,
-          'noun': 'cache' })
+          'page': $page, 'noun': 'cache' })
     }
   </form>
 };
@@ -795,14 +799,16 @@ declare function panels:cache-dialog() as element(dialog) {
 (:~
  : Creates the contents of the database sessions panel.
  : @param  $sort  table sort key; empty string for the addresses
+ : @param  $page  number of shown pages
  : @return panel contents
  :)
 declare function panels:db-sessions(
-  $sort  as xs:string := ''
+  $sort  as xs:string := '',
+  $page  as xs:integer := 1
 ) as element(div) {
   let $presort := 'address'
   let $sort := $sort[.] otherwise $presort
-  return <div data-sort='{ $sort }'>{
+  return <div data-sort='{ $sort }' data-page='{ $page }'>{
     <h2>Database Sessions</h2>,
     table:create(
       (
@@ -813,7 +819,7 @@ declare function panels:db-sessions(
       let $address := string($session/@address)
       order by $address
       return { 'address': fn() { html:address($address) }, 'user': $session/@user },
-      (), {}, { 'sort': $sort, 'presort': $presort, 'noun': 'session',
+      (), {}, { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'session',
         'empty': 'No clients are connected via the server protocol.' }
     )
   }</div>
