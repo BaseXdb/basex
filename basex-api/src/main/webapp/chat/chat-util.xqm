@@ -119,7 +119,7 @@ declare function chat-util:message(
 ) as empty-sequence() {
   (: the receiver is supplied by the client: a message to someone who is not a
    : registered user is ignored, it would only add an entry to the store :)
-  if (empty($to) or $to = user:list()) {
+  if (not($to) or $to = user:list()) {
     let $from := chat-util:user()
     let $key := if ($to) { chat-util:key($from, $to) } else { $room }
     let $message := { 'from': $from, 'text': $text, 'date': current-dateTime() }
@@ -132,9 +132,6 @@ declare function chat-util:message(
     }
     return (
       store:put($key, (store:get($key, $chat-util:store), $message), $chat-util:store),
-      (: the store is written to disk when the server shuts down; writing it
-       : here as well keeps the history if the process is killed :)
-      store:write($chat-util:store),
       ws:send(map:put(chat-util:entry($message, $key), 'type', 'message'), $ids)
     )
   }
