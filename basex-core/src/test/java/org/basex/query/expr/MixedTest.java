@@ -72,12 +72,8 @@ public final class MixedTest extends SandboxTest {
         + "local:u('12:00:00') instance of xs:time", true);
     query("declare type local:n as xs:numeric; "
         + "local:n('1') instance of xs:double", true);
-    // constructor functions for record types
-    query("declare type local:r as record(x as xs:integer, y as xs:string); "
-        + "local:r(1, 'a')?y", "a");
-    query("declare type local:r as record(x as xs:integer); "
-        + "local:r(2) instance of local:r", true);
     // no constructor functions for other item types
+    error("declare type local:r as record(x as xs:integer); local:r(2)", WHICHFUNC_X);
     error("declare type local:m as map(*); local:m({})", WHICHFUNC_X);
     error("declare type local:e as element(); local:e(<x/>)", WHICHFUNC_X);
     // failing constructions
