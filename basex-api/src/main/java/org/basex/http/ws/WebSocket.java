@@ -69,6 +69,8 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
   private boolean sending;
   /** WebSocket session ({@code null} until the connection has been opened). */
   private volatile Session socket;
+  /** Pending close and error handlers, in the order of the events (guarded by this instance). */
+  private CompletableFuture<Void> handlers = CompletableFuture.completedFuture(null);
 
   /**
    * Constructor.
@@ -137,18 +139,28 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
   public void onClose(final Session sess, final CloseReason reason) {
     final int status = reason.getCloseCode().getCode();
     final String message = reason.getReasonPhrase();
-    try {
-      run("[WS-CLOSE] " + requestCtx.state().url(), status,
-          () -> findAndProcess(Annotation._WS_CLOSE,
-              new WsFunction.CloseInfo(status, message != null ? message : "")));
-    } finally {
-      WsPool.remove(id);
-    }
+    dispatch(() -> {
+      try {
+        run("[WS-CLOSE] " + requestCtx.state().url(), status,
+            () -> findAndProcess(Annotation._WS_CLOSE,
+                new WsFunction.CloseInfo(status, message != null ? message : "")));
+      } finally {
+        WsPool.remove(id);
+      }
+    });
   }
 
   @Override
   public void onError(final Session sess, final Throwable th) {
-    error(th);
+    dispatch(() -> error(th));
+  }
+
+  /**
+   * Runs a close or error handler on a virtual thread, after the pending ones.
+   * @param handler handler
+   */
+  private synchronized void dispatch(final Runnable handler) {
+    handlers = handlers.whenCompleteAsync((v, ex) -> handler.run(), Thread::startVirtualThread);
   }
 
   @Override
@@ -239,40 +251,48 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
   }
 
   /**
-   * Sends queued frames. Messages are sent asynchronously; the completion handler continues
-   * with the next frame.
+   * Sends the next queued frame; its completion continues with the following one.
    */
   private void sendNext() {
-    while(true) {
-      final Object value;
-      synchronized(queue) {
-        value = queue.poll();
-        if(value == null) {
-          sending = false;
-          return;
-        }
-      }
-      try {
-        final RemoteEndpoint.Async remote = socket.getAsyncRemote();
-        if(value == PING) {
-          // pings are sent synchronously, so the loop continues with the next frame
-          remote.sendPing(ByteBuffer.allocate(0));
-        } else if(value instanceof final ByteBuffer bb) {
-          remote.sendBinary(bb, result -> sendNext());
-          return;
-        } else {
-          remote.sendText((String) value, result -> sendNext());
-          return;
-        }
-      } catch(final Exception ex) {
-        // the connection is broken: discard all pending frames
-        Util.debug(ex);
-        synchronized(queue) {
-          queue.clear();
-          sending = false;
-        }
+    final Object value;
+    synchronized(queue) {
+      value = queue.poll();
+      if(value == null) {
+        sending = false;
         return;
       }
+    }
+    try {
+      final RemoteEndpoint.Async remote = socket.getAsyncRemote();
+      if(value == PING) {
+        // pings block until they are written: keep them off the container threads
+        Thread.startVirtualThread(() -> {
+          try {
+            remote.sendPing(ByteBuffer.allocate(0));
+            sendNext();
+          } catch(final Exception ex) {
+            discard(ex);
+          }
+        });
+      } else if(value instanceof final ByteBuffer bb) {
+        remote.sendBinary(bb, result -> sendNext());
+      } else {
+        remote.sendText((String) value, result -> sendNext());
+      }
+    } catch(final Exception ex) {
+      discard(ex);
+    }
+  }
+
+  /**
+   * Discards all pending frames after the connection has been broken.
+   * @param ex exception
+   */
+  private void discard(final Exception ex) {
+    Util.debug(ex);
+    synchronized(queue) {
+      queue.clear();
+      sending = false;
     }
   }
 
