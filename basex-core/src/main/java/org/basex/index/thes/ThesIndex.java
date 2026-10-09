@@ -6,18 +6,17 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.*;
-import org.basex.query.expr.ft.*;
-import org.basex.query.value.node.*;
+import org.basex.query.util.ft.thesaurus.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Thesaurus index, stored in the files starting with {@link DataText#DATATHS}.
@@ -25,23 +24,23 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ThesIndex implements Closeable {
+public final class ThesIndex implements ThesSource, Closeable {
   /** Format of the index. */
-  private static final byte[] FORMAT = token("thesaurus 1");
+  private static final byte[] FORMAT = token("thesaurus 2");
 
   /** Indicates if the index has the current format. */
   private final boolean current;
-  /** Offsets (can be {@code null}). */
-  private DataAccess offsets;
-  /** Terms (can be {@code null}). */
-  private DataAccess terms;
-  /** Synonyms (can be {@code null}). */
-  private DataAccess synonyms;
-  /** Groups of equivalent terms (can be {@code null}). */
-  private DataAccess groups;
-  /** Relationships (can be {@code null}). */
+  /** Offsets of the labels (can be {@code null}). */
+  private DataAccess labelOffsets;
+  /** Labels and their concepts (can be {@code null}). */
+  private DataAccess labels;
+  /** Offsets of the concepts (can be {@code null}). */
+  private DataAccess conceptOffsets;
+  /** Labels and relationships of the concepts (can be {@code null}). */
+  private DataAccess concepts;
+  /** Names of relationships (can be {@code null}). */
   private TokenSet relations;
-  /** Number of terms. */
+  /** Number of labels. */
   private int size;
   /** Case sensitivity. */
   private boolean casesens;
@@ -73,11 +72,11 @@ public final class ThesIndex implements Closeable {
       final String ln = string(in.readToken());
       language = ln.isEmpty() ? null : Language.get(ln);
     }
-    offsets = new DataAccess(meta.dbFile(DATATHS + 'l'));
-    terms = new DataAccess(meta.dbFile(DATATHS + 't'));
-    synonyms = new DataAccess(meta.dbFile(DATATHS + 'e'));
-    groups = new DataAccess(meta.dbFile(DATATHS + 'g'));
-    size = offsets.read4(0);
+    labelOffsets = new DataAccess(meta.dbFile(DATATHS + 'l'));
+    labels = new DataAccess(meta.dbFile(DATATHS + 't'));
+    conceptOffsets = new DataAccess(meta.dbFile(DATATHS + 'o'));
+    concepts = new DataAccess(meta.dbFile(DATATHS + 'c'));
+    size = labelOffsets.read4(0);
   }
 
   /**
@@ -86,73 +85,60 @@ public final class ThesIndex implements Closeable {
    * @throws IOException I/O exception
    */
   public static void create(final Data data) throws IOException {
-    final IntList docs = data.resources.docs();
-    final int ds = docs.size();
-    final DBNode[] roots = new DBNode[ds];
-    for(int d = 0; d < ds; d++) roots[d] = new DBNode(data, docs.get(d));
     final MetaData meta = data.meta;
-    final Thesaurus thesaurus = new Thesaurus(new FTOpt().assign(meta), roots);
+    final Thesaurus thesaurus = new Thesaurus(new FTOpt().assign(meta),
+      DBNodeSeq.get(data.resources.docs(), data, true, true));
 
+    // labels are sorted by their normalized keys
     final byte[][] keys = thesaurus.keys();
-    Arrays.sort(keys, (k1, k2) -> compare(k1, k2));
-    final int ks = keys.length;
-    final TokenIntMap ids = new TokenIntMap(ks);
-    for(int k = 0; k < ks; k++) ids.put(keys[k], k);
+    final int[] order = Array.createOrder(keys, false, true);
+    final int ls = order.length, cs = thesaurus.conceptCount();
+    final int[] ids = new int[ls];
+    for(int l = 0; l < ls; l++) ids[order[l]] = l;
 
-    // g: groups of equivalent terms (ids of the members)
-    final byte[][][] grps = thesaurus.groups();
-    final int gs = grps.length;
-    final long[] positions = new long[gs];
-    final IntList[] memberships = new IntList[ks];
-    try(DataOutput outg = new DataOutput(meta.dbFile(DATATHS + 'g'))) {
-      for(int g = 0; g < gs; g++) {
-        positions[g] = outg.size();
-        outg.writeNum(grps[g].length);
-        for(final byte[] member : grps[g]) {
-          final int id = ids.get(member);
-          outg.writeNum(id);
-          if(memberships[id] == null) memberships[id] = new IntList(1);
-          memberships[id].add(g);
-        }
-      }
-    }
-
-    // l: offsets of terms and synonyms, t: terms, e: synonyms and positions of groups,
-    // r: relationships and options
-    final TokenSet rels = new TokenSet();
+    // l: offsets of labels, t: labels and their concepts
     try(DataOutput outl = new DataOutput(meta.dbFile(DATATHS + 'l'));
-        DataOutput outt = new DataOutput(meta.dbFile(DATATHS + 't'));
-        DataOutput oute = new DataOutput(meta.dbFile(DATATHS + 'e'))) {
-      outl.write4(ks);
-      for(int k = 0; k < ks; k++) {
-        final byte[] key = keys[k];
+        DataOutput outt = new DataOutput(meta.dbFile(DATATHS + 't'))) {
+      outl.write4(ls);
+      for(int l = 0; l < ls; l++) {
         outl.write5(outt.size());
-        outl.write5(oute.size());
-        outt.writeToken(key);
-        outt.writeToken(thesaurus.term(key));
-        final IntList list = new IntList();
-        thesaurus.synonyms(key, (synonym, relation) -> {
-          list.add(ids.get(synonym));
-          list.add(rels.put(relation));
-        });
-        oute.writeNum(list.size() >>> 1);
-        for(final int value : list.finish()) oute.writeNum(value);
-        final IntList groupIds = memberships[k];
-        oute.writeNum(groupIds != null ? groupIds.size() : 0);
-        if(groupIds != null) {
-          for(final int g : groupIds.finish()) oute.write5(positions[g]);
-        }
+        outt.writeToken(keys[l]);
+        outt.writeToken(thesaurus.term(order[l]));
+        outt.writeNums(thesaurus.concepts(order[l]));
       }
     }
+    // o: offsets of concepts, c: labels and relationships of concepts
+    try(DataOutput outo = new DataOutput(meta.dbFile(DATATHS + 'o'));
+        DataOutput outc = new DataOutput(meta.dbFile(DATATHS + 'c'))) {
+      for(int c = 0; c < cs; c++) {
+        outo.write5(outc.size());
+        final int[] conceptLabels = thesaurus.labels(c);
+        for(int l = 0; l < conceptLabels.length; l++) conceptLabels[l] = ids[conceptLabels[l]];
+        outc.writeNums(conceptLabels);
+        outc.writeNums(thesaurus.relations(c));
+      }
+    }
+    // r: relationships and options
     try(DataOutput outr = new DataOutput(meta.dbFile(DATATHS + 'r'))) {
       outr.writeBytes(FORMAT);
-      rels.write(outr);
+      thesaurus.relations().write(outr);
       outr.writeBool(meta.casesens);
       outr.writeBool(meta.diacritics);
       outr.writeBool(meta.stemming);
       final Language ln = meta.language();
       outr.writeToken(token(ln != null ? ln.toString() : ""));
     }
+  }
+
+  /**
+   * Reads ids, starting from the current position.
+   * @param in input
+   * @return ids
+   */
+  private static int[] read(final DataAccess in) {
+    final int[] values = new int[in.readNum()];
+    for(int v = 0; v < values.length; v++) values[v] = in.readNum();
+    return values;
   }
 
   /**
@@ -174,12 +160,8 @@ public final class ThesIndex implements Closeable {
         Objects.equals(opt.ln, language);
   }
 
-  /**
-   * Returns the id of a normalized term.
-   * @param key normalized term
-   * @return id, or {@code -1} if the term is not found
-   */
-  public synchronized int id(final byte[] key) {
+  @Override
+  public synchronized int label(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1, c = compare(key(m), key);
@@ -190,55 +172,54 @@ public final class ThesIndex implements Closeable {
     return -1;
   }
 
-  /**
-   * Returns the normalized term with the specified id.
-   * @param id id
-   * @return normalized term
-   */
-  public synchronized byte[] key(final int id) {
-    return terms.readToken(offsets.read5(4 + id * 10L));
+  @Override
+  public synchronized byte[] term(final int label) {
+    key(label);
+    return labels.readToken();
   }
 
-  /**
-   * Returns the original term with the specified id.
-   * @param id id
-   * @return term
-   */
-  public synchronized byte[] term(final int id) {
-    terms.readToken(offsets.read5(4 + id * 10L));
-    return terms.readToken();
+  @Override
+  public synchronized int[] concepts(final int label) {
+    key(label);
+    labels.readToken();
+    return read(labels);
   }
 
-  /**
-   * Passes the synonyms and the other members of the groups of a term to the specified action.
-   * @param id id of the term
-   * @param action action, receiving relationship and id of the synonym
-   */
-  public synchronized void synonyms(final int id, final ObjIntConsumer<byte[]> action) {
-    final int ss = synonyms.readNum(offsets.read5(4 + id * 10L + 5));
-    final IntList list = new IntList(ss << 1);
-    for(int s = 0; s < ss << 1; s++) list.add(synonyms.readNum());
-    final int gs = synonyms.readNum();
-    final long[] positions = new long[gs];
-    for(int g = 0; g < gs; g++) positions[g] = synonyms.read5();
+  @Override
+  public synchronized int[] labels(final int concept) {
+    concepts.cursor(conceptOffsets.read5(concept * 5L));
+    return read(concepts);
+  }
 
-    for(int s = 0; s < ss << 1; s += 2) action.accept(relations.key(list.get(s + 1)), list.get(s));
-    for(final long position : positions) {
-      final int ms = groups.readNum(position);
-      final int[] members = new int[ms];
-      for(int m = 0; m < ms; m++) members[m] = groups.readNum();
-      for(final int member : members) {
-        if(member != id) action.accept(Thesaurus.EQ, member);
-      }
+  @Override
+  public synchronized int[] relations(final int concept) {
+    // skip the labels
+    for(int l = concepts.readNum(conceptOffsets.read5(concept * 5L)); l > 0; l--) {
+      concepts.readNum();
     }
+    return read(concepts);
+  }
+
+  @Override
+  public int relation(final byte[] name) {
+    return relations.index(Thesaurus.relationship(name));
+  }
+
+  /**
+   * Returns the normalized label with the specified id.
+   * @param label id of the label
+   * @return normalized label
+   */
+  private byte[] key(final int label) {
+    return labels.readToken(labelOffsets.read5(4 + label * 5L));
   }
 
   @Override
   public synchronized void close() {
     if(!current) return;
-    offsets.close();
-    terms.close();
-    synonyms.close();
-    groups.close();
+    labelOffsets.close();
+    labels.close();
+    conceptOffsets.close();
+    concepts.close();
   }
 }

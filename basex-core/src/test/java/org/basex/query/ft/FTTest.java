@@ -11,7 +11,10 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
+import org.basex.query.util.ft.thesaurus.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -554,42 +557,46 @@ public class FTTest extends SandboxTest {
     query(_DB_DROP.args(db));
   }
 
-  /** Thesaurus index: levels and groups of equivalent terms. */
-  @Test public void thesaurusGroups() {
-    final String db = NAME + "thes", thes = "<thesaurus><entry><term>flower</term>"
-        + "<synonym><term>Blume</term><relationship>EQ</relationship></synonym>"
-        + "<synonym><term>fleur</term><relationship>EQ</relationship></synonym></entry>"
-        + "<entry><term>fleur</term><synonym><term>bloom</term><relationship>RT</relationship>"
-        + "</synonym></entry>"
-        + "<entry><term>blossom</term>"
-        + "<synonym><term>Blüte</term><relationship>EQ</relationship></synonym>"
-        + "<synonym><term>flower</term><relationship>EQ</relationship></synonym></entry>"
-        + "</thesaurus>";
+  /** Thesaurus index: SKOS concepts. */
+  @Test public void thesaurusConcepts() {
+    final String db = NAME + "thes", thes = "<rdf:RDF "
+        + "xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' "
+        + "xmlns:skos='http://www.w3.org/2004/02/skos/core#'>"
+        + "<skos:Concept rdf:about='flower'><skos:prefLabel>flower</skos:prefLabel>"
+        + "<skos:altLabel>Blume</skos:altLabel><skos:broader rdf:resource='plant'/>"
+        + "</skos:Concept>"
+        + "<skos:Concept rdf:about='plant'><skos:prefLabel>plant</skos:prefLabel>"
+        + "<skos:altLabel>Pflanze</skos:altLabel><skos:related rdf:resource='garden'/>"
+        + "</skos:Concept>"
+        + "<skos:Concept rdf:about='garden'><skos:prefLabel>garden</skos:prefLabel>"
+        + "<skos:altLabel>Blume</skos:altLabel></skos:Concept>"
+        + "</rdf:RDF>";
     query(_DB_CREATE.args(db, " " + thes, "thesaurus.xml", " { 'thesindex': true() }"));
+    thesInfo("'plant' contains text 'flower' using thesaurus at '" + db + "'",
+        "Thesaurus \"" + db + "\": index");
 
     // index and main memory yield the same results
-    for(final String options : new String[] { " {}", " { 'levels': 1 }", " { 'levels': 2 }",
-        " { 'relationship': 'EQ' }", " { 'relationship': 'RT' }" }) {
-      for(final String term : new String[] { "flower", "blume", "fleur", "bloom", "blossom",
-          "blüte" }) {
+    for(final String options : new String[] { " {}", " { 'levels': 0 }", " { 'levels': 1 }",
+        " { 'relationship': 'NT' }", " { 'relationship': 'RT' }" }) {
+      for(final String term : new String[] { "flower", "blume", "plant", "garden", "x" }) {
         query("deep-equal(" + _FT_THESAURUS.args(_DB_GET.args(db), term, options) + ", " +
             _FT_THESAURUS.args(" " + thes, term, options) + ")", true);
       }
     }
-    // a term in two groups: the members of both groups are found on the first level
-    query(_FT_THESAURUS.args(_DB_GET.args(db), "flower", " { 'levels': 1 }"),
-        "Blume\nfleur\nBlüte\nblossom");
-    // groups sharing a term are not merged: the other group is found on the second level
-    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume", " { 'levels': 1 }"), "fleur\nflower");
-    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume", " { 'levels': 2 }"),
-        "fleur\nflower\nbloom\nBlüte\nblossom");
+    // a label of two concepts
+    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume", " { 'levels': 0 }"), "flower\ngarden");
+    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume"), "flower\ngarden\nplant\nPflanze");
 
-    // minimum and maximum level
+    // by default, one level is traversed
     final String th = " using thesaurus at '" + db + "'";
-    query("'bloom' contains text 'blume'" + th + " exactly 2 levels", true);
-    query("'fleur' contains text 'blume'" + th + " exactly 2 levels", false);
-    query("'fleur' contains text 'blume'" + th + " exactly 1 levels", true);
-    query("'bloom' contains text 'blume'" + th + " exactly 1 levels", false);
+    query("'plant' contains text 'flower'" + th, true);
+    query("'garden' contains text 'flower'" + th, false);
+    query("'garden' contains text 'flower'" + th + " at most 2 levels", true);
+    query("'garden' contains text 'flower'" + th + " exactly 2 levels", true);
+    query("'plant' contains text 'flower'" + th + " exactly 2 levels", false);
+    // synonyms are matched like the query term, independently of relationship and levels
+    query("'flower' contains text 'blume'" + th + " exactly 2 levels", true);
+    query("'flower' contains text 'blume'" + th + " relationship 'NT'", true);
     query(_DB_DROP.args(db));
   }
 
@@ -606,6 +613,25 @@ public class FTTest extends SandboxTest {
       assertTrue(xq.info().contains(expected), xq.info());
     } finally {
       set(MainOptions.QUERYINFO, false);
+    }
+  }
+
+  /**
+   * Thesaurus: relationships that are stated in both directions are stored once.
+   * @throws IOException I/O exception
+   */
+  @Test public void thesaurusDuplicates() throws IOException {
+    final Thesaurus thesaurus = new Thesaurus(new FTOpt(), new DBNode(new IOContent("<rdf:RDF "
+        + "xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' "
+        + "xmlns:skos='http://www.w3.org/2004/02/skos/core#'>"
+        + "<skos:Concept rdf:about='flower'><skos:prefLabel>flower</skos:prefLabel>"
+        + "<skos:broader rdf:resource='plant'/></skos:Concept>"
+        + "<skos:Concept rdf:about='plant'><skos:prefLabel>plant</skos:prefLabel>"
+        + "<skos:narrower rdf:resource='flower'/></skos:Concept>"
+        + "</rdf:RDF>")));
+    for(final String term : new String[] { "flower", "plant" }) {
+      final int concept = thesaurus.concepts(thesaurus.label(Token.token(term)))[0];
+      assertEquals(2, thesaurus.relations(concept).length);
     }
   }
 

@@ -1,5 +1,6 @@
 package org.basex.query.func.ft;
 
+import org.basex.query.expr.ft.*;
 import org.basex.util.options.*;
 
 /**
@@ -12,5 +13,5 @@ public final class FtThesaurusOptions extends Options {
   /** Option: relationship. */
   public static final StringOption RELATIONSHIP = new StringOption("relationship", "");
   /** Option: levels. */
-  public static final NumberOption LEVELS = new NumberOption("levels", Integer.MAX_VALUE);
+  public static final NumberOption LEVELS = new NumberOption("levels", ThesAccessor.LEVELS);
 }

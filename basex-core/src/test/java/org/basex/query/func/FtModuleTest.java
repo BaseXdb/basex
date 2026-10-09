@@ -20,6 +20,10 @@ import org.junit.jupiter.api.Test;
 public final class FtModuleTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
+  /** RDF namespace URI. */
+  private static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+  /** SKOS namespace URI. */
+  private static final String SKOS = "http://www.w3.org/2004/02/skos/core#";
 
   /**
    * Initializes a test.
@@ -356,6 +360,7 @@ public final class FtModuleTest extends SandboxTest {
         + "<entry><term>x</term><synonym><term>c</term><relationship>RT</relationship></synonym>"
         + "</entry><entry><term>c</term><synonym><term>d</term><relationship>RT</relationship>"
         + "</synonym></entry></thesaurus>";
+    query(func.args(levels, "a"), "x\nc");
     query(func.args(levels, "a", " { 'levels': 1 }"), "x\nc");
     query(func.args(levels, "a", " { 'levels': 2 }"), "x\nc\nd");
 
@@ -365,15 +370,75 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(bt, "computers", " { 'relationship': 'NT' }"), "hardware");
     query(func.args(bt, "hardware", " { 'relationship': 'BT' }"), "computers");
 
-    // groups of equivalent terms
+    // custom relationships
     final String eq = " <thesaurus><entry><term>flower</term>"
-        + "<synonym><term>Blume</term><relationship>EQ</relationship></synonym>"
-        + "<synonym><term>fleur</term><relationship>EQ</relationship></synonym></entry>"
-        + "<entry><term>fleur</term><synonym><term>bloom</term><relationship>RT</relationship>"
-        + "</synonym></entry></thesaurus>";
-    query(func.args(eq, "blume", " { 'levels': 1 }"), "fleur\nflower");
-    query(func.args(eq, "flower", " { 'relationship': 'EQ' }"), "Blume\nfleur");
-    query(func.args(eq, "blume", " { 'levels': 2 }"), "fleur\nflower\nbloom");
+        + "<synonym><term>Blume</term><relationship>EQ</relationship></synonym></entry>"
+        + "</thesaurus>";
+    query(func.args(eq, "flower", " { 'relationship': 'EQ' }"), "Blume");
+    query(func.args(eq, "blume", " { 'relationship': 'EQ' }"), "");
+
+    // SKOS: labels are synonyms, relationships connect concepts
+    final String concepts = " <rdf:RDF xmlns:rdf='" + RDF + "' xmlns:skos='" + SKOS + "'>"
+        + "<skos:Concept rdf:about='flower'><skos:prefLabel>flower</skos:prefLabel>"
+        + "<skos:altLabel>Blume</skos:altLabel><skos:broader rdf:resource='plant'/>"
+        + "</skos:Concept>"
+        + "<rdf:Description rdf:about='plant'><rdf:type rdf:resource='" + SKOS + "Concept'/>"
+        + "<skos:prefLabel>plant</skos:prefLabel><skos:hiddenLabel>Pflanze</skos:hiddenLabel>"
+        + "<skos:related rdf:resource='garden'/></rdf:Description>"
+        + "<skos:Concept rdf:about='garden'><skos:prefLabel>garden</skos:prefLabel>"
+        + "<skos:related rdf:resource='x'/></skos:Concept>"
+        + "<rdf:Description rdf:about='x'><skos:prefLabel>x</skos:prefLabel></rdf:Description>"
+        + "</rdf:RDF>";
+    // by default, one level is traversed
+    query(func.args(concepts, "blume"), "flower\nplant\nPflanze");
+    // synonyms are matched like the query term, independently of relationship and levels
+    query(func.args(concepts, "blume", " { 'levels': 0 }"), "flower");
+    query(func.args(concepts, "blume", " { 'relationship': 'NT' }"), "flower");
+    query(func.args(concepts, "blume", " { 'levels': 2 }"), "flower\nplant\nPflanze\ngarden");
+    query(func.args(concepts, "x"), "garden");
+    query(func.args(concepts, "blume", " { 'relationship': 'BT' }"), "flower\nplant\nPflanze");
+    query(func.args(concepts, "blume", " { 'relationship': 'broader' }"),
+        "flower\nplant\nPflanze");
+    query(func.args(concepts, "pflanze", " { 'relationship': 'NT' }"), "plant\nflower\nBlume");
+    query(func.args(concepts, "garden", " { 'relationship': 'related' }"), "plant\nPflanze\nx");
+
+    // SKOS: statements can be split, IRIs are resolved, untyped concepts are inferred
+    final String split = " <rdf:RDF xmlns:rdf='" + RDF + "' xmlns:skos='" + SKOS + "' "
+        + "xml:base='http://x.org/a/'>"
+        + "<skos:Concept rdf:about='c/1'/>"
+        + "<rdf:Description rdf:about='http://x.org/a/c/1'>"
+        + "<skos:prefLabel xml:lang='en-US'>harbour</skos:prefLabel>"
+        + "<skos:prefLabel xml:lang='de'>Hafen</skos:prefLabel></rdf:Description>"
+        + "<rdf:Description rdf:about='c/1'><skos:broader rdf:resource='../a/c/2'/>"
+        + "</rdf:Description>"
+        + "<rdf:Description rdf:about='c/2'><skos:prefLabel"
+        + " xml:lang='en'>transport</skos:prefLabel>"
+        + "<skos:altLabel>Verkehr</skos:altLabel></rdf:Description>"
+        + "</rdf:RDF>";
+    query(func.args(split, "harbour"), "Hafen\ntransport\nVerkehr");
+
+    // SKOS: mapping relationships; transitive relationships are derived, not stored
+    final String mappings = " <rdf:RDF xmlns:rdf='" + RDF + "' xmlns:skos='" + SKOS + "'>"
+        + "<skos:Concept rdf:about='a'><skos:prefLabel>a</skos:prefLabel>"
+        + "<skos:broader rdf:resource='b'/><skos:broaderTransitive rdf:resource='e'/>"
+        + "<skos:narrowMatch rdf:resource='c'/>"
+        + "<skos:relatedMatch rdf:resource='d'/></skos:Concept>"
+        + "<rdf:Description rdf:about='b'><skos:prefLabel>b</skos:prefLabel></rdf:Description>"
+        + "<rdf:Description rdf:about='c'><skos:prefLabel>c</skos:prefLabel>"
+        + "<skos:broadMatch rdf:resource='e'/></rdf:Description>"
+        + "<rdf:Description rdf:about='d'><skos:prefLabel>d</skos:prefLabel></rdf:Description>"
+        + "<rdf:Description rdf:about='e'><skos:prefLabel>e</skos:prefLabel></rdf:Description>"
+        + "</rdf:RDF>";
+    query(func.args(mappings, "a", " { 'relationship': 'BT', 'levels': 2 }"), "b");
+    query(func.args(mappings, "a", " { 'relationship': 'NT' }"), "c");
+    query(func.args(mappings, "a", " { 'relationship': 'RT' }"), "d");
+    query(func.args(mappings, "c", " { 'relationship': 'BT' }"), "a\ne");
+
+    // languages: labels of other languages are ignored
+    query("declare ft-option using language 'en'; " + func.args(split, "harbour"),
+        "transport\nVerkehr");
+    query("declare ft-option using language 'de'; " + func.args(split, "hafen"), "Verkehr");
+    query("declare ft-option using language 'de'; " + func.args(split, "harbour"), "");
   }
 
   /** Test method. */

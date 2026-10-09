@@ -393,3 +393,4 @@ fuzzywuzzy
 thefuzz
 jakarta
 unvalidated
+thesauri

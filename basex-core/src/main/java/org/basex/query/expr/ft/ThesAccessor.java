@@ -5,17 +5,20 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.index.thes.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.thesaurus.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -25,6 +28,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ThesAccessor {
+  /** Default maximum level. */
+  public static final int LEVELS = 1;
+
   /** Thesaurus sources, indexed by the full-text options for normalizing terms. */
   private final HashMap<List<Object>, Source> sources = new HashMap<>();
   /** Input info (can be {@code null}). */
@@ -42,14 +48,6 @@ public final class ThesAccessor {
   private IO file;
   /** Name of the thesaurus database (can be {@code null}). */
   private String db;
-
-  /**
-   * Constructor.
-   * @param file file reference
-   */
-  public ThesAccessor(final IO file) {
-    this(file, null, EMPTY, 0, Long.MAX_VALUE, null);
-  }
 
   /**
    * Constructor.
@@ -118,15 +116,15 @@ public final class ThesAccessor {
       throws QueryException {
     final Source source = source(opt, qc);
     // wildcard characters are retained, so query terms with wildcards are not found
-    FTOpt qopt = source.opt;
+    FTOpt qopt = source.opt();
     if(opt.is(WC)) {
       qopt = qopt.copy();
       qopt.set(WC, true);
     }
     final TokenList list = new TokenList();
     final byte[] key = Thesaurus.normalize(term, new FTLexer(qopt));
-    final ThesEntry entry = key.length != 0 ? source.entry(key) : null;
-    if(entry != null) find(list, entry, source);
+    final int label = key.length != 0 ? source.thesaurus().label(key) : -1;
+    if(label != -1) find(list, label, source.thesaurus());
     return list.finish();
   }
 
@@ -140,9 +138,10 @@ public final class ThesAccessor {
   private synchronized Source source(final FTOpt opt, final QueryContext qc)
       throws QueryException {
     // database that may contain a thesaurus index
+    final Data thesData = db != null ? qc.resources.database(db, qc, false, info) : null;
     DiskData data = null;
-    if(db != null) {
-      if(qc.resources.database(db, qc, false, info) instanceof final DiskData dd) data = dd;
+    if(thesData instanceof final DiskData dd) {
+      data = dd;
     } else if(node instanceof final DBNode dbnode && node.kind() == Kind.DOCUMENT &&
         dbnode.data() instanceof final DiskData dd && dd.resources.docs().size() == 1) {
       data = dd;
@@ -166,25 +165,15 @@ public final class ThesAccessor {
           file != null ? file.path() : "node";
         final ThesIndex index = data != null && data.meta.thesindex ? data.thesIndex() : null;
         if(index != null && index.compatible(norm)) {
-          source = new Source(norm, null, index);
+          source = new Source(norm, index);
           qc.evalInfo("Thesaurus \"" + name + "\": index");
         } else {
           qc.evalInfo("Thesaurus \"" + name + "\": main memory" + (data == null ? "" :
             !data.meta.createthes ? " (no index)" : index == null ? " (index is outdated)" :
             !index.current() ? " (index format is outdated)" : " (full-text options differ)"));
-          final XNode[] roots;
-          if(node != null) {
-            roots = new XNode[] { node };
-          } else if(db != null) {
-            final Data dt = qc.resources.database(db, qc, false, info);
-            final IntList docs = dt.resources.docs();
-            final int ds = docs.size();
-            roots = new XNode[ds];
-            for(int d = 0; d < ds; d++) roots[d] = new DBNode(dt, docs.get(d));
-          } else {
-            roots = new XNode[] { new DBNode(file) };
-          }
-          source = new Source(norm, new Thesaurus(norm, roots), null);
+          final Value roots = node != null ? node : thesData != null ?
+            DBNodeSeq.get(thesData.resources.docs(), thesData, true, true) : new DBNode(file);
+          source = new Source(norm, new Thesaurus(norm, roots));
         }
       } catch(final IOException ex) {
         throw QueryError.NOTHES_X.get(info, db != null ? db : file).cause(ex);
@@ -195,33 +184,49 @@ public final class ThesAccessor {
   }
 
   /**
-   * Collects the terms of the requested levels, level by level.
+   * Collects the labels of the concepts of the query term and of the requested levels.
    * @param list result list
-   * @param entry entry of the query term
+   * @param label id of the query term
    * @param source thesaurus source
    */
-  private void find(final TokenList list, final ThesEntry entry, final Source source) {
-    // the level of a term is the length of the shortest path from the query term
-    final TokenSet keys = new TokenSet();
-    keys.add(entry.key);
-    ArrayList<ThesEntry> entries = new ArrayList<>(1);
-    entries.add(entry);
-    for(long level = 1; level <= max && !entries.isEmpty(); level++) {
-      final boolean add = level >= min, expand = level < max;
-      final ArrayList<ThesEntry> next = new ArrayList<>();
-      for(final ThesEntry ent : entries) {
-        ent.forEach((synonym, rel) -> {
-          if((relation.length == 0 || eq(rel, relation)) && keys.add(synonym.key)) {
-            if(add) list.add(synonym.term);
-            if(expand) next.add(synonym);
+  private void find(final TokenList list, final int label, final ThesSource source) {
+    // the other labels of the concepts of the term are matched like the term itself
+    final BitSet labels = new BitSet(), concepts = new BitSet();
+    labels.set(label);
+    final IntConsumer add = concept -> {
+      for(final int l : source.labels(concept)) {
+        if(!labels.get(l)) {
+          labels.set(l);
+          list.add(source.term(l));
+        }
+      }
+    };
+    IntList current = new IntList();
+    for(final int concept : source.concepts(label)) {
+      concepts.set(concept);
+      current.add(concept);
+      add.accept(concept);
+    }
+    // the level of a concept is the length of the shortest path from the concepts of the term
+    int rel = 0;
+    if(relation.length != 0) {
+      rel = source.relation(relation);
+      if(rel == 0) return;
+    }
+    for(long level = 1; level <= max && !current.isEmpty(); level++) {
+      final IntList next = new IntList();
+      for(final int concept : current.finish()) {
+        final int[] relations = source.relations(concept);
+        for(int r = 0; r < relations.length; r += 2) {
+          final int target = relations[r];
+          if((rel == 0 || relations[r + 1] == rel) && !concepts.get(target)) {
+            concepts.set(target);
+            if(level >= min) add.accept(target);
+            if(level < max) next.add(target);
           }
-        });
+        }
       }
-      entries = new ArrayList<>(next.size());
-      for(final ThesEntry synonym : next) {
-        final ThesEntry ent = source.entry(synonym.key);
-        if(ent != null) entries.add(ent);
-      }
+      current = next;
     }
   }
 
@@ -246,40 +251,10 @@ public final class ThesAccessor {
     return "\"" + (db != null ? db : file) + '"';
   }
 
-  /** Thesaurus source: an in-memory structure or an index. */
-  private static final class Source {
-    /** Full-text options for normalizing terms. */
-    private final FTOpt opt;
-    /** Thesaurus structure (can be {@code null}). */
-    private final Thesaurus thesaurus;
-    /** Thesaurus index (can be {@code null}). */
-    private final ThesIndex index;
-
-    /**
-     * Constructor.
-     * @param opt full-text options for normalizing terms
-     * @param thesaurus thesaurus structure (can be {@code null})
-     * @param index thesaurus index (can be {@code null})
-     */
-    private Source(final FTOpt opt, final Thesaurus thesaurus, final ThesIndex index) {
-      this.opt = opt;
-      this.thesaurus = thesaurus;
-      this.index = index;
-    }
-
-    /**
-     * Returns the entry for the specified normalized term.
-     * @param key normalized term
-     * @return entry or {@code null}
-     */
-    private ThesEntry entry(final byte[] key) {
-      if(thesaurus != null) return thesaurus.get(key);
-      final int id = index.id(key);
-      if(id == -1) return null;
-      final ThesEntry entry = new ThesEntry(index.term(id), key);
-      index.synonyms(id, (rel, syn) ->
-        entry.add(new ThesEntry(index.term(syn), index.key(syn)), rel));
-      return entry;
-    }
-  }
+  /**
+   * Thesaurus source: an in-memory structure or an index.
+   * @param opt full-text options for normalizing terms
+   * @param thesaurus thesaurus structure or index
+   */
+  private record Source(FTOpt opt, ThesSource thesaurus) { }
 }

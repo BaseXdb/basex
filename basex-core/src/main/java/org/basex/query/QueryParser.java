@@ -4849,7 +4849,7 @@ public class QueryParser extends InputParser {
     final IO fl = qc.resources.thesaurus(location, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true, Itr.ZERO);
-    long min = 0, max = Long.MAX_VALUE;
+    long min = 0, max = ThesAccessor.LEVELS;
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances
