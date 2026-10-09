@@ -66,7 +66,7 @@ abstract class ProcFn extends StandardFunc {
     }
 
     // standard input is closed in any case, so that processes waiting for input terminate
-    final Thread writer = new Thread(() -> {
+    final Thread writer = Thread.startVirtualThread(() -> {
       try(OutputStream os = proc.getOutputStream()) {
         if(input != null) os.write(input);
       } catch(final IOException ex) {
@@ -74,33 +74,17 @@ abstract class ProcFn extends StandardFunc {
         Util.debug(ex);
       }
     });
-    writer.start();
     if(fork) return null;
 
     final Thread outt = reader(proc.getInputStream(), result.output, result);
     final Thread errt = reader(proc.getErrorStream(), result.error, result);
-    outt.start();
-    errt.start();
-
-    final Thread thread = new Thread(() -> {
-      try {
-        proc.waitFor();
-        writer.join();
-        outt.join();
-        errt.join();
-      } catch(final InterruptedException ex) {
-        Util.debug(ex);
-      }
-    });
-    thread.start();
 
     final Performance perf = new Performance();
     try {
-      while(thread.isAlive()) {
+      while(proc.isAlive() || writer.isAlive() || outt.isAlive() || errt.isAlive()) {
         qc.checkStop();
         if(seconds > 0 && perf.nanoRuntime(false) / 1000000000 >= seconds) {
           proc.destroyForcibly();
-          thread.interrupt();
           throw PROC_TIMEOUT.get(info);
         }
         Performance.sleep(10);
@@ -109,7 +93,6 @@ abstract class ProcFn extends StandardFunc {
       return result;
     } catch(final JobException ex) {
       proc.destroyForcibly();
-      thread.interrupt();
       throw ex;
     }
   }
@@ -173,7 +156,7 @@ abstract class ProcFn extends StandardFunc {
   }
 
   /**
-   * Creates a reader thread.
+   * Starts a reader thread.
    * @param in input stream
    * @param out output stream
    * @param result process result
@@ -181,7 +164,7 @@ abstract class ProcFn extends StandardFunc {
    */
   private static Thread reader(final InputStream in, final ArrayOutput out,
       final ProcResult result) {
-    return new Thread(() -> {
+    return Thread.startVirtualThread(() -> {
       try(in) {
         in.transferTo(out);
       } catch(final IOException ex) {
