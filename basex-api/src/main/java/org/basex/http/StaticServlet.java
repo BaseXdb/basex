@@ -53,7 +53,15 @@ public final class StaticServlet extends BaseXServlet {
 
     // report unchanged resources; timestamps are sent with a granularity of seconds
     final long modified = attrs.lastModifiedTime().toMillis() / 1000 * 1000;
-    if(conn.request.getDateHeader(HTTPText.IF_MODIFIED_SINCE) >= modified) {
+    long since;
+    try {
+      since = conn.request.getDateHeader(HTTPText.IF_MODIFIED_SINCE);
+    } catch(final IllegalArgumentException ex) {
+      // malformed header: ignored
+      Util.debug(ex);
+      since = -1;
+    }
+    if(since >= modified) {
       conn.response.setStatus(SC_NOT_MODIFIED);
       conn.log(SC_NOT_MODIFIED, "");
       return;
@@ -62,7 +70,7 @@ public final class StaticServlet extends BaseXServlet {
     conn.contentType(MediaType.get(file.path()), Strings.UTF8);
     conn.response.setContentLengthLong(attrs.size());
     conn.response.setDateHeader(HTTPText.LAST_MODIFIED, modified);
-    conn.response.getOutputStream().write(file.read());
+    Files.copy(source, conn.response.getOutputStream());
     conn.log(SC_OK, "");
   }
 }

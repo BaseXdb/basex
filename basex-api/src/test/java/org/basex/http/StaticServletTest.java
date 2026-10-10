@@ -82,6 +82,14 @@ public final class StaticServletTest extends HTTPTest {
   }
 
   /**
+   * A malformed {@code If-Modified-Since} header is ignored.
+   * @throws Exception exception
+   */
+  @Test public void malformedModified() throws Exception {
+    assertEquals(200, send("yesterday").statusCode());
+  }
+
+  /**
    * Requests the static test resource.
    * @param modified value of the {@code If-Modified-Since} header (can be {@code null})
    * @return response
