@@ -243,6 +243,11 @@ abstract class TextDecoder {
         in.flip();
         out.clear();
         final CoderResult cr = csd.decode(in, out, eof);
+        if(eof && !cr.isError()) {
+          csd.flush(out);
+          // reset the decoder so it stays usable if read() is called again after EOF
+          csd.reset();
+        }
         out.flip();
         if(out.hasRemaining()) {
           in.compact();
@@ -255,15 +260,6 @@ abstract class TextDecoder {
           return invalid(false, bytes);
         }
         if(eof) {
-          out.clear();
-          csd.flush(out);
-          out.flip();
-          // reset the decoder so it stays usable if read() is called again after EOF
-          csd.reset();
-          if(out.hasRemaining()) {
-            in.compact();
-            return codePoint();
-          }
           final int rem = in.remaining();
           final byte[] bytes = new byte[rem];
           in.get(bytes);

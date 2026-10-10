@@ -55,7 +55,7 @@ final class XHTMLSerializer extends XhtmlHtmlSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(printCT(true)) return;
-    if(isElement(rules.empties(), elem)) {
+    if(isElement(empties, elem)) {
       // prior to HTML5, a space is inserted before the trailing slash
       if(!html5) out.print(' ');
       out.print(ELEM_SC);

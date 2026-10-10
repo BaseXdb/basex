@@ -88,7 +88,7 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
   protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(html5) {
       // output PIs as comments; properly escape multiple dashes (----)
-      final Function<byte[], String> esc = v -> string(v).replace("--", "- -").replace("--", "- -");
+      final Function<byte[], String> esc = v -> string(v).replaceAll("-(?=-)", "- ");
       final TokenBuilder tb = new TokenBuilder().add('?').add(esc.apply(name));
       if(value.length > 0) tb.add(' ').add(esc.apply(value));
       comment(tb.add('?').finish());
@@ -139,7 +139,7 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
       if(printCT(true)) return;
       out.print(ELEM_C);
       // no end tag if the element is expected to be empty
-      if(rules.empties().contains(local)) return;
+      if(empties.contains(local)) return;
       sep = false;
       super.finishClose();
     }

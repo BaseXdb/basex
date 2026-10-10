@@ -52,22 +52,15 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
   final boolean htmlMethod;
   /** HTML5 flag. */
   final boolean html5;
-  /** Version-dependent rules. */
-  final HtmlRules rules;
+  /** Elements with an empty content model. */
+  final TokenSet empties;
+  /** Inline elements. */
+  private final TokenSet inlines;
 
   /** Media type. */
   private final String media;
   /** Namespace bindings that were discarded by prefix normalization. */
   private final TokenObjectMap<byte[]> discarded = new TokenObjectMap<>();
-
-  /**
-   * Rules that depend on the requested HTML version.
-   *
-   * @param empties elements with an empty content model
-   * @param inlines inline elements
-   * @param caseless caseless comparison of element names
-   */
-  record HtmlRules(TokenSet empties, TokenSet inlines, boolean caseless) { }
 
   /**
    * Constructor.
@@ -86,8 +79,8 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
     // requested HTML version: 'html-version', 'version' (HTML method only), 5.0 by default
     final String requested = !htmlVersion.isEmpty() ? htmlVersion : html ? version : V50;
     html5 = requested.equals(V50);
-    rules = new HtmlRules(html5 ? EMPTIES5 : EMPTIES, html5 ? INLINES5 : INLINES,
-        html5 || html);
+    empties = html5 ? EMPTIES5 : EMPTIES;
+    inlines = html5 ? INLINES5 : INLINES;
     media = sopts.get(MEDIA_TYPE);
   }
 
@@ -163,7 +156,6 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
   @Override
   final boolean inline() {
     // namespaces are ignored: the inline elements of HTML5 include svg and math
-    final TokenSet inlines = rules.inlines();
     return inlines.contains(localName(closed)) || opening && inlines.contains(localName(elem)) ||
         super.inline();
   }
@@ -190,7 +182,7 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
    * @return local name
    */
   final byte[] localName(final QNm name) {
-    return rules.caseless() ? lc(name.local()) : name.local();
+    return html5 || htmlMethod ? lc(name.local()) : name.local();
   }
 
   /**
