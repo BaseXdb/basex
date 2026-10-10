@@ -1,11 +1,9 @@
 package org.basex.query.func.archive;
 
-import static org.basex.util.Token.*;
+import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -16,13 +14,10 @@ import org.basex.util.hash.*;
 public final class ArchiveDelete extends ArchiveFn {
   @Override
   public B64 value(final QueryContext qc) throws QueryException {
-    final Value entries = arg(1).atomValue(qc, info);
-
     // entries to be deleted
-    final TokenSet names = new TokenSet(entries.size());
-    for(final Item item : entries) names.add(toString(item, qc));
+    final HashSet<String> names = toEntries(arg(1), qc);
     return rewrite(arg(0), qc,
-      (entry, out) -> !names.contains(token(entry.getName())),
+      (entry, out) -> names == null || !names.contains(entry.getName()),
       out -> { });
   }
 }

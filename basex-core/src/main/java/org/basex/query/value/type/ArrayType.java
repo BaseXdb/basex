@@ -94,8 +94,8 @@ public final class ArrayType extends FType {
   @Override
   public Type union(final Type type) {
     return type instanceof ChoiceItemType ? type.union(this) :
-      instanceOf(type) ? type :
-      type.instanceOf(this) ? this :
+      SeqType.kept(this, type, true) ? type :
+      SeqType.kept(type, this, true) ? this :
       type instanceof final ArrayType at ? union(at.valueType) :
       type instanceof MapType ? FUNCTION :
       type instanceof FuncType ? type.union(this) : BasicType.ITEM;

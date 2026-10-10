@@ -52,9 +52,10 @@ public enum Calc {
     @Override
     public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
         final CompileContext cc) throws QueryException {
-      // check for neutral number
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof final ANum num && num.dbl() == 0) {
+      // check for neutral number (-0 + 0 → 0)
+      final Type type1 = expr1.seqType().type, type = numType(type1, expr2.seqType().type);
+      if(expr2 instanceof final ANum num && num.dbl() == 0 &&
+          (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) < 0)) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
@@ -66,12 +67,10 @@ public enum Calc {
       if(expr2 instanceof final Unary unry) {
         return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
-      // $x * $n + $x → $x * ($n + 1)
-      if(expr1 instanceof final Arith arth) {
-        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
-            arth.exprs[1] instanceof final Itr itr) {
-          return new Arith(info, arth.exprs[0], Itr.get(itr.itr() + 1), MULTIPLY).optimize(cc);
-        }
+      // $x * $n + $x → $x * ($n + 1); ignore floating numbers due to rounding errors
+      if(expr1 instanceof final Arith arth && type.instanceOf(DECIMAL) && arth.calc == MULTIPLY &&
+          arth.exprs[0].equals(expr2) && arth.exprs[1] instanceof final Itr itr) {
+        return new Arith(info, arth.exprs[0], Itr.get(itr.itr() + 1), MULTIPLY).optimize(cc);
       }
       return null;
     }
@@ -131,9 +130,10 @@ public enum Calc {
     public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
         final CompileContext cc) throws QueryException {
 
-      // check for neutral number
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof final ANum num && num.dbl() == 0) {
+      // check for neutral number (-0 - -0 → 0)
+      final Type type1 = expr1.seqType().type, type = numType(type1, expr2.seqType().type);
+      if(expr2 instanceof final ANum num && num.dbl() == 0 &&
+          (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) >= 0)) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
@@ -146,12 +146,10 @@ public enum Calc {
       if(expr2 instanceof final Unary unry) {
         return new Arith(info, expr1, unry.expr, ADD).optimize(cc);
       }
-      // $x * $n - $x → $x * ($n - 1)
-      if(expr1 instanceof final Arith arth) {
-        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
-            arth.exprs[1] instanceof final Itr itr) {
-          return new Arith(info, arth.exprs[0], Itr.get(itr.itr() - 1), MULTIPLY).optimize(cc);
-        }
+      // $x * $n - $x → $x * ($n - 1); ignore floating numbers due to rounding errors
+      if(expr1 instanceof final Arith arth && type.instanceOf(DECIMAL) && arth.calc == MULTIPLY &&
+          arth.exprs[0].equals(expr2) && arth.exprs[1] instanceof final Itr itr) {
+        return new Arith(info, arth.exprs[0], Itr.get(itr.itr() - 1), MULTIPLY).optimize(cc);
       }
       return null;
     }
@@ -222,12 +220,6 @@ public enum Calc {
       if(type == DOUBLE && expr1.equals(expr2)) {
         return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
       }
-      // $x * ($n div $x) → $n
-      if(expr2 instanceof final Arith arth) {
-        if(arth.calc == DIVIDE && arth.exprs[0] instanceof Itr && arth.exprs[1].equals(expr1)) {
-          return new Cast(info, arth.exprs[0], type.seqType()).optimize(cc);
-        }
-      }
       return null;
     }
 
@@ -286,20 +278,15 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       // check for neutral number
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
+      final Type type = numType(type1, type2);
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
-        return new Cast(info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type(type1, type2).seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       // $x div $x → 1
       if(expr1.equals(expr2)) {
-        return type == DECIMAL ? Dec.ONE : type == INTEGER ? Itr.ONE : null;
-      }
-      // math:pow($x, $n) div $x → math:pow($x, $n - 1)
-      if(_MATH_POW.is(expr1)) {
-        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
-          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() - 1));
-        }
+        return type.oneOf(DECIMAL, INTEGER) ? Dec.ONE : null;
       }
       return null;
     }

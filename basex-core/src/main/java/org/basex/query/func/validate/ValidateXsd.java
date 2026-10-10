@@ -175,8 +175,7 @@ public class ValidateXsd extends ValidateFn {
         final Validator v = s.newValidator();
         XmlParser.english(v::setProperty);
         v.setErrorHandler(this);
-        v.validate(content(input) ?
-            new StreamSource(input.inputStream()) : new StreamSource(input.url()));
+        v.validate(content(input) ? input.streamSource() : new StreamSource(input.url()));
       }
     });
   }

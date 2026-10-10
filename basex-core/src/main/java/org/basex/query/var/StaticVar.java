@@ -38,7 +38,7 @@ public final class StaticVar extends StaticDecl {
    * @param doc xqdoc string
    * @param field record field flag
    */
-  StaticVar(final Var var, final Expr expr, final AnnList anns, final boolean external,
+  public StaticVar(final Var var, final Expr expr, final AnnList anns, final boolean external,
       final VarScope vs, final String doc, final boolean field) {
     super(var.name, var.declType, anns, vs, var.info, doc);
     this.expr = expr;

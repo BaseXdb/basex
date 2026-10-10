@@ -120,8 +120,8 @@ public class MapType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType || type instanceof ShapeType) return type.union(this);
-    if(type.instanceOf(this)) return this;
-    if(instanceOf(type)) return type;
+    if(SeqType.kept(type, this, true)) return this;
+    if(SeqType.kept(this, type, true)) return type;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
     return type instanceof ArrayType ? FUNCTION :
            type instanceof FuncType ? type.union(this) : BasicType.ITEM;

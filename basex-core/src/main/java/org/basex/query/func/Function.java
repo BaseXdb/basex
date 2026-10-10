@@ -1049,20 +1049,20 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive, entries)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries::new, "entries(archive)",
       params(ANY_ATOMIC_TYPE_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary::new, "extract-binary(archive, entries?)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive, entries?, encoding?)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI,
+      params(ANY_ATOMIC_TYPE_O, STRING_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI,
       Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path, archive, entries?)",
-      params(STRING_O, ANY_ATOMIC_TYPE_O, ITEM_ZM),
+      params(STRING_O, ANY_ATOMIC_TYPE_O, STRING_ZM),
       EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",

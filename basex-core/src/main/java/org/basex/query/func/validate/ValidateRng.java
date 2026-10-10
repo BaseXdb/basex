@@ -43,10 +43,9 @@ public class ValidateRng extends ValidateFn {
           schm = read(schema, null);
         } catch(final QueryException ex) {
           // compact schema: treat string as input
-          if(!compact || ex.error() != WHICHRES_X) throw ex;
+          if(!compact || !schema.type.isStringOrUntyped()) throw ex;
           schm = new IOContent(schema.string(info));
         }
-        schm = prepare(schm);
 
         try {
           /*

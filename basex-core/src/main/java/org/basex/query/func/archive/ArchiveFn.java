@@ -62,9 +62,9 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final HashSet<String> toEntries(final Expr expr, final QueryContext qc) throws QueryException {
     final HashSet<String> entries = new LinkedHashSet<>();
-    final Iter names = expr.unwrappedIter(qc);
+    final Iter names = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(names)) != null;) {
-      entries.add(toString(item, qc));
+      entries.add(normalize(toString(item, expr)));
     }
     return entries.isEmpty() ? null : entries;
   }
@@ -129,7 +129,7 @@ abstract class ArchiveFn extends StandardFunc {
         if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
         break;
       }
-      final String name = toString(entry, qc);
+      final String name = name(entry);
       if(files.put(name, new SimpleEntry<>(entry, content)) != null) {
         throw ARCHIVE_DUPL_X.get(info, name);
       }
@@ -177,9 +177,18 @@ abstract class ArchiveFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final String name(final Item header) throws QueryException {
-    final String name = string(header.string(info));
+    final String name = normalize(string(header.string(info)));
     if(name.isEmpty()) throw ARCHIVE_NAME.get(info);
-    return Prop.WIN  ? name.replace('\\', '/') : name;
+    return name;
+  }
+
+  /**
+   * Normalizes the separators of an entry name.
+   * @param name name
+   * @return normalized name
+   */
+  private static String normalize(final String name) {
+    return Prop.WIN ? name.replace('\\', '/') : name;
   }
 
   /**

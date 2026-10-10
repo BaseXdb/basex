@@ -309,8 +309,8 @@ public abstract class XQMap extends XQStruct {
       // a map matches a record type only if it is a record, i.e. if it has a type annotation
       if(tp instanceof final ShapeType sh) {
         // coercion to a record type creates a record with the field order of that type
-        return type instanceof final RecordType rt &&
-            (coerce && !sh.any() ? rt.equals(sh) : rt.instanceOf(sh) || sh.matches(this));
+        return type instanceof final RecordType rt && (coerce && sh.coercive() ?
+          SeqType.kept(rt, sh, true) : rt.instanceOf(sh) || sh.matches(this));
       }
       if(SeqType.instanceOf(type, tp, coerce)) return true;
 
@@ -332,7 +332,7 @@ public abstract class XQMap extends XQStruct {
       if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
       // remember the more specific type to skip subsequent checks (records keep their type)
-      if(tp instanceof MapType && !(type instanceof ShapeType) &&
+      if(tp instanceof MapType && !(type instanceof ShapeType) && (coerce || !tp.coercive()) &&
           (kt == null || TypeRef.deref(kt).assignable()) &&
           (vt == null || TypeRef.deref(vt.type).assignable())) refineType(tp);
       return true;

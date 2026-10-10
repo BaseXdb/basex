@@ -94,7 +94,7 @@ public final class Switch extends ParseExpr {
    * @return map from strings to group indexes, or {@code null}
    */
   private TokenIntMap index() {
-    if(info != null && sc().collation != null) return null;
+    if(info == null || sc().collation != null) return null;
     int size = 0;
     for(final SwitchGroup group : groups) {
       final Expr[] exprs = group.exprs;

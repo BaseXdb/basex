@@ -356,7 +356,8 @@ public abstract class XQArray extends XQStruct {
         if(!mt.instance(value, coerce)) return false;
       }
       // remember the more specific type to skip subsequent checks
-      if(tp instanceof ArrayType && TypeRef.deref(mt.type).assignable()) refineType(tp);
+      if(tp instanceof ArrayType && (coerce || !tp.coercive()) &&
+          TypeRef.deref(mt.type).assignable()) refineType(tp);
     }
     return true;
   }

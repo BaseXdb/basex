@@ -79,6 +79,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry/>", ""), ARCHIVE_NAME);
     // duplicate entry names
     error(func.args(" ('a', 'b', 'a')", " ('1', '2', '3')"), ARCHIVE_DUPL_X);
+    if(Prop.WIN) error(func.args(" ('a/b', 'a\\b')", " ('1', '2')"), ARCHIVE_DUPL_X);
     // invalid compression level
     error(func.args(" <archive:entry compression-level='x'>X</archive:entry>", ""),
         ARCHIVE_LEVEL_X);
@@ -307,6 +308,10 @@ public final class ArchiveModuleTest extends SandboxTest {
     query("let$archive := " + func.args(ZIP, "infos/stopWords") +
         "let $entries := " + _ARCHIVE_ENTRIES.args(" $archive") +
         "return count($entries)", 4);
+    if(Prop.WIN) query(COUNT.args(_ARCHIVE_ENTRIES.args(func.args(ZIP, "infos\\stopWords"))), 4);
+    // entries supplied as arrays
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(func.args(ZIP, " [ 'infos/stopWords' ]"))), 4);
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(func.args(ZIP, " []"))), 5);
     query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
         "let $updated := " + func.args(" $archive", "infos/stopWords") +
         "let $entries := " + _ARCHIVE_ENTRIES.args(" $updated") +
@@ -416,6 +421,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     final Function func = _ARCHIVE_EXTRACT_TEXT;
     // extract all entries
     query(COUNT.args(func.args(ZIP)), 5);
+    if(Prop.WIN) query(COUNT.args(func.args(ZIP, "test\\input.xml")), 1);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(ZIP))), 5);
     // extract all entries
     query("let $entries := " + _ARCHIVE_ENTRIES.args(ZIP) +

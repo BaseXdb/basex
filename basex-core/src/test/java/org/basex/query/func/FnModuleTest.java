@@ -386,6 +386,9 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(REPLICATE.args(1.0, 3)), 1, empty(func));
     check(func.args(REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
+    // repeated items: average of integers is a decimal, doubles are summed up
+    query(func.args(REPLICATE.args(1, 2)) + " instance of xs:integer", false);
+    query(func.args(REPLICATE.args(" 0.1e0", 10)), "0.09999999999999999");
     query(func.args(SUBSEQUENCE.args(" 1 to " + wrap(10), 5)), 7.5);
 
     error(func.args(" true#0"), FIATOMIZE_X);
@@ -5984,6 +5987,13 @@ return
     query(func.args(SUBSEQUENCE.args(" 1 to " + wrap(10), 5)), 45);
     query(func.args(SLICE.args(" -3 to " + wrap(10), 2, -2)), 42);
     query(func.args(REPLICATE.args(" xs:integer(" + wrap(3) + ")", 10)), 30);
+    // repeated doubles: same result as at runtime
+    query(func.args(REPLICATE.args(" 0.1e0", 10)), "0.9999999999999999");
+    // reordered doubles: same result as at runtime
+    final String dbls = "let $s := (" + wrap("1e308") + " ! xs:double(.), -1e308, 1e-20) return ";
+    query(dbls + func.args(" reverse($s)"), 0);
+    query(dbls + func.args(" sort($s)"), 0);
+    check(func.args(" reverse((" + wrap(1) + " ! xs:integer(.), 2))"), 3, empty(REVERSE));
     query(func.args(" for $i in 1 to " + wrap(10) + " return 3"), 30);
 
     query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");

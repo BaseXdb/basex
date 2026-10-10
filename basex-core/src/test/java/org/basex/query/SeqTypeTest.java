@@ -156,8 +156,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
-    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
+    ((TypeRef) r1.type).resolve(new RecordType(fld1));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2));
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
@@ -422,8 +422,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
-    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
+    ((TypeRef) r1.type).resolve(new RecordType(fld1));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2));
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
@@ -698,8 +698,8 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
     fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
-    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
+    ((TypeRef) r8.type).resolve(new RecordType(fld8));
+    ((TypeRef) r9.type).resolve(new RecordType(fld9));
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
@@ -1012,8 +1012,8 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
     fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
-    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
+    ((TypeRef) r8.type).resolve(new RecordType(fld8));
+    ((TypeRef) r9.type).resolve(new RecordType(fld9));
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);

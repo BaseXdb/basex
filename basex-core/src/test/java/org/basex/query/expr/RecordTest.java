@@ -933,6 +933,59 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "for $i in 1 to 2 "
         + "return (if($i = 1) then local:ab() else "
         + "({ 'b': 2, 'a': 1 } coerce to local:BA))?a", "1\n1");
+
+    // instance checks must not skip subsequent coercions
+    final String d = "declare type local:D as record(a as xs:decimal, b as xs:decimal); "
+        + "declare %basex:inline(0) function local:d() { let $d as local:D := { 'a': 1, 'b': 2 } "
+        + "return $d }; ";
+    query(prolog + d + "declare %basex:inline(0) function local:f($r as local:BA*) { "
+        + "$r ! string-join(map:keys(.)) }; "
+        + "let $s := (local:d(), local:ab()) "
+        + "return ($s instance of local:BA+, local:f($s))", "true\nba\nba");
+    query(prolog + d + "declare %basex:inline(0) function local:f($a as array(local:BA)) { "
+        + "string-join(map:keys($a(2))) }; "
+        + "let $a := [ local:d(), local:ab() ] "
+        + "return ($a instance of array(local:BA), local:f($a))", "true\nba");
+    query(prolog + d + "declare %basex:inline(0) "
+        + "function local:f($m as map(xs:string, local:BA)) { "
+        + "string-join(map:keys($m?y)) }; "
+        + "let $m := { 'x': local:d(), 'y': local:ab() } "
+        + "return ($m instance of map(xs:string, local:BA), local:f($m))", "true\nba");
+    // union of record types with different field orders
+    final String any = "declare %basex:inline(0) function local:any($x) { $x }; ";
+    query(prolog + "let $r as local:BA* := (local:AB(1, 2), "
+        + "({ 'b': 2, 'a': 1 } coerce to local:BA)) "
+        + "return $r ! string-join(map:keys(.))", "ba\nba");
+    query(prolog + any
+        + "let $r as local:BA* := local:any((({ 'b': 2, 'a': 1 } coerce to local:BA), "
+        + "local:ab())) return $r ! string-join(map:keys(.))", "ba\nba");
+    query(prolog + any
+        + "declare %basex:inline(0) function local:f($a as array(local:BA)*) { "
+        + "$a ! string-join(map:keys(.(1))) }; "
+        + "local:f(local:any(([ { 'b': 2, 'a': 1 } coerce to local:BA ], [ local:ab() ])))",
+        "ba\nba");
+    query(prolog + any
+        + "declare %basex:inline(0) function local:f($m as map(xs:string, local:BA)*) { "
+        + "$m ! string-join(map:keys(?x)) }; "
+        + "local:f(local:any((map:build(1, fn { 'x' }, fn { { 'b': 2, 'a': 1 } "
+        + "coerce to local:BA }), "
+        + "map:build(1, fn { 'x' }, fn { local:ab() }))))", "ba\nba");
+  }
+
+  /** Coercion to choice types: first matching alternative. */
+  @Test public void choiceCoercion() {
+    final String prolog = "declare record local:AB(a as xs:integer, b as xs:integer); "
+        + "declare type local:BA as record(b as xs:integer, a as xs:integer); "
+        + "declare %basex:inline(0) function local:any($x) { $x }; ";
+    query(prolog + "let $r as (local:BA | xs:string)* := local:any((local:AB(1, 2), "
+        + "local:AB(3, 4))) return $r ! string-join(map:keys(.))", "ba\nba");
+    query(prolog + "let $r as (map(*) | local:BA)* := local:any((local:AB(1, 2), "
+        + "local:AB(3, 4))) return $r ! string-join(map:keys(.))", "ab\nab");
+    query(prolog + "let $f as (fn(xs:integer) as item()* | xs:string)* := "
+        + "local:any((fn($x) { $x }, fn($x) { $x })) "
+        + "return $f ! (try { .('x') } catch * { 'coerced' })", "coerced\ncoerced");
+    query(prolog + "let $v as (xs:decimal | xs:string)* := local:any((1, 2)) "
+        + "return $v ! (. instance of xs:integer)", "true\ntrue");
   }
 
   /** Records whose type lacks fields that admit the empty sequence. */

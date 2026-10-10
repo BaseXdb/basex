@@ -49,6 +49,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   private final Prepared[] dflts;
   /** Cached properties of the default expressions (entries can be {@code null}). */
   private final FlagCache[] dprops;
+  /** Global variables of default expressions without focus (entries can be {@code null}). */
+  private final StaticVar[] globals;
 
   /**
    * Default expression with a variable scope of its own.
@@ -81,6 +83,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     int mn = dl;
     dflts = new Prepared[dl];
     dprops = new FlagCache[dl];
+    globals = new StaticVar[dl];
     for(int d = 0; d < dl; d++) {
       if(defaults[d] != null) {
         final int i = d;
@@ -159,6 +162,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       prepareDefault(index, new CompileContext(qc, true));
       prepared = dflts[index];
     }
+    // defaults without focus are evaluated once, like global variables
+    if(!defaultHas(index, Flag.CTX)) return global(index, prepared, qc).value(qc);
+
     final Value current = qc.current;
     qc.current = null;
     final int fp = prepared.scope.enter(qc);
@@ -168,6 +174,23 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       prepared.scope.exit(fp, qc);
       qc.current = current;
     }
+  }
+
+  /**
+   * Returns the global variable that binds a default expression without focus.
+   * @param index parameter index
+   * @param prepared prepared default expression
+   * @param qc query context
+   * @return variable
+   */
+  private synchronized StaticVar global(final int index, final Prepared prepared,
+      final QueryContext qc) {
+    if(globals[index] == null) {
+      final Var var = new Var(params[index].name, null, qc, params[index].info);
+      globals[index] = new StaticVar(var, prepared.expr, AnnList.EMPTY, false, prepared.scope,
+          "", false);
+    }
+    return globals[index];
   }
 
   /**

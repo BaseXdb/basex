@@ -185,6 +185,9 @@ public final class StringModuleTest extends SandboxTest {
     // a format specifier requires a value
     error(func.args("%s", " ()"), INVTYPE_X);
     error(func.args("%d", " ()"), INVTYPE_X);
+    // the class name of the exception is reported once
+    query("try { " + func.args("%x", " xs:untypedAtomic('a')") + " } catch * { $err:description }",
+        "IllegalFormatConversionException: x != java.lang.String.");
 
     // hidden: never suggested
     query("try { xquery:eval('string:formatt(\"x\")') } catch * { $err:description }",

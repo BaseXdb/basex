@@ -418,8 +418,8 @@ public class ShapeType extends MapType {
   private Type union(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == Types.MAP) return Types.MAP;
-    if(type.instanceOf(this)) return this;
-    if(instanceOf(type)) return type;
+    if(SeqType.kept(type, this, true)) return this;
+    if(SeqType.kept(this, type, true)) return type;
 
     if(type instanceof final ShapeType sh) {
       if(sameFields(sh)) {
@@ -438,7 +438,9 @@ public class ShapeType extends MapType {
           }
           map.put(key, new ShapeField(union));
         }
-        return declared() && sh.declared() ? new RecordType(map) : new ShapeType(map);
+        // records with other identities or field orders must still be coerced
+        return declared() && sh.declared() && sameIdentity(sh) && sameOrder(sh) ?
+          new RecordType(map) : new ShapeType(map);
       }
       // fallback (map supertype)
       return union(sh.keyType(), sh.valueType());

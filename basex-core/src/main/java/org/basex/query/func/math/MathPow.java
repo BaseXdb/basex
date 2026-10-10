@@ -1,7 +1,6 @@
 package org.basex.query.func.math;
 
 import static java.lang.StrictMath.*;
-import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -38,13 +37,6 @@ public final class MathPow extends MathFn {
       if(e == 0 && st.one()) return Dbl.ONE;
       if(e == 1) return new Cast(info, base, Types.DOUBLE_ZO).optimize(cc);
       if(e == -1) return new Arith(info, Dbl.ONE, base, Calc.DIVIDE).optimize(cc);
-
-      // merge nested function calls
-      if(_MATH_POW.is(base) && e == (int) e && base.arg(1) instanceof final ANum b &&
-          b.dbl() == b.itr()) {
-        final Expr factor = new Arith(info, base.arg(1), exp, Calc.MULTIPLY).optimize(cc);
-        return cc.function(_MATH_POW, info, base.arg(0), factor);
-      }
     }
     return super.opt(cc);
   }

@@ -247,6 +247,11 @@ public final class XQuery4Test extends SandboxTest {
   @Test public void paramDefaults() {
     query("declare function local:f($x := 1 + 1) { $x }; local:f()", 2);
     query("declare function local:f($x := 1) { $x }; local:f(2)", 2);
+    // defaults without focus are fixed
+    query("declare function local:f($x := <a/>) { $x }; local:f() is local:f()", true);
+    query("declare function local:f($x := <a/>) { $x }; local:f#0() is local:f()", true);
+    query("declare function local:f($x := (<a/>, .)) { $x[1] }; "
+        + "let $r := (1, 2) ! local:f() return $r[1] is $r[2]", false);
 
     // defaults are evaluated with the focus of the caller
     query("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "a");

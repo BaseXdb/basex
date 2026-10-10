@@ -70,33 +70,40 @@ public class FnSum extends NumericFn {
    */
   final Expr opt(final boolean avg, final CompileContext cc) throws QueryException {
     // sum(reverse($values)) → sum($values), avg(sort($values)) → avg($values)
-    final Expr reordered = reordered(arg(0));
-    if(reordered != null) {
+    // exact arithmetic only: floating-point results depend on the summation order
+    final Expr values = arg(0), reordered = reordered(values);
+    if(reordered != null && values.seqType().type.instanceOf(DECIMAL)) {
       final Expr[] args = exprs.clone();
       args[0] = reordered;
       return cc.function(avg ? Function.AVG : Function.SUM, info, args);
     }
 
-    final Expr values = arg(0);
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
     } else if(values instanceof final SingletonSeq ss && ss.singleItem()) {
-      Item item = ss.itemAt(0);
-      if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
-      if(item.type.isNumber()) {
-        return avg ? item : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
+      // exact arithmetic only: floating-point results depend on the summation order
+      final Item item = ss.itemAt(0);
+      if(item.type.instanceOf(DECIMAL)) {
+        return avg ? Dec.get(item.dec(info)) : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
       }
     } else if(values instanceof final Path path) {
       final ArrayList<Stats> list = path.pathStats();
       if(list != null) {
-        double sum = 0;
+        // negative zero: result if all values are negative zeros
+        double sum = -0d, abs = 0;
+        int exp = Double.MAX_EXPONENT - 53;
         long count = 0;
         for(final Stats stats : list) {
-          if(!StatsType.isNumeric(stats.type) || !StatsType.isCategory(stats.type)) return this;
+          if(!StatsType.isNumeric(stats.type) || !StatsType.isCategory(stats.type)) return null;
           for(final byte[] value : stats.values) {
-            if(value.length == 0) return null;
+            final double d = Token.toDouble(value);
+            if(!Double.isFinite(d)) return null;
+            if(d != 0) exp = Math.min(exp, lowestBit(d));
             final long c = stats.values.get(value);
-            sum += c * Token.toDouble(value);
+            sum += c * d;
+            abs += c * Math.abs(d);
+            // exact results only: all partial sums must be representable, regardless of the order
+            if(abs >= Math.scalb(1d, exp + 53)) return null;
             count += c;
           }
         }
@@ -112,6 +119,16 @@ public class FnSum extends NumericFn {
     if(arg(0).seqType().type.isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
+  }
+
+  /**
+   * Returns the exponent of the lowest set bit of a finite, non-zero double.
+   * @param d double value
+   * @return exponent
+   */
+  private static int lowestBit(final double d) {
+    return Math.max(Math.getExponent(d), Double.MIN_EXPONENT) - 52 +
+        Long.numberOfTrailingZeros(Double.doubleToRawLongBits(d) | 1L << 52);
   }
 
   /**

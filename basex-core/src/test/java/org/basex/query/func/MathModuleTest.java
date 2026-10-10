@@ -45,8 +45,8 @@ public final class MathModuleTest extends SandboxTest {
     check(func.args(wrap(5), 1), 5, root(Cast.class));
     check(func.args(wrap(5), -1), 0.2, root(ArithSimple.class));
 
-    check(func.args(func.args(wrap(3), 2), 2), 81, count(func, 1));
-    check(func.args(func.args(func.args(wrap(3), 2), 2), 2), 6561, count(func, 1));
+    check(func.args(func.args(wrap(3), 2), 2), 81, count(func, 2));
+    check(func.args(func.args(func.args(wrap(3), 2), 2), 2), 6561, count(func, 3));
     check(func.args(func.args(wrap(3), 2), 0.5), 3, count(func, 2));
 
     check(func.args(" ()", 0), "", empty());
@@ -54,8 +54,9 @@ public final class MathModuleTest extends SandboxTest {
     error(func.args(" [ " + wrap(1) + ", 2 ]", 0), INVTYPE_X);
     query(func.args(" array { " + wrap(1) + "[. = 0] }", 0), "");
 
-    // merge nested function calls
-    check(func.args(func.args(wrap(-2), 3), 2), 64, count(func, 1));
+    // nested function calls: no merge (results depend on the evaluation order)
+    check(func.args(func.args(wrap(-2), 3), 2), 64, count(func, 2));
+    query(func.args(func.args(wrap(1.1), 3), 2), "1.771561000000001");
     check(func.args(func.args(wrap(-1), 2), 0.5), 1, count(func, 2));
     query(func.args(func.args(wrap(-1), 0.5), 2), "NaN");
   }

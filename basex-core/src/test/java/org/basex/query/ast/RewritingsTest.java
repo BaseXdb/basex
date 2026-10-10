@@ -1994,6 +1994,15 @@ public final class RewritingsTest extends SandboxTest {
     check("//(b, c, d) => max()", 5, root(Dbl.class));
     check("//(b, c, d) => sum()", 8, root(Dbl.class));
     check("//(b, c, d) => avg()", 4, root(Dbl.class));
+
+    // inexact floating-point sums: no pre-evaluation
+    execute(new CreateDB(NAME, "<xml>" + "<a>0.1</a>".repeat(10) + "</xml>"));
+    check("//a => sum()", "0.9999999999999999", root(SUM));
+    check("//a => avg()", "0.09999999999999999", root(AVG));
+    execute(new CreateDB(NAME, "<xml><a>1e300</a><a>1</a><a>-1e300</a></xml>"));
+    check("//a => sum()", 0, root(SUM));
+    execute(new CreateDB(NAME, "<xml><a>-0</a><a>-0</a></xml>"));
+    check("//a => sum()", "-0", root(Dbl.class));
     execute(new Close());
 
     // whitespace will be preserved in categories, but numbers will still be detected
@@ -2018,7 +2027,7 @@ public final class RewritingsTest extends SandboxTest {
     check(query + "count()", 1000, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 1000, root(Dbl.class));
-    check(query + "sum()", 500500, root(SUM));
+    check(query + "sum()", 500500, root(SUM), type(SUM, "xs:double"));
     check(query + "avg()", 500.5, root(AVG));
 
     // lower MAXCATS limit

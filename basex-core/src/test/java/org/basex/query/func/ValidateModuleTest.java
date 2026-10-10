@@ -144,6 +144,10 @@ public final class ValidateModuleTest extends SandboxTest {
     query(func.args(FILE, " <_ xml:base='{ " + _FILE_PATH_TO_URI.args(DIR) + " }'>"
         + "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
         + "<xs:include schemaLocation='validate.xsd'/></xs:schema></_>/*"), "");
+    // resolve relative schema locations against the base URI of the input node
+    query(func.args(" <_ xml:base='{ " + _FILE_PATH_TO_URI.args(DIR) + " }'>"
+        + "<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='validate.xsd'/></_>/*"), "");
 
     // caching
     query(func.args(FILE, XSD, " { 'cache': true() }"), "");
@@ -251,7 +255,8 @@ public final class ValidateModuleTest extends SandboxTest {
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with '' " +
       "}",
-      "<report><status>invalid</status><message level=\"\" line=\"\" column=\"\"/></report>");
+      "<report><status>invalid</status>"
+      + "<message level=\"\" line=\"\" column=\"\" url=\"\"/></report>");
     // check URL attribute
     query("exists(" + func.args(INPUT, XSD) + "//@url)", true);
 
@@ -264,5 +269,21 @@ public final class ValidateModuleTest extends SandboxTest {
   @Test public void xsdVersion() {
     final Function func = _VALIDATE_XSD_VERSION;
     assertFalse(query(func.args()).isEmpty());
+  }
+
+  /** Test method. */
+  @Test public void rng() {
+    final Function func = _VALIDATE_RNG;
+    query(func.args(FILE, DIR + "validate.rng"), "");
+    query(func.args(FILE, " doc('" + DIR + "validate.rng')"), "");
+    // resolve relative references against the base URI of the schema node
+    query(func.args(FILE, " <_ xml:base='{ " + _FILE_PATH_TO_URI.args(DIR) + " }'>"
+        + "<grammar xmlns='http://relaxng.org/ns/structure/1.0'>"
+        + "<start><externalRef href='validate.rng'/></start></grammar></_>/*"), "");
+    // compact syntax, supplied as string
+    query(func.args(FILE, "element root { empty }", true), "");
+    query(func.args(FILE, "# comment\nelement root { empty }", true), "");
+    error(func.args(FILE, " ' '", true), VALIDATE_ERROR_X);
+    error(func.args(" <root>x</root>", "element root { empty }", true), VALIDATE_ERROR_X);
   }
 }

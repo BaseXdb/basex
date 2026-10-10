@@ -33,7 +33,7 @@ public final class StringFormat extends StandardFunc {
       // fixed locale: the result must not depend on the system the query is run on
       return Str.get(String.format(Locale.ENGLISH, pattern, args));
     } catch(final IllegalArgumentException ex) {
-      throw STRING_FORMAT_X_X.get(info, Util.className(ex), ex);
+      throw STRING_FORMAT_X_X.get(info, Util.className(ex), ex.getMessage());
     }
   }
 }

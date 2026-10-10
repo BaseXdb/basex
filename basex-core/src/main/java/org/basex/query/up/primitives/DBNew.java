@@ -149,7 +149,9 @@ public final class DBNew {
       parsers.size() == 1 ? parsers.getFirst() : new MultiParser(parsers);
     final StaticOptions sopts = qc.context.soptions;
     final String dbName = disk ? sopts.createTempDb(name) : name;
+    // main memory mode: never write to disk
     final Builder builder = disk ? new DiskBuilder(dbName, parser, sopts, mopts) :
+      mopts.get(MainOptions.MAINMEM) ? new MemBuilder(name, parser) :
       new SpillBuilder(name, parser, sopts);
     builder.binariesDir(sopts.dbPath(dbName));
     try {

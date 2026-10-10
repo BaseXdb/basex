@@ -37,8 +37,14 @@ public final class ArithTest extends SandboxTest {
     check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n) > 0",
         true, root(CmpSimpleG.class));
 
+    // negative zero: -0 + 0 → 0, -0 + -0 → -0
+    final String z = "xs:double(" + wrap("-0") + ")";
+    query(z + "+ 0", 0);
+    check(z + "+ -0e0", "-0", empty(Arith.class), empty(ArithSimple.class));
+
     check(wrap(3) + "! (. + .)", 6, exists(Itr.class), count(ArithSimple.class, 1));
-    check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(ArithSimple.class, 1));
+    check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(ArithSimple.class, 2));
+    check("xs:decimal(" + wrap(3) + ") ! (. + . + .)", 9, root(Arith.class));
     check(wrap(3) + "! (. + -.)", 0, empty(Unary.class));
     check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
   }
@@ -67,7 +73,17 @@ public final class ArithTest extends SandboxTest {
         "2017-07-07T17:59:59.1");
 
     check("xs:decimal(" + wrap(3) + ") ! (. - .)", 0, root(Dec.class));
-    check(wrap(3) + "! (. + . - .)", 3, exists(Cast.class), empty(ArithSimple.class));
+    // negative zero: -0 - -0 → 0, -0 - 0 → -0, 0 - 0 → 0
+    final String z = "xs:double(" + wrap("-0") + ")";
+    query(z + "- -0e0", 0);
+    check(z + "- 0", "-0", empty(Arith.class), empty(ArithSimple.class));
+    query("0 - xs:double(" + wrap(0) + ")", 0);
+
+    check(wrap(3) + "! (. + . - .)", 3, exists(ArithSimple.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. + . - .)", 3, exists(Cast.class),
+        empty(ArithSimple.class));
+    // floating-point numbers: rounding errors
+    query("xs:double(" + wrap("0.42857142857142855") + ") ! (. * 3 - .)", "0.857142857142857");
     check(wrap(3) + "! (. - -.)", 6, exists(Itr.class), empty(Unary.class),
         count(ArithSimple.class, 1));
   }
@@ -98,7 +114,9 @@ public final class ArithTest extends SandboxTest {
 
     check(wrap(3) + "! (. * .)", 9, exists(Dbl.class), exists(Function._MATH_POW));
     check(wrap(3) + "! (. * . * .)", 27, exists(Dbl.class), count(Function._MATH_POW, 1));
-    check(wrap(3) + "! (. * (1 div .))", 1, root(Dbl.class));
+    // rounding errors (also for decimals)
+    query(wrap(49) + "! (. * (1 div .))", "0.9999999999999999");
+    query("xs:decimal(" + wrap(3) + ") ! (. * (1 div .))", "0.999999999999999999");
   }
 
   /** Test method. */
@@ -124,7 +142,16 @@ public final class ArithTest extends SandboxTest {
     error("xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')", DIVZERO_X);
 
     check("xs:decimal(" + wrap(3) + ") ! (. div .)", 1, root(Dec.class));
-    check(wrap(3) + "! (. * . div .)", 3, exists(Cast.class), empty(ArithSimple.class));
+    check(wrap(3) + "! (. * . div .)", 3, exists(ArithSimple.class));
+    query("xs:double(" + wrap(0) + ") ! (math:pow(., 2) div .)", "NaN");
+
+    // integer division yields decimals
+    final String i = "xs:integer(" + wrap(6) + ")";
+    query("(" + i + " div 1) instance of xs:decimal", true);
+    query("(" + i + " div 1) instance of xs:integer", false);
+    query("(" + i + " ! (. div .)) instance of xs:integer", false);
+    query("(" + i + " * 3 div 3) instance of xs:integer", false);
+    query("(" + i + " + 3 - 3) instance of xs:integer", true);
 
     // decimals: at least 18 fractional and 18 significant digits
     query("1 div 3.0", "0.333333333333333333");
@@ -167,12 +194,24 @@ public final class ArithTest extends SandboxTest {
 
   /** Merge arithmetic expressions. */
   @Test public void gh1938() {
-    check("(" + wrap(1) + "+ 1 - 1)[. instance of xs:double]", 1, root(Cast.class));
-    check(wrap(6) + "div 3 * 2", 4, count(ArithSimple.class, 1));
-    check("(1 to 2) ! (" + wrap(1) + "+ . - .)", "1\n1", empty(ArithSimple.class));
-    check("(1 to 2) ! (" + wrapContext() + "+ . - .)", "1\n2", empty(ArithSimple.class));
+    final String i = "xs:integer(" + wrap(1) + ")";
+    check("(" + i + "+ 1 - 1)[. instance of xs:integer]", 1, root(Cast.class));
+    check("xs:integer(" + wrap(6) + ") * 3 * 2", 36, count(ArithSimple.class, 1));
+    check("(1 to 2) ! (" + i + "+ . - .)", "1\n1", empty(ArithSimple.class));
+    check("(1 to 2) ! (" + i + "* . div .)", "1\n1", empty(ArithSimple.class));
     check("(1 to 6) ! (. + 1 - .)", "1\n1\n1\n1\n1\n1",
         empty(ArithSimple.class), root(SingletonSeq.class));
+    query(i + "* 7 idiv 3 idiv 2", 1);
+    query(i + "* 7 mod 4 mod 2", 1);
+
+    // floating-point and decimal division: no rewrite
+    final String d = "xs:double(" + wrap("1e308") + ")";
+    query(d + "+ 1e308 - 1e308", "INF");
+    query(d + "* 10 div 10", "INF");
+    query(wrap("1e-20") + "+ 1 - 1", 0);
+    query("(1 to 2) ! (" + wrap("1e-20") + "+ . - .)", "0\n0");
+    query("xs:decimal(" + wrap(1) + ") div 3 * 3", "0.999999999999999999");
+    query("xs:decimal(" + wrap(2) + ") * 2 div 3", "1.333333333333333333");
   }
 
   /** Simplify arithmetic expressions. */

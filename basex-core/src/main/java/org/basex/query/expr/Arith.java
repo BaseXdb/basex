@@ -65,8 +65,9 @@ public class Arith extends Arr {
     exprType.assign(type, oneOrMore ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
 
     Expr expr = emptyExpr();
-    // 0 - $x → -$x
-    if(expr == this && expr1 == Itr.ZERO && calc == Calc.SUBTRACT) {
+    // 0 - $x → -$x; ignore floating numbers (0 - 0e0 → 0e0)
+    if(expr == this && expr1 == Itr.ZERO && calc == Calc.SUBTRACT &&
+        type2.instanceOf(BasicType.DECIMAL)) {
       expr = new Unary(info, expr2, true).optimize(cc);
     }
     // count($n/@*) + count($n/*) → count(($n/@*, $n/*))
@@ -79,24 +80,27 @@ public class Arith extends Arr {
       final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;
-      } else if(expr1 instanceof final Arith arth1) {
+      } else if(expr1 instanceof final Arith arth1 &&
+          arth1.calc.oneOf(Calc.ADD, Calc.SUBTRACT, Calc.MULTIPLY) &&
+          type1.instanceOf(BasicType.DECIMAL) && type2.instanceOf(BasicType.DECIMAL)) {
+        // exact arithmetic only: no floating-point numbers, no reassociation across division
         final Calc acalc = arth1.calc;
         final boolean add = acalc.oneOf(Calc.ADD, Calc.MULTIPLY);
-        final boolean sub = acalc.oneOf(Calc.SUBTRACT, Calc.DIVIDE);
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = arth1.arg(0), arg2 = arth1.arg(1);
 
-        if(arg2 instanceof ANum && expr2 instanceof ANum && (acalc == calc || inverse)) {
+        if(arg2 instanceof ANum && expr2 instanceof ANum && calc != Calc.DIVIDE &&
+            (acalc == calc || inverse)) {
           // (E - 3) + 2 → E - (3 - 2)
-          // (E * 3 div 2 → E * (3 div 2)
-          final Calc ncalc = add ? calc : sub ? calc.invert() : null;
-          if(ncalc != null) expr = new Arith(info, arg1,
-              new Arith(info, arg2, expr2, ncalc).optimize(cc), acalc).optimize(cc);
+          // E * 3 * 2 → E * (3 * 2)
+          final Calc ncalc = add ? calc : calc.invert();
+          expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
+              acalc).optimize(cc);
         } else if(inverse) {
           // E + NUMBER - NUMBER → E
           // NUMBER * E div NUMBER → E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
-          if(expr != this) expr = new Cast(info, expr, Types.NUMERIC_O).optimize(cc);
+          if(expr != this) expr = new Cast(info, expr, type.seqType()).optimize(cc);
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
           num.dbl() < 0) {

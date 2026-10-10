@@ -170,7 +170,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     final Type vt = TypeRef.deref(value.type);
-    if(dt instanceof ChoiceItemType ? vt.eq(dt) : instanceOf(vt, dt, coerce)) return true;
+    if(instanceOf(vt, dt, coerce)) return true;
     // check single item
     if(size == 1) return instance((Item) value, coerce);
     // check each item
@@ -178,7 +178,7 @@ public final class SeqType {
       if(!instance(item, coerce)) return false;
     }
     // remember the more specific type to skip subsequent checks
-    if(dt.assignable() && dt.instanceOf(vt)) value.type = dt;
+    if(dt.assignable() && (coerce || !dt.coercive()) && dt.instanceOf(vt)) value.type = dt;
     return true;
   }
 
@@ -807,8 +807,8 @@ public final class SeqType {
    * @return result of check
    */
   public static boolean kept(final Type type, final Type target, final boolean coerce) {
-    return coerce && target.coercive() ?
-      type == target || TypeRef.deref(type).eq(TypeRef.deref(target)) : type.instanceOf(target);
+    return type.instanceOf(target) && (!coerce || type == target || type == BasicType.ERROR ||
+      !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)));
   }
 
   /**
