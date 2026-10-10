@@ -228,6 +228,11 @@ public final class RewritingsTest extends SandboxTest {
         true, root(Bln.class));
     error("data(data(" + wrap("a") + ") coerce to element(e))", INVTYPE_X);
     error("data(" + wrap("a") + "coerce to element(e))", INVTYPE_X);
+
+    // element with empty content is atomized to an empty string
+    final String func = "declare %basex:inline(0) function local:f($e as xs:string?) ";
+    query(func + "{ count(data(<a>{ $e }</a>)) }; local:f(())", 1);
+    query(func + "{ <a>{ $e }</a> = '' }; local:f(())", true);
   }
 
   /** Remove redundant atomizations. */
@@ -1912,6 +1917,9 @@ public final class RewritingsTest extends SandboxTest {
 
     // no rewrite
     check("<x a='2'/>/@a != 1 to 3", true, empty(CmpR.class));
+    // untyped values are cast to xs:float
+    check("<x a='0.1'/>/@a >= xs:float('0.1')", true, empty(CmpR.class));
+    check("<x a='0.1'/>/@a <= xs:float('0.1')", true, empty(CmpR.class));
     check("<x a='2'/>/@a =  2"     , true, empty(CmpR.class));
     check("trace(2) = 1 to 3", true , empty(CmpR.class));
     check("xs:decimal(<x>1</x>/text()) >= 1.0", true , empty(CmpR.class));

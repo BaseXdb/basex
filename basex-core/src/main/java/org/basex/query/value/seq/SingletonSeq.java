@@ -83,8 +83,13 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Value insertValue(final long pos, final Value val, final Job job) {
-    return val.equals(value) ? get(value, count() + 1) : val instanceof final SingletonSeq ss &&
-      value.equals(ss.value) ? get(value, count() + ss.count()) : super.insertValue(pos, val, job);
+    if(pos % value.size() == 0) {
+      if(val.equals(value)) return get(value, count() + 1);
+      if(val instanceof final SingletonSeq ss && value.equals(ss.value)) {
+        return get(value, count() + ss.count());
+      }
+    }
+    return super.insertValue(pos, val, job);
   }
 
   @Override

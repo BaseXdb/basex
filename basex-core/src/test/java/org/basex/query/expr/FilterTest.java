@@ -311,6 +311,10 @@ public final class FilterTest extends SandboxTest {
     check("for $i in (-1, 0, 1.5, 4, 'x') return ('a', 'b')[$i]",
         "a\nb",
         exists(HoistedFilter.class));
+    // decimal that is no integer, even if rounded to a double
+    check("for $i in (1.0000000000000000001, 2.0, 'x') return ('a', 'b')[$i]",
+        "b\na\nb",
+        exists(HoistedFilter.class));
     // empty predicate value at runtime
     check("for $i in (1, 'a', 2) return ('A', 'B', 'C')[if(string($i) = 'a') then () else $i]",
         "A\nB",

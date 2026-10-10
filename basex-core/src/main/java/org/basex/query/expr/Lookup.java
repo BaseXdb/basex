@@ -199,12 +199,15 @@ public final class Lookup extends Arr {
    */
   private Value lookup(final Item input, final Value keys, final QueryContext qc)
       throws QueryException {
+    if(input instanceof final JNode jnode) {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(final Item item : jnode.value) vb.add(lookup(item, keys, qc));
+      return vb.value(this);
+    }
+    if(!(input instanceof final XQStruct struct)) throw LOOKUP_X.get(info, input);
+    if(exprs[1] == Str.WILDCARD) return struct.items(qc);
     final long ks = keys.size();
     if(ks == 0) return Empty.VALUE;
-    final Item item = input instanceof final JNode jnode ? jnode.value.item(qc, info) : input;
-    if(item.isEmpty()) return Empty.VALUE;
-    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
-    if(exprs[1] == Str.WILDCARD) return struct.items(qc);
     if(ks == 1) return struct.invoke(qc, info, keys.itemAt(0));
 
     final ValueBuilder vb = new ValueBuilder(qc);

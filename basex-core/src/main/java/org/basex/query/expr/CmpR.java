@@ -136,7 +136,9 @@ public final class CmpR extends CmpRange {
     if(expr2 instanceof final RangeSeq rs) {
       mn = rs.min();
       mx = rs.max();
-    } else if(expr2 instanceof final ANum num && !(num instanceof Dec && int1)) {
+    } else if(expr2 instanceof final ANum num && !(num instanceof Dec && int1) &&
+        !(num instanceof Flt && type1.isUntyped())) {
+      // untyped values compared with floats are cast to xs:float, not xs:double
       mn = num.dbl();
       mx = mn;
     } else {

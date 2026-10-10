@@ -40,9 +40,8 @@ public final class HoistedFilter extends CachedFilter {
         if(pred instanceof final Item item) {
           // evaluate single-item predicate
           if(item instanceof final ANum num) {
-            final double d = num.dbl(info) - 1;
-            final long l = (long) d;
-            value = d == l && l >= 0 && l < value.size() ? value.itemAt(l) : Empty.VALUE;
+            final long l = Pos.position(num) - 1;
+            value = l >= 0 && l < value.size() ? value.itemAt(l) : Empty.VALUE;
           } else if(!item.ebv(qc, info)) {
             value = Empty.VALUE;
           }

@@ -23,7 +23,7 @@ public abstract class NativeSeq extends Seq {
 
   /**
    * Returns a sorted sequence.
-   * @return sorted sequence
+   * @return sorted sequence or {@code null} if the values cannot be sorted natively
    */
   public abstract Value sort();
 

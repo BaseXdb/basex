@@ -728,6 +728,15 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Returns an error string for an option that is not supported in the current context.
+   * @param option option
+   * @return error string
+   */
+  public static String unknown(final Option<?> option) {
+    return unknown(option.name());
+  }
+
+  /**
    * Inverts the boolean value of an option.
    * @param option option
    * @return new value

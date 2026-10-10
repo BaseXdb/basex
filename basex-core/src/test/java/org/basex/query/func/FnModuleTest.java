@@ -2152,6 +2152,20 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
         "America/New_York"), "2024-01-11-05:00");
 
+    // week in month: the week belongs to the month of its Thursday
+    query(func.args(" xs:date('2013-01-29')", "[w]"), 5);
+    query(func.args(" xs:date('2013-02-01')", "[w]"), 5);
+    query(func.args(" xs:date('2024-12-30')", "[w]"), 1);
+    query(func.args(" xs:date('2025-03-31')", "[w]"), 1);
+    // no year zero: ISO year 0000 is 1 BC
+    query(func.args(" xs:date('0000-01-01')", "[Y] [EN]"), "1 BC");
+    query(func.args(" xs:date('-0044-03-15')", "[Y] [EN]"), "45 BC");
+    query(func.args(" xs:date('0001-01-01')", "[Y] [EN]"), "1 AD");
+    // ISO calendar: year zero exists, era is a minus sign or empty
+    query(func.args(" xs:date('0000-01-01')", "[E][Y]", " ()", "ISO", " ()"), "0");
+    query(func.args(" xs:date('-0044-03-15')", "[E][Y]", " ()", "ISO", " ()"), "-44");
+    query(func.args(" xs:date('2024-03-15')", "[E][Y]", " ()", "ISO", " ()"), "2024");
+
     if(ExternalLib.ICU.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
           "Dydd Llun, Rhagfyr 11, 2023");
@@ -2609,6 +2623,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" reverse(-9223372036854775806 to 0)", " -9223372036854775806"),
         Long.MAX_VALUE);
     query(func.args(" 1 to 9223372036854775807", " 3e0"), 3);
+
+    // existence checks: no rewrite to general comparisons for incompatible types and NaN
+    query("exists(" + func.args(" (<_>1</_>, <_>x</_>) ! data()", 1) + ')', false);
+    query("exists(" + func.args(" (1, 2)[. > 0]", " string(<_>1</_>)") + ')', false);
+    query("exists(" + func.args(" (1e0, number(<_>x</_>))", " xs:double('NaN')") + ')', true);
+    query("empty(" + func.args(" (1e0, number(<_>x</_>))", " xs:double('NaN')") + ')', false);
   }
 
   /** Test method. */
@@ -2691,6 +2711,13 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void insertBefore() {
     final Function func = INSERT_BEFORE;
     query(func.args(1, 1, 1), "1\n1");
+    // repeated sequences: insert position must be respected
+    query("string-join(" + func.args(" replicate(('a', 'b'), 3)", 2, " ('a', 'b')") + ')',
+        "aabbabab");
+    query("string-join(" + func.args(" replicate(('a', 'b'), 3)", 2,
+        " replicate(('a', 'b'), 2)") + ')', "aababbabab");
+    query("string-join(" + func.args(" replicate(('a', 'b'), 3)", 3, " ('a', 'b')") + ')',
+        "abababab");
     query("count(" + func.args(" ()", 2, " 1 to 100_000_000") + ')', 100000000);
     query("count(" + func.args(" 1 to 100_000_000", 3, " ()") + ')', 100000000);
     query("count(" + func.args(" 1 to 100_000_000", 4, " 1 to 100_000_000") + ')', 200000000);
@@ -3858,6 +3885,7 @@ return
     check(func.args("abc", 6), "abc   ", empty(func));
 
     error(func.args("abc", 6, " { 'padding': '' }"), INVALIDVALUE_X_X);
+    error(func.args("abc", 2, " { 'padding': '' }"), INVALIDVALUE_X_X);
     error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
     error(func.args("abc", Long.MAX_VALUE), RANGE_X);
     error(func.args("abc", Integer.MAX_VALUE), MAX_SIZE_X_X);
@@ -4131,6 +4159,11 @@ return
   @Test public void parseJson() {
     final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
+
+    // rejected option: error message contains the name, but not the default value
+    error(func.args("1", " { 'json-lines': true() }"), INVALIDOPTION_X);
+    query("try { " + func.args("1", " { 'json-lines': true() }") + " } "
+        + "catch * { contains($err:description, \"'json-lines'\") }", true);
 
     // permitted characters are returned, all control characters stay escaped with 'escape'
     query("string-to-codepoints(" + func.args("\"\\u0001\"") + ')', 1);
@@ -4622,6 +4655,8 @@ return
     query(func.args("aba", "(?<n>a)?b\\k<n>", "[$<n>]"), "[a]");
     // groups with back-references: group numbers in the replacement string
     query(func.args("ab", "(a)\\1?(b)", "[$2|$20|$3]"), "[b|b0|]");
+    // leading zeros: digits are only dropped if the group number exceeds 9
+    query(func.args("abc", "(b)", "[$01|$09|$0000000001]"), "a[b||b]c");
     // literal, case-insensitive search: replacement is literal as well
     query(func.args("A$B.b", "b", "$\\", "qi"), "A$$\\.$\\");
     // escaped backslash, followed by an unescaped dollar sign
@@ -5382,6 +5417,9 @@ return
         + "'20', '15', '10')", " ()", " function($s) { number($s) }") + "[1]",
         "36-37");
     query(func.args(" (1, 2)", " ()", " function($s) { [$s] }"), "1\n2");
+    // NaN first, negative and positive zero in input order
+    query(func.args(" (1e0, xs:double('NaN'), 0e0, -0e0)") + " ! string()", "NaN\n0\n-0\n1");
+    query(func.args(" (1, 'NaN', 0, '-0') ! xs:float(.)") + " ! string()", "NaN\n0\n-0\n1");
 
     query("for $i in (10000, 10001) return " + func.args(" 1 to $i") + "[1]", "1\n1");
     query("for $i in (10000, 10001) return " + func.args(" reverse(1 to $i)") + "[1]", "1\n1");
@@ -5432,6 +5470,10 @@ return
     final String input = " ('b', 'a')";
     query(func.args(input, " compare#2"), "a\nb");
     query(func.args(input, " fn($a, $b) { -compare($a, $b) }"), "b\na");
+
+    // inconsistent comparator: unpredictable order, but no error and no lost items
+    query("let $input := (1 to 2000) ! (. mod 1000) return sort(" + func.args(" $input",
+        " fn($a, $b) { " + _RANDOM_INTEGER.args(3) + " - 1 }") + ") = sort($input)", true);
   }
 
   /** Test method. */

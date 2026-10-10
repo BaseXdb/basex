@@ -78,7 +78,8 @@ public final class ArraySort extends ArraySortBy {
         }
         // integers, strings, etc.
         if(members instanceof final NativeSeq ns && sc().collation == null) {
-          return XQArray.items(ns.sort());
+          final Value sorted = ns.sort();
+          if(sorted != null) return XQArray.items(sorted);
         }
         // repeated sortable member
         if(members instanceof final SingletonSeq ss && ss.singleItem() &&

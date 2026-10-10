@@ -99,15 +99,16 @@ public abstract class CNode extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // ignore PIs and attributes as values must be normalized
+    // single item required: a node with empty content is atomized to an empty string
     SeqType st = null;
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
       final SeqType st1 = exprs[0].seqType();
-      if(st1.zeroOrOne() && st1.instanceOf(Types.ANY_ATOMIC_TYPE_ZO) && !has(Flag.NDT)) {
+      if(st1.one() && st1.instanceOf(Types.ANY_ATOMIC_TYPE_O) && !has(Flag.NDT)) {
         if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
-          st = Types.STRING_ZO;
+          st = Types.STRING_O;
         } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-          st = this instanceof CComm || this instanceof CNSpace ? Types.STRING_ZO :
-            Types.UNTYPED_ATOMIC_ZO;
+          st = this instanceof CComm || this instanceof CNSpace ? Types.STRING_O :
+            Types.UNTYPED_ATOMIC_O;
         }
       }
     }

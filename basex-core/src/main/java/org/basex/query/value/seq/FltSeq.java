@@ -71,6 +71,10 @@ public final class FltSeq extends NativeSeq {
 
   @Override
   public Value sort() {
+    // NaN and negative zero: XQuery order and stability differ from Java
+    for(final float f : values) {
+      if(Float.isNaN(f) || f == 0 && Float.floatToRawIntBits(f) < 0) return null;
+    }
     final float[] tmp = values.clone();
     Arrays.sort(tmp);
     return get(tmp);

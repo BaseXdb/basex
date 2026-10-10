@@ -625,6 +625,13 @@ public final class SerializerTest extends SandboxTest {
     query(option + "document { comment {'C1'}, <doc>Hello, world!<!--C2--></doc>, comment {'C3'} }",
         "<!--C1-->\n<doc>Hello, world!<!--C2--></doc>\n<!--C3-->");
     query(option + "<x a='1 > 0'>1 > 0</x>", "<x a=\"1 > 0\">1 &gt; 0</x>");
+    // attributes are sorted by namespace URI (database and main-memory nodes)
+    for(final String suffix : new String[] { "", " update { }" }) {
+      query(option + "<a xmlns:z='urn:z' xmlns:b='urn:b' z:x='1' b:y='2'/>" + suffix,
+          "<a xmlns:b=\"urn:b\" xmlns:z=\"urn:z\" b:y=\"2\" z:x=\"1\"></a>");
+      query(option + "<a xmlns='urn:z' xmlns:b='urn:b'><e b:y='1' a='2'/></a>/*:e" + suffix,
+          "<e xmlns=\"urn:z\" xmlns:b=\"urn:b\" a=\"2\" b:y=\"1\"></e>");
+    }
 
     // relative namespace URIs are not allowed
     error(option + "<x xmlns='relative'/>", SERCANONURI_X);

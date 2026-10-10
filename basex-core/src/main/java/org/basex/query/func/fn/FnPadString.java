@@ -43,13 +43,13 @@ public final class FnPadString extends StandardFunc {
     final long length = toLong(arg(1), qc);
     final PadOptions options = options(2, PadOptions::new, qc);
 
-    final byte[] token = value.isEmpty() ? Token.EMPTY : value.string(info);
-    final long missing = length - Token.length(token);
-    if(missing <= 0) return Str.get(token);
-
     final byte[] padding = Token.token(options.get(PadOptions.PADDING));
     if(padding.length == 0)
       throw INVALIDVALUE_X_X.get(info, PadOptions.PADDING.name(), Str.get(padding));
+
+    final byte[] token = value.isEmpty() ? Token.EMPTY : value.string(info);
+    final long missing = length - Token.length(token);
+    if(missing <= 0) return Str.get(token);
     if(missing > Integer.MAX_VALUE) throw RANGE_X.get(info, length);
 
     final int miss = (int) missing;

@@ -71,6 +71,10 @@ public final class DblSeq extends NativeSeq {
 
   @Override
   public Value sort() {
+    // NaN and negative zero: XQuery order and stability differ from Java
+    for(final double d : values) {
+      if(Double.isNaN(d) || d == 0 && Double.doubleToRawLongBits(d) < 0) return null;
+    }
     final double[] tmp = values.clone();
     Arrays.sort(tmp);
     return get(tmp);

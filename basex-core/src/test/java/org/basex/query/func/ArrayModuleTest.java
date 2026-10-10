@@ -512,6 +512,9 @@ public final class ArrayModuleTest extends SandboxTest {
     check(func.args(" [ 1 ]"), "[1]", empty(func));
 
     query(func.args(" [ 1, 4, 6, 5, 3 ]"), "[1,3,4,5,6]");
+    // NaN first, negative and positive zero in input order
+    query(func.args(" array { 1e0, xs:double('NaN'), 0e0, -0e0 }") + "?* ! string()",
+        "NaN\n0\n-0\n1");
     query(func.args(" [ (1, 0), (1, 1), (0, 1), (0, 0) ]"), "[(0,0),(0,1),(1,0),(1,1)]");
     query(func.args(" [ 3, 2, 1 ]", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
         "[1,2,3]");

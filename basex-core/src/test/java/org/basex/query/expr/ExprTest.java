@@ -661,6 +661,11 @@ public final class ExprTest extends SandboxTest {
     // an error raised while inlining into the try clause is caught as well
     check("let $x := 'z' return try { xs:integer($x) } catch * { 'caught' }", "caught",
         root(Str.class));
+    // count and existence checks must not discard errors that are caught
+    final String s = "let $s := (1 to 3)[. > " + wrap(0) + "] return ";
+    query(s + "count(try { $s ! xs:integer('x' || .) } catch * { 1 to 5 })", 5);
+    query(s + "empty(try { $s ! xs:integer('x' || .) } catch * { () })", true);
+    query(s + "min(try { sort-by($s, fn($i) { xs:integer('x' || $i) }) } catch * { 0 })", 0);
   }
 
   /** Checks the simplification of boolean sequences. */

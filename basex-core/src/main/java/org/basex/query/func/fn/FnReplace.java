@@ -117,12 +117,11 @@ public final class FnReplace extends RegExFn {
               sb.append("${").append(name).append('}');
               s = i + 1;
             } else {
-              // take all digits, drop trailing ones while the number exceeds the group count
+              // take digits as long as the number exceeds neither 9 nor the group count
               while(i < sl && digit(string.charAt(i))) i++;
-              final int gc = regExpr.groupCount(matcher);
-              int e = i;
-              while(e - s > 1 && (e - s > 9 || Integer.parseInt(string.substring(s, e)) > gc)) e--;
-              final int n = Integer.parseInt(string.substring(s, e));
+              final int gc = regExpr.groupCount(matcher), max = Math.max(9, gc);
+              int e = s, n = 0;
+              for(int d; e < i && (d = n * 10 + string.charAt(e) - '0') <= max; e++) n = d;
               if(n <= gc) sb.append('$').append(regExpr.group(n));
               // escape dropped digits: they must not extend the group number
               for(; e < i; e++) sb.append('\\').append(string.charAt(e));

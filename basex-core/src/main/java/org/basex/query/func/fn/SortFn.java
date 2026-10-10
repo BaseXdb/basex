@@ -249,10 +249,16 @@ public abstract class SortFn extends StandardFunc {
       }
     };
 
+    // sort a copy: an aborted sort may leave the array in an inconsistent state
+    final Value[] list = Arrays.copyOf(values.list, values.size());
     try {
-      Arrays.sort(values.list, 0, values.size(), comparator);
+      Arrays.sort(list, comparator);
+      System.arraycopy(list, 0, values.list, 0, list.length);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
+    } catch(final IllegalArgumentException ex) {
+      // inconsistent comparator: the order is unpredictable, the input order is kept
+      Util.debug(ex);
     }
   }
 }

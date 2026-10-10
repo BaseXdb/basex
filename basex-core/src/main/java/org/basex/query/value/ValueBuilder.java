@@ -86,9 +86,9 @@ public final class ValueBuilder {
       sb = sb.add(sngl);
       tree = tr;
     }
-    if(tr > 0 && (tr -= value.size()) <= 0) {
-      sb = new TreeSeqBuilder(job).add(sb.value(BasicType.ITEM));
-      tree = tr;
+    if(tr > 0) {
+      tree = tr -= value.size();
+      if(tr <= 0) sb = new TreeSeqBuilder(job).add(sb.value(BasicType.ITEM));
     }
     builder = sb.add(value);
     return this;

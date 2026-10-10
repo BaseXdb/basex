@@ -113,9 +113,16 @@ public final class LookupTest extends SandboxTest {
     check("[ <x/> ]?*", "<x/>", exists(_ARRAY_ITEMS), empty(Lookup.class));
   }
 
+  /** JNodes: lookup is applied to each item of the value. */
+  @Test public void jnode() {
+    query("let $j := { 'a': ({ 'x': 1 }, { 'x': 2 }) }/a return $j?x", "1\n2");
+    query("let $j := { 'a': () }/a return $j?x", "");
+  }
+
   /** Test. */
   @Test public void error() {
     error("1?a", LOOKUP_X);
+    error("(1, 2)[" + wrap(1) + " = 1]?((1)[" + wrap(1) + " = 2])", LOOKUP_X);
     error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X_X);
     error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X_X);
     error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X_X);

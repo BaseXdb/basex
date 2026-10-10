@@ -158,7 +158,8 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
-    if(calendar != null && !supported(calendar, info)) tb.add("[Calendar: AD]");
+    final int cal = calendar != null ? calendar(calendar, info) : 1;
+    if(cal > 1) tb.add("[Calendar: AD]");
 
     // adopt IANA timezone, and remember its name (standard time for xs:time, otherwise DST-aware)
     ADate date = dt;
@@ -187,7 +188,7 @@ public abstract class Formatter extends FormatUtil {
         // retrieve and format variable marker
         final byte[] marker = dp.marker();
         if(marker.length == 0) throw PICDATE_X.get(info, picture);
-        tb.add(component(marker, date, zone, info));
+        tb.add(component(marker, date, zone, cal == 0, info));
       }
     }
     return tb.finish();
@@ -198,12 +199,13 @@ public abstract class Formatter extends FormatUtil {
    * @param marker variable marker
    * @param date date
    * @param zone timezone name (can be {@code null})
+   * @param iso ISO calendar
    * @param info input info (can be {@code null})
    * @return formatted component
    * @throws QueryException query exception
    */
   private byte[] component(final byte[] marker, final ADate date, final byte[] zone,
-      final InputInfo info) throws QueryException {
+      final boolean iso, final InputInfo info) throws QueryException {
 
     // reject components that are not available in the supplied value
     final int comp = ch(marker, 0);
@@ -217,7 +219,11 @@ public abstract class Formatter extends FormatUtil {
     BigDecimal frac = null;
     long num = 0;
     switch(comp) {
-      case 'Y' -> num = Math.abs(date.yea());
+      case 'Y' -> {
+        // AD calendar has no year zero: 0000 is 1 BC, -0001 is 2 BC
+        final long year = date.yea();
+        num = year > 0 ? year : iso ? -year : 1 - year;
+      }
       case 'M' -> num = date.mon();
       case 'D' -> num = date.day();
       case 'd' -> {
@@ -231,11 +237,9 @@ public abstract class Formatter extends FormatUtil {
       }
       case 'W' -> num = date.toLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
       case 'w' -> {
-        final TemporalField wom = WeekFields.ISO.weekOfMonth();
-        final LocalDate ld = date.toLocalDate();
-        num = ld.get(wom);
-        // first week of month: use last week of previous month, according to ISO 8601
-        if(num == 0) num = ld.minusDays(ld.getDayOfMonth()).get(wom);
+        // week in month: the week belongs to the month of its Thursday
+        final LocalDate thursday = date.toLocalDate().with(ChronoField.DAY_OF_WEEK, 4);
+        num = (thursday.getDayOfMonth() + 6) / 7;
       }
       case 'H' -> num = date.hour();
       case 'h' -> {
@@ -270,6 +274,8 @@ public abstract class Formatter extends FormatUtil {
     // parse presentation modifier(s) and width modifier
     final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
     if(comp == 'Y') num = year(num, fp);
+    // ISO calendar: era is a minus sign for negative years
+    if(comp == 'E' && iso) return num < 0 ? cpToken('-') : EMPTY;
 
     if(comp == 'Z' || comp == 'z') {
       // output timezone (as name if requested via 'N' and a place is known)
@@ -306,13 +312,13 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Checks if the specified calendar is supported.
+   * Returns the index of the specified calendar (only ISO and AD are supported).
    * @param calendar calendar
    * @param info input info
-   * @return result of check
+   * @return index ({@code 0}: ISO, {@code 1}: AD or calendar in a namespace, otherwise unsupported)
    * @throws QueryException query exception
    */
-  private static boolean supported(final byte[] calendar, final InputInfo info)
+  private static int calendar(final byte[] calendar, final InputInfo info)
       throws QueryException {
 
     final QNm qnm;
@@ -321,15 +327,14 @@ public abstract class Formatter extends FormatUtil {
     } catch(final QueryException ex) {
       throw CALWHICH_X.get(info, calendar).cause(ex);
     }
-    if(qnm.uri().length != 0) return true;
+    if(qnm.uri().length != 0) return 1;
 
     final byte[] local = qnm.local();
     int c = -1;
     final int cl = CALENDARS.length;
     while(++c < cl && !eq(CALENDARS[c], local));
     if(c == cl) throw CALWHICH_X.get(info, calendar);
-    // only ISO and AD are supported
-    return c <= 1;
+    return c;
   }
 
   /**

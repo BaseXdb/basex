@@ -652,7 +652,7 @@ public abstract class Serializer implements Closeable {
       final BasicNodeIter iter = node.attributeIter();
       for(GNode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
-        addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
+        addAttribute(n, v, canonical ? nd.qname().uri() : null);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
       }
       adjustNamespaces(originalName);
