@@ -1196,7 +1196,8 @@ public class QueryParser extends InputParser {
         final boolean statik = wsConsume("%");
         if(statik && !wsConsumeWs("static")) throw error(WRONGCHAR_X_X, "static", found());
         final InputInfo fi = info();
-        final byte[] name = ncName(NONCNAME_X, false);
+        skipWs();
+        final byte[] name = quote(current()) ? stringLiteral() : ncName(NONCNAME_X, false);
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
         Expr init = null;

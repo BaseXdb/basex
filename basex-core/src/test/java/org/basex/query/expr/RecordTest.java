@@ -1044,7 +1044,8 @@ public final class RecordTest extends SandboxTest {
     // syntax
     error("declare record local:s(%static a); 1", WRONGCHAR_X_X);
     error("declare record local:s(a := 1, b); 1", PARAMOPTIONAL_X);
-    error("declare record local:s('a'); 1", NONCNAME_X);
+    query("declare record local:s('a'); 1", "1");
+    error("declare record local:s(1); 1", NONCNAME_X);
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
   }
 }
