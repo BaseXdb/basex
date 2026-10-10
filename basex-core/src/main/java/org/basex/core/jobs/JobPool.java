@@ -1,8 +1,10 @@
 package org.basex.core.jobs;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
@@ -32,8 +34,8 @@ public final class JobPool {
   public final Map<String, QueryJobTask> tasks = new ConcurrentHashMap<>();
 
   /** Scheduler for delayed and periodic job tasks. */
-  private final ScheduledExecutorService scheduler =
-      Executors.newSingleThreadScheduledExecutor(factory("basex-scheduler"));
+  private final ScheduledThreadPoolExecutor scheduler =
+      new ScheduledThreadPoolExecutor(1, factory("basex-scheduler"));
   /** Executor for running jobs. */
   private final ExecutorService pool = Executors.newCachedThreadPool(factory("basex-job"));
   /** Available slots for jobs running in parallel. */
@@ -56,6 +58,8 @@ public final class JobPool {
    */
   public JobPool(final StaticOptions sopts) {
     timeout = sopts.get(StaticOptions.CACHETIMEOUT) * 1000L;
+    // canceled tasks may reference query contexts: release them immediately
+    scheduler.setRemoveOnCancelPolicy(true);
   }
 
   /**
@@ -109,6 +113,26 @@ public final class JobPool {
   }
 
   /**
+   * Waits until a condition is met; aborted if the waiting job is stopped.
+   * @param job waiting job
+   * @param done condition, checked whenever a job or task completes
+   */
+  public void await(final Job job, final BooleanSupplier done) {
+    try {
+      job.runStoppable(() -> {
+        synchronized(monitor) {
+          // bounded wait: state changes outside the pool are not notified
+          while(!done.getAsBoolean()) monitor.wait(1000);
+        }
+        return null;
+      });
+    } catch(final IOException | InterruptedException ex) {
+      Util.debug(ex);
+      throw new JobException(Text.INTERRUPTED);
+    }
+  }
+
+  /**
    * Stops all jobs before closing the application.
    */
   public synchronized void close() {
@@ -125,7 +149,7 @@ public final class JobPool {
    * @param delay delay (ms)
    * @return cancellation handle
    */
-  ScheduledFuture<?> schedule(final Runnable task, final long delay) {
+  public ScheduledFuture<?> schedule(final Runnable task, final long delay) {
     return scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
   }
 

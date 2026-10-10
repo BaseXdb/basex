@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -307,15 +308,9 @@ final class Unit {
   private void eval(final StaticFunc func, final long timeout) throws QueryException {
     current = func;
 
-    Timer timer = null;
+    ScheduledFuture<?> timer = null;
     try(QueryContext qc = job.pushJob(new QueryContext(ctx))) {
-      if(timeout > 0) {
-        timer = new Timer(true);
-        timer.schedule(new TimerTask() {
-          @Override
-          public void run() { qc.timeout(); }
-        }, timeout);
-      }
+      if(timeout > 0) timer = ctx.jobs.schedule(qc::timeout, timeout);
       try {
         qc.parse(input, file.path());
         qc.assign(func);
@@ -334,7 +329,7 @@ final class Unit {
         throw ex;
       }
     } finally {
-      if(timer != null) timer.cancel();
+      if(timer != null) timer.cancel(false);
       job.popJob();
     }
   }

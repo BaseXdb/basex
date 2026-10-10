@@ -5,7 +5,6 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -24,15 +23,12 @@ public final class JobExecute extends JobEval {
     // wait for result; stop process if child process is stopped
     final JobPool pool = qc.context.jobs;
     try {
-      while(true) {
-        if(!pool.tasks.containsKey(id)) {
-          final Job job = pool.active.get(id);
-          if(job == null) break;
-          if(job.state == JobState.STOPPED) throw new JobException(Text.INTERRUPTED);
-        }
-        Performance.sleep(1);
-        qc.checkStop();
-      }
+      pool.await(qc, () -> {
+        if(pool.tasks.containsKey(id)) return false;
+        final Job job = pool.active.get(id);
+        if(job != null && job.state == JobState.STOPPED) throw new JobException(Text.INTERRUPTED);
+        return job == null;
+      });
     } catch(final JobException ex) {
       // stop child process if process is stopped
       pool.remove(id);

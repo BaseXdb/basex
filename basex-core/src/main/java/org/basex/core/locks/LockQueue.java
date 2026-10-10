@@ -29,15 +29,11 @@ final class LockQueue {
   /**
    * Queues the job until it can be started.
    * @param id job ID
-   * @param read read flag
    * @param write write flag
    * @throws InterruptedException interrupted exception
    */
-  synchronized void acquire(final Long id, final boolean read, final boolean write)
-      throws InterruptedException {
-
-    // only wait if job is locking
-    if(jobs >= parallel && (read || write)) {
+  synchronized void acquire(final Long id, final boolean write) throws InterruptedException {
+    if(jobs >= parallel) {
       // add job ID to queue and wait
       final Queue<Long> queue = write ? writers : readers;
       queue.add(id);

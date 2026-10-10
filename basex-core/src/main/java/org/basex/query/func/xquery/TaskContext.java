@@ -176,7 +176,8 @@ final class TaskContext {
     final ForkJoinPool caller = ForkJoinTask.getPool();
     final ForkJoinPool pool = dedicated ? new ForkJoinPool(parallel) :
       Objects.requireNonNullElse(caller, ForkJoinPool.commonPool());
-    final Timer timer = scheduleTimeout();
+    final ScheduledFuture<?> timer = timeout > 0 ?
+      qc.context.jobs.schedule(group::timeout, timeout) : null;
     try {
       return dedicated && caller != null ? await(pool, fn) : fn.apply(pool);
     } catch(final Exception ex) {
@@ -190,7 +191,7 @@ final class TaskContext {
       if(e instanceof final JobException je) throw je;
       throw XQUERY_UNEXPECTED_X.get(info, e);
     } finally {
-      if(timer != null) timer.cancel();
+      if(timer != null) timer.cancel(false);
       if(dedicated) pool.shutdown();
       group.close();
     }
@@ -210,22 +211,5 @@ final class TaskContext {
     final FutureTask<Value> task = new FutureTask<>(() -> fn.apply(pool));
     pool.execute(task);
     return task.get();
-  }
-
-  /**
-   * Schedules a job that cancels all branches once the timeout is exceeded.
-   * @return timer, or {@code null} if no positive timeout was specified
-   */
-  private Timer scheduleTimeout() {
-    if(timeout <= 0) return null;
-
-    final Timer timer = new Timer(true);
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        group.timeout();
-      }
-    }, timeout);
-    return timer;
   }
 }

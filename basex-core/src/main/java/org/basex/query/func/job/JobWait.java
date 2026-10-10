@@ -21,10 +21,7 @@ public final class JobWait extends StandardFunc {
     if(qc.jc().id().equals(id)) throw JOBS_SELF_X.get(info, id);
 
     final JobPool pool = qc.context.jobs;
-    while(pool.tasks.containsKey(id) || pool.active.containsKey(id)) {
-      qc.checkStop();
-      pool.awaitChange();
-    }
+    pool.await(qc, () -> !pool.tasks.containsKey(id) && !pool.active.containsKey(id));
     return Empty.VALUE;
   }
 }

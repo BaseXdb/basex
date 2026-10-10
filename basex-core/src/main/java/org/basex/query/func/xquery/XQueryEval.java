@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -80,7 +81,7 @@ public class XQueryEval extends StandardFunc {
     final HashMap<String, Value> bindings = function != null ? null : toBindings(arg(1), qc);
     final Value[] args = function != null ? toArguments(arg(1), function, qc) : null;
 
-    Timer to = null;
+    ScheduledFuture<?> to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {
       qctx.user = new User(user).permission(perm);
       qctx.maxPerm = perm(qc).min(limit != null ? limit : Perm.ADMIN);
@@ -92,13 +93,7 @@ public class XQueryEval extends StandardFunc {
       // timeout
       final long ms = ((ANum) options.get(XQueryOptions.TIMEOUT)).dec(info).
           multiply(BigDecimal.valueOf(1000)).longValue();
-      if(ms > 0) {
-        to = new Timer(true);
-        to.schedule(new TimerTask() {
-          @Override
-          public void run() { qctx.timeout(); }
-        }, ms);
-      }
+      if(ms > 0) to = qc.context.jobs.schedule(qctx::timeout, ms);
 
       // evaluate query; a function has no path to report
       final boolean pass = options.get(XQueryOptions.PASS) && query != null;
@@ -152,7 +147,7 @@ public class XQueryEval extends StandardFunc {
         qc.context.jobs.unwatchMemory(qctx);
       }
     } finally {
-      if(to != null) to.cancel();
+      if(to != null) to.cancel(false);
     }
   }
 

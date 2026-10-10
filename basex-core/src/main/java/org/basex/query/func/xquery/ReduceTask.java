@@ -74,7 +74,6 @@ final class ReduceTask extends RecursiveTask<Value> {
       return computeValue();
     } catch(final QueryException ex) {
       completeExceptionally(ex);
-      cancel(true);
       return Empty.VALUE;
     }
   }

@@ -32,7 +32,7 @@ public final class QueryJobTask implements Runnable {
   private LocalDateTime next;
   /** Handle for cancelling the scheduled task (can be {@code null}). */
   private ScheduledFuture<?> future;
-  /** Indicates that cancellation was requested before the future was assigned. */
+  /** Indicates that the task was canceled. */
   private boolean canceled;
 
   /**
@@ -73,7 +73,12 @@ public final class QueryJobTask implements Runnable {
       job.remove();
       cancel();
     } else {
-      reschedule();
+      try {
+        schedule();
+      } catch(final RejectedExecutionException ex) {
+        // scheduler has been shut down (application is closing): stop repeating
+        Util.debug(ex);
+      }
     }
     job.startIfNotRunning();
   }
@@ -88,32 +93,10 @@ public final class QueryJobTask implements Runnable {
   }
 
   /**
-   * Schedules the first execution.
+   * Schedules the next execution unless the task was canceled.
    */
   synchronized void schedule() {
-    future(jobs.schedule(this, Math.max(0, start - System.currentTimeMillis())));
-  }
-
-  /**
-   * Schedules the next repetition.
-   */
-  private void reschedule() {
-    if(canceled) return;
-    try {
-      future(jobs.schedule(this, Math.max(0, start - System.currentTimeMillis())));
-    } catch(final RejectedExecutionException ex) {
-      // scheduler has been shut down (application is closing): stop repeating
-      Util.debug(ex);
-    }
-  }
-
-  /**
-   * Assigns the handle for canceling the scheduled task.
-   * @param ftr scheduled future
-   */
-  synchronized void future(final ScheduledFuture<?> ftr) {
-    future = ftr;
-    if(canceled) ftr.cancel(false);
+    if(!canceled) future = jobs.schedule(this, Math.max(0, start - System.currentTimeMillis()));
   }
 
   /**

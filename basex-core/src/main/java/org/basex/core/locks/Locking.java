@@ -102,7 +102,7 @@ public final class Locking {
 
     // queue job if the job limit has been reached (only locking jobs count towards the limit)
     final LockList reads = locks.reads, writes = locks.writes;
-    final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
+    final boolean write = writes.locking(), lock = write || reads.locking();
     final boolean inherited = locks.inherited();
     boolean global = false;
     locks.slot = false;
@@ -110,7 +110,7 @@ public final class Locking {
       if(lock) {
         // a job that inherits the run slot of a blocked caller must not occupy a second one
         if(!inherited) {
-          queue.acquire(id, read, write);
+          queue.acquire(id, write);
           locks.slot = true;
         }
         // apply exclusive lock (global write), or shared lock otherwise
