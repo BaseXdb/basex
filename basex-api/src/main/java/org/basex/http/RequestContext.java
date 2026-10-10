@@ -65,9 +65,12 @@ public final class RequestContext implements RequestScope {
     if(request == null) return this;
     final RequestContext rc = new RequestContext(new FrozenRequest(state));
     rc.values = values;
-    rc.form = form;
     rc.headers = headers;
-    rc.body = body;
+    // temporary files are deleted with the live request: share in-memory data only
+    if(temp.isEmpty()) {
+      rc.form = form;
+      rc.body = body;
+    }
     return rc;
   }
 
@@ -163,6 +166,8 @@ public final class RequestContext implements RequestScope {
    */
   public IO body() throws IOException {
     if(body == null) {
+      // no live request (WebSocket connection, detached job): empty body
+      if(request == null) return new IOContent(Token.EMPTY);
       final InputStream is = request.getInputStream();
       // binary and multipart bodies are consumed as streams: spill large ones to disk
       final MediaType mt = state.mediaType();

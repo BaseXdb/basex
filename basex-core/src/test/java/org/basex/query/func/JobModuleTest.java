@@ -700,6 +700,15 @@ public final class JobModuleTest extends SandboxTest {
           " fn() { " + func.args("count(db:get('db'))") + " }"));
       error(_DB_GET.args("db") + ", " + _XQUERY_FORK_JOIN.args(
           " fn() { " + func.args("db:optimize('db')") + " }"), JOBS_DEADLOCK_X);
+      // caller reads globally and writes locally: job must not read globally or the written data
+      for(final String job : new String[] { "count(db:get(db:list()[1]))",
+          "count(db:get('db'))" }) {
+        error("let $id := " + _JOB_EVAL.args("let $g := db:get(db:list()[1]) "
+            + "let $r := job:execute(\"" + job + "\") "
+            + "return db:add('db', <a>{ count($g), $r }</a>, 'a.xml')", " ()",
+            " { 'cache': true(), 'timeout': 5 }") + " return (" + _JOB_WAIT.args(" $id") + ", "
+            + _JOB_RESULT.args(" $id") + ')', JOBS_DEADLOCK_X);
+      }
     } finally {
       query(_DB_DROP.args("db"));
       query(_DB_DROP.args("db2"));

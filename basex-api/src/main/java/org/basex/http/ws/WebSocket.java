@@ -275,7 +275,8 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
           }
         });
       } else if(value instanceof final ByteBuffer bb) {
-        remote.sendBinary(bb, result -> sendNext());
+        // buffers may be shared by multiple clients: send a view with its own position
+        remote.sendBinary(bb.duplicate(), result -> sendNext());
       } else {
         remote.sendText((String) value, result -> sendNext());
       }

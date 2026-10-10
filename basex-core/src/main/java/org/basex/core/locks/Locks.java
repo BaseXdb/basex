@@ -71,14 +71,14 @@ public final class Locks {
    * @return result of check
    */
   public boolean deadlocks(final Locks locks) {
-    // the job must never wait for a lock: it may only read what its blocked caller reads
+    // the job must never wait for a lock: it may only read what its blocked caller reads,
+    // but nothing that the caller writes
     if(!inherited() || !locks.locking()) return false;
     if(locks.writes.locking()) return true;
-    final LockList held = caller.reads;
-    if(held.global()) return false;
-    if(locks.reads.global()) return true;
+    final LockList held = caller.reads, written = caller.writes;
+    if(locks.reads.global()) return !held.global() || written.locking();
     for(final String lock : locks.reads) {
-      if(!held.contains(lock)) return true;
+      if(!held.global() && !held.contains(lock) || written.contains(lock)) return true;
     }
     return false;
   }

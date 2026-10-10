@@ -89,6 +89,12 @@ public final class CacheModuleTest extends SandboxTest {
     // nested call with the same key
     query(func.args("nested", " function() { " + func.args("nested", " function() { 1 }") +
         " + 1 }"), 2);
+    // concurrent nested calls with unrelated keys must not block each other
+    final String nested = "fn() { " + func.args("a", " fn() { " + _PROF_SLEEP.args(200) + ", " +
+        func.args("\"", " fn() { 1 }") + " }") + " }, fn() { " + func.args("b", " fn() { " +
+        _PROF_SLEEP.args(200) + ", " + func.args("!", " fn() { 2 }") + " }") + " }";
+    query(_XQUERY_FORK_JOIN.args(" (" + nested + ")", " { 'parallel': 2, 'timeout': 5 }"),
+        "1\n2");
   }
 
   /** Test method. */

@@ -31,6 +31,25 @@ public final class WsRequestTest extends WsTest {
   }
 
   /**
+   * {@code request:body} returns an empty sequence: there is no live request.
+   * @throws Exception exception
+   */
+  @Test public void requestBody() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit('body:' || count(request:body())) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h", l);
+    try {
+      assertEquals("body:0", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * {@code request:header} returns upgrade headers; lookup is case-insensitive.
    * @throws Exception exception
    */

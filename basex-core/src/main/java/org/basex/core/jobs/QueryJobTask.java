@@ -23,12 +23,12 @@ public final class QueryJobTask implements Runnable {
 
   /** Job pool (for rescheduling). */
   private final JobPool jobs;
-  /** Time zone for wall-clock interval arithmetic. */
+  /** Time zone for wall-clock cron arithmetic. */
   private final ZoneId zone = ZoneId.systemDefault();
 
   /** Next start time (ms). */
   public long start;
-  /** Next start time as local wall-clock time. */
+  /** Next cron occurrence as local wall-clock time ({@code null} if no cron expression exists). */
   private LocalDateTime next;
   /** Handle for cancelling the scheduled task (can be {@code null}). */
   private ScheduledFuture<?> future;
@@ -53,23 +53,23 @@ public final class QueryJobTask implements Runnable {
     this.cron = cron;
     final long time = System.currentTimeMillis();
     end = duration == Long.MAX_VALUE ? duration : time + duration;
-    if(first != null) {
-      // cron occurrences are exact wall-clock times
-      next = first;
-      start = millis(first);
-    } else {
-      // interval starts are exact instants
-      start = time + delay;
-      next = Instant.ofEpochMilli(start).atZone(zone).toLocalDateTime();
-    }
+    // cron occurrences are wall-clock times, interval starts are exact instants
+    next = first;
+    start = first != null ? millis(first) : time + delay;
   }
 
   @Override
   public synchronized void run() {
-    next = cron != null ? cron.next(next) :
-      interval != 0 ? next.plus(Duration.ofMillis(interval)) : null;
-    if(next != null) start = millis(next);
-    if(next == null || start >= end) {
+    final boolean repeat;
+    if(cron != null) {
+      next = cron.next(next);
+      repeat = next != null;
+      if(repeat) start = millis(next);
+    } else {
+      repeat = interval != 0;
+      start += interval;
+    }
+    if(!repeat || start >= end) {
       job.remove();
       cancel();
     } else {

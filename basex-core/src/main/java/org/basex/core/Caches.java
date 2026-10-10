@@ -22,8 +22,8 @@ public final class Caches {
   private final HashMap<String, Cache> caches = new HashMap<>();
   /** Configurations of initialized caches. */
   private final HashMap<String, Config> configs = new HashMap<>();
-  /** Locks for computing values, indexed by the hash codes of cache names and keys. */
-  private final ReentrantLock[] locks = new ReentrantLock[64];
+  /** Locks for computing values, indexed by cache names and keys. */
+  private final HashMap<String, KeyLock> locks = new HashMap<>();
   /** Database context. */
   private final Context context;
 
@@ -33,7 +33,6 @@ public final class Caches {
    */
   public Caches(final Context context) {
     this.context = context;
-    Arrays.setAll(locks, i -> new ReentrantLock());
   }
 
   /**
@@ -84,24 +83,35 @@ public final class Caches {
     Value value = get(key, name);
     if(value != null) return value;
 
-    final ReentrantLock lock = locks[(name + '\0' + key).hashCode() & locks.length - 1];
-    try {
-      Job.run(() -> {
-        lock.lockInterruptibly();
-        return null;
-      });
-    } catch(final IOException | InterruptedException ex) {
-      throw new JobException(Text.INTERRUPTED, ex);
+    final String id = name + '\0' + key;
+    final KeyLock lock;
+    synchronized(this) {
+      lock = locks.computeIfAbsent(id, k -> new KeyLock());
+      lock.users++;
     }
     try {
-      value = get(key, name);
-      if(value == null) {
-        value = compute.get();
-        put(key, value, name);
+      try {
+        Job.run(() -> {
+          lock.lockInterruptibly();
+          return null;
+        });
+      } catch(final IOException | InterruptedException ex) {
+        throw new JobException(Text.INTERRUPTED, ex);
       }
-      return value;
+      try {
+        value = get(key, name);
+        if(value == null) {
+          value = compute.get();
+          put(key, value, name);
+        }
+        return value;
+      } finally {
+        lock.unlock();
+      }
     } finally {
-      lock.unlock();
+      synchronized(this) {
+        if(--lock.users == 0) locks.remove(id);
+      }
     }
   }
 
@@ -305,6 +315,17 @@ public final class Caches {
       if(evict) evictions++;
       return evict;
     }
+  }
+
+  /**
+   * Lock for computing the value of a single key.
+   *
+   * @author BaseX Team, BSD License
+   * @author Christian Gruen
+   */
+  private static final class KeyLock extends ReentrantLock {
+    /** Number of threads that hold or wait for this lock. */
+    private int users;
   }
 
   /**

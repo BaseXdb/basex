@@ -27,6 +27,14 @@ public final class TempFiles implements QueryResource {
     files.add(file);
   }
 
+  /**
+   * Indicates if no temporary files have been registered.
+   * @return result of check
+   */
+  public synchronized boolean isEmpty() {
+    return files.isEmpty();
+  }
+
   @Override
   public synchronized void close() {
     for(final IOFile file : files) file.delete();

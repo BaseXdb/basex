@@ -2,6 +2,7 @@ package org.basex.http.ws;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.nio.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -66,6 +67,29 @@ public final class WsPoolTest extends WsTest {
       wsa.sendText("hi", true).get(5, TimeUnit.SECONDS);
       assertEquals("all:hi", la.pollText());
       assertEquals("all:hi", lb.pollText());
+    } finally {
+      close(wsa);
+      close(wsb);
+    }
+  }
+
+  /**
+   * {@code ws:emit($msg)} sends a binary message to all connected clients.
+   * @throws Exception exception
+   */
+  @Test public void emitBinary() throws Exception {
+    register("declare %ws:message('/p', '{$m}') function m:msg($m) {"
+        + " ws:emit(xs:base64Binary($m)) };");
+
+    final Listener la = new Listener();
+    final Listener lb = new Listener();
+    final java.net.http.WebSocket wsa = connect("/p", la);
+    final java.net.http.WebSocket wsb = connect("/p", lb);
+    try {
+      final byte[] payload = { 1, 2, 3, 4, 5 };
+      wsa.sendBinary(ByteBuffer.wrap(payload), true).get(5, TimeUnit.SECONDS);
+      assertArrayEquals(payload, la.pollBinary());
+      assertArrayEquals(payload, lb.pollBinary());
     } finally {
       close(wsa);
       close(wsb);
