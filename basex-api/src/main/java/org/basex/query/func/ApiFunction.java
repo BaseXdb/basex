@@ -300,6 +300,8 @@ public enum ApiFunction implements AFunction {
    */
   public static void init(final ArrayList<FuncDefinition> list) {
     for(final ApiFunction function : values()) list.add(function.definition);
+    Functions.HIDDEN.add(_WEBDAV_LOCKS.definition.name);
+    Functions.HIDDEN.add(_WEBDAV_LOCK_UPDATE.definition.name);
   }
 
   @Override

@@ -150,6 +150,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
         Collections.addAll(KEYWORDS, op.nodes);
       }
       for(final QNm name : Functions.BUILT_IN) {
+        if(Functions.HIDDEN.contains(name)) continue;
         final String local = string(name.local());
         final byte[] prefix = NSGlobal.prefix(name.uri());
         if(prefix.length != 0) FUNCTIONS.add(string(prefix) + ':' + local);
@@ -187,19 +188,18 @@ final class SyntaxXQuery extends SyntaxMarkup {
     }
     // add functions (functions of the default namespace can also be called without prefix)
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
+      if(Functions.HIDDEN.contains(fd.name)) continue;
       final String args = '(' + fd.paramString() + ')', value = fd.params.length > 0 ? "(_)" : "()";
       final boolean deflt = eq(fd.name.uri(), FN_URI);
       final String prefixed = string(fd.name.prefixId());
       final Signature signature = Signature.get(args);
       SIGNATURES.put(prefixed, signature);
-      // deprecated functions get signature hints, but are never proposed
-      final boolean propose = !Functions.DEPRECATED.contains(fd.name);
       if(deflt) {
         final String local = string(fd.name.local());
         SIGNATURES.put(local, signature);
-        if(propose) add(local, args, value, abbrs, names, false);
+        add(local, args, value, abbrs, names, false);
       }
-      if(propose) add(prefixed, args, value, prefixedAbbrs, prefixedNames, deflt);
+      add(prefixed, args, value, prefixedAbbrs, prefixedNames, deflt);
     }
     // add annotations (annotations of the XQuery namespace are specified without prefix)
     for(final Annotation ann : Annotation.values()) {

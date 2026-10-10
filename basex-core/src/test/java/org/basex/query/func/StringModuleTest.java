@@ -186,7 +186,7 @@ public final class StringModuleTest extends SandboxTest {
     error(func.args("%s", " ()"), INVTYPE_X);
     error(func.args("%d", " ()"), INVTYPE_X);
 
-    // deprecated: never suggested
+    // hidden: never suggested
     query("try { xquery:eval('string:formatt(\"x\")') } catch * { $err:description }",
         "Unknown function: string:formatt.");
   }
