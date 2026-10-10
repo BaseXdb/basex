@@ -63,7 +63,7 @@ public final class RequestContext implements RequestScope {
   @Override
   public RequestContext detach() {
     if(request == null) return this;
-    final RequestContext rc = new RequestContext(new FrozenRequest(state));
+    final RequestContext rc = new RequestContext(FrozenRequest.of(state));
     rc.values = values;
     rc.headers = headers;
     // temporary files are deleted with the live request: share in-memory data only

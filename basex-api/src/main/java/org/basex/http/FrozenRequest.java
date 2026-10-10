@@ -9,120 +9,41 @@ import jakarta.servlet.http.*;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
+ *
+ * @param method method
+ * @param query query string (can be {@code null})
+ * @param url URL
+ * @param uri URI
+ * @param scheme scheme
+ * @param serverName server name
+ * @param serverPort server port
+ * @param contextPath context path
+ * @param localAddress local address
+ * @param remoteAddress remote address
+ * @param remoteHostname remote host name
+ * @param remotePort remote port
+ * @param headers headers (names are case-insensitive)
+ * @param cookies cookies (can be {@code null})
+ * @param attributes attributes
  */
-final class FrozenRequest implements RequestState {
-  /** Headers (names are case-insensitive). */
-  private final TreeMap<String, List<String>> headers =
-      new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-  /** Attributes. */
-  private final Map<String, Object> attributes;
-  /** Cookies (can be {@code null}). */
-  private final Cookie[] cookies;
-  /** Method. */
-  private final String method;
-  /** Query string (can be {@code null}). */
-  private final String query;
-  /** URL. */
-  private final String url;
-  /** URI. */
-  private final String uri;
-  /** Scheme. */
-  private final String scheme;
-  /** Server name. */
-  private final String serverName;
-  /** Server port. */
-  private final int serverPort;
-  /** Context path. */
-  private final String contextPath;
-  /** Local address. */
-  private final String localAddress;
-  /** Remote address. */
-  private final String remoteAddress;
-  /** Remote host name. */
-  private final String remoteHostname;
-  /** Remote port. */
-  private final int remotePort;
+record FrozenRequest(String method, String query, String url, String uri, String scheme,
+    String serverName, int serverPort, String contextPath, String localAddress,
+    String remoteAddress, String remoteHostname, int remotePort,
+    TreeMap<String, List<String>> headers, Cookie[] cookies, Map<String, Object> attributes)
+    implements RequestState {
 
   /**
-   * Constructor, capturing the values of the supplied state.
+   * Captures the values of the supplied state.
    * @param state request state
+   * @return frozen request
    */
-  FrozenRequest(final RequestState state) {
-    method = state.method();
-    query = state.query();
-    url = state.url();
-    uri = state.uri();
-    scheme = state.scheme();
-    serverName = state.serverName();
-    serverPort = state.serverPort();
-    contextPath = state.contextPath();
-    localAddress = state.localAddress();
-    remoteAddress = state.remoteAddress();
-    remoteHostname = state.remoteHostname();
-    remotePort = state.remotePort();
+  static FrozenRequest of(final RequestState state) {
+    final TreeMap<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     for(final String name : state.headerNames()) headers.put(name, state.headers(name));
-    cookies = state.cookies();
-    attributes = state.attributes();
-  }
-
-  @Override
-  public String method() {
-    return method;
-  }
-
-  @Override
-  public String query() {
-    return query;
-  }
-
-  @Override
-  public String url() {
-    return url;
-  }
-
-  @Override
-  public String uri() {
-    return uri;
-  }
-
-  @Override
-  public String scheme() {
-    return scheme;
-  }
-
-  @Override
-  public String serverName() {
-    return serverName;
-  }
-
-  @Override
-  public int serverPort() {
-    return serverPort;
-  }
-
-  @Override
-  public String contextPath() {
-    return contextPath;
-  }
-
-  @Override
-  public String localAddress() {
-    return localAddress;
-  }
-
-  @Override
-  public String remoteAddress() {
-    return remoteAddress;
-  }
-
-  @Override
-  public String remoteHostname() {
-    return remoteHostname;
-  }
-
-  @Override
-  public int remotePort() {
-    return remotePort;
+    return new FrozenRequest(state.method(), state.query(), state.url(), state.uri(),
+        state.scheme(), state.serverName(), state.serverPort(), state.contextPath(),
+        state.localAddress(), state.remoteAddress(), state.remoteHostname(), state.remotePort(),
+        headers, state.cookies(), state.attributes());
   }
 
   @Override
@@ -137,11 +58,6 @@ final class FrozenRequest implements RequestState {
   }
 
   @Override
-  public Cookie[] cookies() {
-    return cookies;
-  }
-
-  @Override
   public HttpSession session(final boolean create) {
     return null;
   }
@@ -149,11 +65,6 @@ final class FrozenRequest implements RequestState {
   @Override
   public Object attribute(final String name) {
     return attributes.get(name);
-  }
-
-  @Override
-  public Map<String, Object> attributes() {
-    return attributes;
   }
 
   @Override

@@ -47,11 +47,8 @@ public final class WebDAVLockUpdate extends StandardFunc {
         if(!writable(user, entry.value(), info)) map = map.put(entry.key(), entry.value());
       }
 
-      long same = 0;
-      for(final XQMap.Entry entry : map.entries()) {
-        if(entry.value().equals(entries.getOrNull(entry.key()))) same++;
-      }
-      return same == map.structSize() && same == entries.structSize() ? entries : map;
+      // unchanged locks: the original map is returned
+      return map.equals(entries) ? entries : map;
     }));
   }
 
