@@ -1675,13 +1675,14 @@ public final class RewritingsTest extends SandboxTest {
   /** Dynamic unroll limit.. */
   @Test public void gh2001() {
     check("(1, 3) ! (. * 2)", "2\n6", exists(ArithSimple.class));
-    check("sum((1, 3) ! (. * 2))", 8, exists(ArithSimple.class));
+    // mod: no linear arithmetic, which would allow sum(E ! (. * 2)) → sum(E) * 2
+    check("sum((1, 3) ! (. mod 2))", 2, exists(ArithSimple.class));
     check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(IterFilter.class));
 
     unroll(true);
     check("(1, 3) ! (. * 2)", "2\n6", empty(ArithSimple.class));
-    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(ArithSimple.class));
+    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. mod 2) })", 2, exists(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(Itr.class));
   }
 

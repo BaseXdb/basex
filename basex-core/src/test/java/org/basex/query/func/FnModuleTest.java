@@ -249,7 +249,8 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(wrap(1), "1"), true, exists(CmpSimpleG.class));
     check(func.args(" <?_ 1?>", "1"), true, exists(CmpSimpleG.class));
     check(func.args(" false()", " boolean(" + wrap(1)) + ')', false, exists(NOT));
-    check("some((1 to 6) !" + func.args(" .", " . + 1") + ')', false, exists(CmpSimpleG.class));
+    // E = E + 1 → false()
+    check("some((1 to 6) !" + func.args(" .", " . + 1") + ')', false, root(Bln.class));
     check(func.args(" xs:anyURI('A')", " <?_ A?>"), true, root(CmpSimpleG.class));
     check(func.args(" <?_ A?>", " xs:anyURI('A')"), true, root(CmpSimpleG.class));
     check(func.args(" #a", " xs:QName(<?_ a?>)"), true, root(CmpSimpleG.class));

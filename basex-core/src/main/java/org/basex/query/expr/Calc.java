@@ -64,13 +64,12 @@ public enum Calc {
         return new Arith(info, expr1, Itr.get(2), MULTIPLY).optimize(cc);
       }
       // $x + -$y → $x - $y
-      if(expr2 instanceof final Unary unry) {
+      if(expr2 instanceof final Unary unry && unry.minus) {
         return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
-      // $x * $n + $x → $x * ($n + 1); ignore floating numbers due to rounding errors
-      if(expr1 instanceof final Arith arth && type.instanceOf(DECIMAL) && arth.calc == MULTIPLY &&
-          arth.exprs[0].equals(expr2) && arth.exprs[1] instanceof final Itr itr) {
-        return new Arith(info, arth.exprs[0], Itr.get(itr.itr() + 1), MULTIPLY).optimize(cc);
+      // -$x + $y → $y - $x
+      if(expr1 instanceof final Unary unry && unry.minus) {
+        return new Arith(info, expr2, unry.expr, SUBTRACT).optimize(cc);
       }
       return null;
     }
@@ -141,15 +140,9 @@ public enum Calc {
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
-      // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
       // $x - -$y → $x + $y
-      if(expr2 instanceof final Unary unry) {
+      if(expr2 instanceof final Unary unry && unry.minus) {
         return new Arith(info, expr1, unry.expr, ADD).optimize(cc);
-      }
-      // $x * $n - $x → $x * ($n - 1); ignore floating numbers due to rounding errors
-      if(expr1 instanceof final Arith arth && type.instanceOf(DECIMAL) && arth.calc == MULTIPLY &&
-          arth.exprs[0].equals(expr2) && arth.exprs[1] instanceof final Itr itr) {
-        return new Arith(info, arth.exprs[0], Itr.get(itr.itr() - 1), MULTIPLY).optimize(cc);
       }
       return null;
     }
@@ -220,7 +213,7 @@ public enum Calc {
       if(type == DOUBLE && expr1.equals(expr2)) {
         return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
       }
-      return null;
+      return unnegate(expr1, expr2, info, cc);
     }
 
     @Override
@@ -288,7 +281,7 @@ public enum Calc {
       if(expr1.equals(expr2)) {
         return type.oneOf(DECIMAL, INTEGER) ? Dec.ONE : null;
       }
-      return null;
+      return unnegate(expr1, expr2, info, cc);
     }
 
     @Override
@@ -339,7 +332,16 @@ public enum Calc {
       if(expr1.equals(expr2)) {
         return type.oneOf(DECIMAL, INTEGER) ? Itr.ONE : null;
       }
-      return null;
+      // $x * 6 idiv 3 → $x * 2, $x * 2 idiv 6 → $x idiv 3
+      if(type == INTEGER && expr1 instanceof final Arith arth && arth.calc == MULTIPLY &&
+          arth.arg(1) instanceof final Itr itr1 && expr2 instanceof final Itr itr2) {
+        final long m = itr1.itr(), d = itr2.itr();
+        if(m != 0 && d != 0 && m != Long.MIN_VALUE && d != Long.MIN_VALUE) {
+          if(m % d == 0) return new Arith(info, arth.arg(0), Itr.get(m / d), MULTIPLY).optimize(cc);
+          if(d % m == 0) return new Arith(info, arth.arg(0), Itr.get(d / m), this).optimize(cc);
+        }
+      }
+      return unnegate(expr1, expr2, info, cc);
     }
 
     @Override
@@ -378,6 +380,17 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(type == INTEGER && expr2 == Itr.ONE) return Itr.ZERO;
+      // $x mod $x → 0; ignore floating numbers due to special cases (NaN, INF)
+      if(expr1.equals(expr2)) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
+      if(expr1 instanceof final Arith arth) {
+        // $x * 6 mod 3 → 0
+        if(type == INTEGER && arth.calc == MULTIPLY && arth.arg(1) instanceof final Itr itr1 &&
+            expr2 instanceof final Itr itr2 && itr2.itr() != 0 && itr1.itr() % itr2.itr() == 0) {
+          return Itr.ZERO;
+        }
+        // $x mod $n mod $n → $x mod $n
+        if(arth.calc == this && arth.arg(1).equals(expr2)) return expr1;
+      }
       return null;
     }
 
@@ -447,6 +460,22 @@ public enum Calc {
    */
   public boolean oneOf(final Calc... candidates) {
     return Enums.oneOf(this, candidates);
+  }
+
+  /**
+   * Removes the negations of two operands: {@code -$x * -$y → $x * $y}.
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return result expression, or {@code null} if expression cannot be optimized
+   * @throws QueryException query exception
+   */
+  final Expr unnegate(final Expr expr1, final Expr expr2, final InputInfo info,
+      final CompileContext cc) throws QueryException {
+    return expr1 instanceof final Unary unry1 && unry1.minus &&
+      expr2 instanceof final Unary unry2 && unry2.minus ?
+      new Arith(info, unry1.expr, unry2.expr, this).optimize(cc) : null;
   }
 
   /**

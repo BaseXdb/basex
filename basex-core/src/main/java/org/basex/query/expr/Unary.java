@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class Unary extends Single {
   /** Minus flag. */
-  private final boolean minus;
+  public final boolean minus;
 
   /**
    * Constructor.

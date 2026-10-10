@@ -12,6 +12,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -112,6 +113,10 @@ public class FnMin extends StandardFunc {
 
     final boolean noColl = !defined(1);
     final Expr values = arg(0);
+    if(noColl && values instanceof final SimpleMap map) {
+      final Expr monotonic = monotonic(min, map, cc);
+      if(monotonic != null) return monotonic;
+    }
     final SeqType st = values.seqType();
     Type type = st.type;
     if(type.isSortable()) {
@@ -151,5 +156,58 @@ public class FnMin extends StandardFunc {
       }
     }
     return this;
+  }
+
+  /**
+   * Applies a monotonic arithmetic operation to the minimum or maximum of its input.
+   * @param min compute minimum or maximum
+   * @param map simple map
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr monotonic(final boolean min, final SimpleMap map, final CompileContext cc)
+      throws QueryException {
+    final Expr[] ops = map.args();
+    final int ol = ops.length;
+    final Expr last = ops[ol - 1];
+    final Expr[] operands;
+    final Calc calc;
+    final boolean antitone;
+    int pos = 0;
+    if(last instanceof final Unary unary && unary.minus) {
+      // max(E ! -X) → -min(E ! X)
+      operands = unary.args();
+      calc = null;
+      antitone = true;
+    } else if(last instanceof final Arith arith &&
+        !arith.calc.oneOf(Calc.DIVIDEINT, Calc.MODULO)) {
+      // max(E ! (X + 1)) → max(E ! X) + 1, max(E ! (X * -2)) → min(E ! X) * -2
+      // max(E ! (1 - X)) → 1 - min(E ! X)
+      calc = arith.calc;
+      if(calc == Calc.SUBTRACT && arith.arg(0) instanceof ANum) pos = 1;
+      if(!(arith.arg(1 - pos) instanceof final ANum num)) return null;
+      final double d = num.dbl();
+      if(Double.isNaN(d) || d == 0 && calc.oneOf(Calc.MULTIPLY, Calc.DIVIDE)) return null;
+      operands = arith.args().clone();
+      antitone = pos == 1 || d < 0 && calc.oneOf(Calc.MULTIPLY, Calc.DIVIDE);
+    } else {
+      return null;
+    }
+
+    // homogeneous input: no promotion of different numeric types
+    final Expr arg = operands[pos];
+    final SeqType st = arg.seqType();
+    final Type type = st.type;
+    if(!st.zeroOrOne() || !(type.isUntyped() || type.instanceOf(DECIMAL) ||
+        type.oneOf(DOUBLE, FLOAT)) || arg.has(Flag.NDT)) return null;
+
+    // trailing context values are removed: E ! . → E
+    final Expr[] args = ops.clone();
+    args[ol - 1] = arg;
+    operands[pos] = cc.function(min ^ antitone ? Function.MIN : Function.MAX, info,
+        SimpleMap.get(cc, info, args));
+    return calc == null ? new Unary(info, operands[0], true).optimize(cc) :
+      new Arith(info, operands[0], operands[1], calc).optimize(cc);
   }
 }

@@ -11,6 +11,7 @@ import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -318,6 +319,27 @@ public class FnSubsequence extends StandardFunc {
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
         // subsequence(EXPR, START, 0) → ()
         if(length <= 0) return Empty.VALUE;
+      }
+    } else if(first.seqType().instanceOf(Types.INTEGER_O) &&
+        second.seqType().instanceOf(Types.INTEGER_O)) {
+      if(range()) {
+        final BigDecimal diff = Linear.difference(first, second);
+        if(diff != null && !has(Flag.NDT)) {
+          // util:range(E, $p, $p - 1) → ()
+          if(diff.signum() < 0) return cc.voidAndReturn(input, Empty.VALUE, info);
+          // util:range(E, $p, $p) → items-at(E, $p)
+          if(diff.signum() == 0) return cc.function(ITEMS_AT, info, input, first);
+        }
+      } else {
+        final BigDecimal diff = Linear.difference(COUNT.get(info, input), first, second);
+        if(diff != null && !has(Flag.NDT)) {
+          // subsequence(E, $i, count(E) - $i + 1) → subsequence(E, $i)
+          if(diff.signum() > 0) return cc.function(SUBSEQUENCE, info, input, first);
+          // subsequence(E, $i, count(E) - $i) → subsequence(trunk(E), $i)
+          if(diff.signum() == 0) {
+            return cc.function(SUBSEQUENCE, info, cc.function(TRUNK, info, input), first);
+          }
+        }
       }
     }
 

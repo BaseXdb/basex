@@ -102,6 +102,9 @@ public class CmpG extends Cmp {
     if(expr == this && noMatches(null, expr1.data())) return cc.replaceWith(this, Bln.FALSE);
 
     // optimizations that rely on the semantics of general comparisons
+    if(expr == this) expr = optMinMax(cc);
+    if(expr == this) expr = optSign();
+    if(expr == this) expr = Linear.compare(this, cc);
     if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
@@ -145,6 +148,70 @@ public class CmpG extends Cmp {
 
     // return optimized, pre-evaluated or original expression
     return expr instanceof CmpG ? expr : cc.replaceWith(this, expr);
+  }
+
+  /**
+   * Rewrites comparisons of minimum and maximum values to existential comparisons.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optMinMax(final CompileContext cc) throws QueryException {
+    // max(E) > 3 → E > 3, min(E) <= 3 → E <= 3
+    Expr expr = minMax(exprs[0], exprs[1], op, cc);
+    // $x < max(E) → E > $x
+    if(expr == null) expr = minMax(exprs[1], exprs[0], op.swap(), cc);
+    return expr != null ? expr : this;
+  }
+
+  /**
+   * Rewrites a comparison of a minimum or maximum value to an existential comparison.
+   * @param expr1 first operand
+   * @param expr2 second operand
+   * @param cop comparison operator
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr minMax(final Expr expr1, final Expr expr2, final CmpOp cop,
+      final CompileContext cc) throws QueryException {
+    // no NaN values, no collation
+    if(!(MAX.is(expr1) ? cop.oneOf(CmpOp.GT, CmpOp.GE) :
+      MIN.is(expr1) && cop.oneOf(CmpOp.LT, CmpOp.LE)) || expr1.args().length != 1 ||
+      !expr1.arg(0).seqType().type.instanceOf(BasicType.DECIMAL)) return null;
+    final SeqType st2 = expr2.seqType();
+    return st2.zeroOrOne() && st2.type.isNumberOrUntyped() ?
+      new CmpG(info, expr1.arg(0), expr2, cop).optimize(cc) : null;
+  }
+
+  /**
+   * Evaluates comparisons of non-negative expressions with numbers.
+   * @return optimized or original expression
+   */
+  private Expr optSign() {
+    if(!(exprs[1] instanceof final ANum num)) return this;
+    final double d = num.dbl();
+    if(!(d <= 0)) return this;
+
+    // results for a larger left operand and, if the number is 0, for equal operands
+    final boolean greater = op.eval(1), equal = d < 0 ? greater : op.eval(0);
+    final Expr expr1 = exprs[0];
+    // abs($x) < 0 → false(), abs($x) >= 0 → true() (no NaN, no empty sequence)
+    final Bln result = !greater && !equal ? Bln.FALSE : greater && equal &&
+      expr1.seqType().instanceOf(Types.DECIMAL_O) ? Bln.TRUE : null;
+    return result != null && nonNegative(expr1) ? result : this;
+  }
+
+  /**
+   * Checks if an expression yields no negative numbers.
+   * @param expr expression
+   * @return result of check
+   */
+  private static boolean nonNegative(final Expr expr) {
+    return ABS.is(expr) ||
+      _MATH_POW.is(expr) && expr.arg(1) instanceof final ANum exp && exp.dbl() % 2 == 0 ||
+      expr instanceof final Arith arth && arth.calc == Calc.MULTIPLY &&
+      arth.arg(0).equals(arth.arg(1)) && !arth.has(Flag.NDT);
   }
 
   /**

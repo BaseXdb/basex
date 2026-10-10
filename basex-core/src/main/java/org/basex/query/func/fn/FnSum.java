@@ -13,11 +13,14 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -62,7 +65,7 @@ public class FnSum extends NumericFn {
   }
 
   /**
-   * Pre-evaluates a value expression.
+   * Pre-evaluates or rewrites the summed values.
    * @param avg calculate average
    * @param cc compilation context
    * @return optimized expression or {@code null}
@@ -80,6 +83,8 @@ public class FnSum extends NumericFn {
 
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
+    } else if(!avg && !defined(1) && values instanceof final SimpleMap map) {
+      return linear(map, cc);
     } else if(values instanceof final SingletonSeq ss && ss.singleItem()) {
       // exact arithmetic only: floating-point results depend on the summation order
       final Item item = ss.itemAt(0);
@@ -119,6 +124,66 @@ public class FnSum extends NumericFn {
     if(arg(0).seqType().type.isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
+  }
+
+  /**
+   * Moves a linear arithmetic operation out of the summed values.
+   * @param map simple map
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr linear(final SimpleMap map, final CompileContext cc) throws QueryException {
+    final Expr[] ops = map.args();
+    final int ol = ops.length;
+    final Expr last = ops[ol - 1];
+    final Expr[] operands;
+    final Calc calc;
+    int pos = 0;
+    if(last instanceof final Unary unary && unary.minus) {
+      operands = unary.args();
+      calc = null;
+    } else if(last instanceof final Arith arith &&
+        arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT, Calc.MULTIPLY)) {
+      operands = arith.args();
+      calc = arith.calc;
+      if(calc == Calc.SUBTRACT && operands[0] instanceof Itr) pos = 1;
+      if(!(operands[1 - pos] instanceof Itr)) return null;
+    } else {
+      return null;
+    }
+
+    // exact arithmetic only; integer constants: sum(()) → 0
+    final Expr arg = operands[pos];
+    final SeqType st = arg.seqType();
+    if(!st.zeroOrOne() || !st.type.instanceOf(DECIMAL) || arg.has(Flag.NDT)) return null;
+    // sum(E ! (X + 1)) → sum(E ! X) + count(E): only if E can be counted cheaply
+    final Expr input = ops[0];
+    if(calc != null && calc.oneOf(Calc.ADD, Calc.SUBTRACT) && (ol != 2 || !st.one() ||
+        !(input instanceof Value || input instanceof final Range range &&
+        cheap(range.arg(0)) && cheap(range.arg(1))))) return null;
+
+    final Expr[] args = ops.clone();
+    args[ol - 1] = arg;
+    final Expr sum = cc.function(Function.SUM, info, SimpleMap.get(cc, info, args));
+    // sum(E ! -X) → -sum(E ! X)
+    if(calc == null) return new Unary(info, sum, true).optimize(cc);
+    // sum(E ! (X * 2)) → sum(E ! X) * 2
+    final Expr num = operands[1 - pos];
+    if(calc == Calc.MULTIPLY) return new Arith(info, sum, num, calc).optimize(cc);
+    // sum(E ! (X - 1)) → sum(E ! X) - count(E), sum(E ! (1 - X)) → count(E) - sum(E ! X)
+    final Expr count = new Arith(info, cc.function(Function.COUNT, info,
+        input.copy(cc, new IntObjectMap<>())), num, Calc.MULTIPLY).optimize(cc);
+    return new Arith(info, pos == 0 ? sum : count, pos == 0 ? count : sum, calc).optimize(cc);
+  }
+
+  /**
+   * Checks if an expression can be evaluated repeatedly at no cost.
+   * @param expr expression
+   * @return result of check
+   */
+  private static boolean cheap(final Expr expr) {
+    return expr instanceof Value || expr instanceof VarRef;
   }
 
   /**

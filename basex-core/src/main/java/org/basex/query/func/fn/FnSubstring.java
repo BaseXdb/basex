@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -7,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -45,6 +48,15 @@ public final class FnSubstring extends StandardFunc {
       // substring($string, 1) → string($string)
       if(start <= 1 && !defined(2) && value.seqType().type.isStringOrUntyped()) {
         return cc.function(Function.STRING, info, value);
+      }
+    }
+    // substring($s, $i, string-length($s) - $i + 1) → substring($s, $i)
+    final Expr start = arg(1);
+    if(start.seqType().instanceOf(Types.INTEGER_O) && len.seqType().instanceOf(Types.INTEGER_O)) {
+      final BigDecimal diff = Linear.difference(Function.STRING_LENGTH.get(info, value),
+          start, len);
+      if(diff != null && diff.signum() > 0 && !has(Flag.NDT)) {
+        return cc.function(Function.SUBSTRING, info, value, start);
       }
     }
     // zero, negative or invalid length: return empty string

@@ -48,21 +48,18 @@ public final class Range extends Arr {
       if(values(false, cc) && !tooLarge()) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
-      if(!min.has(Flag.NDT)) {
-        final boolean one = min.seqType().one();
-        if(min.equals(max)) {
-          // identical operands: $int to $int
-          exprType.assign(one ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
-          if(integers()) expr = min;
-        } else if(max instanceof final Arith arith && min.equals(max.arg(0))) {
-          if(arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) && arith.arg(1) instanceof final Itr itr) {
-            // known result size: . to . + 10
-            final long n = (arith.calc == Calc.ADD ? itr.itr() : -itr.itr()) + 1;
-            if(n < 1) {
-              expr = Empty.VALUE;
-            } else if(one) {
-              exprType.assign(seqType(), n);
-            }
+      if(min.equals(max) && !min.has(Flag.NDT)) {
+        // identical operands: $int to $int
+        exprType.assign(min.seqType().one() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+        if(integers()) expr = min;
+      } else if(integers()) {
+        // known result size: . to . + 10, $x - 1 to $x + 1
+        final BigDecimal diff = Linear.difference(min, max);
+        if(diff != null && !has(Flag.NDT)) {
+          if(diff.signum() < 0) {
+            expr = Empty.VALUE;
+          } else if(diff.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) < 0) {
+            exprType.assign(seqType(), diff.longValue() + 1);
           }
         }
       }

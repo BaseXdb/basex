@@ -83,6 +83,8 @@ public final class FnInsertBefore extends StandardFunc {
       // insert-before($seq, N, $ins) → ($seq, $ins)  (N > count($seq))
       if(size != -1 && ps >= size) return List.get(cc, info, input, insert);
     }
+    // insert-before($seq, count($seq) + 1, $ins) → ($seq, $ins)
+    if(FnItemsAt.countInputDiff(input, pos) > 0) return List.get(cc, info, input, insert);
 
     final long sz = Seq.size(size, sizeInsert);
     exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz).data(input, insert);

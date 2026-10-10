@@ -74,32 +74,31 @@ public class Arith extends Arr {
     if(expr == this && Function.COUNT.is(expr1) && calc == Calc.ADD && Function.COUNT.is(expr2)) {
       expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
     }
+    // sum(E) div count(E) → avg(E)
+    if(expr == this && Function.SUM.is(expr1) && expr1.args().length == 1 &&
+        calc == Calc.DIVIDE && Function.COUNT.is(expr2) && expr1.arg(0).equals(expr2.arg(0)) &&
+        !has(Flag.NDT)) {
+      expr = cc.function(Function.AVG, info, expr1.arg(0));
+    }
     if(expr == this && numbers && noArrays && st1.one() && st2.one() && !has(Flag.NDT)) {
-      // example: number($a) + 0 → number($a)
       // nondeterministic operands must not be dropped, in order to preserve side effects
-      final Expr ex = calc.optimize(expr1, expr2, info, cc);
+      // ($x + 1) + ($y - 1) → $x + $y
+      Expr ex = Linear.normalize(this, cc);
+      // number($a) + 0 → number($a)
+      if(ex == null) ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;
-      } else if(expr1 instanceof final Arith arth1 &&
-          arth1.calc.oneOf(Calc.ADD, Calc.SUBTRACT, Calc.MULTIPLY) &&
+      } else if(expr1 instanceof final Arith arth1 && arth1.calc == Calc.MULTIPLY &&
           type1.instanceOf(BasicType.DECIMAL) && type2.instanceOf(BasicType.DECIMAL)) {
-        // exact arithmetic only: no floating-point numbers, no reassociation across division
-        final Calc acalc = arth1.calc;
-        final boolean add = acalc.oneOf(Calc.ADD, Calc.MULTIPLY);
-        final boolean inverse = acalc == calc.invert();
+        // exact arithmetic only: no floating-point numbers
         final Expr arg1 = arth1.arg(0), arg2 = arth1.arg(1);
-
-        if(arg2 instanceof ANum && expr2 instanceof ANum && calc != Calc.DIVIDE &&
-            (acalc == calc || inverse)) {
-          // (E - 3) + 2 → E - (3 - 2)
+        if(calc == Calc.MULTIPLY && arg2 instanceof ANum && expr2 instanceof ANum) {
           // E * 3 * 2 → E * (3 * 2)
-          final Calc ncalc = add ? calc : calc.invert();
-          expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
-              acalc).optimize(cc);
-        } else if(inverse) {
-          // E + NUMBER - NUMBER → E
+          expr = new Arith(info, arg1, new Arith(info, arg2, expr2, calc).optimize(cc),
+              calc).optimize(cc);
+        } else if(calc == Calc.DIVIDE) {
           // NUMBER * E div NUMBER → E
-          expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
+          expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) ? arg2 : this;
           if(expr != this) expr = new Cast(info, expr, type.seqType()).optimize(cc);
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&

@@ -214,12 +214,227 @@ public final class ArithTest extends SandboxTest {
     query("xs:decimal(" + wrap(2) + ") * 2 div 3", "1.333333333333333333");
   }
 
+  /** Linear combinations of integers and decimals. */
+  @Test public void linear() {
+    final String xy = "let $x := xs:integer(" + wrap(1) + ") let $y := xs:integer(" + wrap(2) +
+        ") return ";
+    check(xy + "($x + 1) + ($y + 2)", 6, count(Itr.class, 1));
+    check(xy + "$x * 2 + $y - $x * 3", 1, empty(Itr.class));
+    check(xy + "2 * ($x + $y) - $y", 4, count(Itr.class, 1));
+    check(xy + "($x + 1) * 2 + 3", 7, count(Itr.class, 2));
+    check(xy + "$x + $y - $y", 1, empty(Arith.class), empty(ArithSimple.class));
+    check(xy + "$x + 1 - $x + $x - 1", 1, empty(Arith.class), empty(ArithSimple.class));
+    check(xy + "-$x + $y + $x", 2, empty(Arith.class), empty(ArithSimple.class));
+    check(xy + "$x * 2 - $x - $x", 0, root(Itr.class));
+    // preserve result type
+    query(xy + "($x + 1.0 - 1.0) instance of xs:integer", false);
+    query(xy + "($x * 0.5 + $x * 0.5) instance of xs:integer", false);
+    query(xy + "(xs:byte($x) + 1 - 1) instance of xs:byte", false);
+    // no rewrite: integer overflow
+    error(xy + "$x * 9223372036854775807 + $x", RANGE_X);
+
+    // comparisons
+    check(xy + "$x + $y = $y + 1", true, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "2 * $x + 3 = 5", true, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "$x * 2 = 3", false, root(Bln.class));
+    check(xy + "$x * 2 != 3", true, root(Bln.class));
+    check(xy + "-$x < -3", false, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "3 - $x >= 1", true, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "$x + 1 = $x + 2", false, root(Bln.class));
+    check(xy + "$x + 1 < $x + 2", true, root(Bln.class));
+    // no rewrite: floating-point numbers
+    query("let $d := xs:double(" + wrap("1e-20") + ") return $d + 1 = 1", true);
+  }
+
+  /** Identities that also apply to floating-point numbers. */
+  @Test public void identities() {
+    for(final String type : new String[] { "integer", "double" }) {
+      final String xy = "let $x := xs:" + type + "(" + wrap(1) + ") let $y := xs:" + type +
+          "(" + wrap(2) + ") return ";
+      check(xy + "-$x * -$y", 2, empty(Unary.class));
+      check(xy + "-$x div -$y", 0.5, empty(Unary.class));
+      check(xy + "-$x idiv -$y", 0, empty(Unary.class));
+      check(xy + "-$x + $y", 1, empty(Unary.class));
+      check(xy + "-$x mod -$y", -1, exists(Unary.class));
+
+      check(xy + "abs(abs(-$x))", 1, count(Function.ABS, 1), empty(Unary.class));
+      check(xy + "floor(ceiling($x div $y))", 1, empty(Function.FLOOR));
+      check(xy + "round(floor($x div $y))", 0, empty(Function.ROUND));
+      check(xy + "round(floor($x div $y), -1)", 0, exists(Function.ROUND));
+      check(xy + "round(floor($x div $y), 2)", 0, empty(Function.ROUND));
+    }
+    // unary plus
+    query("1 + +" + wrap(1), 2);
+    query("1 - +" + wrap(1), 0);
+    // negative zero
+    final String z = "xs:double(" + wrap("-0") + ")";
+    query("-" + z + " * -" + z, 0);
+    query("-" + z + " + " + z, 0);
+    query("abs(-" + z + ")", 0);
+    query("floor(ceiling(" + z + "))", "-0");
+  }
+
+  /** Aggregations of arithmetic expressions. */
+  @Test public void aggregate() {
+    final String e = "(1 to " + wrap(5) + ")";
+    // monotonic functions: max(E ! (. + 1)) → max(E) + 1
+    check("max(" + e + " ! (. + 1))", 6, exists(Function.MAX), empty(SimpleMap.class));
+    check("min(" + e + " ! (. - 1))", 0, exists(Function.MIN), empty(SimpleMap.class));
+    check("max(" + e + " ! (. * -2))", -2, exists(Function.MIN), empty(SimpleMap.class));
+    check("max(" + e + " ! (10 - .))", 9, exists(Function.MIN), empty(SimpleMap.class));
+    check("min(" + e + " ! (. div -2))", -2.5, exists(Function.MAX), empty(SimpleMap.class));
+    check("max((" + wrap(1) + ", " + wrap(2) + ") ! (. + 0.5))", 2.5, empty(SimpleMap.class));
+    check("max(" + e + " ! (. * 0))", 0, exists(SimpleMap.class));
+    check("max(" + e + " ! (. * 2 + 1))", 11, empty(SimpleMap.class));
+    check("max(" + e + " ! (abs(.) + 1))", 6, exists(Function.MAX), exists(SimpleMap.class),
+        count(ArithSimple.class, 1));
+    check("max(" + e + " ! (-.))", -1, exists(Function.MIN), empty(SimpleMap.class));
+    check("max((element b { " + wrap(1) + " }, element b { " + wrap(2) + " }) ! (. * 2))", 4,
+        exists(Function.MAX), empty(SimpleMap.class));
+    query("max((" + wrap("NaN") + ", 1) ! xs:double(.) ! (. + 1))", "NaN");
+    query("max((1 to " + wrap(0) + ") ! (. + 1))", "");
+    check("max((xs:float(" + wrap("1.1") + "), 1e0) ! (. + 1))", 2.1, exists(SimpleMap.class));
+
+    // sum(E ! (. * 2)) → sum(E) * 2, sum(E ! (. + 1)) → sum(E) + count(E)
+    check("sum(" + e + " ! (. * 2))", 30, empty(SimpleMap.class));
+    final String n = "let $n := xs:integer(" + wrap(5) + ") return ";
+    check(n + "sum((1 to $n) ! (. + 1))", 20, empty(SimpleMap.class));
+    check(n + "sum((1 to $n) ! (10 - .))", 35, empty(SimpleMap.class));
+    check(n + "sum((1 to $n) ! (. * 2 + 1))", 35, empty(SimpleMap.class));
+    check("sum(" + e + " ! (. + 1))", 20, exists(SimpleMap.class));
+    check("sum(" + e + " ! (-.))", -15, empty(SimpleMap.class));
+    query("sum((1 to " + wrap(0) + ") ! (. * 2)) instance of xs:integer", true);
+    check("sum((" + wrap(1) + ", " + wrap(2) + ") ! (. * 2))", 6, exists(SimpleMap.class));
+    check("sum(" + e + " ! (. * 2), 0)", 30, exists(SimpleMap.class));
+
+    // sum(E) div count(E) → avg(E)
+    check("let $e := " + e + " return sum($e) div count($e)", 3, exists(Function.AVG),
+        empty(Function.SUM));
+  }
+
+  /** Ranges. */
+  @Test public void range() {
+    final String n = "let $n := xs:integer(" + wrap(3) + ") return ";
+    check(n + "(1 to $n) ! (. + 1)", "2\n3\n4", root(Range.class));
+    check(n + "($n to 5) ! (. - 2)", "1\n2\n3", root(Range.class));
+    check(n + "(5 to $n) ! (. + 1)", "", root(Range.class));
+    // known result size
+    check(n + "($n to $n + 10) ! (. + 1)", "4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14",
+        "//Range/@size = 11");
+    check(n + "$n - 1 to $n + 1", "2\n3\n4", "//Range/@size = 3");
+    check(n + "$n + 1 to $n - 1", "", empty());
+    check(n + "count($n to $n + random:integer(9) - random:integer(9)) >= 0", true,
+        "empty(//Range/@size)");
+    check(n + "$n to $n - 1 + random:integer(9) * 0", "", exists(Function._RANDOM_INTEGER));
+    // untyped bounds: no rewrite (double arithmetic)
+    check("(1 to " + wrap(3) + ") ! (. + 1)", "2\n3\n4", exists(SimpleMap.class));
+  }
+
+  /** Arithmetic positions and lengths. */
+  @Test public void positions() {
+    final String i = "let $i := xs:integer(" + wrap(2) + ") ";
+    final String s = i + "let $s := string(" + wrap("abcde") + ") return ";
+    check(s + "substring($s, $i, string-length($s) - $i + 1)", "bcde",
+        empty(Function.STRING_LENGTH));
+    query("substring(" + wrap("abc") + ", 5, 9223372036854775807)", "");
+    // no rewrite: $i may be smaller than 1
+    check(s + "substring($s, $i, string-length($s))", "bcde", exists(Function.STRING_LENGTH));
+    check(s + "substring($s, $i, string-length($s) - $i + 3)", "bcde",
+        empty(Function.STRING_LENGTH));
+    check(s + "substring($s, $i, string-length($s) - $i)", "bcd",
+        exists(Function.STRING_LENGTH));
+
+    final String e = i + "let $e := tokenize(string(" + wrap("a b c d e") + ")) return ";
+    check(e + "subsequence($e, $i, count($e) - $i + 1)", "b\nc\nd\ne", empty(Function.COUNT));
+    check(e + "subsequence($e, $i, count($e) - $i)", "b\nc\nd", exists(Function.TRUNK),
+        empty(Function.COUNT));
+    check(e + "subsequence($e, $i, count($e) - $i - 1)", "b\nc", exists(Function.COUNT));
+    check(e + "util:range($e, $i, $i - 1)", "", empty(Function._UTIL_RANGE));
+    check(e + "util:range($e, $i, $i)", "b", empty(Function._UTIL_RANGE));
+    check(e + "remove($e, count($e))", "a\nb\nc\nd", exists(Function.TRUNK));
+    check(e + "remove($e, count($e) + 1)", "a\nb\nc\nd\ne", empty(Function.REMOVE));
+    check(e + "insert-before($e, count($e) + 1, 'x')", "a\nb\nc\nd\ne\nx",
+        empty(Function.INSERT_BEFORE));
+  }
+
+  /** Integer division and modulo. */
+  @Test public void idivMod() {
+    final String n = "let $n := xs:integer(" + wrap(9) + ") return ";
+    final String d = "let $d := xs:double(" + wrap("9.5") + ") return ";
+    final String mods = "count(//ArithSimple[@op = 'mod'])";
+    check(n + "$n * 6 idiv 3", 18, count(ArithSimple.class, 1));
+    check(n + "$n * 2 idiv 6", 3, count(ArithSimple.class, 1));
+    check(n + "$n * -2 idiv 6", -3, count(ArithSimple.class, 1));
+    check(n + "$n * 4 idiv 6", 6, count(ArithSimple.class, 2));
+    check(n + "$n * 6 mod 3", 0, root(Itr.class));
+    check(n + "$n * 6 mod 4", 2, count(ArithSimple.class, 2));
+    check(n + "$n mod 4 mod 4", 1, mods + " = 1");
+    check(n + "$n mod $n", 0, root(Itr.class));
+    check("xs:decimal(" + wrap("2.5") + ") ! (. mod .)", 0, root(Dec.class));
+    check(d + "$d mod $d", 0, mods + " = 1");
+    query("xs:double(" + wrap("INF") + ") ! (. mod .)", "NaN");
+    check(d + "$d mod 4 mod 4", 1.5, mods + " = 1");
+    check(d + "$d * 6 idiv 3", 19, count(ArithSimple.class, 2));
+  }
+
+  /** Comparisons. */
+  @Test public void compare() {
+    final String xy = "let $x := xs:integer(" + wrap(1) + ") let $y := xs:integer(" + wrap(2) +
+        ") return ";
+    // two terms
+    check(xy + "$x + 1 = $y + 1", false, empty(ArithSimple.class));
+    check(xy + "2 * $x < 2 * $y", true, empty(ArithSimple.class));
+    check(xy + "-$x < -$y", false, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "$x + $y = $y + $x", true, root(Bln.class));
+
+    // integer bounds: $x * 2 < 3 → $x <= 1
+    check(xy + "$x * 2 < 3", true, exists(CmpIR.class));
+    check(xy + "$x * 2 <= 3", true, exists(CmpIR.class));
+    check(xy + "$x * 2 > 3", false, exists(CmpIR.class));
+    check(xy + "$x * -2 >= -3", true, exists(CmpIR.class));
+    check(xy + "$y * 2 > 3", true, exists(CmpIR.class));
+
+    // zero-or-one operands
+    final String o = "let $o := xs:integer(" + wrap(3) + ")[. > 0] return ";
+    final String oe = "let $o := xs:integer(" + wrap(3) + ")[. > 5] return ";
+    check(o + "$o * 2 = 6", true, empty(ArithSimple.class));
+    check(oe + "$o * 2 = 6", false, empty(ArithSimple.class));
+    check(o + "$o + $o = 6", true, empty(ArithSimple.class));
+    query(oe + "$o * 2 != 3", false);
+    query(oe + "$o - $o + 1 = 1", false);
+
+    // minimum and maximum
+    final String e = "(1 to " + wrap(5) + ")";
+    check("max(" + e + ") > 3", true, empty(Function.MAX));
+    check("max(" + e + ") >= 5", true, empty(Function.MAX));
+    check("min(" + e + ") < 2", true, empty(Function.MIN));
+    check("max(" + e + ") < 3", false, exists(Function.MAX));
+    check("3 < max(" + e + ")", true, empty(Function.MAX));
+    check("max(" + e + ") > max((1 to " + wrap(3) + "))", true, count(Function.MAX, 1));
+    check("max(" + e + ") > (6, 4)", true, exists(Function.MAX));
+    check("max(" + e + " ! (. + 1)) > 3", true, empty(Function.MAX));
+    query("max((1 to " + wrap(0) + ")) > 3", false);
+    check("max((" + wrap("NaN") + ", 5) ! xs:double(.)) > 3", false, exists(Function.MAX));
+
+    // non-negative operands
+    final String u = wrap(-1);
+    check("abs(" + u + ") < 0", false, root(Bln.class));
+    check("abs(" + u + ") = -1", false, root(Bln.class));
+    check(xy + "abs($x) >= 0", true, root(Bln.class));
+    check(xy + "$x * $x < 0", false, root(Bln.class));
+    check(xy + "$x * $x != -1", true, root(Bln.class));
+    check("let $d := xs:double(" + u + ") return $d * $d < 0", false, root(Bln.class));
+    // no rewrite: NaN, empty sequence
+    check("abs(xs:double(" + wrap("NaN") + ")) >= 0", false, exists(Function.ABS));
+    check("abs(" + u + "[. = 0]) != -1", false, exists(Function.ABS));
+  }
+
   /** Simplify arithmetic expressions. */
   @Test public void simplify() {
     final String i = "xs:integer(" + wrap(1) + ")";
     check(i + "- 1 = 0", true, empty(ArithSimple.class), count(Itr.class, 1));
     check(i + "- 1 = " + i + " - 1", true, empty(ArithSimple.class), empty(Itr.class));
-    check(i + "- 1 != " + i + " - 2", true, count(ArithSimple.class, 1), count(Itr.class, 1));
+    check(i + "- 1 != " + i + " - 2", true, root(Bln.class));
 
     // untyped values: no rewrite (double arithmetic, decimal comparison)
     check(wrap(1) + "- 1 = 0", true, exists(ArithSimple.class));

@@ -109,6 +109,12 @@ public final class FnRemove extends StandardFunc {
     if(st.zero()) return input;
     if(pos.seqType().zero()) return cc.voidAndReturn(pos, input, info);
 
+    final long diff = FnItemsAt.countInputDiff(input, pos);
+    // remove($seq, count($seq)) → trunk($seq)
+    if(diff == 0) return cc.function(Function.TRUNK, info, input);
+    // remove($seq, count($seq) + 1) → $seq
+    if(diff > 0) return input;
+
     long sz = -1;
     if(pos instanceof Item) {
       // position is static...
