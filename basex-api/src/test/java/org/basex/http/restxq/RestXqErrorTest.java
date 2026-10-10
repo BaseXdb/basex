@@ -155,6 +155,10 @@ public final class RestXqErrorTest extends RestXqTest {
     register("declare %R:path('') function m:a() { web:error(400, <a>é€</a>, " +
         "{ 'method': 'xml', 'encoding': 'ISO-8859-1', 'omit-xml-declaration': true() }) };");
     assertEquals("<a>é&#x20AC;</a>", get(400, ""));
+    // status codes are only derived from valid 'status' names
+    get(404, "declare %R:path('') function m:a() { error(xs:QName('R:status404')) };", "");
+    get(500, "declare %R:path('') function m:a() { error(xs:QName('R:status999')) };", "");
+    get(500, "declare %R:path('') function m:a() { error(xs:QName('R:other')) };", "");
   }
 
   /**
