@@ -344,6 +344,13 @@ public final class SerializerTest extends SandboxTest {
     // adaptive and JSON methods
     query("serialize(('x', { 'a': 'x' }), { 'method': 'adaptive', "
         + "'use-character-maps': { 'x': 'X' } })", "\"X\"\n{\"a\":\"X\"}");
+    // only strings, untyped atomics and URIs are mapped
+    query("serialize((xs:date('2026-10-10'), xs:untypedAtomic('1'), 'xs:date'), "
+        + "{ 'method': 'adaptive', 'use-character-maps': { 'd': 'D', '1': 'I' } })",
+        "xs:date(\"2026-10-10\")\n\"I\"\n\"xs:Date\"");
+    query("serialize((xs:date('2026-10-10'), true()), "
+        + "{ 'method': 'basex', 'use-character-maps': { 'e': 'E', '1': 'I' } })",
+        "2026-10-10\ntrue");
     query("serialize('x', { 'method': 'json', 'use-character-maps': { 'x': 'X' } })", "\"X\"");
     query("serialize(<json type='object'><ax>x\"</ax></json>, { 'method': 'json', "
         + "'json': { 'format': 'direct' }, 'use-character-maps': { 'x': 'X' } })",

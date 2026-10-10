@@ -45,7 +45,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
           return;
         }
         if(item.type != QNAME && !item.type.instanceOf(NUMERIC)) {
-          expand(item.string(null), this::printChars);
+          string(item.type, item.string(null));
           return;
         }
       } catch(final QueryException ex) {

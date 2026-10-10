@@ -164,13 +164,27 @@ public class AdaptiveSerializer extends OutputSerializer {
       } else {
         // the resulting string is serialized with the Text output method
         final Type tp = constructor(type);
-        final byte[] string = value(item.string(null), true, false, false);
-        expand(tp != null ? Token.concat(Token.token(tp), "(", string, ")") : string,
-          this::printChars);
+        if(tp != null) {
+          printChars(Token.token(tp));
+          printChar('(');
+        }
+        string(type, value(item.string(null), true, false, false));
+        if(tp != null) printChar(')');
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
+  }
+
+  /**
+   * Prints the string of an atomic value, applying character maps to string-like values.
+   * @param type type of the value
+   * @param string string to print
+   * @throws IOException I/O exception
+   */
+  protected final void string(final Type type, final byte[] string) throws IOException {
+    if(type.isStringOrUntyped()) expand(string, this::printChars);
+    else printChars(string);
   }
 
   /**
@@ -180,8 +194,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    */
   protected Type constructor(final Type type) {
     if(expression) return type.oneOf(STRING, BOOLEAN, INTEGER) ? null : type;
-    return type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ? null :
-      type.instanceOf(DURATION) ? DURATION : type;
+    return type.isStringOrUntyped() ? null : type.instanceOf(DURATION) ? DURATION : type;
   }
 
   @Override

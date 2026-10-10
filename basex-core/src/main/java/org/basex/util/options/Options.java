@@ -145,10 +145,9 @@ public class Options implements Iterable<Option<?>> {
     if(persisted == null) return;
     final List<Option<?>> changed = meta.definitions.values().stream().filter(option ->
       !Objects.deepEquals(get(option), persisted[index(option)])).toList();
-    if(changed.isEmpty() && file.exists()) return;
+    final boolean exists = file.exists();
+    if(changed.isEmpty() && exists) return;
 
-    // without changes, the file is missing
-    final boolean exists = !changed.isEmpty() && file.exists();
     final StringList lines = new StringList();
     try {
       if(rewrite()) {

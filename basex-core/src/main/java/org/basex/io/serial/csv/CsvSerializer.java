@@ -208,8 +208,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       if(columns != null) {
         for(final Item column : columns) {
           final Item item = coerce(column);
-          if(!(item instanceof Uri || item.type.isStringOrUntyped()))
-            throw typeError("String", column);
+          if(!item.type.isStringOrUntyped()) throw typeError("String", column);
           tl.add(item.string(null));
         }
       }
