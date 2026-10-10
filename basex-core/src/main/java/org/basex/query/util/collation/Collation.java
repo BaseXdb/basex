@@ -202,67 +202,23 @@ public abstract class Collation {
   }
 
   /**
-   * Returns the substring after a specified string.
+   * Returns the substring before or after the first or last occurrence of a specified string.
    * @param string string
    * @param sub substring to be found
+   * @param before return substring before the occurrence
+   * @param last search last occurrence
    * @param info input info (can be {@code null})
    * @return substring
    * @throws QueryException query exception
    */
-  public final byte[] after(final byte[] string, final byte[] sub, final InputInfo info)
-      throws QueryException {
+  public final byte[] extract(final byte[] string, final byte[] sub, final boolean before,
+      final boolean last, final InputInfo info) throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, info);
-    return i == -1 ? EMPTY : token(st.substring(i));
-  }
-
-  /**
-   * Returns the substring before a specified string.
-   * @param string string
-   * @param sub substring to be found
-   * @param info input info (can be {@code null})
-   * @return substring
-   * @throws QueryException query exception
-   */
-  public final byte[] before(final byte[] string, final byte[] sub, final InputInfo info)
-      throws QueryException {
-
-    final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
-    return i == -1 ? EMPTY : token(st.substring(0, i));
-  }
-
-  /**
-   * Returns the substring after the last occurrence of a specified string.
-   * @param string string
-   * @param sub substring to be found
-   * @param info input info (can be {@code null})
-   * @return substring
-   * @throws QueryException query exception
-   */
-  public final byte[] afterLast(final byte[] string, final byte[] sub, final InputInfo info)
-      throws QueryException {
-
-    final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.LAST_INDEX_AFTER, info);
-    return i == -1 ? EMPTY : token(st.substring(i));
-  }
-
-  /**
-   * Returns the substring before the last occurrence of a specified string.
-   * @param string string
-   * @param sub substring to be found
-   * @param info input info (can be {@code null})
-   * @return substring
-   * @throws QueryException query exception
-   */
-  public final byte[] beforeLast(final byte[] string, final byte[] sub, final InputInfo info)
-      throws QueryException {
-
-    final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.LAST_INDEX_OF, info);
-    return i == -1 ? EMPTY : token(st.substring(0, i));
+    final Mode mode = last ? before ? Mode.LAST_INDEX_OF : Mode.LAST_INDEX_AFTER :
+      before ? Mode.INDEX_OF : Mode.INDEX_AFTER;
+    final int i = indexOf(st, string(sub), mode, info);
+    return i == -1 ? EMPTY : token(before ? st.substring(0, i) : st.substring(i));
   }
 
   /**

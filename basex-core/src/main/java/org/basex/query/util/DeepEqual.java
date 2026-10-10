@@ -124,10 +124,8 @@ public final class DeepEqual {
 
     // unordered comparison
     final ItemList items2 = new ItemList();
-    int size1 = 0, size2 = 0;
     OUTER: for(Item item1; (item1 = iter1.next()) != null;) {
       if(qc != null) qc.checkStop();
-      size1++;
       for(int i = items2.size(); --i >= 0;) {
         if(equal(item1, items2.get(i))) {
           items2.remove(i);
@@ -136,7 +134,6 @@ public final class DeepEqual {
       }
       for(Item item2; (item2 = iter2.next()) != null;) {
         if(qc != null) qc.checkStop();
-        size2++;
         if(equal(item1, item2)) continue OUTER;
         items2.add(item2);
       }
@@ -144,7 +141,6 @@ public final class DeepEqual {
     }
     final Item item2 = iter2.next();
     if(item2 != null) return different(item2, null);
-    if(size1 != size2) return different(size1, size2);
     return items2.isEmpty() || different(items2.get(0), null);
   }
 

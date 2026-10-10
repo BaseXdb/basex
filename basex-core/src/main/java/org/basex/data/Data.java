@@ -1289,11 +1289,12 @@ public abstract class Data {
    * @return value indexes
    */
   public final ValueIndex[] valueIndexes() {
-    final ArrayList<ValueIndex> list = new ArrayList<>(4);
-    for(final ValueIndex index : new ValueIndex[] { textIndex, attrIndex, tokenIndex, ftIndex }) {
-      if(index != null) list.add(index);
+    final ValueIndex[] indexes = { textIndex, attrIndex, tokenIndex, ftIndex };
+    int i = 0;
+    for(final ValueIndex index : indexes) {
+      if(index != null) indexes[i++] = index;
     }
-    return list.toArray(ValueIndex[]::new);
+    return i == indexes.length ? indexes : Arrays.copyOf(indexes, i);
   }
 
   // HELPER FUNCTIONS =============================================================================

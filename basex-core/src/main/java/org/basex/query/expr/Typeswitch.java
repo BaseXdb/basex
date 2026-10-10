@@ -40,10 +40,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public boolean navigational() {
-    for(final TypeswitchGroup group : groups) {
-      if(!group.expr.navigational()) return false;
-    }
-    return true;
+    return Checks.all(groups, group -> group.expr.navigational());
   }
 
   /**

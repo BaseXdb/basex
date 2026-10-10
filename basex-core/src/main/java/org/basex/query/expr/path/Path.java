@@ -120,11 +120,7 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean navigational() {
-    if(root != null && !root.navigational()) return false;
-    for(final Expr step : steps) {
-      if(!step.navigational()) return false;
-    }
-    return true;
+    return (root == null || root.navigational()) && Checks.all(steps, Expr::navigational);
   }
 
   @Override

@@ -37,10 +37,8 @@ public final class FileDescendants extends FileList {
     final Value filterValue = options.get(DescendantsOptions.FILTER);
     final Value recurseValue = options.get(DescendantsOptions.RECURSE);
     final Value depthValue = options.get(DescendantsOptions.DEPTH);
-    final FItem filter = filterValue.isEmpty() ? constantFn(true) :
-        toFunction(filterValue, 1, qc);
-    final FItem recurse = recurseValue.isEmpty() ? constantFn(true) :
-        toFunction(recurseValue, 1, qc);
+    final FItem filter = filterValue.isEmpty() ? null : toFunction(filterValue, 1, qc);
+    final FItem recurse = recurseValue.isEmpty() ? null : toFunction(recurseValue, 1, qc);
     final int depth = depthValue.isEmpty() ? Integer.MAX_VALUE :
         (int) Math.min(toLong(depthValue.itemAt(0)), Integer.MAX_VALUE);
 

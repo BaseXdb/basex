@@ -60,10 +60,18 @@ abstract class DbNew extends DbAccessFn {
     final NewInput ni = new NewInput();
     ni.type = type != null ? type : input.type.isStringOrUntyped() ? ResourceType.XML :
       input instanceof Bin ? ResourceType.BINARY : ResourceType.VALUE;
+    if(ni.type != ResourceType.XML) {
+      if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
+      ni.path = path;
+    }
     switch(ni.type) {
       case XML    -> fillXmlInput(ni, input, path, qc);
-      case BINARY -> fillBinaryInput(ni, input, path, qc);
-      case VALUE  -> fillValueInput(ni, input, path);
+      case VALUE  -> ni.value = input;
+      case BINARY -> {
+        final Object source = toBinarySource(input, qc);
+        if(source instanceof final Bin bin) ni.value = bin;
+        else ni.io = (IO) source;
+      }
     }
     return ni;
   }
@@ -126,37 +134,6 @@ abstract class DbNew extends DbAccessFn {
 
     ni.io = io;
     ni.path = target;
-  }
-
-  /**
-   * Populates a NewInput for a binary resource.
-   * @param ni new input container
-   * @param input input item (binary literal or string-typed IO reference)
-   * @param path target path (must not be empty)
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  private void fillBinaryInput(final NewInput ni, final Item input, final String path,
-      final QueryContext qc) throws QueryException {
-    if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
-    ni.path = path;
-    final Object source = toBinarySource(input, qc);
-    if(source instanceof final Bin bin) ni.value = bin;
-    else ni.io = (IO) source;
-  }
-
-  /**
-   * Populates a NewInput for a value resource (db:put-value semantics).
-   * @param ni new input container
-   * @param input input item (any XDM item, stored verbatim)
-   * @param path target path (must not be empty)
-   * @throws QueryException query exception
-   */
-  private void fillValueInput(final NewInput ni, final Item input, final String path)
-      throws QueryException {
-    if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
-    ni.path = path;
-    ni.value = input;
   }
 
   /**

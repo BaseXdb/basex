@@ -33,10 +33,7 @@ public final class Otherwise extends Arr {
 
   @Override
   public boolean navigational() {
-    for(final Expr expr : exprs) {
-      if(!expr.navigational()) return false;
-    }
-    return true;
+    return Checks.all(exprs, Expr::navigational);
   }
 
   @Override

@@ -45,10 +45,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean navigational() {
-    for(final SwitchGroup group : groups) {
-      if(!group.rtrn().navigational()) return false;
-    }
-    return true;
+    return Checks.all(groups, group -> group.rtrn().navigational());
   }
 
   /**

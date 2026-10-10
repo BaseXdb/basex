@@ -48,11 +48,7 @@ public final class Try extends Single {
   @Override
   public boolean navigational() {
     // the 'finally' clause does not contribute to the result
-    if(!expr.navigational()) return false;
-    for(final Catch ctch : catches) {
-      if(!ctch.expr.navigational()) return false;
-    }
-    return true;
+    return expr.navigational() && Checks.all(catches, ctch -> ctch.expr.navigational());
   }
 
   @Override

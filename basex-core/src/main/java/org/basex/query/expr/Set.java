@@ -38,10 +38,7 @@ abstract class Set extends Arr {
 
   @Override
   public final boolean navigational() {
-    for(final Expr expr : exprs) {
-      if(!expr.navigational()) return false;
-    }
-    return true;
+    return Checks.all(exprs, Expr::navigational);
   }
 
   @Override

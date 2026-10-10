@@ -9,12 +9,9 @@ import java.util.regex.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -34,20 +31,19 @@ public class FileList extends FileFn {
     final Pattern pattern = glob == null ? null :
       Pattern.compile(IOFile.regex(glob, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     final TokenList tl = new TokenList();
-    final FItem recurse = constantFn(recursive), filter = constantFn(true);
-    list(dir, recurse, new HofArgs(1), pattern, dir.getNameCount(),
-        filter, new HofArgs(1), tl, Integer.MAX_VALUE, true, qc);
+    list(dir, null, new HofArgs(1), pattern, dir.getNameCount(),
+        null, new HofArgs(1), tl, recursive ? Integer.MAX_VALUE : 0, true, qc);
     return StrSeq.get(tl);
   }
 
   /**
    * Collects the subdirectories and files of the specified directory.
    * @param root root path
-   * @param recurse subtree predicate
+   * @param recurse subtree predicate (can be {@code null})
    * @param recurseArgs arguments for the subtree predicate
    * @param pattern file name pattern; ignored if {@code null}
    * @param index index of root path for relative paths; {@code -1} for absolute paths
-   * @param filter inclusion predicate
+   * @param filter inclusion predicate (can be {@code null})
    * @param filterArgs arguments for the inclusion predicate
    * @param list file list
    * @param depth maximum number of subdirectory levels to descend ({@code 0}: none)
@@ -100,7 +96,7 @@ public class FileList extends FileFn {
       // recursive traversal: descend if the depth allows it, do not follow links
       if(depth > 0 && !links.contains(child)) {
         final Str p = path != null ? path : get(subPath(child, index), true);
-        if(test(recurse, recurseArgs.set(0, p), qc)) {
+        if(recurse == null || test(recurse, recurseArgs.set(0, p), qc)) {
           list(child, recurse, recurseArgs, pattern, index, filter, filterArgs,
               list, depth - 1, false, qc);
         }
@@ -118,7 +114,7 @@ public class FileList extends FileFn {
    * @param child raw path
    * @param isDir directory flag
    * @param pattern file name pattern (can be {@code null})
-   * @param filter inclusion predicate
+   * @param filter inclusion predicate (can be {@code null})
    * @param filterArgs arguments for the inclusion predicate
    * @param index index of root path (or {@code -1})
    * @param list file list
@@ -133,7 +129,7 @@ public class FileList extends FileFn {
     if(pattern != null && !pattern.matcher(child.getFileName().toString()).matches()) return null;
 
     final Str path = get(subPath(child, index), isDir);
-    if(test(filter, filterArgs.set(0, path), qc)) list.add(path.string());
+    if(filter == null || test(filter, filterArgs.set(0, path), qc)) list.add(path.string());
     return path;
   }
 
@@ -145,15 +141,5 @@ public class FileList extends FileFn {
    */
   private static Path subPath(final Path child, final int index) {
     return index < 0 ? child : child.subpath(index, child.getNameCount());
-  }
-
-  /**
-   * Creates a boolean predicate function.
-   * @param value return value
-   * @return function item
-   */
-  final FItem constantFn(final boolean value) {
-    return new FuncItem(info, Bln.get(value), new Var[0], AnnList.EMPTY,
-      FuncType.get(Types.BOOLEAN_O), 0, null);
   }
 }

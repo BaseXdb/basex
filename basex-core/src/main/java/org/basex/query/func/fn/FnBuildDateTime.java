@@ -59,13 +59,13 @@ public final class FnBuildDateTime extends DateTimeFn {
     if(value.isEmpty()) return Empty.VALUE;
 
     final XQMap map = toRecord(value, Records.DATETIME.get(), qc);
-    final Long       year    = itr(map, YEAR);
-    final Long       month   = itr(map, MONTH);
-    final Long       day     = itr(map, DAY);
-    final Long       hours   = itr(map, HOURS);
-    final Long       minutes = itr(map, MINUTES);
-    final BigDecimal seconds = dec(map, SECONDS);
-    final DTDur      tz      = dur(map, TIMEZONE);
+    final Long       year    = get(map, YEAR, item -> item.itr(null));
+    final Long       month   = get(map, MONTH, item -> item.itr(null));
+    final Long       day     = get(map, DAY, item -> item.itr(null));
+    final Long       hours   = get(map, HOURS, item -> item.itr(null));
+    final Long       minutes = get(map, MINUTES, item -> item.itr(null));
+    final BigDecimal seconds = get(map, SECONDS, item -> item.dec(null));
+    final DTDur      tz      = get(map, TIMEZONE, DTDur.class::cast);
     checkTz(tz, info);
 
     final int mask =
@@ -117,39 +117,18 @@ public final class FnBuildDateTime extends DateTimeFn {
   }
 
   /**
-   * Retrieves an integer.
+   * Retrieves and converts a field value.
+   * @param <T> result type
    * @param map input map
    * @param key key to look up
+   * @param convert conversion function
    * @return result or {@code null}
    * @throws QueryException query exception
    */
-  private static Long itr(final XQMap map, final Str key) throws QueryException {
+  private static <T> T get(final XQMap map, final Str key, final QueryFunction<Item, T> convert)
+      throws QueryException {
     final Item item = (Item) map.get(key);
-    return item.isEmpty() ? null : item.itr(null);
-  }
-
-  /**
-   * Retrieves a decimal.
-   * @param map input map
-   * @param key key to look up
-   * @return result or {@code null}
-   * @throws QueryException query exception
-   */
-  private static BigDecimal dec(final XQMap map, final Str key) throws QueryException {
-    final Item item = (Item) map.get(key);
-    return item.isEmpty() ? null : item.dec(null);
-  }
-
-  /**
-   * Retrieves a duration.
-   * @param map input map
-   * @param key key to look up
-   * @return result or {@code null}
-   * @throws QueryException query exception
-   */
-  private static DTDur dur(final XQMap map, final Str key) throws QueryException {
-    final Item item = (Item) map.get(key);
-    return item.isEmpty() ? null : (DTDur) item;
+    return item.isEmpty() ? null : convert.apply(item);
   }
 
   /**
@@ -209,10 +188,8 @@ public final class FnBuildDateTime extends DateTimeFn {
   private static void checkDate(final long year, final long month, final long day,
       final InputInfo info) throws QueryException {
     checkYear(year, info);
-    checkMonth(month, info);
-    checkDayOnly(day, info);
-    final int dom = ADate.daysOfMonth(year, (int) month);
-    if(day > dom) throw INVALIDVALUE_X_X.get(info, DAY, day);
+    checkMonthDay(month, day, info);
+    if(day > ADate.daysOfMonth(year, (int) month)) throw INVALIDVALUE_X_X.get(info, DAY, day);
   }
 
   /**

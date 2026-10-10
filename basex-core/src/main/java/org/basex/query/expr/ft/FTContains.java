@@ -58,6 +58,8 @@ public final class FTContains extends Single {
         final FTMatches all = it.matches();
         if(all.matches()) {
           found = true;
+          // without scores and match positions, the first match is sufficient
+          if(!scoring && ftPosData == null) break;
           if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
           if(ftPosData != null) {
@@ -72,25 +74,6 @@ public final class FTContains extends Single {
         count++;
       }
       return found && scoring ? Bln.get(Scoring.avg(score, count)) : Bln.get(found);
-    } finally {
-      qc.ftLexer = tmp;
-    }
-  }
-
-  @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    // scores and match positions require all items to be evaluated
-    if(qc.scoring || qc.ftPosData != null) return value(qc).bool(info);
-
-    final Iter iter = expr.iter(qc);
-    final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
-    qc.ftLexer = lexer;
-    try {
-      for(Item item; (item = qc.next(iter)) != null;) {
-        lexer.init(item.string(info));
-        if(ftexpr.value(qc).matches().matches()) return true;
-      }
-      return false;
     } finally {
       qc.ftLexer = tmp;
     }

@@ -93,7 +93,6 @@ public abstract class ItrSeq extends NativeSeq {
       if(v < min) min = v;
       else if(v > max) max = v;
       // stop as soon as the values do not fit a narrower representation
-      else continue;
       if(minWidth(min, max) >= width) return this;
     }
     final int w = minWidth(min, max);

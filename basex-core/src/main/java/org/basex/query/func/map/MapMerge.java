@@ -236,8 +236,6 @@ public class MapMerge extends MapFn {
   final class Invoke extends MapDuplicates {
     /** Combiner function. */
     private final FItem function;
-    /** HOF arguments. */
-    private final ThreadLocal<HofArgs> args;
 
     /**
      * Constructor.
@@ -245,13 +243,12 @@ public class MapMerge extends MapFn {
      */
     Invoke(final FItem function) {
       this.function = function;
-      args = ThreadLocal.withInitial(() -> new HofArgs(2));
     }
 
     @Override
     Value get(final Item key, final Value old, final Value value, final QueryContext qc)
         throws QueryException {
-      return function.invoke(qc, info, args.get().set(0, old).set(1, value).get());
+      return function.invoke(qc, info, old, value);
     }
 
     @Override

@@ -56,7 +56,7 @@ public final class FnStringLength extends ContextFn {
    * Rewrites the string length of concatenated values to a sum of string lengths.
    * @param values values to be concatenated
    * @param cc compilation context
-   * @return sum expression or {@code null}
+   * @return sum expression, or this function if the values may be wrapped
    * @throws QueryException query exception
    */
   private Expr lengths(final Expr values, final CompileContext cc) throws QueryException {
