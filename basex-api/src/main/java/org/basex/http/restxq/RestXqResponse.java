@@ -112,12 +112,8 @@ public final class RestXqResponse extends WebResponse {
 
       if(status != null) {
         final int s = status;
-        final StringBuilder msg = new StringBuilder();
-        if(s == 302) {
-          if(!msg.isEmpty()) msg.append("; ");
-          msg.append(HTTPText.LOCATION + ": ").append(conn.response.getHeader(HTTPText.LOCATION));
-        }
-        conn.log(s, msg.toString());
+        conn.log(s, s == 302 ? HTTPText.LOCATION + ": " +
+          conn.response.getHeader(HTTPText.LOCATION) : "");
         conn.status(s, null);
       }
 

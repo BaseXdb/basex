@@ -75,13 +75,23 @@ public final class BaseXHTTP extends CLI {
 
     if(!quiet) Util.println(header());
 
-    // initialize configuration files and initialize HTTP context
+    hc = HTTPContext.get();
+    hc.init(soptions, options);
+
+    // stop web server (configuration files are not required)
+    if(stop) {
+      jetty = null;
+      stop();
+      // the HTTP port of the stopped instance is unknown: report the stop port
+      if(!quiet) Util.println(HTTP + " STOP " + SRV_STOPPED_PORT_X,
+          soptions.get(StaticOptions.STOPPORT));
+      return;
+    }
+
+    // initialize configuration files
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
-
-    hc = HTTPContext.get();
-    hc.init(soptions, options);
 
     // create jetty instance
     final ServerConnector sc = connector(new IOFile(webapp, JETTYCONF),
@@ -94,15 +104,6 @@ public final class BaseXHTTP extends CLI {
     // info strings
     final String started = Util.info(HTTP + ' ' + SRV_STARTED_PORT_X, port);
     final String stopped = Util.info(HTTP + ' ' + SRV_STOPPED_PORT_X, port);
-
-    // stop web server
-    if(stop) {
-      stop();
-      // the HTTP port of the stopped instance is unknown: report the stop port
-      if(!quiet) Util.println(HTTP + " STOP " + SRV_STOPPED_PORT_X,
-          soptions.get(StaticOptions.STOPPORT));
-      return;
-    }
 
     // start web server in a new Java process
     if(service) {
