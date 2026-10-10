@@ -40,7 +40,7 @@ public final class JobPool {
   private final ExecutorService pool = Executors.newCachedThreadPool(factory("basex-job"));
   /** Available slots for jobs running in parallel. */
   private final Semaphore slots = new Semaphore(MAX_RUNNING);
-  /** Monitor, notified whenever a job or task completes (see {@link #awaitChange}). */
+  /** Monitor, notified whenever a job or task completes. */
   private final Object monitor = new Object();
   /** Jobs with a memory limit, watched by the memory guard. */
   private final Map<Job, Watch> watched = new ConcurrentHashMap<>();
@@ -99,20 +99,6 @@ public final class JobPool {
   }
 
   /**
-   * Waits a bounded time for a job or task to complete.
-   */
-  public void awaitChange() {
-    synchronized(monitor) {
-      try {
-        monitor.wait(1000);
-      } catch(final InterruptedException ex) {
-        Util.debug(ex);
-        Thread.currentThread().interrupt();
-      }
-    }
-  }
-
-  /**
    * Waits until a condition is met; aborted if the waiting job is stopped.
    * @param job waiting job
    * @param done condition, checked whenever a job or task completes
@@ -139,7 +125,14 @@ public final class JobPool {
     // stop running tasks and queries
     scheduler.shutdownNow();
     for(final Job job : active.values()) job.stop();
-    while(!active.isEmpty()) awaitChange();
+    synchronized(monitor) {
+      try {
+        while(!active.isEmpty()) monitor.wait(1000);
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
+        Thread.currentThread().interrupt();
+      }
+    }
     pool.shutdown();
   }
 

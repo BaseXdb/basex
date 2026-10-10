@@ -269,6 +269,13 @@ public final class JobModuleTest extends SandboxTest {
     query(_JOB_LIST.args() + "='" + id + '\'', true);
     assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + id + "')"));
 
+    // job is removed if it is still running when the end time is exceeded
+    final String slow = query(func.args("prof:sleep(2000)", " ()",
+      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
+    Performance.sleep(1500);
+    query(_JOB_LIST.args() + "='" + slow + '\'', true);
+    assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + slow + "')"));
+
     // error
     error(func.args("1", " ()",
       " { 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"),

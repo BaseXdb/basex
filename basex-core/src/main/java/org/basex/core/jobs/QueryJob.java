@@ -43,7 +43,7 @@ public final class QueryJob extends Job implements Runnable {
   /** Query processor (can be {@code null}). */
   private QueryProcessor qp;
   /** Remove flag. */
-  private boolean remove;
+  private volatile boolean remove;
   /** Running flag. */
   private final AtomicBoolean running = new AtomicBoolean(false);
 
@@ -244,12 +244,12 @@ public final class QueryJob extends Job implements Runnable {
   public void run() {
     // clear a possibly stale interrupt status
     Thread.interrupted();
+    final JobContext jc = jc();
+    final String id = jc.id();
+    final Context ctx = jc.context;
     try {
       result.init();
 
-      final JobContext jc = jc();
-      final String id = jc.id();
-      final Context ctx = jc.context;
       final JobOptions opts = job.options;
 
       String log = opts.get(JobOptions.LOG);
@@ -371,7 +371,6 @@ public final class QueryJob extends Job implements Runnable {
           // invalidate performance measurements
           jc.performance = null;
 
-          if(remove) ctx.jobs.tasks.remove(id);
           ctx.jobs.notifyChange();
           // an empty result is dropped, unless query information is attached to it
           if(result.value != null && result.value.isEmpty() && result.info == null)
@@ -381,6 +380,8 @@ public final class QueryJob extends Job implements Runnable {
       }
     } finally {
       running.set(false);
+      // the final tick may have been rejected while the job was still running
+      if(remove && ctx.jobs.tasks.remove(id) != null) ctx.jobs.notifyChange();
     }
   }
 
