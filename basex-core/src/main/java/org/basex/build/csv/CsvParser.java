@@ -39,7 +39,7 @@ public final class CsvParser extends SingleParser {
   @Override
   protected void parse() throws IOException {
     final CsvFormat format = copts.get(CsvOptions.FORMAT);
-    if(format == CsvFormat.W3 || format == CsvFormat.W3_ARRAYS) {
+    if(format == CsvFormat.W3) {
       throw new IOException(Util.info("Format '%' cannot be converted to XML.", format));
     }
     csv = pushJob(CsvConverter.get(copts, builder));

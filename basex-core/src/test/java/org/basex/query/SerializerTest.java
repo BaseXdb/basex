@@ -359,7 +359,7 @@ public final class SerializerTest extends SandboxTest {
         + "</string></map>, { 'method': 'json', 'json': { 'format': 'w3-xml' }, "
         + "'use-character-maps': { 'x': 'X' } })", "{\"X\\\"\":\"X\"}");
     // CSV: fields are mapped and normalized before quoting
-    query("serialize(['x\"&#xe7;'], { 'method': 'csv', 'csv': { 'format': 'w3-arrays' }, "
+    query("serialize({ 'rows': ['x\"&#xe7;'] }, { 'method': 'csv', 'csv': { 'format': 'w3' }, "
         + "'use-character-maps': { 'x': 'X' }, 'normalization-form': 'NFD' }) "
         + "=> string-to-codepoints()", "34\n88\n34\n34\n99\n807\n34\n10");
   }

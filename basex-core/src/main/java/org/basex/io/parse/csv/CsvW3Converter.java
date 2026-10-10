@@ -17,6 +17,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class converts CSV data to the representation defined by fn:parse-csv.
@@ -24,7 +25,15 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CsvW3Converter extends CsvW3ArraysConverter {
+public final class CsvW3Converter extends CsvConverter {
+  /** String array type. */
+  private static final ArrayType STRING_ARRAY = ArrayType.get(STRING_O);
+
+  /** Rows. */
+  private final ItemList rowList = new ItemList();
+  /** Current row (can be {@code null}). */
+  private TokenList row;
+
   /**
    * Constructor.
    * @param opts CSV options
@@ -34,8 +43,29 @@ public final class CsvW3Converter extends CsvW3ArraysConverter {
   }
 
   @Override
+  protected void header(final byte[] string) {
+    headers.add(shared.token(string));
+  }
+
+  @Override
+  protected void record() {
+    if(row != null) rowList.add(XQArray.items(StrSeq.get(row.next())));
+    else row = new TokenList();
+  }
+
+  @Override
+  protected void entry(final byte[] value) {
+    row.add(shared.token(value));
+  }
+
+  @Override
+  protected void init(final String uri) {
+  }
+
+  @Override
   protected Value finish(final InputInfo ii, final QueryContext qc) throws QueryException {
-    final Value rows = super.finish(ii, qc);
+    if(row != null) rowList.add(XQArray.items(StrSeq.get(row.next())));
+    final Value rows = rowList.value(STRING_ARRAY);
     final MapBuilder columnIndexBuilder = new MapBuilder();
     final int hs = headers.size();
     for(int h = 0; h < hs; h++) {

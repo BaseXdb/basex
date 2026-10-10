@@ -51,7 +51,6 @@ public class CsvOptions extends Options {
     /** Default. */ DIRECT,
     /** Attributes. */ ATTRIBUTES,
     /** fn:parse-csv. */ W3,
-    /** Rows of fn:parse-csv. */ W3_ARRAYS,
     /** fn:csv-to-xml. */ W3_XML;
 
     @Override

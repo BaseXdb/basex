@@ -31,21 +31,17 @@ public abstract class ParseFn extends StandardFunc {
   }
 
   /**
-   * Checks if the format option is statically known to be one of the specified formats.
+   * Checks if the format option is statically known to be the specified format.
    * @param option format option
-   * @param formats formats
+   * @param format format
    * @return result of check
    */
-  final boolean format(final Option<?> option, final Enum<?>... formats) {
+  final boolean format(final Option<?> option, final Enum<?> format) {
     if(!(arg(1) instanceof final Value value)) return false;
     final Value v = value instanceof final JNode jnode ? jnode.value : value;
-    if(!(v instanceof final XQMap map) ||
-       !(map.value(Str.get(option.name())) instanceof final Str format)) return false;
-    final String string = Token.string(format.string());
-    for(final Enum<?> f : formats) {
-      if(f.toString().equals(string)) return true;
-    }
-    return false;
+    return v instanceof final XQMap map &&
+        map.value(Str.get(option.name())) instanceof final Str str &&
+        format.toString().equals(Token.string(str.string()));
   }
 
   /**

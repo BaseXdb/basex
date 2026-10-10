@@ -64,7 +64,6 @@ public abstract class CsvConverter extends Job {
   public static CsvConverter get(final CsvParserOptions copts, final XmlHandler handler) {
     return switch(copts.get(CsvOptions.FORMAT)) {
       case W3        -> new CsvW3Converter(copts);
-      case W3_ARRAYS -> new CsvW3ArraysConverter(copts);
       case W3_XML    -> new CsvW3XmlConverter(copts, handler);
       default        -> new CsvDirectConverter(copts, handler);
     };

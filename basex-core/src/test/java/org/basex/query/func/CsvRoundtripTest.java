@@ -31,75 +31,6 @@ public final class CsvRoundtripTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void w3Arrays() {
-    arrays("", "",
-      "");
-    arrays("one", "",
-      "[\"one\"]");
-    arrays("one,two", "",
-      "[\"one\",\"two\"]");
-    arrays("one,two&#xA;three,four", "",
-      "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    arrays("one,two&#xA;three,four&#xA;", "",
-      "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    arrays("one,two&#xA;three,four,five", "",
-      "[\"one\",\"two\"]\n[\"three\",\"four\",\"five\"]");
-    arrays("one,two&#xA;&#xA;three,four", "",
-      "[\"one\",\"two\"]\n[]\n[\"three\",\"four\"]");
-    arrays("one,two&#xA;\"three,four\",five", "",
-      "[\"one\",\"two\"]\n[\"three,four\",\"five\"]");
-    arrays("one,two&#xA;\"three,\"\"four\"\"\",five", "",
-      "[\"one\",\"two\"]\n[\"three,\"\"four\"\"\",\"five\"]");
-    arrays("one,&#xA;,four&#xA;,&#xA;,,,", "",
-      "[\"one\",\"\"]\n[\"\",\"four\"]\n[\"\",\"\"]\n[\"\",\"\",\"\",\"\"]");
-    arrays("one,\"\"&#xA;\"\",\"four\"", "",
-      "[\"one\",\"\"]\n[\"\",\"four\"]");
-    arrays("one,\"[&#xA;]\"&#xA;\"\",\"four\"", "",
-      "[\"one\",\"[&#xA;]\"]\n[\"\",\"four\"]");
-    arrays("one;two&#xA;three;four",
-      "'separator': ';'",
-      "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    arrays("one.two&#xA;three.four",
-      "'separator': '.'",
-      "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    arrays("one,'two,2'&#xA;three,'four,4'",
-      "'quote-character': ''''",
-      "[\"one\",\"two,2\"]\n[\"three\",\"four,4\"]");
-    arrays("one,'two,''2'''&#xA;three,'four,''4'''",
-      "'quote-character': ''''",
-      "[\"one\",\"two,'2'\"]\n[\"three\",\"four,'4'\"]");
-    arrays("one ,two &#xA; three, four",
-      "",
-      "[\"one \",\"two \"]\n[\" three\",\" four\"]");
-    arrays("one ,two &#xA; three, twenty  four ",
-      "'trim-whitespace': true()",
-      "[\"one\",\"two\"]\n[\"three\",\"twenty  four\"]");
-    arrays("&#xA;", "",
-      "[]");
-    arrays("&#xA; ", "",
-      "[]\n[\" \"]");
-    arrays("&#xA; ",
-      "'trim-whitespace': true()",
-      "[]");
-    arrays("&#xA;&#xA;",
-      "'trim-whitespace': true()",
-      "[]\n[]");
-    arrays("&#xA;&#xA;&#xA;",
-      "'trim-whitespace': true()",
-      "[]\n[]\n[]");
-    arrays("one,two,\"z\"", "",
-      "[\"one\",\"two\",\"z\"]");
-    arrays("one,two,\"z\"&#xA;", "",
-      "[\"one\",\"two\",\"z\"]");
-    arrays("a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    arrays("a,b,c&#xA;p,q,r",
-      "",
-      "[\"a\",\"b\",\"c\"]\n[\"p\",\"q\",\"r\"]");
-  }
-
-  /** Test method. */
   @Test public void parseCsv() {
     final Function func = PARSE_CSV;
     roundtrip(func, "", "",
@@ -531,17 +462,6 @@ public final class CsvRoundtripTest extends SandboxTest {
       "<csv xmlns=\"http://www.w3.org/2005/xpath-functions\"><rows>" +
       "<row><field>one</field><field>two</field></row>" +
       "<row><field>three</field><field>four</field></row></rows></csv>");
-  }
-
-  /**
-   * Runs a roundtrip test for the w3-arrays format.
-   * @param input CSV input
-   * @param options options
-   * @param expected expected result
-   */
-  private static void arrays(final String input, final String options, final String expected) {
-    roundtrip(_CSV_PARSE, input, (options.isEmpty() ? "" : options + ", ") +
-        "'format': 'w3-arrays'", expected);
   }
 
   /**
