@@ -170,6 +170,30 @@ public final class DBATest extends WebappTest {
         send(404, "GET", page, null, null);
       }
     }
+
+    /**
+     * Closes the WebSocket connections of a session on logout.
+     * @throws Exception exception
+     */
+    @Test public void logoutClosesSockets() throws Exception {
+      final CompletableFuture<Integer> closed = new CompletableFuture<>();
+      final java.net.http.WebSocket socket = socket("/dba/logs",
+          new java.net.http.WebSocket.Listener() {
+        @Override
+        public CompletionStage<?> onClose(final java.net.http.WebSocket wsc, final int status,
+            final String reason) {
+          closed.complete(status);
+          return null;
+        }
+      });
+      try {
+        post("logout", Map.of());
+        assertNotNull(closed.get(10, TimeUnit.SECONDS));
+      } finally {
+        socket.abort();
+        post("login", Map.of("_name", "admin", "_pass", NAME));
+      }
+    }
   }
 
   /**

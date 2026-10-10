@@ -137,7 +137,8 @@ function dba:logout(
     admin:write-log('Logout: ' || $user, 'DBA'),
     web:redirect(utils:page('login'), { '_name': $user })
   ),
-  (: deletes the session key :)
+  (: closes the WebSockets of the session, deletes the session key :)
+  ws:list-details()[@session = session:id()] ! ws:close(@id),
   session:delete($config:SESSION-KEY)
 };
 
