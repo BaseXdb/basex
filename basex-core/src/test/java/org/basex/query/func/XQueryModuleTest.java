@@ -2,12 +2,14 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Timeout.ThreadMode.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.junit.jupiter.api.*;
 
@@ -144,6 +146,61 @@ public final class XQueryModuleTest extends SandboxTest {
     } finally {
       execute(new DropDB(NAME));
     }
+  }
+
+  /** Ensures that code with reduced permissions cannot access privileged information. */
+  @Test public void evalPrivileged() {
+    final Function func = _XQUERY_EVAL;
+    final String none = " { 'permission': 'none' }";
+
+    // users
+    query(func.args(_USER_LIST.args().trim(), " ()", none), "");
+    query(func.args(_USER_LIST_DETAILS.args().trim(), " ()", none), "");
+    query(func.args(_USER_CURRENT.args().trim(), " ()", none), "admin");
+    error(func.args(_USER_LIST_DETAILS.args("admin").trim(), " ()", none), XQUERY_PERM_X);
+    error(func.args(_USER_INFO.args().trim(), " ()", none), XQUERY_PERM_X);
+    error(func.args(_USER_INFO.args("admin").trim(), " ()", none), XQUERY_PERM_X);
+    error(func.args(_USER_CHECK.args("admin", "").trim(), " ()", none), XQUERY_PERM_X);
+    error(_XQUERY_EVAL_UPDATE.args(_USER_PASSWORD.args("admin", "").trim(), " ()", none),
+        XQUERY_PERM_X);
+    error(_XQUERY_EVAL_UPDATE.args(_USER_UPDATE_INFO.args(" <info/>").trim(), " ()", none),
+        XQUERY_PERM_X);
+    error(_XQUERY_EVAL_UPDATE.args(_USER_UPDATE_INFO.args(" <info/>", "admin").trim(), " ()",
+        none), XQUERY_PERM_X);
+    // returned function items keep the reduced permissions
+    error(func.args("fn() { " + _USER_LIST_DETAILS.args("admin") + " }", " ()", none) + "()",
+        EXTERNALRESOURCE_X);
+    query(func.args("fn() { " + _USER_LIST.args() + " }", " ()", none) + "()", "");
+
+    // global options and system information
+    query(func.args((_DB_OPTION_MAP.args() + "?dbpath").trim(), " ()", none), "");
+    error(func.args(_DB_OPTION.args("dbpath").trim(), " ()", none), DB_OPTION_X);
+    query(func.args((_DB_SYSTEM.args() + "//dbpath").trim(), " ()", none), "");
+    query(func.args(_DB_OPTION.args("stripns").trim(), " ()", none), false);
+
+    // compilation of parsed queries
+    error(func.args(_XQUERY_PARSE.args("environment-variable('PATH')",
+        " { 'compile': true() }").trim(), " ()", " { 'permission': 'create' }"),
+        XQUERY_PERM_X);
+
+    // file system paths
+    error(func.args(_FILE_PARENT.args("x").trim(), " ()", none), XQUERY_PERM_X);
+    error(func.args(_FILE_PATH_TO_URI.args("x").trim(), " ()", none), XQUERY_PERM_X);
+
+    // jobs: the permission limits the code and local permissions
+    final String id = query(_JOB_EVAL.args("doc('" + PATH + "')", " ()",
+        " { 'cache': true(), 'permission': 'read' }"));
+    query(_JOB_WAIT.args(id));
+    error(_JOB_RESULT.args(id), EXTERNALRESOURCE_X);
+    final User user = new User(NAME).permission(Perm.WRITE, NAME);
+    assertFalse(new User(user, Perm.READ).has(Perm.WRITE, NAME));
+    assertTrue(user.has(Perm.WRITE, NAME));
+
+    // full permissions
+    query(_USER_LIST.args(), "admin");
+    query(_USER_LIST_DETAILS.args("admin") + "/@name/string()", "admin");
+    query(_DB_OPTION.args("dbpath") + " => exists()", true);
+    query(_FILE_PARENT.args("x") + " => exists()", true);
   }
 
   /** Invokes updating function items. */

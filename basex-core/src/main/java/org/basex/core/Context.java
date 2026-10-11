@@ -366,12 +366,13 @@ public final class Context {
   }
 
   /**
-   * Returns all options visible to the current user.
+   * Returns all visible options.
+   * @param admin include global options
    * @return options (with names in lower-case)
    */
-  public HashMap<String, Object> options() {
+  public HashMap<String, Object> options(final boolean admin) {
     final HashMap<String, Object> map = new HashMap<>();
-    if(user().has(Perm.ADMIN)) {
+    if(admin) {
       for(final Option<?> o : soptions) {
         map.put(o.name().toLowerCase(Locale.ENGLISH), soptions.get(o));
       }
@@ -383,15 +384,16 @@ public final class Context {
   }
 
   /**
-   * Returns the value of an option visible to the current user.
+   * Returns the value of a visible option.
    * @param name name of option (case-insensitive)
+   * @param admin include global options
    * @return value or {@code null}
    */
-  public Object option(final String name) {
+  public Object option(final String name, final boolean admin) {
     final String uc = name.toUpperCase(Locale.ENGLISH);
     Options opts = options;
     Option<?> opt = opts.option(uc);
-    if(opt == null && user().has(Perm.ADMIN)) {
+    if(opt == null && admin) {
       opts = soptions;
       opt = opts.option(uc);
     }

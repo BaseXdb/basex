@@ -1,6 +1,5 @@
 package org.basex.query.func.user;
 
-import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -19,11 +18,8 @@ public final class UserListDetails extends UserList {
     if(user != null) return user.toXml(qc, info);
 
     // return information for all users
-    final Context ctx = qc.context;
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final User us : ctx.users.users(null, ctx)) {
-      vb.add(us.toXml(qc, info));
-    }
+    for(final User us : users(qc)) vb.add(us.toXml(qc, info));
     return vb.value(this);
   }
 }

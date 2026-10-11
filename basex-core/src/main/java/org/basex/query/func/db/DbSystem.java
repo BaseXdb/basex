@@ -1,6 +1,7 @@
 package org.basex.query.func.db;
 
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
@@ -14,6 +15,7 @@ import org.basex.query.value.node.*;
 public final class DbSystem extends StandardFunc {
   @Override
   public FNode value(final QueryContext qc) {
-    return DbInfo.node(DbAccessFn.Q_SYSTEM, Info.info(qc.context), qc);
+    final boolean admin = qc.has(Perm.ADMIN, null, info);
+    return DbInfo.node(DbAccessFn.Q_SYSTEM, Info.info(qc.context, admin), qc);
   }
 }

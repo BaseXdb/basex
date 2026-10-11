@@ -83,7 +83,7 @@ public class XQueryEval extends StandardFunc {
 
     ScheduledFuture<?> to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {
-      qctx.user = new User(user).permission(perm);
+      qctx.user = new User(user, perm);
       qctx.maxPerm = perm(qc).min(limit != null ? limit : Perm.ADMIN);
 
       // limit memory consumption

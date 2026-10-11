@@ -54,7 +54,7 @@ public final class ShowOptions extends Command {
     } else {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
-      final Object value = context.option(name);
+      final Object value = context.option(name, context.user().has(Perm.ADMIN));
       if(value == null) return error(context.options.similar(name));
       out.println(name + COLS + value);
     }

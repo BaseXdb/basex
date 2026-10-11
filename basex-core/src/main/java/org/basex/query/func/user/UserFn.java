@@ -72,10 +72,23 @@ abstract class UserFn extends StandardFunc {
     final String name = toName(expr, empty, qc);
     if(name.isEmpty()) return null;
 
-    if(!qc.user.name().equals(name)) checkPerm(qc, Perm.ADMIN);
     final User user = qc.context.users.get(name);
+    if(user == null || !accessible(user, qc)) checkPerm(qc, Perm.ADMIN);
     if(user == null) throw USER_UNKNOWN_X.get(info, name);
     return user;
+  }
+
+  /**
+   * Checks if the current user and code may access the specified user.
+   * @param user user
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean accessible(final User user, final QueryContext qc) {
+    // own user: no admin permissions required, unless the permissions are reduced
+    final Perm perm = user.name().equals(qc.user.name()) ? user.permission((String) null) :
+      Perm.ADMIN;
+    return qc.has(perm, null, info);
   }
 
   /**

@@ -14,6 +14,7 @@ public final class UserInfo extends UserFn {
   @Override
   public XNode value(final QueryContext qc) throws QueryException {
     final User user = toUser(arg(0), true, qc);
+    if(user == null) checkPerm(qc, Perm.ADMIN);
 
     final XNode node = user != null ? user.info() : qc.context.users.info();
     return node != null ? node : FElem.build(Q_INFO).finish();

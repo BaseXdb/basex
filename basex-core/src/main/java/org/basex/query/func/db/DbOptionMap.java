@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import java.util.Map.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -20,7 +21,8 @@ public class DbOptionMap extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
-    for(final Entry<String, Object> option : qc.context.options().entrySet()) {
+    final boolean admin = qc.has(Perm.ADMIN, null, info);
+    for(final Entry<String, Object> option : qc.context.options(admin).entrySet()) {
       map.put(option.getKey(), item(option.getValue()));
     }
     return map.map();

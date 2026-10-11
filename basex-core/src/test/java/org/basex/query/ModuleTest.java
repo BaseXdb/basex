@@ -227,7 +227,7 @@ public final class ModuleTest extends SandboxTest {
     try(QueryProcessor qp = new QueryProcessor("load-xquery-module('n')?variables?*", context)) {
       qp.module("n", n.path());
       qp.module("o", o.path());
-      qp.qc.user = new User(context.user()).permission(Perm.READ);
+      qp.qc.user = new User(context.user(), Perm.READ);
       assertEquals("42", qp.value().serialize().toString());
     }
   }

@@ -99,7 +99,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Indicates if parsed code may access static resources without CREATE permission. */
   public boolean parseResources;
   /** Maximum permission of the parsed code. */
-  public Perm maxPerm = Perm.ADMIN;
+  public Perm maxPerm;
 
   /** Cached full-text position data. */
   public FTPosData ftPosData;
@@ -210,7 +210,8 @@ public final class QueryContext extends Job implements Closeable {
     regex = parent != null ? parent.regex : new TokenObjectMap<>();
     memo = parent != null ? parent.memo : new ConcurrentHashMap<>();
     globals = parent != null ? parent.globals : new GlobalValues();
-    user = context.user();
+    user = parent != null ? parent.user : context.user();
+    maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;
   }
 
   /**

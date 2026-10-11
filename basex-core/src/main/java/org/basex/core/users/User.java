@@ -55,15 +55,19 @@ public final class User {
   }
 
   /**
-   * Copy constructor.
+   * Creates a copy of a user whose global and local permissions are limited.
    * @param user parent user
+   * @param perm maximum permission
    */
-  public User(final User user) {
+  public User(final User user, final Perm perm) {
     name = user.name;
     passwords = user.passwords;
-    patterns = user.patterns;
-    permission = user.permission;
-    info = user.info;
+    patterns = new LinkedHashMap<>();
+    synchronized(user) {
+      user.patterns.forEach((pattern, p) -> patterns.put(pattern, p.min(perm)));
+      permission = user.permission.min(perm);
+      info = user.info;
+    }
   }
 
   /**

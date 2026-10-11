@@ -21,6 +21,7 @@ public final class UserUpdateInfo extends UserFn {
   public Value value(final QueryContext qc) throws QueryException {
     final XNode node = toElem(arg(0), Q_INFO, qc, ELM_X_X_X);
     final User user = toUser(arg(1), true, qc);
+    if(user == null) checkPerm(qc, Perm.ADMIN);
 
     qc.updates().add(new UpdateInfo(node.materialize(n -> false, info, qc), user, qc, info), qc);
     return Empty.VALUE;

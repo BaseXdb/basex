@@ -9,7 +9,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -21,7 +20,6 @@ public final class WebDAVLockUpdate extends StandardFunc {
   @Override
   public Bln value(final QueryContext qc) throws QueryException {
     final FItem update = toFunction(arg(0), 1, qc);
-    final User user = qc.context.user();
 
     return Bln.get(qc.context.stores.locks(entries -> {
       final XQMap result = toMap(invoke(update, new HofArgs(1).set(0, entries), qc).item(qc, info));
@@ -41,10 +39,10 @@ public final class WebDAVLockUpdate extends StandardFunc {
 
       // locks of databases that may not be written are restored
       for(final XQMap.Entry entry : map.entries()) {
-        if(!writable(user, entry.value(), info)) map = map.remove(entry.key());
+        if(!writable(entry.value(), qc)) map = map.remove(entry.key());
       }
       for(final XQMap.Entry entry : entries.entries()) {
-        if(!writable(user, entry.value(), info)) map = map.put(entry.key(), entry.value());
+        if(!writable(entry.value(), qc)) map = map.put(entry.key(), entry.value());
       }
 
       // unchanged locks: the original map is returned
@@ -54,15 +52,13 @@ public final class WebDAVLockUpdate extends StandardFunc {
 
   /**
    * Checks if a lock refers to a database that may be written.
-   * @param user user
    * @param value lock
-   * @param info input info (can be {@code null})
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  private static boolean writable(final User user, final Value value, final InputInfo info)
-      throws QueryException {
+  private boolean writable(final Value value, final QueryContext qc) throws QueryException {
     return !(value instanceof final XQMap lock) ||
-      user.has(Perm.WRITE, WebDAVLocks.database(lock, info));
+      qc.has(Perm.WRITE, WebDAVLocks.database(lock, info), info);
   }
 }

@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
+import org.basex.core.users.*;
 import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -50,8 +51,25 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public QueryProcessor(final String query, final String uri, final Context ctx,
       final QueryInfo info) {
+    this(query, uri, ctx, info, null);
+  }
+
+  /**
+   * Constructor with limited permissions.
+   * @param query query string
+   * @param uri base URI (can be {@code null})
+   * @param ctx database context
+   * @param info query info (can be {@code null})
+   * @param perm maximum permission of the user and the code (can be {@code null})
+   */
+  public QueryProcessor(final String query, final String uri, final Context ctx,
+      final QueryInfo info, final Perm perm) {
     this.query = query;
     qc = pushJob(new QueryContext(ctx, null, null, info));
+    if(perm != null) {
+      qc.user = new User(qc.user, perm);
+      qc.maxPerm = perm;
+    }
     sc = new StaticContext(qc);
     sc.baseURI(uri != null && uri.isEmpty() ? "./" : uri);
   }

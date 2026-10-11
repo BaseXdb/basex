@@ -17,9 +17,17 @@ import org.basex.util.list.*;
 public class UserList extends UserFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ArrayList<User> users = qc.context.users.users(null, qc.context);
-    final TokenList tl = new TokenList(users.size());
-    for(final User user : users) tl.add(user.name());
+    final TokenList tl = new TokenList();
+    for(final User user : users(qc)) tl.add(user.name());
     return StrSeq.get(tl);
+  }
+
+  /**
+   * Returns all users that may be accessed by the current user and code.
+   * @param qc query context
+   * @return users
+   */
+  final ArrayList<User> users(final QueryContext qc) {
+    return qc.context.users.users(null, user -> accessible(user, qc));
   }
 }

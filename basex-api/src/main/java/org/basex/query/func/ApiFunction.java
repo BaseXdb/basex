@@ -114,7 +114,7 @@ public enum ApiFunction implements AFunction {
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
   _REST_INIT(RestInit::new, "init(update?)",
-      params(BOOLEAN_ZO), EMPTY_SEQUENCE_Z, REST_URI),
+      params(BOOLEAN_ZO), EMPTY_SEQUENCE_Z, REST_URI, Perm.ADMIN),
   /** XQuery function. */
   _REST_URI(RestUri::new, "uri()",
       params(), ANY_URI_O, REST_URI),
@@ -132,13 +132,13 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZO, SESSION_URI),
   /** XQuery function. */
   _SESSION_CLOSE(SessionClose::new, "close()",
-      params(), EMPTY_SEQUENCE_Z, SESSION_URI),
+      params(), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
   /** XQuery function. */
   _SESSION_CREATED(SessionCreated::new, "created()",
       params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_DELETE(SessionDelete::new, "delete(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
   /** XQuery function. */
   _SESSION_GET(SessionGet::new, "get(key, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, SESSION_URI),
@@ -150,7 +150,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_SET(SessionSet::new, "set(key, value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
 
   // Sessions Module
 

@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -181,25 +182,24 @@ public final class Users {
     table.description = Text.USERS_X;
 
     for(final String user : S_USERINFO) table.header.add(user);
-    for(final User user : users(db, ctx)) {
+    final User curr = ctx.user();
+    final boolean admin = curr.has(Perm.ADMIN);
+    for(final User user : users(db, user -> admin || user == curr)) {
       table.contents.add(new TokenList().add(user.name()).add(user.permission(db).toString()));
     }
     return table.toTop(token(ADMIN));
   }
 
   /**
-   * Returns all users, or users that have permissions for a specific database, sorted by name.
-   * The list will only contain the current user if no admin permissions are available.
+   * Returns all visible users, or users with permissions for a specific database, sorted by name.
    * @param db database (can be {@code null})
-   * @param ctx database context
+   * @param visible filter for visible users
    * @return user information
    */
-  public synchronized ArrayList<User> users(final String db, final Context ctx) {
-    final User curr = ctx.user();
-    final boolean admin = curr.has(Perm.ADMIN);
+  public synchronized ArrayList<User> users(final String db, final Predicate<User> visible) {
     final ArrayList<User> list = new ArrayList<>();
     for(final User user : users.values()) {
-      if(admin || curr == user) {
+      if(visible.test(user)) {
         if(db == null) {
           list.add(user);
         } else {

@@ -39,13 +39,11 @@ public final class WebDAVLocks extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final User user = qc.context.user();
-
     // a local permission overrides the global one, so every lock is checked separately
     final MapBuilder mb = new MapBuilder();
     for(final XQMap.Entry entry : qc.context.stores.locks().entries()) {
       final Value value = entry.value();
-      if(value instanceof final XQMap lock && user.has(Perm.READ, database(lock, info))) {
+      if(value instanceof final XQMap lock && qc.has(Perm.READ, database(lock, info), info)) {
         mb.put(entry.key(), value);
       }
     }

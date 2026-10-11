@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
@@ -17,7 +18,7 @@ public final class DbOption extends DbOptionMap {
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] key = toToken(arg(0), qc);
 
-    final Object value = qc.context.option(Token.string(key));
+    final Object value = qc.context.option(Token.string(key), qc.has(Perm.ADMIN, null, info));
     if(value == null) throw DB_OPTION_X.get(info, key);
     return item(value);
   }

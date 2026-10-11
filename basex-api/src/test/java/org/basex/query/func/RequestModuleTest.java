@@ -22,6 +22,19 @@ public final class RequestModuleTest extends HTTPTest {
   }
 
   /**
+   * Ensures that code with reduced permissions cannot modify sessions or server state.
+   * @throws Exception exception
+   */
+  @Test public void reducedPermission() throws Exception {
+    for(final String call : new String[] { _SESSION_SET.args("x", "x"), _SESSION_DELETE.args("x"),
+        _SESSION_CLOSE.args(), _REST_INIT.args() }) {
+      get("permission", "", "query", "try { xquery:eval('" + call.trim() +
+          "', (), { 'permission': 'none' }) } catch * { local-name-from-QName($err:code) }");
+    }
+    get("true", "", "query", "exists(" + _REQUEST_HEADER_MAP.args() + ")");
+  }
+
+  /**
    * Function test.
    * @throws Exception exception
    */

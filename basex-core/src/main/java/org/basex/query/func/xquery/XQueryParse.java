@@ -59,6 +59,9 @@ public final class XQueryParse extends StandardFunc {
     // optimization opens databases: share the resources and locks of the parent query
     final boolean optimize = options.get(XQueryOptions.OPTIMIZE);
     try(QueryContext qctx = optimize ? new QueryContext(qc, null) : new QueryContext(qc.context)) {
+      // compilation may evaluate code: adopt the permissions of the calling code
+      qctx.user = qc.user;
+      qctx.maxPerm = perm(qc);
       final AModule module = qctx.parse(query.readString(),
           toBaseUri(query.path(), options, XQueryOptions.BASE_URI));
       // library modules have no main expression to optimize

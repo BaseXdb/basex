@@ -1546,7 +1546,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_PARENT(FileParent::new, "parent(path)",
-      params(STRING_O), STRING_ZO, flag(NDT), FILE_URI),
+      params(STRING_O), STRING_ZO, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_PATH_SEPARATOR(FilePathSeparator::new, "path-separator()",
       params(), STRING_O, FILE_URI),
@@ -1555,7 +1555,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_PATH_TO_URI(FilePathToUri::new, "path-to-uri(path)",
-      params(STRING_O), ANY_URI_O, flag(NDT), FILE_URI),
+      params(STRING_O), ANY_URI_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_READ_BINARY(FileReadBinary::new, "read-binary(file, offset?, length?)",
       params(STRING_O, INTEGER_ZO, INTEGER_ZO), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
