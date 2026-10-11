@@ -385,21 +385,9 @@ final class TextRenderer extends BaseXBack {
     final TextIterator iter = layout.iter;
     // try to resume from the edited line
     final int r0 = cache.beginUpdate(txt, cacheWidth(), offset);
-    int endY;
     if(r0 < 0) {
       cache.reset();
       cache.add(layout.y, 0, syntax.state());
-      while(more(layout)) {
-        // advance the highlighter state so it can be restored when rendering resumes mid-document
-        syntax.getColor(iter);
-        if(next(layout)) {
-          // the line that was left behind ends at the remembered row position
-          cache.lineWidth(layout.rowX - offset);
-          cache.add(layout.y, iter.posEnd(), syntax.state());
-        }
-      }
-      cache.lineWidth(layout.x - offset);
-      endY = layout.y;
     } else {
       // resume at the first changed line
       final int sp = cache.startPos();
@@ -411,24 +399,28 @@ final class TextRenderer extends BaseXBack {
       iter.posEnd(sp);
       syntax.state(st);
       cache.add(layout.y, sp, st);
-
-      endY = -1;
-      while(more(layout)) {
-        syntax.getColor(iter);
-        if(next(layout)) {
-          final int p = iter.posEnd();
-          final int[] state = syntax.state();
-          cache.lineWidth(layout.rowX - offset);
-          // stop as soon as the layout re-converges with the unchanged tail
-          if(cache.splice(p, layout.y, state)) { endY = cache.endY(); break; }
-          cache.add(layout.y, p, state);
+    }
+    int endY = -1;
+    while(more(layout)) {
+      // advance the highlighter state so it can be restored when rendering resumes mid-document
+      syntax.getColor(iter);
+      if(next(layout)) {
+        final int p = iter.posEnd();
+        final int[] state = syntax.state();
+        // the line that was left behind ends at the remembered row position
+        cache.lineWidth(layout.rowX - offset);
+        // incremental update: stop as soon as the layout re-converges with the unchanged tail
+        if(r0 >= 0 && cache.splice(p, layout.y, state)) {
+          endY = cache.endY();
+          break;
         }
+        cache.add(layout.y, p, state);
       }
-      // no convergence: the edit reached the end of the document
-      if(endY < 0) {
-        cache.lineWidth(layout.x - offset);
-        endY = layout.y;
-      }
+    }
+    // full rebuild, or no convergence: the edit reached the end of the document
+    if(endY < 0) {
+      cache.lineWidth(layout.x - offset);
+      endY = layout.y;
     }
     cache.finish(txt, cacheWidth(), offset, endY);
     height = getHeight() + fontHeight;

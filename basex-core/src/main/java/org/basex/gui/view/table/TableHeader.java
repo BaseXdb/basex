@@ -13,6 +13,7 @@ import javax.swing.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.view.table.TableData.TableCol;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -59,18 +60,13 @@ final class TableHeader extends BaseXPanel {
     // restore default focus traversal with TAB key
     setFocusTraversalKeysEnabled(false);
 
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        filter(e.getOppositeComponent() instanceof TableView ? 0 : tdata.cols.length - 1);
-      }
-      @Override
-      public void focusLost(final FocusEvent e) {
-        // tab key pressed...
-        if(box != null) box.stop();
-        inputCol = -1;
-        repaint();
-      }
+    addFocusListener((FocusGainedListener) e ->
+      filter(e.getOppositeComponent() instanceof TableView ? 0 : tdata.cols.length - 1));
+    addFocusListener((FocusLostListener) e -> {
+      // tab key pressed...
+      if(box != null) box.stop();
+      inputCol = -1;
+      repaint();
     });
   }
 

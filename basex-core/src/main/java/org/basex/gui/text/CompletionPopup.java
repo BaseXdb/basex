@@ -8,7 +8,6 @@ import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.Timer;
 
 import org.basex.gui.layout.*;
 import org.basex.util.list.*;
@@ -19,32 +18,22 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class CompletionPopup {
+final class CompletionPopup extends TextPopup {
   /** Maximum number of visible candidates. */
   private static final int ROWS = 12;
   /** Characters to show. */
   private static final int CHARS = 45;
-  /** Popup delay (ms). */
-  private static final int DELAY = 250;
-  /** Horizontal margin of a candidate. */
-  private static final int MARGIN = 4;
 
-  /** Text panel. */
-  private final TextPanel panel;
   /** Candidates. */
   private final DefaultListModel<Completion> model = new DefaultListModel<>();
   /** Displayed candidates. */
   private final JList<Completion> list = new JList<>(model);
-  /** Timer for showing the popup automatically. */
-  private final Timer timer;
   /** Candidates that start a new group. */
   private BoolList groups;
   /** Matched string (lower case). */
   private String input = "";
   /** Font for matched characters. */
   private Font boldFont;
-  /** Popup window (can be {@code null}: popup is hidden). */
-  private JWindow window;
   /** Start position of the completed string. */
   private int start;
 
@@ -53,12 +42,8 @@ final class CompletionPopup {
    * @param panel text panel
    */
   CompletionPopup(final TextPanel panel) {
-    this.panel = panel;
+    super(panel);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-    timer = new Timer(DELAY, e -> panel.complete(false));
-    timer.setRepeats(false);
-
     list.setCellRenderer(new CandidateRenderer());
     list.addMouseListener(new MouseAdapter() {
       @Override
@@ -74,12 +59,9 @@ final class CompletionPopup {
     });
   }
 
-  /**
-   * Indicates if the popup is visible.
-   * @return result of check
-   */
-  boolean visible() {
-    return window != null && window.isVisible();
+  @Override
+  void timeout() {
+    panel.complete(false);
   }
 
   /**
@@ -101,16 +83,14 @@ final class CompletionPopup {
       final Point point) {
     hide();
     start = strt;
-    // the popup must not take away the focus from the text panel
-    window = new JWindow(SwingUtilities.getWindowAncestor(panel));
-    window.setFocusableWindowState(false);
-    window.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
     update(candidates, word);
+    open(point);
+  }
 
-    final Point screen = panel.getLocationOnScreen();
-    window.setLocation(screen.x + point.x, screen.y + point.y);
-    window.setVisible(true);
+  @Override
+  Component content() {
+    return new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
   }
 
   /**
@@ -144,24 +124,7 @@ final class CompletionPopup {
     list.setFixedCellHeight(fm.getHeight());
     list.setVisibleRowCount(Math.min(values.size(), ROWS));
     list.setSelectedIndex(0);
-    window.pack();
-  }
-
-  /**
-   * Hides the popup, discards its window and stops the timer.
-   */
-  void hide() {
-    timer.stop();
-    if(window == null) return;
-    window.dispose();
-    window = null;
-  }
-
-  /**
-   * Restarts the timer for showing the popup automatically.
-   */
-  void schedule() {
-    timer.restart();
+    pack();
   }
 
   /**

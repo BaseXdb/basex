@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
-import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import org.basex.data.*;
@@ -14,8 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
-public abstract class ResourceNode extends DefaultMutableTreeNode
-    implements TreeWillExpandListener {
+public abstract class ResourceNode extends DefaultMutableTreeNode {
 
   /** Node name. */
   public final byte[] name;
@@ -41,7 +39,6 @@ public abstract class ResourceNode extends DefaultMutableTreeNode
     this.path = path;
     this.tree = tree;
     this.data = data;
-    tree.addTreeWillExpandListener(this);
   }
 
   /**
@@ -73,15 +70,6 @@ public abstract class ResourceNode extends DefaultMutableTreeNode
    * Lazy loading.
    */
   abstract void load();
-
-  @Override
-  public void treeWillExpand(final TreeExpansionEvent e) {
-    if(equals(e.getPath().getLastPathComponent()))
-      load();
-  }
-
-  @Override
-  public void treeWillCollapse(final TreeExpansionEvent e) { }
 
   @Override
   public String toString() {

@@ -95,8 +95,7 @@ final class PlotData {
     final int itmID = data.elemNames.index(item);
 
     if(!sub) {
-      pres = nodes.pres();
-      Arrays.sort(pres);
+      pres = nodes.sorted();
       return;
     }
 

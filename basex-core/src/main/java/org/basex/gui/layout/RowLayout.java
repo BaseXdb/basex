@@ -1,7 +1,5 @@
 package org.basex.gui.layout;
 
-import java.awt.*;
-
 /**
  * This LayoutManager is a simplified version of the TableLayout. The added components
  * will be rendered as rows.
@@ -9,10 +7,7 @@ import java.awt.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class RowLayout implements LayoutManager {
-  /** Gap between components. */
-  private final int gap;
-
+public final class RowLayout extends AxisLayout {
   /**
    * Default constructor.
    */
@@ -25,44 +20,6 @@ public final class RowLayout implements LayoutManager {
    * @param gap gap
    */
   public RowLayout(final int gap) {
-    this.gap = gap;
-  }
-
-  @Override
-  public void addLayoutComponent(final String name, final Component comp) { }
-
-  @Override
-  public void removeLayoutComponent(final Component comp) { }
-
-  @Override
-  public Dimension preferredLayoutSize(final Container cont) {
-    synchronized(cont.getTreeLock()) {
-      int w = 0, h = 0;
-      for(final Component comp : cont.getComponents()) {
-        final Dimension d = comp.getPreferredSize();
-        w = Math.max(w, d.width);
-        h += gap + d.height;
-      }
-      final Insets in = cont.getInsets();
-      return new Dimension(in.left + w + in.right, in.top + Math.max(h - gap, 0) + in.bottom);
-    }
-  }
-
-  @Override
-  public Dimension minimumLayoutSize(final Container parent) {
-    return preferredLayoutSize(parent);
-  }
-
-  @Override
-  public void layoutContainer(final Container cont) {
-    synchronized(cont.getTreeLock()) {
-      int y = 0;
-      final Insets in = cont.getInsets();
-      for(final Component comp : cont.getComponents()) {
-        final Dimension d = comp.getPreferredSize();
-        comp.setBounds(in.left, in.top + y, d.width, d.height);
-        y += gap + d.height;
-      }
-    }
+    super(gap, false);
   }
 }

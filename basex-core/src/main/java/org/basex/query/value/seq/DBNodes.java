@@ -178,7 +178,7 @@ public final class DBNodes extends DBNodeSeq {
    * Returns a sorted node array.
    * @return sorted nodes
    */
-  private int[] sorted() {
+  public int[] sorted() {
     if(sorted == null) {
       int min = Integer.MIN_VALUE;
       for(final int pre : pres) {
@@ -192,15 +192,6 @@ public final class DBNodes extends DBNodeSeq {
       sorted = pres;
     }
     return sorted;
-  }
-
-  /**
-   * Returns a sorted PRE value.
-   * @param index index of PRE value
-   * @return PRE value
-   */
-  public int sorted(final int index) {
-    return sorted[index];
   }
 
   @Override

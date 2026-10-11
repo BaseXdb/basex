@@ -198,7 +198,7 @@ final class TreeRects {
    * @return rectangle containing the given PRE value, {@code null} else
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv, final int pre) {
-    final int i = sub.searchPreArrayPos(rn, lv, pre);
+    final int i = sub.preIndex(rn, lv, pre);
     return i < 0 ? null : rects[rn][lv][bigRect(sub, rn, lv) ? 0 : i];
   }
 }

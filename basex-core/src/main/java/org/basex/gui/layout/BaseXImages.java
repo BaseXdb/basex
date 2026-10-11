@@ -124,8 +124,9 @@ public final class BaseXImages {
         name = "file_xquery";
       } else if(Prop.WIN) {
         // retrieve system icons (only supported on Windows)
-        final int p = path.lastIndexOf(path, '.');
-        final String suffix = p == -1 ? null : path.substring(p + 1);
+        final String fn = file.name();
+        final int p = fn.lastIndexOf('.');
+        final String suffix = p == -1 ? null : fn.substring(p + 1);
         Icon icon = null;
         if(suffix != null) icon = FILES.get(suffix);
         if(icon == null) {

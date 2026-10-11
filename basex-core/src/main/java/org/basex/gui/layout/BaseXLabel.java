@@ -105,9 +105,4 @@ public class BaseXLabel extends JLabel {
     setFont(new Font(f.getName(), Font.BOLD, (int) (f.getSize2D() * 1.4)));
     return this;
   }
-
-  @Override
-  public void setEnabled(final boolean flag) {
-    if(flag != isEnabled()) super.setEnabled(flag);
-  }
 }

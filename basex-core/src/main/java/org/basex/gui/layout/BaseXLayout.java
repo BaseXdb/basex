@@ -56,7 +56,7 @@ public final class BaseXLayout {
    * @param comp component to be focused
    */
   static void focus(final Component comp) {
-    final GUI gui = gui(comp);
+    final GUI gui = (GUI) SwingUtilities.getAncestorOfClass(GUI.class, comp);
     if(gui == null) return;
     if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && comp.isEnabled()) comp.requestFocusInWindow();
   }
@@ -98,20 +98,6 @@ public final class BaseXLayout {
       default     -> null;
     };
     if(hint != null) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
-  }
-
-  /**
-   * Returns the ancestor GUI reference of the specified component.
-   * @param comp component
-   * @return reference to the main window or {@code null}
-   */
-  private static GUI gui(final Component comp) {
-    Component c = comp;
-    do {
-      if(c instanceof final GUI gui) return gui;
-      c = c.getParent();
-    } while(c != null);
-    return null;
   }
 
   /**
@@ -255,7 +241,6 @@ public final class BaseXLayout {
         clip.setContents(new StringSelection(text), null);
         return;
       } catch(final Exception ex) {
-        Util.stack(ex);
         if(i == n) {
           Util.stack(ex);
         } else {

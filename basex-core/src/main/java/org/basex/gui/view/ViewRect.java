@@ -52,9 +52,17 @@ public class ViewRect {
       (yy >= y && yy <= y + h || yy >= y + h && yy <= y);
   }
 
+  /**
+   * Returns a copy of this rectangle with non-negative width and height.
+   * @return normalized rectangle
+   */
+  public final ViewRect normalize() {
+    return new ViewRect(w < 0 ? x + w : x, h < 0 ? y + h : y, Math.abs(w), Math.abs(h));
+  }
+
   @Override
   public final String toString() {
-    return Util.className(this) + "[x=" + x + ",y=" + y + ",h=" + h +
-      ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
+    return Util.className(this) + "[x=" + x + ",y=" + y + ",w=" + w + ",h=" + h +
+      ",pre=" + pre + ",level=" + level + ']';
   }
 }

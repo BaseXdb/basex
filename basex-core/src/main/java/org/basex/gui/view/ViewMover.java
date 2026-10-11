@@ -3,6 +3,8 @@ package org.basex.gui.view;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -47,15 +49,19 @@ final class ViewMover extends BaseXPanel {
     for(int y = h - 1; y >= 0; y -= 2) g.drawLine(0, y, w, y);
   }
 
+  /**
+   * Returns the view container.
+   * @return view container
+   */
+  private ViewContainer container() {
+    return (ViewContainer) SwingUtilities.getAncestorOfClass(ViewContainer.class, this);
+  }
+
   @Override
   public void mouseDragged(final MouseEvent e) {
-    final ViewPanel view = (ViewPanel) getParent();
-    Component comp = view;
-    while(!(comp instanceof final ViewContainer container)) comp = comp.getParent();
-
-    final Point a = getLocationOnScreen(), b = container.getLocationOnScreen();
-    final Point c = new Point(a.x - b.x + e.getX(), a.y - b.y + e.getY());
-    container.dragPanel(view, c);
+    final ViewContainer container = container();
+    container.dragPanel((ViewPanel) getParent(), SwingUtilities.convertPoint(this, e.getPoint(),
+        container));
     move = true;
   }
 
@@ -68,9 +74,7 @@ final class ViewMover extends BaseXPanel {
   @Override
   public void mouseReleased(final MouseEvent e) {
     if(!move) return;
-    Component comp = this;
-    while(!(comp instanceof final ViewContainer container)) comp = comp.getParent();
-    container.dropPanel();
+    container().dropPanel();
     move = false;
     repaint();
   }

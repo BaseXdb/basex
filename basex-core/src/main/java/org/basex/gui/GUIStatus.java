@@ -47,8 +47,6 @@ public final class GUIStatus extends BaseXPanel {
   GUIStatus(final GUI gui) {
     super(gui);
     setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 10));
-    addMouseListener(this);
-    addMouseMotionListener(this);
 
     layout(new BorderLayout());
     label = new BaseXLabel(OK).border(0, 4, 2, 0);

@@ -127,9 +127,8 @@ public final class ViewNotifier {
    * <li>2: toggle currently focused node</li>
    * </ul>
    * @param mode mark mode
-   * @param vw calling view
    */
-  public void mark(final int mode, final View vw) {
+  public void mark(final int mode) {
     final int f = gui.context.focused;
     if(f == -1) return;
 
@@ -142,7 +141,7 @@ public final class ViewNotifier {
     } else {
       nodes.toggle(f);
     }
-    mark(nodes, vw);
+    mark(nodes, null);
   }
 
   /**

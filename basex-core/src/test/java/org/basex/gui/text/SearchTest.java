@@ -60,7 +60,8 @@ public final class SearchTest {
         for(final String text : texts) {
           final String msg = "pat=" + pat + " dotall=" + da + " text=" + text.replace("\n", "\\n");
           assertEquals(nonEmpty(spans(plain(pat, da), text)),
-              nonEmpty(spans(SearchContext.pattern(pat, true, false, true, da), text)), msg);
+              nonEmpty(spans(SearchContext.pattern(pat, new SearchFlags(true, false, true, da)),
+              text)), msg);
         }
       }
     }
@@ -69,18 +70,18 @@ public final class SearchTest {
   /** Lazy quantifiers are never anchored (they would drop matches). */
   @Test public void lazyNotAnchored() {
     assertEquals(List.of("afoo", " bfoo"), subs(".*?foo", true, false, "afoo bfoo"));
-    assertFalse(SearchContext.pattern(".*?foo", true, false, true, false).pattern().
-        startsWith("^"));
-    assertTrue(SearchContext.pattern(".*foo", true, false, true, false).pattern().
-        startsWith("^"));
+    final SearchFlags flags = new SearchFlags(true, false, true, false);
+    assertFalse(SearchContext.pattern(".*?foo", flags).pattern().startsWith("^"));
+    assertTrue(SearchContext.pattern(".*foo", flags).pattern().startsWith("^"));
   }
 
   /** Invalid expressions surface as a {@link PatternSyntaxException}. */
   @Test public void invalidRegex() {
     assertThrows(PatternSyntaxException.class,
-        () -> SearchContext.pattern("(", false, false, true, false));
+        () -> SearchContext.pattern("(", new SearchFlags(false, false, true, false)));
     // a literal search is quoted, so it can never be invalid
-    assertDoesNotThrow(() -> SearchContext.pattern("(", false, false, false, false));
+    assertDoesNotThrow(
+        () -> SearchContext.pattern("(", new SearchFlags(false, false, false, false)));
   }
 
   /** A literal search never interprets metacharacters. */
@@ -308,7 +309,8 @@ public final class SearchTest {
   private static List<String> subs(final String pat, final boolean mcase, final boolean dotall,
       final String text) {
     final List<String> list = new ArrayList<>();
-    final Matcher m = SearchContext.pattern(pat, mcase, false, true, dotall).matcher(text);
+    final SearchFlags flags = new SearchFlags(mcase, false, true, dotall);
+    final Matcher m = SearchContext.pattern(pat, flags).matcher(text);
     while(m.find()) list.add(text.substring(m.start(), m.end()));
     return list;
   }
@@ -376,7 +378,7 @@ public final class SearchTest {
    * @return context
    */
   private static SearchContext regex(final String search) {
-    return new SearchContext(null, search, true, false, true, false);
+    return new SearchContext(null, search, new SearchFlags(true, false, true, false));
   }
 
   /**
@@ -386,7 +388,7 @@ public final class SearchTest {
    * @return context
    */
   private static SearchContext literal(final String search, final boolean mcase) {
-    return new SearchContext(null, search, mcase, false, false, false);
+    return new SearchContext(null, search, new SearchFlags(mcase, false, false, false));
   }
 
   /**
@@ -395,7 +397,7 @@ public final class SearchTest {
    * @return context
    */
   private static SearchContext word(final String search) {
-    return new SearchContext(null, search, true, true, false, false);
+    return new SearchContext(null, search, new SearchFlags(true, true, false, false));
   }
 
   /**
@@ -404,7 +406,7 @@ public final class SearchTest {
    * @return context
    */
   private static SearchContext wordRegex(final String search) {
-    return new SearchContext(null, search, true, true, true, false);
+    return new SearchContext(null, search, new SearchFlags(true, true, true, false));
   }
 
   /**
@@ -506,7 +508,7 @@ public final class SearchTest {
    * @return result
    */
   private static String repl(final String search, final String replInput, final String input) {
-    return SearchContext.pattern(search, true, false, true, false).matcher(input).
+    return SearchContext.pattern(search, new SearchFlags(true, false, true, false)).matcher(input).
         replaceAll(SearchContext.normalize(replInput));
   }
 }

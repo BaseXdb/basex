@@ -97,7 +97,7 @@ public final class PlotView extends View {
    * @param notifier view notifier
    */
   public PlotView(final ViewNotifier notifier) {
-    super(PLOTVIEW, notifier);
+    super(PLOTVIEW, notifier, GUIOptions.SHOWPLOT, true);
     border(5).layout(new BorderLayout());
 
     final BaseXBack panel = new BaseXBack(false).layout(new BorderLayout());
@@ -194,26 +194,16 @@ public final class PlotView extends View {
 
   /**
    * Creates a buffered image for items.
-   * @param focus create image of focused item if true
-   * @param marked create image of marked item
-   * @param markedSub child node of marked node
-   * @return item image
+   * @param color color
+   * @param offset size offset
+   * @return image
    */
-  private BufferedImage itemImage(final boolean focus, final boolean marked,
-      final boolean markedSub) {
-
-    final int size = Math.max(1, fontSize +
-        gui.gopts.get(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
+  private BufferedImage itemImage(final Color color, final int offset) {
+    final int size = Math.max(1, fontSize + gui.gopts.get(GUIOptions.PLOTDOTS) - offset);
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
-
     final Graphics g = img.getGraphics();
     BaseXLayout.antiAlias(g);
-    Color c = color1A;
-    if(marked) c = colormark1A;
-    if(markedSub) c = colormark2A;
-    if(focus) c = color4;
-
-    g.setColor(c);
+    g.setColor(color);
     g.fillOval(0, 0, size, size);
     return img;
   }
@@ -231,10 +221,9 @@ public final class PlotView extends View {
     drawAxis(g, false);
 
     // draw items
-    g.setColor(color4);
     final int pl = plotData.pres.length;
     for(int p = 0; p < pl; p++) {
-      drawItem(g, plotData.xAxis.co[p], plotData.yAxis.co[p], false, false, false);
+      drawItem(g, p, itemImg);
     }
   }
 
@@ -299,7 +288,7 @@ public final class PlotView extends View {
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
-        drawItem(g, x1, y1, true, false, false);
+        drawItem(g, f, itemImgFocused);
         // draw focused x and y value
         g.setFont(font);
         final int textH = g.getFontMetrics().getHeight();
@@ -338,13 +327,11 @@ public final class PlotView extends View {
 
     // draw selection box
     if(dragging) {
-      final int selW = selectionBox.w, selH = selectionBox.h;
-      final int x1 = selectionBox.x, y1 = selectionBox.y;
-      final int x = selW > 0 ? x1 : x1 + selW, y = selH > 0 ? y1 : y1 + selH;
+      final ViewRect sr = selectionBox.normalize();
       g.setColor(colormark2A);
-      g.fillRect(x, y, Math.abs(selW), Math.abs(selH));
+      g.fillRect(sr.x, sr.y, sr.w, sr.h);
       g.setColor(colormark1A);
-      g.drawRect(x, y, Math.abs(selW), Math.abs(selH));
+      g.drawRect(sr.x, sr.y, sr.w, sr.h);
     }
     markingChanged = false;
     plotChanged = false;
@@ -362,17 +349,13 @@ public final class PlotView extends View {
 
     final DBNodes marked = gui.context.marked;
     if(marked.isEmpty()) return;
-    final int[] pres = marked.pres();
-    final int[] m = Arrays.copyOf(pres, pres.length);
-    int i = 0;
+    final int[] m = marked.sorted();
 
     // no child nodes of the marked context nodes are marked
     if(!drawSubNodes) {
-      final int ml = m.length;
-      while(i < ml) {
-        final int pi = plotData.findPre(m[i]);
-        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi], false, true, false);
-        ++i;
+      for(final int pre : m) {
+        final int pi = plotData.findPre(pre);
+        if(pi > -1) drawItem(gi, pi, itemImgMarked);
       }
       return;
     }
@@ -380,30 +363,23 @@ public final class PlotView extends View {
     // if nodes are marked in another view, the given nodes as well as their
     // descendants are checked for intersection with the nodes displayed in
     // the plot
-    Arrays.sort(m);
     final int[] p = plotData.pres;
     int k = plotData.findPre(m[0]);
-
-    if(k > -1) {
-      drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
-      ++k;
-    } else {
-      k = -k;
-      --k;
-    }
+    if(k < 0) k = -k - 1;
 
     // context change (triggered by another view).
     // descendants of marked node set are also checked for intersection
     // with currently plotted nodes
     final int ml = m.length, pl = p.length;
+    int i = 0;
     while(i < ml && k < pl) {
       final int a = m[i], b = p[k];
       final int ns = data.size(a, data.kind(a)) - 1;
       if(a == b) {
-        drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
+        drawItem(gi, k, itemImgMarked);
         ++k;
       } else if(a + ns >= b) {
-        if(a < b) drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, false, true);
+        if(a < b) drawItem(gi, k, itemImgSub);
         ++k;
       } else {
         ++i;
@@ -412,24 +388,15 @@ public final class PlotView extends View {
   }
 
   /**
-   * Draws a plot item at the given position. If the item to be drawn is
-   * focused the focused item buffered image is used.
+   * Draws a plot item.
    * @param g graphics reference
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param focus focused item is drawn
-   * @param marked item is marked
-   * @param sub item is a child of a marked node
+   * @param index index of the item
+   * @param img item image
    */
-  private void drawItem(final Graphics g, final double x, final double y, final boolean focus,
-      final boolean marked, final boolean sub) {
-    final int x1 = calcCoordinate(true, x);
-    final int y1 = calcCoordinate(false, y);
-
-    final BufferedImage img = focus ? itemImgFocused : marked ?
-        itemImgMarked : sub ? itemImgSub : itemImg;
+  private void drawItem(final Graphics g, final int index, final BufferedImage img) {
     final int size = img.getWidth() / 2;
-    g.drawImage(img, x1 - size, y1 - size, this);
+    g.drawImage(img, calcCoordinate(true, plotData.xAxis.co[index]) - size,
+      calcCoordinate(false, plotData.yAxis.co[index]) - size, this);
   }
 
   /**
@@ -493,25 +460,13 @@ public final class PlotView extends View {
           final double distL = Math.abs(coSorted[i - 1] - op);
           final double distG = Math.abs(coSorted[i] - op);
           op = coSorted[distL < distG ? i - 1 : i];
-
-          int j = 0;
-          // find value for given plot position
-          final int al = axis.co.length;
-          while(j < al && axis.co[j] != op) ++j;
-          drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
+          drawCaptionAndGrid(g, drawX, caption(axis, op), op);
           // increase to next optimum caption position
           op += capRange;
         }
         ++i;
       }
-      if(nrCats == 1) {
-        op = 0.5d;
-        int j = 0;
-        // find value for given plot position
-        final int al = axis.co.length;
-        while(j < al && axis.co[j] != op) ++j;
-        drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
-      }
+      if(nrCats == 1) drawCaptionAndGrid(g, drawX, caption(axis, 0.5d), 0.5d);
       // axis is drawn for numerical data, type INT/DBL
     } else {
       final boolean noRange = axis.max - axis.min == 0;
@@ -530,66 +485,11 @@ public final class PlotView extends View {
 
       // draw LOGARITHMIC SCALE
       if(axis.log) {
-        int l;
-        double a;
-        double b;
-
-        // draw labels for negative values
-        if(axis.min < 0) {
-          l = 0;
-          a = -1;
-          while(a >= axis.min) {
-            if(a <= axis.max && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a), axis.calcPosition(a));
-            }
-            final int lim = (int) (-1 * StrictMath.pow(10, l + 1));
-            double last = a;
-            b = 2 * a;
-            while(b > lim && b >= axis.min) {
-              if(adequateDistance(drawX, last, b) &&
-                  adequateDistance(drawX, lim, b) &&
-                  b < axis.max) {
-                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), BaseXLayout.value(b));
-                last = b;
-              }
-              b += a;
-            }
-
-            ++l;
-            a = -1 * StrictMath.pow(10, l);
-          }
-        }
-
-        // draw 0 label if necessary
+        // draw labels for negative values, 0 label if necessary, labels > 0
+        if(axis.min < 0) drawLogScale(g, drawX, axis, -1);
         if(axis.min <= 0 && axis.max >= 0)
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(0), axis.calcPosition(0));
-
-        // draw labels > 0
-        if(axis.max > 0) {
-          l = 0;
-          a = 1;
-          while(a <= axis.max) {
-            if(a >= axis.min && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a), axis.calcPosition(a));
-            }
-            final int lim = (int) StrictMath.pow(10, l + 1);
-            double last = a;
-            b = 2 * a;
-            while(b < lim && b <= axis.max) {
-              if(adequateDistance(drawX, last, b) &&
-                  adequateDistance(drawX, lim, b) &&
-                  b > axis.min) {
-                drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
-                    BaseXLayout.value(b));
-                last = b;
-              }
-              b += a;
-            }
-
-            ++l;
-            a = StrictMath.pow(10, l);
-          }
-        }
+        if(axis.max > 0) drawLogScale(g, drawX, axis, 1);
         // draw LINEAR SCALE
       } else {
         // draw captions between min and max
@@ -606,6 +506,47 @@ public final class PlotView extends View {
         if(c < 2) {
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.min), 0.0);
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.max), 1.0);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the caption of the item at the given plot position.
+   * @param axis axis
+   * @param op plot position
+   * @return caption
+   */
+  private String caption(final PlotAxis axis, final double op) {
+    int j = 0;
+    final int al = axis.co.length;
+    while(j < al && axis.co[j] != op) ++j;
+    return string(axis.getValue(plotData.pres[j]));
+  }
+
+  /**
+   * Draws the labels of a logarithmic scale for negative or positive values.
+   * @param g     graphics reference
+   * @param drawX drawn axis is x axis
+   * @param axis  axis
+   * @param s     sign of the values ({@code -1} or {@code 1})
+   */
+  private void drawLogScale(final Graphics g, final boolean drawX, final PlotAxis axis,
+      final int s) {
+    final double bound = s < 0 ? axis.min : axis.max, other = s < 0 ? axis.max : axis.min;
+    for(int l = 0;; l++) {
+      final double a = s * StrictMath.pow(10, l);
+      if(s * a > s * bound) break;
+      if(s * a >= s * other && adequateDistance(drawX, a, 0)) {
+        drawCaptionAndGrid(g, drawX, BaseXLayout.value(a), axis.calcPosition(a));
+      }
+      final int lim = (int) (s * StrictMath.pow(10, l + 1));
+      double last = a;
+      for(double b = 2 * a; s * b < s * lim && s * b <= s * bound; b += a) {
+        if(adequateDistance(drawX, last, b) && adequateDistance(drawX, lim, b) &&
+            s * b > s * other) {
+          drawIntermediateGridLine(g, drawX, axis.calcPosition(b), BaseXLayout.value(b));
+          last = b;
         }
       }
     }
@@ -796,10 +737,10 @@ public final class PlotView extends View {
 
   @Override
   public void refreshLayout() {
-    itemImg = itemImage(false, false, false);
-    itemImgMarked = itemImage(false, true, false);
-    itemImgFocused = itemImage(true, false, false);
-    itemImgSub = itemImage(false, false, true);
+    itemImg = itemImage(color1A, 6);
+    itemImgMarked = itemImage(colormark1A, 4);
+    itemImgFocused = itemImage(color4, 2);
+    itemImgSub = itemImage(colormark2A, 4);
     final int sz = sizeFactor() / 2;
     MARGIN[0] = sz + 7;
     MARGIN[1] = sz * 6;
@@ -821,21 +762,6 @@ public final class PlotView extends View {
   @Override
   public void refreshUpdate() {
     refreshContext(false, true);
-  }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWPLOT);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWPLOT, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
   }
 
   /**
@@ -969,46 +895,16 @@ public final class PlotView extends View {
       selectionBox.y = mouseY;
     }
 
-    // keeps selection box on the plot inside. if mouse pointer is outside box
-    // the corners of the selection box are set to the predefined values s.a.
-    int x = mouseX;
-    int y = mouseY;
-    if(!inBox) {
-      if(mouseX < lb) {
-        if(mouseY > bb) {
-          x = lb;
-          y = bb;
-        } else if(mouseY < tb) {
-          x = lb;
-          y = tb;
-        } else {
-          x = lb;
-        }
-      } else if(mouseX > rb) {
-        if(mouseY > bb) {
-          x = rb;
-          y = bb;
-        } else if(mouseY < tb) {
-          x = rb;
-          y = tb;
-        } else {
-          x = rb;
-        }
-      } else if(mouseY < tb) {
-        y = tb;
-      } else {
-        y = bb;
-      }
-    }
-    selectionBox.w = x - selectionBox.x;
-    selectionBox.h = y - selectionBox.y;
+    // keeps selection box on the plot inside
+    selectionBox.w = Math.max(lb, Math.min(rb, mouseX)) - selectionBox.x;
+    selectionBox.h = Math.max(tb, Math.min(bb, mouseY)) - selectionBox.y;
 
     // searches for items located in the selection box
     final IntList il = new IntList();
     final int pl = plotData.pres.length;
     for(int p = 0; p < pl; p++) {
-      x = calcCoordinate(true, plotData.xAxis.co[p]);
-      y = calcCoordinate(false, plotData.yAxis.co[p]);
+      final int x = calcCoordinate(true, plotData.xAxis.co[p]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[p]);
       if(selectionBox.contains(x, y)) il.add(plotData.pres[p]);
     }
     gui.notify.mark(new DBNodes(gui.context.data(), il.finish()), this);

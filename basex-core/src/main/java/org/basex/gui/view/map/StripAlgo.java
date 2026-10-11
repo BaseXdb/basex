@@ -39,10 +39,7 @@ final class StripAlgo extends MapAlgo {
       for(int i = start; i <= ni; i++) {
         int h = (int) (i == ni ? yy + hh - y : ml.weight[i] / weight * hh);
         h = h > 0 ? h : 1;
-
-        if(yy <= yy + hh)
-          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i), r.level));
-        else break;
+        tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i), r.level));
         y += h;
       }
       final double tmpratio = lineRatio(tmp);
@@ -55,7 +52,6 @@ final class StripAlgo extends MapAlgo {
         // preparing next line
         ww -= row.get(0).w;
         xx += row.get(0).w;
-        tmp.reset();
         row.reset();
         start = ni;
         sumweight -= weight - ml.weight[ni];

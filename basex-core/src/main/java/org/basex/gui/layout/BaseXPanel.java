@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import java.awt.event.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.
@@ -23,6 +24,14 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener, Mou
   protected BaseXPanel(final BaseXWindow win) {
     gui = win.gui();
     BaseXLayout.addInteraction(this, win);
+  }
+
+  /**
+   * Repaints the panel whenever it gains or loses the focus.
+   */
+  protected final void repaintOnFocus() {
+    addFocusListener((FocusGainedListener) e -> repaint());
+    addFocusListener((FocusLostListener) e -> repaint());
   }
 
   @Override

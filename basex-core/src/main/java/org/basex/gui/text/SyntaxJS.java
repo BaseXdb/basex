@@ -16,7 +16,14 @@ import org.basex.util.*;
  */
 final class SyntaxJS extends Syntax {
   /** Keywords. */
-  private static final HashSet<String> KEYWORDS = new HashSet<>();
+  private static final Set<String> KEYWORDS = Set.of(
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
+    "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
+    "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if",
+    "implements", "import", "in", "instanceof", "interface", "let", "new", "package", "private",
+    "protected", "public", "return", "static", "super", "switch", "this", "throw", "try",
+    "typeof", "var", "void", "while", "with", "yield"
+  );
 
   /** Mode: code. */
   private static final int CODE = 0;
@@ -37,18 +44,6 @@ final class SyntaxJS extends Syntax {
 
   /** Keywords that end an operand: they are followed by a division, not by a regular expression. */
   private static final Set<String> OPERANDS = Set.of("super", "this");
-
-  // initialize keywords
-  static {
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
-    Collections.addAll(KEYWORDS,
-      "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
-      "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if",
-      "implements", "import", "in", "instanceof", "interface", "let", "new", "package", "private",
-      "protected", "public", "return", "static", "super", "switch", "this", "throw", "try",
-      "typeof", "var", "void", "while", "with", "yield"
-    );
-  }
 
   @Override
   boolean code(final int mode) {
@@ -138,32 +133,6 @@ final class SyntaxJS extends Syntax {
         yield KEYWORDS.contains(string(text, pos, end - pos)) ? blue : plain;
       }
     };
-  }
-
-  @Override
-  int skipBack(final byte[] text, final int pos) {
-    int p = skipWsBack(text, pos);
-    // block comments are skipped as well: 'return /* c */ /a/'
-    while(p > 0 && text[p] == '/' && text[p - 1] == '*') {
-      final int start = commentStart(text, p);
-      if(start < 0) return -1;
-      p = skipWsBack(text, start);
-    }
-    return p;
-  }
-
-  /**
-   * Returns the start of the block comment that ends at the specified position.
-   * @param text text
-   * @param pos position of the closing slash
-   * @return position of the opening slash, or {@code -1} if the comment is not opened
-   */
-  private static int commentStart(final byte[] text, final int pos) {
-    // block comments do not nest
-    for(int p = pos - 2; p > 0; p--) {
-      if(text[p] == '*' && text[p - 1] == '/') return p - 1;
-    }
-    return -1;
   }
 
   @Override

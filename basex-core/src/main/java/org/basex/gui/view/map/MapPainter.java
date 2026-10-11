@@ -17,17 +17,13 @@ import org.basex.query.value.seq.*;
 final class MapPainter {
   /** Graphics reference. */
   private final MapView view;
-  /** GUI options. */
-  private final GUIOptions gopts;
 
   /**
    * Constructor.
    * @param view map reference
-   * @param gopts gui options
    */
-  MapPainter(final MapView view, final GUIOptions gopts) {
+  MapPainter(final MapView view) {
     this.view = view;
-    this.gopts = gopts;
   }
 
   /**
@@ -57,7 +53,7 @@ final class MapPainter {
             e = data.size(spre, data.kind(spre));
           }
           // mark rectangle if PRE value is its descendant
-          return marked.sorted(m) < e ? GUIConstants.colormark2 : null;
+          return marked.sorted()[m] < e ? GUIConstants.colormark2 : null;
         }
         return null;
       }
@@ -80,6 +76,7 @@ final class MapPainter {
     final Data data = view.gui.context.data();
     final FTPosData ftpos = view.gui.context.marked.ftpos();
 
+    final GUIOptions gopts = view.gui.gopts;
     final int o = gopts.get(GUIOptions.MAPOFFSETS);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ri++) {
@@ -141,15 +138,5 @@ final class MapPainter {
       rect.x -= 3;
       rect.w += 3;
     }
-  }
-
-  /**
-   * Returns textual contents for a rectangle.
-   * @param data data reference
-   * @param mr map rectangle
-   * @return byte[] content
-   */
-  static byte[] text(final Data data, final MapRect mr) {
-    return ViewData.text(data, mr.pre);
   }
 }

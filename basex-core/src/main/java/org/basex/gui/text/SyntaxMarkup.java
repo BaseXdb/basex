@@ -4,8 +4,11 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
+import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Syntax highlighting for markup languages.
@@ -58,6 +61,35 @@ abstract class SyntaxMarkup extends Syntax {
   @Override
   final boolean elementClose() {
     return modeAfter() == ETAG && modeBefore() != ETAG;
+  }
+
+  /**
+   * Updates the names of the open elements after the character at the specified position.
+   * @param stack names of the open elements
+   * @param text text
+   * @param pos position
+   * @param element name of the last start tag (can be {@code null})
+   */
+  final void openElements(final TokenList stack, final byte[] text, final int pos,
+      final byte[] element) {
+    // the name of a start tag is pushed when the element is opened, and popped by its end tag
+    if(elementOpen(text, pos)) stack.add(element);
+    else if(modeBefore() == ETAG && modeAfter() != ETAG && !stack.isEmpty()) stack.pop();
+  }
+
+  /**
+   * Returns the completion candidates for a name in a start tag.
+   * @param text text
+   * @param pos position
+   * @param elements element names
+   * @param attributes attribute names
+   * @return candidates
+   */
+  static ArrayList<Completion> tagCandidates(final byte[] text, final int pos,
+      final TokenSet elements, final TokenSet attributes) {
+    // the element name follows the angle bracket, all other names are attributes
+    final boolean element = cp(text, pos) == '<';
+    return candidates(element ? elements : attributes, element ? "<" : "");
   }
 
   @Override

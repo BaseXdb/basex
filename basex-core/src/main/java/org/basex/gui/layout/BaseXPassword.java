@@ -2,8 +2,6 @@ package org.basex.gui.layout;
 
 import javax.swing.*;
 
-import org.basex.gui.listener.*;
-
 /**
  * Project specific password field implementation.
  *
@@ -20,9 +18,6 @@ public final class BaseXPassword extends JPasswordField {
     BaseXLayout.addInteraction(this, win);
 
     final BaseXDialog dialog = win.dialog();
-    if(dialog == null) return;
-
-    addKeyListener(dialog.keys);
-    addMouseListener((MouseEnteredListener) e -> BaseXLayout.focus(this));
+    if(dialog != null) addKeyListener(dialog.keys);
   }
 }

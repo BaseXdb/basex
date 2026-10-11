@@ -102,7 +102,7 @@ public final class EditorView extends View {
    * @param notifier view notifier
    */
   public EditorView(final ViewNotifier notifier) {
-    super(EDITORVIEW, notifier);
+    super(EDITORVIEW, notifier, GUIOptions.SHOWEDITOR, false);
     layout(new BorderLayout());
     setBackground(panelColor);
 
@@ -236,12 +236,6 @@ public final class EditorView extends View {
   }
 
   @Override
-  public void refreshInit() { }
-
-  @Override
-  public void refreshFocus() { }
-
-  @Override
   public void refreshMark() {
     final EditorArea edit = getEditor();
     test.setEnabled(edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified());
@@ -249,31 +243,10 @@ public final class EditorView extends View {
   }
 
   @Override
-  public void refreshContext(final boolean more, final boolean quick) { }
-
-  @Override
   public void refreshLayout() {
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     project.refreshLayout();
     search.refreshLayout();
-  }
-
-  @Override
-  public void refreshUpdate() { }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWEDITOR);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWEDITOR, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return false;
   }
 
   @Override

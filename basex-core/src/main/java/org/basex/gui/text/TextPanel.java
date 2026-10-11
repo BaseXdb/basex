@@ -132,17 +132,12 @@ public class TextPanel extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
 
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        if(isEnabled()) caret(true);
-      }
-      @Override
-      public void focusLost(final FocusEvent e) {
-        caret(false);
-        completion.hide();
-        signature.hide();
-      }
+    addFocusListener((FocusGainedListener) e -> {
+      if(isEnabled()) caret(true);
+    });
+    addFocusListener((FocusLostListener) e -> {
+      caret(false);
+      hidePopups();
     });
 
     setFont(dmfont);
@@ -478,13 +473,11 @@ public class TextPanel extends BaseXPanel {
    */
   final void replace(final ReplaceContext rc) {
     final int[] range = editor.replace(rc);
-    if(rc.text != null) {
-      // a replacement in a selection reselects its new range; otherwise, the caret is preserved
-      setText(rc.text);
-      if(range != null) editor.select(range[0], range[1]);
-      else setCaret(rc.caret);
-      edited();
-    }
+    // a replacement in a selection reselects its new range; otherwise, the caret is preserved
+    setText(rc.text);
+    if(range != null) editor.select(range[0], range[1]);
+    else setCaret(rc.caret);
+    edited();
   }
 
   /**
@@ -627,8 +620,7 @@ public class TextPanel extends BaseXPanel {
     } else {
       return false;
     }
-    completion.hide();
-    signature.hide();
+    hidePopups();
     return true;
   }
 
@@ -678,10 +670,10 @@ public class TextPanel extends BaseXPanel {
       editor.prevWord(shift);
       down = false;
     } else if(TEXTSTART.is(e)) {
-      editor.textStart(shift);
+      editor.moveTo(0, shift);
       down = false;
     } else if(TEXTEND.is(e)) {
-      editor.textEnd(shift);
+      editor.moveTo(editor.size(), shift);
     } else if(LINESTART.is(e)) {
       moveRow(false, shift);
       down = false;
@@ -730,16 +722,16 @@ public class TextPanel extends BaseXPanel {
       } else if(DELLINES.is(e)) {
         editor.deleteLines();
       } else if(DELNEXTWORD.is(e)) {
-        editor.deleteNext(true);
+        editor.delete(true, true);
       } else if(DELLINEEND.is(e)) {
-        editor.deleteNext(false);
+        editor.delete(false, true);
       } else if(DELNEXT.is(e)) {
         editor.delete();
       } else if(DELPREVWORD.is(e)) {
-        editor.deletePrev(true);
+        editor.delete(true, false);
         down = false;
       } else if(DELLINESTART.is(e)) {
-        editor.deletePrev(false);
+        editor.delete(false, false);
         down = false;
       } else if(DELPREV.is(e)) {
         editor.deletePrev();
@@ -764,8 +756,7 @@ public class TextPanel extends BaseXPanel {
       signatureCode.invokeLater(false);
     } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
       // close the popups: the key press will be processed as a shortcut
-      completion.hide();
-      signature.hide();
+      hidePopups();
     }
   }
 
@@ -976,8 +967,7 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseWheelMoved(final MouseWheelEvent e) {
-    completion.hide();
-    signature.hide();
+    hidePopups();
     final int units = e.getUnitsToScroll() * 20;
     if(e.isShiftDown()) rend.moveX(units);
     else scroll.pos(scroll.pos() + units);
@@ -1299,6 +1289,14 @@ public class TextPanel extends BaseXPanel {
    */
   private String word(final int start) {
     return string(editor.text(), start, editor.pos() - start);
+  }
+
+  /**
+   * Hides the completion and signature popups.
+   */
+  private void hidePopups() {
+    completion.hide();
+    signature.hide();
   }
 
   /**

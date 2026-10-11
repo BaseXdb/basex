@@ -260,14 +260,6 @@ public final class BaseXList extends BaseXBack {
   }
 
   /**
-   * Returns the current list index.
-   * @return list index entry
-   */
-  public int getIndex() {
-    return list.getSelectedIndex();
-  }
-
-  /**
    * Sets the specified list index.
    * @param i list entry
    */

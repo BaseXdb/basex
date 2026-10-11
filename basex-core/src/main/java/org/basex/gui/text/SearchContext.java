@@ -34,31 +34,26 @@ public final class SearchContext {
    * @param text search string
    */
   SearchContext(final SearchBar bar, final String text) {
-    this(bar, text, bar.mcase.isSelected(), bar.word.isSelected(), bar.regex.isSelected(),
-        bar.dotall.isSelected());
+    this(bar, text, bar.flags());
   }
 
   /**
    * Constructor.
    * @param bar search bar (can be {@code null} if the results are never displayed)
    * @param text search string
-   * @param mcase match case
-   * @param word whole word
-   * @param regex regular expression
-   * @param dotall dot matches all
+   * @param flags search flags
    */
-  SearchContext(final SearchBar bar, final String text, final boolean mcase, final boolean word,
-      final boolean regex, final boolean dotall) {
+  SearchContext(final SearchBar bar, final String text, final SearchFlags flags) {
     this.bar = bar;
     string = text;
-    flags = new SearchFlags(mcase, word, regex, dotall);
+    this.flags = flags;
 
     // compile pattern once; remember error message for invalid expressions
     Pattern pt = null;
     String err = null;
     if(!string.isEmpty()) {
       try {
-        pt = pattern(string, mcase, word, regex, dotall);
+        pt = pattern(string, flags);
       } catch(final PatternSyntaxException ex) {
         err = ex.getDescription();
       }
@@ -70,16 +65,12 @@ public final class SearchContext {
   /**
    * Compiles the search string as a regular expression; literal input is quoted.
    * @param string search string
-   * @param mcase match case
-   * @param word whole word
-   * @param regex regular expression
-   * @param dotall dot matches all
+   * @param flags search flags
    * @return compiled pattern
    */
-  public static Pattern pattern(final String string, final boolean mcase, final boolean word,
-      final boolean regex, final boolean dotall) {
+  public static Pattern pattern(final String string, final SearchFlags flags) {
     String pat;
-    if(regex) {
+    if(flags.regex()) {
       // anchor greedy leading wildcards to avoid quadratic backtracking; lazy ones would drop hits
       // only a leading wildcard may be anchored: in (.*a)?b, ^ would bind to the whole expression
       pat = (string.startsWith(".*") || string.startsWith(".+")) &&
@@ -89,13 +80,13 @@ public final class SearchContext {
     }
     // the non-capturing group binds the boundaries to the whole expression, not to (a|b) branches
     // the optional low surrogate widens the lookbehind: a single char would be a non-word surrogate
-    if(word) pat = "(?<!" + WORD + "[\\uDC00-\\uDFFF]?)(?:" + pat + ")(?!" + WORD + ")";
+    if(flags.word()) pat = "(?<!" + WORD + "[\\uDC00-\\uDFFF]?)(?:" + pat + ")(?!" + WORD + ")";
     // ^/$ anchor per line; . matches newlines only in dot-all mode
-    int flags = Pattern.MULTILINE;
-    if(dotall) flags |= Pattern.DOTALL;
+    int pf = Pattern.MULTILINE;
+    if(flags.dotall()) pf |= Pattern.DOTALL;
     // UNICODE_CASE: fold non-ASCII characters as well
-    if(!mcase) flags |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
-    return Pattern.compile(pat, flags);
+    if(!flags.mcase()) pf |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+    return Pattern.compile(pat, pf);
   }
 
   /**

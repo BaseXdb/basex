@@ -96,6 +96,16 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
+   * Adds a button list at the bottom of the dialog and focuses its first button.
+   * @param buttons button list
+   */
+  protected final void setButtons(final BaseXBack buttons) {
+    set(buttons, BorderLayout.SOUTH);
+    SwingUtilities.invokeLater(((Container) buttons.getComponent(0)).getComponent(0)::
+      requestFocusInWindow);
+  }
+
+  /**
    * Finalizes the dialog layout and sets it visible.
    */
   protected final void finish() {

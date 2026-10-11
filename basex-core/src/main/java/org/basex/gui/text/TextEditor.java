@@ -27,8 +27,6 @@ public final class TextEditor {
     /** Title case. */ TITLE
   }
 
-  /** Completion characters. */
-  private static final char[] ALLOWED = { ':', '-' };
   /** Delay before a text change triggers a new search (ms). */
   private static final int SEARCH_DELAY = 100;
 
@@ -386,27 +384,7 @@ public final class TextEditor {
    * @return result of check
    */
   static boolean nameChar(final byte ch) {
-    if(letterOrDigit(ch)) return true;
-    for(final char a : ALLOWED) {
-      if(ch == a) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Jumps to the beginning of the text.
-   * @param select selection flag
-   */
-  void textStart(final boolean select) {
-    moveTo(0, select);
-  }
-
-  /**
-   * Jumps to the end of the text.
-   * @param select selection flag
-   */
-  void textEnd(final boolean select) {
-    moveTo(size(), select);
+    return letterOrDigit(ch) || ch == ':' || ch == '-';
   }
 
   /**
@@ -979,16 +957,10 @@ public final class TextEditor {
     if(!sel) selectAll();
     if(!extend()) return false;
 
-    // count lines
-    int l = 1;
+    // collect lines to be sorted
     final int s = start, e = end, ts = size();
     final byte[] tmp = Arrays.copyOf(text, ts);
-    for(int i = s; i < e; i++) {
-      if(tmp[i] == '\n') l++;
-    }
-
-    // collect lines to be sorted
-    final TokenList tl = new TokenList(l);
+    final TokenList tl = new TokenList();
     final ByteList bl = new ByteList();
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
@@ -1103,8 +1075,7 @@ public final class TextEditor {
     if(shift) {
       sb.setLength(0);
     } else {
-      final boolean c = pos > 0;
-      for(int p = pos - 1; p >= 0 && c; p--) {
+      for(int p = pos - 1; p >= 0; p--) {
         final byte b = text[p];
         if(!ws(b)) return false;
         if(b == '\n') break;
@@ -1360,27 +1331,11 @@ public final class TextEditor {
   }
 
   /**
-   * Deletes the word or line following the cursor.
-   * @param word word/line flag
-   */
-  void deleteNext(final boolean word) {
-    delete(word, true);
-  }
-
-  /**
-   * Deletes the word or line preceding the cursor.
-   * @param word word/line flag
-   */
-  void deletePrev(final boolean word) {
-    delete(word, false);
-  }
-
-  /**
    * Deletes the word or line that precedes or follows the cursor.
    * @param word word/line flag
    * @param next next/previous flag
    */
-  private void delete(final boolean word, final boolean next) {
+  void delete(final boolean word, final boolean next) {
     if(!isSelected()) {
       if(pos == (next ? size() : 0)) return;
       anchorSelection();

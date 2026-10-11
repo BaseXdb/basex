@@ -84,16 +84,7 @@ public final class BaseXSlider extends BaseXPanel {
     setFocusable(true);
 
     setPreferredSize(new Dimension(DWIDTH, (int) (getFont().getSize() * 1.2)));
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        repaint();
-      }
-      @Override
-      public void focusLost(final FocusEvent e) {
-        repaint();
-      }
-    });
+    repaintOnFocus();
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
@@ -180,13 +171,13 @@ public final class BaseXSlider extends BaseXPanel {
   public void keyPressed(final KeyEvent e) {
     final int old = value;
     if(PREVCHAR.is(e) || PREVLINE.is(e)) {
-      value = Math.max(min, value - 1);
+      value = Math.clamp(value - 1, min, max);
     } else if(NEXTCHAR.is(e) || NEXTLINE.is(e)) {
-      value = Math.min(max, value + 1);
+      value = Math.clamp(value + 1, min, max);
     } else if(NEXTPAGE.is(e)) {
-      value = Math.max(min, value + 10);
+      value = Math.clamp(value + 10, min, max);
     } else if(PREVPAGE.is(e)) {
-      value = Math.min(max, value - 10);
+      value = Math.clamp(value - 10, min, max);
     } else if(LINESTART.is(e)) {
       value = min;
     } else if(LINEEND.is(e)) {

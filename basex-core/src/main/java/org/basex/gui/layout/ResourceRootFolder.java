@@ -1,5 +1,7 @@
 package org.basex.gui.layout;
 
+import javax.swing.event.*;
+
 import org.basex.data.*;
 
 /**
@@ -21,6 +23,16 @@ public final class ResourceRootFolder extends ResourceFolder {
   public ResourceRootFolder(final byte[] name, final byte[] path, final BaseXTree tree,
       final Data data) {
     super(name, path, tree, data);
+    // lazy loading of expanded nodes
+    tree.addTreeWillExpandListener(new TreeWillExpandListener() {
+      @Override
+      public void treeWillExpand(final TreeExpansionEvent e) {
+        if(e.getPath().getLastPathComponent() instanceof final ResourceNode node) node.load();
+      }
+
+      @Override
+      public void treeWillCollapse(final TreeExpansionEvent e) { }
+    });
   }
 
   @Override

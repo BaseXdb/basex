@@ -57,7 +57,7 @@ public final class FolderView extends View {
    * @param notifier view notifier
    */
   public FolderView(final ViewNotifier notifier) {
-    super(FOLDERVIEW, notifier);
+    super(FOLDERVIEW, notifier, GUIOptions.SHOWFOLDER, true);
     createBoxes();
     layout(new BorderLayout());
     scroll = new BaseXScrollBar(this);
@@ -147,21 +147,6 @@ public final class FolderView extends View {
     repaint();
   }
 
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWFOLDER);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWFOLDER, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
-  }
-
   /**
    * Refreshes tree height.
    */
@@ -179,7 +164,6 @@ public final class FolderView extends View {
       return;
     }
     super.paintComponent(g);
-    if(opened == null) return;
 
     gui.painting = true;
     startY = -scroll.pos();
@@ -371,17 +355,15 @@ public final class FolderView extends View {
     final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       gui.notify.context(marked, false, null);
-    } else if(e.isShiftDown()) {
-      gui.notify.mark(1, null);
-    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
-      gui.notify.mark(2, null);
-    } else if(getCursor() != CURSORHAND) {
-      if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
-    } else {
-      // open/close entry
-      opened[gui.context.focused] ^= true;
-      refreshHeight();
-      repaint();
+    } else if(!markFocused(e)) {
+      if(getCursor() != CURSORHAND) {
+        if(!marked.contains(gui.context.focused)) gui.notify.mark(0);
+      } else {
+        // open/close entry
+        opened[gui.context.focused] ^= true;
+        refreshHeight();
+        repaint();
+      }
     }
   }
 
@@ -392,7 +374,7 @@ public final class FolderView extends View {
     super.mouseDragged(e);
 
     // marks currently focused node
-    if(focus(e.getX(), e.getY())) gui.notify.mark(1, null);
+    if(focus(e.getX(), e.getY())) gui.notify.mark(1);
   }
 
   @Override

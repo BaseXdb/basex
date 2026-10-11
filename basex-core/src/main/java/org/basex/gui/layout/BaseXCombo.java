@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
 
 import org.basex.gui.*;
@@ -117,14 +116,7 @@ public class BaseXCombo extends JComboBox<Object> {
       if(tf == null) {
         addActionListener(e -> dialog.action(this));
       } else {
-        tf.getDocument().addDocumentListener(new DocumentListener() {
-          @Override
-          public void removeUpdate(final DocumentEvent e) { dialog.action(BaseXCombo.this); }
-          @Override
-          public void insertUpdate(final DocumentEvent e) { dialog.action(BaseXCombo.this); }
-          @Override
-          public void changedUpdate(final DocumentEvent e) { }
-        });
+        tf.getDocument().addDocumentListener((DocumentChangeListener) e -> dialog.action(this));
       }
     });
   }
@@ -175,14 +167,10 @@ public class BaseXCombo extends JComboBox<Object> {
   public final BaseXCombo onChange(final Runnable action) {
     final JTextComponent comp = textField();
     // assigned text is removed and inserted: the action is deferred until the text is complete
-    if(comp != null) comp.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void removeUpdate(final DocumentEvent e) { SwingUtilities.invokeLater(action); }
-      @Override
-      public void insertUpdate(final DocumentEvent e) { SwingUtilities.invokeLater(action); }
-      @Override
-      public void changedUpdate(final DocumentEvent e) { }
-    });
+    if(comp != null) {
+      comp.getDocument().addDocumentListener(
+          (DocumentChangeListener) e -> SwingUtilities.invokeLater(action));
+    }
     return this;
   }
 

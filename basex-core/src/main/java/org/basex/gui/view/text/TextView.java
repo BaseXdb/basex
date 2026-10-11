@@ -49,7 +49,7 @@ public final class TextView extends View {
    * @param notifier view notifier
    */
   public TextView(final ViewNotifier notifier) {
-    super(TEXTVIEW, notifier);
+    super(TEXTVIEW, notifier, GUIOptions.SHOWTEXT, false);
     border(5).layout(new BorderLayout(0, 5));
 
     text = new TextPanel(gui, false);
@@ -111,21 +111,6 @@ public final class TextView extends View {
   @Override
   public void refreshUpdate() {
     refreshContext(true, true);
-  }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWTEXT);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWTEXT, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return false;
   }
 
   /**

@@ -71,11 +71,9 @@ public final class BaseXFileChooser {
    * @return self reference
    */
   public BaseXFileChooser filter(final String dsc, final boolean dflt, final String... suf) {
-    if(fc != null) {
-      final FileFilter ff = fc.getFileFilter(), ff2 = new Filter(suf, dsc);
-      fc.addChoosableFileFilter(ff2);
-      fc.setFileFilter(dflt ? ff2 : ff);
-    }
+    final FileFilter ff = fc.getFileFilter(), ff2 = new Filter(suf, dsc);
+    fc.addChoosableFileFilter(ff2);
+    fc.setFileFilter(dflt ? ff2 : ff);
     return this;
   }
 
@@ -94,7 +92,7 @@ public final class BaseXFileChooser {
    * @return self reference
    */
   public BaseXFileChooser multi() {
-    if(fc != null) fc.setMultiSelectionEnabled(true);
+    fc.setMultiSelectionEnabled(true);
     return this;
   }
 
@@ -154,18 +152,13 @@ public final class BaseXFileChooser {
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
-      final FileFilter ff = fc.getFileFilter();
-      if(suffix != null) {
+      String suf = suffix;
+      if(suf == null && fc.getFileFilter() instanceof final Filter filter &&
+          filter.suffixes.length != 0) suf = filter.suffixes[0];
+      if(suf != null) {
         for(int f = 0; f < fl; f++) {
           final String path = files[f].path();
-          if(!path.contains(".")) files[f] = new IOFile(path + suffix);
-        }
-      } else if(ff instanceof final Filter filter) {
-        final String[] sufs = filter.suffixes;
-        final int sl = sufs.length;
-        for(int f = 0; f < fl && sl != 0; f++) {
-          final String path = files[f].path();
-          if(!path.contains(".")) files[f] = new IOFile(path + sufs[0]);
+          if(!path.contains(".")) files[f] = new IOFile(path + suf);
         }
       }
 

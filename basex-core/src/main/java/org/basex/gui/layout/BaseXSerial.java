@@ -100,15 +100,15 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
       });
       comp = combo;
     } else if(option instanceof final StringOption opt) {
-      comp = addInput(new BaseXTextField(dialog, opt, options));
+      comp = input(new BaseXTextField(dialog, opt, options));
     } else if(option instanceof final NumberOption opt) {
-      comp = addInput(new BaseXTextField(dialog, opt, options));
+      comp = input(new BaseXTextField(dialog, opt, options));
     } else if(option instanceof final BooleanOption opt) {
-      comp = addCombo(new BaseXCombo(dialog, opt, options));
+      comp = combo(new BaseXCombo(dialog, opt, options));
     } else if(option instanceof final EnumOption opt) {
-      comp = addCombo(new BaseXCombo(dialog, opt, options));
+      comp = combo(new BaseXCombo(dialog, opt, options));
     } else if(option instanceof final OptionsOption opt) {
-      comp = addOption(opt, options);
+      comp = embedded(opt, options);
     } else {
       throw Util.notExpected("Unknown option type: " + option);
     }
@@ -118,41 +118,39 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
   }
 
   /**
-   * Adds a text field.
+   * Prepares a text field.
    * @param text text field
    * @return text field
    */
-  private Component addInput(final BaseXTextField text) {
+  private Component input(final BaseXTextField text) {
     text.addKeyListener((KeyReleasedListener) e -> {
       text.assign();
       update();
     });
     BaseXLayout.setWidth(text, COMPT);
-    panel.add(text);
     return text;
   }
 
   /**
-   * Adds a combobox.
+   * Prepares a combo box.
    * @param combo combo box
    * @return combo box
    */
-  private Component addCombo(final BaseXCombo combo) {
+  private Component combo(final BaseXCombo combo) {
     combo.addActionListener(e -> {
       combo.assign();
       update();
     });
-    panel.add(combo);
     return combo;
   }
 
   /**
-   * Adds option components.
+   * Creates a panel for embedded options.
    * @param option option with embedded options
    * @param options parent options
    * @return panel
    */
-  private Component addOption(final OptionsOption<?> option, final Options options) {
+  private Component embedded(final OptionsOption<?> option, final Options options) {
     final BaseXBack p = new BaseXBack(new ColumnLayout(8));
     final Options opts = options.get(option);
     final BaseXCombo combo = new BaseXCombo(dialog, opts.names());

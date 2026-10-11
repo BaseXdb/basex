@@ -81,9 +81,8 @@ final class DialogGeneralPrefs extends BaseXBack {
   /**
    * Reacts on user input.
    * @param source source
-   * @return success flag
    */
-  boolean action(final Object source) {
+  void action(final Object source) {
     // new database path: close opened database
     final StaticOptions opts = gui.context.soptions;
     if(source == dbPath || source == dbButton) {
@@ -98,6 +97,5 @@ final class DialogGeneralPrefs extends BaseXBack {
       opts.set(StaticOptions.REPOPATH, repoPath.getText());
     }
     xmlSuffixes.assign();
-    return true;
   }
 }

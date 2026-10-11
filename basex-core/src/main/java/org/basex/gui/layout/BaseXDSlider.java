@@ -72,21 +72,11 @@ public final class BaseXDSlider extends BaseXPanel {
     BaseXLayout.setWidth(this, 200 + LABELW);
     setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 9));
 
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        repaint();
-      }
-      @Override
-      public void focusLost(final FocusEvent e) {
-        repaint();
-      }
-    });
-
+    repaintOnFocus();
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
-    setToolTip();
+    setToolTipText(range());
   }
 
   @Override
@@ -125,17 +115,18 @@ public final class BaseXDSlider extends BaseXPanel {
       currMax = (long) currMax;
     }
     listener.actionPerformed(null);
-    setToolTip();
+    setToolTipText(range());
     repaint();
   }
 
   /**
-   * Sets a new tooltip.
+   * Returns a string representation of the current range.
+   * @return range string
    */
-  private void setToolTip() {
+  private String range() {
     final double mn = (long) (currMin * 100) / 100.0;
     final double mx = (long) (currMax * 100) / 100.0;
-    setToolTipText(BaseXLayout.value(mn) + " - " + BaseXLayout.value(mx));
+    return BaseXLayout.value(mn) + " - " + BaseXLayout.value(mx);
   }
 
   @Override
@@ -148,7 +139,7 @@ public final class BaseXDSlider extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     oldMin = currMin;
-    oldMax = currMin;
+    oldMax = currMax;
     double diffMin = 0;
     double diffMax = 0;
     if(PREVCHAR.is(e)) {
@@ -251,11 +242,7 @@ public final class BaseXDSlider extends BaseXPanel {
 
     // draw range info
     g.setColor(textColor);
-    final double mn = (long) (currMin * 100) / 100.0;
-    final double mx = (long) (currMax * 100) / 100.0;
-
-    g.drawString(BaseXLayout.value(mn) + " - " + BaseXLayout.value(mx),
-        w + 15, h - (h - getFont().getSize()) / 2);
+    g.drawString(range(), w + 15, h - (h - getFont().getSize()) / 2);
   }
 
   /**

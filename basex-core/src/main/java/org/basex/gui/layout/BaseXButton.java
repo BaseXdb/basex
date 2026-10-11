@@ -53,7 +53,7 @@ public final class BaseXButton extends JButton {
   /**
    * Returns a new image button.
    * @param icon name of image icon
-   * @param tooltip tooltip text
+   * @param tooltip tooltip text (can be {@code null})
    * @param toggle toggle flag
    * @param gui reference to the main window
    * @return button
@@ -62,29 +62,16 @@ public final class BaseXButton extends JButton {
       final GUI gui) {
 
     final AbstractButton button = toggle ? new JToggleButton() : new JButton();
-    init(button, icon, tooltip, gui);
+    button.setIcon(BaseXImages.icon(icon));
+    BaseXLayout.addInteraction(button, gui);
+    if(tooltip != null) button.setToolTipText(tooltip);
+    style(button);
     if(!toggle) {
       button.setBorder(TEMPLATE.getBorder());
       button.setMargin(TEMPLATE.getMargin());
     }
     button.setFocusable(false);
     return button;
-  }
-
-  /**
-   * Initializes an image button.
-   * @param button button reference
-   * @param icon name of image icon
-   * @param tooltip tooltip text (can be {@code null})
-   * @param gui reference to the main window
-   */
-  private static void init(final AbstractButton button, final String icon, final String tooltip,
-      final GUI gui) {
-
-    button.setIcon(BaseXImages.icon(icon));
-    BaseXLayout.addInteraction(button, gui);
-    if(tooltip != null) button.setToolTipText(tooltip);
-    style(button);
   }
 
   /**
@@ -115,11 +102,5 @@ public final class BaseXButton extends JButton {
     final AbstractButton button = get(name, cmd.shortCut(), cmd.toggle(), gui);
     button.addActionListener(e -> cmd.execute(gui));
     return button;
-  }
-
-  @Override
-  public void setEnabled(final boolean flag) {
-    // skip repainting
-    if(flag != isEnabled()) super.setEnabled(flag);
   }
 }

@@ -81,7 +81,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
    * @param notifier view notifier
    */
   public InfoView(final ViewNotifier notifier) {
-    super(GUIConstants.INFOVIEW, notifier);
+    super(GUIConstants.INFOVIEW, notifier, GUIOptions.SHOWINFO, false);
     border(5).layout(new BorderLayout(0, 5));
 
     header = new BaseXHeader(INFO);
@@ -134,39 +134,9 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   }
 
   @Override
-  public void refreshInit() { }
-
-  @Override
-  public void refreshFocus() { }
-
-  @Override
-  public void refreshMark() { }
-
-  @Override
-  public void refreshContext(final boolean more, final boolean quick) { }
-
-  @Override
-  public void refreshUpdate() { }
-
-  @Override
   public void refreshLayout() {
     text.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
-  }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWINFO);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWINFO, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return false;
   }
 
   /**

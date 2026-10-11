@@ -137,7 +137,7 @@ public final class TextEditorTest {
   private static String deleteNext(final String string, final int pos, final boolean word) {
     final TextEditor editor = editor(string);
     editor.pos(pos);
-    editor.deleteNext(word);
+    editor.delete(word, true);
     return Token.string(editor.text());
   }
 
@@ -151,7 +151,7 @@ public final class TextEditorTest {
   private static String deletePrev(final String string, final int pos, final boolean word) {
     final TextEditor editor = editor(string);
     editor.pos(pos);
-    editor.deletePrev(word);
+    editor.delete(word, false);
     return Token.string(editor.text());
   }
 

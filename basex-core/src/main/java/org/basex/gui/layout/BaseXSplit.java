@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -229,23 +230,16 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     final Component[] comps = getComponents();
     final int cl = comps.length;
     final int w = getWidth(), h = getHeight();
-    final int panels = (comps.length + 1) / 2;
 
     // calculate proportional size of panels
     if(propSize == null) {
+      final int panels = (cl + 1) / 2;
       propSize = new double[panels];
-      for(int c = 0; c < cl; c++) {
-        if((c & 1) == 0) propSize[c / 2] = 1.0d / panels;
-      }
-    }
-    // count number of invisible panels
-    int c = panels - 1;
-    for(final double d : propSize) {
-      if(d == 0) c--;
+      Arrays.fill(propSize, 1.0d / panels);
     }
 
     // set bounds of all components
-    final int sz = (horizontal ? w : h) - c * SEPARATOR_SIZE;
+    final int sz = splitSize();
 
     // enforce a fixed pixel size for the anchored panel (skip while hidden or dragging)
     if(anchor >= 0 && !dragged && propSize[anchor] != 0 && sz > 0) {
@@ -263,7 +257,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
     double posD = 0;
     boolean invisible = false;
-    for(c = 0; c < cl; c++) {
+    for(int c = 0; c < cl; c++) {
       final int size;
       if((c & 1) == 0) {
         // panel

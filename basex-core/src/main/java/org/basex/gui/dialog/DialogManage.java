@@ -215,7 +215,6 @@ public final class DialogManage extends BaseXDialog {
       rename.setEnabled(active);
       copy.setEnabled(active);
       open.setEnabled(active);
-      restore.setEnabled(active);
 
       active = false;
       for(final String d : dbs) active |= ctx.soptions.dbExists(d);

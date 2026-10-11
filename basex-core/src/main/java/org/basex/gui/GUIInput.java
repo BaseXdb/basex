@@ -171,10 +171,10 @@ public final class GUIInput extends BaseXCombo {
 
   /**
    * Creates and shows the combo box.
-   * @param sl strings to be added (can be {@code null})
+   * @param sl strings to be added
    */
   private void createCombo(final StringList sl) {
-    if(sl == null || sl.isEmpty()) {
+    if(sl.isEmpty()) {
       popup.setVisible(false);
       return;
     }

@@ -70,16 +70,9 @@ final class DialogParsing extends BaseXBack {
    */
   void setType(final MainParser mp) {
     parser = mp;
-    if(mp == MainParser.RAW) {
-      tabs.setEnabledAt(1, false);
-    } else {
-      tabs.setEnabledAt(1, true);
-      final MainParser[] mps = MainParser.values();
-      final int ml = mps.length;
-      for(int t = 0; t < ml; t++) {
-        if(mps[t] == mp) panel = parsers[t];
-      }
-    }
+    final boolean raw = mp == MainParser.RAW;
+    tabs.setEnabledAt(1, !raw);
+    if(!raw) panel = parsers[mp.ordinal()];
   }
 
   /**

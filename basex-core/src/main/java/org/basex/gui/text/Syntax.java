@@ -572,8 +572,25 @@ abstract class Syntax {
    * @param pos position
    * @return position ({@code -1} if there is none)
    */
-  int skipBack(final byte[] text, final int pos) {
-    return skipWsBack(text, pos);
+  final int skipBack(final byte[] text, final int pos) {
+    final byte[] open = commentOpen(), close = commentEnd();
+    final int ol = open.length, cl = close.length;
+    int p = skipWsBack(text, pos);
+    // comments are skipped as well: 'concat((: c :) <a/>, <b/>)', 'return /* c */ /a/'
+    while(cl > 0 && p - cl + 1 >= 0 && Token.startsWith(text, close, p - cl + 1)) {
+      // comments nest: the delimiters of inner comments are counted
+      int s = p - cl + 1 - ol, level = 1;
+      for(; s >= 0; s--) {
+        if(Token.startsWith(text, open, s)) {
+          if(--level == 0) break;
+        } else if(Token.startsWith(text, close, s)) {
+          level++;
+        }
+      }
+      if(s < 0) return -1;
+      p = skipWsBack(text, s);
+    }
+    return p;
   }
 
   /**

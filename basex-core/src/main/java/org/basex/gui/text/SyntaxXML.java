@@ -53,9 +53,7 @@ public final class SyntaxXML extends SyntaxMarkup {
     for(int p = 0, tl = text.length; p < tl;) {
       final int cl = cl(text, p);
       color(text, p, p + cl);
-      // the name of a start tag is pushed when the element is opened, and popped by its end tag
-      if(elementOpen(text, p)) stack.add(element);
-      else if(modeBefore() == ETAG && modeAfter() != ETAG && !stack.isEmpty()) stack.pop();
+      openElements(stack, text, p, element);
       if(p < pos) open = stack.isEmpty() ? null : stack.peek();
       p += cl;
     }
@@ -66,9 +64,7 @@ public final class SyntaxXML extends SyntaxMarkup {
       // an end tag is closed by the name of the innermost open element
       list = open == null ? new ArrayList<>() : candidates(new TokenSet(open), "");
     } else {
-      // in a start tag, the element name follows the angle bracket, all other names are attributes
-      final boolean tag = cp(text, pos) == '<';
-      list = candidates(tag ? elements : attributes, tag ? "<" : "");
+      list = tagCandidates(text, pos, elements, attributes);
     }
     elements = null;
     attributes = null;

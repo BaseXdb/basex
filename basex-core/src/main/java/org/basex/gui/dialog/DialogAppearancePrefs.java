@@ -177,9 +177,8 @@ final class DialogAppearancePrefs extends BaseXBack {
   /**
    * Reacts on user input.
    * @param source source
-   * @return success flag
    */
-  boolean action(final Object source) {
+  void action(final Object source) {
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.LOOKANDFEEL, classes.get(lookfeel.getSelectedIndex()));
     gopts.set(GUIOptions.UISCALE, SCALES[uiScale.getSelectedIndex()]);
@@ -226,7 +225,6 @@ final class DialogAppearancePrefs extends BaseXBack {
       font2.setFont(gopts.get(GUIOptions.MONOFONT));
       gui.updateLayout();
     }
-    return true;
   }
 
   /**

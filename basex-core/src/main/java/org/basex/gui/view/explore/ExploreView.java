@@ -30,7 +30,7 @@ public final class ExploreView extends View {
    * @param notifier view notifier
    */
   public ExploreView(final ViewNotifier notifier) {
-    super(EXPLOREVIEW, notifier);
+    super(EXPLOREVIEW, notifier, GUIOptions.SHOWEXPLORE, true);
     border(5).layout(new BorderLayout(0, 4));
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER_NODES, gui);
@@ -55,9 +55,6 @@ public final class ExploreView extends View {
   }
 
   @Override
-  public void refreshFocus() { }
-
-  @Override
   public void refreshMark() {
     final DBNodes marked = gui.context.marked;
     filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && marked != null);
@@ -69,26 +66,8 @@ public final class ExploreView extends View {
   }
 
   @Override
-  public void refreshUpdate() { }
-
-  @Override
   public void refreshLayout() {
     refreshMark();
-  }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWEXPLORE);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWEXPLORE, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
   }
 
   @Override

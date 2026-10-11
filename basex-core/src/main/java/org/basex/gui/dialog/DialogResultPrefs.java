@@ -78,9 +78,8 @@ final class DialogResultPrefs extends BaseXBack {
 
   /**
    * Reacts on user input.
-   * @return success flag
    */
-  boolean action() {
+  void action() {
     final int mt = MAXTEXT[textMax.getValue()], mr = MAXRESULTS[resultsMax.getValue()];
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.MAXTEXT, mt);
@@ -88,7 +87,6 @@ final class DialogResultPrefs extends BaseXBack {
 
     resultsLabel.setText(mr == Integer.MAX_VALUE ? ALL : BaseXLayout.format(mr));
     textLabel.setText(mt == Integer.MAX_VALUE ? ALL : Performance.formatHuman(mt));
-    return true;
   }
 
   /**

@@ -2,8 +2,6 @@ package org.basex.gui.dialog;
 
 import java.awt.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -54,11 +52,7 @@ public final class DialogReplace extends BaseXDialog {
     back.add(row);
     set(back, BorderLayout.CENTER);
 
-    final BaseXBack bttns = okCancel();
-    set(bttns, BorderLayout.SOUTH);
-
-    SwingUtilities.invokeLater(((Container) bttns.getComponent(0)).getComponent(0)::
-      requestFocusInWindow);
+    setButtons(okCancel());
     action(backup);
     finish();
   }

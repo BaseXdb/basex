@@ -282,11 +282,10 @@ final class ProjectFilter extends BaseXBack {
     if(!replaceButton.isEnabled()) return;
 
     final String contents = view.list.search();
-    final boolean rgx = regex.isSelected();
+    final SearchFlags flags = flags();
     final Pattern pattern;
     try {
-      pattern = SearchContext.pattern(contents, mcase.isSelected(), word.isSelected(), rgx,
-          dotall.isSelected());
+      pattern = SearchContext.pattern(contents, flags);
     } catch(final PatternSyntaxException ex) {
       Util.debug(ex);
       return;
@@ -310,8 +309,7 @@ final class ProjectFilter extends BaseXBack {
     } else {
       final FilterJob filterJob = known != null ? new FilterJob(known, pattern) :
         new FilterJob(view.files, filesQuery(filesFilter.getText()),
-          view.files.contentFilter(contents, mcase.isSelected(), word.isSelected(), rgx,
-              dotall.isSelected()), view.root.file, pattern);
+          view.files.contentFilter(contents, flags), view.root.file, pattern);
       DialogProgress.execute(view.gui, filterJob);
       targets = filterJob.result();
       strings = filterJob.strings();
@@ -322,7 +320,8 @@ final class ProjectFilter extends BaseXBack {
     if(!dialog.ok()) return;
 
     final String in = replace.getText();
-    final String replacement = rgx ? SearchContext.normalize(in) : Matcher.quoteReplacement(in);
+    final String replacement = flags.regex() ? SearchContext.normalize(in) :
+      Matcher.quoteReplacement(in);
     replace.updateHistory();
 
     // save open editors so the on-disk replacement sees their current content
@@ -462,8 +461,7 @@ final class ProjectFilter extends BaseXBack {
     contentsFilter.setCursor(CURSORWAIT);
     view.list.setCursor(CURSORWAIT);
 
-    final ProjectFiles.ContentFilter content = view.files.contentFilter(contents,
-        mcase.isSelected(), word.isSelected(), regex.isSelected(), dotall.isSelected());
+    final ProjectFiles.ContentFilter content = view.files.contentFilter(contents, flags());
     new GUIWorker<String[]>() {
       @Override
       protected String[] doInBackground() throws Exception {
@@ -504,8 +502,7 @@ final class ProjectFilter extends BaseXBack {
 
     final Pattern pattern;
     try {
-      pattern = SearchContext.pattern(contents, mcase.isSelected(), word.isSelected(),
-          regex.isSelected(), dotall.isSelected());
+      pattern = SearchContext.pattern(contents, flags());
     } catch(final PatternSyntaxException ex) {
       Util.debug(ex);
       return;

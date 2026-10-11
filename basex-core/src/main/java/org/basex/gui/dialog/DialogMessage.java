@@ -3,8 +3,6 @@ package org.basex.gui.dialog;
 import java.awt.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
@@ -55,26 +53,14 @@ public final class DialogMessage extends BaseXDialog {
       Collections.addAll(list, buttons);
       list.add(Text.B_OK);
     }
-    final BaseXBack bttns = newButtons(list.toArray(Object[]::new));
-    set(bttns, BorderLayout.SOUTH);
-
-    SwingUtilities.invokeLater(((Container) bttns.getComponent(0)).getComponent(0)::
-      requestFocusInWindow);
+    setButtons(newButtons(list.toArray(Object[]::new)));
     finish();
   }
 
   @Override
   public void action(final Object cmp) {
-    final BaseXButton button = (BaseXButton) cmp;
-    final String text = button.getText();
-    if(text.equals(Text.B_CANCEL)) cancel();
-
-    action = text;
-    if(text.equals(Text.NO)) {
-      cancel();
-    } else {
-      close();
-    }
+    action = ((BaseXButton) cmp).getText();
+    close();
   }
 
   /**

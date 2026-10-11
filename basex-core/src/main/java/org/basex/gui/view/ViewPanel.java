@@ -1,10 +1,8 @@
 package org.basex.gui.view;
 
 import java.awt.*;
-import java.util.*;
 
 import org.basex.gui.layout.*;
-import org.basex.util.options.*;
 
 /**
  * This class contains a view and a {@link ViewMover} on top.
@@ -53,8 +51,7 @@ final class ViewPanel extends BaseXBack implements ViewComponent {
    * Makes the view invisible.
    */
   public void delete() {
-    final String name = "SHOW" + view.getName().toUpperCase(Locale.ENGLISH);
-    view.gui.gopts.set((BooleanOption) view.gui.gopts.option(name), false);
+    view.visible(false);
     view.gui.layoutViews();
   }
 

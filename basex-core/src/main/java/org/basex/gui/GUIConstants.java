@@ -267,8 +267,6 @@ public final class GUIConstants {
 
   // FONTS ========================================================================================
 
-  /** Name of monospace font. */
-  public static final String MONOFONT = Prop.WIN ? "Consolas" : Font.MONOSPACED;
   /** Font. */
   public static Font font;
   /** Bold Font. */

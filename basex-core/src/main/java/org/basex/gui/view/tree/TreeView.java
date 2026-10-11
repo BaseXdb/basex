@@ -41,8 +41,6 @@ public final class TreeView extends View {
   private int width = -1;
   /** Window height. */
   private int height = -1;
-  /** Window start. */
-  private int start;
   /** Current Image of visualization. */
   private BufferedImage treeImage;
   /** Notified focus flag. */
@@ -87,7 +85,7 @@ public final class TreeView extends View {
    * @param notifier view notifier
    */
   public TreeView(final ViewNotifier notifier) {
-    super(TREEVIEW, notifier);
+    super(TREEVIEW, notifier, GUIOptions.SHOWTREE, true);
     new BaseXPopup(this, POPUP);
   }
 
@@ -131,23 +129,13 @@ public final class TreeView extends View {
 
   @Override
   public boolean visible() {
-    final boolean v = gui.gopts.get(GUIOptions.SHOWTREE);
+    final boolean v = super.visible();
     if(!v) {
       sub = null;
       tr = null;
       paintType = Refresh.INIT;
     }
     return v;
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWTREE, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
   }
 
   @Override
@@ -193,10 +181,8 @@ public final class TreeView extends View {
 
       // if window-size changed
       final boolean winChange = windowSizeChanged();
-      if(winChange && paintType == Refresh.VOID
-          || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
-          || paintType == Refresh.RESIZE) {
-        treedist = tr.generateRects(sub, start, width, slimToText);
+      if(winChange || paintType != Refresh.VOID) {
+        treedist = tr.generateRects(sub, LEFT_AND_RIGHT_MARGIN, width, slimToText);
         nes = treedist == -1;
         if(!nes) {
           markedImage = null;
@@ -216,11 +202,9 @@ public final class TreeView extends View {
       if(selection) {
         if(selectRect != null) {
           // draw selection
-          final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
-          final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
-          final int w = Math.abs(selectRect.w), h = Math.abs(selectRect.h);
+          final ViewRect sr = selectRect.normalize();
           g.setColor(colormark1);
-          g.drawRect(x, y, w, h);
+          g.drawRect(sr.x, sr.y, sr.w, sr.h);
         }
         markNodes();
       }
@@ -453,10 +437,9 @@ public final class TreeView extends View {
    * Marks nodes inside the dragged selection.
    */
   private void markSelectedNodes() {
-    final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
-    final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
-    final int w = Math.abs(selectRect.w), h = Math.abs(selectRect.h);
-    final int t = y + h, size = sub.maxSubtreeHeight(), rl = roots.length;
+    final ViewRect sr = selectRect.normalize();
+    final int x = sr.x, y = sr.y, w = sr.w;
+    final int t = y + sr.h, size = sub.maxSubtreeHeight(), rl = roots.length;
     final IntList list = new IntList();
     final int rs = treePerX(x), re = treePerX(x + w);
     for(int r = Math.max(rs, 0); r <= re; r++) {
@@ -476,8 +459,8 @@ public final class TreeView extends View {
               }
             } else {
               final int mw = rlv[0].w();
-              int sPrePos = (int) (s * (x - start) / (double) mw);
-              int ePrePos = (int) (s * (x - start + w) / (double) mw);
+              int sPrePos = (int) (s * (x - LEFT_AND_RIGHT_MARGIN) / (double) mw);
+              int ePrePos = (int) (s * (x - LEFT_AND_RIGHT_MARGIN + w) / (double) mw);
               if(sPrePos < 0) sPrePos = 0;
               if(ePrePos >= s) ePrePos = s - 1;
               do {
@@ -891,7 +874,7 @@ public final class TreeView extends View {
    * @return tree number
    */
   private int treePerX(final int x) {
-    return (int) ((x - start) / treedist);
+    return (int) ((x - LEFT_AND_RIGHT_MARGIN) / treedist);
   }
 
   /**
@@ -909,12 +892,7 @@ public final class TreeView extends View {
    * Sets optimal distance between levels.
    */
   private void setLevelDistance() {
-    final int h = height - BOTTOM_MARGIN, rl = roots.length;
-    int lvs = 0;
-    for(int r = 0; r < rl; r++) {
-      final int th = sub.subtreeHeight(r);
-      if(th > lvs) lvs = th;
-    }
+    final int h = height - BOTTOM_MARGIN, lvs = sub.maxSubtreeHeight();
     int nh = (int) (fontSize * 1.4);
     final int dist = nh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
     while(true) {
@@ -960,7 +938,6 @@ public final class TreeView extends View {
     if(width > -1 && height > -1 && h == height && w == width + 2 * LEFT_AND_RIGHT_MARGIN)
       return false;
     height = h;
-    start = LEFT_AND_RIGHT_MARGIN;
     width = w - 2 * LEFT_AND_RIGHT_MARGIN;
     return true;
   }
@@ -1032,14 +1009,14 @@ public final class TreeView extends View {
         ns.union(m);
         gui.notify.mark(ns, null);
       } else {
-        gui.notify.mark(0, null);
+        gui.notify.mark(0);
       }
       if(e.getClickCount() > 1) {
         gui.notify.context(gui.context.marked, false, this);
         refreshContext(false, false);
       }
     } else if(!marked(mousePosX, mousePosY)) {
-      gui.notify.mark(0, null);
+      gui.notify.mark(0);
     }
   }
 

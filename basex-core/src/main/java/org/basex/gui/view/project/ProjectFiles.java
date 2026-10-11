@@ -374,26 +374,23 @@ final class ProjectFiles {
   /**
    * Creates a filter for the file contents.
    * @param contents contents search string
-   * @param mcase match case
-   * @param word whole word
-   * @param regex regular expression
-   * @param dotall dot matches all
+   * @param flags search flags
    * @return content filter
    */
-  ContentFilter contentFilter(final String contents, final boolean mcase, final boolean word,
-      final boolean regex, final boolean dotall) {
+  ContentFilter contentFilter(final String contents, final SearchFlags flags) {
     // empty search string matches every file
     if(contents.isEmpty()) return new ContentFilter(null, false, null, null);
 
     // fast path: literal searches (incl. regex mode without metacharacters) use a streaming scan
-    if(!word && (!regex || literal(contents))) {
+    if(!flags.word() && (!flags.regex() || literal(contents))) {
+      final boolean mcase = flags.mcase();
       final String search = mcase ? contents : contents.toLowerCase(Locale.ENGLISH);
       return new ContentFilter(search.codePoints().toArray(), !mcase, null, null);
     }
 
     // buffered path: reuse the editor's pattern logic
     try {
-      final Pattern pattern = SearchContext.pattern(contents, mcase, word, regex, dotall);
+      final Pattern pattern = SearchContext.pattern(contents, flags);
       return new ContentFilter(null, false, pattern, null);
     } catch(final PatternSyntaxException ex) {
       // invalid expression: match no file, remember the error

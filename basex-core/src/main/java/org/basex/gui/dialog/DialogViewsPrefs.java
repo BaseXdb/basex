@@ -126,9 +126,8 @@ final class DialogViewsPrefs extends BaseXBack {
   /**
    * Reacts on user input.
    * @param source source
-   * @return success flag
    */
-  boolean action(final Object source) {
+  void action(final Object source) {
     mousefocus.assign();
     treeSlim.assign();
     treeAtts.assign();
@@ -148,7 +147,6 @@ final class DialogViewsPrefs extends BaseXBack {
     colorBlue.assign();
     if(source == colorReset || source == colorRed || source == colorGreen ||
         source == colorBlue) gui.updateLayout();
-    return true;
   }
 
   /**

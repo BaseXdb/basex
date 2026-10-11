@@ -99,9 +99,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Indicates if a command is running. */
   private boolean running;
 
-  /** Password reader (can be {@code null}). */
-  private static volatile PasswordReader pwReader;
-
   /**
    * Default constructor.
    * @param context database context
@@ -295,11 +292,10 @@ public final class GUI extends JFrame implements BaseXWindow {
       try {
         // parse and execute all commands
         final CommandParser cp = CommandParser.get(in.substring(exc ? 1 : 0), context);
-        if(pwReader == null) pwReader = () -> {
+        cp.pwReader(() -> {
           final DialogPass dp = new DialogPass(this);
           return dp.ok() ? dp.password() : "";
-        };
-        cp.pwReader(pwReader);
+        });
         execute(cp.parse());
       } catch(final QueryException ex) {
         Util.debug(ex);
@@ -628,7 +624,6 @@ public final class GUI extends JFrame implements BaseXWindow {
         chk = BaseXDialog.confirm(this, H_VERSION_CHECK);
         gopts.set(GUIOptions.CHECKUPDATES, chk);
       }
-      saveOptions();
     } else if(ask) {
       // version is up-to-date: ask for automatic check
       chk = BaseXDialog.confirm(this, Util.info(H_VERSION_LATEST_X, Prop.NAME) + '\n' +

@@ -291,14 +291,7 @@ final class TextLineCache {
     // a line before the end of the edit cannot match the shifted old text
     if(p < changeEnd) return false;
     // locate the old line at the matching position
-    final int target = p - delta;
-    int lo = 0, hi = tailPos.length - 1, j = -1;
-    while(lo <= hi) {
-      final int mid = lo + hi >>> 1, v = tailPos[mid];
-      if(v < target) lo = mid + 1;
-      else if(v > target) hi = mid - 1;
-      else { j = mid; break; }
-    }
+    final int j = Arrays.binarySearch(tailPos, p - delta);
     if(j < 0 || !Arrays.equals(tailState[j], state)) return false;
 
     // append the unchanged tail, shifted by the position and height deltas
@@ -315,21 +308,12 @@ final class TextLineCache {
 
   /**
    * Binary search for the largest index whose value is at or below the target.
-   * @param list ascending values
+   * @param list strictly ascending values
    * @param target target value
    * @return index
    */
   private static int index(final IntList list, final int target) {
-    int lo = 0, hi = list.size() - 1, idx = 0;
-    while(lo <= hi) {
-      final int mid = lo + hi >>> 1;
-      if(list.get(mid) <= target) {
-        idx = mid;
-        lo = mid + 1;
-      } else {
-        hi = mid - 1;
-      }
-    }
-    return idx;
+    final int i = list.sortedIndexOf(target);
+    return i >= 0 ? i : Math.max(0, -i - 2);
   }
 }

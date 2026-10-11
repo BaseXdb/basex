@@ -63,9 +63,6 @@ public final class SearchBar extends BaseXBack {
   /** Whether that jump selects its hit. */
   private boolean jumpSelect;
 
-  /** Escape key listener. */
-  private final KeyListener keys;
-
   /** Search button (can be {@code null}). */
   private AbstractButton search;
   /** Current editor reference (can be {@code null}). */
@@ -147,39 +144,28 @@ public final class SearchBar extends BaseXBack {
       search();
     });
 
-    replace.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(ENTER.is(e)) {
-          replaceNext();
-        } else if(META_ENTER.is(e)) {
-          replaceAll();
-        } else {
-          return;
-        }
-        e.consume();
+    replace.addKeyListener((KeyPressedListener) e -> {
+      if(ENTER.is(e)) {
+        replaceNext();
+      } else if(META_ENTER.is(e)) {
+        replaceAll();
+      } else {
+        return;
       }
+      e.consume();
     });
 
     // add default shortcuts to all interaction components
-    keys = (KeyPressedListener) e -> {
+    final KeyListener keys = (KeyPressedListener) e -> {
       if(ESCAPE.is(e)) deactivate(false);
       else if(MATCHCASE.is(e)) toggle(mcase);
       else if(WHOLEWORD.is(e)) toggle(word);
       else if(REGEX.is(e)) toggle(regex);
       else if(DOTALL.is(e)) toggle(dotall);
     };
-    mcase.addKeyListener(keys);
-    word.addKeyListener(keys);
-    regex.addKeyListener(keys);
-    dotall.addKeyListener(keys);
-    find.addKeyListener(keys);
-    replace.addKeyListener(keys);
-    prev.addKeyListener(keys);
-    next.addKeyListener(keys);
-    rplc.addKeyListener(keys);
-    rplcNext.addKeyListener(keys);
-    cls.addKeyListener(keys);
+    for(final Component comp : new Component[] {
+      mcase, word, regex, dotall, find, replace, prev, next, rplc, rplcNext, cls
+    }) comp.addKeyListener(keys);
 
     prev.addActionListener(e -> editor.jump(SearchDir.BACKWARD, true));
     next.addActionListener(e -> editor.jump(SearchDir.FORWARD, true));
@@ -548,7 +534,6 @@ public final class SearchBar extends BaseXBack {
   private AbstractButton button(final String icon, final String tooltip,
       final ActionListener action) {
     final AbstractButton b = BaseXButton.get(icon, tooltip, true, gui);
-    b.addKeyListener(keys);
     b.addActionListener(action);
     return b;
   }

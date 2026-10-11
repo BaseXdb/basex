@@ -1,12 +1,23 @@
 package org.basex.gui.view.map;
 
 /**
- * SplitLayout algorithm.
+ * Split and binary layout algorithm.
  *
  * @author BaseX Team, BSD License
  * @author Joerg Hauser
  */
 final class SplitAlgo extends MapAlgo {
+  /** Binary layout: split the list in the middle instead of at half of the weight. */
+  private final boolean binary;
+
+  /**
+   * Constructor.
+   * @param binary binary layout
+   */
+  SplitAlgo(final boolean binary) {
+    this.binary = binary;
+  }
+
   @Override
   MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     return calcMap(r, ml, ns, ne, 1);
@@ -21,24 +32,29 @@ final class SplitAlgo extends MapAlgo {
    * @param sw weight of this recursion level
    * @return rectangles
    */
-  private static MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne,
+  private MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne,
       final double sw) {
 
+    final MapRects rects = new MapRects();
     if(ne - ns == 0) {
-      final MapRects rects = new MapRects();
       rects.add(new MapRect(r, ml.get(ns)));
       return rects;
     }
 
-    final MapRects rects = new MapRects();
-    int ni = ns - 1;
-
-    // increment pivot until left rectangle contains more or equal
-    // than half the weight or leave with just setting it to ne - 1
     double w = 0;
-    while(ni < ne) {
-      w += ml.weight[++ni];
-      if(w >= sw / 2 || ni == ne - 1) break;
+    int ni;
+    if(binary) {
+      // setting middle of the list and calc weights
+      ni = ns + (ne - ns) / 2;
+      for(int i = ns; i <= ni; i++) w += ml.weight[i];
+    } else {
+      // increment pivot until left rectangle contains more or equal
+      // than half the weight or leave with just setting it to ne - 1
+      ni = ns - 1;
+      while(ni < ne) {
+        w += ml.weight[++ni];
+        if(w >= sw / 2 || ni == ne - 1) break;
+      }
     }
 
     int xx = r.x;

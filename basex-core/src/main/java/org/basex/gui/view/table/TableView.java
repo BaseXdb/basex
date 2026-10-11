@@ -42,7 +42,7 @@ public final class TableView extends View {
    * @param notifier view notifier
    */
   public TableView(final ViewNotifier notifier) {
-    super(TABLEVIEW, notifier);
+    super(TABLEVIEW, notifier, GUIOptions.SHOWTABLE, true);
     tdata = new TableData(gui.context, gui.gopts);
     layout(new BorderLayout());
     header = new TableHeader(this);
@@ -133,21 +133,6 @@ public final class TableView extends View {
   }
 
   @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWTABLE);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWTABLE, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
-  }
-
-  @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     if(tdata.rows == null && visible()) refreshInit();
@@ -198,20 +183,7 @@ public final class TableView extends View {
     final boolean valid = y >= 0 && l < tdata.rows.size();
 
     final Data data = gui.context.data();
-    int focused = -1;
-    if(valid) {
-      final int pre = tdata.rows.get(l);
-      final TableIterator iter = new TableIterator(data, tdata);
-      final int c = tdata.column(getWidth() - scroll.getWidth(), tdata.mouseX);
-      iter.init(pre);
-      while(iter.more()) {
-        if(iter.col == c) {
-          focused = iter.pre;
-          break;
-        }
-      }
-    }
-    gui.notify.focus(focused, this);
+    gui.notify.focus(valid ? cell(data, tdata.rows.get(l), tdata.mouseX) : -1, this);
     content.repaint();
 
     final String str = content.focusedString;
@@ -251,16 +223,26 @@ public final class TableView extends View {
         gui.notify.context(nodes, false, null);
       }
     } else {
-      final TableIterator iter = new TableIterator(data, tdata);
-      final int c = tdata.column(getWidth() - scroll.getWidth(), e.getX());
-      iter.init(pre);
-      while(iter.more()) {
-        if(iter.col == c) {
-          gui.notify.mark(new DBNodes(data, iter.pre), null);
-          return;
-        }
-      }
+      final int cell = cell(data, pre, e.getX());
+      if(cell != -1) gui.notify.mark(new DBNodes(data, cell), null);
     }
+  }
+
+  /**
+   * Returns the PRE value of the table cell at the given horizontal position.
+   * @param data data reference
+   * @param pre PRE value of the table row
+   * @param x horizontal position
+   * @return PRE value, or {@code -1}
+   */
+  private int cell(final Data data, final int pre, final int x) {
+    final TableIterator iter = new TableIterator(data, tdata);
+    final int c = tdata.column(getWidth() - scroll.getWidth(), x);
+    iter.init(pre);
+    while(iter.more()) {
+      if(iter.col == c) return iter.pre;
+    }
+    return -1;
   }
 
   /**

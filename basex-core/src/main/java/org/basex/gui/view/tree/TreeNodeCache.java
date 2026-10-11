@@ -56,12 +56,10 @@ final class TreeNodeCache {
    * @return index
    */
   private int getMinIndex(final int lv, final int lp, final int rp) {
-    final int l = 0;
-    final int r = nodes[lv].size() - 1;
-    int min = searchPreIndex(lv, lp, rp, l, r);
+    final IntList n = nodes[lv];
+    int min = searchPreIndex(lv, lp, rp, 0, n.size() - 1);
     if(min == -1) return -1;
-    final int[] n = nodes[lv].toArray();
-    while(min-- > 0 && n[min] > lp);
+    while(min-- > 0 && n.get(min) > lp);
     return min + 1;
   }
 
@@ -110,22 +108,10 @@ final class TreeNodeCache {
     int pos = -1;
     int l;
     for(l = 0; l < maxLevel; l++) {
-      pos = searchPreArrayPos(l, 0, nodes[l].size() - 1, pre);
+      pos = searchPreIndex(l, pre, pre, 0, nodes[l].size() - 1);
       if(pos > -1) break;
     }
     return pos > -1 ? new int[] { l, pos} : null;
-  }
-
-  /**
-   * Determines the index position of given PRE value.
-   * @param lv level to be searched
-   * @param l left array border
-   * @param r right array border
-   * @param pre PRE value
-   * @return determined index position
-   */
-  int searchPreArrayPos(final int lv, final int l, final int r, final int pre) {
-    return searchPreIndex(lv, pre, pre, l, r);
   }
 
   /**

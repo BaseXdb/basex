@@ -79,7 +79,7 @@ public final class MapView extends View {
    * @param notifier view notifier
    */
   public MapView(final ViewNotifier notifier) {
-    super(MAPVIEW, notifier);
+    super(MAPVIEW, notifier, GUIOptions.SHOWMAP, true);
     new BaseXPopup(this, POPUP);
   }
 
@@ -101,9 +101,8 @@ public final class MapView extends View {
     zoomStep = 0;
 
     final Data data = gui.context.data();
-    final GUIOptions gopts = gui.gopts;
     if(data != null && visible()) {
-      painter = new MapPainter(this, gopts);
+      painter = new MapPainter(this);
       mainMap = createImage();
       zoomMap = createImage();
       refreshLayout();
@@ -160,21 +159,6 @@ public final class MapView extends View {
   public void refreshUpdate() {
     textLen = null;
     refreshContext(false, true);
-  }
-
-  @Override
-  public boolean visible() {
-    return gui.gopts.get(GUIOptions.SHOWMAP);
-  }
-
-  @Override
-  public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWMAP, v);
-  }
-
-  @Override
-  protected boolean db() {
-    return true;
   }
 
   /**
@@ -361,7 +345,7 @@ public final class MapView extends View {
         f.x += 3;
         f.w -= 3;
         // read content from disk
-        final byte[] text = MapPainter.text(data, f);
+        final byte[] text = ViewData.text(data, f.pre);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
         final TokenList tl = renderer.computeToolTip(f, info, mouseX, mouseY, getWidth());
@@ -456,12 +440,8 @@ public final class MapView extends View {
     final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
-    } else if(e.isShiftDown()) {
-      gui.notify.mark(1, null);
-    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
-      gui.notify.mark(2, null);
-    } else if(!marked.contains(gui.context.focused)) {
-      gui.notify.mark(0, null);
+    } else if(!markFocused(e) && !marked.contains(gui.context.focused)) {
+      gui.notify.mark(0);
     }
   }
 

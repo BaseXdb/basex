@@ -68,9 +68,11 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    // no short-circuiting, do all checks...
-    ok = general.action(cmp) & appearance.action(cmp) & editor.action() & result.action() &
-      views.action(cmp);
+    general.action(cmp);
+    appearance.action(cmp);
+    ok = editor.action();
+    result.action();
+    views.action(cmp);
     gui.notify.layout();
   }
 

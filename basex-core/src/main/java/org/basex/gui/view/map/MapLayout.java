@@ -57,8 +57,8 @@ final class MapLayout {
       case 1  -> new StripAlgo();
       case 2  -> new SquarifiedAlgo();
       case 3  -> new SliceDiceAlgo();
-      case 4  -> new BinaryAlgo();
-      default -> new SplitAlgo();
+      case 4  -> new SplitAlgo(true);
+      default -> new SplitAlgo(false);
     };
   }
 
@@ -121,13 +121,10 @@ final class MapLayout {
     final int w = r.w - layout.w;
     final int h = r.h - layout.h;
 
-    // skip too small rectangles and metadata in file systems
-    if(w < size && h < size || w <= 2 || h <= 2) {
-      rectangles.add(r);
-      return;
-    }
-
     rectangles.add(r);
+    // skip too small rectangles and metadata in file systems
+    if(w < size && h < size || w <= 2 || h <= 2) return;
+
     final MapList ch = children(r.pre);
     final int cs = ch.size();
     if(cs != 0) {
