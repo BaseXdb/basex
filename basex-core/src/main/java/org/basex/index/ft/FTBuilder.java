@@ -121,12 +121,12 @@ public final class FTBuilder extends IndexBuilder {
   /**
    * Passes the tokens of a value to be indexed, and their positions, to a consumer.
    * @param lexer lexer
-   * @param maxlen maximum token length
+   * @param meta meta data
    * @param value value
    * @param consumer consumer
    * @throws IOException I/O exception
    */
-  static void tokens(final FTLexer lexer, final int maxlen, final byte[] value,
+  static void tokens(final FTLexer lexer, final MetaData meta, final byte[] value,
       final TokenConsumer consumer) throws IOException {
     final StopWords sw = lexer.ftOpt().sw;
     lexer.init(value);
@@ -134,8 +134,9 @@ public final class FTBuilder extends IndexBuilder {
     while(lexer.hasNext()) {
       final byte[] token = lexer.nextToken();
       ++pos;
-      // skip too long and stopword tokens
-      if(token.length <= maxlen && !sw.contains(token)) consumer.accept(token, pos);
+      // record too long tokens, skip stopwords
+      if(token.length > meta.maxlen) meta.skipped.add(IndexType.FULLTEXT);
+      else if(!sw.contains(token)) consumer.accept(token, pos);
     }
   }
 
@@ -159,7 +160,7 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   private void index(final int id, final byte[] value) throws IOException {
-    tokens(lexer, data.meta.maxlen, value, (token, pos) -> {
+    tokens(lexer, data.meta, value, (token, pos) -> {
       // check if main memory is exhausted
       if(splitTokens > 0 ? count > 0 && count % splitTokens == 0 :
         (count & 0xFFFF) == 0 && splitRequired(tree.memory())) {

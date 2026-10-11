@@ -157,7 +157,8 @@ public final class CmpSR extends CmpRange {
     if(data == null ? !ii.enforce() : data.inMemory()) return false;
 
     final IndexType type = ii.type(expr, null);
-    if(type == null) return false;
+    // values exceeding the maximum length are not indexed, but may be in the range
+    if(type == null || data != null && data.meta.skipped.contains(type)) return false;
 
     // create range access
     final StringRange sr = new StringRange(type, min, mni, max, mxi);

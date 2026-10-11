@@ -94,6 +94,8 @@ public interface DataText {
   String DBCOUNTS = "COUNTS";
   /** Optimized indexes. */
   String DBOPTIMIZED = "OPTIMIZED";
+  /** Indexes with skipped values. */
+  String DBSKIPPED = "SKIPPED";
   /** Last (highest) ID. */
   String DBLASTID = "LASTID";
   /** Committed length of the ID-PRE log. */

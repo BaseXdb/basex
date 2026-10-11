@@ -113,9 +113,22 @@ public abstract class ValueIndex implements Index {
     if(type == IndexType.TOKEN) {
       int pos = 0;
       for(final byte[] token : distinctTokens(data.text(pre, false))) consumer.accept(token, pos++);
-    } else if(data.textLen(pre, text) <= data.meta.maxlen) {
+    } else if(indexable(data, type, pre)) {
       consumer.accept(data.text(pre, text), 0);
     }
+  }
+
+  /**
+   * Checks if a value does not exceed the maximum length, and records a skipped value otherwise.
+   * @param data data reference
+   * @param type index type (text or attribute)
+   * @param pre PRE value
+   * @return result of check
+   */
+  static boolean indexable(final Data data, final IndexType type, final int pre) {
+    if(data.textLen(pre, type == IndexType.TEXT) <= data.meta.maxlen) return true;
+    data.meta.skipped.add(type);
+    return false;
   }
 
   /**

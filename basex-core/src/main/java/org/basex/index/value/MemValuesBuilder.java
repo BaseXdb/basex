@@ -29,8 +29,6 @@ public final class MemValuesBuilder extends IndexBuilder {
 
     final MemValues index = new MemValues(data, type);
     final boolean updindex = data.meta.updindex, tokenize = type == IndexType.TOKEN;
-    final boolean text = type == IndexType.TEXT;
-    final int maxlen = data.meta.maxlen;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
       if(includeNames.unit(pre)) {
@@ -40,7 +38,7 @@ public final class MemValuesBuilder extends IndexBuilder {
             index.add(key, id);
             count++;
           });
-        } else if(data.textLen(pre, text) <= maxlen) {
+        } else if(ValueIndex.indexable(data, type, pre)) {
           // texts of main-memory instances are references to the keys of the index
           index.add((int) data.textRef(pre), id);
           count++;

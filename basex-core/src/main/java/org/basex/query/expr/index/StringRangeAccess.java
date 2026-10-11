@@ -91,7 +91,7 @@ public final class StringRangeAccess extends IndexAccess {
           if(data.kind(pre) != kind) continue;
           final byte[] txt = data.text(pre, text);
           final int min = Token.compare(txt, index.min()), max = Token.compare(txt, index.max());
-          if(min >= (index.mni() ? 0 : 1) && max <= (index.mxi() ? 0 : 1)) return true;
+          if(min >= (index.mni() ? 0 : 1) && max <= (index.mxi() ? 0 : -1)) return true;
         }
         return false;
       }

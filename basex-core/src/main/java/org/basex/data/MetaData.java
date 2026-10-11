@@ -109,6 +109,8 @@ public final class MetaData {
   public boolean complete = true;
   /** Value indexes whose structures are optimized. */
   public final EnumSet<IndexType> optimized = EnumSet.noneOf(IndexType.class);
+  /** Indexes that skipped values or tokens exceeding {@link #maxlen}. */
+  public final EnumSet<IndexType> skipped = EnumSet.noneOf(IndexType.class);
   /** Indicate if the database may be corrupt. */
   public boolean corrupt;
   /** Dirty flag. */
@@ -196,6 +198,7 @@ public final class MetaData {
     counts = meta.counts;
     complete = meta.complete;
     optimized.addAll(meta.optimized);
+    skipped.addAll(meta.skipped);
     corrupt = meta.corrupt;
     dirty = meta.dirty;
     oldindex = meta.oldindex;
@@ -598,6 +601,9 @@ public final class MetaData {
         case DBOPTIMIZED -> {
           for(final String type : split(v, ',')) optimized.add(IndexType.valueOf(type));
         }
+        case DBSKIPPED -> {
+          for(final String type : split(v, ',')) skipped.add(IndexType.valueOf(type));
+        }
       }
     }
     // restore implications (relevant for databases created before version 13)
@@ -666,6 +672,11 @@ public final class MetaData {
       final StringList types = new StringList();
       for(final IndexType type : optimized) types.add(type.name());
       writeInfo(out, DBOPTIMIZED, String.join(",", types.finish()));
+    }
+    if(!skipped.isEmpty()) {
+      final StringList types = new StringList();
+      for(final IndexType type : skipped) types.add(type.name());
+      writeInfo(out, DBSKIPPED, String.join(",", types.finish()));
     }
     writeInfo(out, DBLASTID,   lastid);
     if(idplog != 0) writeInfo(out, DBIDPLOG, idplog);

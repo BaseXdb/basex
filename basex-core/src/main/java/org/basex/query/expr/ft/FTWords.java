@@ -434,7 +434,9 @@ public final class FTWords extends FTExpr {
       if(ftOpt.cs != null && ftOpt.cs != (md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE) ||
           ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
           ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
-          ftOpt.ln != null && !ftOpt.ln.equals(md.language())) return false;
+          ftOpt.ln != null && !ftOpt.ln.equals(md.language()) ||
+          // tokens exceeding the maximum length are not indexed, but may match
+          (ftOpt.is(WC) || ftOpt.is(FZ)) && md.skipped.contains(IndexType.FULLTEXT)) return false;
       // assign database options
       ftOpt.assign(md);
     }

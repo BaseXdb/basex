@@ -62,6 +62,7 @@ public final class DropIndex extends ACreate {
     data.meta.dirty = true;
     data.meta.index(type, false);
     data.meta.optimized.remove(type);
+    data.meta.skipped.remove(type);
     data.dropIndex(type);
   }
 }

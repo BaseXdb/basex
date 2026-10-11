@@ -520,7 +520,7 @@ public final class FTIndex extends SegmentedIndex {
   protected void unit(final int pre, final TokenList keys, final IntList poss)
       throws IOException {
     if(lexer == null) lexer = FTBuilder.lexer(data);
-    FTBuilder.tokens(lexer, data.meta.maxlen, data.atom(pre), (token, pos) -> {
+    FTBuilder.tokens(lexer, data.meta, data.atom(pre), (token, pos) -> {
       keys.add(token);
       poss.add(pos);
     });
