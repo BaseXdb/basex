@@ -267,7 +267,7 @@ public final class TextEditor {
 
   /**
    * Counts the number of lines in the text.
-   * @return number of new lines in the text
+   * @return number of lines in the text
    */
   int lines() {
     if(lines == -1) {
@@ -356,7 +356,7 @@ public final class TextEditor {
   }
 
   /**
-   * Returns the position of first character of the current auto-completion input.
+   * Returns the position of the first character of the current auto-completion input.
    * @return position
    */
   int completionStart() {
@@ -1062,7 +1062,7 @@ public final class TextEditor {
    * @return indentation flag
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
-    // no selection, shift pressed: select current character
+    // no selection, shift pressed: select current line
     if(!isSelected() && shift && size() != 0) selectLine();
 
     // check if something is selected
@@ -1119,7 +1119,7 @@ public final class TextEditor {
    * Processes and adds the specified string.
    * @param sb string to be added
    * @param selected states if the text was selected
-   * @return returns the number spaces to move forward
+   * @return number of characters to move forward
    */
   int add(final StringBuilder sb, final boolean selected) {
     if(sb.isEmpty()) return 0;
@@ -1313,7 +1313,7 @@ public final class TextEditor {
   }
 
   /**
-   * Duplicate lines.
+   * Duplicates lines.
    */
   void duplLines() {
     final int p = pos, s = start, e = end;
@@ -1630,7 +1630,7 @@ public final class TextEditor {
   }
 
   /**
-   * Selects the word at the cursor position.
+   * Selects the line at the cursor position.
    */
   void selectLine() {
     startOfLine(false);

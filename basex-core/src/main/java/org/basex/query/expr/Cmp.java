@@ -84,7 +84,7 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * If possible, returns an optimized expression with inverted operands.
+   * If possible, returns an optimized expression with an inverted operator.
    * @param cc compilation context
    * @return original or modified expression
    * @throws QueryException query exception
@@ -95,8 +95,8 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * If possible, returns an expression with inverted operands.
-   * @return original or {@code null}
+   * If possible, returns an expression with an inverted operator.
+   * @return inverted expression or {@code null}
    */
   public abstract Expr invert();
 
@@ -336,8 +336,8 @@ public abstract class Cmp extends Arr {
       // count(A) > 0 → exists(A)
       if(counts == COUNT_EMPTY) return cc.function(EMPTY, info, arg);
       if(counts == COUNT_EXISTS) return cc.function(EXISTS, info, arg);
-      // count(A) > 1 → util:within(A, 2)
-      // count(A) < 5 → util:within(A, 0, 4)
+      // count(A) > 1 → util:count-within(A, 2)
+      // count(A) < 5 → util:count-within(A, 0, 4)
       if(counts != null) {
         for(final long c : counts) args.add(Itr.get(c));
       }
@@ -345,15 +345,15 @@ public abstract class Cmp extends Arr {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(BasicType.INTEGER)) {
         if(count instanceof final RangeSeq rs) {
-          // count(A) = 3 to 5 → util:within(A, 3, 5)
+          // count(A) = 3 to 5 → util:count-within(A, 3, 5)
           args.add(Itr.get(rs.min())).add(Itr.get(rs.max()));
         } else if(st2.one() && count.duplicable()) {
-          // count(A) = $c → util:within(A, $c)
+          // count(A) = $c → util:count-within(A, $c)
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {
-          // count(A) >= 3 to 5 → util:within(A, 3)
-          // count(A) <= 3 to 5 → util:within(A, 0, 5)
+          // count(A) >= 3 to 5 → util:count-within(A, 3)
+          // count(A) <= 3 to 5 → util:count-within(A, 0, 5)
           if(op == CmpOp.GE) args.remove(args.size() - 1);
           else if(op == CmpOp.LE) args.set(0, Itr.ZERO);
         }
@@ -361,7 +361,7 @@ public abstract class Cmp extends Arr {
     }
     if(args.isEmpty()) return this;
 
-    // count(A) = 1 → util:within(A, 1, 1)
+    // count(A) = 1 → util:count-within(A, 1, 1)
     args.insert(0, arg);
     return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
   }

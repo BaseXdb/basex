@@ -72,7 +72,7 @@ interface CalcOpt {
    * @param item1 first item
    * @param item2 second item
    * @param info input info (can be {@code null})
-   * @return result type
+   * @return result item
    * @throws QueryException query exception
    */
   Item eval(Item item1, Item item2, InputInfo info) throws QueryException;
@@ -229,7 +229,7 @@ interface CalcOpt {
   }
 
   /**
-   * Modulo, two doubles.
+   * Modulo, two floats.
    * @param item1 first item
    * @param item2 second item
    * @param info input info

@@ -35,7 +35,7 @@ public final class Util {
   /**
    * Returns an information string for an unexpected exception.
    * @param throwable exception
-   * @return dummy object
+   * @return information string
    */
   public static String bug(final Throwable throwable) {
     final TokenBuilder tb = new TokenBuilder().add(S_BUGINFO).add(NL);

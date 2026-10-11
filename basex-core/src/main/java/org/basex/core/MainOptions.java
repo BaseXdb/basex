@@ -146,7 +146,7 @@ public final class MainOptions extends Options {
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Validate string inputs. */
   public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
-  /** Runs the query results, or only parses it. */
+  /** Runs the query, or only parses it. */
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
@@ -236,7 +236,7 @@ public final class MainOptions extends Options {
     /** INSTANCE. */ INSTANCE,
     /** ALL.      */ ALL,
     /** VOID.     */ VOID,
-    /** SOM.      */ SOME,
+    /** SOME.     */ SOME,
     /** NONE.     */ NONE;
 
     @Override

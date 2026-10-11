@@ -46,7 +46,7 @@ final class NodeUpdates {
   /**
    * Finds the update primitive with the given type.
    * @param type update type
-   * @return primitive of type or {code null}
+   * @return primitive of type or {@code null}
    */
   private NodeUpdate find(final UpdateType type) {
     for(final NodeUpdate update : updates) {
@@ -73,7 +73,7 @@ final class NodeUpdates {
    * - replaceElementContent has the desired effect.
    * - a REPLACE and a DELETE on a target T result in replacing the node.
    * @return list with update primitives
-   * This method can only be once, as the internal update list will eventually be removed.
+   * This method can only be called once, as the internal update list will eventually be removed.
    */
   List<NodeUpdate> finish() {
     List<NodeUpdate> primnew = new ArrayList<>();

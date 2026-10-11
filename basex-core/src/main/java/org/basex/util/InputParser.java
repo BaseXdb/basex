@@ -36,7 +36,7 @@ public class InputParser {
 
   /**
    * Checks if more characters are found.
-   * @return current character
+   * @return result of check
    */
   public final boolean more() {
     return pos < length;

@@ -171,7 +171,7 @@ public final class Token {
    *   <li> objects of type {@link Throwable} are converted to a string representation via
    *        {@link Util#message(Throwable)}.</li>
    *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
-   *   <li> for all other typer, {@link Object#toString} is called.</li>
+   *   <li> for all other types, {@link Object#toString} is called.</li>
    * </ul>
    * @param object object
    * @return token
@@ -511,7 +511,7 @@ public final class Token {
   /**
    * Converts the specified token into a double value.
    * @param token token to be converted
-   * @return resulting double value, or {@link Double#NaN} is returned if the input is invalid
+   * @return resulting double value, or {@link Double#NaN} if the input is invalid
    */
   public static double toDouble(final byte[] token) {
     final int tl = token.length;
@@ -937,9 +937,9 @@ public final class Token {
   }
 
   /**
-   * Checks if the first token starts with the specified character.
+   * Checks if the first token ends with the specified character.
    * @param token token
-   * @param ch character to be bound
+   * @param ch character to be found
    * @return result of check
    */
   public static boolean endsWith(final byte[] token, final int ch) {
@@ -1428,7 +1428,7 @@ public final class Token {
     };
 
     /**
-     * Test if characters needs to be encoded.
+     * Tests if a character can be output without encoding.
      * @param ch character
      * @return result of check
      */

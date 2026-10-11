@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * German stemming algorithm, derived from the Apache Lucene project and the report
+ * Greek stemming algorithm, derived from the Apache Lucene project and the report
  * "Development of a Stemmer for the Greek Language" by Georgios Ntais.
  *
  * @author BaseX Team, BSD License

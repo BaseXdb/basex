@@ -141,7 +141,7 @@ public class XMLInput extends InputStream {
 
   /**
    * Returns the file length.
-   * @return file position
+   * @return file length
    */
   public long length() {
     return inputs[0].length();

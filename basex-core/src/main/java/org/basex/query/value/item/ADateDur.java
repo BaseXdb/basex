@@ -31,7 +31,7 @@ public abstract class ADateDur extends Item {
 
   /**
    * Returns the months.
-   * @return year
+   * @return month
    */
   public abstract long mon();
 
@@ -43,24 +43,24 @@ public abstract class ADateDur extends Item {
 
   /**
    * Returns the hours (0-23).
-   * @return day
+   * @return hour
    */
   public abstract long hour();
 
   /**
    * Returns the minutes (0-59).
-   * @return day
+   * @return minute
    */
   public abstract long minute();
 
   /**
    * Returns the seconds (0-59), including the fractional part.
-   * @return day
+   * @return seconds
    */
   public abstract BigDecimal seconds();
 
   /**
-   * Throws a date format exception.
+   * Returns a date format exception.
    * @param input input
    * @param ex example format
    * @param info input info (can be {@code null})
@@ -72,7 +72,7 @@ public abstract class ADateDur extends Item {
 
   /**
    * Date and durations: converts the specified string to an integer value.
-   * Returns an exception if the value is invalid.
+   * Throws an exception if the value is invalid.
    * @param string string to be converted
    * @param dur duration
    * @param info input info (can be {@code null})
@@ -90,7 +90,7 @@ public abstract class ADateDur extends Item {
 
   /**
    * Date and durations: converts the specified string to a decimal value.
-   * Returns an exception if the value is invalid.
+   * Throws an exception if the value is invalid.
    * @param string string to be converted
    * @param dur duration
    * @param info input info (can be {@code null})

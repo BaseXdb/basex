@@ -295,7 +295,7 @@ public final class Stores implements Closeable {
   /**
    * Writes the current store to disk.
    * @param name name of store
-   * @param enforce always write dirty store (not only dirty ones)
+   * @param enforce always write store (not only dirty ones)
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
@@ -422,7 +422,7 @@ public final class Stores implements Closeable {
    * Reads a value from disk.
    * @param in input stream
    * @param qc query context
-   * @return value, or {@code null} if data could not be read
+   * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */

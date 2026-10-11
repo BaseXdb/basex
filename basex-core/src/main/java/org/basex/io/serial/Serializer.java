@@ -482,7 +482,7 @@ public abstract class Serializer implements Closeable {
   }
 
   /**
-   * Emits attributes in canonical sorting order and clears the attributes.
+   * Emits namespaces in canonical sorting order and clears the namespaces.
    * @throws IOException I/O exception
    */
   private void emitNamespaces() throws IOException {

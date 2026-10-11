@@ -43,7 +43,7 @@ public abstract class ResourceNode extends DefaultMutableTreeNode {
 
   /**
    * Prepares the given path to be used as a tree node.
-   * The returned path looks the following:
+   * The returned path looks as follows:
    * <ol>
    *   <li> The path is relative to the database root directory</li>
    *   <li> It has one leading slash</li>

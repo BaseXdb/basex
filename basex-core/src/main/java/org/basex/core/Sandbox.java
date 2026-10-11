@@ -64,7 +64,7 @@ public abstract class Sandbox {
   protected static Context context;
 
   /**
-   * Executes a command and returns exceptions into assertion errors.
+   * Executes a command and turns exceptions into assertion errors.
    * @param cmd command to be run
    * @return string result
    */
@@ -78,7 +78,7 @@ public abstract class Sandbox {
   }
 
   /**
-   * Sets an option and returns exceptions into assertion errors.
+   * Sets an option and turns exceptions into assertion errors.
    * @param option option to be set
    * @param value value to be assigned
    */
@@ -87,7 +87,7 @@ public abstract class Sandbox {
   }
 
   /**
-   * Runs a query and returns exceptions into assertion errors.
+   * Runs a query and turns exceptions into assertion errors.
    * @param query query to be evaluated
    * @return string result
    */
@@ -608,7 +608,7 @@ public abstract class Sandbox {
   }
 
   /**
-   * Triggers function inlining.
+   * Triggers loop unrolling.
    * @param enable flag
    */
   protected static void unroll(final boolean enable) {
@@ -729,14 +729,14 @@ public abstract class Sandbox {
     private final CountDownLatch stopSignal;
     /** Client session. */
     private final ClientSession session;
-    /** Command string. */
+    /** Command. */
     private final Command cmd;
     /** Fail flag. */
     public String error;
 
     /**
      * Client constructor.
-     * @param c command string to execute
+     * @param c command to execute
      * @param start start signal
      * @param stop stop signal
      * @throws IOException I/O exception

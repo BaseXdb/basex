@@ -309,7 +309,7 @@ public final class ClientListener extends Thread implements ClientInfo {
 
   /**
    * Returns the context of this session.
-   * @return user reference
+   * @return database context
    */
   public Context context() {
     return context;

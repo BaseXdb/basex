@@ -111,7 +111,7 @@ public final class JNodeTest extends Test {
 
   @Override
   public Boolean subsumes(final Type type) {
-    // [ 'yes ']/self::node();
+    // [ 'yes' ]/self::node();
     if(kind == Kind.NODE) return Boolean.TRUE;
     // (<who/>, [ 'knows' ])/self::jnode(no-one)
     final Kind kn = type.kind();

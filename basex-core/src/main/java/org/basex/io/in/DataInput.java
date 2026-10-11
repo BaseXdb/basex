@@ -44,7 +44,7 @@ public final class DataInput extends BufferInput {
 
   /**
    * Reads a double value.
-   * @return byte array
+   * @return double value
    * @throws IOException I/O exception
    */
   public double readDouble() throws IOException {
@@ -86,7 +86,7 @@ public final class DataInput extends BufferInput {
 
   /**
    * Reads a token array.
-   * @return double array
+   * @return token array
    * @throws IOException I/O exception
    */
   public byte[][] readTokens() throws IOException {
@@ -134,7 +134,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Read a long value.
+   * Reads a long value.
    * @return read value
    * @throws IOException I/O exception
    */

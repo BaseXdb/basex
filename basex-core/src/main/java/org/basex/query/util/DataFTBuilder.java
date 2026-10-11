@@ -203,7 +203,7 @@ final class DataFTBuilder {
     int off = 0;
     for(XNode nd = node; !nd.is(ancestor); nd = nd.parent()) {
       for(final GNode sibling : nd.precedingSiblingIter(false)) {
-        // comments and processing instructions are no part of the string value
+        // comments and processing instructions are not part of the string value
         if(sibling.kind().oneOf(Kind.ELEMENT, Kind.TEXT)) off += sibling.string().length;
       }
     }

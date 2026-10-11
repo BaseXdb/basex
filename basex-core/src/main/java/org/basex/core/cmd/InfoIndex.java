@@ -66,11 +66,11 @@ public final class InfoIndex extends AInfo {
   }
 
   /**
-   * Prints information on the specified index.
+   * Returns information on the specified index.
    * @param idx index type
    * @param data data reference
    * @param options main options
-   * @return success flag
+   * @return information
    */
   private static byte[] info(final CmdIndexInfo idx, final Data data, final MainOptions options) {
     return switch(idx) {

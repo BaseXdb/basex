@@ -3,7 +3,7 @@ package org.basex.gui.listener;
 import java.awt.event.*;
 
 /**
- * Listener interface for released keys.
+ * Listener interface for pressed keys.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -86,7 +86,7 @@ public abstract class QueryModule {
   public @interface Updating { }
 
   /**
-   * Java code is treated as "nondeterministic", as its behavior cannot be predicted from
+   * Java code is treated as "nondeterministic", as its behavior cannot be predicted by
    * the XQuery processor. You may annotate a function as {@link Deterministic} if you
    * know that it will have no side effects and will always yield the same result.
    */

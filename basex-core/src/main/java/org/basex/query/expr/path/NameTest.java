@@ -214,7 +214,7 @@ public final class NameTest extends Test {
     if(type instanceof final NodeType ntype && ntype.test instanceof final NameTest nt) {
       if(nt.scope.oneOf(scope, Scope.FLEXIBLE, Scope.FULL)) return matches(nt.qname);
     }
-    // (<who/>, <knows/>)/self::no-one)
+    // (<who/>, <knows/>)/self::no-one
     return null;
   }
 

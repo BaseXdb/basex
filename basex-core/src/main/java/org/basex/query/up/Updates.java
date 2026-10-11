@@ -33,7 +33,7 @@ import org.basex.util.list.*;
  * <p>Updates work like the following:</p>
  *
  * <ol>
- * <li> Each call of an updating expression creates an {@link NodeUpdate}.</li>
+ * <li> Each call of an updating expression creates a {@link NodeUpdate}.</li>
  * <li> All update primitives for a snapshot/query are collected here.</li>
  * <li> Primitives are kept separately for each database that is addressed. This
  *      way we can operate on PRE values instead of node IDs, skip mapping

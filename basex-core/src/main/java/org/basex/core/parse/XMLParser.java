@@ -240,11 +240,11 @@ final class XMLParser extends CommandParser {
    *   <li> labels for text nodes if prefixed with "#"</li>
    *   <li> labels for text or descendant nodes if prefixed with "<"</li>
    * </ul>
-   * Arguments are optional if they suffixed with "?". Examples:
+   * Arguments are optional if they are suffixed with "?". Examples:
    * <ul>
    *   <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
    *     attribute and may have one text node, but nothing else</li>
-   *   <li> <code>{}</code> means that the command must not have any arguments }</li>
+   *   <li> <code>{}</code> means that the command must not have any arguments</li>
    * </ul>
    * @param root root node
    * @param checks checks to be performed

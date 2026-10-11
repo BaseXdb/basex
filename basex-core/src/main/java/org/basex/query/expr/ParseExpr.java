@@ -393,7 +393,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression to a string.
+   * Converts an item to a string.
    * @param item item to be converted
    * @return string
    * @throws QueryException query exception
@@ -403,7 +403,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression to a string.
+   * Converts an item to a string.
    * @param item item to be converted
    * @param expr expression that yielded the item (can be {@code null})
    * @return string
@@ -730,7 +730,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to a node.
+   * Evaluates an expression to a node.
    * @param expr expression
    * @param qc query context
    * @return node
@@ -775,7 +775,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression to an atomized item of the given type.
+   * Evaluates an expression to an atomized item.
    * @param expr expression
    * @param qc query context
    * @return atomized item
@@ -853,7 +853,7 @@ public abstract class ParseExpr extends Expr {
    * Evaluates an expression to a binary item.
    * @param expr expression
    * @param qc query context
-   * @return Base64 item, or {@code null} if the expression yields an empty sequence
+   * @return binary item, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
   protected final Bin toBinOrNull(final Expr expr, final QueryContext qc) throws QueryException {

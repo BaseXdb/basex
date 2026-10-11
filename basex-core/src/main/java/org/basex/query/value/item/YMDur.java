@@ -84,8 +84,8 @@ public final class YMDur extends Dur {
   }
 
   /**
-   * Returns the years and months.
-   * @return year
+   * Returns the duration in months.
+   * @return months
    */
   public long ymd() {
     return months;

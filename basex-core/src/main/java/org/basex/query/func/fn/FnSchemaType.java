@@ -140,7 +140,7 @@ public class FnSchemaType extends StandardFunc {
     }
 
     /**
-     * Create a function item for a new instance.
+     * Creates a function item for a new instance.
      * @param info input info
      * @param types types to be annotated
      * @return function item
@@ -185,7 +185,7 @@ public class FnSchemaType extends StandardFunc {
     }
 
     /**
-     * Create a function item for a new instance.
+     * Creates a function item for a new instance.
      * @param type type to be matched
      * @param qc query context
      * @param info input info

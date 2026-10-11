@@ -385,7 +385,7 @@ public class IdPreMap {
     final int end = pre - c - 1;
     final int startIndex = findPre(pre);
 
-    // remove all updates which has affected records which now have to be deleted
+    // remove all updates which have affected records which now have to be deleted
     final int removeStart = startIndex < rows && pres[startIndex] < pre ?
       startIndex + 1 : startIndex;
     int removeEnd = -1;
@@ -550,7 +550,7 @@ public class IdPreMap {
   }
 
   /**
-   * Removes a records from the table and the ID index.
+   * Removes records from the table and the ID index.
    * @param s start index of records in the table (inclusive)
    * @param e end index of records in the table (inclusive)
    */

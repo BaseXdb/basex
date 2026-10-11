@@ -58,7 +58,7 @@ public final class FnTranslate extends StandardFunc {
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&
         withSt.one() && withSt.type.isStringOrUntyped()) {
-      // tokenize($value, '', 'abcde') → string($value)
+      // translate($value, '', 'abcde') → string($value)
       return cc.function(Function.STRING, info, value);
     }
     return this;

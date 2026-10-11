@@ -8,7 +8,7 @@ import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
- * Visualization preferences.
+ * Result preferences.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

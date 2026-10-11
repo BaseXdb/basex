@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * A window {@code start} of {@code end} condition.
+ * A window {@code start} or {@code end} condition.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler

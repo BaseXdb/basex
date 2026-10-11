@@ -26,7 +26,7 @@ public final class Bln extends Item {
   private double score;
 
   /**
-   * Constructor, adding a full-text score.
+   * Constructor.
    * @param value boolean value
    */
   private Bln(final boolean value) {

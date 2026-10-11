@@ -116,8 +116,8 @@ public final class BoolList extends ElementList {
   }
 
   /**
-   * Finishes the int array.
-   * @return int array
+   * Finishes the boolean array.
+   * @return boolean array
    */
   public boolean[] toArray() {
     return Arrays.copyOf(list, size);

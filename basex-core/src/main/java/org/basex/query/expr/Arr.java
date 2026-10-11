@@ -229,7 +229,7 @@ public abstract class Arr extends ParseExpr {
           if(contradict(expr1, expr2, true) || contradict(expr2, expr1, true)) return true;
 
           // 'a'[. = 'a' or . = 'b'] → 'a'[. = ('a', 'b')]
-          // $v[. != 'a'][. != 'b'] → $v[not(. = ('a', 'b')]
+          // $v[. != 'a'][. != 'b'] → $v[not(. = ('a', 'b'))]
           final Expr merged = expr1.mergeEbv(expr2, or, cc);
           if(merged != null) {
             cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
@@ -369,7 +369,7 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * {@inheritDoc}
-   * Must be overwritten by implementing class.
+   * Must be overridden by implementing class.
    */
   @Override
   public boolean equals(final Object obj) {

@@ -20,7 +20,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   private double[] dragSize;
   /** Current drag position. */
   private double dragPos;
-  /** Proportions of visible panels. */
+  /** Proportions of hidden panels. */
   private double[] hiddenSize;
   /** Cached sizes (when panel is hidden). */
   private double[] cachedSize;
@@ -107,7 +107,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   }
 
   /**
-   * Sets proportional panel sizes (sum must be 1.0).
+   * Shows or hides panels.
    * @param show show/hide flag
    */
   public void visible(final boolean show) {

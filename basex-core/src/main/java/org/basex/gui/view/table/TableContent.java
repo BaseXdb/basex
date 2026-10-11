@@ -21,7 +21,7 @@ import org.basex.util.*;
 final class TableContent extends BaseXBack {
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
-  /** View reference. */
+  /** Table data. */
   private final TableData tdata;
   /** GUI reference. */
   private final GUI gui;

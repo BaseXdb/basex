@@ -304,7 +304,7 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
    * @return {@code false} if the function raised an error
    */
   private boolean findAndProcess(final Annotation ann, final Object message) {
-    // check if an HTTP session exists, and if it still valid
+    // check if an HTTP session exists, and if it is still valid
     try {
       if(session != null) session.getCreationTime();
     } catch(final IllegalStateException ex) {

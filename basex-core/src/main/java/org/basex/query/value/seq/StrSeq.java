@@ -14,7 +14,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Sequence of items of type {@link Str xs:anyURI}, {@link Str xs:untypedAtomic} or
+ * Sequence of items of type {@link Uri xs:anyURI}, {@link Atm xs:untypedAtomic} or
  * instance of {@link Str xs:string}, containing at least two of them.
  *
  * @author BaseX Team, BSD License

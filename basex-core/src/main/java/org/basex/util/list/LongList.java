@@ -127,7 +127,7 @@ public final class LongList extends ElementList {
   }
 
   /**
-   * Sorts the data and removes distinct values.
+   * Sorts the data and removes duplicate values.
    * @return self reference
    */
   public LongList ddo() {

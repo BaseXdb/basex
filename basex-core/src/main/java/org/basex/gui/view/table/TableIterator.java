@@ -14,7 +14,7 @@ final class TableIterator {
   private final TableData tdata;
   /** Data reference. */
   private final Data data;
-  /** Current PRE value. */
+  /** Last PRE value. */
   private int last;
   /** Current element. */
   private int elem;
@@ -25,7 +25,7 @@ final class TableIterator {
   int pre;
   /** Current column. */
   int col;
-  /** Element flag. */
+  /** Text flag. */
   boolean text;
 
   /**

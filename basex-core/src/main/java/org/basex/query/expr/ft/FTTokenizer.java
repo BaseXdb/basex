@@ -79,7 +79,7 @@ public final class FTTokenizer {
   /**
    * Returns cached query tokens.
    * @param input query token
-   * @return number of occurrences
+   * @return query tokens
    * @throws QueryException query exception
    */
   FTTokens cache(final byte[] input) throws QueryException {

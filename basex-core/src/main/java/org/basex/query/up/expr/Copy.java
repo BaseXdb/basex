@@ -70,7 +70,7 @@ abstract class Copy extends Arr {
 
   /**
    * Returns the position of the updating expression.
-   * @return result expression
+   * @return position
    */
   static int update() {
     return 0;
@@ -78,7 +78,7 @@ abstract class Copy extends Arr {
 
   /**
    * Returns the position of the target expression.
-   * @return target expression
+   * @return position
    */
   static int target() {
     return 1;

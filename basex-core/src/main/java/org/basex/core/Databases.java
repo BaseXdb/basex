@@ -55,7 +55,7 @@ public final class Databases {
 
   /**
    * Returns the sorted names of all databases.
-   * @return databases and backups
+   * @return databases
    */
   public StringList list() {
     return list(null, null, false);

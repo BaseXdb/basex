@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class DialogParsing extends BaseXBack {
-  /** JSON options panel. */
+  /** Parser options panels. */
   private final DialogParser[] parsers;
 
   /** Format label. */
@@ -87,7 +87,7 @@ final class DialogParsing extends BaseXBack {
   }
 
   /**
-   * Sets the parsing options.
+   * Updates the parsing options.
    */
   private void update() {
     for(final DialogParser dp : parsers) dp.update();

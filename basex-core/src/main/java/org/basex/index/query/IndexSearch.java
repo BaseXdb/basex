@@ -3,7 +3,7 @@ package org.basex.index.query;
 import org.basex.index.*;
 
 /**
- * This class provides an index search definition.
+ * This interface provides an index search definition.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

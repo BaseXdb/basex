@@ -284,7 +284,7 @@ public final class AtomicUpdateCache {
   public void applyUpdates() {
     // check if previous update still in buffer
     flush();
-    // value updates applied front-to-back, doens't matter as there are no row shifts
+    // value updates applied front-to-back, doesn't matter as there are no row shifts
     for(final BasicUpdate update : valueUpdates) update.apply(data);
     // structural updates are applied back-to-front
     for(int i = structUpdates.size() - 1; i >= 0; i--) structUpdates.get(i).apply(data);
@@ -343,7 +343,7 @@ public final class AtomicUpdateCache {
   /**
    * Calculates the PRE value of a given node before/after updates.
    *
-   * Finds all updates that affect the given node N. The result is than calculated based
+   * Finds all updates that affect the given node N. The result is then calculated based
    * on N and the accumulated PRE value shifts introduced by these updates.
    *
    * If a node has been inserted at position X and this method is used to calculate the

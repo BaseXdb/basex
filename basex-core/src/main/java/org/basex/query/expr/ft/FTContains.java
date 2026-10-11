@@ -20,7 +20,7 @@ import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
- * Abstract FTContains expression.
+ * FTContains expression.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

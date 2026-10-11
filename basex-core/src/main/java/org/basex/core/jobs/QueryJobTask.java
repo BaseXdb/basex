@@ -18,7 +18,7 @@ public final class QueryJobTask implements Runnable {
   public final long interval;
   /** Cron expression (can be {@code null}). */
   public final Cron cron;
-  /** End time (@link {@link Long#MAX_VALUE}: no end). */
+  /** End time ({@link Long#MAX_VALUE}: no end). */
   public final long end;
 
   /** Job pool (for rescheduling). */
@@ -30,7 +30,7 @@ public final class QueryJobTask implements Runnable {
   public long start;
   /** Next cron occurrence as local wall-clock time ({@code null} if no cron expression exists). */
   private LocalDateTime next;
-  /** Handle for cancelling the scheduled task (can be {@code null}). */
+  /** Handle for canceling the scheduled task (can be {@code null}). */
   private ScheduledFuture<?> future;
   /** Indicates that the task was canceled. */
   private boolean canceled;

@@ -146,7 +146,7 @@ public final class ViewData {
    * Returns the size for the specified node.
    * @param data data reference
    * @param pre child node
-   * @return parent node
+   * @return size
    */
   public static int size(final Data data, final int pre) {
     return data.size(pre, data.kind(pre));

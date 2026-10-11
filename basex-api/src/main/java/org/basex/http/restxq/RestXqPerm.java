@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class RestXqPerm implements Comparable<RestXqPerm> {
-  /** Permission path (with heading and trailing slash). */
+  /** Permission path (with leading and trailing slash). */
   private final String path;
   /** Permission variable (can be {@code null}). */
   final QNm var;

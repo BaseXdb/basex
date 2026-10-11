@@ -13,7 +13,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * This class defines a parser, which is used to create new databases instances.
+ * This class defines a parser, which is used to create new database instances.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -27,7 +27,7 @@ public class Parser extends Job {
   protected final MainOptions options;
   /** Target path (empty, or suffixed with a single slash). */
   protected String target = "";
-  /** Parses source or {@code null}. */
+  /** Parsed source or {@code null}. */
   protected IO source;
 
   /**
@@ -102,7 +102,7 @@ public class Parser extends Job {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Returns a parser instance for creating an empty databases.
+   * Returns a parser instance for creating an empty database.
    * @param options main options
    * @return parser
    */

@@ -12,7 +12,7 @@ package org.basex.query;
 @FunctionalInterface
 public interface QueryBiFunction<T, U, R> {
   /**
-   * Applies this function to the given argument.
+   * Applies this function to the given arguments.
    *
    * @param t first function argument
    * @param u second function argument

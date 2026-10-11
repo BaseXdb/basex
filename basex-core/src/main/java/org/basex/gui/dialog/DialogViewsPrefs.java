@@ -19,7 +19,7 @@ final class DialogViewsPrefs extends BaseXBack {
   /** GUI reference. */
   private final GUI gui;
 
-  /** Show names checkbox. */
+  /** Label attributes. */
   private final BaseXTextField labels;
 
   /** Slim rectangles to text length. */
@@ -35,7 +35,7 @@ final class DialogViewsPrefs extends BaseXBack {
   private final BaseXCheckBox mapAtts;
   /** Focus checkbox. */
   private final BaseXCheckBox mousefocus;
-  /** Select layout algorithm. */
+  /** Map offsets. */
   private final BaseXCombo mapOffsets;
 
   /** Red slider. */

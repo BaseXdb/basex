@@ -66,7 +66,7 @@ public abstract class Benchmark extends SandboxTest {
   }
 
   /**
-   * Performs the specified query n times and and returns the result.
+   * Performs the specified query n times and returns the result.
    * @param query query to be evaluated
    * @param n number of runs
    * @return resulting string

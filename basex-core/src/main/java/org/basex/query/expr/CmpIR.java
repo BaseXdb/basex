@@ -49,7 +49,7 @@ public final class CmpIR extends CmpRange {
    * @param info input info (can be {@code null})
    * @param expr expression to be compared
    * @param min minimum position
-   * @param max minimum position (inclusive)
+   * @param max maximum position (inclusive)
    * @return expression
    * @throws QueryException query exception
    */

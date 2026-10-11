@@ -16,7 +16,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
   private final O value;
 
   /**
-   * Constructor without default value.
+   * Constructor with default value.
    * @param name name
    * @param value value
    */

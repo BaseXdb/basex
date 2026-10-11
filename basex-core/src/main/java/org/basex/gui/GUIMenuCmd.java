@@ -551,7 +551,7 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Shows the XQuery view. */
+  /** Shows the editor view. */
   C_SHOW_EDITOR(EDITOR, "% E", Requires.NOTHING, GUIOptions.SHOWEDITOR),
 
   /** Jumps to the currently edited file. */
@@ -619,7 +619,7 @@ public enum GUIMenuCmd implements GUICommand {
   /** Shows the tree view. */
   C_SHOW_TREE(TREE, "% 2", Requires.DATA, GUIOptions.SHOWTREE),
 
-  /** Shows the tree view. */
+  /** Shows the folder view. */
   C_SHOW_FOLDER(FOLDER, "% 3", Requires.DATA, GUIOptions.SHOWFOLDER),
 
   /** Shows the plot view. */
@@ -932,7 +932,7 @@ public enum GUIMenuCmd implements GUICommand {
   }
 
   /**
-   * Returns a database function for the first node in a node set.
+   * Returns a database function for the specified node in a node set.
    * @param nodes node set
    * @param index node index
    * @return function string

@@ -26,14 +26,14 @@ public final class Strings {
   public static final String UTF16 = "UTF-16";
   /** UTF16BE encoding string. */
   public static final String UTF16BE = "UTF-16BE";
-  /** UTF16 encoding string. */
+  /** UTF16LE encoding string. */
   public static final String UTF16LE = "UTF-16LE";
-  /** UTF16 encoding string. */
+  /** UTF32 encoding string. */
   public static final String UTF32 = "UTF-32";
 
   /** UTF8 encoding strings. */
   private static final String[] ALL_UTF8 = { UTF8, "UTF8" };
-  /** UTF16-LE encoding strings. */
+  /** UTF16 encoding strings. */
   private static final String[] ALL_UTF16 = { UTF16, "UTF16" };
   /** UTF32 encoding strings. */
   private static final String[] ALL_UTF32 = { UTF32, "UTF32" };

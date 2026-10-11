@@ -326,7 +326,7 @@ public final class DataAccess implements Closeable {
   /**
    * Writes an integer value to the specified position.
    * @param pos write position
-   * @param value byte array to be appended
+   * @param value value to be written
    */
   public void write4(final long pos, final int value) {
     final Reader writer = writer();

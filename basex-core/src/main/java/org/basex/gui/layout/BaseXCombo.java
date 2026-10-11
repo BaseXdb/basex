@@ -312,7 +312,7 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Assigns the current checkbox value to the option specified in the constructor.
+   * Assigns the current combo box value to the option specified in the constructor.
    */
   @SuppressWarnings("unchecked")
   public void assign() {

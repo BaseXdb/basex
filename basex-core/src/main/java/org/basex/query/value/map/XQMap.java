@@ -212,7 +212,7 @@ public abstract class XQMap extends XQStruct {
   public abstract XQMap put(Item key, Value value) throws QueryException;
 
   /**
-   * Puts a value with the specified key into this map.
+   * Puts a value at the specified index into this map.
    * @param index map index (starting with 0, must be valid)
    * @param value value to insert
    * @return updated map
@@ -221,7 +221,7 @@ public abstract class XQMap extends XQStruct {
   public abstract XQMap putAt(int index, Value value) throws QueryException;
 
   /**
-   * Removed a key from this map.
+   * Removes a key from this map.
    * @param key key to remove
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception

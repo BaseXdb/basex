@@ -596,7 +596,7 @@ public final class Client {
   /**
    * Returns the payload.
    * @param request request data
-   * @return input stream
+   * @return payload
    * @throws IOException I/O exception
    */
   public static byte[] payload(final Request request) throws IOException {

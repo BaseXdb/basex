@@ -29,7 +29,7 @@ public final class DataOutput extends OutputStream {
 
   /**
    * Constructor, specifying a file.
-   * @param input input to be read
+   * @param input file to be written
    * @throws IOException I/O exception
    */
   public DataOutput(final IOFile input) throws IOException {
@@ -39,7 +39,7 @@ public final class DataOutput extends OutputStream {
   /**
    * Constructor, specifying a file and a buffer size.
    * The specified buffer size is used.
-   * @param input input to be read
+   * @param input file to be written
    * @param bufsize size of the buffer to use
    * @throws IOException I/O exception
    */
@@ -82,7 +82,7 @@ public final class DataOutput extends OutputStream {
 
   /**
    * Writes a double value.
-   * @param num array to be written
+   * @param num value to be written
    * @return number of written bytes
    * @throws IOException I/O exception
    */
@@ -130,7 +130,7 @@ public final class DataOutput extends OutputStream {
    * Writes a compressed integer value; see {@link Num} for more.
    * By compressing, the size of the database files is reduced.
    * @param v value to be written
-   * @return number of written values
+   * @return number of written bytes
    * @throws IOException I/O exception
    */
   public int writeNum(final int v) throws IOException {

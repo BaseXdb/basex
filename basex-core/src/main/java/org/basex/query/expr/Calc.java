@@ -422,7 +422,7 @@ public enum Calc {
    * @param item1 first item
    * @param item2 second item
    * @param info input info (can be {@code null})
-   * @return result type
+   * @return result item
    * @throws QueryException query exception
    */
   public abstract Item eval(Item item1, Item item2, InputInfo info) throws QueryException;
@@ -443,7 +443,7 @@ public enum Calc {
    * Returns the result type of this calculation.
    * @param type1 first item type
    * @param type2 second item type
-   * @return result expression, or {@code null} if expression cannot be optimized
+   * @return result type
    */
   public abstract Type type(Type type1, Type type2);
 
@@ -505,7 +505,7 @@ public enum Calc {
   }
 
   /**
-   * Returns a duration type error.
+   * Returns a duration or raises a type error.
    * @param info input info (can be {@code null})
    * @param item item
    * @return duration

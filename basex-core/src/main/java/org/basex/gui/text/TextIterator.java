@@ -143,7 +143,7 @@ final class TextIterator {
   }
 
   /**
-   * Checks if the character position equals the word end.
+   * Checks if the character position precedes the word end.
    * @return result of check
    */
   boolean more() {

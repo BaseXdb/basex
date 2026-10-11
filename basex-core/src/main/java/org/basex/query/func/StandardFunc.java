@@ -100,7 +100,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Simplifies the types of all arguments. This function is overwritten by functions that
+   * Simplifies the types of all arguments. This function is overridden by functions that
    * rely on the original argument type.
    * @param cc compilation context
    * @throws QueryException query exception
@@ -861,7 +861,6 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression and returns serialization parameters.
-   * Constructor for serialization functions.
    * @param expr expression (can be empty)
    * @param qc query context
    * @return serialization parameters

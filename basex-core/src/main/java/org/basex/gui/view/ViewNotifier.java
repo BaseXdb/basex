@@ -29,7 +29,7 @@ public final class ViewNotifier {
   /** Reference to the main window. */
   final GUI gui;
 
-  /** Zoomed rectangle history. */
+  /** Marked nodes history. */
   private final DBNodes[] marked = new DBNodes[MAXHIST];
   /** Zoomed rectangle history. */
   private final DBNodes[] cont = new DBNodes[MAXHIST];
@@ -63,7 +63,7 @@ public final class ViewNotifier {
     final Data data = initHistory(gui.context);
     if(data != null) {
       // if a large database is opened, the user is asked if complex
-      /// visualizations should be closed first
+      // visualizations should be closed first
       final long size = data.meta.dbSize();
       boolean open = false;
       for(final View view : views) open |= view.visible() && view.db();

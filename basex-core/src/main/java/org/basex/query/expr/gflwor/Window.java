@@ -180,7 +180,7 @@ public final class Window extends Clause {
   /**
    * Evaluator for sliding windows.
    * @param sub wrapped evaluator
-   * @return evaluator for tumbling windows
+   * @return evaluator for sliding windows
    */
   private Eval slidingEval(final Eval sub) {
     return new WindowEval() {
@@ -407,7 +407,7 @@ public final class Window extends Clause {
 
     /**
      * Reads a new current item and populates the {@code next} variable if it's used.
-     * @return next item
+     * @return {@code true} if a new current item was read
      * @throws QueryException query exception
      */
     final boolean readNext() throws QueryException {

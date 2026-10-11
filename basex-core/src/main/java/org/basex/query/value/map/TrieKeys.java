@@ -25,7 +25,7 @@ final class TrieKeys implements Iterable<Item> {
   private final int size;
 
   /**
-   * Empty constructor.
+   * Constructor.
    * @param keys keys
    */
   TrieKeys(final Item... keys) {

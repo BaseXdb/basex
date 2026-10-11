@@ -126,13 +126,13 @@ public interface BuildText {
   byte[] ATTL = token("<!ATTLIST");
   /** DTD: ENTITY. */
   byte[] ENT = token("<!ENTITY");
-  /** DTD: NOTATION. */
+  /** DTD: conditional section start. */
   byte[] COND = token("<![");
-  /** DTD: NOTATION. */
+  /** DTD: conditional section end. */
   byte[] CONE = token("]]>");
-  /** DTD: NOTATION. */
+  /** DTD: INCLUDE. */
   byte[] INCL = token("INCLUDE");
-  /** DTD: NOTATION. */
+  /** DTD: IGNORE. */
   byte[] IGNO = token("IGNORE");
   /** DTD: XML. */
   byte[] XDECL = token("<?");

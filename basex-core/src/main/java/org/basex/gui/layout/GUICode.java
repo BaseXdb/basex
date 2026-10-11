@@ -3,7 +3,7 @@ package org.basex.gui.layout;
 import javax.swing.*;
 
 /**
- * This class can be overwritten to define code snippets that are to be evaluated
+ * This class can be overridden to define code snippets that are to be evaluated
  * after all pending events.
  *
  * @author BaseX Team, BSD License

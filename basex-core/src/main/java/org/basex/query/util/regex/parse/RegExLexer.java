@@ -171,7 +171,7 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
   }
 
   /**
-   * Match a string against the input.
+   * Matches a string against the input.
    * @param string the string to be matched
    * @return true if the input matches the string
    */

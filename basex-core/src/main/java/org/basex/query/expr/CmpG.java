@@ -59,7 +59,7 @@ public class CmpG extends Cmp {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate if one value is empty:
     // () eq local:expensive() → ()
-    // void(123) = 1 → boolean(void('123'))
+    // void(123) = 1 → boolean(void(123))
     Expr expr = emptyExpr();
     if(expr != this) return cc.replaceWith(this, cc.function(BOOLEAN, info, expr));
 
@@ -537,7 +537,7 @@ public class CmpG extends Cmp {
     final boolean seqR1 = !exprR1.seqType().one(), seqR2 = !exprR2.seqType().one();
     if(or) {
       /* do not merge if second comparison was inverted and left operand or
-       * second right operand contain are not a single item. examples:
+       * second right operand are not a single item. examples:
        * $number  = 2  or  not($number  = 4)
        * $numbers = 3  or  not($numbers = 4)  */
       if(not2 && (seqR2 || seqL)) return null;
@@ -550,7 +550,7 @@ public class CmpG extends Cmp {
        * second comparison was inverted and right operand is not a single item. examples:
        * $numbers = 2      and  $numbers = 2
        * $number = (1, 2)  and  $number  = 3
-       * $number = 1       and  not($number = (2, 3)  */
+       * $number = 1       and  not($number = (2, 3))  */
       if(seqL || seqR1 || seqR2 && !not2) return null;
       /* rewriting is possible in all other cases. examples:
        * $number != 1  and  $number != 2            → not($number = (1, 2))

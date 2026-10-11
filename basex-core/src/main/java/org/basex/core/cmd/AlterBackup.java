@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Evaluates the 'restore' command and restores a backup of a database.
+ * Evaluates the 'alter backup' command and renames the backups of a database.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -56,7 +56,7 @@ public final class AlterBackup extends ABackup {
   }
 
   /**
-   * Drops a backup with the specified name.
+   * Renames a backup with the specified name.
    * @param name name of backup
    * @param newname new name
    * @param sopts static options

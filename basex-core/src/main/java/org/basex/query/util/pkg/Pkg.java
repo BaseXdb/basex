@@ -153,7 +153,7 @@ public final class Pkg {
   }
 
   /**
-   * Choose module directory (support for both 2010 and 2012 specs).
+   * Chooses module directory (support for both 2010 and 2012 specs).
    * @param pkgPath package path
    * @return module directory
    */

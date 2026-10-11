@@ -26,7 +26,7 @@ public final class ThesList {
   }
 
   /**
-   * Merges two list.
+   * Merges two lists.
    * @param tl second list
    */
   public void merge(final ThesList tl) {

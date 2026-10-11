@@ -209,7 +209,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       compiled = true;
       simple = !expr.has(Flag.CTX);
 
-      // dynamic compilation: refine parameter types to arguments types of function call
+      // dynamic compilation: refine parameter types to argument types of function call
       final SeqType[] callTypes = cc.dynamic ? cc.qc.functions.seqTypes(this, cc) : null;
       final int pl = params.length;
       if(callTypes != null) {

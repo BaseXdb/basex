@@ -50,7 +50,7 @@ public final class Enums {
   /**
    * Helper function for converting enumeration names to strings.
    * @param en enumeration
-   * @return lower-case string with '-' replaced by '-';
+   * @return lower-case string with '_' replaced by '-'
    */
   public static String string(final Enum<?> en) {
     return en.name().toLowerCase(Locale.ENGLISH).replace('_', '-');

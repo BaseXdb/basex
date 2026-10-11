@@ -80,7 +80,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns the item at the given position.
-   * The specified value must be lie within the valid bounds.
+   * The specified value must lie within the valid bounds.
    * @param index index position
    * @return item
    */

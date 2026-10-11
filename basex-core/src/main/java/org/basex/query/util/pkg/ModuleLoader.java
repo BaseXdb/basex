@@ -142,7 +142,7 @@ public final class ModuleLoader {
 
   /**
    * Returns a reference to the specified class.
-   * @param name fully classified class name
+   * @param name fully qualified class name
    * @return found class
    * @throws ClassNotFoundException class not found exception
    */

@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
 
 /**
  * Abstract class for representing XQuery expressions.
- * Expression are divided into {@link ParseExpr} and {@link Value} classes.
+ * Expressions are divided into {@link ParseExpr} and {@link Value} classes.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -145,7 +145,7 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns the atomized items.
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @return atomized item
+   * @return atomized items
    * @throws QueryException query exception
    */
   public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
@@ -186,7 +186,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the unwrapped items.
    * @param qc query context
-   * @return item
+   * @return value
    * @throws QueryException query exception
    */
   public abstract Value unwrappedValue(QueryContext qc) throws QueryException;
@@ -232,7 +232,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the data reference bound to this expression. This method is currently overwritten
+   * Returns the data reference bound to this expression. This method is currently overridden
    * by {@link DBNode}, {@link DBNodeSeq}, {@link AxisPath} and {@link VarRef}.
    * @return data reference (can be {@code null})
    */
@@ -257,7 +257,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Indicates if an expression has one of the specified compiler properties. This method must only
    * be called at compile time. It is invoked to test properties of sub-expressions.
-   * It returns {@code true} if at least flag matches an expression.
+   * It returns {@code true} if at least one flag matches an expression.
    * @param flags flags to be checked
    * @return result of check
    */
@@ -351,7 +351,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
-   * Simplifies the expression. Overwritten by many expressions;
+   * Simplifies the expression. Overridden by many expressions;
    * calls {@link #simplify(Simplify, CompileContext)} otherwise.
    * @param mode mode of simplification
    * @param cc compilation context
@@ -365,7 +365,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Refines the parameter types of a function expression.
-   * Overwritten by {@link FuncItem} and {@link Closure}.
+   * Overridden by {@link FuncItem} and {@link Closure}.
    * @param cc compilation context
    * @param argTypes argument types
    * @return refined or original expression
@@ -378,7 +378,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Simplifies the body of a function expression.
-   * Overwritten by {@link Closure}.
+   * Overridden by {@link Closure}.
    * @param mode mode of simplification
    * @param cc compilation context
    * @return simplified or original expression
@@ -416,7 +416,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns the static type of the resulting value.
-   * @return result of check
+   * @return sequence type
    */
   public abstract SeqType seqType();
 
@@ -474,7 +474,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Optimizes an expression for positional access.
-   * Overwritten by {@link Itr}, {@link Range}, {@link RangeSeq}}.
+   * Overridden by {@link Itr}, {@link Range}, {@link RangeSeq}.
    * @param op comparison operator
    * @param cc compilation context
    * @return boolean result, optimized or original expression
@@ -545,8 +545,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Tries to merge two expressions that are part of an EBV test.
-   * Called by {@link And}, {@link Or}), {@link Step} and {@link Filter}.
-   * Overwritten by {@link CmpG}, {@link CmpRange},
+   * Called by {@link And}, {@link Or}, {@link Step} and {@link Filter}.
+   * Overridden by {@link CmpG}, {@link CmpRange},
    * {@link IntPos}, {@link SimplePos} and others.
    * @param expr second expression
    * @param or union or intersection

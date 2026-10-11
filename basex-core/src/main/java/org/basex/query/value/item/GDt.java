@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class GDt extends ADate {
-  /** Date pattern. */
+  /** Date types. */
   private static final Type[] TYPES = { G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY };
   /** Date patterns. */
   private static final Pattern[] PATTERNS = {
@@ -29,7 +29,7 @@ public final class GDt extends ADate {
     Pattern.compile("--" + DD + '-' + DD + ZONE),
     Pattern.compile("---" + DD + ZONE)
   };
-  /** Date pattern. */
+  /** Date examples. */
   private static final String[] EXAMPLES = { XYEA, XYMO, XMON, XMDA, XDAY };
   /** Date zones. */
   private static final int[] ZONES = { 3, 4, 2, 3, 2 };

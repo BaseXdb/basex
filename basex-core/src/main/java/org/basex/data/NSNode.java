@@ -184,7 +184,7 @@ final class NSNode {
    */
   void delete(final int p, final int s) {
     final int sz = size;
-    // find the node to deleted
+    // find the node to be deleted
     int i = find(p);
     // if the node is not directly contained as a child, either start at array index 0 or
     // proceed with the next node in the child array to search for descendants of pre

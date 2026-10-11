@@ -115,7 +115,7 @@ public final class FnTrunk extends StandardFunc {
       }
     }
 
-    // trunk(1, (2 to 5))) → 1, trunk(2 to 5))
+    // trunk((1, (2 to 5))) → 1, trunk(2 to 5)
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];

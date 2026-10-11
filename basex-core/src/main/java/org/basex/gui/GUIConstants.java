@@ -38,12 +38,12 @@ import org.basex.util.list.*;
  *
  * <ul>
  *  <li> add a boolean visibility flag with the view name included
- *    in the {@link GUIOptions} class {@link GUIOptions#SHOWMAP})</li>
+ *    in the {@link GUIOptions} class (e.g. {@link GUIOptions#SHOWMAP})</li>
  *  <li> add strings for the menu text.</li>
  *  <li> optionally add localized translations in the .lang files
  *    (e.g. {@code c_showmap} and {@code c_showmaptt})</li>
  *  <li> add a corresponding command in the {@link GUIMenuCmd} class
- *   (e.g. {@link GUIMenuCmd#C_SHOW_MAP})and add a reference in the
+ *   (e.g. {@link GUIMenuCmd#C_SHOW_MAP}) and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
@@ -56,7 +56,7 @@ public final class GUIConstants {
 
   /** Internal name of the Map View. */
   public static final String MAPVIEW = "map";
-  /** Internal name of the Tree View. */
+  /** Internal name of the Folder View. */
   public static final String FOLDERVIEW = "folder";
   /** Internal name of the Text View. */
   public static final String TEXTVIEW = "text";
@@ -105,7 +105,7 @@ public final class GUIConstants {
 
   /**
    * Two-dimensional menu entries, containing the menu item commands.
-   * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
+   * {@link GUICommand#SEPARATOR} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_EXPORT, C_CLOSE, SEPARATOR,
@@ -154,7 +154,7 @@ public final class GUIConstants {
   public static final Cursor CURSORWAIT = new Cursor(Cursor.WAIT_CURSOR);
   /** Left/Right arrow cursor. */
   public static final Cursor CURSORMOVEH = new Cursor(Cursor.E_RESIZE_CURSOR);
-  /** Move cursor. */
+  /** Up/Down arrow cursor. */
   public static final Cursor CURSORMOVEV = new Cursor(Cursor.N_RESIZE_CURSOR);
   /** Text cursor. */
   public static final Cursor CURSORTEXT = new Cursor(Cursor.TEXT_CURSOR);
@@ -208,7 +208,7 @@ public final class GUIConstants {
   public static Color lightRed;
   /** Color: green. */
   public static Color green;
-  /** Color: cyan. */
+  /** Color: blue. */
   public static Color blue;
   /** Color: purple. */
   public static Color purple;

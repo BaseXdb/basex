@@ -222,7 +222,7 @@ public final class MapView extends View {
 
   /**
    * Finds the rectangle at the cursor position.
-   * @return focused rectangle
+   * @return true if the focus has changed
    */
   private boolean focus() {
     if(gui.updating || mainRects == null) return false;

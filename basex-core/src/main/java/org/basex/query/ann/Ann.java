@@ -19,7 +19,7 @@ public final class Ann {
   public final InputInfo info;
   /** Annotation definition ({@code null} if {@link #name} is assigned). */
   public final Annotation definition;
-  /** No-standard annotation ({@code null} if {@link #definition} is assigned). */
+  /** Non-standard annotation ({@code null} if {@link #definition} is assigned). */
   private final QNm name;
   /** Value. */
   private final Value value;

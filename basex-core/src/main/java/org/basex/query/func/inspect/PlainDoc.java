@@ -33,7 +33,7 @@ final class PlainDoc extends Inspect {
   }
 
   /**
-   * Parses a module and returns an inspection element.
+   * Returns an inspection element for the query context.
    * @return inspection element
    * @throws QueryException query exception
    */

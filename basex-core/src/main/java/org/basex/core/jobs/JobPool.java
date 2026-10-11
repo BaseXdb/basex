@@ -287,7 +287,7 @@ public final class JobPool {
   /**
    * Removes a job.
    * @param id ID
-   * @return return success flag
+   * @return success flag
    */
   public boolean remove(final String id) {
     // stop scheduled task; the job is stopped as well, as it may not be registered yet

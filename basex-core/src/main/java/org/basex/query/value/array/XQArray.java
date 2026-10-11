@@ -122,7 +122,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Returns a subsequence with the given start and length.
+   * Returns a subarray with the given start and length.
    * @param pos starting position
    * @param length number of items
    * @param job interruptible job
@@ -136,9 +136,9 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Returns a subsequence with the given start and length.
+   * Returns a subarray with the given start and length.
    * @param pos position of first member (>= 0)
-   * @param length number of members (1 &lt; length &lt; size())
+   * @param length number of members (1 &lt; length &lt; structSize())
    * @param job interruptible job
    * @return new subarray
    */
@@ -174,7 +174,7 @@ public abstract class XQArray extends XQStruct {
 
   /**
    * Removes a value at the given position.
-   * @param pos deletion position, must be between 0 and {@link #structSize() - 1}
+   * @param pos deletion position, must be between 0 and {@link #structSize()} - 1
    * @param job interruptible job
    * @return new array
    */
@@ -207,7 +207,7 @@ public abstract class XQArray extends XQStruct {
    * Returns an iterator over the values of this array.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
-   * @return array over the array values
+   * @return iterator over the array values
    */
   public ListIterator<Value> iterator(final long start) {
     return new ListIterator<>() {

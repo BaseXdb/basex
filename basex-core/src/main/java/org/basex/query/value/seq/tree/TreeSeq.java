@@ -74,7 +74,7 @@ public abstract class TreeSeq extends Seq {
    * Iterator over the members of this sequence.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
-   * @return array over the array members
+   * @return iterator over the sequence items
    */
   public abstract ListIterator<Item> iterator(long start);
 
@@ -88,8 +88,8 @@ public abstract class TreeSeq extends Seq {
 
   /**
    * Appends the given sequence to this sequence.
-   * @param other array to append to the end of this array
-   * @return resulting array
+   * @param other sequence to append to the end of this sequence
+   * @return resulting sequence
    */
   abstract TreeSeq append(TreeSeq other);
 

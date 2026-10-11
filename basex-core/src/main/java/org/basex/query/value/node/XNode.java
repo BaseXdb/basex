@@ -300,7 +300,7 @@ public abstract class XNode extends GNode {
 
   /**
    * Returns all namespaces defined for the node.
-   * Overwritten by {@link FElem} and {@link DBNode}.
+   * Overridden by {@link FElem} and {@link DBNode}.
    * @return namespace array or {@code null}
    */
   public Atts namespaces() {

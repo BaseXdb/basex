@@ -73,7 +73,7 @@ public final class Context {
 
   /** Marked nodes. {@code null} if database is closed. */
   public DBNodes marked;
-  /** Copied nodes {@code null} if database is closed. */
+  /** Copied nodes. {@code null} if database is closed. */
   public DBNodes copied;
   /** Focused node. */
   public int focused = -1;
@@ -129,7 +129,7 @@ public final class Context {
   }
 
   /**
-   * Private constructor.
+   * Constructor.
    * @param soptions static options
    */
   public Context(final StaticOptions soptions) {
@@ -168,7 +168,7 @@ public final class Context {
 
   /**
    * Returns the user of this context.
-   * @return user (can be {@code null} if it has not yet been assigned
+   * @return user (can be {@code null} if it has not yet been assigned)
    */
   public User user() {
     return user;

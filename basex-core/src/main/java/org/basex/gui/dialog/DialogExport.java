@@ -11,7 +11,7 @@ import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.io.*;
 
 /**
- * Dialog window for changing some project's preferences.
+ * Dialog window for exporting a database.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

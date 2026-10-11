@@ -257,7 +257,7 @@ final class EnglishStemmer extends InternalStemmer {
   /**
    * Returns the lower character at the specified position.
    * @param p position
-   * @return result of check
+   * @return character
    */
   private int l(final int p) {
     return lc(token[p]);

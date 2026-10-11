@@ -45,7 +45,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param external {@code external} flag
    * @param vs variable scope
    * @param doc xqdoc string
-   * @return static variable reference
+   * @return static variable
    * @throws QueryException query exception
    */
   public StaticVar declare(final Var var, final TokenSet imports, final Expr expr,

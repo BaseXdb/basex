@@ -23,7 +23,7 @@ public final class HtmlOptions extends Options {
   public static final BooleanOption NOCOLONS = new BooleanOption("nocolons", false);
   /** TagSoup option: norestart. */
   public static final BooleanOption NORESTART = new BooleanOption("norestart", false);
-  /** TagSoup option: nobogons. */
+  /** TagSoup option: ignorable. */
   public static final BooleanOption IGNORABLE = new BooleanOption("ignorable", false);
   /** TagSoup option: emptybogons. */
   public static final BooleanOption EMPTYBOGONS = new BooleanOption("emptybogons", false);
@@ -149,7 +149,7 @@ public final class HtmlOptions extends Options {
   }
 
   /*
-   * Copied from nu.validator.htmlparser.common.XmlViolationPolicy in order to avoid the
+   * Copied from nu.validator.htmlparser.common.Heuristics in order to avoid the
    * class path dependency of HtmlOptions on Validator.nu.
    *
    * Permission is hereby granted, free of charge, to any person obtaining a

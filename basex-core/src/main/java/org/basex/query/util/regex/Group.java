@@ -49,14 +49,14 @@ public final class Group extends RegExp {
   }
 
   /**
-   * Set the back-reference flag.
+   * Sets the back-reference flag.
    */
   public void setHasBackRef() {
     hasBackRef = true;
   }
 
   /**
-   * Get the back-reference flag.
+   * Gets the back-reference flag.
    * @return flag value
    */
   public boolean hasBackRef() {
@@ -64,7 +64,7 @@ public final class Group extends RegExp {
   }
 
   /**
-   * Get the atom path of this group.
+   * Gets the atom path of this group.
    * @return atom path
    */
   public Integer[] getAtomPath() {
@@ -72,7 +72,7 @@ public final class Group extends RegExp {
   }
 
   /**
-   * Set the Java number of this group.
+   * Sets the Java number of this group.
    * @param nr number
    */
   public void setNumber(final int nr) {
@@ -80,7 +80,7 @@ public final class Group extends RegExp {
   }
 
   /**
-   * Set the Java number of the marker group, which is only captured if this group is.
+   * Sets the Java number of the marker group, which is only captured if this group is.
    * @param nr number
    */
   public void setMarker(final int nr) {

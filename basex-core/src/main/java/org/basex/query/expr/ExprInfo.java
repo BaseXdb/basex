@@ -14,7 +14,7 @@ public abstract class ExprInfo {
    * Returns a string description of the expression. This method is only
    * called by error messages. Contrary to the {@link #toString()} method,
    * arguments are not included in the output.
-   * @return result of check
+   * @return description
    */
   public String description() {
     final TokenBuilder tb = new TokenBuilder();
@@ -53,7 +53,7 @@ public abstract class ExprInfo {
   /**
    * Returns a string representation of the expression that can be embedded in error messages.
    * Defaults to {@link #toString()}.
-   * @return class name
+   * @return string representation
    */
   public final String toErrorString() {
     return new QueryString(true).token(this).toString();

@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 /**
- * Names and namespace URIs of elements/attribute to index.
+ * Names and namespace URIs of elements/attributes to index.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

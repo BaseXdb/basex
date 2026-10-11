@@ -42,7 +42,7 @@ public final class QNmMap<E> extends QNmSet {
   /**
    * Returns the value for the specified key. Creates a new value if none exists.
    * @param key key
-   * @param func function that create a new value
+   * @param func function that creates a new value
    * @return value
    */
   public E computeIfAbsent(final QNm key, final Supplier<? extends E> func) {

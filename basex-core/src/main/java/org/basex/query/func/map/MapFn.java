@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
  */
 abstract class MapFn extends StandardFunc {
   /**
-   * Returns the array size of the specified expression.
+   * Returns the map size of the specified expression.
    * @param expr expression
    * @return map size
    */

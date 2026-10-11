@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.node.*;
 
 /**
- * ANode iterator interface.
+ * GNode iterator interface.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -298,7 +298,7 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
 
   /**
    * Returns an unescaped representation of the value.
-   * @param value value to escape
+   * @param value value to unescape
    * @return unescaped token
    * @throws QueryIOException query I/O exception
    */

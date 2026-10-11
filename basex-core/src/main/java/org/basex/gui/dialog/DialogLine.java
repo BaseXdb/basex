@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogLine extends BaseXDialog {
-  /** New password. */
+  /** Line number. */
   private final BaseXTextField line;
   /** Buttons. */
   private final BaseXBack buttons;
@@ -63,7 +63,7 @@ public final class DialogLine extends BaseXDialog {
 
   /**
    * Returns the entered line number.
-   * @return line number, or {@code -1} or invalid values
+   * @return line number, or {@code -1} for invalid values
    */
   public int line() {
     final int num = Strings.toInt(line.getText());

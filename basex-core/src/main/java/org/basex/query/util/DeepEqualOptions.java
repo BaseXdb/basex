@@ -85,7 +85,7 @@ public final class DeepEqualOptions extends Options {
   /**
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName
-   * @return element names
+   * @return result of check
    */
   public boolean unordered(final QNm qname) {
     if(unordered == null) {

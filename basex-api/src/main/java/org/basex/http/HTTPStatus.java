@@ -28,7 +28,7 @@ public enum HTTPStatus {
 
   /** Error: 404 (not found). */
   NOT_FOUND_X(SC_NOT_FOUND, "%"),
-  /** Error: 404, "No path specified". */
+  /** Error: 404, "No database specified". */
   NO_DATABASE_SPECIFIED(SC_NOT_FOUND, "No database specified."),
   /** Error: 404, "Service not found". */
   SERVICE_NOT_FOUND(SC_NOT_FOUND, "Service not found."),
@@ -42,7 +42,7 @@ public enum HTTPStatus {
   /** Error: 415, "Missing content type". */
   MISSING_TYPE_X(SC_UNSUPPORTED_MEDIA_TYPE, "Missing content type. Supported: %."),
 
-  /** Error: 500, "RESTXQ path cannot be resolved.". */
+  /** Error: 500, "RESTXQ directory does not exist.". */
   NO_RESTXQ_DIRECTORY(SC_INTERNAL_SERVER_ERROR, "RESTXQ directory does not exist."),
   /** Error 501, "Method not supported.". */
   METHOD_NOT_SUPPORTED_X(SC_NOT_IMPLEMENTED, "Method not supported: %.");

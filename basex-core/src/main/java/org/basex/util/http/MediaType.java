@@ -48,9 +48,9 @@ public final class MediaType implements Comparable<MediaType> {
       new MediaType("application/x-www-form-urlencoded");
   /** Media type: application/html+xml. */
   public static final MediaType APPLICATION_HTML_XML = new MediaType("application/html+xml");
-  /** Text/plain. */
+  /** Media type: application/json. */
   public static final MediaType APPLICATION_JSON = new MediaType("application/json");
-  /** Media type: text/plain. */
+  /** Media type: application/octet-stream. */
   public static final MediaType APPLICATION_OCTET_STREAM =
       new MediaType("application/octet-stream");
   /** Media type: application/xml. */
@@ -62,7 +62,7 @@ public final class MediaType implements Comparable<MediaType> {
   /** Media type: multipart/form-data. */
   public static final MediaType MULTIPART_FORM_DATA = new MediaType("multipart/form-data");
 
-  /** Media type: text/comma-separated-values. */
+  /** Media type: text/csv. */
   public static final MediaType TEXT_CSV = new MediaType("text/csv");
   /** Media type: text/html. */
   public static final MediaType TEXT_HTML = new MediaType("text/html");
@@ -70,7 +70,7 @@ public final class MediaType implements Comparable<MediaType> {
   public static final MediaType TEXT_PLAIN = new MediaType("text/plain");
   /** Media type: text/xml. */
   public static final MediaType TEXT_XML = new MediaType("text/xml");
-  /** XML media type. */
+  /** Media type: text/xml-external-parsed-entity. */
   public static final MediaType TEXT_XML_EPE = new MediaType("text/xml-external-parsed-entity");
 
   /** Main type. */

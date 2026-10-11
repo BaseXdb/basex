@@ -123,7 +123,7 @@ public final class VarScope {
   }
 
   /**
-   * Returns a copy of this variable scope.
+   * Copies the variables of this scope.
    * @param cc compilation context
    * @param vm variable mapping
    */

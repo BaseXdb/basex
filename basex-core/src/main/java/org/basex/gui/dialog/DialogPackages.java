@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Open database dialog.
+ * Package manager dialog.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -42,7 +42,7 @@ public final class DialogPackages extends BaseXDialog {
   /** Path label. */
   private final BaseXLabel path;
 
-  /** Refresh list of databases. */
+  /** Refresh list of packages. */
   private boolean refresh;
 
   /**
@@ -73,7 +73,7 @@ public final class DialogPackages extends BaseXDialog {
     table.add(new BaseXLabel(PATH + COL, false, true));
     table.add(path);
 
-    // database buttons
+    // package buttons
     installURL = new BaseXButton(this, INSTALL_FROM_URL + ELLIPSIS);
     install = new BaseXButton(this, INSTALL + ELLIPSIS);
     delete = new BaseXButton(this, DELETE + ELLIPSIS);
@@ -98,7 +98,7 @@ public final class DialogPackages extends BaseXDialog {
   public void action(final Object cmp) {
     final Context ctx = gui.context;
     if(refresh) {
-      // rebuild databases and focus list chooser
+      // rebuild packages and focus list chooser
       packages.setData(new RepoManager(ctx).ids().finish());
       packages.requestFocusInWindow();
       refresh = false;

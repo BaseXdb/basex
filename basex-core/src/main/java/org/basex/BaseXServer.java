@@ -26,7 +26,7 @@ import org.basex.util.log.*;
 public final class BaseXServer extends CLI implements Runnable {
   /** Maximum number of queued incoming connections (absorbs connection bursts). */
   private static final int BACKLOG = 1 << 10;
-  /** Reserved identifier for shutting down a server shutdown during the login handshake. */
+  /** Reserved identifier for requesting a server shutdown during the login handshake. */
   public static final String STOP = "stop:";
 
   /** New sessions. */

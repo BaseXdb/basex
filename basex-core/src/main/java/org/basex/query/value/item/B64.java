@@ -23,7 +23,7 @@ public class B64 extends Bin {
   /** Constant values. */
   private static final B64[] B64S;
 
-  // caches the first 128 integers
+  // caches all 256 single-byte values
   static {
     final int nl = 256;
     B64S = new B64[nl];

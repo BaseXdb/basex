@@ -27,7 +27,7 @@ public class BaseXTree extends JTree {
   }
 
   /**
-   * Sets the label borders.
+   * Sets the tree borders.
    * @param t top distance
    * @param l left distance
    * @param b bottom distance

@@ -109,7 +109,7 @@ public abstract class FNode extends XNode {
   }
 
   /**
-   * Returns the children of the specified DOM node.
+   * Adds the children of the specified DOM node.
    * @param node node
    * @param builder parent node
    * @param nsMap namespace map

@@ -301,7 +301,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
       // node drained, move to the previous one
       final DeepTree<?, E> curr = trees[tTop];
       if(deepPos > 1) {
-        // go to next node in right digit
+        // go to previous node in right digit
         --deepPos;
         start = curr.right[deepPos - 1];
       } else if(deepPos == 1) {

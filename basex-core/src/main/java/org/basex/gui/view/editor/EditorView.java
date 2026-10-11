@@ -1051,7 +1051,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Choose a unique dummy file reference for a new tab.
+   * Chooses a unique dummy file reference for a new tab.
    * @return io reference
    */
   private IOFile newTabFile() {

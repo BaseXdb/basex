@@ -10,7 +10,7 @@ package org.basex.query;
 @FunctionalInterface
 public interface QueryPredicate<T> {
   /**
-   * Evaluates this predicate on the given arguments.
+   * Evaluates this predicate on the given argument.
    *
    * @param t input argument
    * @return result of check

@@ -23,7 +23,7 @@ public final class XQTrieMap extends XQMap {
   /**
    * Constructor.
    * @param root root node
-   * @param order map order (can be ({@code null})
+   * @param order map order (can be {@code null})
    * @param type map type
    */
   XQTrieMap(final TrieNode root, final TrieOrder order, final Type type) {

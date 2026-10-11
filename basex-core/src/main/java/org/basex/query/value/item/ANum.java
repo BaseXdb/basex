@@ -190,7 +190,7 @@ public abstract class ANum extends Item {
    * @param item value to be compared
    * @param transitive transitive comparison
    * @param ii input info
-   * @return difference difference
+   * @return difference
    * @throws QueryException query exception
    */
   final int compare(final Item item, final boolean transitive, final InputInfo ii)

@@ -135,7 +135,7 @@ public final class StaticFuncCall extends FuncCall {
   public void setFunc(final StaticFunc sf) throws QueryException {
     func = sf;
 
-    // assign keywords arguments
+    // assign keyword arguments
     final int arity = sf.arity();
     if(keywords != null) {
       final QNm[] names = new QNm[arity];

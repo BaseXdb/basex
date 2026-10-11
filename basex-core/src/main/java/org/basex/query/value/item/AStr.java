@@ -102,7 +102,7 @@ public abstract class AStr extends Item {
   /**
    * Returns the string length.
    * @param info input info (can be {@code null})
-   * @return result of check
+   * @return length
    * @throws QueryException query exception
    */
   public final int length(final InputInfo info) throws QueryException {
@@ -113,7 +113,7 @@ public abstract class AStr extends Item {
   /**
    * Returns the single characters of the string.
    * @param info input info (can be {@code null})
-   * @return result of check
+   * @return characters
    * @throws QueryException query exception
    */
   public final byte[][] characters(final InputInfo info) throws QueryException {

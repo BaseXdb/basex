@@ -186,7 +186,7 @@ public final class TypeswitchGroup extends Single {
    * Checks if the given value matches this group.
    * @param value value to be matched
    * @param qc query context (if {@code null}, value will not be assigned to the variable)
-   * @return result of check ({@code true} is returned for the default case
+   * @return result of check ({@code true} is returned for the default case)
    * @throws QueryException query exception
    */
   boolean match(final Value value, final QueryContext qc) throws QueryException {

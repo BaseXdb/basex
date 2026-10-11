@@ -35,7 +35,7 @@ public final class FnNot extends StandardFunc {
 
   /**
    * Inverts the specified expression.
-   * @param input input info
+   * @param input input expression
    * @param cc compilation context
    * @return inverted or original expression
    * @throws QueryException query exception

@@ -61,7 +61,7 @@ public final class QueryResources {
   /** Input references. */
   private final ArrayList<InputStream> inputs = new ArrayList<>(1);
 
-  /** Current directory for file operations (can be {@null}). */
+  /** Current directory for file operations (can be {@code null}). */
   public Path currentDir;
 
   /**
@@ -460,7 +460,7 @@ public final class QueryResources {
    * @param qc query context
    * @param info input info (can be {@code null})
    * @param allowExternal allow access to external resources
-   * @return document
+   * @return data reference
    * @throws QueryException query exception
    */
   private Data data(final boolean single, final QueryInput qi, final DocOptions docOpts,

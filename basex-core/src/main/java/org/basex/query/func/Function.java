@@ -2228,7 +2228,7 @@ public enum Function implements AFunction {
 
   /**
    * Constructs a function signature; calls
-   * {@link #Function(Supplier, String, SeqType[], SeqType, EnumSet)}.
+   * {@link #Function(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
    * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param params parameter types
@@ -2279,7 +2279,7 @@ public enum Function implements AFunction {
    * @param params parameter types
    * @param seqType return type
    * @param flags static function properties ({@link Flag#HOF} can be omitted if there is a
-   *   parameter of type {@link FuncType}, or if {@link StandardFunc#hofOffsets} is overwritten
+   *   parameter of type {@link FuncType}, or if {@link StandardFunc#hofOffsets} is overridden
    *   in the implementation)
    * @param uri URI
    * @param perm minimum permission

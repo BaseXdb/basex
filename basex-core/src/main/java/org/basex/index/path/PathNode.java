@@ -29,10 +29,10 @@ public final class PathNode {
   public final PathNode parent;
   /** Children. */
   public PathNode[] children;
-  /** Node kind. */
+  /** Statistics. */
   public final Stats stats;
 
-  /** Empty element flag,assigned during index construction.
+  /** Empty element flag, assigned during index construction.
    *  0: no empty elements;
    *  1: test flag;
    *  2: element can be empty. */

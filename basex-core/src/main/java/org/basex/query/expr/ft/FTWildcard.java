@@ -103,7 +103,7 @@ public final class FTWildcard {
   }
 
   /**
-   * Indicates if the wildcard expression was valid.
+   * Indicates if the input contains no wildcard characters.
    * @return result of check
    */
   public boolean simple() {
@@ -145,7 +145,7 @@ public final class FTWildcard {
   }
 
   /**
-   * Indicates if the input contains no wildcard characters.
+   * Indicates if the wildcard expression was valid.
    * @return result of check
    */
   public boolean valid() {

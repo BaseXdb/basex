@@ -189,7 +189,7 @@ public abstract class Mapping extends Arr {
   /**
    * Merges adjacent operands.
    * @param cc compilation context
-   * @return resulting expression or {@code null}
+   * @return resulting expressions or {@code null}
    * @throws QueryException query exception
    */
   final Expr[] merge(final CompileContext cc) throws QueryException {
@@ -234,7 +234,7 @@ public abstract class Mapping extends Arr {
   }
 
   /**
-   * Merges adjacent operands.
+   * Inlines an expression into the next operand.
    * @param expr expression to inline
    * @param next target expression
    * @param cc compilation context
@@ -251,7 +251,7 @@ public abstract class Mapping extends Arr {
      *   $a ! (. + .) → $a + $a
      * inline any other expression
      *   ($a + $b) ! (. * 2) → ($a + $b) * 2
-     *   ($n + 2) ! abs(.)   → abs(. + 2)
+     *   ($n + 2) ! abs(.)   → abs($n + 2)
      * values
      *   (<X/>, <Y/>) -> count(.) → count((<X/>, <Y/>))
      * skip positional access and higher-order functions

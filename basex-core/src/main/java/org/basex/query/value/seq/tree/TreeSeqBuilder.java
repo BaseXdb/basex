@@ -89,7 +89,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
     } else {
       // push leaf node into the tree
       tree.append(new LeafNode(items(mid, NODE_SIZE)));
-      // move rest of the nodes to the right
+      // move rest of the nodes to the left
       final int rest = inRight - NODE_SIZE;
       for(int i = 0; i < rest; i++) {
         final int to = (mid + i) % CAP, from = (to + NODE_SIZE) % CAP;

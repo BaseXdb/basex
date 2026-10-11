@@ -155,7 +155,7 @@ public abstract class Item extends Value {
 
   /**
    * Checks if this item is instance of the specified type.
-   * Overwritten by {@link XQMap} and {@link XQArray}.
+   * Overridden by {@link XQMap} and {@link XQArray}.
    * @param tp type
    * @param coerce item coercion
    * @return result of check
@@ -253,14 +253,14 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by: {@link Lazy}, {@link XQMap}, {@link XQArray}.
+   * Overridden by: {@link Lazy}, {@link XQMap}, {@link XQArray}.
    */
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
   /**
    * {@inheritDoc}
-   * Overwritten by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link XNode}.
+   * Overridden by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -269,7 +269,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link JNode}, {@link XNode}.
+   * Overridden by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link JNode}, {@link XNode}.
    */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -323,7 +323,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns a score value. Overwritten by {@link FTNode}.
+   * Returns a score value. Overridden by {@link FTNode}.
    * @return score value
    */
   public double score() {
@@ -332,7 +332,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns data model info.
-   * Overwritten by {@link QNm}, {@link DBNode}, {@link FAttr} and {@link FDoc}.
+   * Overridden by {@link QNm}, {@link DBNode}, {@link FAttr} and {@link FDoc}.
    * @return type string
    */
   public byte[] xdmInfo() {
@@ -341,7 +341,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a type ID.
-   * Overwritten by {@link DBNode} and {@link FDoc}.
+   * Overridden by {@link DBNode} and {@link FDoc}.
    * @return type string
    */
   public ID typeId() {

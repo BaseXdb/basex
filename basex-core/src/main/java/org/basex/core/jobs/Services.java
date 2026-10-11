@@ -140,7 +140,7 @@ public final class Services {
   }
 
   /**
-   * Assign jobs options.
+   * Assigns jobs options.
    * @param job job element
    * @return jobs options, or {@code null} if an error occurred
    */

@@ -1,7 +1,7 @@
 package org.basex.core.jobs;
 
 /**
- * This exception is called whenever a job is interrupted.
+ * This exception is thrown whenever a job is interrupted.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

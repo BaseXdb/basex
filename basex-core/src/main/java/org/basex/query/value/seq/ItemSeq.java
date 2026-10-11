@@ -21,7 +21,7 @@ public final class ItemSeq extends Seq {
    * Constructor.
    * @param items items
    * @param size number of items
-   * @param type node type
+   * @param type item type
    */
   private ItemSeq(final Item[] items, final int size, final Type type) {
     super(size, type);

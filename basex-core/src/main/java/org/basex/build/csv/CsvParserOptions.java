@@ -4,7 +4,7 @@ import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
- * Options for parsing and serializing CSV data.
+ * Options for parsing CSV data.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

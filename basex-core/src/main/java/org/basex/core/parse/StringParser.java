@@ -220,7 +220,7 @@ final class StringParser extends CommandParser {
 
   /**
    * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
-   * with asterisks, question marks and commands.
+   * with asterisks, question marks and commas.
    * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @return glob expression
    * @throws QueryException query exception
@@ -231,7 +231,7 @@ final class StringParser extends CommandParser {
 
   /**
    * Parses and returns a name, or a glob string that extends a {@link #name(Cmd)}
-   * with asterisks, question marks and commands.
+   * with asterisks, question marks and commas.
    * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @param glob allow glob syntax
    * @return glob expression
@@ -286,7 +286,7 @@ final class StringParser extends CommandParser {
 
   /**
    * Parses and returns a number.
-   * @return name
+   * @return number
    * @throws QueryException query exception
    */
   private String number() throws QueryException {
@@ -311,7 +311,7 @@ final class StringParser extends CommandParser {
    * @param complete possible completions
    * @param parent parent command (can be {@code null})
    * @param <E> token type
-   * @return command, or {@code null} if no nothing can be consumed and if no parent was specified
+   * @return command, or {@code null} if nothing can be consumed and if no parent was specified
    * @throws QueryException query exception
    */
   private <E extends Enum<E>> E consume(final Class<E> complete, final Cmd parent)
@@ -350,7 +350,7 @@ final class StringParser extends CommandParser {
    * Returns help output as query exception instance.
    * Prints some command info.
    * @param alt input alternatives
-   * @param cmd input completions
+   * @param cmd referring command
    * @return query exception
    */
   private QueryException help(final Enum<?>[] alt, final Cmd cmd) {

@@ -87,7 +87,7 @@ public abstract class Clause extends ParseExpr {
   /**
    * Checks if the given variable is declared by this clause.
    * @param var variable
-   * @return {code true} if the variable was declared here, {@code false} otherwise
+   * @return {@code true} if the variable was declared here, {@code false} otherwise
    */
   public final boolean declares(final Var var) {
     for(final Var decl : vars) {

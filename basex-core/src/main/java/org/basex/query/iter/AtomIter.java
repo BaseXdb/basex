@@ -15,7 +15,7 @@ public final class AtomIter extends Iter {
   private final QueryContext qc;
   /** Input info (can be {@code null}). */
   private final InputInfo info;
-  /** Atomizing iterator. */
+  /** Input iterator. */
   private final Iter iter;
   /** Atomizing iterator (can be {@code null}). */
   private Iter atom;

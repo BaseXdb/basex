@@ -62,7 +62,7 @@ public abstract class ASet {
   }
 
   /**
-   * Tests is the set is empty.
+   * Tests if the set is empty.
    * @return result of check
    */
   public final boolean isEmpty() {

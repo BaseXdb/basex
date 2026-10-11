@@ -88,7 +88,7 @@ public final class JsonParser {
 
   /**
    * Parses a JSON expression.
-   * @param ii input info (can be @null)
+   * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
@@ -101,7 +101,7 @@ public final class JsonParser {
 
   /**
    * Parses the next JSON value of a JSON Lines input.
-   * @param ii input info (can be @null)
+   * @param ii input info (can be {@code null})
    * @return {@code false} if the end of input was reached
    * @throws QueryException query exception
    * @throws IOException I/O exception

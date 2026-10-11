@@ -64,7 +64,7 @@ public final class Restore extends ABackup {
   }
 
   /**
-   * Restores the specified database .
+   * Restores the specified database.
    * @param db name of database (empty string for general data)
    * @param backup name of backup
    * @param sopts static options

@@ -64,7 +64,7 @@ public final class FnFoot extends StandardFunc {
     }
 
     // foot((1, 2)) → 2
-    // foot((1, (2 to 3)) → foot(2 to 3)
+    // foot((1, (2 to 3))) → foot(2 to 3)
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];

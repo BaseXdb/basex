@@ -79,7 +79,7 @@ public final class FnCodepointsToString extends StandardFunc {
   }
 
   /**
-   * Checks if the specified value is valid codepoint.
+   * Checks if the specified value is a valid codepoint.
    * @param value codepoint
    * @param info input info (can be {@code null})
    * @return codepoint as integer

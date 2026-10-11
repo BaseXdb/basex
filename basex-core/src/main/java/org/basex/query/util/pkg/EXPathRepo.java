@@ -46,7 +46,7 @@ public final class EXPathRepo {
 
   /**
    * Returns the path to the repository.
-   * @return dictionary
+   * @return path
    */
   public IOFile path() {
     return init().repo;

@@ -37,7 +37,7 @@ public final class StaticContext {
   /** Maximum permission of the code. */
   public final Perm maxPerm;
 
-  /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
+  /** Default collation (default collation ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace fixed flag. */
   public boolean elemNsFixed;
@@ -94,7 +94,7 @@ public final class StaticContext {
   /**
    * Declares a namespace.
    * A namespace is undeclared if the specified URI is an empty string.
-   * The default element namespaces is set if the specified prefix is empty.
+   * The default element namespace is set if the specified prefix is empty.
    * @param prefix namespace prefix
    * @param uri namespace URI
    * @throws QueryException query exception

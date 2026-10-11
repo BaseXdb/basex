@@ -115,7 +115,7 @@ final class MapLayout {
    * @param r parent rectangle
    */
   private void putRect(final MapRect r) {
-    // position, with and height calculated using sizes of former level
+    // position, width and height calculated using sizes of former level
     final int x = r.x + layout.x;
     final int y = r.y + layout.y;
     final int w = r.w - layout.w;

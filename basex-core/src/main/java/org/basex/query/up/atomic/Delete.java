@@ -14,7 +14,7 @@ final class Delete extends StructuralUpdate {
    * @param location target node location PRE
    * @param shifts PRE value shifts introduced by update
    * @param acc accumulated shifts
-   * @param first PRE value of the first node which distance has to be updated
+   * @param first PRE value of the first node whose distance has to be updated
    * @param parent parent
    */
   private Delete(final int location, final int shifts, final int acc, final int first,

@@ -138,7 +138,7 @@ public final class Constr {
       } else if(kind == Kind.NAMESPACE) {
         // type: namespace node
 
-        // no attribute allowed after texts or child nodes
+        // no namespace allowed after texts or child nodes
         if(!text.isEmpty() || builder.children != null) {
           errNS = node.qname();
           return false;

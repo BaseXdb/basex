@@ -20,7 +20,7 @@ public final class FnMessage extends FnTrace {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    // overwrite fn:trace optimization
+    // override fn:trace optimization
     return this;
   }
 

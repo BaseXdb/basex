@@ -14,7 +14,7 @@ import org.basex.util.*;
 public interface XQFunction extends XQFunctionExpr {
   /**
    * Calls the function with the given arguments and takes care of tail calls.
-   * Must not be overwritten.
+   * Must not be overridden.
    * @param qc query context
    * @param info input info (can be {@code null})
    * @param args arguments for the call (possibly more than required)
@@ -48,7 +48,7 @@ public interface XQFunction extends XQFunctionExpr {
 
   /**
    * Tail-calls the given function with the given arguments.
-   * Must not be overwritten.
+   * Must not be overridden.
    * @param qc query context
    * @param info input info (can be {@code null})
    * @param args arguments for the call

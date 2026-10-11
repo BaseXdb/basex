@@ -409,7 +409,7 @@ public class QueryException extends Exception {
    * @param text text message with optional placeholders
    * @param ext info extensions
    * @param info input info (can be {@code null})
-   * @return argument
+   * @return error message
    */
   private static String message(final String text, final Object[] ext, final InputInfo info) {
     final TokenList list = new TokenList(ext.length);

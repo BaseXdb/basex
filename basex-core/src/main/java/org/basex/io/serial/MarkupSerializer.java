@@ -21,7 +21,7 @@ import org.basex.util.ft.*;
 import org.basex.util.options.*;
 
 /**
- * This class serializes items to in a markup language.
+ * This class serializes items in a markup language.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

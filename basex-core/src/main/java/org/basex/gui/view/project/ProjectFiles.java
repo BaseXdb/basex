@@ -126,7 +126,7 @@ final class ProjectFiles {
   }
 
   /**
-   * Refreshes the view after a file has been saved.
+   * Parses the XQuery files of the project.
    * @param root root directory
    * @param ctx database context
    * @throws InterruptedException interrupted exception
@@ -191,7 +191,7 @@ final class ProjectFiles {
   /**
    * Returns the current file cache.
    * @param root root directory
-   * @return ID, or {@code null} if newer file cache exists
+   * @return file cache
    * @throws InterruptedException interrupted exception
    */
   private ProjectCache cache(final IOFile root) throws InterruptedException {

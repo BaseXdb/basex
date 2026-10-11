@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 public enum Flag {
   /**
-   * Node creation. No relocation of expressions that would change number of node constructions
+   * Node creation. No relocation of expressions that would change number of node constructions.
    * Example: node constructor
    */
   CNS,
@@ -47,7 +47,7 @@ public enum Flag {
   UPD,
   /**
    * Function invocation. Used to suppress pre-evaluation of built-in functions with
-   * functions arguments.
+   * function arguments.
    * Example: fn:fold-left
    */
   HOF;

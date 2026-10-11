@@ -69,7 +69,7 @@ final class TextRenderer extends BaseXBack {
   /** Cursor position. */
   private final int[] cursor = new int[2];
 
-  /** Vertical start position. */
+  /** Syntax highlighter. */
   private Syntax syntax = Syntax.SIMPLE;
   /** Visibility of text cursor. */
   private boolean caret;
@@ -588,7 +588,7 @@ final class TextRenderer extends BaseXBack {
   /**
    * Checks if the text has more words to print.
    * @param layout layout
-   * @return {@code true}} if more strings exist
+   * @return {@code true} if more strings exist
    */
   private boolean more(final Layout layout) {
     final TextIterator iter = layout.iter;
@@ -755,7 +755,7 @@ final class TextRenderer extends BaseXBack {
       mark(iter.selection(), layout, g, GUIConstants.color2A);
       for(final int[] sr : iter.searchResults()) mark(sr, layout, g, GUIConstants.color2A);
 
-      // retrieve first character of current token
+      // mark erroneous text
       if(iter.error()) drawError(layout, g);
 
       if(showNL && cp == TokenBuilder.NLINE) {

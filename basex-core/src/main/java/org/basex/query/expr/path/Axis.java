@@ -78,7 +78,7 @@ public enum Axis {
     }
   },
 
-  /** Following axis. */
+  /** Following-or-self axis. */
   FOLLOWING_OR_SELF("following-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test) {
@@ -110,7 +110,7 @@ public enum Axis {
     }
   },
 
-  /** Preceding-sibling axis. */
+  /** Preceding-sibling-or-self axis. */
   PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test) {
@@ -126,7 +126,7 @@ public enum Axis {
     }
   },
 
-  /** Preceding axis. */
+  /** Preceding-or-self axis. */
   PRECEDING_OR_SELF("preceding-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test) {
@@ -142,7 +142,7 @@ public enum Axis {
     }
   },
 
-  /** Step axis. */
+  /** Self axis. */
   SELF("self", true) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test) {
@@ -168,7 +168,7 @@ public enum Axis {
   /**
    * Returns a node iterator.
    * @param node input node
-   * @param test step
+   * @param test node test
    * @return node iterator
    */
   abstract BasicNodeIter iter(GNode node, Test test);

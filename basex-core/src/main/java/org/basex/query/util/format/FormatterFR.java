@@ -88,7 +88,7 @@ final class FormatterFR extends Formatter {
    * @param n number to be formatted
    * @param numType numeral type
    * @param suffix suffix (can be {@code null})
-   * @param last words appears last
+   * @param last word appears last
    */
   private static void word(final TokenBuilder tb, final long n, final NumeralType numType,
       final byte[] suffix, final boolean last) {

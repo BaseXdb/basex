@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public class StringOption extends Option<String> {
-  /** Default value (can be {@null}). */
+  /** Default value (can be {@code null}). */
   private final String value;
 
   /**
@@ -23,7 +23,7 @@ public class StringOption extends Option<String> {
   /**
    * Default constructor.
    * @param name name
-   * @param value value (can be {@null})
+   * @param value value (can be {@code null})
    */
   public StringOption(final String name, final String value) {
     this(name, value, null);
@@ -32,7 +32,7 @@ public class StringOption extends Option<String> {
   /**
    * Constructor with required type.
    * @param name name
-   * @param value value (can be {@null})
+   * @param value value (can be {@code null})
    * @param seqType required type (can be {@code null})
    */
   public StringOption(final String name, final String value, final SeqType seqType) {

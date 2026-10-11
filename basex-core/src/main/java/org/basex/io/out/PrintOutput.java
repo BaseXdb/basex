@@ -15,7 +15,7 @@ import org.basex.io.*;
 public class PrintOutput extends OutputStream {
   /** Output stream reference (can be {@code null}). */
   protected final OutputStream os;
-  /** Maximum numbers of bytes to write. */
+  /** Maximum number of bytes to write. */
   protected long max = Long.MAX_VALUE;
   /** Number of bytes written. */
   protected long size;

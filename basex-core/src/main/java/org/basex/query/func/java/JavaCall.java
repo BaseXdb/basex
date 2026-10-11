@@ -171,7 +171,7 @@ public abstract class JavaCall extends Arr {
       return new Object[0];
     }
 
-    // convert empty number to the smallest type
+    // convert number to the target type
     if(arg instanceof final ANum num) {
       final double d = num.dbl();
       if((param == byte.class  || param == Byte.class)      && (byte)  d == d) return (byte)   d;
@@ -598,7 +598,7 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Returns the parameters types from the specified executable.
+   * Returns the parameter types from the specified executable.
    * @param exec executable (constructor, method)
    * @param xquery xquery include XQuery types
    * @return string

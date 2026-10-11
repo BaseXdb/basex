@@ -82,7 +82,7 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: xml/xhtml/html/text/json/csv/raw/adaptive. */
   public static final EnumOption<SerialMethod> METHOD =
       new EnumOption<>("method", SerialMethod.BASEX, METHOD_TYPE);
-  /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
+  /** Serialization parameter: NFC/NFD/NFKC/NFKD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
       new StringOption("normalization-form", "none", Types.STRING_ZO);
   /** Serialization parameter: yes/no. */
@@ -108,7 +108,7 @@ public final class SerializerOptions extends Options {
   /** Parameter document. */
   public static final StringOption PARAMETER_DOCUMENT =
       new StringOption("parameter-document", "", Types.STRING_ZO);
-  /** Serialization parameter: xml/xhtml/html/text. */
+  /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ALLOW_DUPLICATE_NAMES =
       new EnumOption<>("allow-duplicate-names", YesNo.NO, YES_NO);
   /** Serialization parameter: xml/xhtml/html/text. */

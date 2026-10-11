@@ -157,7 +157,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns the addressed database (i.e., the first path entry).
-   * @return database, or {@code null} if the root directory was specified
+   * @return database, or an empty string if the root directory was specified
    */
   public String db() {
     final int i = path.indexOf('/', 1);
@@ -456,7 +456,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sets a status and sends an info message.
+   * Logs an error that occurred while sending a status.
    * @param code status code
    * @param info detailed information (can be {@code null})
    * @param ex exception

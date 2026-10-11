@@ -60,7 +60,7 @@ final class FormatterEN extends Formatter {
 
   /** AM/PM Markers. */
   private static final byte[][] AMPM = tokens("AM", "PM");
-  /** Ordinal suffixes (st, nr, rd, th). */
+  /** Ordinal suffixes (st, nd, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
   /** Eras: BC, AD. */
   private static final byte[][] ERAS = tokens("BC", "AD");

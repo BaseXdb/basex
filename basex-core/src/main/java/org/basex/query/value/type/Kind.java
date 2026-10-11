@@ -129,7 +129,7 @@ public enum Kind {
   final byte[] name;
   /** Parent kind (can be {@code null}). */
   final Kind parent;
-  /** Type ID . */
+  /** Type ID. */
   final ID id;
 
   /**

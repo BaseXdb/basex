@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class BooleanOption extends Option<Boolean> {
-  /** Default value (can be {@null}). */
+  /** Default value (can be {@code null}). */
   private final Boolean value;
 
   /**
@@ -23,7 +23,7 @@ public final class BooleanOption extends Option<Boolean> {
   /**
    * Default constructor.
    * @param name name
-   * @param value value (can be {@null})
+   * @param value value (can be {@code null})
    */
   public BooleanOption(final String name, final Boolean value) {
     super(name);

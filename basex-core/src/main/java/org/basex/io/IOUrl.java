@@ -200,7 +200,7 @@ public final class IOUrl extends IO {
   /**
    * Returns a singleton HTTP client instance.
    * @param redirect follow redirects
-   * @return client builder
+   * @return client
    */
   public static HttpClient client(final boolean redirect) {
     return CLIENTS.get(redirect);
@@ -292,7 +292,7 @@ public final class IOUrl extends IO {
   /**
    * Checks if the specified string is a valid URL.
    * @param url url string
-   * @return file path
+   * @return result of check
    */
   static boolean isValid(final String url) {
     final int ul = url.length();

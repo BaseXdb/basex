@@ -96,7 +96,7 @@ abstract class DynJavaCall extends JavaCall {
 
   /**
    * {@inheritDoc}
-   * Must be overwritten by implementing class.
+   * Must be overridden by implementing class.
    */
   @Override
   public boolean equals(final Object obj) {

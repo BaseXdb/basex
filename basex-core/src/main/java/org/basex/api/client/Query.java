@@ -59,7 +59,7 @@ public abstract class Query implements Closeable {
   }
 
   /**
-   * Binds a value with an optional type to an external variable.
+   * Binds a value with an optional type to the context value.
    * @param value value to be bound
    * @param type value type (can be {@code null})
    * @throws IOException I/O exception

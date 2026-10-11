@@ -26,7 +26,7 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // boolean(true())) → true()
+    // boolean(true()) → true()
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.eq(Types.BOOLEAN_O)) return input;

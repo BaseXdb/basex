@@ -25,7 +25,7 @@ final class TableInput {
   private String text;
   /** Flashing cursor. */
   private boolean flashing;
-  /** Flashing cursor. */
+  /** Cursor position. */
   private int pos;
 
   /**

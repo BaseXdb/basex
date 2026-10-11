@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class FtNormalize extends FtTokenize {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    // overwrite implementation of superclass
+    // override implementation of superclass
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] token : tokens(qc, true)) tb.add(token);
     return Str.get(tb.finish());

@@ -29,7 +29,7 @@ public final class IntPos extends Simple implements CmpPos {
   /**
    * Constructor.
    * @param min minimum value (1 or larger)
-   * @param max minimum value (inclusive, 1 or larger)
+   * @param max maximum value (inclusive, 1 or larger)
    * @param info input info (can be {@code null})
    */
   private IntPos(final long min, final long max, final InputInfo info) {
@@ -41,7 +41,7 @@ public final class IntPos extends Simple implements CmpPos {
   /**
    * Returns a position expression for the specified range, or an optimized boolean item.
    * @param min minimum position
-   * @param max minimum position (inclusive)
+   * @param max maximum position (inclusive)
    * @param info input info (can be {@code null})
    * @return expression
    */

@@ -133,7 +133,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   }
 
   /**
-   * Adds a combobox.
+   * Adds a slider.
    * @param min minimum value
    * @param max maximum value
    * @param pos position

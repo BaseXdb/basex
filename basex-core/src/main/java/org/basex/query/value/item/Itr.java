@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class Itr extends ANum {
   /** Minimum value. */
   public static final Itr MIN;
-  /** Maximum values. */
+  /** Maximum value. */
   public static final Itr MAX;
   /** Value 0. */
   public static final Itr ZERO;

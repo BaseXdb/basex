@@ -106,7 +106,7 @@ public final class JobContext {
 
   /**
    * Returns the job type.
-   * @return name
+   * @return type
    */
   public String type() {
     return tp != null ? tp : Util.className(job);
@@ -114,7 +114,7 @@ public final class JobContext {
 
   /**
    * Returns the query tracer.
-   * @return name
+   * @return query tracer
    */
   public QueryTracer tracer() {
     if(context != null) {

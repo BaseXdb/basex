@@ -30,7 +30,7 @@ final class MapRenderer {
   private int ul;
 
   /**
-   * Private constructor.
+   * Constructor.
    * @param g graphics reference
    */
   MapRenderer(final Graphics g) {
@@ -57,7 +57,7 @@ final class MapRenderer {
   }
 
   /**
-   * Draws the specified string. Chops the last character if space is not enough space.
+   * Draws the specified string. Chops the last character if there is not enough space.
    * @param text text to be drawn
    * @param x x coordinate
    * @param y y coordinate
@@ -100,7 +100,7 @@ final class MapRenderer {
         xx = rect.x;
         if(ll != 0) yy += fh;
         if(yy + fh > rect.y + rect.h) {
-          // text to high, skip drawing
+          // text too high, skip drawing
           if(draw) g.drawString(Text.ELLIPSIS, xx + ll, yy);
           return rect.h;
         }
@@ -135,7 +135,7 @@ final class MapRenderer {
         ll = 0;
         yy += fh;
         if(yy + fh > rect.y + rect.h) {
-          // text to high, skip drawing
+          // text too high, skip drawing
           if(draw) g.drawString(Text.ELLIPSIS, xx + ll, yy);
           return rect.h;
         }
@@ -303,7 +303,7 @@ final class MapRenderer {
           ll = 0;
           yy += rect.thumblh;
           if(yy + rect.thumblh >= rect.y + mh) {
-            // height to big
+            // height too big
             return rect.h;
           }
         }
@@ -488,7 +488,7 @@ final class MapRenderer {
       // find hovered thumbnail and corresponding text
       final boolean ir;
       if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? rect.thumbsw : 0) >= ww) {
-        // split token to safe space
+        // split token to save space
         if(!ds) wl -= ww - ll;
         yy += rect.thumblh;
         ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
@@ -503,7 +503,7 @@ final class MapRenderer {
         final int si = i;
         final int sp = BaseXLayout.width(g, ' ');
         final int sd = BaseXLayout.width(g, '.');
-        // go some tokens backwards form current token
+        // go some tokens backwards from current token
         final int bpsl = data1[psl] == sl ? psl + 1 : psl;
         final int bsl = data1[psl] == sl ? 0 : sl;
         ll = sd * 2 + sp;

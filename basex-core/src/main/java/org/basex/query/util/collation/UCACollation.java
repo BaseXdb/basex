@@ -31,7 +31,7 @@ final class UCACollation extends Collation {
 
   /**
    * Private Constructor.
-   * @param collator collation options
+   * @param collator collator
    */
   UCACollation(final RuleBasedCollator collator) {
     this.collator = collator;
@@ -42,7 +42,7 @@ final class UCACollation extends Collation {
   }
 
   /**
-   * Return a bit mask for the relevant parts of a collation element per the collator's strength.
+   * Returns a bit mask for the relevant parts of a collation element per the collator's strength.
    * @see <a href=
    *      "https://unicode-org.github.io/icu/userguide/collation/architecture#collation-elements"
    *      >Collation Elements</a>

@@ -257,7 +257,7 @@ public abstract class OutputSerializer extends Serializer {
   protected abstract void printChar(int cp) throws IOException;
 
   /**
-   * Returns a hex entity for the specified codepoint.
+   * Prints a hex entity for the specified codepoint.
    * @param cp codepoint
    * @throws IOException I/O exception
    */

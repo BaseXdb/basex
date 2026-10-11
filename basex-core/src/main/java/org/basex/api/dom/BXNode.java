@@ -68,7 +68,7 @@ public abstract class BXNode implements Node {
 
   /**
    * Returns a numeric value for the node kind.
-   * Overwritten by {@link BXCData}.
+   * Overridden by {@link BXCData}.
    * @return node kind
    */
   int kind() {

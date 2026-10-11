@@ -4,7 +4,7 @@ import org.basex.query.util.ft.*;
 import org.basex.util.list.*;
 
 /**
- * This interface provides methods for returning index results.
+ * This class provides methods for returning index results.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

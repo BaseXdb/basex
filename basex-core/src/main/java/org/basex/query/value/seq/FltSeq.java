@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Sequence of items of type {@link Itr xs:float}, containing at least two of them.
+ * Sequence of items of type {@link Flt xs:float}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -25,7 +25,7 @@ public final class FltSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param values bytes
+   * @param values values
    */
   private FltSeq(final float[] values) {
     super(values.length, BasicType.FLOAT);

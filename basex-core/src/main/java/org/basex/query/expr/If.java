@@ -197,7 +197,7 @@ public final class If extends Arr {
   /**
    * Tests the condition and returns the expression to evaluate.
    * @param qc query context
-   * @return branch offset
+   * @return branch
    * @throws QueryException query exception
    */
   private Expr expr(final QueryContext qc) throws QueryException {

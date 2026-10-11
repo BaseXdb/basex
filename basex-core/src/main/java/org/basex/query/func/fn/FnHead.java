@@ -80,7 +80,7 @@ public final class FnHead extends StandardFunc {
       final SeqType stFirst = first.seqType();
       // head((1, 2)) → 1
       if(stFirst.one()) return first;
-      // head((1 to 2), 3)) → head(1 to 2)
+      // head(((1 to 2), 3)) → head(1 to 2)
       if(stFirst.oneOrMore()) return cc.function(HEAD, info, first);
       final int al = args.length;
       if(stFirst.zeroOrOne() && (al == 2 || args[1].seqType().occ != Occ.ZERO_OR_ONE)) {

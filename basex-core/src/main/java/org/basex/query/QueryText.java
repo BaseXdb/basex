@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 import org.basex.util.*;
 
 /**
- * This class assembles text string and tokens required by the XQuery processor
+ * This class assembles text strings and tokens required by the XQuery processor
  * implementation.
  *
  * @author BaseX Team, BSD License

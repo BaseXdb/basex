@@ -57,7 +57,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   public final GUIStatus status;
   /** Input field. */
   public final GUIInput input;
-  /** Search view. */
+  /** Editor view. */
   public final EditorView editor;
   /** Text view. */
   public final TextView text;
@@ -74,7 +74,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Navigation/input panel. */
   final BaseXBack nav;
 
-  /** Result panel. */
+  /** Menu bar. */
   private final GUIMenu menu;
   /** Content panel, containing all views. */
   private final ViewContainer views;

@@ -17,7 +17,7 @@ import org.basex.gui.listener.*;
 import org.basex.util.*;
 
 /**
- * This superclass in inherited by all dialog windows.
+ * This superclass is inherited by all dialog windows.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -116,21 +116,21 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
-   * Places the dialog window; can be overwritten.
+   * Places the dialog window; can be overridden.
    */
   protected void place() {
     setLocationRelativeTo(gui);
   }
 
   /**
-   * Reacts on user input; can be overwritten.
+   * Reacts on user input; can be overridden.
    * @param source source
    */
   @SuppressWarnings("unused")
   public void action(final Object source) { }
 
   /**
-   * Cancels the dialog; can be overwritten.
+   * Cancels the dialog; can be overridden.
    */
   public void cancel() {
     ok = false;
@@ -138,7 +138,7 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
-   * Closes the dialog and stores the location of the dialog window; can be overwritten.
+   * Closes the dialog and stores the location of the dialog window; can be overridden.
    */
   public void close() {
     ok = true;

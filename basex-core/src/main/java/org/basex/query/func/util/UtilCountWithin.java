@@ -42,7 +42,7 @@ public final class UtilCountWithin extends StandardFunc {
       return size >= min && size <= max;
     }
 
-    // iterative through the results if an iterator is nondeterministic or its size is unknown
+    // iterate through the results if an iterator is nondeterministic or its size is unknown
     final Iter iter = input.iter(qc);
     long size = ndt ? -1 : iter.size();
     if(size == -1) {

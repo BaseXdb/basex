@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  *   [size0, id1, id2, ...]. The number of index keys is stored in the first 4
  *   bytes of the file.</li>
  * <li> {@code DATATXT/ATV + 'r'}: contains 5-byte references to the ID lists
- *   for all keys. To save space, the keys itself are not stored in the index
+ *   for all keys. To save space, the keys themselves are not stored in the index
  *   structure. Instead, they can be found by following the ID references to
  *   the main table.
  * </li>

@@ -221,9 +221,9 @@ public class XMLParser extends SingleParser {
 
   /**
    * Returns the token for the specified token type. If the current token type
-   * is wrong, a {@code null} reference is returned.
+   * is wrong, an exception is thrown.
    * @param type token type
-   * @return token or {@code null} if the token type is wrong
+   * @return token
    * @throws IOException I/O exception
    */
   private byte[] consumeToken(final Type type) throws IOException {

@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Dec extends ANum {
-  /** Maximum long value. */
+  /** Minimum long value. */
   public static final BigDecimal BD_MINLONG = BigDecimal.valueOf(Long.MIN_VALUE);
  /** Maximum long value. */
   public static final BigDecimal BD_MAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
@@ -173,7 +173,7 @@ public final class Dec extends ANum {
    * @param value value to be converted
    * @param info input info (can be {@code null})
    * @param error raise error for an invalid input
-   * @return decimal, or {@code null} value is invalid and no error is raised
+   * @return decimal, or {@code null} if the value is invalid and no error is raised
    * @throws QueryException query exception
    */
   public static BigDecimal parse(final byte[] value, final InputInfo info,

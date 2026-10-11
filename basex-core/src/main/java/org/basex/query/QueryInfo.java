@@ -113,7 +113,7 @@ public final class QueryInfo {
   /**
    * Adds some compilation info.
    * @param dynamic dynamic compilation
-   * @param string evaluation info
+   * @param string compilation info
    * @param ext text extensions
    */
   void compInfo(final boolean dynamic, final String string, final Object... ext) {
@@ -149,7 +149,7 @@ public final class QueryInfo {
    * @param hits number of returned hits
    * @param locks read and write locks (can be {@code null})
    * @param success success flag
-   * @return query string
+   * @return query information
    */
   public String toString(final QueryProcessor qp, final long printed, final long hits,
       final Locks locks, final boolean success) {

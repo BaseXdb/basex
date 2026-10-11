@@ -27,7 +27,7 @@ public class DbTextRange extends DbAccessFn {
   }
 
   /**
-   * Returns the index type (overwritten by implementing functions).
+   * Returns the index type (overridden by implementing functions).
    * @return index type
    */
   IndexType type() {

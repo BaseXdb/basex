@@ -29,7 +29,7 @@ public final class SessionListener implements HttpSessionListener {
 
   /**
    * Returns the IDs of all connected sessions.
-   * @return client IDs
+   * @return session IDs
    */
   public static TokenList ids() {
     final TokenList ids = new TokenList(SESSIONS.size());

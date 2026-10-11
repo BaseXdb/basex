@@ -146,8 +146,6 @@ public final class Namespaces {
 
   /**
    * Returns if no namespaces exist.
-   * Note that the container size does not change if namespaces are deleted.
-   * This function is mainly used to decide namespaces need to be considered in query optimizations.
    * @return result of check
    */
   public boolean isEmpty() {

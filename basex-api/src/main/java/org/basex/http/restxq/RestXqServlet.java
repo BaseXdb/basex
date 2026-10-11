@@ -9,9 +9,9 @@ import org.basex.query.*;
 import org.basex.util.http.*;
 
 /**
- * <p>This servlet receives and processes REST requests.
+ * <p>This servlet receives and processes RESTXQ requests.
  * The evaluated code is defined in XQuery modules, which are located in the web server's
- * root directory (specified by the {@code HTTPPATH} option), and decorated with RESTXQ
+ * root directory (specified by the {@code RESTXQPATH} option), and decorated with RESTXQ
  * annotations.</p>
  *
  * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,

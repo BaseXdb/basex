@@ -70,7 +70,7 @@ public final class OrderBy extends Clause {
        * @throws QueryException query exception
        */
       private void sort(final QueryContext qc) throws QueryException {
-        // keys are stored at odd positions, values at even ones
+        // keys are stored at even positions, values at odd ones
         List<Value[]> tuples = new ArrayList<>();
         // collation keys of strings (only created if a collation is specified)
         boolean coll = false;

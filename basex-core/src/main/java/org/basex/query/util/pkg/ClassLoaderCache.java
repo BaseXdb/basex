@@ -124,7 +124,7 @@ final class ClassLoaderCache {
     }
 
     /**
-     * Releases this Loader after use, but keep it cached.
+     * Releases this Loader after use, but keeps it cached.
      */
     void release() {
       if(refs.decrementAndGet() == 0 && stale) close();

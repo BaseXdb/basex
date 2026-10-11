@@ -109,11 +109,9 @@ public final class FTPosData {
   /**
    * Gets full-text data from the container.
    * If no data is stored for a PRE value, {@code null} is returned.
-   * int[0] : [pos0, ..., posn]
-   * int[1] : [poi0, ..., poin]
    * @param data data reference
    * @param pre int PRE value
-   * @return int[2][n] full-text data or {@code null}
+   * @return full-text data or {@code null}
    */
   public FTPos get(final Data data, final int pre) {
     final int p = find(pre);

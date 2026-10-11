@@ -209,7 +209,7 @@ public final class PlotView extends View {
   }
 
   /**
-   * Precalculates the plot and returns the result as buffered image.
+   * Precalculates the plot and stores the result as buffered image.
    */
   private void createPlotImage() {
     plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
@@ -406,7 +406,7 @@ public final class PlotView extends View {
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
     final int sz = sizeFactor();
-    // the painting space provided for items which lack no value
+    // the painting space provided for items which lack a value
     final int pWidth = plotWidth - sz;
     final int pHeight = plotHeight - sz;
 
@@ -766,7 +766,7 @@ public final class PlotView extends View {
 
   /**
    * Locates the nearest item to the mouse pointer.
-   * @return item focused
+   * @return true if the focus has changed
    */
   private boolean focus() {
     final int size = itemImg.getWidth() / 2;

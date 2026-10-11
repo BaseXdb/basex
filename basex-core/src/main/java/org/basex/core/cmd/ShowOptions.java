@@ -12,7 +12,7 @@ import org.basex.core.users.*;
 import org.basex.util.options.*;
 
 /**
- * Evaluates the 'get' command and return the value of a database option.
+ * Evaluates the 'show options' command and returns the values of database options.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

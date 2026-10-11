@@ -19,7 +19,7 @@ import org.xml.sax.*;
 
 /**
  * This class parses an XML document with Java's internal SAX parser. Note that
- * not all files cannot be parsed with the default parser; for example, the
+ * not all files can be parsed with the default parser; for example, the
  * DBLP documents contain too many entities and cause an out of memory error.
  * The internal {@link XMLParser} can be used as alternative.
  *

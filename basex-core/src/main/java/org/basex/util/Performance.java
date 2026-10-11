@@ -66,7 +66,7 @@ public final class Performance {
   }
 
   /**
-   * Returns a string with the specified time in milliseconds.
+   * Returns the specified time in milliseconds.
    * @param nano time in nanoseconds
    * @return time in milliseconds with 2 decimal places
    */
@@ -75,7 +75,7 @@ public final class Performance {
   }
 
   /**
-   * Returns a string with the specified time in milliseconds.
+   * Returns the specified time in milliseconds.
    * @param nano time in nanoseconds
    * @param runs number of runs
    * @return time in milliseconds with 2 decimal places

@@ -48,7 +48,7 @@ final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Caches all texts and IDs in the specified database range.
+   * Returns the PRE values in the specified database range.
    * @param pre PRE value
    * @param size size value
    * @return list of PRE values

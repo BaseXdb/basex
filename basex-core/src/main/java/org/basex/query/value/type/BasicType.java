@@ -493,7 +493,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** Short type. */
+  /** Unsigned int type. */
   UNSIGNED_INT("unsignedInt", UNSIGNED_LONG, Type.ID.UIN, true, false) {
     @Override
     public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
@@ -1197,7 +1197,7 @@ public enum BasicType implements Type {
    * Checks the validity of the specified object and returns it as item.
    * @param value value to be checked
    * @param info input info (can be {@code null})
-   * @return integer value
+   * @return item
    * @throws QueryException query exception
    */
   final Item checkNum(final Object value, final InputInfo info) throws QueryException {
@@ -1259,7 +1259,7 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Returns an info message for a similar function.
+   * Returns an info message for a similar type.
    * @param qname name of type
    * @return info string
    */
@@ -1272,7 +1272,7 @@ public enum BasicType implements Type {
   /**
    * Checks if the specified item is a string.
    * @param item item
-   * @return item argument
+   * @return result of check
    */
   private static boolean isString(final Item item) {
     final Type type = item.type;

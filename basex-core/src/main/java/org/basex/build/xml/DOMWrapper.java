@@ -13,7 +13,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
 /**
- * This class converts an DOM document instance to a database representation.
+ * This class converts a DOM document instance to a database representation.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

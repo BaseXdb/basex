@@ -429,7 +429,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   /**
-   * Remove an element from the left digit.
+   * Removes an element from the left digit.
    * @param pos position inside the left digit
    * @return resulting tree
    */
@@ -498,7 +498,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   /**
-   * Remove an element from the right digit.
+   * Removes an element from the right digit.
    * @param pos position inside the right digit
    * @return resulting tree
    */
@@ -706,7 +706,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param len number of elements
    * @param buffer buffer to insert the node slice into
    * @param inBuffer initial number of nodes in the buffer
-   * @return slice
+   * @return new number of nodes in the buffer
    */
   private static <N, E> int splitDigit(final Node<N, E>[] nodes, final long from,
       final long len, final NodeLike<N, E>[] buffer, final int inBuffer) {

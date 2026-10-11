@@ -151,13 +151,13 @@ public final class Types {
   /** Zero or more xs:base64Binary. */
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
 
-  /** String or xs:hex-binary or xs:base64-binary. */
+  /** String or xs:hexBinary or xs:base64Binary. */
   public static final Type STRING_OR_BINARY = ChoiceItemType.get(STRING, HEX_BINARY, BASE64_BINARY);
   /** Single string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
-  /** String or xs:base64-binary. */
+  /** String or xs:base64Binary. */
   public static final Type STRING_OR_BASE64_BINARY = ChoiceItemType.get(STRING, BASE64_BINARY);
   /** Single string or xs:base64-binary. */
   public static final SeqType STRING_OR_BASE64_BINARY_O = STRING_OR_BASE64_BINARY.seqType();

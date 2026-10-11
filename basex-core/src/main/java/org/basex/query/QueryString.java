@@ -186,7 +186,7 @@ public final class QueryString {
   /**
    * Serializes a chopped version of the specified value.
    * @param value value
-   * @return string
+   * @return self reference
    */
   public QueryString value(final byte[] value) {
     tb.add(toValue(value));
@@ -196,7 +196,7 @@ public final class QueryString {
   /**
    * Serializes a chopped version of the specified value with quotes.
    * @param value value
-   * @return token
+   * @return self reference
    */
   public QueryString quoted(final byte[] value) {
     tb.add(toQuoted(value));

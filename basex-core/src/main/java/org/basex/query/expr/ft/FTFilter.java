@@ -136,7 +136,7 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Checks if the filter requires the whole text node to be parsed.
-   * Is overwritten by {@link FTContent} to perform other checks.
+   * Is overridden by {@link FTContent} to perform other checks.
    * @return result of check
    */
   boolean content() {

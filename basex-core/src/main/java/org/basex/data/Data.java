@@ -149,8 +149,8 @@ public abstract class Data {
   }
 
   /**
-   * Drops the specified index.
-   * @param type index to be dropped
+   * Creates the specified index.
+   * @param type index to be created
    * @param cmd calling command
    * @throws IOException I/O exception
    */
@@ -548,7 +548,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns the reference to a text (text, comment, pi, pi, document) or attribute value.
+   * Returns the reference to a text (text, comment, pi, document) or attribute value.
    * @param pre PRE value
    * @return disk offset
    */
@@ -843,7 +843,7 @@ public abstract class Data {
     // delete entries in value indexes
     indexDelete(pre, id(pre), size);
 
-    /// delete textual values
+    // delete textual values
     if(kind != DOC && kind != ELEM) delete(pre, kind != ATTR);
 
     // reduce size of ancestors
@@ -966,7 +966,7 @@ public abstract class Data {
           // add attribute
           final byte[] name = sData.name(sPre, sKind);
           int uriId = sData.uriId(sPre, sKind);
-          // extend namespace scope and write namespace flag if attribute has a new namespaces
+          // extend namespace scope and write namespace flag if attribute has a new namespace
           if(uriId != 0) {
             final byte[] prefix = prefix(name), uri = sData.nspaces.uri(uriId);
             uriId = nspaces.uriIdForPrefix(prefix, false);
@@ -1239,7 +1239,7 @@ public abstract class Data {
   }
 
   /**
-   * Generates a reference for a text (text, comment, pi, pi, document) or attribute value.
+   * Generates a reference for a text (text, comment, pi, document) or attribute value.
    * @param value text to be indexed
    * @param text text/attribute flag
    * @return reference

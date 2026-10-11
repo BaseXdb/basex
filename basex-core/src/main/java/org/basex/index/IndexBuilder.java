@@ -10,7 +10,7 @@ import org.basex.index.value.*;
 import org.basex.util.*;
 
 /**
- * This interface defines the functions which are needed for building
+ * This class defines the functions which are needed for building
  * new index structures.
  *
  * @author BaseX Team, BSD License

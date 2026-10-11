@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class defines is an abstract class for full-text expressions.
+ * This is an abstract class for full-text expressions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -50,7 +50,7 @@ public abstract class FTExpr extends ParseExpr {
   /**
    * This method is called by the index-based full-text evaluation.
    * @param qc query context
-   * @return resulting item
+   * @return iterator
    * @throws QueryException query exception
    */
   @Override

@@ -64,7 +64,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
 
   /**
    * Invalidates all entries that are not referenced in the list.
-   * @return iterator
+   * @return self reference
    */
   public GNodeList clean() {
     Arrays.fill(list, size, list.length, null);

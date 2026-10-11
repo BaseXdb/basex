@@ -127,7 +127,7 @@ public final class IntList extends ElementList {
   /**
    * Adds an element to the array if it is not contained yet.
    * @param element element to be added
-   * @return result of check
+   * @return self reference
    */
   public IntList addUnique(final int element) {
     if(!contains(element)) add(element);
@@ -246,7 +246,7 @@ public final class IntList extends ElementList {
   }
 
   /**
-   * Sorts the data and removes distinct values.
+   * Sorts the data and removes duplicate values.
    * @return self reference
    */
   public IntList ddo() {

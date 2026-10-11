@@ -43,7 +43,7 @@ public abstract class Job {
 
   /**
    * Returns the job context.
-   * @return info
+   * @return job context
    */
   public final JobContext jc() {
     return jc;
@@ -252,7 +252,7 @@ public abstract class Job {
 
   /**
    * Returns short progress information.
-   * Can be overwritten to give more specific feedback.
+   * Can be overridden to give more specific feedback.
    * @return header information
    */
   public String shortInfo() {
@@ -261,7 +261,7 @@ public abstract class Job {
 
   /**
    * Returns detailed progress information.
-   * Can be overwritten to give more specific feedback.
+   * Can be overridden to give more specific feedback.
    * @return header information
    */
   public String detailedInfo() {
@@ -270,8 +270,8 @@ public abstract class Job {
 
   /**
    * Returns a progress value (0 - 1).
-   * Can be overwritten to give more specific feedback.
-   * @return header information
+   * Can be overridden to give more specific feedback.
+   * @return progress value
    */
   public double progressInfo() {
     return 0;

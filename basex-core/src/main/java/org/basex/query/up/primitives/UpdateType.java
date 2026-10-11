@@ -26,7 +26,7 @@ public enum UpdateType {
   /** Alter backup.         */ BACKUPALTER,
   /** Create backup.        */ BACKUPCREATE,
 
-  /** Add value resource .  */ DBPUT,
+  /** Add value resource.   */ DBPUT,
   /** Add binary resource.  */ DBPUTBINARY,
 
   // Operations on nodes of existing databases
@@ -56,7 +56,7 @@ public enum UpdateType {
   // User operations
 
   /** Update info.          */ USERINFO,
-  /** Change username.      */ USERGRANT,
+  /** Grant permissions.    */ USERGRANT,
   /** Change password.      */ USERPASSWORD,
   /** Drop user.            */ USERDROP,
   /** Change username.      */ USERALTER,

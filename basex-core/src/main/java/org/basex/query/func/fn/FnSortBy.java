@@ -35,7 +35,7 @@ public class FnSortBy extends SortFn {
   }
 
   /**
-   * Sort the input data and returns an iterator.
+   * Sorts the input data and returns an iterator.
    * @param input items to be sorted
    * @param qc query context
    * @return iterator with ordered items

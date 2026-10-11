@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * Abstract class for an update operations.
+ * Abstract class for update operations.
  *
  * @author BaseX Team, BSD License
  * @author Lukas Kircher

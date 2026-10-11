@@ -149,7 +149,7 @@ public final class ValueBuilder {
   }
 
   /**
-   * Returns the built array and annotates it with the type of the specified expression.
+   * Returns the built value and annotates it with the type of the specified expression.
    * @param expr expression that created the value (can be {@code null})
    * @return value
    */
@@ -167,7 +167,7 @@ public final class ValueBuilder {
   }
 
   /**
-   * Checks if the specified value is a string.
+   * Checks if the specified value is an untyped atomic value.
    * @param value value
    * @return result of check
    */

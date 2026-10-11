@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author Wolfgang Miller
  */
 public final class TreeView extends View {
-  /** TreeBorders Object, contains cached PRE values and borders (can be {@code null}). */
+  /** TreeSubtree Object, contains cached PRE values and borders (can be {@code null}). */
   private TreeSubtree sub;
   /** TreeRects Object, contains cached rectangles. */
   private TreeRects tr;
@@ -802,7 +802,7 @@ public final class TreeView extends View {
 
   /**
    * Finds rectangle at cursor position.
-   * @return focused rectangle
+   * @return true if a rectangle was found
    */
   private boolean focus() {
     if(refreshedFocus) {

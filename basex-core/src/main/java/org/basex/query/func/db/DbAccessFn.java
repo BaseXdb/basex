@@ -99,7 +99,7 @@ abstract class DbAccessFn extends StandardFunc {
 
   /**
    * Checks create permissions.
-   * @param name database node
+   * @param name name of database
    * @param qc query context
    * @throws QueryException query exception
    */

@@ -41,7 +41,7 @@ public final class FnUriCollection extends FnCollection {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // overwrite implementation of superclass
+    // override implementation of superclass
     return iter(qc).value(qc, this);
   }
 }

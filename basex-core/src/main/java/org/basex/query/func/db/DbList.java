@@ -47,7 +47,7 @@ public class DbList extends DbAccessFn {
   }
 
   /**
-   * Returns an iterator over all resources in a databases.
+   * Returns an iterator over all resources in a database.
    * @param name name of database
    * @param qc query context
    * @return resource iterator

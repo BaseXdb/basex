@@ -268,7 +268,7 @@ public abstract sealed class SimpleMap extends Mapping
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 
-    // A ! (if(B) then C else () → A[B] ! C
+    // A ! (if(B) then C else ()) → A[B] ! C
     if(next instanceof final If iff && iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
         !iff.cond.seqType().mayBeNumber()) {
       return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
@@ -351,7 +351,7 @@ public abstract sealed class SimpleMap extends Mapping
 
     // all operands are steps
     //   db:get('animals') ! xml → db:get('animals')/xml
-    //   a ! b ! c → /a/b/c
+    //   a ! b ! c → a/b/c
     final Expr path = Path.get(cc, info, root, stps);
     if(e == el) return path;
 

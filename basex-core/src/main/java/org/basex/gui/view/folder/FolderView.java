@@ -234,7 +234,7 @@ public final class FolderView extends View {
    * Focuses the current PRE value.
    * @param x x mouse position
    * @param y y mouse position
-   * @return currently focused ID
+   * @return true if a node was focused
    */
   private boolean focus(final int x, final int y) {
     if(opened == null) return false;

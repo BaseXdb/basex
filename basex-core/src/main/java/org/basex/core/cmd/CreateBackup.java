@@ -81,7 +81,7 @@ public final class CreateBackup extends ABackup {
   }
 
   /**
-   * Backups the specified database.
+   * Backs up the specified database.
    * @param db name of the database (empty string for general data)
    * @param comment comment (can be {@code null})
    * @param compress compress flag

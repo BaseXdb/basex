@@ -146,7 +146,7 @@ public final class User {
         // create copy of the info node if query context is available
         user.node(info.materialize(n -> false, ii, qc));
       } else {
-        // otherwise, referenced original info node and invalidate parent reference
+        // otherwise, reference original info node and invalidate parent reference
         user.node(info);
         info.parent(null);
       }

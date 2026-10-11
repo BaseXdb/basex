@@ -140,8 +140,8 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Returns the date and time.
-   * @return year
+   * Returns the duration in seconds.
+   * @return seconds
    */
   public BigDecimal dtd() {
     return seconds;
@@ -170,7 +170,7 @@ public final class DTDur extends Dur {
   /**
    * Returns a dayTimeDuration item for the specified milliseconds.
    * @param ms milliseconds
-   * @return dateTime instance
+   * @return dayTimeDuration instance
    */
   public static DTDur get(final long ms) {
     return new DTDur(BigDecimal.valueOf(ms).divide(BD_1000, MathContext.DECIMAL64));

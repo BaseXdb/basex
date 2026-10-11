@@ -35,7 +35,7 @@ public interface Text {
   String UPDATE_URL = PUBLIC_URL + "/download/";
   /** URL of the documentation. */
   String DOCS_URL = "https://docs." + Prop.PROJECT + ".org";
-  /** URL of the documentation. */
+  /** Files URL. */
   String FILES_URL = "https://files." + Prop.PROJECT + ".org";
   /** Version URL. */
   String VERSION_URL = FILES_URL + "/version.txt";
@@ -271,7 +271,7 @@ public interface Text {
 
   // SERVER =======================================================================================
 
-  /** Server was started. */
+  /** Port info. */
   String PORT_X = " (" + lang("port") + ": %).";
   /** Server was started. */
   String SRV_STARTED_PORT_X = lang("srv_started") + PORT_X;
@@ -637,7 +637,7 @@ public interface Text {
   String DB_NOT_DROPPED_X = lang("db_not_dropped_%");
   /** Database renamed. */
   String DB_RENAMED_X = lang("db_renamed_%");
-  /** Database not dropped. */
+  /** Database not renamed. */
   String DB_NOT_RENAMED_X = lang("db_not_renamed_%");
   /** Database flushed. */
   String DB_FLUSHED_X = lang("db_flushed_%");
@@ -659,11 +659,11 @@ public interface Text {
   String DB_EXPORTED_X = lang("db_exported_%");
   /** Database already exists. */
   String DB_EXISTS_X = lang("db_exists_%");
-  /** Database was renamed. */
+  /** Backup was renamed. */
   String BACKUP_RENAMED_X = lang("backup_renamed_%");
-  /** Database was not renamed. */
+  /** Backup was not renamed. */
   String BACKUP_NOT_RENAMED_X = lang("backup_not_renamed_%");
-  /** Database was dropped. */
+  /** Backup was dropped. */
   String BACKUP_DROPPED_X = lang("backup_dropped_%");
   /** Backup was not found. */
   String BACKUP_NOT_FOUND_X = lang("backup_not_found_%");
@@ -697,7 +697,7 @@ public interface Text {
   String QUERY = lang("query");
   /** Query info: parsing. */
   String PARSING = lang("parsing");
-  /** Query info: result . */
+  /** Query info: result. */
   String RESULT = lang("result");
 
   /** Parsing. */
@@ -746,7 +746,7 @@ public interface Text {
   String PW_CHANGED_X = lang("pw_changed_%");
   /** User renamed. */
   String USER_RENAMED_X_X = lang("user_renamed_%_%");
-  /** User unknown. */
+  /** User exists. */
   String USER_EXISTS_X = lang("user_exists_%");
   /** Admin user. */
   String ADMIN_STATIC = lang("admin_static");
@@ -767,7 +767,7 @@ public interface Text {
   String GLOBAL_OPTION_X = lang("global_option_%");
   /** Unknown option '%'. */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
-  /** Unknown command error. */
+  /** Unknown option error. */
   String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
   /** Unknown option, followed by the allowed options. */
   String UNKNOWN_OPT_ONEOF_X_X = lang("unknown_option_%") + " Allowed: %.";
@@ -1038,7 +1038,7 @@ public interface Text {
   String FIND_FILES = lang("find_files");
   /** Find contents. */
   String FIND_CONTENTS = lang("find_contents");
-  /** Find next . */
+  /** Find next. */
   String FIND_NEXT = lang("find_next");
   /** Find previous. */
   String FIND_PREVIOUS = lang("find_previous");
@@ -1083,7 +1083,7 @@ public interface Text {
 
   // VISUALIZATIONS ===============================================================================
 
-  /** No data available.. */
+  /** No data available. */
   String NO_DATA = lang("no_data");
   /** Not enough pixels. */
   String NO_PIXELS = lang("no_pixels");
@@ -1189,7 +1189,7 @@ public interface Text {
   String PARSE_QUOTES = lang("parse_quotes");
   /** Merge type information. */
   String MERGE_TYPES = lang("merge_types");
-  /** Merge type information. */
+  /** Include strings. */
   String INCLUDE_STRINGS = lang("include_strings");
   /** Escape characters. */
   String ESCAPE_CHARS = lang("escape_chars");
@@ -1217,7 +1217,7 @@ public interface Text {
 
   /** Users. */
   String USERS_X = lang("users_%");
-  /** Confirmation . */
+  /** Confirmation. */
   String ARE_YOU_SURE = lang("are_you_sure");
 
   /** Alter password. */
@@ -1255,7 +1255,7 @@ public interface Text {
   String DROP_BACKUPS_X = lang("drop_backups_%") + NL + ARE_YOU_SURE;
   /** Dialog text for dropping a package. */
   String DELETE_PACKAGES_X = lang("delete_packages_%") + NL + ARE_YOU_SURE;
-  /** Dialog text for overwriting a backup. */
+  /** Dialog text for overwriting a database. */
   String OVERWRITE_DB_QUESTION = OVERWRITE_DB + NL + ARE_YOU_SURE;
 
   /** Dialog title for deleting nodes. */

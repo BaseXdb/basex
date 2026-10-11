@@ -19,7 +19,7 @@ final class RESTSession implements Iterable<Command> {
   private final ArrayList<Command> commands = new ArrayList<>();
 
   /**
-   * Constructor, specifying login data and an output stream.
+   * Constructor.
    * @param conn HTTP connection
    */
   RESTSession(final HTTPConnection conn) {

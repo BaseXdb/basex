@@ -196,7 +196,7 @@ public final class FnItemsAt extends StandardFunc {
         return cc.function(_UTIL_RANGE, info, input, arg1, arg2);
       }
     }
-    // items-at(E, reverse(P)) → reverse(E, P))
+    // items-at(E, reverse(P)) → reverse(items-at(E, P))
     if(REVERSE.is(at))
       return cc.function(REVERSE, info, cc.function(ITEMS_AT, info, input, at.arg(0)));
 

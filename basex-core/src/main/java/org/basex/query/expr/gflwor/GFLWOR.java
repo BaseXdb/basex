@@ -320,7 +320,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Rewrites and expressions in predicates to where clauses.
+   * Rewrites and expressions in where clauses to single where clauses.
    */
   private void flattenAnd() {
     // rewrite and operators in where clauses to single clauses
@@ -386,7 +386,7 @@ public final class GFLWOR extends ParseExpr {
             fr.remove(cc, fr.pos);
           } else {
             // replace with singleton sequence (will never be accessed)
-            //   for $i in 1 to 3 return <a/> → for $i in replicate('', 3) return $i
+            //   for $i in 1 to 3 return <a/> → for $i in replicate('', 3) return <a/>
             fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.EMPTY, fs));
             fr.exprType.assign(BasicType.STRING);
           }
@@ -713,10 +713,10 @@ public final class GFLWOR extends ParseExpr {
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         changed = true;
         if(expr == Bln.TRUE) {
-          // for $i in 1 to 2 while true() return $i → for $i in 1 to 3 return $i
+          // for $i in 1 to 2 while true() return $i → for $i in 1 to 2 return $i
           clauses.remove(c--);
         } else {
-          // for $i in 1 to 2 where false() return $i → for $i in 1 to 3 return ()
+          // for $i in 1 to 2 where false() return $i → for $i in 1 to 2 return ()
           clauses.subList(c, clauses.size()).clear();
           rtrn = Empty.VALUE;
         }
@@ -961,8 +961,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Tries to slide 'let' expressions out of loops.
-   * Care is taken that no unnecessary relocations are done.
+   * Moves leading 'let' clauses of a nested FLWOR return expression into this expression.
    * @param cc compilation context
    * @return {@code true} if there were relocations, {@code false} otherwise
    * @throws QueryException query exception

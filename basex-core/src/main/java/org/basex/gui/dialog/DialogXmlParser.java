@@ -10,7 +10,7 @@ import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
 
 /**
- * CSV parser panel.
+ * XML parser panel.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

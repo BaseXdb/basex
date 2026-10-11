@@ -46,7 +46,7 @@ public final class XmlParser {
   }
 
   /**
-   * Sets a content handler.
+   * Parses an input stream.
    * @param stream input stream
    * @throws IOException I/O exception
    * @throws SAXException SAX exception

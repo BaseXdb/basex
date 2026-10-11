@@ -59,7 +59,7 @@ public enum CmpOp {
     }
   },
 
-  /** General comparison: greater of equal. */
+  /** General comparison: greater or equal. */
   GE(">=", "follows-or-is") {
     @Override
     public boolean eval(final int v) {
@@ -160,8 +160,8 @@ public enum CmpOp {
 
   /**
    * Constructor.
-   * @param general string representation or general comparator
-   * @param nodes string representation or node comparators
+   * @param general string representation of general comparator
+   * @param nodes string representation of node comparators
    */
   CmpOp(final String general, final String... nodes) {
     this.general = general;
@@ -214,7 +214,7 @@ public enum CmpOp {
 
   /**
    * Returns the string representation of the general comparator.
-   * @return value comparator
+   * @return general comparator
    */
   @Override
   public String toString() {

@@ -176,7 +176,7 @@ public final class Catch extends Single {
   }
 
   /**
-   * Checks if all errors are caught by this cause.
+   * Checks if all errors are caught by this clause.
    * @return result of check
    */
   boolean global() {

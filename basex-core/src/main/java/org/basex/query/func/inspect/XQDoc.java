@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class contains functions for generating a xqDoc documentation.
+ * This class contains functions for generating an xqDoc documentation.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -77,7 +77,7 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   /**
-   * Build function items for all arities of a static function and add them to the given value
+   * Builds function items for all arities of a static function and adds them to the given value
    * builder.
    * @param vb value builder
    * @param sf static function

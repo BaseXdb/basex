@@ -69,7 +69,7 @@ public final class CsvParser {
 
   /**
    * Parses a CSV expression.
-   * @param ii input info (can be @null)
+   * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */

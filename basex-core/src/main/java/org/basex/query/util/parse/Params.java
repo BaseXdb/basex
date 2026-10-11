@@ -88,8 +88,8 @@ public final class Params {
   }
 
   /**
-   * Returns the variables values of the specified parameter list.
-   * @return default values
+   * Returns the variables of the specified parameter list.
+   * @return variables
    */
   public Var[] vars() {
     final int ps = size();

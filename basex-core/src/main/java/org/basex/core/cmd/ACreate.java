@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
-  /** Flag for closing a data instances before executing the command. */
+  /** Flag for closing a data instance before executing the command. */
   private boolean newData;
   /** Indicates if database should be locked. */
   protected boolean lock = true;

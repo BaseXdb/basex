@@ -11,7 +11,7 @@ final class PkgDep {
   final String name;
   /** Name of processor a package depends on. */
   String processor;
-  /** Set of acceptable version. */
+  /** Set of acceptable versions. */
   String versions;
   /** SemVer template. */
   String semver;

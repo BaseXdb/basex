@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.query.value.type.*;
 
 /**
- * Option containing an strings array value.
+ * Option containing a string array value.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

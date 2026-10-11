@@ -42,7 +42,7 @@ public final class IndexStats {
   }
 
   /**
-   * Checks if the specified number of occurrence will be remembered.
+   * Checks if the specified number of occurrences will be remembered.
    * @param oc number of occurrences
    * @return result of check
    */

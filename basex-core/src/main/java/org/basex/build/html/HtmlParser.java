@@ -68,7 +68,7 @@ public final class HtmlParser extends XMLParser {
    * @param io io reference
    * @param parser parser to be used (can be {@code null})
    * @param hopts HTML options
-   * @return parser
+   * @return XML input
    * @throws IOException I/O exception
    */
   private static IO toXml(final IO io, final Parser parser, final HtmlOptions hopts)
@@ -319,7 +319,7 @@ public final class HtmlParser extends XMLParser {
     private final ExternalLib lib;
 
     /**
-     * Return a reader instance for this parser.
+     * Returns a reader instance for this parser.
      * @param options HTML options
      * @param writer string writer
      * @return reader

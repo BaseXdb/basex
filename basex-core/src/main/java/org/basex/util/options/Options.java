@@ -266,7 +266,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the option with the specified name.
    * @param name name of the option
-   * @return value (can be {@code null})
+   * @return option (can be {@code null})
    */
   public final synchronized Option<?> option(final String name) {
     return meta.definitions.get(name);
@@ -973,7 +973,7 @@ public class Options implements Iterable<Option<?>> {
    * @param option option
    * @param value supplied value
    * @param all allowed values
-   * @return exception
+   * @return error string
    */
   public static String allowed(final Option<?> option, final String value, final Object... all) {
     return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, list(all));

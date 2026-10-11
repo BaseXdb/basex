@@ -66,7 +66,7 @@ public class DbText extends DbAccessFn {
   }
 
   /**
-   * Returns the index type (overwritten by implementing functions).
+   * Returns the index type (overridden by implementing functions).
    * @return index type
    */
   IndexType type() {
@@ -87,7 +87,7 @@ public class DbText extends DbAccessFn {
   /**
    * Returns tokens to be looked up.
    * @param qc query context
-   * @return index accessor
+   * @return tokens
    * @throws QueryException query exception
    */
   private TokenSet tokens(final QueryContext qc) throws QueryException {

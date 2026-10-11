@@ -915,7 +915,7 @@ public abstract class Path extends ParseExpr {
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
-      // Example for position predicate: child:x[1] != parent::x[1]
+      // Example for position predicate: child::x[1] != parent::x[1]
       final Step step = axisStep(s);
       if(step == null || !step.axis.down || step.selector != null || step.mayBePositional()) break;
       if(nodes != null) nodes = step.nodes(nodes, false);

@@ -151,7 +151,7 @@ public abstract class Collation {
   /**
    * Returns a map with all arguments.
    * @param args arguments
-   * @return error message
+   * @return arguments
    */
   private static HashMap<String, String> args(final String args) {
     final HashMap<String, String> map = new HashMap<>();

@@ -19,7 +19,7 @@ public final class StemDir {
   private final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
 
   /**
-   * Reads a stop words file.
+   * Reads a stemming dictionary file.
    * @param fl file reference
    * @return success flag
    */

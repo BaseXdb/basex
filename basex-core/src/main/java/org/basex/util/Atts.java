@@ -113,7 +113,7 @@ public final class Atts extends ElementList {
   /**
    * Returns the offset to the specified name.
    * @param name name to be found
-   * @return value, or {@code null}
+   * @return offset, or {@code -1}
    */
   public int get(final byte[] name) {
     final byte[][] lst = list;

@@ -43,7 +43,7 @@ public final class SearchEditor extends BaseXBack {
   }
 
   /**
-   * Return search bar.
+   * Returns the search bar.
    * @return search bar
    */
   public SearchBar bar() {

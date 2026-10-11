@@ -19,7 +19,7 @@ public final class HoistedFilter extends CachedFilter {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param root root expression
-   * @param preds single loop-invariant predicate
+   * @param preds loop-invariant predicates
    */
   HoistedFilter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, root, preds);

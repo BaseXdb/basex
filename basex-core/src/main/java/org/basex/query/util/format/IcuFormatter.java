@@ -42,7 +42,7 @@ public final class IcuFormatter extends Formatter {
 
   /** ICU rule based spell out format. */
   private final RuleBasedNumberFormat spelloutFormat;
-  /** ICU rule based spell out format. */
+  /** ICU rule based ordinal format. */
   private final RuleBasedNumberFormat ordinalFormat;
   /** Supported ICU rule set names. */
   private final Set<String> ruleSetNames;
@@ -190,7 +190,7 @@ public final class IcuFormatter extends Formatter {
   }
 
   /**
-   * Determine name of rule set for ICU RuleBasedNumberFormat to be used with this format for some
+   * Determines name of rule set for ICU RuleBasedNumberFormat to be used with this format for some
    * given numeral type and format modifier.
    * @param numType numeral type
    * @param modifier format modifier (can be {@code null})
@@ -224,7 +224,7 @@ public final class IcuFormatter extends Formatter {
   }
 
   /**
-   * Determine rule set to be used for a given rule set name, by matching that name with supported
+   * Determines rule set to be used for a given rule set name, by matching that name with supported
    * rule set names.
    * @param name proposed ruleset name
    * @return supported rule set name, or {@code null} if none available
@@ -253,7 +253,7 @@ public final class IcuFormatter extends Formatter {
   }
 
   /**
-   * Determine rule set to be used for a given numeral type.
+   * Determines rule set to be used for a given numeral type.
    * @param numType numeral type
    * @return rule set name, or {@code null} if not available
    */

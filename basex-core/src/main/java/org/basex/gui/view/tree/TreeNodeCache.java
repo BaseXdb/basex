@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 final class TreeNodeCache {
   /** Document depth. */
   private final int maxLevel;
-  /** All nodes document nodes per level. */
+  /** All document nodes per level. */
   private final IntList[] nodes;
 
   /**

@@ -230,7 +230,7 @@ public class MathlingArtTest {
   }
 
   /**
-   * Locates and unpacks the test data and initialises the engines; skips all tests if the data
+   * Locates and unpacks the test data and initializes the engines; skips all tests if the data
    * is missing.
    * @throws Exception exception
    */

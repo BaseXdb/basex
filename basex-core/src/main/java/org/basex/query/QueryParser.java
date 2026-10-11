@@ -843,7 +843,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DefaultCollationDecl" rule.
-   * @return query expression
+   * @return true if declaration was found
    * @throws QueryException query exception
    */
   private boolean defaultCollationDecl() throws QueryException {
@@ -1684,7 +1684,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "WindowVars" rule.
    * @param start start condition flag
-   * @return array containing the current, positional, previous and next variable name
+   * @return window condition
    * @throws QueryException query exception
    */
   private Condition windowCond(final boolean start) throws QueryException {
@@ -1700,7 +1700,6 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "OrderSpec" and "OrderModifier" rules.
-   * Empty order specs are ignored, {@code order} is then returned unchanged.
    * @return new order key
    * @throws QueryException query exception
    */
@@ -2671,7 +2670,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "SimpleNodeTest" and "NameTest" rules.
    * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or
-   *   {@code null} for catch clause))
+   *   {@code null} for catch clause)
    * @param all check all tests, or only names
    * @return node test or {@code null}
    * @throws QueryException query exception
@@ -2848,7 +2847,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "KeySpecifier" rule.
-   * @return specifier expression ({@code null} means wildcard)
+   * @return specifier expression ({@link Str#WILDCARD} means wildcard)
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
@@ -3124,7 +3123,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StringLiteral" rule.
-   * @return query expression
+   * @return string
    * @throws QueryException query exception
    */
   private byte[] stringLiteral() throws QueryException {
@@ -3147,7 +3146,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "URILiteral" rule.
    * @param special tokens that are allowed though not valid URI literals
-   * @return query expression
+   * @return URI
    * @throws QueryException query exception
    */
   private byte[] uriLiteral(final byte[]... special) throws QueryException {
@@ -3159,7 +3158,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "BracedURILiteral" rule without the "Q{" prefix.
-   * @return query expression
+   * @return URI
    * @throws QueryException query exception
    */
   private byte[] bracedURILiteral() throws QueryException {
@@ -4462,7 +4461,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "NameTestUnion" rule.
    * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or {@code null})
-   * @return name tests or {@code null}
+   * @return name tests
    * @throws QueryException query exception
    */
   private ArrayList<Test> nameTestUnion(final Kind kind) throws QueryException {
@@ -4720,7 +4719,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FTUnit" rule.
-   * @return query expression
+   * @return unit
    * @throws QueryException query exception
    */
   private FTUnit ftUnit() throws QueryException {

@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
   /**
    * Returns information about the currently opened sessions.
-   * @return data reference
+   * @return info string
    */
   public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();

@@ -87,7 +87,7 @@ public final class BaseXCollationOptions extends CollationOptions {
   /**
    * Returns a collator for the specified arguments.
    * @param args argument to be parsed
-   * @return collator collator
+   * @return collator
    * @throws BaseXException database exception
    */
   private Collator collator(final HashMap<String, String> args) throws BaseXException {

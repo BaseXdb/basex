@@ -278,7 +278,7 @@ final class Unit {
    * Creates a new element.
    * @param item item (can be {@code null})
    * @param name name (expected/returned)
-   * @param count item count (ignore it {@code -1})
+   * @param count item count (ignored if {@code -1})
    * @return element
    */
   private static FBuilder element(final Item item, final QNm name, final int count) {

@@ -33,7 +33,7 @@ public final class Log implements QueryTracer {
 
   /** Static options. */
   private final StaticOptions sopts;
-  /** Logs messages to exclude. */
+  /** Log messages to exclude. */
   private final Pattern exclude;
   /** Log messages to cut. */
   private final Pattern cut;

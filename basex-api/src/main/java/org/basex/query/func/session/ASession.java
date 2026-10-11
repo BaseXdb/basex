@@ -71,8 +71,8 @@ public final class ASession {
   }
 
   /**
-   * Returns all session attributes.
-   * @return session attributes
+   * Returns the names of all session attributes.
+   * @return attribute names
    * @throws QueryException query exception
    */
   public Value names() throws QueryException {

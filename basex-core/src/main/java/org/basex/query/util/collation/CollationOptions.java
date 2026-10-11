@@ -25,9 +25,9 @@ abstract class CollationOptions extends Options {
   }
 
   /**
-   * Parses the specified options and returns the faulty key.
+   * Parses the specified options and returns a collation.
    * @param args arguments
-   * @return error message
+   * @return collation
    * @throws BaseXException database exception
    */
   abstract Collation get(HashMap<String, String> args) throws BaseXException;

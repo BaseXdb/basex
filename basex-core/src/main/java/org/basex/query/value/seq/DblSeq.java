@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Sequence of items of type {@link Itr xs:double}, containing at least two of them.
+ * Sequence of items of type {@link Dbl xs:double}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -25,7 +25,7 @@ public final class DblSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param values bytes
+   * @param values values
    */
   private DblSeq(final double[] values) {
     super(values.length, BasicType.DOUBLE);

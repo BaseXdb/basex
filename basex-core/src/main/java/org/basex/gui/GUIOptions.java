@@ -59,7 +59,7 @@ public final class GUIOptions extends Options {
   /** Height of the project list (percentage). */
   public static final NumberOption PROJECTLIST = new NumberOption("PROJECTLIST", 30);
 
-  /** GUI height. */
+  /** GUI size. */
   public static final NumbersOption GUISIZE = new NumbersOption("GUISIZE", 1004, 748);
   /** GUI position. */
   public static final NumbersOption GUILOC = new NumbersOption("GUILOC", 10, 10);
@@ -79,13 +79,13 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWTABLE = new BooleanOption("SHOWTABLE", false);
   /** Flag for activated result view. */
   public static final BooleanOption SHOWTEXT = new BooleanOption("SHOWTEXT", true);
-  /** Flag for activated tree view. */
+  /** Flag for activated folder view. */
   public static final BooleanOption SHOWFOLDER = new BooleanOption("SHOWFOLDER", false);
-  /** Flag for activated query view. */
+  /** Flag for activated explore view. */
   public static final BooleanOption SHOWEXPLORE = new BooleanOption("SHOWEXPLORE", false);
   /** Flag for activated plot view. */
   public static final BooleanOption SHOWPLOT = new BooleanOption("SHOWPLOT", false);
-  /** Flag for activated xquery view. */
+  /** Flag for activated editor view. */
   public static final BooleanOption SHOWEDITOR = new BooleanOption("SHOWEDITOR", true);
   /** Flag for activated tree view. */
   public static final BooleanOption SHOWTREE = new BooleanOption("SHOWTREE", false);

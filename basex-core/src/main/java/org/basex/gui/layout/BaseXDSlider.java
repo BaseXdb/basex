@@ -42,7 +42,7 @@ public final class BaseXDSlider extends BaseXPanel {
   private boolean left;
   /** Right button flag. */
   private boolean right;
-  /** Right button flag. */
+  /** Center flag. */
   private boolean center;
   /** Logarithmic scale. */
   private final boolean log;

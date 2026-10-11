@@ -28,7 +28,7 @@ public abstract class RegExFn extends StandardFunc {
    * @param pattern pattern
    * @param flags flags (can be {@code null})
    * @param qc query context
-   * @return pattern modifier
+   * @return pattern
    * @throws QueryException query exception
    */
   final Pattern pattern(final byte[] pattern, final byte[] flags, final QueryContext qc)

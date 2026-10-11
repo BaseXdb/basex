@@ -35,7 +35,7 @@ public final class DBOptimize extends DBUpdate {
    * @param data data
    * @param all optimize all database structures flag
    * @param qopts query options
-   * @param qc database context
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */

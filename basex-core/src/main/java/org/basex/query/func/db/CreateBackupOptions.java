@@ -3,14 +3,14 @@ package org.basex.query.func.db;
 import org.basex.util.options.*;
 
 /**
- * Options for processing archives.
+ * Options for creating backups.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CreateBackupOptions extends Options {
-  /** Recursive parsing. */
+  /** Comment. */
   public static final StringOption COMMENT = new StringOption("comment");
-  /** Include root directory. */
+  /** Compression flag. */
   public static final BooleanOption COMPRESS = new BooleanOption("compress", true);
 }

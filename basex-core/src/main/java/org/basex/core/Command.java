@@ -233,7 +233,7 @@ public abstract class Command extends Job {
   /**
    * Returns a string representation of the command.
    * @param password password flag
-   * @return result of check
+   * @return string representation
    */
   public final String toString(final boolean password) {
     final CmdBuilder cb = new CmdBuilder(this, password);

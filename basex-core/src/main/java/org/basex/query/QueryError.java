@@ -1671,8 +1671,8 @@ public enum QueryError {
   }
 
   /**
-   * Returns the namespace URI of this error.
-   * @return function
+   * Returns the QName of this error.
+   * @return QName
    */
   public final QNm qname() {
     return new QNm(Token.token(prefix), code, uri);
@@ -1947,7 +1947,7 @@ public enum QueryError {
   }
 
   /**
-   * Returns a singular or plural form for 'argument'.
+   * Returns a singular or plural form for 'parameter'.
    * @param number number of parameters
    * @return string
    */

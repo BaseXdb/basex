@@ -107,7 +107,7 @@ abstract class XQHashMap extends XQMap {
   abstract XQHashMap build(Item key, Value value) throws QueryException;
 
   /**
-   * Builds the map by adding keys and values from the old map and a new key and value.
+   * Builds the map by adding keys and values from the old map.
    * @param old old values
    * @return map
    * @throws QueryException query exception

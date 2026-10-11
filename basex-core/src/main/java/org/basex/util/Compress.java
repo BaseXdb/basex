@@ -130,7 +130,7 @@ public final class Compress {
   }
 
   /**
-   * Indicates if the specified value is inlined.
+   * Indicates if the specified value is compressed.
    * @param value value
    * @return result of check
    */

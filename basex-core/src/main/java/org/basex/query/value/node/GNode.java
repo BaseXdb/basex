@@ -200,7 +200,7 @@ public abstract class GNode extends Item {
   }
 
   /**
-   * Returns an iterator for all descendant nodes.
+   * Returns a following axis iterator.
    * @param self include self node
    * @return node iterator
    */

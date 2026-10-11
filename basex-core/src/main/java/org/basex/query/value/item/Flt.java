@@ -130,7 +130,7 @@ public final class Flt extends ANum {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Converts the given item to a float value.
+   * Converts the given token into a float value.
    * @param value value to be converted
    * @param info input info (can be {@code null})
    * @return float value

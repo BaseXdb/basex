@@ -81,7 +81,7 @@ public final class WsPool {
   }
 
   /**
-   * Sends a message to a specific clients.
+   * Sends a message to specific clients.
    * @param message message
    * @param ids client IDs
    * @throws QueryException query exception

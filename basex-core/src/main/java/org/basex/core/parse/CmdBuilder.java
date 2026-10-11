@@ -50,7 +50,7 @@ public final class CmdBuilder {
   }
 
   /**
-   * Returns a string representation of all arguments.
+   * Adds all arguments.
    * @return self instance
    */
   public CmdBuilder args() {

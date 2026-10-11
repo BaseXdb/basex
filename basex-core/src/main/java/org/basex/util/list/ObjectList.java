@@ -21,7 +21,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   /**
    * Constructor.
    * @param list initial list
-.   */
+   */
   @SuppressWarnings("unchecked")
   protected ObjectList(final E... list) {
     this.list = list;
@@ -60,7 +60,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   /**
    * Adds an element to the array if it is not contained yet.
    * @param element element to be added
-   * @return result of check
+   * @return self reference
    */
   @SuppressWarnings("unchecked")
   public final L addUnique(final E element) {

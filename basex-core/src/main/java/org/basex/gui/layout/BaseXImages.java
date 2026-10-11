@@ -99,7 +99,7 @@ public final class BaseXImages {
   }
 
   /**
-   * Returns an icon for the specified text.
+   * Returns an icon for the specified resource type.
    * @param type resource type
    * @return icon
    */

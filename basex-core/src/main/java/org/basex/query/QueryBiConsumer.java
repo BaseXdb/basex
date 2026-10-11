@@ -11,7 +11,7 @@ package org.basex.query;
 @FunctionalInterface
 public interface QueryBiConsumer<T, U> {
   /**
-   * Performs this operation on the given argument.
+   * Performs this operation on the given arguments.
    *
    * @param t first input argument
    * @param u second input argument

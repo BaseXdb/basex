@@ -24,7 +24,7 @@ public final class ShortList extends ElementList {
   /**
    * Constructor with initial array capacity.
    * @param capacity array capacity
-3   */
+   */
   public ShortList(final long capacity) {
     list = new short[Array.initialCapacity(capacity)];
   }

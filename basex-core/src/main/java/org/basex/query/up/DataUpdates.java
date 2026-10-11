@@ -153,7 +153,7 @@ final class DataUpdates {
 
   /**
    * Returns the data instance.
-   * @return data data instance
+   * @return data instance
    */
   Data data() {
     return data;

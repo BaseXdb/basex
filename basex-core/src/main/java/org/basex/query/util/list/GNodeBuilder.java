@@ -54,7 +54,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
    * Returns a value with the type of the given expression and invalidates the internal array.
    * Warning: the function must only be called if the builder is discarded afterward.
    * @param expr expression
-   * @return iterator
+   * @return value
    */
   public Value value(final Expr expr) {
     ddo();
@@ -79,7 +79,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   }
 
   /**
-   * Sorts the nodes and removes distinct nodes.
+   * Sorts the nodes and removes duplicates.
    */
   public void ddo() {
     if(ddo) return;

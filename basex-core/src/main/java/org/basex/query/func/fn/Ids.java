@@ -81,7 +81,7 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Checks if the IDs can to be found in the index.
+   * Checks if the IDs can be found in the index.
    * @param root root node
    * @param idref follow IDREF
    * @return result of check
@@ -121,7 +121,7 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Return IDREF flag.
+   * Returns IDREF flag.
    * @return result of check
    */
   boolean idref() {

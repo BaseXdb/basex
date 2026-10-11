@@ -140,7 +140,7 @@ final class XMLScanner extends Job {
 
   /**
    * Reads and interprets the next token from the input stream.
-   * @return true if the document scanning has been completed
+   * @return false if the document scanning has been completed
    * @throws IOException I/O exception
    */
   boolean more() throws IOException {
@@ -350,7 +350,7 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Checks input for CDATA section... &lt;![DATA[...]]&gt;.
+   * Checks input for CDATA section... &lt;![CDATA[...]]&gt;.
    * @return true for CDATA
    * @throws IOException I/O exception
    */
@@ -540,7 +540,7 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a PEReference. [69]
-   * @return entity or {@code null}
+   * @return entity or name
    * @throws IOException I/O exception
    */
   private byte[] peRef() throws IOException {
@@ -585,7 +585,7 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Reads next character or throws an exception if all bytes have been read.
+   * Reads next character or returns 0 if all bytes have been read.
    * @return next character
    * @throws IOException I/O exception
    */

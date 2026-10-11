@@ -27,7 +27,7 @@ public class CsvOptions extends Options {
   public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header. */
   public static final ValueOption HEADER = new ValueOption("header", ITEM_ZM, Bln.FALSE);
-  /** Option: backslash flag . */
+  /** Option: backslash flag. */
   public static final BooleanOption BACKSLASHES = new BooleanOption("backslashes", false);
   /** Option: lax conversion of strings to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", true);

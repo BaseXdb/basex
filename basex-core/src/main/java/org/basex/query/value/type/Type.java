@@ -168,7 +168,7 @@ public interface Type {
   /**
    * Casts the specified Java value to this type.
    * @param value Java value
-   * @param qc query context (can be {@code null} if the target type needs no reference
+   * @param qc query context (can be {@code null} if the target type needs no reference)
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
@@ -178,7 +178,7 @@ public interface Type {
   /**
    * Reads an item from the input stream.
    * @param in data input
-   * @param qc interruptible job
+   * @param qc query context
    * @return item
    * @throws IOException I/O exception
    * @throws QueryException query exception
@@ -366,7 +366,7 @@ public interface Type {
   /**
    * Returns the given type, or the type of the specified expression if it is more specific.
    * @param expr expression (can be {@code null})
-   * @return node type
+   * @return type
    */
   default Type refine(final Expr expr) {
     if(expr != null) {
@@ -377,7 +377,7 @@ public interface Type {
   }
 
   /**
-   * Returns an info message for a similar function.
+   * Returns an info message for a similar type.
    * @param qname name of type
    * @return info string
    */

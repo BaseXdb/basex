@@ -31,7 +31,7 @@ final class SimplePos extends Arr implements CmpPos {
   }
 
   /**
-   * Returns a position expression for the specified range, or an optimized boolean item.
+   * Returns a position expression for the specified range.
    * @param min minimum position
    * @param max maximum position (inclusive, can be {@code null})
    * @param info input info (can be {@code null})

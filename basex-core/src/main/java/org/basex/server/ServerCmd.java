@@ -19,7 +19,7 @@ public enum ServerCmd {
   EXEC(5),
   /** Code for showing the query info: {id}0. */
   INFO(6),
-  /** Code for showing the serializations options: {id}0. */
+  /** Code for showing the serialization options: {id}0. */
   OPTIONS(7),
   /** Code for creating a database: {name}0{input}0. */
   CREATE(8),
@@ -35,7 +35,7 @@ public enum ServerCmd {
   UPDATING(30),
   /** Code for executing a query and returning all information relevant for XQJ: {id}0. */
   FULL(31),
-  /** Code for running a database command: {path}0{input}0. */
+  /** Code for running a database command: {command}0. */
   EXECUTE(-1);
 
   /** Control code (soon obsolete). */

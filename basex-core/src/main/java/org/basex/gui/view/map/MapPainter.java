@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 final class MapPainter {
-  /** Graphics reference. */
+  /** Map reference. */
   private final MapView view;
 
   /**

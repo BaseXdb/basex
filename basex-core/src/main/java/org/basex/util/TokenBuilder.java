@@ -184,9 +184,9 @@ public final class TokenBuilder {
   }
 
   /**
-   * Returns the length of the codepoints stored at the specified position.
+   * Returns the length of the codepoint stored at the specified position.
    * @param pos position
-   * @return character
+   * @return length
    */
   public int cl(final int pos) {
     return Token.cl(chars, pos);

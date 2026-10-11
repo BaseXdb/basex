@@ -45,7 +45,7 @@ public final class CompileContext {
      * EBV checks.
      * Requested by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
      * {@link FnBoolean}, {@link FnNot}.
-     * Evaluated by {@link Expr} {@link Filter}, {@link List}, {@link SimpleMap}, {@link Path}
+     * Evaluated by {@link Expr}, {@link Filter}, {@link List}, {@link SimpleMap}, {@link Path}
      * and others.
      */
     EBV,
@@ -176,7 +176,7 @@ public final class CompileContext {
 
   /**
    * Adds some compilation info.
-   * @param string evaluation info
+   * @param string compilation info
    * @param ext text extensions
    */
   public void info(final String string, final Object... ext) {

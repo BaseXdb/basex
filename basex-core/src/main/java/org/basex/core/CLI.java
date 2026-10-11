@@ -143,9 +143,9 @@ public abstract class CLI extends Main {
   }
 
   /**
-   * Returns the base URI and the query string for the specified command input.
+   * Returns the base URI and the command string for the specified command input.
    * @param input command string or command script reference
-   * @return return base URI and query string
+   * @return base URI and command string
    * @throws IOException I/O exception
    */
   protected static Entry<String, String> commands(final String input) throws IOException {
@@ -155,7 +155,7 @@ public abstract class CLI extends Main {
   /**
    * Returns the base URI and the contents for the specified command script.
    * @param input input
-   * @return return input path and content
+   * @return input path and content
    * @throws IOException I/O exception
    */
   protected static Entry<String, String> script(final String input) throws IOException {
@@ -166,7 +166,7 @@ public abstract class CLI extends Main {
   /**
    * Indicates if the specified string points to an existing file.
    * @param input string
-   * @return return result of check
+   * @return result of check
    */
   protected static boolean isFile(final String input) {
     final IO io = IO.get(input);

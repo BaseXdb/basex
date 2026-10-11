@@ -133,7 +133,7 @@ public final class CsvW3Converter extends CsvConverter {
     }
 
     /**
-     * Create a function item for the get function.
+     * Creates a function item for the get function.
      * @param rows result rows
      * @param columnIndex column name to index mapping
      * @param qc query context

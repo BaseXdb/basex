@@ -39,7 +39,7 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.ITER;
 
-    // return iterator if all results are returned, of it iterator yields no items
+    // return iterator if all results are returned, or if iterator yields no items
     final Iter iter = arg(0).iter(qc);
     if(sr == ALL) return iter;
 
@@ -92,7 +92,7 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.VALUE;
 
-    // return iterator if all results are returned, of it iterator yields no items
+    // return iterator if all results are returned, or if iterator yields no items
     final Expr input = arg(0);
     if(sr == ALL) return input.value(qc);
 

@@ -248,7 +248,7 @@ public final class PathIndex implements Index {
           if(nd.kind == Data.TEXT) node = nd;
         }
       }
-      // skip nodes others than texts and attributes
+      // skip nodes other than texts and attributes
       final int kind = node.kind;
       if(kind != Data.TEXT && kind != Data.ATTR) return null;
       stats.add(node.stats);

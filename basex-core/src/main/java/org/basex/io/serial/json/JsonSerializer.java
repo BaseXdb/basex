@@ -27,7 +27,7 @@ import org.basex.util.options.Options.*;
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends StandardSerializer {
-  /** QName: xml:base. */
+  /** QName: fn:null. */
   private static final QNm FN_NULL = new QNm(JsonConstants.NULL, QueryText.FN_URI);
 
   /** JSON options. */

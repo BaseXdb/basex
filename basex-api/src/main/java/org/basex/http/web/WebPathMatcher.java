@@ -207,7 +207,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
 
     /**
      * Construct a new character iterator for the given input text.
-     * @param input input text to iterator over
+     * @param input input text to iterate over
      */
     CharIterator(final String input) {
       this.input = input;

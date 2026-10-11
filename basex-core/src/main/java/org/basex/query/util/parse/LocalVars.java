@@ -81,7 +81,7 @@ public final class LocalVars {
 
   /**
    * Resolves the referenced variable as a local or static variable and returns a reference to it.
-   * IF the variable is not declared, the specified error is thrown.
+   * If the variable is not declared, the specified error is thrown.
    * @param name variable name
    * @param info input info (can be {@code null})
    * @return referenced variable

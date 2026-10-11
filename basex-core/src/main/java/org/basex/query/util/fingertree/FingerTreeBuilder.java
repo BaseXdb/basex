@@ -235,7 +235,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an {@link FingerTree} containing the elements of this builder.
+     * Creates a {@link FingerTree} containing the elements of this builder.
      * @return finger tree
      */
     FingerTree<N, E> freeze() {
@@ -312,7 +312,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
   private static final class BufferNodeIterator<E> implements Iterator<E> {
     /** Stack of buffer nodes. */
     private BufferNode<?, E>[] stack = new BufferNode[8];
-    /** Stack of position inside the buffer nodes. */
+    /** Stack of positions inside the buffer nodes. */
     private int[] poss = new int[8];
     /** Stack top. */
     private int top;

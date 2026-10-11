@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  *
  * This class prevents locking deadlocks by sorting all strings.
  *
- * Locks can only be released by the same thread which acquired it.
+ * Locks can only be released by the same thread which acquired them.
  *
  * Locking methods are not synchronized to each other. The user must make sure not to call them in
  * parallel by the same thread (it is fine to call arbitrary locking methods by different threads at

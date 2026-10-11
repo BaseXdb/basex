@@ -30,7 +30,7 @@ public final class BlnSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param values bytes
+   * @param values values
    */
   private BlnSeq(final boolean[] values) {
     super(values.length, BasicType.BOOLEAN);

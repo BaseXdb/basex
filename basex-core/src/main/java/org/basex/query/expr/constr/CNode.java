@@ -173,7 +173,7 @@ public abstract class CNode extends Arr {
   }
 
   /**
-   * Adds the expression with the specified separator to the query string.
+   * Adds the expression with the specified node kind to the query string.
    * @param qs query string builder
    * @param kind node kind (can be {@code null})
    */

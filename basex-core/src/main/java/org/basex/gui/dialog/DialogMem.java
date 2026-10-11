@@ -12,7 +12,7 @@ import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
- * Dialog with a single text field.
+ * Dialog window for displaying the used memory.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

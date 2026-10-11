@@ -116,7 +116,7 @@ public abstract class AxisPath extends Path {
   /**
    * Returns a node sequence.
    * @param qc query context
-   * @return iterator
+   * @return node sequence
    * @throws QueryException query exception
    */
   protected abstract Value nodes(QueryContext qc) throws QueryException;

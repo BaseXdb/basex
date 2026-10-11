@@ -442,7 +442,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Returns the result.
-   * @return result iterator
+   * @return result
    * @throws QueryException query exception
    */
   public Value value() throws QueryException {
@@ -524,7 +524,7 @@ public final class QueryContext extends Job implements Closeable {
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
    *        specified in {@link JsonW3Converter}.</li>
-   *   <li> Otherwise, the type is cast to the specified XDM type.</li>
+   *   <li> Otherwise, the value is cast to the specified XDM type.</li>
    * </ul>
    * @param name name of variable; context value if empty string or {@code null}
    * @param value value to be bound (object or XQuery {@link Value})
@@ -806,7 +806,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Initializes the static date and time context of a query if not done yet.
-   * @return self reference
+   * @return date and time context
    * @throws QueryException query exception
    */
   public QueryDateTime dateTime() throws QueryException {
@@ -872,7 +872,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Returns the result of an updating expression.
-   * @return result iterator
+   * @return result
    * @throws QueryException query exception
    */
   private Value update() throws QueryException {

@@ -24,7 +24,7 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox showmargin;
   /** Line margin. */
   private final BaseXTextField margin;
-  /** Indent tabs as spaced. */
+  /** Insert tabs as spaces. */
   private final BaseXCheckBox spaces;
   /** Indentation. */
   private final BaseXTextField indent;

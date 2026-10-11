@@ -52,7 +52,7 @@ public final class BaseXSlider extends BaseXPanel {
   }
 
   /**
-   * Checkbox.
+   * Constructor.
    * @param win parent window
    * @param min min value
    * @param max max value
@@ -206,7 +206,7 @@ public final class BaseXSlider extends BaseXPanel {
   }
 
   /**
-   * Assigns the current checkbox value to the option specified in the constructor.
+   * Assigns the current slider value to the option specified in the constructor.
    */
   public void assign() {
     options.set(option, value);

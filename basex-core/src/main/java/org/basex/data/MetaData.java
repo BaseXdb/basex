@@ -52,7 +52,7 @@ public final class MetaData {
 
   /** Flag for activated automatic index update. */
   public boolean updindex;
-  /** Flag for automatic index updating. */
+  /** Flag for automatic optimization. */
   public boolean autooptimize;
 
   /** Indicates if the text index is to be recreated. */
@@ -111,7 +111,7 @@ public final class MetaData {
   public final EnumSet<IndexType> optimized = EnumSet.noneOf(IndexType.class);
   /** Indexes that skipped values or tokens exceeding {@link #maxlen}. */
   public final EnumSet<IndexType> skipped = EnumSet.noneOf(IndexType.class);
-  /** Indicate if the database may be corrupt. */
+  /** Indicates if the database may be corrupt. */
   public boolean corrupt;
   /** Dirty flag. */
   public boolean dirty;
@@ -356,7 +356,7 @@ public final class MetaData {
 
   /**
    * Returns the disk timestamp of the database.
-   * @return database size
+   * @return database timestamp
    */
   public long dbTime() {
     return dir != null ? dir.timeStamp() : 0;
@@ -486,7 +486,7 @@ public final class MetaData {
   /**
    * Returns the included names for the specified index type.
    * @param type index type
-   * @return index
+   * @return included names
    */
   public String names(final IndexType type) {
     return switch(type) {

@@ -89,7 +89,7 @@ public final class DropDB extends ACreate {
   }
 
   /**
-   * Recursively drops files in a database directory with the specified pattern.
+   * Drops files in a database directory with the specified pattern.
    * @param path database path
    * @param pattern file pattern
    * @return success of operation

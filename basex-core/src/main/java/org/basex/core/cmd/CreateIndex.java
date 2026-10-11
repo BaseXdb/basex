@@ -13,7 +13,7 @@ import org.basex.index.*;
 import org.basex.util.ft.*;
 
 /**
- * Evaluates the 'create db' command and creates a new index.
+ * Evaluates the 'create index' command and creates a new index.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

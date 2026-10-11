@@ -60,7 +60,7 @@ final class MapRects implements Iterable<MapRect> {
   }
 
   /**
-   * Resets the integer list.
+   * Resets the rectangle list.
    */
   void reset() {
     size = 0;

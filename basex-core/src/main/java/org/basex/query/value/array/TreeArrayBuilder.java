@@ -84,7 +84,7 @@ final class TreeArrayBuilder extends ArrBuilder {
       for(int i = 0; i < NODE_SIZE; i++) leaf[i] = members[(start + i) % CAP];
       tree.append(new LeafNode(leaf));
 
-      // move rest of the nodes to the right
+      // move rest of the nodes to the left
       final int rest = inRight - NODE_SIZE;
       for(int i = 0; i < rest; i++) {
         final int to = (mid + i) % CAP, from = (to + NODE_SIZE) % CAP;

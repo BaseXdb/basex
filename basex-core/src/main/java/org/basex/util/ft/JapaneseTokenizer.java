@@ -453,7 +453,7 @@ final class JapaneseTokenizer extends Tokenizer {
    * @param feature feature of the morpheme
    */
   private record Morpheme(String surface, String feature) {
-    /** A part of speech in the context, NEISHI(Noun). */
+    /** A part of speech in the context, MEISHI(Noun). */
     private static final int HINSHI_MEISHI = 1;
     /** A part of speech in the context, RENTAISHI(Pre-noun Adjectival). */
     private static final int HINSHI_RENTAISHI = 2;

@@ -43,7 +43,7 @@ public abstract class CommandParser {
   }
 
   /**
-   * Constructor.
+   * Returns a parser for the specified input.
    * @param input input
    * @param ctx context
    * @return command parser
@@ -95,7 +95,7 @@ public abstract class CommandParser {
 
   /**
    * Restricts parsing to a single command.
-   * @return self reference
+   * @return command
    * @throws QueryException query exception
    */
   public final Command parseSingle() throws QueryException {

@@ -15,7 +15,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * FTOptions expression.
+ * FTWeight expression.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

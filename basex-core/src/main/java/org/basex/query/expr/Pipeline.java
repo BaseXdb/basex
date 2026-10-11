@@ -26,7 +26,7 @@ public final class Pipeline extends Mapping {
   }
 
   /**
-   * Creates a new, optimized map expression.
+   * Creates a new, optimized pipeline expression.
    * @param cc compilation context
    * @param info input info (can be {@code null})
    * @param exprs expressions

@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class DialogProps extends BaseXDialog {
-  /** Index types. */
+  /** Help texts. */
   private static final String[] HELP = {
     "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, H_TOKEN_INDEX, ""
   };
@@ -40,9 +40,9 @@ public final class DialogProps extends BaseXDialog {
   private final BaseXBack ftPanel;
   /** Name tab. */
   private final BaseXBack namesPanel;
-  /** Name tab. */
+  /** Paths tab. */
   private final BaseXBack pathsPanel;
-  /** Name tab. */
+  /** Indexes tab. */
   private final BaseXBack indexesPanel;
   /** Versions for which the index infos were requested. */
   private final int[] requested = new int[LABELS.length];
@@ -106,7 +106,7 @@ public final class DialogProps extends BaseXDialog {
       infos[l] = new TextPanel(this, PLEASE_WAIT_D, false);
       infos[l].setFont(dmfont);
     }
-    // create/drop buttons for values indexes
+    // create/drop buttons for value indexes
     for(int l = 0; l < ll; l++) {
       if(!TYPES[l].value()) continue;
       buttons[l] = new BaseXButton(this, " ");

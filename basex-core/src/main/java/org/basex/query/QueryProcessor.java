@@ -186,7 +186,7 @@ public final class QueryProcessor extends Job implements Closeable {
   /**
    * Declares a namespace.
    * A namespace is undeclared if the specified URI is an empty string.
-   * The default element namespaces is set if the specified prefix is empty.
+   * The default element namespace is set if the specified prefix is empty.
    * @param prefix namespace prefix
    * @param uri namespace URI
    * @return self reference

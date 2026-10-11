@@ -61,13 +61,13 @@ public final class DecFormatter extends FormatUtil {
 
   /** Decimal-separator rendition. */
   private int[] decimalRendition = { decimal };
-  /** Decimal-separator rendition. */
+  /** Exponent-separator rendition. */
   private int[] exponentRendition = { exponent };
-  /** Decimal-separator rendition. */
+  /** Grouping-separator rendition. */
   private int[] groupingRendition = { grouping };
-  /** Decimal-separator rendition. */
+  /** Percent rendition. */
   private int[] percentRendition = { percent };
-  /** Decimal-separator rendition. */
+  /** Per-mille rendition. */
   private int[] permilleRendition = { permille };
 
   /**
@@ -151,7 +151,7 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /**
-   * Get the rendition value from an option value matching the pattern '.|.:.*', where the first
+   * Returns the rendition value from an option value matching the pattern '.|.:.*', where the first
    * character identifies the marker, and the optional part following a colon is the rendition.
    * In absence of the colon part, the rendition value defaults to the marker character.
    * @param name option name
@@ -186,7 +186,7 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /**
-   * Returns a decimal format symbols for the given language.
+   * Returns the decimal format symbols for the given language.
    * @param languageTag language tag
    * @return format symbols, or {@code null} if the language is not supported
    */
@@ -221,7 +221,7 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /**
-   * Convert these properties to an XQuery map.
+   * Converts these properties to an XQuery map.
    * @return map
    * @throws QueryException query exception
    */
@@ -522,7 +522,7 @@ public final class DecFormatter extends FormatUtil {
    * @param item item
    * @param pics pictures
    * @param info input info (can be {@code null})
-   * @return picture variables
+   * @return string representation
    * @throws QueryException query exception
    */
   private byte[] format(final ANum item, final Picture[] pics, final InputInfo info)

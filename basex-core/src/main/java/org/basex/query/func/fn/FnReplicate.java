@@ -179,7 +179,7 @@ public final class FnReplicate extends StandardFunc {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(replicate(<a>1</a>, 2)) → data(replicate(xs:untypedAtomic('1'), 2))
-    // distinct-values(replicate(('a', 'a'), 2)) → distinct-values('a', 2)
+    // distinct-values(replicate(('a', 'a'), 2)) → distinct-values(replicate('a', 2))
     final Expr input = !mode.conditional() ? arg(0).simplifyFor(mode, cc) : arg(0);
 
     final long count = arg(1) instanceof final Itr itr ? itr.itr() : -1;

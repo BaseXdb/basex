@@ -32,7 +32,7 @@ public abstract class ADate extends ADateDur {
   static final String DD = "(\\d{2})";
   /** Year pattern. */
   static final String YEAR = "(-?([1-9]\\d{3,}|0\\d{3}))";
-  /** Date pattern. */
+  /** Timezone pattern. */
   static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
   /** Date pattern. */
   public static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
@@ -64,7 +64,7 @@ public abstract class ADate extends ADateDur {
   byte month = -1;
   /** Day ({@code 1-31}). */
   byte day = -1;
-  /** Hour ({@code 0-59}). */
+  /** Hour ({@code 0-23}). */
   byte hour = -1;
   /** Minute ({@code 0-59}). */
   byte minute = -1;
@@ -379,7 +379,7 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Returns if the timezone is defined.
-   * @return time zone
+   * @return result of check
    */
   public final boolean hasTz() {
     return has(ZON);

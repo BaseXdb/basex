@@ -17,7 +17,7 @@ final class Insert extends StructuralUpdate {
    * @param location PRE value of the target node location
    * @param shifts shifts
    * @param acc accumulated shifts
-   * @param first PRE value of the first node which distance has to be updated
+   * @param first PRE value of the first node whose distance has to be updated
    * @param parent parent PRE value for the inserted nodes
    * @param clip insertion sequence data clip
    */

@@ -15,7 +15,7 @@ import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * CSV parser panel.
+ * HTML parser panel.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -78,7 +78,7 @@ final class DialogHtmlParser extends DialogParser {
 
   /**
    * Returns a tooltip for the specified options string.
-   * @param opts serialization options
+   * @param opts HTML options
    * @return string
    */
   private static String tooltip(final HtmlOptions opts) {

@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 abstract class BinFn extends StandardFunc {
   /** Big endian order. */
   private static final byte[][] BIG = tokens("most-significant-first", "big-endian", "BE");
-  /** Big endian order. */
+  /** Little endian order. */
   private static final byte[][] LITTLE = tokens("least-significant-first", "little-endian", "LE");
 
   /**

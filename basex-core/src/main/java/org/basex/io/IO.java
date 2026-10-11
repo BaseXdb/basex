@@ -93,13 +93,13 @@ public abstract class IO {
   /** Markdown suffixes. */
   public static final String[] MDSUFFIXES = { ".md", ".markdown" };
 
-  /** Disk block/page size (12). */
+  /** Disk block/page size power (12). */
   public static final int BLOCKPOWER = 12;
   /** Disk block/page size (4096). */
   public static final int BLOCKSIZE = 1 << BLOCKPOWER;
   /** Table node size power (4). */
   public static final int NODEPOWER = 4;
-  /** Table node size power (16). */
+  /** Table node size (16). */
   public static final int NODESIZE = 1 << NODEPOWER;
   /** Entries per block (256). */
   public static final int ENTRIES = BLOCKSIZE >>> NODEPOWER;

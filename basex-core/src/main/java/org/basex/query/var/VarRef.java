@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class VarRef extends ParseExpr {
-  /** Variable name. */
+  /** Variable. */
   public final Var var;
 
   /**

@@ -517,7 +517,7 @@ public abstract class Step extends Preds {
     // <xml/>/. → <xml/>
     // <xml/>/self::node() → <xml/>
     // $text/descendant-or-self::text() → $text
-    // $doc/ancestor-or-self::text() → $doc
+    // $doc/ancestor-or-self::node() → $doc
     final Type type = seqType.type;
     return exprs.length == 0 && selector == null && (
       axis == SELF ||

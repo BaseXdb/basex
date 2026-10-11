@@ -59,7 +59,7 @@ final class UnicodeNoCaseCollation extends Collation {
   }
 
   /**
-   * Converts an ASCII character to lower case.
+   * Converts a character to lower case.
    * @param cp codepoint
    * @return lower-case representation
    */

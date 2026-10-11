@@ -76,7 +76,7 @@ public final class Dir extends Command {
    * Creates a table entry.
    * @param dir directory flag
    * @param name name of resource
-   * @param size file size (can be {@code null})
+   * @param size file size
    * @param type resource type
    * @return table entry
    */

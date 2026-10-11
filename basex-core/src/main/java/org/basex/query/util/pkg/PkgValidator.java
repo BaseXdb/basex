@@ -54,7 +54,7 @@ public final class PkgValidator {
   private void checkDepends(final Pkg pkg) throws QueryException {
     final ArrayList<PkgDep> procs = new ArrayList<>();
     for(final PkgDep dep : pkg.dep) {
-      // first check of dependency elements are consistently defined in the
+      // first check if dependency elements are consistently defined in the
       // descriptor
       if(dep.name == null && dep.processor == null) throw REPO_DESCRIPTOR_X.get(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
@@ -84,7 +84,7 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if current database version of is among the processor dependencies.
+   * Checks if current database version is among the processor dependencies.
    * @param deps processor dependencies
    * @throws QueryException query exception
    */
@@ -93,7 +93,7 @@ public final class PkgValidator {
     final HashSet<String> versions = new HashSet<>();
     versions.add(Prop.VERSION.replaceAll(" .*", ""));
 
-    // check if any of the dependencies math
+    // check if any of the dependencies match
     for(final PkgDep dep : deps) {
       if(dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT) &&
           availVersion(dep, versions) != null) return;

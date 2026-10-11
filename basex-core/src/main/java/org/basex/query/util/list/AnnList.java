@@ -122,7 +122,7 @@ public final class AnnList implements Iterable<Ann> {
   }
 
   /**
-   * Returns the unions of these annotations and the given ones.
+   * Returns the union of these annotations and the given ones.
    * @param list annotations
    * @return new instance with annotations that are present in both lists
    */

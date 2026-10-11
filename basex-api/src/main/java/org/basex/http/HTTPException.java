@@ -13,7 +13,7 @@ public final class HTTPException extends IOException {
   private final int status;
 
   /**
-   * Constructs an exception with the specified message and extension.
+   * Constructs an exception with the specified message and status code.
    * @param description description
    * @param status status code
    */

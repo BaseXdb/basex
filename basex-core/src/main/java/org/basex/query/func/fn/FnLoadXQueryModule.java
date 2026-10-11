@@ -206,7 +206,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
   }
 
   /**
-   * Return the repository file path of the XQuery module with the given module URI, or
+   * Returns the repository file path of the XQuery module with the given module URI, or
    * {@code null}, if there is no such module in the repository.
    * @param modUri module URI
    * @param context database context

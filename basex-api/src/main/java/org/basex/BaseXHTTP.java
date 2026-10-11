@@ -25,7 +25,7 @@ import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.xml.*;
 
 /**
- * This is the main class for the starting the database HTTP services.
+ * This is the main class for starting the database HTTP services.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

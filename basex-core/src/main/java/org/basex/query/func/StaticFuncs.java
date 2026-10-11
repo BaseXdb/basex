@@ -88,7 +88,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
 
   /**
    * Assigns a function to a static function call.
-   * @param call name function name
+   * @param call function call
    * @param dynamic {@code true} if function lookup should include the dynamic context
    * @param qc query context
    * @throws QueryException query exception
@@ -257,7 +257,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   }
 
   /**
-   * Returns the unions of the sequences types for function calls of the specified function.
+   * Returns the unions of the sequence types for function calls of the specified function.
    * @param func function
    * @param cc compilation context
    * @return sequence types, or {@code null} if not all calls of the function are known

@@ -150,10 +150,9 @@ public class RegExpr {
     }
 
     /**
-     * Find the parent groups of capturing groups in a Java regular expression.
+     * Finds the parent groups of capturing groups in a Java regular expression.
      * @param pattern regular expression
-     * @return array indicating the parent group ID for each capturing group, where element i
-     * contains the parent group ID of capturing group i+1.
+     * @return group info
      */
     public static GroupInfo groupInfo(final String pattern) {
       final GroupScanner gnd = new GroupScanner(pattern);
@@ -211,7 +210,7 @@ public class RegExpr {
     }
 
     /**
-     * Return the next token.
+     * Returns the next token.
      * @return next token
      */
     private Token nxtToken() {
@@ -254,7 +253,7 @@ public class RegExpr {
     }
 
     /**
-     * Fetch the next code point.
+     * Fetches the next code point.
      * @return next code point
      */
     private int nxtCp() {
@@ -272,7 +271,7 @@ public class RegExpr {
     }
 
     /**
-     * Reset current position to before the most recent code point.
+     * Resets current position to before the most recent code point.
      */
     private void reset() {
       pos -= chrCount;

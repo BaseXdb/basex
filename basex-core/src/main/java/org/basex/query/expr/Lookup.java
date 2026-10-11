@@ -118,7 +118,7 @@ public final class Lookup extends Arr {
 
       /* REWRITE LOOKUP:
        *  MAP?*     → map:items(MAP)
-       *  ARRAY?*   → array:items(MAP)
+       *  ARRAY?*   → array:items(ARRAY)
        *  MAP?KEY   → map:get(INPUT, KEY)
        *  ARRAY?KEY → array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == Str.WILDCARD ?

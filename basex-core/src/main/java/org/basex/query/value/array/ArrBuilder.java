@@ -19,8 +19,8 @@ public abstract class ArrBuilder {
 
   /**
    * Creates an array containing the values of this builder.
-   * @param type type of all members in this sequence
-   * @return resulting sequence
+   * @param type type of all members in this array
+   * @return resulting array
    */
   abstract XQArray array(ArrayType type);
 }

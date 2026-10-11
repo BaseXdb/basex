@@ -249,7 +249,7 @@ public final class WebModules {
   }
 
   /**
-   * Returns RESTXQ and permissions functions that match the current request.
+   * Returns RESTXQ and permission functions that match the current request.
    * @param conn HTTP connection
    * @param error error code (can be {@code null}; assigned if error function is to be called)
    * @param perm permission flag
@@ -268,7 +268,7 @@ public final class WebModules {
   /**
    * Returns permission functions that match the current request.
    * @param conn HTTP connection
-   * @return list of function, ordered by relevance
+   * @return list of functions, ordered by relevance
    * @throws IOException I/O exception
    */
   public List<RestXqFunction> checks(final HTTPConnection conn) throws IOException {

@@ -90,7 +90,7 @@ final class RESTRetrieve extends RESTCmd {
   /**
    * Runs a database query.
    * @param function function
-   * @return query
+   * @return result
    * @throws HTTPException HTTP exception
    */
   private String run(final Function function) throws HTTPException {

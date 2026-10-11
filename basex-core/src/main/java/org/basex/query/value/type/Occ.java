@@ -81,7 +81,7 @@ public enum Occ {
   /**
    * Adds two occurrence indicators.
    * @param other other occurrence indicator
-   * @return union
+   * @return sum
    */
   public Occ add(final Occ other) {
     return get(min + other.min, Math.min(2, max) + Math.min(2, other.max));
@@ -90,7 +90,7 @@ public enum Occ {
   /**
    * Multiplies two occurrence indicators.
    * @param other other occurrence indicator
-   * @return union
+   * @return product
    */
   public Occ multiply(final Occ other) {
     return get(min * other.min, Math.min(2, max) * Math.min(2, other.max));

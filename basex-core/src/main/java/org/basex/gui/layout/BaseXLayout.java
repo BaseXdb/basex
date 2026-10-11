@@ -149,7 +149,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns a keystroke for the specified string.
+   * Returns a keystroke for the specified command.
    * @param cmd command
    * @return keystroke or {@code null}
    */
@@ -296,7 +296,7 @@ public final class BaseXLayout {
         final BaseXCombo combo = comp instanceof final BaseXCombo bxc ? bxc : null;
         if(combo != null && combo.isPopupVisible()) return;
 
-        // do not key close dialog if button or editor is focused
+        // do not close dialog if button or editor is focused
         if(ENTER.is(e) && !(comp instanceof BaseXButton || comp instanceof TextPanel)) {
           dialog.close();
         } else if(ESCAPE.is(e)) {
@@ -412,7 +412,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the value of the specified PRE value and attribute.
+   * Returns a string representation of the specified value.
    * @param val value to be evaluated
    * @return value as string
    */

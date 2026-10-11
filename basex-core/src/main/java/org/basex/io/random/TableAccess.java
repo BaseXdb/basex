@@ -79,7 +79,7 @@ public abstract class TableAccess {
    * Reads a 5-byte value and returns it as a long value.
    * @param pre PRE value
    * @param offset offset
-   * @return integer value
+   * @return long value
    */
   public abstract long read5(int pre, int offset);
 

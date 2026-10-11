@@ -3,7 +3,7 @@ package org.basex.io.out;
 import java.io.*;
 
 /**
- * This server-side class wraps an {@link InputStream} referenced by a database client.
+ * This server-side class wraps an {@link OutputStream} referenced by a database client.
  * The incoming bytes are encoded:
  * <ul>
  * <li>{@code 0x00} and {@code 0xFF} are prefixed with {@code 0xFF}</li>

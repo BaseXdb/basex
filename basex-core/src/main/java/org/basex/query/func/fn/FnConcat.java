@@ -31,7 +31,7 @@ public final class FnConcat extends StandardFunc {
 
   /**
    * Creates a new {@link Concat} expression.
-   * @return new otherwise expression
+   * @return new concat expression
    */
   private Concat build() {
     return new Concat(info, exprs);

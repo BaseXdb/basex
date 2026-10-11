@@ -3,7 +3,7 @@ package org.basex.gui.listener;
 import java.awt.event.*;
 
 /**
- * Listener interface for handling mouse clicks.
+ * Listener interface for handling mouse-entered events.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
