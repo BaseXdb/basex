@@ -227,6 +227,18 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
+   * Tokens without live references are not returned.
+   */
+  @Test public void liveTokens() {
+    execute(new CreateDB(NAME, "<x><p>one</p><p>two</p></x>"));
+    query("insert node text { 'three' } into " + _DB_GET.args(NAME) + "/x/p[1]");
+    query("replace value of node " + _DB_GET.args(NAME) + "/x/p[2]/text() with 'four'");
+    query(_FT_TOKENS.args(NAME) + " ! `{ . }={ @count }`", "four=1\nonethree=1");
+    query(_FT_TOKENS.args(NAME, "o") + " ! string()", "onethree");
+    query(_FT_TOKENS.args(NAME, "four", " { 'fuzzy': true() }") + " ! string()", "four");
+  }
+
+  /**
    * A unit is superseded across segments, and segments are merged.
    */
   @Test public void supersede() {
@@ -242,8 +254,8 @@ public final class FTIndexUpdateTest extends SandboxTest {
       check(word);
       assertTrue(segments() <= 9, "Segments: " + segments());
     }
-    // superseded references are counted until the segments are merged
-    tokens("word38", 2);
+    // superseded references are not counted
+    tokens("word38", 1);
     execute(new Optimize());
     assertEquals(1, segments());
     search("word39", "word39", "word39" + WORDS);
@@ -511,9 +523,9 @@ public final class FTIndexUpdateTest extends SandboxTest {
     query("replace value of node " + _DB_GET.args(NAME) + "//a[. = 'word8 '] with 'three '");
     query(_FT_SEARCH.args(NAME, "two three") + "/a[2]/string()", "word1 ");
     query(_FT_SEARCH.args(NAME, "word8") + "/a[2]/string()", "");
-    // the unit was indexed three times; superseded references are counted until the merge
+    // the unit was indexed three times; superseded references are not counted
     assertEquals(3, segments());
-    tokens("word9", 3);
+    tokens("word9", 1);
     execute(new Optimize());
     assertEquals(1, segments());
     tokens("word9", 1);

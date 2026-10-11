@@ -126,21 +126,29 @@ final class FTSegment extends IndexSegment implements FTSource {
    * Collects live references.
    * @param off offset on the references
    * @param size number of references
-   * @param pres PRE values
-   * @param poss positions
+   * @param pres PRE values (can be {@code null})
+   * @param poss positions (can be {@code null})
+   * @return number of live references
    */
-  private void collect(final long off, final int size, final IntList pres, final IntList poss) {
+  private int collect(final long off, final int size, final IntList pres, final IntList poss) {
     // references are node IDs: skip superseded units, map the IDs to PRE values
     final boolean check = buffer != null && (!newer.isEmpty() || !buffer.isEmpty());
+    // unchanged index: all references are live
+    if(pres == null && !check && (buffer == null || data.idmap.isIdentity())) return size;
     dataZ.cursor(off);
+    int live = 0;
     for(int c = 0; c < size; c++) {
       final int id = dataZ.readNum(), pos = dataZ.readNum();
       if(check && (newer.contains(id) || buffer.supersedes(id))) continue;
       final int pre = buffer != null ? data.pre(id) : id;
       if(pre == -1) continue;
-      pres.add(pre);
-      poss.add(pos);
+      if(pres != null) {
+        pres.add(pre);
+        poss.add(pos);
+      }
+      live++;
     }
+    return live;
   }
 
   /**
@@ -177,16 +185,17 @@ final class FTSegment extends IndexSegment implements FTSource {
 
       @Override
       public byte[] next() {
-        if(inner && start < end) {
-          // loop through all entries with the same character length
+        // loop through all entries with the same character length
+        while(inner && start < end) {
           final byte[] entry = dataY.readBytes(start, p);
-          if(startsWith(entry, pref)) {
-            final long poi = dataY.read5();
-            nr = dataY.read4();
-            if(pref.length != 0) cache.add(entry, nr, poi);
-            start += p + FTIndex.ENTRY;
-            return entry;
-          }
+          if(!startsWith(entry, pref)) break;
+          final long poi = dataY.read5();
+          final int size = dataY.read4();
+          if(pref.length != 0) cache.add(entry, size, poi);
+          start += p + FTIndex.ENTRY;
+          // skip tokens without live references
+          nr = collect(poi, size, null, null);
+          if(nr > 0) return entry;
         }
         // find next available entry group
         final int pl = positions.length;
@@ -226,8 +235,10 @@ final class FTSegment extends IndexSegment implements FTSource {
           // loop through all similar entries with the same character length
           if(i < offsets.size()) {
             final int p = offsets.get(i++);
-            nr = FTSegment.this.size(p, s);
-            return dataY.readBytes(p, s);
+            // skip tokens without live references
+            nr = collect(pointer(p, s), FTSegment.this.size(p, s), null, null);
+            if(nr > 0) return dataY.readBytes(p, s);
+            continue;
           }
           // find next group of entries
           if(++s > last) return null;

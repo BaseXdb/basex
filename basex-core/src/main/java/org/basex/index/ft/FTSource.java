@@ -44,14 +44,14 @@ interface FTSource {
   void fuzzy(FTFuzzy fuzzy, IntList pres, IntList poss);
 
   /**
-   * Returns all tokens that start with the specified prefix, in ascending order.
+   * Returns the tokens with live references that start with a prefix, in ascending order.
    * @param prefix prefix
    * @return entry iterator
    */
   EntryIterator entries(byte[] prefix);
 
   /**
-   * Returns all tokens that are similar to the token of a fuzzy matcher, in ascending order.
+   * Returns the tokens with live references that match a fuzzy matcher, in ascending order.
    * @param fuzzy fuzzy matcher
    * @return entry iterator
    */
