@@ -33,7 +33,7 @@ public final class TableDiskAccess extends TableAccess {
   /** Indicates if the table is read-locked and additional readers can be assigned. */
   private volatile boolean pooled;
   /** Bitmap storing free (=0) and used (=1) pages (can be {@code null}). */
-  private BitArray usedPages;
+  private BitSet usedPages;
   /** File lock (can be {@code null}). */
   private FileLock lock;
 
@@ -72,7 +72,7 @@ public final class TableDiskAccess extends TableAccess {
         pageIndex = in.readNums();
         // read block bitmap
         final int s = in.readNum();
-        usedPages = new BitArray(in.readLongs(s), used);
+        usedPages = BitSet.valueOf(in.readLongs(s));
       }
     }
 
@@ -131,7 +131,7 @@ public final class TableDiskAccess extends TableAccess {
           for(int s = 0; s < p; s++) out.writeNum(fPreIndex[s]);
           out.writeNum(p);
           for(int s = 0; s < p; s++) out.writeNum(pageIndex[s]);
-          out.writeLongs(usedPages.toArray());
+          out.writeLongs(usedPages.toLongArray());
         }
       }
       dirty = false;
@@ -425,7 +425,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // write the all remaining entries
     while(needed-- > 0) {
-      final int p = usedPages.nextFree();
+      final int p = usedPages.nextClearBit(0);
       usedPages.set(p);
       master.read(p);
       ++used;
@@ -536,7 +536,8 @@ public final class TableDiskAccess extends TableAccess {
       for(int i = 0; i < pages; i++) fPreIndex[i] = i * IO.ENTRIES;
       pageIndex = new int[pages];
       for(int i = 0; i < pages; i++) pageIndex[i] = i;
-      usedPages = new BitArray(used, true);
+      usedPages = new BitSet(used);
+      usedPages.set(0, used);
     }
     dirty = true;
   }

@@ -3,6 +3,8 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -154,7 +156,7 @@ public final class Transform extends Copy {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Transform tf && Array.equals(copies, tf.copies) &&
+    return this == obj || obj instanceof final Transform tf && Arrays.equals(copies, tf.copies) &&
         super.equals(obj);
   }
 

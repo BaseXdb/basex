@@ -552,7 +552,7 @@ public final class FTWords extends FTExpr {
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final FTWords f && query.equals(f.query) &&
         mode == f.mode && Objects.equals(db, f.db) && Objects.equals(ftOpt, f.ftOpt) &&
-        Array.equals(occ, f.occ) && super.equals(obj);
+        Arrays.equals(occ, f.occ) && super.equals(obj);
   }
 
   @Override

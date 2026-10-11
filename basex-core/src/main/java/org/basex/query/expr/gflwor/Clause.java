@@ -1,5 +1,7 @@
 package org.basex.query.expr.gflwor;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -36,7 +38,7 @@ public abstract class Clause extends ParseExpr {
    * @return {@code true} if something changed, {@code false} otherwise
    */
   @SuppressWarnings("unused")
-  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitSet used) {
     return false;
   }
 

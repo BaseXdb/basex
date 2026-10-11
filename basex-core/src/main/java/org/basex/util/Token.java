@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.math.*;
+import java.nio.*;
 import java.nio.charset.*;
 import java.text.*;
 import java.util.*;
@@ -149,6 +150,21 @@ public final class Token {
     return sl == 0 ? EMPTY :
       sl == 1 || sl == 2 && Character.isHighSurrogate(string.charAt(0)) ?
         cpToken(string.codePointAt(0)) : string.getBytes(StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Encodes a token in the specified encoding.
+   * @param token token
+   * @param encoding encoding (can be {@code null})
+   * @return encoded bytes
+   * @throws CharacterCodingException character coding exception
+   */
+  public static byte[] encode(final byte[] token, final String encoding)
+      throws CharacterCodingException {
+    if(encoding == null || encoding == Strings.UTF8) return token;
+    final Charset cs = Charset.forName(encoding == Strings.UTF16 ? Strings.UTF16BE : encoding);
+    final ByteBuffer bb = cs.newEncoder().encode(CharBuffer.wrap(string(token)));
+    return Arrays.copyOfRange(bb.array(), bb.position(), bb.limit());
   }
 
   /**

@@ -391,7 +391,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   INDEX_OF_SUBSTRING(FnIndexOfSubstring::new, "index-of-substring(value, substring)",
-      params(STRING_ZO, STRING_O), INTEGER_ZM),
+      params(STRING_ZO, STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   INDEX_WHERE(FnIndexWhere::new, "index-where(input, predicate)",
       params(ITEM_ZM, PREDICATE_O), INTEGER_ZM),

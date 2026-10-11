@@ -90,28 +90,23 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
   private void update(final Option<?> option, final Options options, final BaseXBack p) {
     while(p.getComponentCount() > 1) p.remove(1);
 
-    final Component comp;
-    if(option == SerializerOptions.ENCODING) {
-      final BaseXCombo combo = new BaseXCombo(dialog, Strings.encodings());
-      combo.setSelectedItem(options.get(option));
-      combo.addActionListener(e -> {
-        options.set((StringOption) option, combo.getSelectedItem());
-        update();
-      });
-      comp = combo;
-    } else if(option instanceof final StringOption opt) {
-      comp = input(new BaseXTextField(dialog, opt, options));
-    } else if(option instanceof final NumberOption opt) {
-      comp = input(new BaseXTextField(dialog, opt, options));
-    } else if(option instanceof final BooleanOption opt) {
-      comp = combo(new BaseXCombo(dialog, opt, options));
-    } else if(option instanceof final EnumOption opt) {
-      comp = combo(new BaseXCombo(dialog, opt, options));
-    } else if(option instanceof final OptionsOption opt) {
-      comp = embedded(opt, options);
-    } else {
-      throw Util.notExpected("Unknown option type: " + option);
-    }
+    final Component comp = switch(option) {
+      case final StringOption opt when opt == SerializerOptions.ENCODING -> {
+        final BaseXCombo combo = new BaseXCombo(dialog, Strings.encodings());
+        combo.setSelectedItem(options.get(opt));
+        combo.addActionListener(e -> {
+          options.set(opt, combo.getSelectedItem());
+          update();
+        });
+        yield combo;
+      }
+      case final StringOption opt -> input(new BaseXTextField(dialog, opt, options));
+      case final NumberOption opt -> input(new BaseXTextField(dialog, opt, options));
+      case final BooleanOption opt -> combo(new BaseXCombo(dialog, opt, options));
+      case final EnumOption<?> opt -> combo(new BaseXCombo(dialog, opt, options));
+      case final OptionsOption<?> opt -> embedded(opt, options);
+      default -> throw Util.notExpected("Unknown option type: " + option);
+    };
     p.add(comp);
     p.revalidate();
     p.repaint();

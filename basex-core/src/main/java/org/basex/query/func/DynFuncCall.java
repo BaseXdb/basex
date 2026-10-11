@@ -273,11 +273,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.dynFuncCall(body()) && super.accept(visitor);
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final DynFuncCall dfc && updating == dfc.updating &&
         super.equals(obj);

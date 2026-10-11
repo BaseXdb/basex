@@ -354,7 +354,7 @@ public final class Switch extends ParseExpr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Switch s && cond.equals(s.cond) &&
-        Array.equals(groups, s.groups);
+        Arrays.equals(groups, s.groups);
   }
 
   @Override

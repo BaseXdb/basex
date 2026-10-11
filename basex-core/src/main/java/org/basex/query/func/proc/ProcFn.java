@@ -12,7 +12,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.convert.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -130,7 +129,7 @@ abstract class ProcFn extends StandardFunc {
     if(input.isEmpty()) return null;
     if(input instanceof final Bin bin) return bin.binary(info);
     try {
-      return ConvertFn.toBinary(((Item) input).string(info), encoding);
+      return Token.encode(((Item) input).string(info), encoding);
     } catch(final IOException ex) {
       throw PROC_ENCODING_X.get(info, ex);
     }

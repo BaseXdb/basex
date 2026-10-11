@@ -17,7 +17,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.convert.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.array.*;
@@ -45,9 +44,9 @@ abstract class ArchiveFn extends StandardFunc {
   final byte[] encode(final byte[] value, final String encoding, final boolean enforce,
       final QueryContext qc) throws QueryException {
     if(encoding == Strings.UTF8 && !enforce) return value;
-    try {
-      final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-      return ConvertFn.toString(new ArrayInput(value), encoding, !validate);
+    final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
+    try(TextInput ti = new TextInput(new ArrayInput(value), encoding)) {
+      return ti.fallback(!validate).content();
     } catch(final IOException ex) {
       throw ARCHIVE_ENCODE2_X.get(info, ex);
     }

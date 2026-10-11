@@ -281,21 +281,4 @@ public final class Array {
     }
     return true;
   }
-
-  /**
-   * Compares two arrays for equality.
-   * @param arr1 first array (can be {@code null})
-   * @param arr2 second array (can be {@code null})
-   * @return result of check
-   */
-  public static boolean equals(final Object[] arr1, final Object[] arr2) {
-    if(arr1 == arr2) return true;
-    if(arr1 == null || arr2 == null) return false;
-    final int al = arr1.length;
-    if(al != arr2.length) return false;
-    for(int a = 0; a < al; a++) {
-      if(!Objects.equals(arr1[a], arr2[a])) return false;
-    }
-    return true;
-  }
 }

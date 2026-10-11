@@ -639,7 +639,7 @@ public final class GFLWOR extends ParseExpr {
       for(final Var var : clause.vars()) decl.put(var.id, var);
     }
 
-    final BitArray used = new BitArray();
+    final BitSet used = new BitSet();
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -988,7 +988,7 @@ public final class GFLWOR extends ParseExpr {
           NEW:
           let $a := 2[. = 1]
           let $c := 1[. = 1]
-          return ($c, if($a) then $a else $c))
+          return ($c, if($a) then $a else $c)
           */
           cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, let.var);
 

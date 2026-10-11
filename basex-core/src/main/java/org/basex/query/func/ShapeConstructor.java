@@ -137,7 +137,7 @@ public final class ShapeConstructor extends StandardFunc {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final ShapeConstructor sc &&
-        shapeType.eq(sc.shapeType) && Array.equals(exprs, sc.exprs);
+        shapeType.eq(sc.shapeType) && Arrays.equals(exprs, sc.exprs);
   }
 
   @Override

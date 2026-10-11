@@ -258,7 +258,7 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Typeswitch ts && cond.equals(ts.cond) &&
-        Array.equals(groups, ts.groups);
+        Arrays.equals(groups, ts.groups);
   }
 
   @Override

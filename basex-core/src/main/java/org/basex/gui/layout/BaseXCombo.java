@@ -314,20 +314,15 @@ public class BaseXCombo extends JComboBox<Object> {
   /**
    * Assigns the current combo box value to the option specified in the constructor.
    */
-  @SuppressWarnings("unchecked")
   public void assign() {
-    if(optionKey instanceof final NumberOption option) {
-      options.set(option, getSelectedIndex());
-    } else if(optionKey instanceof final EnumOption option) {
-      options.set(option, getSelectedItem());
-    } else if(optionKey instanceof final StringOption option) {
-      options.set(option, getSelectedItem());
-    } else if(optionKey instanceof final BooleanOption option) {
-      options.set(option, Boolean.parseBoolean(getSelectedItem()));
-    } else if(optionKey instanceof StringsOption) {
-      updateHistory();
-    } else {
-      throw Util.notExpected("Option type not supported: " + optionKey);
+    switch(optionKey) {
+      case final NumberOption option -> options.set(option, getSelectedIndex());
+      case final EnumOption<?> option -> options.set(option, getSelectedItem());
+      case final StringOption option -> options.set(option, getSelectedItem());
+      case final BooleanOption option ->
+        options.set(option, Boolean.parseBoolean(getSelectedItem()));
+      case final StringsOption option -> updateHistory();
+      default -> throw Util.notExpected("Option type not supported: " + optionKey);
     }
   }
 

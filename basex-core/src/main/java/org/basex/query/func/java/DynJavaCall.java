@@ -12,7 +12,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.Array;
 
 /**
  * Dynamic invocation of a Java constructor, field or method.
@@ -101,6 +100,6 @@ abstract class DynJavaCall extends JavaCall {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final DynJavaCall java && clazz.equals(java.clazz) &&
-        Array.equals(types, java.types) && super.equals(obj);
+        Arrays.equals(types, java.types) && super.equals(obj);
   }
 }

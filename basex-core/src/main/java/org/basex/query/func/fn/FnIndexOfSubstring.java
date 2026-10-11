@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
 public final class FnIndexOfSubstring extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc), substring = toToken(arg(1), qc);
+    final byte[] value = toZeroToken(arg(0), qc), substring = toZeroToken(arg(1), qc);
     final int vl = value.length;
 
     return new Iter() {

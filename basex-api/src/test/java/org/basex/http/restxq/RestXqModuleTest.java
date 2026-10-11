@@ -47,6 +47,29 @@ public final class RestXqModuleTest extends RestXqTest {
   }
 
   /**
+   * Modules are parsed again if a transitively imported module has been changed.
+   * @throws Exception exception
+   */
+  @Test public void transitiveImport() throws Exception {
+    register("import module namespace lib = 'lib' at 'lib.xqm';" +
+      "declare %R:path('imported') function m:f() { lib:f() };");
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
+    new IOFile(path, "lib.xqm").write("module namespace lib = 'lib';" +
+      "import module namespace lib2 = 'lib2' at 'lib2.xqm';" +
+      "declare function lib:f() { lib2:f() };");
+    final IOFile lib2 = new IOFile(path, "lib2.xqm");
+    lib2.write("module namespace lib2 = 'lib2'; declare function lib2:f() { $unbound };");
+    WebModules.get(context).init(true);
+    assertContains(get(500, "imported"), "$unbound");
+
+    // fix inner module; simulate cache update after idle time
+    lib2.write("module namespace lib2 = 'lib2'; declare function lib2:f() { 'x' };");
+    assertTrue(lib2.file().setLastModified(System.currentTimeMillis() - 60000));
+    WebModules.get(context).init(true);
+    assertEquals("x", get(200, "imported"));
+  }
+
+  /**
    * Modules are parsed again if an imported module was modified while being parsed.
    * @throws Exception exception
    */

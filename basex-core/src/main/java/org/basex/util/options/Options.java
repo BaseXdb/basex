@@ -186,17 +186,19 @@ public class Options implements Iterable<Option<?>> {
     final String name = option.name();
     final Object value = get(option);
     final StringList lines = new StringList();
-    if(option instanceof NumbersOption) {
-      final int[] ints = (int[]) value;
-      final int is = ints == null ? 0 : ints.length;
-      for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
-    } else if(option instanceof StringsOption) {
-      final String[] strings = (String[]) value;
-      final int ss = strings == null ? 0 : strings.length;
-      lines.add(name + " = " + ss);
-      for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
-    } else {
-      lines.add(name + " = " + value);
+    switch(option) {
+      case final NumbersOption no -> {
+        final int[] ints = (int[]) value;
+        final int is = ints == null ? 0 : ints.length;
+        for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
+      }
+      case final StringsOption so -> {
+        final String[] strings = (String[]) value;
+        final int ss = strings == null ? 0 : strings.length;
+        lines.add(name + " = " + ss);
+        for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
+      }
+      default -> lines.add(name + " = " + value);
     }
     return lines;
   }
@@ -896,74 +898,84 @@ public class Options implements Iterable<Option<?>> {
       final Consumer<Object> assign, final Options options) {
 
     final String name = option.name();
-    if(option instanceof final BooleanOption bo) {
-      Boolean v;
-      if(value.isEmpty() && options != null) {
-        // no value given: invert current value
-        v = options.get(bo);
-        if(v != null) v = !v;
-      } else {
-        v = Strings.toBoolean(value);
+    switch(option) {
+      case final BooleanOption bo -> {
+        Boolean v;
+        if(value.isEmpty() && options != null) {
+          // no value given: invert current value
+          v = options.get(bo);
+          if(v != null) v = !v;
+        } else {
+          v = Strings.toBoolean(value);
+        }
+        if(v == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
+        assign.accept(v);
       }
-      if(v == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
-      assign.accept(v);
-    } else if(option instanceof NumberOption) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      assign.accept(v);
-    } else if(option instanceof StringOption) {
-      assign.accept(value);
-    } else if(option instanceof ValueOption) {
-      final Boolean b = Strings.toBoolean(value);
-      assign.accept(b != null ? Bln.get(b) : Str.get(value));
-    } else if(option instanceof final EnumOption eo) {
-      final Object v = eo.get(normalizeEnum(value));
-      if(v == null) return allowed(eo, value, (Object[]) eo.values());
-      assign.accept(v);
-    } else if(option instanceof final OptionsOption oo) {
-      final Options o = oo.newInstance();
-      try {
-        o.assign(value);
-      } catch(final BaseXException ex) {
-        Util.debug(ex);
-        return Util.message(ex);
+      case final NumberOption no -> {
+        final int v = Strings.toInt(value);
+        if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+        assign.accept(v);
       }
-      assign.accept(o);
-    } else if(option instanceof NumbersOption && options != null) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      int[] ii = (int[]) options.get(option);
-      if(index == -1) {
-        if(ii == null) ii = new int[0];
-        final IntList il = new IntList(ii.length + 1);
-        for(final int i : ii) il.add(i);
-        assign.accept(il.add(v).finish());
-      } else {
-        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
-        // the current value may be the default value, which is shared by all instances
-        final int[] copy = ii.clone();
-        copy[index] = v;
-        assign.accept(copy);
+      case final StringOption so -> {
+        assign.accept(value);
       }
-    } else if(option instanceof StringsOption && options != null) {
-      String[] ss = (String[]) options.get(option);
-      if(index == -1) {
-        if(ss == null) ss = new String[0];
-        final StringList sl = new StringList(ss.length + 1);
-        for(final String s : ss) sl.add(s);
-        assign.accept(sl.add(value).finish());
-      } else if(index == 0) {
-        final int i = Strings.toInt(value);
-        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-        options.put(option, new String[i]);
-      } else {
-        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
-        final String[] copy = ss.clone();
-        copy[index - 1] = value;
-        assign.accept(copy);
+      case final ValueOption vo -> {
+        final Boolean b = Strings.toBoolean(value);
+        assign.accept(b != null ? Bln.get(b) : Str.get(value));
       }
-    } else {
-      throw Util.notExpected("Unsupported option (%): %", Util.className(option), option);
+      case final EnumOption<?> eo -> {
+        final Object v = eo.get(normalizeEnum(value));
+        if(v == null) return allowed(eo, value, (Object[]) eo.values());
+        assign.accept(v);
+      }
+      case final OptionsOption<?> oo -> {
+        final Options o = oo.newInstance();
+        try {
+          o.assign(value);
+        } catch(final BaseXException ex) {
+          Util.debug(ex);
+          return Util.message(ex);
+        }
+        assign.accept(o);
+      }
+      case final NumbersOption no when options != null -> {
+        final int v = Strings.toInt(value);
+        if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+        int[] ii = (int[]) options.get(option);
+        if(index == -1) {
+          if(ii == null) ii = new int[0];
+          final IntList il = new IntList(ii.length + 1);
+          for(final int i : ii) il.add(i);
+          assign.accept(il.add(v).finish());
+        } else {
+          if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
+          // the current value may be the default value, which is shared by all instances
+          final int[] copy = ii.clone();
+          copy[index] = v;
+          assign.accept(copy);
+        }
+      }
+      case final StringsOption so when options != null -> {
+        String[] ss = (String[]) options.get(option);
+        if(index == -1) {
+          if(ss == null) ss = new String[0];
+          final StringList sl = new StringList(ss.length + 1);
+          for(final String s : ss) sl.add(s);
+          assign.accept(sl.add(value).finish());
+        } else if(index == 0) {
+          final int i = Strings.toInt(value);
+          if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+          options.put(option, new String[i]);
+        } else {
+          if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
+          final String[] copy = ss.clone();
+          copy[index - 1] = value;
+          assign.accept(copy);
+        }
+      }
+      default -> {
+        throw Util.notExpected("Unsupported option (%): %", Util.className(option), option);
+      }
     }
     return null;
   }
@@ -1080,40 +1092,44 @@ public class Options implements Iterable<Option<?>> {
     }
     final Item item = val.size() == 1 ? (Item) val : null;
 
-    Object result = null;
-    if(option instanceof ValueOption) {
-      result = val;
-    } else if(option instanceof BooleanOption) {
+    final Object result = switch(option) {
+      case final ValueOption vo -> val;
       // coercion has already yielded a single boolean
-      result = item.bool(info);
-    } else if(option instanceof NumberOption) {
-      final long l = item.itr(info);
-      if(l != (int) l) throw expected.apply(SeqType.get(BasicType.INT, Occ.EXACTLY_ONE));
-      result = (int) l;
-    } else if(option instanceof StringOption) {
-      result = serialize(val, info);
-    } else if(option instanceof StringsOption) {
-      final StringList list = new StringList();
-      for(final Item it :  val) list.add(serialize(it, info));
-      result = list.finish();
-    } else if(option instanceof NumbersOption) {
-      final IntList list = new IntList();
-      // values beyond the int range are clamped (e.g. column positions that cannot exist)
-      for(final Item it :  val) {
-        list.add(Math.clamp(it.itr(info), Integer.MIN_VALUE, Integer.MAX_VALUE));
+      case final BooleanOption bo -> item.bool(info);
+      case final NumberOption no -> {
+        final long l = item.itr(info);
+        if(l != (int) l) throw expected.apply(SeqType.get(BasicType.INT, Occ.EXACTLY_ONE));
+        yield (int) l;
       }
-      result = list.finish();
-    } else if(option instanceof final EnumOption eo) {
-      final String string = normalizeEnum(serialize(val, info));
-      result = eo.get(string);
-      if(result == null) {
-        throw INVALIDOPTIONVALUE_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      case final StringOption so -> serialize(val, info);
+      case final StringsOption so -> {
+        final StringList list = new StringList();
+        for(final Item it :  val) list.add(serialize(it, info));
+        yield list.finish();
       }
-    } else if(option instanceof final OptionsOption oo) {
-      if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);
-      result = oo.newInstance();
-      ((Options) result).assign(map, qc, info);
-    }
+      case final NumbersOption no -> {
+        final IntList list = new IntList();
+        // values beyond the int range are clamped (e.g. column positions that cannot exist)
+        for(final Item it :  val) {
+          list.add(Math.clamp(it.itr(info), Integer.MIN_VALUE, Integer.MAX_VALUE));
+        }
+        yield list.finish();
+      }
+      case final EnumOption<?> eo -> {
+        final String string = normalizeEnum(serialize(val, info));
+        final Object constant = eo.get(string);
+        if(constant == null) {
+          throw INVALIDOPTIONVALUE_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+        }
+        yield constant;
+      }
+      case final OptionsOption<?> oo -> {
+        if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);
+        final Options options = oo.newInstance();
+        options.assign(map, qc, info);
+        yield options;
+      }
+    };
     put(option, result);
   }
 

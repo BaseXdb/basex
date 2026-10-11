@@ -218,7 +218,7 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitSet used) {
     // delete unused variables
     final int len = refs.length;
     for(int r = refs.length; --r >= 0;) {
@@ -227,7 +227,7 @@ public final class OrderBy extends Clause {
     if(refs.length == used.cardinality()) return refs.length != len;
 
     // add new variables, possible when an expression is inlined below this clause
-    OUTER: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
+    OUTER: for(int id = used.nextSetBit(0); id >= 0; id = used.nextSetBit(id + 1)) {
       for(final VarRef ref : refs) {
         if(ref.var.id == id) continue OUTER;
       }
@@ -256,8 +256,8 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final OrderBy o && Array.equals(refs, o.refs) &&
-        Array.equals(keys, o.keys);
+    return this == obj || obj instanceof final OrderBy o && Arrays.equals(refs, o.refs) &&
+        Arrays.equals(keys, o.keys);
   }
 
   @Override

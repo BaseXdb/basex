@@ -1,6 +1,7 @@
 package org.basex.query.func.convert;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -10,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ConvertEncodeKey extends ConvertIntegersToBase64 {
+public final class ConvertEncodeKey extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final byte[] key = toToken(arg(0), qc);

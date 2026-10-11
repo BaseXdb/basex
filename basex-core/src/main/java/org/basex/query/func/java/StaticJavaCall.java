@@ -3,6 +3,7 @@ package org.basex.query.func.java;
 import static org.basex.query.QueryError.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 import org.basex.core.MainOptions.*;
 import org.basex.core.users.*;
@@ -15,7 +16,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.Array;
 import org.basex.util.hash.*;
 
 /**
@@ -118,6 +118,6 @@ public final class StaticJavaCall extends JavaCall {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final StaticJavaCall java && module.equals(java.module) &&
-        method.equals(java.method) && Array.equals(params, java.params) && super.equals(obj);
+        method.equals(java.method) && Arrays.equals(params, java.params) && super.equals(obj);
   }
 }

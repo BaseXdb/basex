@@ -85,7 +85,7 @@ public final class DecSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof final DecSeq seq ? Array.equals(values, seq.values) :
+    return this == obj || (obj instanceof final DecSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 

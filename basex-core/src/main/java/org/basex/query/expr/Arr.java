@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -373,7 +374,7 @@ public abstract class Arr extends ParseExpr {
    */
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final Arr arr && Array.equals(exprs, arr.exprs);
+    return obj instanceof final Arr arr && Arrays.equals(exprs, arr.exprs);
   }
 
   @Override

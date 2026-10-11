@@ -1380,7 +1380,7 @@ public abstract class Path extends ParseExpr {
   @Override
   public final boolean equals(final Object obj) {
     return this == obj || obj instanceof final Path path && Objects.equals(root, path.root) &&
-        Array.equals(steps, path.steps);
+        Arrays.equals(steps, path.steps);
   }
 
   @Override

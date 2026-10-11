@@ -11,7 +11,8 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  * @param <O> option type
  */
-public abstract class Option<O> {
+public abstract sealed class Option<O> permits BooleanOption, EnumOption, NumberOption,
+    NumbersOption, OptionsOption, StringOption, StringsOption, ValueOption {
   /** Counter for assigning option indexes. */
   private static final AtomicInteger COUNTER = new AtomicInteger();
 

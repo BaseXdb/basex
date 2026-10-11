@@ -2,6 +2,7 @@ package org.basex.util.list;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -61,5 +62,19 @@ public final class IntListTest {
     final IntList list = new IntList();
     assertThrows(ArrayIndexOutOfBoundsException.class, () -> list.set(-1, 9));
     assertEquals(0, list.size());
+  }
+
+  /** Test method for {@link IntList#sort(int[], boolean)}: compares extreme values. */
+  @Test public void sortIntExtremes() {
+    final int[] values = { Integer.MIN_VALUE, 1, Integer.MAX_VALUE, -1 };
+    assertArrayEquals(new int[] { 0, 3, 1, 2 }, Array.createOrder(values.clone(), true));
+    assertArrayEquals(new int[] { 2, 1, 3, 0 }, Array.createOrder(values.clone(), false));
+  }
+
+  /** Test method for {@link IntList#sort(long[], boolean)}: compares extreme values. */
+  @Test public void sortLongExtremes() {
+    final long[] values = { Long.MIN_VALUE, 1, Long.MAX_VALUE, -1 };
+    assertArrayEquals(new int[] { 0, 3, 1, 2 }, Array.createOrder(values.clone(), true));
+    assertArrayEquals(new int[] { 2, 1, 3, 0 }, Array.createOrder(values.clone(), false));
   }
 }

@@ -2,6 +2,7 @@ package org.basex.query.func.convert;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -15,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ConvertIntegersToBase64 extends ConvertFn {
+public class ConvertIntegersToBase64 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return bytesToB64(qc);

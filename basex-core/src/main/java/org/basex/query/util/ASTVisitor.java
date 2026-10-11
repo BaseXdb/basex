@@ -1,5 +1,8 @@
 package org.basex.query.util;
 
+import java.util.*;
+import java.util.function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -19,7 +22,7 @@ import org.basex.query.var.*;
  * @author Leo Woerteler
  */
 @SuppressWarnings("unused")
-public abstract class ASTVisitor implements LockCollector {
+public abstract class ASTVisitor {
   /**
    * Notifies the visitor of a variable declaration and visits its declared type.
    * @param var declared variable
@@ -111,15 +114,6 @@ public abstract class ASTVisitor implements LockCollector {
   }
 
   /**
-   * Notifies the visitor of a dynamic function call.
-   * @param func expression that yields the invoked function
-   * @return if more expressions should be visited ({@code true} by default)
-   */
-  public boolean dynFuncCall(final Expr func) {
-    return true;
-  }
-
-  /**
    * Notifies the visitor of an expression that is passed on to another query context.
    * @param expr expression
    * @return if more expressions should be visited (visits the expression by default)
@@ -198,4 +192,43 @@ public abstract class ASTVisitor implements LockCollector {
    * Notifies the visitor of an expression leaving a focus.
    */
   public void exitFocus() { }
+
+  /**
+   * Notifies the visitor of database locks.
+   * @param list function supplying lock strings
+   * @param write write access
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean lock(final Supplier<ArrayList<String>> list, final boolean write) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of a database lock.
+   * @param lock lock string ({@code null} if all databases need to be locked)
+   * @param write write access
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean lock(final String lock, final boolean write) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of locks whose names and access type cannot be resolved statically.
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean unknownLocks() {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of custom query locks.
+   * @param list function supplying lock strings
+   */
+  public void queryLock(final Supplier<ArrayList<String>> list) { }
+
+  /**
+   * Notifies the visitor of an update whose target database cannot be resolved statically.
+   */
+  public void unresolvedTarget() { }
 }

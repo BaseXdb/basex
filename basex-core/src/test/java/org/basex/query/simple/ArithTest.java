@@ -19,13 +19,13 @@ import org.junit.jupiter.api.*;
 public final class ArithTest extends SandboxTest {
   /** Test method. */
   @Test public void plus() {
-    check("for $i in (1 to 2)[. != 0] return ($i * $i) + 1", "2\n5", exists(ArithSimple.class));
+    check("for $i in (1 to 2)[. != 0] return ($i * $i) + 1", "2\n5", exists(Arith.class));
 
     // neutral number
     check("for $i in (1 to 2)[. != 0] return $i + 0",
-        "1\n2", empty(ArithSimple.class), empty(GFLWOR.class));
+        "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 0 + $i",
-        "1\n2", empty(ArithSimple.class), empty(GFLWOR.class));
+        "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 0e0 + $i",
         "1\n2", exists(Cast.class));
     check("for $i in (1 to 2)[. != 0] return $i + 0e0",
@@ -40,10 +40,10 @@ public final class ArithTest extends SandboxTest {
     // negative zero: -0 + 0 → 0, -0 + -0 → -0
     final String z = "xs:double(" + wrap("-0") + ")";
     query(z + "+ 0", 0);
-    check(z + "+ -0e0", "-0", empty(Arith.class), empty(ArithSimple.class));
+    check(z + "+ -0e0", "-0", empty(Arith.class));
 
-    check(wrap(3) + "! (. + .)", 6, exists(Itr.class), count(ArithSimple.class, 1));
-    check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(ArithSimple.class, 2));
+    check(wrap(3) + "! (. + .)", 6, exists(Itr.class), count(Arith.class, 1));
+    check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(Arith.class, 2));
     check("xs:decimal(" + wrap(3) + ") ! (. + . + .)", 9, root(Arith.class));
     check(wrap(3) + "! (. + -.)", 0, empty(Unary.class));
     check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
@@ -51,11 +51,11 @@ public final class ArithTest extends SandboxTest {
 
   /** Test method. */
   @Test public void minus() {
-    check("for $i in (1 to 2)[. != 0] return ($i * $i) - 1", "0\n3", exists(ArithSimple.class));
+    check("for $i in (1 to 2)[. != 0] return ($i * $i) - 1", "0\n3", exists(Arith.class));
 
     // neutral number
     check("for $i in (1 to 2)[. != 0] return $i - 0",
-        "1\n2", empty(ArithSimple.class), empty(GFLWOR.class));
+        "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return $i - 0e0",
         "1\n2", exists(Cast.class));
     check("for $i in (1 to 2)[. != 0] return 0 - $i",
@@ -65,7 +65,7 @@ public final class ArithTest extends SandboxTest {
     check("for $i in (1, xs:double('NaN'))[. != 0] return $i - $i",
         "0\nNaN", exists(Arith.class));
     check("for $i in (1 to 2)[. != 0] return $i - $i",
-        "0\n0", empty(Arith.class), empty(ArithSimple.class), empty(GFLWOR.class));
+        "0\n0", empty(Arith.class), empty(GFLWOR.class));
 
     query("string(xs:dateTime('2017-07-07T18:30:00.1') - xs:dayTimeDuration('PT1S'))",
         "2017-07-07T18:29:59.1");
@@ -76,27 +76,27 @@ public final class ArithTest extends SandboxTest {
     // negative zero: -0 - -0 → 0, -0 - 0 → -0, 0 - 0 → 0
     final String z = "xs:double(" + wrap("-0") + ")";
     query(z + "- -0e0", 0);
-    check(z + "- 0", "-0", empty(Arith.class), empty(ArithSimple.class));
+    check(z + "- 0", "-0", empty(Arith.class));
     query("0 - xs:double(" + wrap(0) + ")", 0);
 
-    check(wrap(3) + "! (. + . - .)", 3, exists(ArithSimple.class));
+    check(wrap(3) + "! (. + . - .)", 3, exists(Arith.class));
     check("xs:decimal(" + wrap(3) + ") ! (. + . - .)", 3, exists(Cast.class),
-        empty(ArithSimple.class));
+        empty(Arith.class));
     // floating-point numbers: rounding errors
     query("xs:double(" + wrap("0.42857142857142855") + ") ! (. * 3 - .)", "0.857142857142857");
     check(wrap(3) + "! (. - -.)", 6, exists(Itr.class), empty(Unary.class),
-        count(ArithSimple.class, 1));
+        count(Arith.class, 1));
   }
 
   /** Test method. */
   @Test public void mult() {
-    check("for $i in (1 to 2)[. != 0] return $i * 2", "2\n4", exists(ArithSimple.class));
+    check("for $i in (1 to 2)[. != 0] return $i * 2", "2\n4", exists(Arith.class));
 
     // neutral number
     check("for $i in (1 to 2)[. != 0] return $i * 1",
-        "1\n2", empty(ArithSimple.class), empty(GFLWOR.class));
+        "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 1 * $i",
-        "1\n2", empty(ArithSimple.class), empty(GFLWOR.class));
+        "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 1e0 * $i",
         "1\n2", exists(Cast.class));
     check("for $i in (1 to 2)[. != 0] return $i * 1e0",
@@ -104,13 +104,13 @@ public final class ArithTest extends SandboxTest {
 
     // absorbing number
     check("for $i in (1 to 2)[. != 0] return $i * 0",
-        "0\n0", empty(ArithSimple.class), empty(GFLWOR.class));
+        "0\n0", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 0 * $i",
-        "0\n0", empty(ArithSimple.class), empty(GFLWOR.class));
+        "0\n0", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (1 to 2)[. != 0] return 0e0 * $i",
-        "0\n0", exists(ArithSimple.class));
+        "0\n0", exists(Arith.class));
     check("for $i in (1 to 2)[. != 0] return $i * 0e0",
-        "0\n0", exists(ArithSimple.class));
+        "0\n0", exists(Arith.class));
 
     check(wrap(3) + "! (. * .)", 9, exists(Dbl.class), exists(Function._MATH_POW));
     check(wrap(3) + "! (. * . * .)", 27, exists(Dbl.class), count(Function._MATH_POW, 1));
@@ -121,14 +121,14 @@ public final class ArithTest extends SandboxTest {
 
   /** Test method. */
   @Test public void div() {
-    check("for $i in (2, 4)[. != 0] return $i div 2", "1\n2", exists(ArithSimple.class));
-    check("for $i in (2, 4)[. != 0] return 1 div $i", "0.5\n0.25", exists(ArithSimple.class));
+    check("for $i in (2, 4)[. != 0] return $i div 2", "1\n2", exists(Arith.class));
+    check("for $i in (2, 4)[. != 0] return 1 div $i", "0.5\n0.25", exists(Arith.class));
 
     // neutral number
     check("for $i in (2.0, 4.0) return $i div 1", "2\n4",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2e0, 4e0) return $i div 1", "2\n4",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2, 4)[. != 0] return $i div 1e0", "2\n4",
         exists(Cast.class));
 
@@ -136,13 +136,13 @@ public final class ArithTest extends SandboxTest {
     check("for $i in (1, xs:double('NaN'))[. != 0] return $i div $i",
         "1\nNaN", exists(Arith.class));
     check("for $i in (2.0, 4.0)[. != 0] return $i div $i", "1\n1",
-        empty(Arith.class), empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
 
     error("xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')", DIVZERO_X);
     error("xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')", DIVZERO_X);
 
     check("xs:decimal(" + wrap(3) + ") ! (. div .)", 1, root(Dec.class));
-    check(wrap(3) + "! (. * . div .)", 3, exists(ArithSimple.class));
+    check(wrap(3) + "! (. * . div .)", 3, exists(Arith.class));
     query("xs:double(" + wrap(0) + ") ! (math:pow(., 2) div .)", "NaN");
 
     // integer division yields decimals
@@ -162,21 +162,21 @@ public final class ArithTest extends SandboxTest {
 
   /** Test method. */
   @Test public void idiv() {
-    check("for $i in (2, 4)[. != 0] return $i idiv 2", "1\n2", exists(ArithSimple.class));
-    check("for $i in (2, 4)[. != 0] return 1 idiv $i", "0\n0", exists(ArithSimple.class));
+    check("for $i in (2, 4)[. != 0] return $i idiv 2", "1\n2", exists(Arith.class));
+    check("for $i in (2, 4)[. != 0] return 1 idiv $i", "0\n0", exists(Arith.class));
 
     // neutral number
     check("for $i in (2, 4) return $i idiv 1e0", "2\n4",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2, 4) return $i idiv 1", "2\n4",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2, 4) return $i idiv 1", "2\n4",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
 
     // identical arguments
     error("for $i in (1, xs:double('NaN')) return $i idiv $i", INVIDIV_X);
     check("for $i in (2, 4) return $i idiv $i", "1\n1",
-        empty(ArithSimple.class), empty(GFLWOR.class));
+        empty(Arith.class), empty(GFLWOR.class));
 
     check("xs:decimal(" + wrap(3) + ") ! (. idiv .)", 1, root(Itr.class));
 
@@ -189,18 +189,18 @@ public final class ArithTest extends SandboxTest {
 
   /** Test method. */
   @Test public void mod() {
-    check("for $i in (-1, 0, 1) return $i mod 1", "0\n0\n0", empty(ArithSimple.class));
+    check("for $i in (-1, 0, 1) return $i mod 1", "0\n0\n0", empty(Arith.class));
   }
 
   /** Merge arithmetic expressions. */
   @Test public void gh1938() {
     final String i = "xs:integer(" + wrap(1) + ")";
     check("(" + i + "+ 1 - 1)[. instance of xs:integer]", 1, root(Cast.class));
-    check("xs:integer(" + wrap(6) + ") * 3 * 2", 36, count(ArithSimple.class, 1));
-    check("(1 to 2) ! (" + i + "+ . - .)", "1\n1", empty(ArithSimple.class));
-    check("(1 to 2) ! (" + i + "* . div .)", "1\n1", empty(ArithSimple.class));
+    check("xs:integer(" + wrap(6) + ") * 3 * 2", 36, count(Arith.class, 1));
+    check("(1 to 2) ! (" + i + "+ . - .)", "1\n1", empty(Arith.class));
+    check("(1 to 2) ! (" + i + "* . div .)", "1\n1", empty(Arith.class));
     check("(1 to 6) ! (. + 1 - .)", "1\n1\n1\n1\n1\n1",
-        empty(ArithSimple.class), root(SingletonSeq.class));
+        empty(Arith.class), root(SingletonSeq.class));
     query(i + "* 7 idiv 3 idiv 2", 1);
     query(i + "* 7 mod 4 mod 2", 1);
 
@@ -222,9 +222,9 @@ public final class ArithTest extends SandboxTest {
     check(xy + "$x * 2 + $y - $x * 3", 1, empty(Itr.class));
     check(xy + "2 * ($x + $y) - $y", 4, count(Itr.class, 1));
     check(xy + "($x + 1) * 2 + 3", 7, count(Itr.class, 2));
-    check(xy + "$x + $y - $y", 1, empty(Arith.class), empty(ArithSimple.class));
-    check(xy + "$x + 1 - $x + $x - 1", 1, empty(Arith.class), empty(ArithSimple.class));
-    check(xy + "-$x + $y + $x", 2, empty(Arith.class), empty(ArithSimple.class));
+    check(xy + "$x + $y - $y", 1, empty(Arith.class));
+    check(xy + "$x + 1 - $x + $x - 1", 1, empty(Arith.class));
+    check(xy + "-$x + $y + $x", 2, empty(Arith.class));
     check(xy + "$x * 2 - $x - $x", 0, root(Itr.class));
     // preserve result type
     query(xy + "($x + 1.0 - 1.0) instance of xs:integer", false);
@@ -234,12 +234,12 @@ public final class ArithTest extends SandboxTest {
     error(xy + "$x * 9223372036854775807 + $x", RANGE_X);
 
     // comparisons
-    check(xy + "$x + $y = $y + 1", true, empty(ArithSimple.class), empty(Unary.class));
-    check(xy + "2 * $x + 3 = 5", true, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "$x + $y = $y + 1", true, empty(Arith.class), empty(Unary.class));
+    check(xy + "2 * $x + 3 = 5", true, empty(Arith.class), empty(Unary.class));
     check(xy + "$x * 2 = 3", false, root(Bln.class));
     check(xy + "$x * 2 != 3", true, root(Bln.class));
-    check(xy + "-$x < -3", false, empty(ArithSimple.class), empty(Unary.class));
-    check(xy + "3 - $x >= 1", true, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "-$x < -3", false, empty(Arith.class), empty(Unary.class));
+    check(xy + "3 - $x >= 1", true, empty(Arith.class), empty(Unary.class));
     check(xy + "$x + 1 = $x + 2", false, root(Bln.class));
     check(xy + "$x + 1 < $x + 2", true, root(Bln.class));
     // no rewrite: floating-point numbers
@@ -287,7 +287,7 @@ public final class ArithTest extends SandboxTest {
     check("max(" + e + " ! (. * 0))", 0, exists(SimpleMap.class));
     check("max(" + e + " ! (. * 2 + 1))", 11, empty(SimpleMap.class));
     check("max(" + e + " ! (abs(.) + 1))", 6, exists(Function.MAX), exists(SimpleMap.class),
-        count(ArithSimple.class, 1));
+        count(Arith.class, 1));
     check("max(" + e + " ! (-.))", -1, exists(Function.MIN), empty(SimpleMap.class));
     check("max((element b { " + wrap(1) + " }, element b { " + wrap(2) + " }) ! (. * 2))", 4,
         exists(Function.MAX), empty(SimpleMap.class));
@@ -361,20 +361,20 @@ public final class ArithTest extends SandboxTest {
   @Test public void idivMod() {
     final String n = "let $n := xs:integer(" + wrap(9) + ") return ";
     final String d = "let $d := xs:double(" + wrap("9.5") + ") return ";
-    final String mods = "count(//ArithSimple[@op = 'mod'])";
-    check(n + "$n * 6 idiv 3", 18, count(ArithSimple.class, 1));
-    check(n + "$n * 2 idiv 6", 3, count(ArithSimple.class, 1));
-    check(n + "$n * -2 idiv 6", -3, count(ArithSimple.class, 1));
-    check(n + "$n * 4 idiv 6", 6, count(ArithSimple.class, 2));
+    final String mods = "count(//Arith[@op = 'mod'])";
+    check(n + "$n * 6 idiv 3", 18, count(Arith.class, 1));
+    check(n + "$n * 2 idiv 6", 3, count(Arith.class, 1));
+    check(n + "$n * -2 idiv 6", -3, count(Arith.class, 1));
+    check(n + "$n * 4 idiv 6", 6, count(Arith.class, 2));
     check(n + "$n * 6 mod 3", 0, root(Itr.class));
-    check(n + "$n * 6 mod 4", 2, count(ArithSimple.class, 2));
+    check(n + "$n * 6 mod 4", 2, count(Arith.class, 2));
     check(n + "$n mod 4 mod 4", 1, mods + " = 1");
     check(n + "$n mod $n", 0, root(Itr.class));
     check("xs:decimal(" + wrap("2.5") + ") ! (. mod .)", 0, root(Dec.class));
     check(d + "$d mod $d", 0, mods + " = 1");
     query("xs:double(" + wrap("INF") + ") ! (. mod .)", "NaN");
     check(d + "$d mod 4 mod 4", 1.5, mods + " = 1");
-    check(d + "$d * 6 idiv 3", 19, count(ArithSimple.class, 2));
+    check(d + "$d * 6 idiv 3", 19, count(Arith.class, 2));
   }
 
   /** Comparisons. */
@@ -382,9 +382,9 @@ public final class ArithTest extends SandboxTest {
     final String xy = "let $x := xs:integer(" + wrap(1) + ") let $y := xs:integer(" + wrap(2) +
         ") return ";
     // two terms
-    check(xy + "$x + 1 = $y + 1", false, empty(ArithSimple.class));
-    check(xy + "2 * $x < 2 * $y", true, empty(ArithSimple.class));
-    check(xy + "-$x < -$y", false, empty(ArithSimple.class), empty(Unary.class));
+    check(xy + "$x + 1 = $y + 1", false, empty(Arith.class));
+    check(xy + "2 * $x < 2 * $y", true, empty(Arith.class));
+    check(xy + "-$x < -$y", false, empty(Arith.class), empty(Unary.class));
     check(xy + "$x + $y = $y + $x", true, root(Bln.class));
 
     // integer bounds: $x * 2 < 3 → $x <= 1
@@ -397,9 +397,9 @@ public final class ArithTest extends SandboxTest {
     // zero-or-one operands
     final String o = "let $o := xs:integer(" + wrap(3) + ")[. > 0] return ";
     final String oe = "let $o := xs:integer(" + wrap(3) + ")[. > 5] return ";
-    check(o + "$o * 2 = 6", true, empty(ArithSimple.class));
-    check(oe + "$o * 2 = 6", false, empty(ArithSimple.class));
-    check(o + "$o + $o = 6", true, empty(ArithSimple.class));
+    check(o + "$o * 2 = 6", true, empty(Arith.class));
+    check(oe + "$o * 2 = 6", false, empty(Arith.class));
+    check(o + "$o + $o = 6", true, empty(Arith.class));
     query(oe + "$o * 2 != 3", false);
     query(oe + "$o - $o + 1 = 1", false);
 
@@ -432,12 +432,12 @@ public final class ArithTest extends SandboxTest {
   /** Simplify arithmetic expressions. */
   @Test public void simplify() {
     final String i = "xs:integer(" + wrap(1) + ")";
-    check(i + "- 1 = 0", true, empty(ArithSimple.class), count(Itr.class, 1));
-    check(i + "- 1 = " + i + " - 1", true, empty(ArithSimple.class), empty(Itr.class));
+    check(i + "- 1 = 0", true, empty(Arith.class), count(Itr.class, 1));
+    check(i + "- 1 = " + i + " - 1", true, empty(Arith.class), empty(Itr.class));
     check(i + "- 1 != " + i + " - 2", true, root(Bln.class));
 
     // untyped values: no rewrite (double arithmetic, decimal comparison)
-    check(wrap(1) + "- 1 = 0", true, exists(ArithSimple.class));
+    check(wrap(1) + "- 1 = 0", true, exists(Arith.class));
     query(wrap("1.00000000000000001") + "- 1 = 0", true);
     query(wrap("1.00000000000000001") + "- 1 = " + wrap(1) + " - 1", true);
 
@@ -452,12 +452,12 @@ public final class ArithTest extends SandboxTest {
 
   /** Error in arithmetic calculation result comparison. */
   @Test public void gh2188() {
-    check("<x _='1'/>/@* *  2 >= -2", true, empty(ArithSimple.class));
-    check("<x _='1'/>/@* *  2 >  -2", true, empty(ArithSimple.class));
-    check("<x _='1'/>/@* *  2 <= -2", false, empty(ArithSimple.class));
-    check("<x _='1'/>/@* *  2 <  -2", false, empty(ArithSimple.class));
-    check("<x _='1'/>/@* *  2  = -2", false, empty(ArithSimple.class));
-    check("<x _='1'/>/@* *  2 != -2", true, empty(ArithSimple.class));
+    query("<x _='1'/>/@* *  2 >= -2", true);
+    query("<x _='1'/>/@* *  2 >  -2", true);
+    query("<x _='1'/>/@* *  2 <= -2", false);
+    query("<x _='1'/>/@* *  2 <  -2", false);
+    query("<x _='1'/>/@* *  2  = -2", false);
+    query("<x _='1'/>/@* *  2 != -2", true);
 
     check("<x _='1'/>/@* * -2 >= 2", false, exists(Arith.class));
     check("<x _='1'/>/@* * -2 >  2", false, exists(Arith.class));

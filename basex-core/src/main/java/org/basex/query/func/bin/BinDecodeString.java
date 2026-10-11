@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.func.convert.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -28,8 +27,9 @@ public final class BinDecodeString extends BinFn {
     if(value == null) return Empty.VALUE;
 
     final boolean all = offset == null && size == null;
-    try(BufferInput bi = all ? value.input(info) : input(value, offset, size)) {
-      return Str.get(ConvertFn.toString(bi, encoding, false));
+    try(BufferInput bi = all ? value.input(info) : input(value, offset, size);
+        TextInput ti = new TextInput(bi, encoding)) {
+      return Str.get(ti.fallback(false).content());
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

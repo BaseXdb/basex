@@ -291,7 +291,7 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitSet used) {
     final int len = preExpr.length;
     for(int p = 0; p < post.length; p++) {
       if(!used.get(post[p].id)) {
@@ -343,8 +343,8 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final GroupBy group && Array.equals(specs, group.specs) &&
-        Array.equals(preExpr, group.preExpr) && Array.equals(post, group.post);
+    return this == obj || obj instanceof final GroupBy group && Arrays.equals(specs, group.specs) &&
+        Arrays.equals(preExpr, group.preExpr) && Arrays.equals(post, group.post);
   }
 
   @Override

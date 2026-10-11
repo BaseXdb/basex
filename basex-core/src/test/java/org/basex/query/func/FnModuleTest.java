@@ -2653,6 +2653,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("", ""), 1);
     query(func.args(" ()", ""), 1);
     query(func.args(" ()", "a"), "");
+    query(func.args("abc", " ()"), "1\n2\n3\n4");
+    query(func.args(" ()", " ()"), 1);
 
     // positions are counted in characters
     query(func.args(" char(0x1F600) || 'ab' || char(0x1F600) || 'b'", "b"), "3\n5");
@@ -2663,8 +2665,6 @@ public final class FnModuleTest extends SandboxTest {
     query("head(" + func.args(" string-join((1 to 1000000) ! 'a')", "a") + ")", 1);
     query("declare default collation 'http://www.w3.org/2005/xpath-functions/collation/"
         + "html-ascii-case-insensitive'; " + func.args(wrap("ABC"), "b"), "");
-
-    error(func.args("abc", " ()"), INVTYPE_X);
   }
 
   /** Test method. */

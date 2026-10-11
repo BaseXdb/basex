@@ -192,9 +192,9 @@ public final class SingletonSeq extends Seq {
     // single count: return value itself
     if(count == 1) return value;
     // zero results: return empty sequence
-    final long vs = value.size(), size = vs * count;
+    final long vs = value.size(), size = Util.multiply(vs, count);
     if(size == 0) return Empty.VALUE;
-    if(!Util.inBounds(vs, count)) throw new OutOfMemoryError("Memory limit reached.");
+    if(size == Long.MIN_VALUE) throw new OutOfMemoryError("Memory limit reached.");
 
     // if all items are equal, reduce value to single item
     Value val = value;

@@ -1,5 +1,7 @@
 package org.basex.query.expr.ft;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -120,7 +122,7 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj != null && getClass() == obj.getClass() &&
-        Array.equals(exprs, ((FTExpr) obj).exprs);
+        Arrays.equals(exprs, ((FTExpr) obj).exprs);
   }
 
   @Override

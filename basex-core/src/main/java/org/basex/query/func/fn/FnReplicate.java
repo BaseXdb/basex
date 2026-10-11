@@ -57,7 +57,7 @@ public final class FnReplicate extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value singleton(final Value value, final long count) throws QueryException {
-    if(!Util.inBounds(value.size(), count)) {
+    if(Util.multiply(value.size(), count) == Long.MIN_VALUE) {
       throw sizeError(BigInteger.valueOf(value.size()).multiply(BigInteger.valueOf(count)), info);
     }
     return SingletonSeq.get(value, count);
@@ -144,7 +144,10 @@ public final class FnReplicate extends StandardFunc {
       // replicate(<a/>, 1) → <a/>
       if(c == 1) return input;
       sz = input.size();
-      if(sz != -1) sz = c > 1 && Util.inBounds(sz, c) ? sz * c : -1;
+      if(sz != -1) {
+        final long size = Util.multiply(sz, c);
+        sz = c > 1 && size != Long.MIN_VALUE ? size : -1;
+      }
     }
     // replicate(void(<a/>), 2) → void(<a/>)
     if(input == Empty.VALUE || sz == 0 && single) return input;
@@ -204,7 +207,7 @@ public final class FnReplicate extends StandardFunc {
   @Override
   protected boolean values(final boolean limit, final CompileContext cc) {
     return super.values(false, cc) && arg(1) instanceof final Itr itr &&
-        Util.inBounds(arg(0).size(), itr.itr());
+        itr.itr() >= 0 && Util.multiply(arg(0).size(), itr.itr()) != Long.MIN_VALUE;
   }
 
   @Override

@@ -170,7 +170,7 @@ public final class AnnList implements Iterable<Ann> {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final AnnList list && Array.equals(anns, list.anns);
+    return this == obj || obj instanceof final AnnList list && Arrays.equals(anns, list.anns);
   }
 
   @Override

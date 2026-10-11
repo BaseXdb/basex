@@ -5,10 +5,10 @@ import static org.basex.query.QueryError.*;
 import java.nio.charset.*;
 
 import org.basex.query.*;
-import org.basex.query.func.convert.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,7 +23,7 @@ public final class BinEncodeString extends BinFn {
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
     if(value == null) return Empty.VALUE;
     try {
-      return B64.get(ConvertFn.toBinary(value, encoding));
+      return B64.get(Token.encode(value, encoding));
     } catch(final CharacterCodingException ex) {
       throw BIN_CE_X.get(info, ex);
     }

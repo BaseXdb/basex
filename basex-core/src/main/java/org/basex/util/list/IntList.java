@@ -463,7 +463,7 @@ public final class IntList extends ElementList {
     if(length < 7) {
       for(int i = start; i < start + length; i++) {
         for(int j = i; j > start; j--) {
-          final int h = values[j - 1] - values[j];
+          final int h = Integer.compare(values[j - 1], values[j]);
           if(asc ? h < 0 : h > 0) break;
           swap(j, j - 1, values);
         }
@@ -488,13 +488,13 @@ public final class IntList extends ElementList {
     int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = values[b] - v;
+        final int h = Integer.compare(values[b], v);
         if(asc ? h > 0 : h < 0) break;
         if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final int h = values[c] - v;
+        final int h = Integer.compare(values[c], v);
         if(asc ? h < 0 : h > 0) break;
         if(h == 0) swap(c, d--, values);
         --c;
@@ -524,7 +524,7 @@ public final class IntList extends ElementList {
     if(length < 7) {
       for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
-          final long h = values[j - 1] - values[j];
+          final int h = Long.compare(values[j - 1], values[j]);
           if(asc ? h < 0 : h > 0) break;
           swap(values, j, j - 1);
         }
@@ -549,13 +549,13 @@ public final class IntList extends ElementList {
     int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final long h = values[b] - v;
+        final int h = Long.compare(values[b], v);
         if(asc ? h > 0 : h < 0) break;
         if(h == 0) swap(values, a++, b);
         ++b;
       }
       while(c >= b) {
-        final long h = values[c] - v;
+        final int h = Long.compare(values[c], v);
         if(asc ? h < 0 : h > 0) break;
         if(h == 0) swap(values, c, d--);
         --c;

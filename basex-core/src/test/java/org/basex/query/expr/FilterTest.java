@@ -426,17 +426,17 @@ public final class FilterTest extends SandboxTest {
 
     // GH-2220: Bug on arithmetic operations with last() and position()
     check("document { <S/> }//S[last() * 150 >= position()]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
     check("document { <S/> }//S[last() * 150000 >= position()]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
     check("document { <S/> }//S[position() <= last() * 1500000000000]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
     check("document { <S/> }//S[last() * -150 <= position()]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
     check("document { <S/> }//S[last() * -150000 <= position()]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
     check("document { <S/> }//S[position() >= last() * -150000000000]", "<S/>",
-        empty(Arith.class), empty(ArithSimple.class));
+        empty(Arith.class));
   }
 
   /** Rewrite positional range tests. */
