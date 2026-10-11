@@ -1,6 +1,7 @@
 package org.basex.index.value;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -15,14 +16,14 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * An updatable value index (text, attribute or token index) stored in segments on disk.
+ * A value index (text, attribute or token index) stored on disk, updatable in segments.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SegmentedValues extends SegmentedIndex {
   /** Number of references or nodes after which a segment is written (lowered by tests). */
-  static int threshold = 100000;
+  static int threshold = THRESHOLD;
   /** Maximum number of references whose live references are counted exactly. */
   private static final int EXACT = 256;
 
@@ -45,20 +46,31 @@ public final class SegmentedValues extends SegmentedIndex {
    */
   public SegmentedValues(final Data data, final IndexType type) throws IOException {
     super(data, type);
-    name = DiskValues.fileSuffix(type);
+    name = fileSuffix(type);
 
     final MetaData meta = data.meta;
     final int[] numbers = numbers(meta.segments.get(type));
     final long[] state = state(meta.buffers.get(type));
     covered = (int) state[2];
     baseid = (int) state[3];
-    orphans(name, "lrs", "lrt", numbers);
     pristine = numbers == null;
-    buffer = new IndexBuffer(data, meta.dbFile(name + 'b'), pristine ? 0 : state[0],
-        (int) state[1]);
+    if(meta.updindex) {
+      orphans(name, "lrs", "lrt", numbers);
+      buffer = new IndexBuffer(data, meta.dbFile(name + 'b'), pristine ? 0 : state[0],
+          (int) state[1]);
+    }
     if(pristine) segments = new IndexSegment[] { new ValueBase(data, type, name) };
     else load(numbers);
     lastid = data.lastid;
+  }
+
+  /**
+   * Returns the file suffix for the specified index type.
+   * @param type index type
+   * @return file suffix
+   */
+  static String fileSuffix(final IndexType type) {
+    return type == IndexType.TOKEN ? DATATOK : type == IndexType.TEXT ? DATATXT : DATAATV;
   }
 
   @Override
@@ -168,17 +180,18 @@ public final class SegmentedValues extends SegmentedIndex {
       for(final ValueSource source : sources()) {
         final int i = source.find(min), sz = source.size();
         for(int s = i < 0 ? -i - 1 : range.mni() ? i : i + 1; s < sz; s++) {
-          final int d = compare(source.key(s), max);
+          final int d = compare(source.scanKey(s), max);
           if(d > 0 || !range.mxi() && d == 0) break;
           collect(source, s, pres);
         }
       }
     } else if(search instanceof final NumericRange range) {
+      // keys are sorted as strings: all of them need to be checked
       final double min = range.min(), max = range.max();
       for(final ValueSource source : sources()) {
         final int sz = source.size();
         for(int s = 0; s < sz; s++) {
-          final double v = toDouble(source.key(s));
+          final double v = source.scanDbl(s);
           if(v >= min && v <= max) collect(source, s, pres);
         }
       }
@@ -202,6 +215,13 @@ public final class SegmentedValues extends SegmentedIndex {
    * @return number of live references
    */
   private int collect(final ValueSource source, final int i, final IntList pres) {
+    // no updatable index: references are PRE values
+    if(!data.meta.updindex) {
+      if(pres == null) return source.count(i);
+      final int size = pres.size();
+      source.refs(i, pres, null);
+      return pres.size() - size;
+    }
     refs.reset();
     source.refs(i, refs, null);
     // references of the buffer are live; references of segments may be superseded
@@ -209,7 +229,8 @@ public final class SegmentedValues extends SegmentedIndex {
     final int rs = refs.size();
     int count = 0;
     for(int r = 0; r < rs; r++) {
-      final int id = refs.get(r), pre = segment != null ? pre(segment, id) : data.pre(id);
+      final int id = refs.get(r);
+      final int pre = segment != null ? pre(segment, id) : data.pre(id);
       if(pre == -1) continue;
       if(pres != null) pres.add(pre);
       count++;
@@ -280,7 +301,7 @@ public final class SegmentedValues extends SegmentedIndex {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     tb.add(LI_NAMES).add(data.meta.names(type)).add(NL);
-    long l = buffer.length();
+    long l = buffer != null ? buffer.length() : 0;
     for(final IndexSegment segment : segments) l += segment.length();
     tb.add(LI_SIZE).add(Performance.formatHuman(l)).add(NL);
     final ValueBase base = base();

@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.io.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -233,6 +234,18 @@ public final class SegmentedValuesTest extends SandboxTest {
         query("count(distinct-values(" + db + "//text()[. >= '15']))"));
     query("count(" + _INDEX_TEXTS.args(NAME, "15", false) + ")",
         query("count(distinct-values(" + db + "//text()[. < '15']))"));
+  }
+
+  /**
+   * Numeric ranges: keys in exponent notation must not stop the scan.
+   */
+  @Test public void numericRange() {
+    for(final boolean updindex : new boolean[] { false, true }) {
+      set(MainOptions.UPDINDEX, updindex);
+      execute(new CreateDB(NAME, "<x><a>100</a><a>1e3</a><a>200</a></x>"));
+      final Data data = context.data();
+      assertEquals(2, data.iter(new NumericRange(IndexType.TEXT, 100, 500)).size());
+    }
   }
 
   /**

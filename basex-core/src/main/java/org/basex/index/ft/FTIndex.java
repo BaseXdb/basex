@@ -70,7 +70,7 @@ public final class FTIndex extends SegmentedIndex {
   /** Log file of the buffer. */
   static final String LOG = DATAFTX + 'b';
   /** Number of references or nodes after which a segment is written (lowered by tests). */
-  static int threshold = 100000;
+  static int threshold = THRESHOLD;
 
   /** Lexer (created on demand). */
   private FTLexer lexer;

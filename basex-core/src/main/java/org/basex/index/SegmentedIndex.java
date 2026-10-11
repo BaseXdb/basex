@@ -27,6 +27,9 @@ import org.basex.util.list.*;
 public abstract class SegmentedIndex extends ValueIndex {
   /** Maximum number of segments before small segments are merged. */
   private static final int SEGMENTS = 8;
+  /** Default number of references or nodes after which a segment is written. */
+  protected static final int THRESHOLD =
+    Integer.getInteger(Prop.DBPREFIX + "segmentthreshold", 100000);
 
   /** Names to include. */
   protected final IndexNames names;

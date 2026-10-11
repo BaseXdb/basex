@@ -13,8 +13,8 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * The base structure of an updatable value index, whose keys are derived from the nodes of their
- * first IDs.
+ * The base structure of a value index, whose keys are derived from the nodes of their first
+ * references.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -56,6 +56,24 @@ final class ValueBase extends ValueStore {
     return key(i, false);
   }
 
+  @Override
+  public double scanDbl(final int i) {
+    final byte[] key = stored(i);
+    if(key != null) return toDouble(key);
+    if(type == IndexType.TOKEN) return toDouble(scanKey(i));
+    return data.textDbl(pre(anchor(i), i), type == IndexType.TEXT);
+  }
+
+  /**
+   * Returns a pinned or cached key.
+   * @param i position
+   * @return key or {@code null}
+   */
+  private byte[] stored(final int i) {
+    final byte[] key = pins.get(i);
+    return key != null ? key : ctext.get(i);
+  }
+
   /**
    * Returns the key at the specified position.
    * @param i position
@@ -63,19 +81,27 @@ final class ValueBase extends ValueStore {
    * @return key
    */
   private byte[] key(final int i, final boolean store) {
-    byte[] key = pins.get(i);
-    if(key != null) return key;
-    key = ctext.get(i);
+    byte[] key = stored(i);
     if(key != null) return key;
 
     count(i);
     final int id = idxl.readNum(), pos = type == IndexType.TOKEN ? idxl.readNum() : 0;
-    final int pre = data.pre(id);
-    if(pre == -1) throw Util.notExpected("%: key % cannot be derived.", type, i);
-    final byte[] text = data.text(pre, type == IndexType.TEXT);
+    final byte[] text = data.text(pre(id, i), type == IndexType.TEXT);
     key = type == IndexType.TOKEN ? distinctTokens(text)[pos] : text;
     if(store) ctext.put(i, key);
     return key;
+  }
+
+  /**
+   * Returns the PRE value of the first reference of an entry.
+   * @param id first reference
+   * @param i position
+   * @return PRE value
+   */
+  private int pre(final int id, final int i) {
+    final int pre = data.meta.updindex ? data.pre(id) : id;
+    if(pre == -1) throw Util.notExpected("%: key % cannot be derived.", type, i);
+    return pre;
   }
 
   @Override

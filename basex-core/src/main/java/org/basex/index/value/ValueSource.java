@@ -36,6 +36,15 @@ interface ValueSource {
   }
 
   /**
+   * Returns the numeric value of the key at the specified position without caching it.
+   * @param i position
+   * @return numeric value
+   */
+  default double scanDbl(final int i) {
+    return toDouble(scanKey(i));
+  }
+
+  /**
    * Returns the position of a key.
    * @param key key
    * @return position, or {@code -(insertion point) - 1} if the key is not found

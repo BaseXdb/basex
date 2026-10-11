@@ -90,14 +90,10 @@ public final class DiskData extends Data {
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbFile(DATAIDP));
       if(meta.idplog != 0) idmap.replay(meta.dbFile(DATAIDPLOG), meta.idplog);
-      if(meta.textindex) textIndex = new SegmentedValues(this, IndexType.TEXT);
-      if(meta.attrindex) attrIndex = new SegmentedValues(this, IndexType.ATTRIBUTE);
-      if(meta.tokenindex) tokenIndex = new SegmentedValues(this, IndexType.TOKEN);
-    } else {
-      if(meta.textindex) textIndex = new DiskValues(this, IndexType.TEXT);
-      if(meta.attrindex) attrIndex = new DiskValues(this, IndexType.ATTRIBUTE);
-      if(meta.tokenindex) tokenIndex = new DiskValues(this, IndexType.TOKEN);
     }
+    if(meta.textindex) textIndex = new SegmentedValues(this, IndexType.TEXT);
+    if(meta.attrindex) attrIndex = new SegmentedValues(this, IndexType.ATTRIBUTE);
+    if(meta.tokenindex) tokenIndex = new SegmentedValues(this, IndexType.TOKEN);
     if(meta.ftindex) ftIndex = new FTIndex(this);
   }
 

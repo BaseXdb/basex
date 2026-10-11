@@ -50,11 +50,11 @@ public final class DiskValuesBuilder extends IndexBuilder {
     Util.debugln(detailedInfo());
     includeNames.check();
 
-    final String prefix = DiskValues.fileSuffix(type);
+    final String prefix = SegmentedValues.fileSuffix(type);
     try {
       build(0, size, new ValueWriter(data, type, prefix, false));
       finishIndex();
-      return data.meta.updindex ? new SegmentedValues(data, type) : new DiskValues(data, type);
+      return new SegmentedValues(data, type);
     } catch(final Throwable th) {
       // drop index files
       data.meta.drop(prefix + ".+");
@@ -112,7 +112,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
    * @return prefix
    */
   static String partial(final IndexType type, final int split) {
-    return DiskValues.fileSuffix(type) + "tmp" + split;
+    return SegmentedValues.fileSuffix(type) + "tmp" + split;
   }
 
   /**
