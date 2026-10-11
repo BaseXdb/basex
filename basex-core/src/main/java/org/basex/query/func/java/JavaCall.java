@@ -288,6 +288,7 @@ public abstract class JavaCall extends Arr {
         for(final Object obj : (Object[]) object) {
           if(obj == null) throw JAVANULL.get(info);
         }
+        if(object instanceof final BigDecimal[] values) return DecSeq.get(values);
         // string array
         if(object instanceof final String[] values) {
           final TokenList list = new TokenList(values.length);

@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Sequence of items of type {@link Itr xs:decimal}, containing at least two of them.
+ * Sequence of items of type {@link Dec xs:decimal}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -28,7 +28,7 @@ public final class DecSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param values bytes
+   * @param values values
    */
   private DecSeq(final BigDecimal[] values) {
     super(values.length, BasicType.DECIMAL);
@@ -96,7 +96,7 @@ public final class DecSeq extends NativeSeq {
    * @param values values
    * @return value
    */
-  private static Value get(final BigDecimal[] values) {
+  public static Value get(final BigDecimal[] values) {
     final int vl = values.length;
     return vl == 0 ? Empty.VALUE : vl == 1 ? Dec.get(values[0]) : new DecSeq(values);
   }

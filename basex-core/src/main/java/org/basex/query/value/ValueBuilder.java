@@ -1,5 +1,8 @@
 package org.basex.query.value;
 
+import java.math.*;
+import java.util.*;
+
 import org.basex.core.jobs.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
@@ -75,14 +78,20 @@ public final class ValueBuilder {
         return this;
       }
       single = null;
+      final Type tp = sngl.type;
       sb = tr > 0 && (tr -= sngl.size()) <= 0 ? new TreeSeqBuilder(job) :
-        isStr(sngl) && isStr(value) ? new StrSeqBuilder(job) :
-        isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder(job) :
-        isItr(sngl) && isItr(value) ? itrSeqBuilder(
-          sngl instanceof final Itr itr ? itr.itr() : 0, capacity) :
-        isDbl(sngl) && isDbl(value) ? new DblSeqBuilder(job) :
-        isBln(sngl) && isBln(value) ? new BlnSeqBuilder(job) :
-        new ItemSeqBuilder(job);
+        tp != value.type || !(tp instanceof final BasicType bt) ? new ItemSeqBuilder(job) :
+        switch(bt) {
+          case STRING -> isStr(sngl) && isStr(value) ? new StrSeqBuilder(job) :
+            new ItemSeqBuilder(job);
+          case UNTYPED_ATOMIC -> new AtmSeqBuilder(job);
+          case INTEGER -> itrSeqBuilder(sngl instanceof final Itr itr ? itr.itr() : 0, capacity);
+          case DOUBLE -> new DblSeqBuilder(job);
+          case FLOAT -> new FltSeqBuilder(job);
+          case DECIMAL -> new DecSeqBuilder(job);
+          case BOOLEAN -> new BlnSeqBuilder(job);
+          default -> new ItemSeqBuilder(job);
+        };
       sb = sb.add(sngl);
       tree = tr;
     }
@@ -182,6 +191,24 @@ public final class ValueBuilder {
    */
   static boolean isDbl(final Value value) {
     return value.type == BasicType.DOUBLE;
+  }
+
+  /**
+   * Checks if the specified value is a float value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isFlt(final Value value) {
+    return value.type == BasicType.FLOAT;
+  }
+
+  /**
+   * Checks if the specified value is a decimal value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isDec(final Value value) {
+    return value.type == BasicType.DECIMAL;
   }
 
   /**
@@ -478,6 +505,62 @@ public final class ValueBuilder {
     @Override
     public Value value(final Type type) {
       return DblSeq.get(values.finish());
+    }
+  }
+
+  /** Float sequence builder. */
+  final class FltSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    FltSeqBuilder(final Job job) {
+      super(job);
+    }
+
+    /** Values. */
+    private final FloatList values = new FloatList(capacity);
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isFlt(item)) {
+        values.add(((Flt) item).flt());
+        return this;
+      }
+      return tree(item);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return FltSeq.get(values.finish());
+    }
+  }
+
+  /** Decimal sequence builder. */
+  final class DecSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    DecSeqBuilder(final Job job) {
+      super(job);
+    }
+
+    /** Values. */
+    private final ArrayList<BigDecimal> values = new ArrayList<>(Array.initialCapacity(capacity));
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isDec(item)) {
+        values.add(((Dec) item).dec(null));
+        return this;
+      }
+      return tree(item);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return DecSeq.get(values.toArray(BigDecimal[]::new));
     }
   }
 

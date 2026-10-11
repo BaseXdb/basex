@@ -371,6 +371,10 @@ public final class RewritingsTest extends SandboxTest {
     check(wrap(1) + "coerce to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) coerce to xs:double+", "1\n2",
         empty(TypeCheck.class), root(DblSeq.class), count(Dbl.class, 2));
+    check("(1.5, 2.5) coerce to xs:decimal+", "1.5\n2.5",
+        empty(TypeCheck.class), root(DecSeq.class), count(Dec.class, 2));
+    check("(1, 2) coerce to xs:float+", "1\n2",
+        empty(TypeCheck.class), root(FltSeq.class), count(Flt.class, 2));
     check("(-128, 127) coerce to xs:byte+", "-128\n127",
         empty(TypeCheck.class), root(ItemSeq.class), count(Itr.class, 2));
 
