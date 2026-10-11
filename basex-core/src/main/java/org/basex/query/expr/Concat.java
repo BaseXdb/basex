@@ -78,8 +78,7 @@ public final class Concat extends Arr {
     final int ls = list.size();
     if(ls == 1) {
       final Expr arg = list.peek();
-      final SeqType st = arg.seqType();
-      if(st.zeroOrOne() && !st.mayBeWrapped()) {
+      if(arg.seqType().atomOcc().max <= 1) {
         return cc.replaceWith(this, cc.function(Function.STRING, info, arg));
       }
     }

@@ -34,7 +34,9 @@ public final class Cast extends Convert {
     super.optimize(cc);
     // zero-or-one(E) cast as xs:string? → E cast as xs:string?
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
-        seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
+        seqType.occ.instanceOf(expr.seqType().occ) && !expr.arg(0).seqType().mayBeWrapped()) {
+      expr = expr.arg(0);
+    }
 
     final SeqType st = castType();
     exprType.assign(st);

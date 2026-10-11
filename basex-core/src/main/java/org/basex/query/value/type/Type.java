@@ -259,6 +259,16 @@ public interface Type {
   boolean instanceOf(Type type);
 
   /**
+   * Checks if the specified item is an instance of this type.
+   * @param item item to check
+   * @param coerce item coercion
+   * @return result of check
+   */
+  default boolean instance(final Item item, final boolean coerce) {
+    return item.instanceOf(this, coerce);
+  }
+
+  /**
    * Computes the union between this type and the given one, i.e. the least common ancestor
    * of both types in the type hierarchy.
    * @param type other type
@@ -290,11 +300,12 @@ public interface Type {
    * Checks if items with this type are numbers or untyped.
    * @return result of check
    */
-  boolean isNumberOrUntyped();
+  default boolean isNumberOrUntyped() {
+    return isNumber() || isUntyped();
+  }
 
   /**
-   * Checks if items of this type are strings or untyped.
-   * Returns if this item is untyped or a string.
+   * Checks if items of this type are strings, URIs or untyped.
    * @return result of check
    */
   boolean isStringOrUntyped();
@@ -361,6 +372,14 @@ public interface Type {
    */
   default boolean assignable() {
     return true;
+  }
+
+  /**
+   * Checks if this type is independent of a specific query and may be cached globally.
+   * @return result of check
+   */
+  default boolean global() {
+    return false;
   }
 
   /**

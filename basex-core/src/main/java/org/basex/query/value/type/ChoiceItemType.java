@@ -99,7 +99,22 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type || type instanceof final ChoiceItemType cit && types.equals(cit.types);
+    if(this == type) return true;
+    if(!(type instanceof final ChoiceItemType cit)) return false;
+    final int ts = types.size();
+    if(ts != cit.types.size()) return false;
+    for(int t = 0; t < ts; t++) {
+      if(!TypeRef.eq(types.get(t), cit.types.get(t))) return false;
+    }
+    return true;
+  }
+
+  @Override
+  public boolean instance(final Item item, final boolean coerce) {
+    for(final Type tp : types) {
+      if(tp.instance(item, coerce)) return true;
+    }
+    return false;
   }
 
   @Override
@@ -175,11 +190,6 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
-  public boolean isNumberOrUntyped() {
-    return union.isNumberOrUntyped();
-  }
-
-  @Override
   public boolean isStringOrUntyped() {
     return union.isStringOrUntyped();
   }
@@ -205,16 +215,6 @@ public final class ChoiceItemType implements Type {
       if(tp.nsSensitive()) return true;
     }
     return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return types.hashCode();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final ChoiceItemType cit && types.equals(cit.types);
   }
 
   @Override
@@ -268,7 +268,7 @@ public final class ChoiceItemType implements Type {
         for(final Type tp : types) {
           if(tp instanceof final TypeRef t && !t.resolved() && t.name().eq(name)) return this;
         }
-      } else if(types.contains(type)) {
+      } else if(Checks.any(types, tp -> TypeRef.eq(tp, type))) {
         return this;
       }
       // non-mergeable types or first entry

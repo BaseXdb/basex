@@ -110,8 +110,7 @@ public final class CmpIR extends CmpRange {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
-    final SeqType st = expr.seqType();
-    single = st.zeroOrOne() && !st.mayBeWrapped();
+    single = expr.seqType().atomOcc().max <= 1;
 
     // position() = 1 to 2 → pos: 1, 2
     if(Function.POSITION.is(expr)) return cc.replaceWith(this, IntPos.get(min, max, info));

@@ -132,7 +132,7 @@ public final class SharedData {
       final ArrayList<ShapeType> types = shapeTypes.computeIfAbsent(sh.fields().size(),
           ArrayList::new);
       for(final ShapeType type : types) {
-        if(type.equals(sh)) return type;
+        if(type.eq(sh)) return type;
       }
       types.add(sh);
       return sh;

@@ -44,12 +44,8 @@ public final class EnumType implements Type {
     return new EnumType(set);
   }
 
-  /**
-   * Checks if the given item is an instance of this type.
-   * @param item item to be checked
-   * @return result of check
-   */
-  public boolean instance(final Item item) {
+  @Override
+  public boolean instance(final Item item, final boolean coerce) {
     try {
       return item.type.instanceOf(BasicType.STRING) && values.contains(item.string(null));
     } catch(final QueryException ex) {
@@ -83,7 +79,8 @@ public final class EnumType implements Type {
 
   @Override
   public boolean eq(final Type type) {
-    return equals(type);
+    return this == type || type instanceof final EnumType et &&
+        values.size() == et.values.size() && instanceOf(et);
   }
 
   @Override
@@ -126,11 +123,7 @@ public final class EnumType implements Type {
       for(final byte[] value : values) {
         if(tv.contains(value)) ts.add(value);
       }
-      for(final byte[] value : tv) {
-        if(values.contains(value)) ts.add(value);
-      }
-      final int sz = ts.size();
-      if(sz > 0) return sz == values.size() ? this : sz == tv.size() ? et : new EnumType(ts);
+      if(!ts.isEmpty()) return new EnumType(ts);
     }
     return null;
   }
@@ -147,11 +140,6 @@ public final class EnumType implements Type {
 
   @Override
   public boolean isUntyped() {
-    return false;
-  }
-
-  @Override
-  public boolean isNumberOrUntyped() {
     return false;
   }
 
@@ -178,27 +166,6 @@ public final class EnumType implements Type {
   @Override
   public boolean nsSensitive() {
     return false;
-  }
-
-  @Override
-  public int hashCode() {
-    int h = 0;
-    for(final byte[] v : values) {
-      h = h * 31 + Token.hashCode(v);
-    }
-    return h;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof final EnumType et)) return false;
-    final TokenSet tv = et.values;
-    if(values.size() != tv.size()) return false;
-    for(final byte[] value : values) {
-      if(!tv.contains(value)) return false;
-    }
-    return true;
   }
 
   @Override

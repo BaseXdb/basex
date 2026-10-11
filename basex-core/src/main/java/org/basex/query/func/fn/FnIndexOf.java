@@ -54,7 +54,7 @@ public final class FnIndexOf extends StandardFunc {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-    if(st.zeroOrOne() && !st.mayBeWrapped()) exprType.assign(Occ.ZERO_OR_ONE);
+    if(st.atomOcc().max <= 1) exprType.assign(Occ.ZERO_OR_ONE);
     return this;
   }
 }

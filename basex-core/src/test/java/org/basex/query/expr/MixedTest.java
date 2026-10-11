@@ -84,6 +84,40 @@ public final class MixedTest extends SandboxTest {
         + "declare function local:int($value) { $value }; 1", DUPLFUNC_X);
   }
 
+  /** Coerced variables: atomized arrays change the number of items. */
+  @Test public void coercedSize() {
+    query("let $n := random:integer(1) + 1 let $x as xs:double* := ([ $n, $n + 1 ], $n + 2)"
+        + "return count($x)", 3);
+  }
+
+  /** Shapes with function values must not adopt the inferred types of other functions. */
+  @Test public void shapeFunctions() {
+    error("let $m := { 'a': random:double(), 'b': random:double() }"
+        + "let $f := fn($x) { 1 } let $g := fn($x) { 'x' }"
+        + "return (map:put($m, 'f', $f)?f(1), xs:integer(map:put($m, 'f', $g)?f(1)))",
+        FUNCCAST_X_X);
+  }
+
+  /** Distinct forward references to item types. */
+  @Test public void forwardTypeRefs() {
+    query("declare function local:f($m as map(local:a, xs:string)) { 'a' };"
+        + "declare function local:g($m as map(local:b, xs:string)) { 'b' };"
+        + "declare type local:a as xs:integer; declare type local:b as xs:string;"
+        + "local:g({ 'x': 'y' })", "b");
+    query("declare function local:g($r as (record(a as local:x) | record(a as local:y))) {"
+        + "'ok' }; declare type local:x as xs:integer; declare type local:y as xs:string;"
+        + "local:g({ 'a': 's' })", "ok");
+    query("declare function local:f($x as local:d) { $x instance of xs:double };"
+        + "declare type local:d as xs:double; local:f(xs:float(1))", true);
+    // types of other queries must not be reused
+    query("let $q := fn($n) { 'declare %basex:inline(0) function local:f("
+        + "$m as map(local:' || $n || ', xs:integer)) { map:filter($m, fn($k, $v) { true() })"
+        + " => inspect:type({ \"mode\": \"expression\" }) };"
+        + " declare type local:' || $n || ' as enum(\"a\"); local:f({ \"a\": 1 })' }"
+        + "return (xquery:eval($q('k')), xquery:eval($q('other')))",
+        "map(local:k, xs:integer)\nmap(local:other, xs:integer)");
+  }
+
   /**
    * Overwrites an empty attribute value.
    */

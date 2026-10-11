@@ -53,22 +53,24 @@ public final class TypeCheck extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     SeqType st = seqType();
     final Type type = st.type;
+    final boolean atomic = type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
 
-    if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+    if(atomic) {
       // data(EXPR) coerce to xs:int → EXPR coerce to xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
-        st.occ.instanceOf(expr.seqType().occ)) {
+        st.occ.instanceOf(expr.seqType().occ) &&
+        (!atomic || !expr.arg(0).seqType().mayBeWrapped())) {
       // exactly-one(ITEM) coerce to item() → ITEM coerce to item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
 
     final SeqType et = expr.seqType(), nst = et.with(st.occ);
-    cardinality = nst.instanceOf(st, true);
+    cardinality = nst.coercible(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
-    if(!et.mayBeWrapped() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+    if(!et.mayBeWrapped() || !atomic) {
       // occurrence indicator:
       //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);
@@ -93,13 +95,13 @@ public final class TypeCheck extends Single {
     }
 
     // remove redundant type check
-    if(expr instanceof final TypeCheck tc && st.instanceOf(et, true)) {
+    if(expr instanceof final TypeCheck tc && st.coercible(et)) {
       // (EXPR coerce to xs:integer) coerce to xs:int → EXPR coerce to xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }
 
     // skip check if return type is correct
-    if(et.instanceOf(st, true)) {
+    if(et.coercible(st)) {
       // (1, 3) coerce to xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
@@ -157,7 +159,7 @@ public final class TypeCheck extends Single {
    * @return resulting expression, or {@code null} if no type check is necessary
    */
   public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
-    if(ex.seqType().instanceOf(st, true)) return null;
+    if(ex.seqType().coercible(st)) return null;
     try {
       return new TypeCheck(info, ex, st, name).optimize(cc);
     } catch(final QueryException qe) {

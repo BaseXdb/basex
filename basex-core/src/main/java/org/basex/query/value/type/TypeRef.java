@@ -70,6 +70,17 @@ public final class TypeRef implements Type {
   }
 
   /**
+   * Checks if two types are equal, treating unresolved references as distinct placeholders.
+   * @param type1 first type
+   * @param type2 second type
+   * @return result of check
+   */
+  public static boolean eq(final Type type1, final Type type2) {
+    return unresolved(type1) || unresolved(type2) ? type1 == type2 :
+      deref(type1).eq(deref(type2));
+  }
+
+  /**
    * Checks if the specified type, its chained references or its choice alternatives contain a
    * still-unresolved reference.
    * @param type type
@@ -113,6 +124,11 @@ public final class TypeRef implements Type {
   }
 
   @Override
+  public boolean assignable() {
+    return deref().assignable();
+  }
+
+  @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     return deref().cast(item, qc, ii);
@@ -137,7 +153,12 @@ public final class TypeRef implements Type {
 
   @Override
   public boolean eq(final Type tp) {
-    return deref().eq(deref(tp));
+    return eq(this, tp);
+  }
+
+  @Override
+  public boolean instance(final Item item, final boolean coerce) {
+    return deref().instance(item, coerce);
   }
 
   @Override
@@ -163,11 +184,6 @@ public final class TypeRef implements Type {
   @Override
   public boolean isUntyped() {
     return deref().isUntyped();
-  }
-
-  @Override
-  public boolean isNumberOrUntyped() {
-    return deref().isNumberOrUntyped();
   }
 
   @Override
@@ -208,16 +224,6 @@ public final class TypeRef implements Type {
   @Override
   public QNm name() {
     return name;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Type tp && deref().equals(deref(tp));
-  }
-
-  @Override
-  public int hashCode() {
-    return deref().hashCode();
   }
 
   @Override

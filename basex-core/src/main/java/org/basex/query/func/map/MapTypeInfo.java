@@ -51,8 +51,9 @@ public final class MapTypeInfo {
       if(kt.isStringOrUntyped()) index = shape.fields().index(item.string(null));
       if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
     }
-    if(mapType != null) {
-      final Type et = expr.seqType().type.atomic(), kt = mapType.keyType();
+    final SeqType st = expr.seqType();
+    if(mapType != null && st.atomOcc() == Occ.EXACTLY_ONE) {
+      final Type et = st.type.atomic(), kt = mapType.keyType();
       keyMismatch = et != null && (kt.isStringOrUntyped() && et.isNumber() ||
         kt.isNumber() && et.isStringOrUntyped());
     }

@@ -98,7 +98,7 @@ public final class Let extends ForLet {
   public Let optimize(final CompileContext cc) throws QueryException {
     // skip redundant type check
     if(!scoring && expr instanceof final TypeCheck tc) {
-      if(var.declType != null && var.declType.instanceOf(expr.seqType(), true) ||
+      if(var.declType != null && var.declType.coercible(expr.seqType()) ||
           var.adoptCheck(expr.seqType())) {
         cc.info(OPTTYPE_X, this);
         expr = tc.expr;
@@ -108,7 +108,7 @@ public final class Let extends ForLet {
     if(expr instanceof final Value value) {
       expr = var.checkType(value, cc.qc, cc);
     } else if(!scoring && var.declType != null &&
-        !expr.seqType().instanceOf(var.declType, true)) {
+        !expr.seqType().coercible(var.declType)) {
       // push type check into the expression: { 'a': 1 } coerce to local:r → local:r(1)
       final Expr checked = var.checked(expr, cc);
       if(!(checked instanceof TypeCheck)) expr = checked;

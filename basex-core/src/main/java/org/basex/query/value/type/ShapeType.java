@@ -33,6 +33,8 @@ public class ShapeType extends MapType {
   private volatile Str[] keys;
   /** Indicates if the fields are free of initializing expressions. */
   private final boolean detached;
+  /** Indicates if the shape is detached and its field types are independent of a query. */
+  private final boolean global;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
 
@@ -43,9 +45,13 @@ public class ShapeType extends MapType {
   public ShapeType(final TokenObjectMap<ShapeField> fields) {
     super(BasicType.STRING, unionType(fields));
     this.fields = fields;
-    boolean d = true;
-    for(final ShapeField rf : fields.values()) d &= rf.init() == null;
+    boolean d = true, g = true;
+    for(final ShapeField rf : fields.values()) {
+      d &= rf.init() == null;
+      g &= rf.seqType().type.global();
+    }
     detached = d;
+    global = d && g;
   }
 
   /**
@@ -87,8 +93,7 @@ public class ShapeType extends MapType {
       return null;
     }
     // shapes with query-scoped components must not be cached: they would be retained forever
-    if(detached() &&
-        !(seqType != null && seqType.type instanceof final ShapeType sh && !sh.detached())) {
+    if(detached() && (seqType == null || seqType.type.global())) {
       if(derived == null) derived = new ConcurrentHashMap<>();
       // do not cache shapes that are derived from arbitrarily many field names
       if(derived.size() < MAX_DERIVED) {
@@ -277,6 +282,11 @@ public class ShapeType extends MapType {
     return Checks.any(fields.values(), f -> f.seqType().type.wraps());
   }
 
+  @Override
+  public boolean global() {
+    return global;
+  }
+
   /**
    * Return the minimum number of fields that must be supplied to the constructor function.
    * @return minimum number of fields
@@ -297,11 +307,6 @@ public class ShapeType extends MapType {
     return eq(type, emptySet());
   }
 
-  @Override
-  public final boolean equals(final Object obj) {
-    return obj instanceof final ShapeType sh && eq(sh);
-  }
-
   /**
    * Checks if this type is equal to the given one, including the field order.
    * @param type other type
@@ -316,13 +321,15 @@ public class ShapeType extends MapType {
         !sameIdentity(sh) || !sameOrder(sh)) return false;
 
     for(final byte[] key : fields) {
-      final SeqType st1 = fields.get(key).seqType(), st2 = sh.fields.get(key).seqType();
+      final ShapeField f1 = fields.get(key), f2 = sh.fields.get(key);
+      if(f1.isStatic() != f2.isStatic() || !Objects.equals(f1.init(), f2.init())) return false;
+      final SeqType st1 = f1.seqType(), st2 = f2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = TypeRef.deref(st1.type), tp2 = TypeRef.deref(st2.type);
       if(tp1 instanceof final ShapeType sh1 && tp2 instanceof final ShapeType sh2) {
         final Pair pair = new Pair(sh1, sh2);
         if(!pairs.contains(pair) && !sh1.eq(sh2, pair.addTo(pairs))) return false;
-      } else if(!tp1.eq(tp2)) {
+      } else if(!st1.eq(st2)) {
         return false;
       }
     }
@@ -618,11 +625,11 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * An ordered pair of objects.
-   * @param o1 first object
-   * @param o2 second object
+   * An ordered pair of shapes.
+   * @param o1 first shape
+   * @param o2 second shape
    */
-  private record Pair(Object o1, Object o2) {
+  private record Pair(ShapeType o1, ShapeType o2) {
     /**
      * Adds this {@code Pair} to the given set of {@code Pair}s, creating a new set if the given set
      * is empty.

@@ -5,7 +5,6 @@ import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -43,8 +42,6 @@ public final class SeqType {
   public final Occ occ;
   /** Array type (can be {@code null}; lazy instantiation). */
   private ArrayType arrayType;
-  /** Map types (can be {@code null}; lazy instantiation). */
-  private Map<Type, MapType> mapTypes;
   /** Map types with basic key types, indexed by ordinal (can be {@code null}). */
   private MapType[] basicMapTypes;
   /** Cached checks: lower bits flag evaluated checks, upper bits their results. */
@@ -114,18 +111,23 @@ public final class SeqType {
    * @return map type
    */
   public MapType mapType(final Type keyType) {
-    // shortcut for basic key types: the array caches the canonical instances of the hash map
-    final int i = keyType instanceof final BasicType bt ? bt.ordinal() : -1;
-    MapType[] mts = basicMapTypes;
-    if(i != -1 && mts != null && mts[i] != null) return mts[i];
+    // only basic key types are cached: other key types may be specific to a query
+    if(!(keyType instanceof final BasicType bt)) return new MapType(keyType, this);
+    final MapType[] mts = basicMapTypes;
+    final MapType mt = mts != null ? mts[bt.ordinal()] : null;
+    return mt != null ? mt : basicMapType(bt);
+  }
 
-    if(mapTypes == null) mapTypes = new ConcurrentHashMap<>();
-    final MapType mt = mapTypes.computeIfAbsent(keyType, k -> new MapType(k, this));
-    if(i != -1) {
-      if(mts == null) basicMapTypes = mts = new MapType[BasicType.values().length];
-      mts[i] = mt;
-    }
-    return mt;
+  /**
+   * Creates and caches the canonical map type for this sequence type and a basic key type.
+   * @param keyType key type
+   * @return map type
+   */
+  private synchronized MapType basicMapType(final BasicType keyType) {
+    if(basicMapTypes == null) basicMapTypes = new MapType[BasicType.values().length];
+    final int i = keyType.ordinal();
+    if(basicMapTypes[i] == null) basicMapTypes[i] = new MapType(keyType, this);
+    return basicMapTypes[i];
   }
 
   /**
@@ -189,17 +191,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item, final boolean coerce) {
-    final Type dt = TypeRef.deref(this.type);
-    if(dt instanceof final ChoiceItemType cit) {
-      for(final Type tp : cit.types) {
-        if(tp.seqType().instance(item, coerce)) return true;
-      }
-      return false;
-    }
-    if(dt instanceof final EnumType et) {
-      return et.instance(item);
-    }
-    return item.instanceOf(dt, coerce);
+    return type.instance(item, coerce);
   }
 
   /**
@@ -439,11 +431,11 @@ public final class SeqType {
     if(dt instanceof BasicType || dt instanceof EnumType) {
       final Value value = item.atomValue(qc, info);
       final long size = value.size();
-      if(size == 1) return coerceAtomic((Item) value, qc, info);
+      if(size == 1) return coerceAtomic((Item) value, dt, qc, info);
 
       final ValueBuilder vb = new ValueBuilder(qc, size);
       for(final Item it : value) {
-        final Item cast = coerceAtomic(it, qc, info);
+        final Item cast = coerceAtomic(it, dt, qc, info);
         if(cast == null) return null;
         vb.add(cast);
       }
@@ -466,64 +458,48 @@ public final class SeqType {
   /**
    * Converts the specified atomized item to this type.
    * @param item item to promote
+   * @param tp dereferenced item type of this sequence type
    * @param qc query context
    * @param info input info (can be {@code null})
    * @return converted value, or {@code null} if conversion failed
    * @throws QueryException query exception
    */
-  private Item coerceAtomic(final Item item, final QueryContext qc, final InputInfo info)
-      throws QueryException {
+  private Item coerceAtomic(final Item item, final Type tp, final QueryContext qc,
+      final InputInfo info) throws QueryException {
     final Type at = item.type;
-    if(at.instanceOf(type)) return item;
+    if(at.instanceOf(tp)) return item;
     // xs:error has an empty value space: function conversion never casts to it, so coercion
     // always fails and the caller reports a type error (XPTY0004)
-    if(type == ERROR) return null;
+    if(tp == ERROR) return null;
 
     Item relabel = null;
     if(at == UNTYPED_ATOMIC) {
-      if(type.nsSensitive()) throw NSSENS_X_X.get(info, at, type);
+      if(tp.nsSensitive()) throw NSSENS_X_X.get(info, at, type);
       // item will be cast
     } else if(
-      type == DECIMAL && (at == DOUBLE || at == FLOAT) ||
-      type == DOUBLE && (at == FLOAT || at.instanceOf(DECIMAL)) ||
-      type == FLOAT && (at == DOUBLE || at.instanceOf(DECIMAL)) ||
-      type == STRING && at == ANY_URI ||
-      type == ANY_URI && at.instanceOf(STRING) ||
-      type == HEX_BINARY && at == BASE64_BINARY ||
-      type == BASE64_BINARY && at == HEX_BINARY ||
-      type instanceof EnumType && at == ANY_URI
+      tp == DECIMAL && (at == DOUBLE || at == FLOAT) ||
+      tp == DOUBLE && (at == FLOAT || at.instanceOf(DECIMAL)) ||
+      tp == FLOAT && (at == DOUBLE || at.instanceOf(DECIMAL)) ||
+      tp == STRING && at == ANY_URI ||
+      tp == ANY_URI && at.instanceOf(STRING) ||
+      tp == HEX_BINARY && at == BASE64_BINARY ||
+      tp == BASE64_BINARY && at == HEX_BINARY ||
+      tp instanceof EnumType && at == ANY_URI
     ) {
       // item will be cast
-    } else if(!type.union(at).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
+    } else if(!tp.union(at).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
       // item will be relabeled: remember old type for future comparison
       relabel = item;
     } else {
       return null;
     }
     // relabeling is no cast: if the value is outside the value space, a type error is raised
-    final boolean lenient = type instanceof EnumType || relabel != null;
+    final boolean lenient = tp instanceof EnumType || relabel != null;
     final Item cast = (Item) cast(item, !lenient, qc, info);
     return cast != null && (relabel == null || cast.compare(relabel, null, false, qc, info) == 0) ?
         cast : null;
   }
 
-  /**
-   * Checks if this type could be converted to the given one by function conversion.
-   * @param st type to convert to
-   * @return result of check
-   */
-  public boolean promotable(final SeqType st) {
-    if(intersect(st) != null) return true;
-    if(occ.intersect(st.occ) == null) return false;
-    final Type tp = st.type;
-    if(tp instanceof BasicType || tp instanceof ChoiceItemType) {
-      if(type.isUntyped()) return !tp.nsSensitive();
-      return tp == DOUBLE && (type.intersect(FLOAT) != null || type.intersect(DECIMAL) != null) ||
-             tp == FLOAT && type.intersect(DECIMAL) != null ||
-             tp == STRING && type.intersect(ANY_URI) != null;
-    }
-    return st.type instanceof FType && type instanceof FType;
-  }
 
   /**
    * Computes the union of two sequence types, i.e. the lowest common ancestor of both types.
@@ -613,7 +589,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean voidType() {
-    return type == BasicType.ERROR && oneOrMore();
+    return TypeRef.deref(type) == BasicType.ERROR && oneOrMore();
   }
 
   /**
@@ -622,7 +598,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean emptyType() {
-    return zero() || type == BasicType.ERROR && !oneOrMore();
+    return zero() || TypeRef.deref(type) == BasicType.ERROR && !oneOrMore();
   }
 
   /**
@@ -648,6 +624,14 @@ public final class SeqType {
    */
   public boolean mayBeWrapped() {
     return mayBe(Check.WRAPPED);
+  }
+
+  /**
+   * Returns the occurrence indicator of the atomized contents.
+   * @return occurrence indicator
+   */
+  public Occ atomOcc() {
+    return mayBeWrapped() ? Occ.ZERO_OR_MORE : occ;
   }
 
   /**
@@ -758,13 +742,13 @@ public final class SeqType {
   }
 
   /**
-   * Checks if values of this type can be supplied without coercion to the specified type.
+   * Checks if values of this type are kept unchanged when coerced to the specified type.
    * @param st sequence type to check
-   * @param coerce coercion (identical records are kept, typed functions are always wrapped)
    * @return result of check
    */
-  public boolean instanceOf(final SeqType st, final boolean coerce) {
-    return instanceOf(st) && !(coerce && rebuilds(type, st.type));
+  public boolean coercible(final SeqType st) {
+    // identical records are kept, typed functions are always wrapped
+    return instanceOf(st) && (!st.type.coercive() || instanceOf(type, st.type, true));
   }
 
   /**
@@ -774,17 +758,7 @@ public final class SeqType {
    */
   public boolean refines(final SeqType st) {
     // inferred function types are upper bounds and must not be enforced
-    return instanceOf(st, true) && !type.wraps();
-  }
-
-  /**
-   * Checks if coercion to the target type rebuilds records or wraps functions of the given type.
-   * @param type type
-   * @param target target type
-   * @return result of check
-   */
-  public static boolean rebuilds(final Type type, final Type target) {
-    return target.coercive() && !instanceOf(type, target, true);
+    return coercible(st) && !type.wraps();
   }
 
   /**
@@ -818,10 +792,7 @@ public final class SeqType {
    */
   public boolean eq(final SeqType st) {
     if(this == st) return true;
-    if(occ != st.occ) return false;
-    // an unresolved forward reference is a distinct placeholder, not its temporary item() deref
-    if(TypeRef.unresolved(type) || TypeRef.unresolved(st.type)) return type == st.type;
-    return TypeRef.deref(type).eq(TypeRef.deref(st.type));
+    return occ == st.occ && TypeRef.eq(type, st.type);
   }
 
   @Override
@@ -829,16 +800,10 @@ public final class SeqType {
     return this == obj || obj instanceof final SeqType st && eq(st);
   }
 
-  /**
-   * This implementation of this method is used on the alternatives of a
-   * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
-   * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
-   * only on {@link #SeqType} instances based on some {@link BasicType}, where suitable hash codes
-   * are available for {@link #type}, and {@link #occ}.
-   */
   @Override
   public int hashCode() {
-    return (type == null ? 0 : type.hashCode()) + (occ == null ? 0 : occ.hashCode());
+    // consistent with eq: structurally equal types may be different instances
+    return Objects.hashCode(type.id()) * 31 + occ.hashCode();
   }
 
   /**

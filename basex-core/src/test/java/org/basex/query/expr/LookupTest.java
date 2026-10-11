@@ -113,6 +113,17 @@ public final class LookupTest extends SandboxTest {
     check("[ <x/> ]?*", "<x/>", exists(_ARRAY_ITEMS), empty(Lookup.class));
   }
 
+  /** Focus-dependent key: the focus of the lookup expression is used. */
+  @Test public void focusKey() {
+    final String map = "map:build((1, 2), value := fn($k) { ('a', 'b')[$k] })";
+    query("declare %basex:inline(0) function local:f($m as map(xs:integer, xs:string)?) {"
+        + " (1, 2)[$m?(.) = 'b'] }; local:f(" + map + ")", 2);
+    query("declare %basex:inline(0) function local:f($m as map(xs:integer, xs:string)*) {"
+        + " (1, 2)[$m?(.) = 'b'] }; local:f((" + map + ", " + map + "))", 2);
+    query("declare %basex:inline(0) function local:f($a as array(xs:string)?) {"
+        + " (1, 2)[$a?(.) = 'b'] }; local:f([ 'a', 'b' ])", 2);
+  }
+
   /** JNodes: lookup is applied to each item of the value. */
   @Test public void jnode() {
     query("let $j := { 'a': ({ 'x': 1 }, { 'x': 2 }) }/a return $j?x", "1\n2");

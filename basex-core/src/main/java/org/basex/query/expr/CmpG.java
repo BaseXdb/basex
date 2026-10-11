@@ -126,7 +126,7 @@ public class CmpG extends Cmp {
       eager = expr1.eager() && expr2.eager();
 
       // choose best implementation
-      if(st1.zeroOrOne() && !st1.mayBeWrapped() && st2.zeroOrOne() && !st2.mayBeWrapped()) {
+      if(st1.atomOcc().max <= 1 && st2.atomOcc().max <= 1) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() &&
@@ -489,7 +489,7 @@ public class CmpG extends Cmp {
   public final CmpG invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.one() && !st1.mayBeWrapped() && st2.one() && !st2.mayBeWrapped() ?
+    return st1.atomOcc() == Occ.EXACTLY_ONE && st2.atomOcc() == Occ.EXACTLY_ONE ?
       new CmpG(info, expr1, expr2, op.invert()) : null;
   }
 
@@ -529,8 +529,8 @@ public class CmpG extends Cmp {
     };
 
     // check if comparisons can be merged
-    final boolean seqL = !exprL.seqType().one();
-    final boolean seqR1 = !exprR1.seqType().one(), seqR2 = !exprR2.seqType().one();
+    final Predicate<Expr> seq = ex -> ex.seqType().atomOcc() != Occ.EXACTLY_ONE;
+    final boolean seqL = seq.test(exprL), seqR1 = seq.test(exprR1), seqR2 = seq.test(exprR2);
     if(or) {
       /* do not merge if second comparison was inverted and left operand or
        * second right operand are not a single item. examples:

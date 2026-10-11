@@ -247,6 +247,14 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
+   * Returns the size of the atomized result.
+   * @return size, or {@code -1} if it is unknown
+   */
+  public final long atomSize() {
+    return seqType().mayBeWrapped() ? -1 : size();
+  }
+
+  /**
    * Returns the size of a structure resulting from this expression.
    * @return size, or {@code -1} if it is unknown or if the result is not a structure
    */

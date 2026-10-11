@@ -215,30 +215,27 @@ public abstract class Cmp extends Arr {
     if(st1.type == BasicType.BOOLEAN && st2.type == BasicType.BOOLEAN) {
       final boolean eq = op == CmpOp.EQ, ne = op == CmpOp.NE;
       if(expr2 instanceof Bln) {
-        final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
+        // results for true and false first operands
+        final boolean ok = expr2 == Bln.TRUE;
+        final boolean t = op.eval(Boolean.compare(true, ok));
+        final boolean f = op.eval(Boolean.compare(false, ok));
 
         // boolean(A) = true() → boolean(A)
         // boolean(A) <= true() → true()
-        if(st1.zeroOrOne() && (success || st1.one())) {
+        // empty operand: general comparison yields false, so f must be false
+        if(st1.zeroOrOne() && (st1.one() || this instanceof CmpG && !f)) {
+          if(t == f) return Bln.get(t);
           final Expr ex1 = st1.one() ? expr1 : cc.function(BOOLEAN, info, expr1);
-          final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
-          return switch(op) {
-            case EQ -> ok ? ex1       : not.get();
-            case NE -> ok ? not.get() : ex1;
-            case GE -> ok ? ex1       : Bln.TRUE;
-            case LE -> ok ? Bln.TRUE  : not.get();
-            case GT -> ok ? Bln.FALSE : ex1;
-            default -> ok ? not.get() : Bln.FALSE;
-          };
+          return t ? ex1 : cc.function(NOT, info, ex1);
         }
 
-        if(this instanceof CmpG) {
+        if(this instanceof CmpG && (eq || ne)) {
           // (A, B) = true() → A or B
           // (A, B) = false() → not(A and B)
           final Expr[] args = expr1.args();
-          if((eq || ne) && expr1 instanceof List &&
+          if(expr1 instanceof List &&
               Checks.all(args, expr -> expr.seqType().eq(Types.BOOLEAN_O))) {
-            return success ? new Or(info, args).optimize(cc) :
+            return t ? new Or(info, args).optimize(cc) :
               cc.function(NOT, info, new And(info, args).optimize(cc));
           }
 
@@ -247,8 +244,8 @@ public abstract class Cmp extends Arr {
             final Expr last = args[al];
 
             // expr ! true() = true() → exists(expr)
-            if(last instanceof final Bln bln && (eq || ne)) {
-              return bln.bool(info) != success ? Bln.FALSE :
+            if(last instanceof final Bln bln) {
+              return bln.bool(info) != t ? Bln.FALSE :
                 cc.function(EXISTS, info, map.remove(cc, al));
             }
 
@@ -258,12 +255,13 @@ public abstract class Cmp extends Arr {
                 // (name ! (. = 'Ukraine')) = true() → name = 'Ukraine'
                 // (code ! (. = 1)) = false() → code != 1
                 final Expr op2 = ops[1];
-                if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
+                if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().atomOcc() == Occ.EXACTLY_ONE &&
+                    !args[al - 1].seqType().mayBeWrapped())) {
                   CmpOp cmpOp = cmp.op;
-                  if(!success) cmpOp = cmpOp.invert();
+                  if(!t) cmpOp = cmpOp.invert();
                   return new CmpG(info, map.remove(cc, al), op2, cmpOp).optimize(cc);
                 }
-              } else if(success && last instanceof final CmpRange cmp) {
+              } else if(t && last instanceof final CmpRange cmp) {
                 // (number ! (. >= 1e0) = true() → number >= 1e0
                 // (integer ! (. >= 1) != false() → integer >= 1
                 // (string ! (. >= 'b') = true() → string >= 'b'
@@ -306,10 +304,9 @@ public abstract class Cmp extends Arr {
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
     // count(distinct-values(E)) = int
-    if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr &&
-        !arg.arg(0).seqType().mayBeWrapped()) {
-      final long size1 = arg.arg(0).size(), size2 = itr.itr();
-      if(size1 != -1 && size1 == size2) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
+    if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr) {
+      final long size = arg.arg(0).atomSize();
+      if(size != -1 && size == itr.itr()) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
 
     final ExprList args = new ExprList(3);
@@ -385,7 +382,7 @@ public abstract class Cmp extends Arr {
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
       if(arg1 != null && !arg1.has(Flag.NDT)) {
         final SeqType st1 = arg1.seqType();
-        if(st1.zero() || st1.one() && !st1.mayBeWrapped()) {
+        if(st1.zero() || st1.atomOcc() == Occ.EXACTLY_ONE) {
           return Bln.get(counts == COUNT_TRUE);
         }
       }

@@ -80,6 +80,11 @@ public class MapType extends FType {
   }
 
   @Override
+  public boolean global() {
+    return keyType.global() && valueType.type.global();
+  }
+
+  @Override
   public final XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof final XQMap map && map.instanceOf(this, false)) return map;

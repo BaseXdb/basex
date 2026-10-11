@@ -57,7 +57,7 @@ abstract class Convert extends Single {
     if(type instanceof ListType) {
       type = type.atomic();
       occ = Occ.ZERO_OR_MORE;
-    } else if(occ == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeWrapped()) {
+    } else if(occ == Occ.ZERO_OR_ONE && est.atomOcc().min >= 1) {
       occ = Occ.EXACTLY_ONE;
     }
     return SeqType.get(type, occ);
@@ -92,7 +92,7 @@ abstract class Convert extends Single {
   final Expr simplify(final SeqType castType, final CompileContext cc) {
     final SeqType est = expr.seqType();
     Expr arg = null;
-    if(est.one() && !est.mayBeWrapped() && castType.type.instanceOf(BasicType.NUMERIC)) {
+    if(est.atomOcc() == Occ.EXACTLY_ONE && castType.type.instanceOf(BasicType.NUMERIC)) {
       // xs:int(string(I))
       // xs:int(xs:double(I)) → xs:int(I)
       arg = FnNumber.simplify(expr, cc);

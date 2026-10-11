@@ -34,8 +34,7 @@ public final class FnDateTime extends StandardFunc {
     final SeqType stDate = date.seqType(), stTime = time.seqType();
     if(stDate.zero()) return cc.voidAndReturn(time, date, info);
     if(stTime.zero()) return cc.voidAndReturn(date, time, info);
-    if(stDate.oneOrMore() && !stDate.mayBeWrapped() && stTime.oneOrMore() &&
-        !stTime.mayBeWrapped()) exprType.assign(Occ.EXACTLY_ONE);
+    if(stDate.atomOcc().min >= 1 && stTime.atomOcc().min >= 1) exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }
 }

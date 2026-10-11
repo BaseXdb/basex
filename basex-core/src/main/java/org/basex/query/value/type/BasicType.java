@@ -938,6 +938,8 @@ public enum BasicType implements Type {
 
   /** Pre/post values (pre, post << 8). */
   private short prePost;
+  /** Indicates if the type has subtypes. */
+  private boolean refinable;
   /** Sequence types. */
   private final SeqType[] seqTypes = SeqType.cache(this);
   /** QName (can be {@code null}; lazy instantiation). */
@@ -977,7 +979,9 @@ public enum BasicType implements Type {
    */
   private void assign(final EnumMap<BasicType, List<BasicType>> types, final byte[] pp) {
     prePost = pp[0]++;
-    for(final BasicType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
+    final List<BasicType> children = types.getOrDefault(this, List.of());
+    refinable = !children.isEmpty();
+    for(final BasicType type : children) type.assign(types, pp);
     prePost |= pp[1]++ << 8;
   }
 
@@ -1088,11 +1092,6 @@ public enum BasicType implements Type {
   }
 
   @Override
-  public final boolean isNumberOrUntyped() {
-    return numeric || isUntyped();
-  }
-
-  @Override
   public final boolean isStringOrUntyped() {
     return string || isUntyped();
   }
@@ -1120,9 +1119,7 @@ public enum BasicType implements Type {
    * @throws QueryException query exception
    */
   final Item checkNum(final Item item, final InputInfo info) throws QueryException {
-    final Type type = item.type;
-    if(item instanceof ANum || type.isStringOrUntyped() && type != ANY_URI || type == BOOLEAN)
-      return item;
+    if(item instanceof ANum || isString(item) || item.type == BOOLEAN) return item;
     throw typeError(item, this, info);
   }
 
@@ -1250,12 +1247,17 @@ public enum BasicType implements Type {
 
   @Override
   public final boolean nsSensitive() {
-    return eq(QNAME) || eq(NOTATION);
+    return oneOf(QNAME, NOTATION);
+  }
+
+  @Override
+  public final boolean global() {
+    return true;
   }
 
   @Override
   public final boolean refinable() {
-    return !Checks.all(values(), at -> at.eq(this) || !at.instanceOf(this));
+    return refinable;
   }
 
   /**

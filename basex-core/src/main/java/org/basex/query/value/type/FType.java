@@ -31,11 +31,6 @@ public abstract class FType implements Type {
   }
 
   @Override
-  public final boolean isNumberOrUntyped() {
-    return false;
-  }
-
-  @Override
   public final boolean isStringOrUntyped() {
     return false;
   }

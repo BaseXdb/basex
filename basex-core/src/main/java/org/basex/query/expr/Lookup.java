@@ -85,7 +85,7 @@ public final class Lookup extends Arr {
     final SeqType kt = keys.seqType();
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
-    if(is != 1 || keys == Str.WILDCARD || !kt.one() || kt.mayBeWrapped()) {
+    if(is != 1 || keys == Str.WILDCARD || kt.atomOcc() != Occ.EXACTLY_ONE) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
@@ -105,7 +105,7 @@ public final class Lookup extends Arr {
   private Expr opt(final CompileContext cc) throws QueryException {
     final Expr inputs = exprs[0], keys = exprs[1];
     final long is = inputs.size();
-    final long ks = keys.seqType().mayBeWrapped() || keys.has(Flag.NDT) ? -1 : keys.size();
+    final long ks = keys.has(Flag.NDT) ? -1 : keys.atomSize();
     if(ks == 0) return keys;
 
     final Type it = inputs.seqType().type;
@@ -129,6 +129,11 @@ public final class Lookup extends Arr {
       if(ks == 1) {
         // single input:  INPUT?KEY → REWRITE(INPUT, KEY)
         if(is == 1) return rewrite.apply(inputs, keys);
+        // focus-dependent key:  INPUTS?KEY → for $item in INPUTS return REWRITE($item, KEY)
+        if(keys.has(Flag.CTX)) {
+          final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
+          return flwor.finish(inputs, null, rewrite.apply(flwor.ref(flwor.item), keys));
+        }
         // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
         return SimpleMap.get(cc, info, inputs,
             cc.get(inputs, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));

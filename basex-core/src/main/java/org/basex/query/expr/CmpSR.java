@@ -14,7 +14,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -58,8 +57,7 @@ public final class CmpSR extends CmpRange {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.STRING, cc);
 
-    final SeqType st = expr.seqType();
-    single = st.zeroOrOne() && !st.mayBeWrapped();
+    single = expr.seqType().atomOcc().max <= 1;
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }

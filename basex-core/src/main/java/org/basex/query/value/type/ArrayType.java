@@ -58,6 +58,11 @@ public final class ArrayType extends FType {
   }
 
   @Override
+  public boolean global() {
+    return valueType.type.global();
+  }
+
+  @Override
   public XQArray cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof final XQArray array && array.instanceOf(this, false)) return array;

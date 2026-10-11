@@ -2451,7 +2451,11 @@ public final class RewritingsTest extends SandboxTest {
 
   /** for clause: coercion. */
   @Test public void gh2334() {
-    query("for $a as xs:integer in [ 1, 2 ] return $a", "1\n2");
+    query("for $a as xs:integer in ([ 1 ], [ 2 ]) return $a", "1\n2");
+    query("for $a as xs:integer* at $p in ([ 1, 2 ], [ 3 ]) return $p || ':' || count($a)",
+        "1:2\n2:1");
+    error("for $a as xs:integer in [ 1, 2 ] return $a", INVTYPE_X);
+    error("for $a as xs:integer in [] return $a", INVTYPE_X);
   }
 
   /** Typing: Filters, instance of. */
@@ -2542,6 +2546,29 @@ public final class RewritingsTest extends SandboxTest {
         empty(BlnSeq.class), root(FnBoolean.class));
     // mixed values: the sequence is replaced with a canonical two-item sequence
     check("boolean(" + wrap(2) + ") = reverse(" + seq + ")", true, count(BlnSeq.class, 1));
+  }
+
+  /** Mapped comparisons are only merged with boolean equality checks. */
+  @Test public void mappedBooleanOrder() {
+    final String f = "declare %basex:inline(0) function local:f($s as xs:integer*) { ";
+    query(f + "($s ! (. = 2)) <= true() }; local:f(1)", true);
+    query(f + "($s ! (. = 1)) > false() }; local:f(1)", true);
+    query(f + "($s ! (. >= 2)) <= true() }; local:f(1)", true);
+    check(f + "($s ! (. = 1)) = false() }; local:f(2)", true, exists("CmpSimpleG[@op = '!=']"));
+  }
+
+  /** Comparisons of optional booleans with boolean literals. */
+  @Test public void optionalBooleanCmp() {
+    final String e = "for $i in (0, 1) let $e := head((1 to $i) ! true()) return ";
+    query(e + "$e <= true()", "false\ntrue");
+    query(e + "$e < true()", "false\nfalse");
+    query(e + "$e > false()", "false\ntrue");
+    query(e + "$e >= true()", "false\ntrue");
+    query(e + "$e != false()", "false\ntrue");
+    query(e + "count($e eq true())", "0\n1");
+    query(e + "count($e le true())", "0\n1");
+    query(e + "count($e ne false())", "0\n1");
+    check(e + "$e = true()", "false\ntrue", empty(CmpSimpleG.class));
   }
 
   /** A kind test is narrowed down to the node type of the step result. */
@@ -2728,5 +2755,29 @@ public final class RewritingsTest extends SandboxTest {
     check(doc + "/r/a ! count(preceding-sibling::a/..)", "0\n1\n1\n1\n1\n1",
         empty(UnorderedPath.class));
     check("count(" + doc + "/r/a/preceding-sibling::a)", 5, empty(UnorderedPath.class));
+  }
+
+  /** Rewritings must not assume that wrapped items are atomized to single items. */
+  @Test public void wrappedAtomization() {
+    query("for $a in ([ 1e0 ], [ 2e0 ]) return number($a)", "1\n2");
+    query("for $a in ([], [ 1 ]) return count($a to $a)", "0\n1");
+    query("for $m in ({ 1: 1 }, { 2: 2 }) "
+        + "return try { map:contains($m, [ 'a', 'b' ]) } catch * { string($err:code) }",
+        "err:XPTY0004\nerr:XPTY0004");
+    query("for $a in ([ 'a', 'b' ], [ 'a', 'c' ]) for $s in (1, 2) "
+        + "let $n := if($s = 1) then 'a' else ('a', 'b') return ($n ! (. = $a)) = false()",
+        "false\nfalse\nfalse\ntrue");
+    query("for $s in (1, 2) let $c := if($s = 1) then ([ 1, 2 ], [ 1 ]) else ([], [ 1 ]) "
+        + "return ($c ! (. = 1)) = false()", "false\ntrue");
+    query("for $a in ([ 1, 3 ], [ 1, 2 ]) return $a != 1 and $a != 2", "true\ntrue");
+    query("for $a in ([ 'a', 'z' ], [ 'b' ]) return $a != 'a' and $a != 'z'", "true\ntrue");
+    query("for $p in ([ 2, 3 ], [ 1, 4 ]) "
+        + "return array:size(array:remove([ 5, 6, 7, 8 ], $p))", "2\n2");
+    query("for $i in (1, 2) let $e := subsequence(([], [ 3 ]), 1, $i) "
+        + "return try { let $x as xs:integer := exactly-one($e) return $x } "
+        + "catch * { string($err:code) }", "err:XPTY0004\nerr:FORG0005");
+    query("for $i in (1, 2) let $e := subsequence(([], [ 3 ]), 1, $i) "
+        + "return try { zero-or-one($e) cast as xs:integer? } catch * { string($err:code) }",
+        "err:FORG0003");
   }
 }

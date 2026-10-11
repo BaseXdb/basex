@@ -116,8 +116,7 @@ public final class DynFuncCall extends FuncCall {
       arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
       if(values(false, cc)) return cc.preEval(this);
-      final SeqType kt = arg(0).seqType();
-      if(kt.one() && !kt.mayBeWrapped() && func.seqType().one()) {
+      if(arg(0).seqType().atomOcc() == Occ.EXACTLY_ONE && func.seqType().one()) {
         // $array(POSITION) → array:get($array, POSITION)
         if(ftype instanceof ArrayType) return cc.function(Function._ARRAY_GET, info, func, arg(0));
         // $map(KEY) → map:get($map, KEY)  (unless a strict record may lack the key)

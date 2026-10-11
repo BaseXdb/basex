@@ -67,6 +67,11 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
+  public boolean global() {
+    return false;
+  }
+
+  @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
     return new RecordType(map, name, anns);
   }

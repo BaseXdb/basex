@@ -50,7 +50,8 @@ public final class Range extends Arr {
       final Expr min = exprs[0], max = exprs[1];
       if(min.equals(max) && !min.has(Flag.NDT)) {
         // identical operands: $int to $int
-        exprType.assign(min.seqType().one() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+        final SeqType st = min.seqType();
+        exprType.assign(st.atomOcc() == Occ.EXACTLY_ONE ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
         if(integers()) expr = min;
       } else if(integers()) {
         // known result size: . to . + 10, $x - 1 to $x + 1

@@ -144,7 +144,7 @@ public final class FuncType extends FType {
     for(int a = 0; a < arity; a++) {
       if(!argTypes[a].eq(ft.argTypes[a])) return false;
     }
-    return declType.eq(ft.declType);
+    return declType.eq(ft.declType) && refinedType.eq(ft.refinedType) && anns.equals(ft.anns);
   }
 
   @Override
@@ -170,9 +170,11 @@ public final class FuncType extends FType {
     if(type instanceof ChoiceItemType) return type.union(this);
     final FuncType ft = type.funcType();
 
-    // structural union, run before the instance-of short-circuits so the refined type is merged too
-    if(this != FUNCTION && ft != null && ft != FUNCTION && argTypes != null &&
-        ft.argTypes != null && argTypes.length == ft.argTypes.length) {
+    // typed function types of equal arity: covering operand (including the refined type), or
+    // structural union
+    if(this != FUNCTION && ft != null && ft != FUNCTION && argTypes.length == ft.argTypes.length) {
+      if(ft.instanceOf(this) && ft.refinedType.instanceOf(refinedType)) return this;
+      if(instanceOf(ft) && refinedType.instanceOf(ft.refinedType)) return ft;
       final int arity = argTypes.length;
       final SeqType[] arg = new SeqType[arity];
       for(int a = 0; a < arity; a++) {
@@ -184,7 +186,6 @@ public final class FuncType extends FType {
     }
 
     if(type.instanceOf(this)) return this;
-    if(instanceOf(type)) return type;
     return ft == null ? BasicType.ITEM : FUNCTION;
   }
 

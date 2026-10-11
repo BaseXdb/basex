@@ -175,13 +175,17 @@ public final class Var extends ExprInfo {
       if(declType.occ.intersect(st.occ) == null) {
         throw typeError(declType, st, null, name, info);
       }
-      if(st.instanceOf(declType, true)) {
-        if(cc != null) cc.info(OPTTYPE_X, this);
-        declType = null;
-      } else if(!st.promotable(declType) || SeqType.rebuilds(st.type, declType.type)) {
-        // coercion rebuilds the value: the bound type provides no information on the result
+      if(!st.coercible(declType)) {
+        // coercion may change the items: only their number is kept, unless arrays are atomized
+        final SeqType dt = exprType.seqType();
+        final Occ occ = dt.occ.intersect(st.occ);
+        if(occ != null && !st.mayBeWrapped()) {
+          exprType.assign(dt, occ, occ.check(size) ? size : -1);
+        }
         return;
       }
+      if(cc != null) cc.info(OPTTYPE_X, this);
+      declType = null;
     }
 
     final SeqType dt = exprType.seqType();
@@ -222,7 +226,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st) {
-    if(declType != null && !st.instanceOf(declType, true)) return declType.instanceOf(st, true);
+    if(declType != null && !st.coercible(declType)) return declType.coercible(st);
     declType = st;
     return true;
   }

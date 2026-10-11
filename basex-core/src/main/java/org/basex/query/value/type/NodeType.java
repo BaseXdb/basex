@@ -111,11 +111,6 @@ public final class NodeType implements Type {
   }
 
   @Override
-  public boolean isNumberOrUntyped() {
-    return isUntyped();
-  }
-
-  @Override
   public boolean isStringOrUntyped() {
     return !kind.oneOf(Kind.NODE, Kind.JNODE);
   }
@@ -203,6 +198,11 @@ public final class NodeType implements Type {
   @Override
   public ID id() {
     return kind.id;
+  }
+
+  @Override
+  public boolean global() {
+    return test == null;
   }
 
   @Override

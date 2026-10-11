@@ -42,7 +42,7 @@ public final class Unary extends Single {
     final SeqType st = expr.seqType();
     final BasicType nt = Calc.numType(st.type, st.type);
     final BasicType type = nt == BasicType.ANY_ATOMIC_TYPE ? BasicType.NUMERIC : nt;
-    final Occ occ = st.oneOrMore() && !st.mayBeWrapped() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+    final Occ occ = st.atomOcc().min >= 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 
     // --123 → 123

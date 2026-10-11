@@ -54,7 +54,7 @@ public final class FnNumber extends ContextFn {
     final Expr value = contextAccess() ? cc.qc.focus.value : arg(0);
     if(value != null) {
       final SeqType st = value.seqType();
-      if(st.one()) return st.type.atomic();
+      if(st.atomOcc() == Occ.EXACTLY_ONE) return st.type.atomic();
     }
     return null;
   }

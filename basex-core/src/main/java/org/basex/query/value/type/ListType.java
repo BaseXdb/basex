@@ -77,8 +77,8 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final boolean isNumberOrUntyped() {
-    return false;
+  public final boolean global() {
+    return true;
   }
 
   @Override

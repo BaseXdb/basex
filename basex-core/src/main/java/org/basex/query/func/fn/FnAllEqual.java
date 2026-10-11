@@ -45,7 +45,7 @@ public final class FnAllEqual extends StandardFunc {
     if(!defined(1)) {
       final SeqType st = values.seqType();
       final BasicType type = st.type.atomic();
-      if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeWrapped())
+      if(st.zero() || st.atomOcc().max <= 1 && type != null)
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
       // all-equal(1 to 10) → false

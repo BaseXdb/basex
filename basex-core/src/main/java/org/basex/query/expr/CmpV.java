@@ -56,7 +56,7 @@ public final class CmpV extends Cmp {
     if(expr == this) {
       // restrict type
       final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
-      if(st1.oneOrMore() && !st1.mayBeWrapped() && st2.oneOrMore() && !st2.mayBeWrapped()) {
+      if(st1.atomOcc().min >= 1 && st2.atomOcc().min >= 1) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
     }
@@ -83,7 +83,8 @@ public final class CmpV extends Cmp {
   private Expr toGeneral(final CompileContext cc, final boolean single) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Predicate<SeqType> p = st -> (single ? st.one() : st.zeroOrOne()) && !st.mayBeWrapped();
+    final Occ occ = single ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+    final Predicate<SeqType> p = st -> st.atomOcc().instanceOf(occ);
     return p.test(st1) && p.test(st2) ? new CmpG(info, expr1, expr2, op).optimize(cc) : this;
   }
 
@@ -123,7 +124,7 @@ public final class CmpV extends Cmp {
   public Expr invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.one() && !st1.mayBeWrapped() && st2.one() && !st2.mayBeWrapped() ?
+    return st1.atomOcc() == Occ.EXACTLY_ONE && st2.atomOcc() == Occ.EXACTLY_ONE ?
       new CmpV(info, expr1, expr2, op.invert()) : null;
   }
 

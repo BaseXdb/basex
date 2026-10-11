@@ -2,8 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -92,12 +90,6 @@ public final class ShapeField {
    */
   public SeqType seqType() {
     return seqType;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final ShapeField rf &&
-        seqType.eq(rf.seqType) && Objects.equals(init, rf.init) && statik == rf.statik;
   }
 
   @Override
