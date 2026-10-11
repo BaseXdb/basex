@@ -56,7 +56,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.CREATE, null, info)) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
-      modCache = qcAnc.threads.moduleCache().get();
+      modCache = qcAnc.caches.moduleCache().get();
       cacheKey = new TokenBuilder(modUri).add('#').add(toToken(hints.itemAt(0))).add('#').
           add(perm.toString()).toString();
       if(modCache.containsKey(cacheKey)) return modCache.get(cacheKey);

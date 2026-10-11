@@ -138,12 +138,8 @@ public class CmpG extends Cmp {
         if(!(this instanceof CmpRangeG)) expr = copyType(new CmpRangeG(expr1, expr2, op, info));
       }
 
-      // pre-evaluate expression; discard hashed results
-      if(values(false, cc)) {
-        final Expr ex = cc.preEval(expr);
-        if(expr instanceof final CmpHashG cmp) cc.qc.threads.get(cmp, info).remove();
-        return ex;
-      }
+      // pre-evaluate expression
+      if(values(false, cc)) return cc.preEval(expr);
     }
 
     // return optimized, pre-evaluated or original expression

@@ -80,7 +80,7 @@ public abstract class AxisPath extends Path {
     final Value value = qc.focus.value;
     if(root == null && value == Empty.VALUE) return value;
 
-    final PathCache cache = qc.threads.get(this).get();
+    final PathCache cache = qc.caches.get(this, PathCache::new);
     switch(cache.state) {
       case INIT ->
         // first invocation: find out if caching is possible

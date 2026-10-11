@@ -407,13 +407,7 @@ public final class FTWords extends FTExpr {
    * @return tokenizer
    */
   private FTTokenizer get(final QueryContext qc) {
-    final ThreadLocal<FTTokenizer> tl = qc.threads.get(this);
-    FTTokenizer ftt = tl.get();
-    if(ftt == null) {
-      ftt = new FTTokenizer(ftOpt, qc, info);
-      tl.set(ftt);
-    }
-    return ftt;
+    return qc.caches.get(this, () -> new FTTokenizer(ftOpt, qc, info));
   }
 
   @Override

@@ -79,7 +79,7 @@ public final class HashFilter extends Filter {
     if(value == null || value.size() < 2 || value.size() > Integer.MAX_VALUE) return null;
 
     // first evaluation with this root: remember it, evaluate sequentially
-    final Cache cache = qc.threads.get(this).get();
+    final Cache cache = qc.caches.get(this, Cache::new);
     if(cache.root != value) {
       cache.root = value;
       cache.index = null;

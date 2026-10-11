@@ -79,8 +79,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Global database options (will be reassigned after query execution). */
   final QueryOptions options = new QueryOptions(this);
 
-  /** Query threads. */
-  public final QueryThreads threads = new QueryThreads();
+  /** Query caches. */
+  public final QueryCaches caches = new QueryCaches();
   /** Shared data references. */
   public final SharedData shared;
   /** User-defined locks. */
@@ -709,7 +709,7 @@ public final class QueryContext extends Job implements Closeable {
     if(parent == null) {
       // topmost query: close resources (opened by compile step)
       resources.close();
-      threads.close();
+      caches.close();
     } else {
       // otherwise, adopt update reference (may have been initialized by sub query)
       parent.updates = updates;

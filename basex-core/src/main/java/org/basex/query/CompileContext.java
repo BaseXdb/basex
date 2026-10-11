@@ -371,6 +371,8 @@ public final class CompileContext {
     } catch(final StackOverflowError | ArraySizeException ex) {
       throw QueryError.limitError(ex, expr.info());
     }
+    // discard caches of the evaluated expression
+    qc.caches.remove(expr);
     return (Value) replaceWith(expr, value);
   }
 

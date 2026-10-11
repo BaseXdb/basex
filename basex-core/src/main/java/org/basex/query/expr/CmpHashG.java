@@ -74,7 +74,7 @@ public final class CmpHashG extends CmpG {
     if(size1 == 0) return false;
 
     // stable right-hand operand: probe against populated cache without re-evaluating expr2
-    final CmpCache cache = qc.threads.get(this, info).get();
+    final CmpCache cache = qc.caches.get(this, () -> new CmpCache(info));
     if(stable && cache.value != null) return probe(iter1, cache, qc);
 
     // dynamic right-hand operand: evaluate, consult cache, fall back if not eligible
