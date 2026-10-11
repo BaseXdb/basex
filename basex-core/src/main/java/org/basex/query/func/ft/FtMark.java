@@ -4,11 +4,13 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -65,10 +67,11 @@ public class FtMark extends StandardFunc {
             final Item item = nodes.next();
             if(item == null) return null;
 
-            // copy node to main memory data instance
+            // copy node to main memory data instance, prefer positions of the argument
+            final XNode node = toNode(item);
             final MemData md = new MemData(qc.context.sharedMeta());
             final DataBuilder db = new DataBuilder(md, qc);
-            db.ftpos(m, qc.ftPosData, l).build(toNode(item));
+            db.ftpos(m, ftd.size(node) != 0 || tmp == null ? ftd : tmp, l).build(node);
 
             final IntList il = new IntList();
             final int s = md.nodes();
@@ -80,5 +83,12 @@ public class FtMark extends StandardFunc {
         }
       }
     };
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    // collect positions in the whole query
+    if(cc.qc.ftPosData == null) cc.qc.ftPosData = new FTPosData();
+    return this;
   }
 }

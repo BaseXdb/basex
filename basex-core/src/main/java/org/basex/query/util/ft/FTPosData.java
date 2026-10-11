@@ -50,7 +50,8 @@ public final class FTPosData {
    * @param all full-text matches
    * @param language language that was used for tokenizing the input (can be {@code null})
    */
-  public void add(final Data data, final int pre, final FTMatches all, final Language language) {
+  public synchronized void add(final Data data, final int pre, final FTMatches all,
+      final Language language) {
     if(dt == null) dt = data;
     else if(dt != data) return;
     lang = language;
@@ -75,7 +76,7 @@ public final class FTPosData {
    * @param all full-text matches
    * @param language language that was used for tokenizing the input (can be {@code null})
    */
-  public void add(final XNode node, final FTMatches all, final Language language) {
+  public synchronized void add(final XNode node, final FTMatches all, final Language language) {
     lang = language;
     final IntList il = positions(all);
     final FTPos ftpos = fragments.get(node);

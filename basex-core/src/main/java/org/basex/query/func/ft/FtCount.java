@@ -1,9 +1,11 @@
 package org.basex.query.func.ft;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 
 /**
  * Function implementation.
@@ -22,11 +24,21 @@ public final class FtCount extends FtAccessFn {
       int count = 0;
       final Iter nodes = arg(0).unwrappedIter(qc);
       for(Item item; (item = qc.next(nodes)) != null;) {
-        count += ftPosData.size(toNode(item));
+        // prefer positions of the argument
+        final XNode node = toNode(item);
+        final int size = ftPosData.size(node);
+        count += size != 0 || tmp == null ? size : tmp.size(node);
       }
       return Itr.get(count);
     } finally {
       qc.ftPosData = tmp;
     }
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    // collect positions in the whole query
+    if(cc.qc.ftPosData == null) cc.qc.ftPosData = new FTPosData();
+    return this;
   }
 }

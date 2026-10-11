@@ -122,6 +122,8 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" //li[text() contains text 'exercise']"), 2);
     query("for $i in //li[text() contains text 'exercise'] return " +
         func.args(" $i[text() contains text 'exercise']"), "1\n1");
+    query("declare %basex:inline(0) function local:f($n) { " + func.args(" $n") + " }; " +
+        "local:f(//li[text() contains text 'exercise'])", 2);
 
     // constructed nodes
     query(func.args(" text { 'a b a' }[. contains text 'a']"), 2);
@@ -151,6 +153,10 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" //li[. contains text '1'], 'b', 20"), "<li>Exercise <b>1</b></li>");
     query(func.args(" <p>Exercise 1</p>[. contains text '1'], 'b', 20"),
       "<p>Exercise <b>1</b></p>");
+
+    // positions computed outside the argument
+    query("declare %basex:inline(0) function local:f($n) { " + func.args(" $n") + " }; " +
+        "local:f(//li[text() contains text '1'])", "<li>Exercise <mark>1</mark></li>");
 
     // only nodes are accepted
     error(func.args("string"), INVTYPE_X);
@@ -194,6 +200,13 @@ public final class FtModuleTest extends SandboxTest {
 
     // positions assigned to an ancestor with an identical string value
     query(func.args(" //li[. contains text '1']", "b"), "<li>Exercise <b>1</b></li>");
+
+    // positions computed outside the argument
+    query("declare %basex:inline(0) function local:f($n) { " + func.args(" $n") + " }; " +
+        "local:f(//li[text() contains text '1'])", "<li>Exercise <mark>1</mark></li>");
+    // local positions take precedence
+    query("count(//li[text() contains text 'exercise']), " +
+        func.args(" //li[text() contains text '1']"), "2\n<li>Exercise <mark>1</mark></li>");
 
     execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
     query(func.args(" /descendant::*[text() contains text 'C']", "b"),
