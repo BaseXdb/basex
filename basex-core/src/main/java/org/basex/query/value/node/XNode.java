@@ -58,7 +58,7 @@ public abstract class XNode extends GNode {
   }
 
   @Override
-  public final void write(final DataOutput out) throws IOException {
+  public void write(final DataOutput out) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     Serializer.get(ao).serialize(this);
     out.writeToken(ao.finish());

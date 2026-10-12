@@ -40,15 +40,13 @@ public final class SingletonSeq extends Seq {
 
   /**
    * Creates a value from the input stream.
-   * Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
-   * @param type type
    * @param qc query context
    * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+  public static Value read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException {
     final long count = in.readLong();
     final Value value = Stores.read(in, qc);
@@ -58,7 +56,7 @@ public final class SingletonSeq extends Seq {
   @Override
   public void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(count());
-    Stores.write(out, value);
+    Stores.writeNested(out, value);
   }
 
   @Override

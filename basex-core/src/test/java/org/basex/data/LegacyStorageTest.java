@@ -259,6 +259,68 @@ public final class LegacyStorageTest extends SandboxTest {
   }
 
   /**
+   * Reads a store that was written with version 12 and rewrites it in the current format.
+   * @throws IOException I/O exception
+   */
+  @Test public void oldVersionStore() throws IOException {
+    final IOFile file = context.soptions.dbPath("store.basex");
+    final byte[] old = new IOFile("src/test/resources/store-v12.basex").read();
+    file.write(old);
+    // returns the keys of all entries that differ, and the sign of the stored negative zero
+    final String check = """
+      declare function local:types($value) {
+        for $item in $value
+        return typeswitch($item) {
+          case map(*) return map:for-each($item, fn($k, $v) { local:types(($k, $v)) })
+          case array(*) return array:for-each($item, local:types#1)?*
+          default return inspect:type($item)
+        }
+      };
+      let $expected := {
+        'double': 1.5e0,
+        'special': (-0e0, xs:double('NaN'), xs:double('-INF')),
+        'doubles': (1e0, 2.5e0, 1e300),
+        'singleton': (3.25e0, 3.25e0, 3.25e0),
+        'mixed': (1e0, 'a', 2, xs:float(3)),
+        'map': { 'k': 4.5e0, 1.25e0: (5e0, 6e0) },
+        'array': [ 7.5e0, (8e0, 9e0), 'x' ],
+        'integers': (1, 2, 3),
+        'range': 1 to 10,
+        'strings': ('a', 'b'),
+        'float': xs:float(0.1),
+        'floats': (xs:float(0.1), xs:float('-INF')),
+        'decimal': 1e30 cast as xs:decimal,
+        'decimals': (1.5, -2.25),
+        'negative': (-1, -5000000000),
+        'byte': xs:byte(-1),
+        'short': xs:short(-300),
+        'ulong': xs:unsignedLong('9223372036854775807'),
+        'bytes': (-1, 1, 2) ! xs:byte(.),
+        'codepoints': (97, 98, 99),
+        'element': <p:a xmlns:p='urn:p'>{ attribute b { -1 } }x</p:a>
+      }
+      return (
+        for $key in distinct-values((store:keys(), map:keys($expected)))
+        let $value := store:get($key), $exp := $expected?($key)
+        where not(deep-equal($value, $exp) and deep-equal(local:types($value), local:types($exp)))
+        return $key,
+        1 div store:get('special')[1]
+      )""";
+    try {
+      query(_STORE_READ.args());
+      query(check, "-INF");
+
+      // the store is rewritten in the current format
+      query(_STORE_WRITE.args());
+      assertFalse(Arrays.equals(old, file.read()));
+      query(_STORE_READ.args());
+      query(check, "-INF");
+    } finally {
+      query(_STORE_CLEAR.args());
+    }
+  }
+
+  /**
    * Updates an opened database: the ID-PRE map is logged, replayed when a copy is opened,
    * and written completely when the database is closed.
    * @throws IOException I/O exception

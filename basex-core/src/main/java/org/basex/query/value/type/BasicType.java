@@ -190,8 +190,8 @@ public enum BasicType implements Type {
       return Flt.get(checkNum(item, info).flt(info));
     }
     @Override
-    public Flt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-      return Flt.get(Flt.parse(in.readToken(), null));
+    public Flt read(final DataInput in, final QueryContext qc) throws IOException {
+      return Flt.get(in.readFloatBits());
     }
   },
 
@@ -203,8 +203,8 @@ public enum BasicType implements Type {
       return Dbl.get(checkNum(item, info).dbl(info));
     }
     @Override
-    public Dbl read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-      return Dbl.get(Dbl.parse(in.readToken(), null));
+    public Dbl read(final DataInput in, final QueryContext qc) throws IOException {
+      return Dbl.get(in.readDoubleCompact());
     }
   },
 
@@ -222,7 +222,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Dec read(final DataInput in, final QueryContext qc) throws IOException {
-      return Dec.get(new BigDecimal(string(in.readToken())));
+      return Dec.get(in.readDecimal());
     }
   },
 
@@ -352,11 +352,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, 0, Long.MAX_VALUE, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      // incompatible with BaseX 12 and earlier, which persisted unsigned longs as string tokens
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -809,7 +804,7 @@ public enum BasicType implements Type {
   @Override
   public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
     if(instanceOf(STRING)) return Str.get(qc.shared.token(in.readToken()), this);
-    if(instanceOf(INTEGER)) return Itr.get(in.readLong(), this);
+    if(instanceOf(INTEGER)) return Itr.get(in.readZigzag(), this);
     throw Util.notExpected();
   }
 

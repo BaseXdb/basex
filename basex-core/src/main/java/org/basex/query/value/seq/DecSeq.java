@@ -1,20 +1,15 @@
 package org.basex.query.value.seq;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.math.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Sequence of items of type {@link Dec xs:decimal}, containing at least two of them.
@@ -37,25 +32,21 @@ public final class DecSeq extends NativeSeq {
 
   /**
    * Creates a value from the input stream.
-   * Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
-   * @param type type
-   * @param qc query context
    * @return value
    * @throws IOException I/O exception
    */
-  public static Value read(final DataInput in, final Type type, final QueryContext qc)
-      throws IOException {
+  public static Value read(final DataInput in) throws IOException {
     final int size = in.readNum();
     final BigDecimal[] values = new BigDecimal[size];
-    for(int s = 0; s < size; s++) values[s] = new BigDecimal(Token.string(in.readToken()));
+    for(int s = 0; s < size; s++) values[s] = in.readDecimal();
     return get(values);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final BigDecimal v : values) out.writeToken(chopNumber(token(v.toPlainString())));
+    for(final BigDecimal v : values) out.writeDecimal(v);
   }
 
   @Override

@@ -673,7 +673,7 @@ public final class DbModuleTest extends SandboxTest {
     query(call + "/@type/data()", "value");
     query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
     query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(call + "/@size/data()", 6);
+    query(call + "/@size/data()", 10);
     query(call + "/text()", "value.data");
 
     query(func.args(NAME, "test"), "");
@@ -925,7 +925,7 @@ public final class DbModuleTest extends SandboxTest {
     query(call + "/@type/data()", "value");
     query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
     query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(call + "/@size/data()", 6);
+    query(call + "/@size/data()", 10);
     query(call + "/text()", "value/value.data");
 
     query(func.args(NAME, "test"), "");

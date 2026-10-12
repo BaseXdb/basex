@@ -324,9 +324,25 @@ public final class StoreModuleTest extends SandboxTest {
     query(put.args("document-node1", " document { <a/> }"));
     query(put.args("document-node2", " document { text { 'x' } }"));
     query(put.args("attribute", " attribute a { ' VALUE ' }"));
+    query(put.args("namespace", " namespace p { 'urn:p' }"));
+    query(put.args("namespace-default", " namespace { '' } { 'urn:default' }"));
+
+    query(put.args("long-min", " xs:long('-9223372036854775808')"));
+    query(put.args("long-max", " xs:long('9223372036854775807')"));
+    query(put.args("unsignedLong-max", " xs:unsignedLong('9223372036854775807')"));
+    query(put.args("float-fraction", " xs:float(0.1)"));
+    query(put.args("float-special", " (xs:float('-0'), xs:float('NaN'), xs:float('-INF'))"));
+    query(put.args("double-integral", " (0e0, -1e0, 3e0, 1073741823e0, 1.7e12, 9.3e18, 1e300)"));
+    query(put.args("double-special", " (-0e0, xs:double('NaN'), xs:double('INF'), 2.5e0)"));
+    query(put.args("decimal-large", " 1e30 cast as xs:decimal"));
+    query(put.args("decimal-fraction", " -123456789.000000001"));
 
     query(put.args("BlnSeq", " (0 to 4) ! xs:boolean(. mod 2)"));
     query(put.args("BytSeq", " (0 to 4) ! xs:byte(.)"));
+    query(put.args("BytSeq-negative", " convert:binary-to-bytes(xs:hexBinary('FF8001'))"));
+    query(put.args("ShrSeq-negative", " (-32768, -1, 16383, 32767) ! xs:short(.)"));
+    query(put.args("IntSeq-negative", " (-2147483648, -1, 2147483647) ! xs:int(.)"));
+    query(put.args("LongSeq-negative", " (-9223372036854775807 - 1, -1, 5000000000)"));
     query(put.args("DblSeq", " (0 to 4) ! xs:double(.)"));
     query(put.args("DecSeq", " (0 to 4) ! xs:decimal(.)"));
     query(put.args("FltSeq", " (0 to 4) ! xs:float(.)"));
@@ -335,6 +351,7 @@ public final class StoreModuleTest extends SandboxTest {
     query(put.args("StrSeq", " (0 to 4) ! xs:string(.)"));
     query(put.args("SingletonSeq", " (1 to 1000) ! 1"));
     query(put.args("RangeSeq", " (1 to 1000)"));
+    query(put.args("RangeSeq-negative", " (-10 to 10)"));
 
     query(put.args("EmptySequence", " ()"));
     query(put.args("SmallSequenceSameType", " (1 to 2) ! <x/>"));

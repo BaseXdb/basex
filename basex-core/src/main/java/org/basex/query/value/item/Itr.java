@@ -81,7 +81,7 @@ public final class Itr extends ANum {
 
   @Override
   public void write(final DataOutput out) throws IOException {
-    out.writeLong(value);
+    out.writeZigzag(value);
   }
 
   @Override

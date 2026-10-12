@@ -122,8 +122,8 @@ public abstract class XQMap extends XQStruct {
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());
     for(final Entry entry : entries()) {
-      Stores.write(out, entry.key());
-      Stores.write(out, entry.value());
+      Stores.writeNested(out, entry.key());
+      Stores.writeNested(out, entry.value());
     }
   }
 

@@ -2,9 +2,11 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.function.*;
 
 import org.basex.data.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -46,6 +48,13 @@ public final class FNSpace extends FNode {
   @Override
   public byte[] string() {
     return value;
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    // namespace nodes cannot be parsed from their serialization
+    out.writeToken(name);
+    out.writeToken(value);
   }
 
   @Override

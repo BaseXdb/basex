@@ -1,6 +1,7 @@
 package org.basex.io.out;
 
 import java.io.*;
+import java.math.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -88,6 +89,61 @@ public final class DataOutput extends OutputStream {
    */
   public int writeDouble(final double num) throws IOException {
     return writeToken(Token.token(num));
+  }
+
+  /**
+   * Writes a double value as compact integer or as raw bits.
+   * @param num value to be written
+   * @throws IOException I/O exception
+   */
+  public void writeDoubleCompact(final double num) throws IOException {
+    final long l = (long) num;
+    if(l == num && Math.abs(num) < 0x1p30 && (l != 0 || Double.doubleToRawLongBits(num) == 0)) {
+      writeZigzag(l << 1);
+    } else {
+      writeZigzag(1);
+      write8(Double.doubleToRawLongBits(num));
+    }
+  }
+
+  /**
+   * Writes the raw bits of a float value.
+   * @param num value to be written
+   * @throws IOException I/O exception
+   */
+  public void writeFloatBits(final float num) throws IOException {
+    write4(Float.floatToRawIntBits(num));
+  }
+
+  /**
+   * Writes a decimal value as scale and unscaled value.
+   * @param num value to be written
+   * @throws IOException I/O exception
+   */
+  public void writeDecimal(final BigDecimal num) throws IOException {
+    final int scale = num.scale();
+    final boolean compact = num.precision() < 19;
+    writeZigzag((long) scale << 1 | (compact ? 0 : 1));
+    if(compact) writeZigzag((scale == 0 ? num : num.scaleByPowerOfTen(scale)).longValue());
+    else writeToken(num.unscaledValue().toByteArray());
+  }
+
+  /**
+   * Writes a zigzag-encoded long value, which keeps small negative values short.
+   * @param v value to be written
+   * @throws IOException I/O exception
+   */
+  public void writeZigzag(final long v) throws IOException {
+    // map small negative and positive values to small positive numbers
+    final long z = v << 1 ^ v >> 63;
+    if(z >>> 32 == 0 && z != 0x3FFF) {
+      // small number: write compactly
+      writeNum((int) z);
+    } else {
+      // large number: write marker and full value
+      writeNum(0x3FFF);
+      write8(z);
+    }
   }
 
   /**

@@ -3,15 +3,12 @@ package org.basex.query.value.seq;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Sequence of items of type {@link Flt xs:float}, containing at least two of them.
@@ -34,26 +31,21 @@ public final class FltSeq extends NativeSeq {
 
   /**
    * Creates a value from the input stream.
-   * Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
-   * @param type type
-   * @param qc query context
    * @return value
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  public static Value read(final DataInput in, final Type type, final QueryContext qc)
-      throws IOException, QueryException {
+  public static Value read(final DataInput in) throws IOException {
     final int size = in.readNum();
     final float[] values = new float[size];
-    for(int s = 0; s < size; s++) values[s] = Flt.parse(in.readToken(), null);
+    for(int s = 0; s < size; s++) values[s] = in.readFloatBits();
     return get(values);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final double v : values) out.writeToken(Token.token(v));
+    for(final float v : values) out.writeFloatBits(v);
   }
 
   @Override

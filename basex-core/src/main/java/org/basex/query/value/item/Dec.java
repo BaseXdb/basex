@@ -2,9 +2,11 @@ package org.basex.query.value.item;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.math.*;
 import java.util.function.*;
 
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
@@ -60,6 +62,11 @@ public final class Dec extends ANum {
    */
   public static Dec get(final BigDecimal value) {
     return value.signum() == 0 ? ZERO : new Dec(value);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeDecimal(value);
   }
 
   @Override

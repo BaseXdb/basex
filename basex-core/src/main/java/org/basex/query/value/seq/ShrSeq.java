@@ -3,7 +3,6 @@ package org.basex.query.value.seq;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -34,25 +33,22 @@ public final class ShrSeq extends ItrSeq {
 
   /**
    * Creates a value from the input stream.
-   * Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
    * @param type type
-   * @param qc query context
    * @return value
    * @throws IOException I/O exception
    */
-  public static Value read(final DataInput in, final Type type, final QueryContext qc)
-      throws IOException {
+  public static Value read(final DataInput in, final Type type) throws IOException {
     final int size = in.readNum();
     final short[] values = new short[size];
-    for(int s = 0; s < size; s++) values[s] = (short) in.readNum();
+    for(int s = 0; s < size; s++) values[s] = in.read2();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final short v : values) out.writeNum(v);
+    for(final short v : values) out.write2(v);
   }
 
   @Override

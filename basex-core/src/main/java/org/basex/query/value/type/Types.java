@@ -354,6 +354,6 @@ public final class Types {
    * @return corresponding type if found, {@code null} otherwise
    */
   public static Type type(final int index) {
-    return TYPES[index];
+    return index >= 0 && index < TYPES.length ? TYPES[index] : null;
   }
 }

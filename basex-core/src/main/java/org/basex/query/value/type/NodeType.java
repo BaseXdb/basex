@@ -130,6 +130,7 @@ public final class NodeType implements Type {
 
   @Override
   public GNode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    if(kind == Kind.NAMESPACE) return new FNSpace(in.readToken(), in.readToken());
     return cast(in.readToken(), qc, null);
   }
 
