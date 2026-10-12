@@ -69,6 +69,15 @@ public final class StaticFuncCall extends FuncCall {
     // return external function call
     if(external != null) return external.compile(cc);
 
+    // coerce arguments at the call site; default values are skipped
+    final int pl = exprs.length;
+    for(int p = 0; p < pl; p++) {
+      final Var param = func.params[p];
+      if(param.declType != null && !(exprs[p] instanceof DefaultValue)) {
+        exprs[p] = new TypeCheck(info, exprs[p], param.declType, param.name);
+      }
+    }
+
     // compile arguments and function
     super.compile(cc);
     func.compile(cc);

@@ -2780,4 +2780,20 @@ public final class RewritingsTest extends SandboxTest {
         + "return try { zero-or-one($e) cast as xs:integer? } catch * { string($err:code) }",
         "err:FORG0003");
   }
+
+  /** Effective boolean value of empty strings with derived types. */
+  @Test public void emptyDerivedStringEbv() {
+    query("boolean(xs:token(''))", false);
+    query("boolean(xs:normalizedString(''))", false);
+    query("boolean('' cast as enum('', 'a'))", false);
+    query("if(xs:token(string-join(()))) then 'a' else 'b'", "b");
+    query("(1, 2)[xs:token('')]", "");
+  }
+
+  /** Branches with string sequences of different types must not be merged. */
+  @Test public void stringSeqTypes() {
+    query("(if(random:double() > 2) then ('a', 'b') "
+        + "else (xs:untypedAtomic('a'), xs:untypedAtomic('b'))) ! (. instance of xs:untypedAtomic)",
+        "true\ntrue");
+  }
 }

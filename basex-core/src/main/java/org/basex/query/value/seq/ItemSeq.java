@@ -1,7 +1,5 @@
 package org.basex.query.value.seq;
 
-import java.util.*;
-
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -53,12 +51,6 @@ public final class ItemSeq extends Seq {
     // discard unused entries of the array, which may have been supplied by a builder
     final int sz = (int) size;
     return items.length == sz ? this : new ItemSeq(Array.copy(items, new Item[sz]), sz, type);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof final ItemSeq seq ? Arrays.equals(items, seq.items) :
-      super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

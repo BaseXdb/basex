@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import java.io.*;
 import java.util.*;
 
 import javax.xml.parsers.*;
@@ -7,6 +8,7 @@ import javax.xml.parsers.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * Java binding example.
@@ -169,6 +171,18 @@ public final class JavaFunctionExample {
    */
   public Document doc() throws Exception {
     return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+  }
+
+  /**
+   * Returns an element whose parent declares a namespace.
+   * @return element
+   * @throws Exception exception
+   */
+  public Node nested() throws Exception {
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    final InputSource is = new InputSource(new StringReader("<a xmlns:p='u'><b>p:c</b></a>"));
+    return dbf.newDocumentBuilder().parse(is).getDocumentElement().getFirstChild();
   }
 
   /**

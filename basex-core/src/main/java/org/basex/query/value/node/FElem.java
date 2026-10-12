@@ -83,7 +83,7 @@ public final class FElem extends FNode {
    * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
-   * @param nsMap namespaces in scope
+   * @param nsMap namespaces in scope ({@code null} for a top-level element)
    * @return element builder
    */
   public static FBuilder build(final Element elem, final TokenObjectMap<byte[]> nsMap) {
@@ -109,10 +109,6 @@ public final class FElem extends FNode {
       }
     }
 
-    // add new namespaces
-    final int ns = nspaces.size();
-    for(int n = 0; n < ns; n++) nsMap.put(nspaces.name(n), nspaces.value(n));
-
     // no parent, so we have to add all namespaces in scope
     TokenObjectMap<byte[]> namespaces = nsMap;
     if(namespaces == null) {
@@ -122,10 +118,15 @@ public final class FElem extends FNode {
         if(!nspaces.contains(prefix)) nspaces.add(prefix, namespaces.get(prefix));
       }
     }
+
+    // add new namespaces
+    final int ns = nspaces.size();
+    for(int n = 0; n < ns; n++) namespaces.put(nspaces.name(n), nspaces.value(n));
+
     final byte[] prefix = name.prefix(), uri = name.uri(), old = namespaces.get(prefix);
     if(old == null || !Token.eq(uri, old)) {
       nspaces.add(prefix, uri);
-      nsMap.put(prefix, uri);
+      namespaces.put(prefix, uri);
     }
     if(!nspaces.isEmpty()) builder.namespaces = nspaces;
     children(elem, builder, new TokenObjectMap<>());
@@ -191,7 +192,7 @@ public final class FElem extends FNode {
       final String prefix = n.getPrefix();
       if(prefix != null) {
         final byte[] pref = token(prefix);
-        if(nsMap.get(pref) != null) nsMap.put(pref, token(n.getNamespaceURI()));
+        if(nsMap.get(pref) == null) nsMap.put(pref, token(n.getNamespaceURI()));
       }
       final int len = atts.getLength();
       for(int i = 0; i < len; i++) {
@@ -200,7 +201,7 @@ public final class FElem extends FNode {
         if(Token.eq(name, XMLNS)) {
           // default namespace
           if(nsMap.get(Token.EMPTY) == null) nsMap.put(Token.EMPTY, val);
-        } else if(startsWith(name, XMLNS)) {
+        } else if(startsWith(name, XMLNS_COLON)) {
           // prefixed namespace
           final byte[] ln = local(name);
           if(nsMap.get(ln) == null) nsMap.put(ln, val);

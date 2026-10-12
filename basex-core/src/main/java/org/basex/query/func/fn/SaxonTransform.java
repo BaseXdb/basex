@@ -58,7 +58,8 @@ public final class SaxonTransform {
     private static Processor processor() {
       try {
         final Processor proc = new Processor();
-        proc.setConfigurationProperty(Feature.RESULT_DOCUMENT_THREADS, 1);
+        // result documents are collected sequentially
+        proc.setConfigurationProperty(Feature.ALLOW_MULTITHREADING, false);
         return proc;
       } catch(final Throwable th) {
         Util.debug(th);

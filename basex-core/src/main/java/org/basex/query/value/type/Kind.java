@@ -63,7 +63,7 @@ public enum Kind {
       if(value instanceof final BXElem elem)
         return elem.getNode();
       if(value instanceof final Element elem)
-        return FElem.build(elem, new TokenObjectMap<>()).finish();
+        return FElem.build(elem, null).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {

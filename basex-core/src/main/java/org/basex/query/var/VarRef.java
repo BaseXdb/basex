@@ -32,6 +32,7 @@ public final class VarRef extends ParseExpr {
   public VarRef(final InputInfo info, final Var var) {
     super(info, Types.ITEM_ZM);
     this.var = var;
+    assignType();
   }
 
   @Override
@@ -78,7 +79,7 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Var nw = vm.get(var.id);
-    return new VarRef(info, nw != null ? nw : var).assignType();
+    return new VarRef(info, nw != null ? nw : var);
   }
 
   /**

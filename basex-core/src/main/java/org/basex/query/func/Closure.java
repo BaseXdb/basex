@@ -465,13 +465,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean vacuous() {
-    return declType != null && declType.zero() && !has(Flag.UPD);
-  }
-
-  @Override
   public boolean vacuousBody() {
-    return vacuous();
+    return declType != null && declType.itemless() && !expr.has(Flag.UPD);
   }
 
   @Override

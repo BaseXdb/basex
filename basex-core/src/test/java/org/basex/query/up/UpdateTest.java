@@ -1442,4 +1442,34 @@ public final class UpdateTest extends SandboxTest {
         + "declare %updating function local:g($f) { updating $f() };"
         + "local:g(%updating fn() { local:f() })", "");
   }
+
+  /** Vacuous calls of functions declared as {@code xs:error}. */
+  @Test public void vacuousErrorType() {
+    for(final String type : new String[] { "xs:error", "xs:error*" }) {
+      error("declare function local:f() as " + type + " { error() };"
+          + "declare %updating function local:g() { if(<a/>/*) then () else local:f() };"
+          + "local:g()", FUNERR1);
+    }
+  }
+
+  /** Vacuous dynamic calls of functions with a declared empty or error type. */
+  @Test public void vacuousDynamicCall() {
+    for(final String type : new String[] { "empty-sequence()", "xs:error" }) {
+      query("let $f as fn() as " + type + " := fn() { error() } "
+          + "return if(<a/>/*) then $f() else delete node <a/>", "");
+      query("if(<a/>/*) then (fn() as " + type + " { error() })() else delete node <a/>", "");
+    }
+    // inferred types are not considered
+    error("let $f := fn() as empty-sequence() { () } "
+        + "return if(<a/>/*) then $f() else delete node <a/>", UPALL);
+    error("let $f as fn() as item()* := fn() { () } "
+        + "return if(<a/>/*) then $f() else delete node <a/>", UPALL);
+    // function literals are not vacuous
+    error("if(<a/>) then fn() as empty-sequence() { () } else delete node <a/>", UPALL);
+  }
+
+  /** External function declarations in updating queries. */
+  @Test public void externalFunction() {
+    query("declare function local:f() external; delete node <a/>", "");
+  }
 }

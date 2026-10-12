@@ -273,6 +273,12 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
+  public boolean vacuous() {
+    final FuncType ft = updating ? null : body().funcType();
+    return ft != null && ft.declType.itemless() && !ft.anns.contains(Annotation.UPDATING);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final DynFuncCall dfc && updating == dfc.updating &&
         super.equals(obj);

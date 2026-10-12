@@ -35,6 +35,8 @@ public final class DeepEqual {
   public final Normalizer.Form normalization;
   /** Whitespace normalization for strings. */
   public final boolean whitespace;
+  /** Compare type annotations of atomic items. */
+  private final boolean typeAnnotations;
 
   /** Comparison function (can be {@code null}; requires {@link #qc} to be assigned). */
   public FItem itemsEqual;
@@ -84,6 +86,7 @@ public final class DeepEqual {
     normalization = this.options.get(DeepEqualOptions.NORMALIZATION_FORM);
     whitespace = this.options.get(DeepEqualOptions.WHITESPACE) ==
         DeepEqualOptions.Whitespace.NORMALIZE;
+    typeAnnotations = this.options.get(DeepEqualOptions.TYPE_ANNOTATIONS);
   }
 
   /**
@@ -155,7 +158,9 @@ public final class DeepEqual {
     final Bln eq = itemsEqual(item1, item2);
     if(eq != null) return eq.bool(info);
     nested = false;
-    return item1 == item2 || item1.deepEqual(item2, this);
+    if(item1 == item2) return true;
+    if(typeAnnotations && item1.type instanceof BasicType && item1.type != item2.type) return false;
+    return item1.deepEqual(item2, this);
   }
 
   /**

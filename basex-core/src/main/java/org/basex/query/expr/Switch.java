@@ -348,7 +348,7 @@ public final class Switch extends ParseExpr {
   public int exprSize() {
     int size = 1;
     for(final Expr group : groups) size += group.exprSize();
-    return size;
+    return size + cond.exprSize();
   }
 
   @Override

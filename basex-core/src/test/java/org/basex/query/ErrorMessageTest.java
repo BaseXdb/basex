@@ -128,9 +128,21 @@ public final class ErrorMessageTest extends SandboxTest {
     errorMessage("1 cast as 2", TYPEINVALID_X, "found '2'");
   }
 
-  /** Coercion errors in record constructors are reported at the record declaration. */
+  /** Coercion errors in record constructors are reported at the call site. */
   @Test public void recordConstructor() {
-    errorAt("declare record local:r(x as xs:integer); local:r('a')", INVTYPE_X, 16);
+    errorAt("declare record local:r(x as xs:integer); local:r('a')", INVTYPE_X, 49);
+  }
+
+  /** Coercion errors in function calls are reported at the call site. */
+  @Test public void functionCall() {
+    final String inlined = "declare function local:f($x as xs:integer) { $x }; ";
+    errorAt(inlined + "local:f('a')", INVTYPE_X, 59);
+    errorAt(inlined + "for $s in ('1', 'a') return local:f(if($s = '1') then 1 else $s)",
+        INVTYPE_X, 87);
+    final String recursive = "declare function local:f($x as xs:integer) "
+        + "{ if($x > 3) then $x else local:f($x + 1) }; ";
+    errorAt(recursive + "for $s in ('1', 'a') return local:f(if($s = '1') then 1 else $s)",
+        INVTYPE_X, 124);
   }
 
   /** Destructuring errors name the binding pattern. */

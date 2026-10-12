@@ -364,5 +364,9 @@ public final class JavaFunctionTest extends SandboxTest {
     query(mod + "n:comment()", "<!--c-->");
     query(mod + "n:element()", "<e/>");
     query(mod + "n:attribute()", "a=\"\"");
+    // namespaces declared by DOM ancestors are in scope
+    query(mod + "in-scope-prefixes(n:nested()) => sort()", "p\nxml");
+    query(mod + "string(resolve-QName(string(n:nested()), n:nested()))", "p:c");
+    query(mod + "namespace-uri-from-QName(resolve-QName(string(n:nested()), n:nested()))", "u");
   }
 }

@@ -137,6 +137,24 @@ public final class InlineTest extends SandboxTest {
     check("declare %basex:lock('x') function local:x($x) { $x }; local:x(123)",
         123,
         exists(StaticFunc.class));
+
+    // expression size: count the conditional expression and its condition
+    final String call = "local:x(" + wrap(1) + ")";
+    check("declare %basex:inline(4) function local:x($x) { if($x) then 1 else 2 }; " + call,
+        1,
+        exists(StaticFunc.class));
+    check("declare %basex:inline(5) function local:x($x) { if($x) then 1 else 2 }; " + call,
+        1,
+        empty(StaticFunc.class));
+    // expression size: count the switch operand
+    check("declare %basex:inline(5) function local:x($x) { "
+        + "switch($x) case '1' return 1 default return 2 }; " + call,
+        1,
+        exists(StaticFunc.class));
+    check("declare %basex:inline(6) function local:x($x) { "
+        + "switch($x) case '1' return 1 default return 2 }; " + call,
+        1,
+        empty(StaticFunc.class));
   }
 
   /** Tests if all let clauses are removed. */

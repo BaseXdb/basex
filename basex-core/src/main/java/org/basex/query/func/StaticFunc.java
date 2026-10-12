@@ -346,8 +346,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {
-    // skip already compiled functions
-    if(compiled) return;
+    // skip already compiled and external functions
+    if(compiled || expr == null) return;
 
     final boolean exprUpdating = expr.has(Flag.UPD);
     if(exprUpdating) expr.checkUp();
@@ -364,7 +364,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean vacuousBody() {
-    return declType != null && declType.zero();
+    return declType != null && declType.itemless();
   }
 
   @Override

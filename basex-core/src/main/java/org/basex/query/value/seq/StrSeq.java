@@ -91,8 +91,8 @@ public final class StrSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof final StrSeq seq ? Array.equals(values, seq.values) :
-      super.equals(obj));
+    return this == obj || (obj instanceof final StrSeq seq ? type == seq.type &&
+        Array.equals(values, seq.values) : super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

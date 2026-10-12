@@ -602,6 +602,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type never yield items (empty or void category).
+   * @return result of check
+   */
+  public boolean itemless() {
+    return zero() || TypeRef.deref(type) == BasicType.ERROR;
+  }
+
+  /**
    * Tests if expressions of this type may yield numbers.
    * @return result of check
    */

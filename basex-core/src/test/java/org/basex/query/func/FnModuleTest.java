@@ -1204,6 +1204,11 @@ public final class FnModuleTest extends SandboxTest {
     // options that are accepted, but cannot take effect in a processor without schema support
     query(func.args(1, 1, " { 'typed-values': false() }"), true);
     query(func.args(1, 1, " { 'type-annotations': true() }"), true);
+    query(func.args(1e0, 1, " { 'type-annotations': true() }"), false);
+    query(func.args(" xs:short(1)", 1, " { 'type-annotations': true() }"), false);
+    query(func.args(" [ 1 ]", " [ 1.0 ]", " { 'type-annotations': true() }"), false);
+    query(func.args(" { 'a': 1 }", " { 'a': 1 }", " { 'type-annotations': true() }"), true);
+    query(func.args(1e0, 1, " { 'type-annotations': false() }"), true);
     query(func.args(1, 1, " { 'type-variety': false() }"), true);
     // diagnostics
     query(func.args(1, 1, " { 'debug': true() }"), true);
@@ -5103,6 +5108,10 @@ return
         "<!DOCTYPE a PUBLIC \"A'B\" 'A\"B'><a/>");
     error(func.args(" <a/>", " { 'doctype-system': 'S', 'doctype-public': '£' }"), SERPARAM_X);
     error(func.args(" <a/>", " { 'doctype-system': 'A\"''B' }"), SERPARAM_X);
+    // deeply nested values
+    final String deep = " fold-left(1 to 100000, [], fn($a, $_) { [ $a ] })";
+    error(func.args(deep, " { 'method': 'json' }"), BASEX_NESTED);
+    error(func.args(deep, " { 'method': 'adaptive' }"), BASEX_NESTED);
 
     // control characters: rejected by XML 1.0 and HTML below 5.0, escaped in JSON
     final String ctrl = " <x>{ codepoints-to-string(1) }</x>";
@@ -6202,7 +6211,8 @@ return
         + "version='1.0'><xsl:param name='v'/><xsl:template match='/'>"
         + "<out><xsl:value-of select='//b'/><xsl:value-of select='$v'/></out>"
         + "</xsl:template></xsl:stylesheet>";
-    final String opts = " { 'stylesheet-text': \"" + xsl + "\", 'source-node': <a><b>89</b></a>";
+    final String opts = " { 'stylesheet-text': \"" + xsl +
+        "\", 'source-node': document { <a><b>89</b></a> }";
 
     query(func.args(opts + " }") + "?output", "<out>89</out>");
     query(func.args(opts + ", 'delivery-format': 'serialized', 'serialization-params': "
@@ -6218,20 +6228,29 @@ return
     final String html = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
         + "version='1.0'><xsl:output method='html'/><xsl:template match='/'><div><br/></div>"
         + "</xsl:template></xsl:stylesheet>";
-    query("count(" + func.args(" { 'stylesheet-text': \"" + html + "\", 'source-node': <a/> }")
-        + "?output//br)", 1);
+    query("count(" + func.args(" { 'stylesheet-text': \"" + html +
+        "\", 'source-node': document { <a/> } }") + "?output//br)", 1);
     final String text = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
         + "version='1.0'><xsl:template match='/'><xsl:value-of select='//b'/>"
         + "</xsl:template></xsl:stylesheet>";
-    query(func.args(" { 'stylesheet-text': \"" + text + "\", 'source-node': <a><b>89</b></a> }")
+    query(func.args(" { 'stylesheet-text': \"" + text + "\", "
+        + "'source-node': document { <a><b>89</b></a> } }")
         + "?output ! (. instance of document-node(), string())", "true\n89");
     // source documents with multiple roots are not serialized
-    query(func.args(opts.replace("<a><b>89</b></a>", "parse-xml-fragment('<a><b>89</b></a><c/>')")
+    query(func.args(opts.replace("document { <a><b>89</b></a> }",
+        "parse-xml-fragment('<a><b>89</b></a><c/>')")
         + " }") + "?output", "<out>89</out>");
 
+    // Saxon s9api: named templates, raw results, Java system properties
+    final String main = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='3.0'><xsl:template name='main'>"
+        + "<xsl:sequence select=\"\"system-property('java.version')\"\"/>"
+        + "</xsl:template></xsl:stylesheet>";
+    query(func.args(" { 'stylesheet-text': \"" + main + "\", "
+        + "'initial-template': QName('', 'main'), 'delivery-format': 'raw' }") + "?output",
+        System.getProperty("java.version"));
+
     // requests that cannot be served by the XSLT processor
-    error(func.args(opts + ", 'initial-template': QName('', 'main') }"), TRANSFORM_PROCESSOR_X);
-    error(func.args(opts + ", 'delivery-format': 'raw' }"), TRANSFORM_PROCESSOR_X);
     error(func.args(opts + ", 'xslt-version': 99.0 }"), TRANSFORM_PROCESSOR_X);
     // missing and conflicting options
     error(func.args(" { }"), TRANSFORM_OPTIONS_X);
@@ -6239,7 +6258,8 @@ return
     // values that are not permitted for an option
     error(func.args(opts + ", 'delivery-format': 'doc' }"), TRANSFORM_OPTIONS_X);
     // invalid stylesheet and options
-    error(func.args(" { 'stylesheet-text': '<oops/>', 'source-node': <a/> }"), TRANSFORM_ERROR_X);
+    query("try { " + func.args(" { 'stylesheet-text': '<oops/>', 'source-node': <a/> }")
+        + " } catch * { string($err:code) }", "err:XTSE0150");
     error(func.args(opts + ", 'unknown': 1 }"), INVALIDOPTION_X);
   }
 

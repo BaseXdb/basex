@@ -162,6 +162,8 @@ public abstract class Serializer implements Closeable {
       item(item);
     } catch(final ArraySizeException ex) {
       throw new QueryIOException(sizeError(ex, null));
+    } catch(final StackOverflowError ex) {
+      throw new QueryIOException(BASEX_NESTED.get(null).cause(ex));
     }
   }
 

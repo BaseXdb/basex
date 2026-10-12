@@ -64,6 +64,8 @@ public enum QueryError {
   /** Error code. */
   BASEX_OVERFLOW(BASEX, "overflow", "Stack Overflow: Try tail recursion?"),
   /** Error code. */
+  BASEX_NESTED(BASEX, "overflow", "Value is too deeply nested to be serialized."),
+  /** Error code. */
   BASEX_PERMISSION_X_X(BASEX, "permission", "No % permission: %."),
   /** Error code. */
   BASEX_RESTXQ_X(BASEX, "restxq", "%"),
@@ -645,7 +647,7 @@ public enum QueryError {
   /** Error code. */
   SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
-  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted: %."),
+  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted (check the function options): %."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),

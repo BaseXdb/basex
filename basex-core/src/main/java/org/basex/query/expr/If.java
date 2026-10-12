@@ -51,20 +51,10 @@ public final class If extends Arr {
       final CompileContext cc) throws QueryException {
     // (if(C) then A else ()) ! F → if(C) then A ! F else ()
     // branches without items (empty sequence, error) are kept
-    final boolean none1 = itemless(exprs[0]), none2 = itemless(exprs[1]);
+    final boolean none1 = exprs[0].seqType().itemless(), none2 = exprs[1].seqType().itemless();
     if(none1 == none2) return null;
     arg(none1 ? 1 : 0, func);
     return optimize(cc);
-  }
-
-  /**
-   * Checks if the specified branch never yields items.
-   * @param branch branch
-   * @return result of check
-   */
-  private static boolean itemless(final Expr branch) {
-    final SeqType st = branch.seqType();
-    return st.zero() || st.type == BasicType.ERROR;
   }
 
   @Override
@@ -269,9 +259,7 @@ public final class If extends Arr {
 
   @Override
   public int exprSize() {
-    int size = cond.exprSize();
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size;
+    return super.exprSize() + cond.exprSize();
   }
 
   @Override

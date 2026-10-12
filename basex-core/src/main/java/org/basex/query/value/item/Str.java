@@ -141,7 +141,7 @@ public final class Str extends AStr {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // E['x'] → E[true()]
-      expr = Bln.get(this != EMPTY);
+      expr = Bln.get(value.length != 0);
     }
     return cc.simplify(this, expr, mode);
   }

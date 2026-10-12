@@ -352,7 +352,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean vacuousBody() {
     final SeqType st = expr.seqType();
-    return st != null && st.zero() && !expr.has(Flag.UPD);
+    return st != null && st.itemless() && !expr.has(Flag.UPD);
   }
 
   /**
