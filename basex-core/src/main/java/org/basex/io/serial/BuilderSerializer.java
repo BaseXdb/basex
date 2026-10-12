@@ -80,6 +80,11 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
+  protected final void attribute(final Att att) {
+    atts.add(att.name(), att.value()).type(atts.size() - 1, att.type());
+  }
+
+  @Override
   protected void openDoc(final byte[] name) throws IOException {
     builder.openDoc(name);
   }

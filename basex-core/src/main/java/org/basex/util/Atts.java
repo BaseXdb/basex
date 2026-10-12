@@ -15,6 +15,8 @@ import org.basex.util.list.*;
 public final class Atts extends ElementList {
   /** Name/value pairs. */
   private byte[][] list;
+  /** DTD types of the attributes (bit flags; can be {@code null}). */
+  private byte[] types;
 
   /**
    * Default constructor.
@@ -37,6 +39,7 @@ public final class Atts extends ElementList {
    */
   public Atts(final Atts atts) {
     list = atts.list.clone();
+    if(atts.types != null) types = atts.types.clone();
     size = atts.size;
   }
 
@@ -66,6 +69,7 @@ public final class Atts extends ElementList {
     lst[s] = name;
     lst[s + 1] = value;
     size = s + 2;
+    if(types != null) type(s / 2, 0);
     return this;
   }
 
@@ -97,6 +101,7 @@ public final class Atts extends ElementList {
     Array.remove(lst, index * 2, 2, s);
     lst[s - 2] = null;
     lst[s - 1] = null;
+    if(types != null && index < types.length) Array.remove(types, index, 1, types.length);
     size = s - 2;
     return this;
   }
@@ -149,6 +154,34 @@ public final class Atts extends ElementList {
    */
   public Atts value(final int index, final byte[] value) {
     list[index * 2 + 1] = value;
+    return this;
+  }
+
+  /**
+   * Returns the DTD type of the attribute at the specified index position.
+   * @param index index
+   * @return type flags
+   */
+  public int type(final int index) {
+    final byte[] tps = types;
+    return tps != null && index < tps.length ? tps[index] : 0;
+  }
+
+  /**
+   * Sets the DTD type of the attribute at the specified index position.
+   * @param index index
+   * @param type type flags
+   * @return self reference
+   */
+  public Atts type(final int index, final int type) {
+    byte[] tps = types;
+    if(tps == null || index >= tps.length) {
+      if(type == 0) return this;
+      final int n = list.length / 2;
+      tps = tps == null ? new byte[n] : Arrays.copyOf(tps, n);
+      types = tps;
+    }
+    tps[index] = (byte) type;
     return this;
   }
 

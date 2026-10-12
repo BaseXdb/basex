@@ -173,14 +173,15 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId)
-      throws IOException {
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId,
+      final int type) throws IOException {
 
     tout.write1(dist << 3 | Data.ATTR);
     tout.write2(nameId);
     tout.write5(textRef(value, false));
-    tout.write4(uriId);
+    tout.write4(type << 8 | uriId);
     tout.write4(size++);
+    if(type != 0) meta.atttypes = true;
   }
 
   @Override

@@ -156,6 +156,8 @@ public final class IndexNames {
   public boolean containsIds(final boolean idref) {
     // no entries: all attributes are indexed
     if(isEmpty()) return true;
+    // names of attributes with DTD types are not known
+    if(data.meta.atttypes) return false;
     // currently no support for documents with namespaces (cannot be resolved from name index)
     if(!data.nspaces.isEmpty()) return false;
     // find ID candidates

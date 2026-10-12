@@ -149,8 +149,9 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
-    data.attr(dist, nameId, value, uriId);
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId,
+      final int type) {
+    data.attr(dist, nameId, value, uriId, type);
     data.insert(data.nodes());
   }
 

@@ -268,9 +268,11 @@ public abstract class Builder extends Job implements XmlHandler {
    * @param value attribute value
    * @param dist distance to parent
    * @param uriId ID of namespace URI
+   * @param type type flags ({@link Data#IS_ID}, {@link Data#IS_IDREFS})
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int nameId, byte[] value, int dist, int uriId) throws IOException;
+  protected abstract void addAttr(int nameId, byte[] value, int dist, int uriId, int type)
+      throws IOException;
 
   /**
    * Adds a text node to the database.
@@ -332,7 +334,7 @@ public abstract class Builder extends Job implements XmlHandler {
 
       path.index(nameId, Data.ATTR, level + 1, av, meta);
       addLocation();
-      addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId);
+      addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId, atts.type(a));
     }
 
     // set leaf node information in index

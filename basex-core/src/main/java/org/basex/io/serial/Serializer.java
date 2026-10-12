@@ -63,8 +63,9 @@ public abstract class Serializer implements Closeable {
    * @param name attribute name or namespace prefix
    * @param value attribute value (can be {@code null})
    * @param uri URI (can be {@code null})
+   * @param type type flags of database attributes ({@link Data#IS_ID}, {@link Data#IS_IDREFS})
    */
-  protected record Att(byte[] name, byte[] value, byte[] uri) { }
+  protected record Att(byte[] name, byte[] value, byte[] uri, int type) { }
   /** Attribute collector. */
   protected final ArrayList<Att> attributes = new ArrayList<>();
   /** Namespace collector. */
@@ -358,6 +359,15 @@ public abstract class Serializer implements Closeable {
       throws IOException { }
 
   /**
+   * Serializes a collected attribute.
+   * @param att attribute
+   * @throws IOException I/O exception
+   */
+  protected void attribute(final Att att) throws IOException {
+    attribute(att.name, att.value, false);
+  }
+
+  /**
    * Returns the element name (may be overridden to modify names).
    * @param name original name
    * @return modified name
@@ -451,9 +461,11 @@ public abstract class Serializer implements Closeable {
    * @param name attribute name including prefix, if any
    * @param value attribute value (can be null)
    * @param uri namespace uri (can be {@code null})
+   * @param type type flags
    */
-  private void addAttribute(final byte[] name, final byte[] value, final byte[] uri) {
-    attributes.add(new Att(name, value, uri != null ? uri : EMPTY));
+  private void addAttribute(final byte[] name, final byte[] value, final byte[] uri,
+      final int type) {
+    attributes.add(new Att(name, value, uri != null ? uri : EMPTY, type));
   }
 
   /**
@@ -462,7 +474,7 @@ public abstract class Serializer implements Closeable {
    * @param uri URI
    */
   protected void addNamespace(final byte[] prefix, final byte[] uri) {
-    namespaces.add(new Att(prefix, null, uri));
+    namespaces.add(new Att(prefix, null, uri, 0));
   }
 
   /**
@@ -477,7 +489,7 @@ public abstract class Serializer implements Closeable {
             b.name, indexOf(b.name, ':') + 1, b.name.length);
       });
     }
-    for(final Att att : attributes) attribute(att.name, att.value, false);
+    for(final Att att : attributes) attribute(att);
     attributes.clear();
   }
 
@@ -588,7 +600,8 @@ public abstract class Serializer implements Closeable {
         final int as = pre + data.attSize(pre, kind);
         while(++pre != as) {
           final byte[] n = data.name(pre, Data.ATTR), v = data.text(pre, false);
-          addAttribute(n, v, canonical ? data.nspaces.uri(data.uriId(pre, Data.ATTR)) : null);
+          addAttribute(n, v, canonical ? data.nspaces.uri(data.uriId(pre, Data.ATTR)) : null,
+              data.attrType(pre));
           if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
         }
         adjustNamespaces(originalName);
@@ -652,7 +665,7 @@ public abstract class Serializer implements Closeable {
       final BasicNodeIter iter = node.attributeIter();
       for(GNode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
-        addAttribute(n, v, canonical ? nd.qname().uri() : null);
+        addAttribute(n, v, canonical ? nd.qname().uri() : null, 0);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
       }
       adjustNamespaces(originalName);

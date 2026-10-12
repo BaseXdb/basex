@@ -156,7 +156,7 @@ public final class DataBuilder {
       par == -1 ? data.nspaces.add(last, prefix, uri, data) : data.nspaces.uriId(uri);
 
     final int nameId = data.attrNames.put(qname.string());
-    data.attr(pre - par, nameId, node.string(), uriId);
+    data.attr(pre - par, nameId, node.string(), uriId, node.attrType());
     data.insert(last);
     return pre + 1;
   }

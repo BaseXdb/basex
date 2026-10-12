@@ -182,6 +182,11 @@ public class DBNode extends XNode {
   }
 
   @Override
+  public final int attrType() {
+    return kind() == Kind.ATTRIBUTE ? data.attrType(pre) : 0;
+  }
+
+  @Override
   public final byte[] baseURI() {
     if(kind() == Kind.DOCUMENT) {
       final String base = Token.string(data.text(pre, true)), name = data.meta.name;

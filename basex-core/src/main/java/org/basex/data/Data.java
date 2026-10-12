@@ -54,6 +54,7 @@ import org.basex.util.list.*;
  *                      Calculated in real-time if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
+ * - Byte    10:  TYPE: IDREFS flag (bit: 1), ID flag (bit: 0)
  * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
  *
@@ -80,6 +81,11 @@ public abstract class Data {
   public static final byte COMM = 0x04;
   /** Node kind: processing instruction (code: {@code 5}). */
   public static final byte PI = 0x05;
+
+  /** Attribute type flag: ID. */
+  public static final int IS_ID = 0x01;
+  /** Attribute type flag: IDREF or IDREFS. */
+  public static final int IS_IDREFS = 0x02;
 
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
@@ -495,6 +501,15 @@ public abstract class Data {
   }
 
   /**
+   * Returns the type flags ({@link #IS_ID}, {@link #IS_IDREFS}) of an attribute.
+   * @param pre PRE value
+   * @return type flags
+   */
+  public final int attrType(final int pre) {
+    return meta.atttypes ? table.read1(pre, 10) : 0;
+  }
+
+  /**
    * Returns the name and namespace URI of the addressed element or attribute.
    * @param pre PRE value
    * @param kind node kind
@@ -714,6 +729,8 @@ public abstract class Data {
       final ValueIndex[] indexes = meta.updindex ? valueIndexes() : new ValueIndex[0];
       for(final ValueIndex index : indexes) index.rename(pre, kind);
       if(kind == ATTR) {
+        // renamed attributes lose their DTD type
+        if(meta.atttypes) table.write1(pre, 10, 0);
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.put(name));
       } else {
@@ -792,7 +809,8 @@ public abstract class Data {
           text(cDist, sData.text(sPre, true), sKind);
         case ATTR ->
           // add attribute
-          attr(cDist, attrNames.put(sData.name(sPre, sKind)), sData.text(sPre, false), 0);
+          attr(cDist, attrNames.put(sData.name(sPre, sKind)), sData.text(sPre, false), 0,
+              sData.attrType(sPre));
         default -> { }
       }
     }
@@ -972,7 +990,7 @@ public abstract class Data {
             uriId = nspaces.uriIdForPrefix(prefix, false);
             if(uriId == 0 && !eq(prefix, XML)) uriId = declare(nsPre, prefix, uri);
           }
-          attr(nDist, attrNames.put(name), sData.text(sPre, false), uriId);
+          attr(nDist, attrNames.put(name), sData.text(sPre, false), uriId, sData.attrType(sPre));
         }
         default -> { }
       }
@@ -1192,16 +1210,19 @@ public abstract class Data {
    * @param nameId ID of attribute name
    * @param value attribute value
    * @param uriId ID of namespace URI
+   * @param type type flags ({@link #IS_ID}, {@link #IS_IDREFS})
    */
-  public final void attr(final int dist, final int nameId, final byte[] value, final int uriId) {
+  public final void attr(final int dist, final int nameId, final byte[] value, final int uriId,
+      final int type) {
     // add attribute to text storage
     final int id = newID();
     final long v = textRef(value, false);
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
     s(nameId >> 8); s(nameId); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
-    s(0); s(0); s(0); s(uriId);
+    s(0); s(0); s(type); s(uriId);
     s(id >> 24); s(id >> 16); s(id >> 8); s(id);
+    if(type != 0 && !meta.atttypes) meta().atttypes = true;
   }
 
   /**

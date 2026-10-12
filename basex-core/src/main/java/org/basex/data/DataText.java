@@ -56,6 +56,8 @@ public interface DataText {
   String DBFTXINC = "FTXINC";
   /** Full-text index: mixed content. */
   String DBFTMIX = "FTMIXED";
+  /** Attributes with ID or IDREF types. */
+  String DBATTTYPES = "ATTTYPES";
   /** Full-text index: segments. */
   String DBFTXSEGS = "FTXSEGS";
   /** Full-text index: buffer. */

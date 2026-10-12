@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -125,7 +126,12 @@ public final class SAXHandler extends DefaultHandler2 {
 
       final int al = attr.getLength();
       for(int a = 0; a < al; a++) {
-        atts.add(token(attr.getQName(a)), token(attr.getValue(a)), stripNS);
+        final int type = switch(attr.getType(a)) {
+          case "ID" -> Data.IS_ID;
+          case "IDREF", "IDREFS" -> Data.IS_IDREFS;
+          default -> 0;
+        };
+        atts.add(token(attr.getQName(a)), token(attr.getValue(a)), stripNS).type(a, type);
       }
       final byte[] en = token(name);
       location();

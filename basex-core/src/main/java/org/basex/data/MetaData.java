@@ -77,6 +77,8 @@ public final class MetaData {
   public boolean ftmixed;
   /** Full-text index: indicates if unsegmented index will be adopted as first segment. */
   public boolean ftadopt;
+  /** Indicates if attributes with ID or IDREF types have been stored. */
+  public boolean atttypes;
   /** Updatable indexes: numbers of segments, oldest first ({@code -1}: base structure). */
   public final EnumMap<IndexType, String> segments = new EnumMap<>(IndexType.class);
   /** Updatable indexes: log length, references, covered IDs, and index-specific values. */
@@ -184,6 +186,7 @@ public final class MetaData {
     ftinclude = meta.ftinclude;
     ftmixed = meta.ftmixed;
     ftadopt = meta.ftadopt;
+    atttypes = meta.atttypes;
     segments.putAll(meta.segments);
     buffers.putAll(meta.buffers);
     stemming = meta.stemming;
@@ -580,6 +583,7 @@ public final class MetaData {
         case DBTOKINC -> tokeninclude = v;
         case DBFTXINC -> ftinclude = v;
         case DBFTMIX -> ftmixed = isTrue(v);
+        case DBATTTYPES -> atttypes = isTrue(v);
         case DBFTXSEGS -> segments.put(IndexType.FULLTEXT, v);
         case DBFTXBUF -> buffers.put(IndexType.FULLTEXT, v);
         case DBTXTSEGS -> segments.put(IndexType.TEXT, v);
@@ -645,6 +649,7 @@ public final class MetaData {
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBFTMIX,    ftmixed);
+    writeInfo(out, DBATTTYPES, atttypes);
     final String[][] keys = { { DBFTXSEGS, DBFTXBUF }, { DBTXTSEGS, DBTXTBUF },
       { DBATVSEGS, DBATVBUF }, { DBTOKSEGS, DBTOKBUF } };
     final IndexType[] values = { IndexType.FULLTEXT, IndexType.TEXT, IndexType.ATTRIBUTE,

@@ -13,6 +13,7 @@ import org.basex.build.*;
 import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -64,9 +65,10 @@ final class XMLScanner extends Job {
   /**
    * Declared attribute.
    * @param tokenized tokenized (non-CDATA) type flag
+   * @param type ID type flags
    * @param value default value (can be {@code null})
    */
-  private record AttDecl(boolean tokenized, byte[] value) { }
+  private record AttDecl(boolean tokenized, int type, byte[] value) { }
   /** DTD flag. */
   private final boolean dtd;
   /** Whether external resources may be accessed. */
@@ -876,16 +878,22 @@ final class XMLScanner extends Job {
         checkS();
         // [56] AttType: CDATA is the only non-tokenized (StringType) type
         final boolean tokenized = !consume(CD);
-        if(tokenized && !consume(IDRS) && !consume(IDR) && !consume(ID) &&
-            !consume(ENTS) && !consume(ENT1) && !consume(NMTS) && !consume(NMT)) {
-          if(consume(NOT)) { // [57,58]
-            checkS(); check('(');
-            do { s(); name(true); s(); } while(consume('|'));
-          } else { // [59]
-            check('(');
-            do { s(); nmtoken(); s(); } while(consume('|'));
+        int tp = 0;
+        if(tokenized) {
+          if(consume(IDRS) || consume(IDR)) {
+            tp = Data.IS_IDREFS;
+          } else if(consume(ID)) {
+            tp = Data.IS_ID;
+          } else if(!consume(ENTS) && !consume(ENT1) && !consume(NMTS) && !consume(NMT)) {
+            if(consume(NOT)) { // [57,58]
+              checkS(); check('(');
+              do { s(); name(true); s(); } while(consume('|'));
+            } else { // [59]
+              check('(');
+              do { s(); nmtoken(); s(); } while(consume('|'));
+            }
+            check(')');
           }
-          check(')');
         }
 
         // [54] DefaultDecl
@@ -899,7 +907,7 @@ final class XMLScanner extends Job {
           attValue(consume());
           value = tokenized ? normalize(token.toArray()) : token.toArray();
         }
-        if(tokenized || value != null) declareAtt(elem, att, tokenized, value);
+        if(tokenized || value != null) declareAtt(elem, att, tokenized, tp, value);
         s();
       }
       check('>');
@@ -959,16 +967,17 @@ final class XMLScanner extends Job {
    * @param elem element name
    * @param att attribute name
    * @param tokenized non-CDATA (tokenized) type flag
+   * @param tp ID type flags
    * @param value default value (can be {@code null})
    */
   private void declareAtt(final byte[] elem, final byte[] att, final boolean tokenized,
-      final byte[] value) {
+      final int tp, final byte[] value) {
     attDecls.computeIfAbsent(elem, TokenObjectMap::new).
-      computeIfAbsent(att, () -> new AttDecl(tokenized, value));
+      computeIfAbsent(att, () -> new AttDecl(tokenized, tp, value));
   }
 
   /**
-   * Applies declared attribute defaults and normalization. [3.3.2, 3.3.3]
+   * Applies declared attribute defaults, normalization and ID types. [3.3.2, 3.3.3]
    * @param elem element name
    * @param atts attributes assembled from the start tag
    * @param stripNS strip namespaces
@@ -976,16 +985,18 @@ final class XMLScanner extends Job {
   void attributes(final byte[] elem, final Atts atts, final boolean stripNS) {
     final TokenObjectMap<AttDecl> decls = attDecls.get(elem);
     if(decls == null) return;
-    // normalize specified values of tokenized-type attributes
+    // normalize specified values of tokenized-type attributes, assign ID types
     final int as = atts.size();
     for(int a = 0; a < as; a++) {
       final AttDecl decl = decls.get(atts.name(a));
-      if(decl != null && decl.tokenized) atts.value(a, normalize(atts.value(a)));
+      if(decl != null && decl.tokenized) atts.value(a, normalize(atts.value(a))).type(a, decl.type);
     }
     // add default values for declared attributes that are absent (in declaration order)
     for(final byte[] att : decls) {
       final AttDecl decl = decls.get(att);
-      if(decl.value != null && !atts.contains(att)) atts.add(att, decl.value, stripNS);
+      if(decl.value != null && !atts.contains(att)) {
+        atts.add(att, decl.value, stripNS).type(atts.size() - 1, decl.type);
+      }
     }
   }
 

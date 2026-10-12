@@ -68,7 +68,7 @@ abstract class Ids extends ContextFn {
       for(Item item; (item = qc.next(iter)) != null;) {
         // check attribute name; check root if database has more than one document
         final XNode attr = (XNode) item;
-        if(XMLToken.isId(attr.name(), idref) && (idref || idSet.remove(attr.string()) != 0) &&
+        if(isId(attr, idref) && (idref || idSet.remove(attr.string()) != 0) &&
             (data.meta.ndocs == 1 || attr.root().is(root))) {
           results.add(idref ? attr : attr.parent());
         }
@@ -96,6 +96,17 @@ abstract class Ids extends ContextFn {
   }
 
   /**
+   * Checks if an attribute is an ID or IDREF attribute.
+   * @param attr attribute
+   * @param idref IDREF flag
+   * @return result of check
+   */
+  private static boolean isId(final XNode attr, final boolean idref) {
+    return (attr.attrType() & (idref ? Data.IS_IDREFS : Data.IS_ID)) != 0 ||
+      XMLToken.isId(attr.name(), idref);
+  }
+
+  /**
    * Adds nodes with the specified ID.
    * @param idSet IDs to be found
    * @param results node cache
@@ -104,7 +115,7 @@ abstract class Ids extends ContextFn {
   private void add(final TokenSet idSet, final GNodeBuilder results, final GNode node) {
     final boolean idref = idref();
     for(final GNode attr : node.attributeIter()) {
-      if(XMLToken.isId(attr.name(), idref)) {
+      if(isId((XNode) attr, idref)) {
         // ID/IDREF found
         boolean found = false;
         for(final byte[] id : distinctTokens(attr.string())) {

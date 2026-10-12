@@ -496,7 +496,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
    */
   private static DataClip attrClip(final Data d, final String name, final String value) {
     final int s = d.nodes();
-    d.attr(s + 1, d.attrNames.put(token(name)), token(value), -1);
+    d.attr(s + 1, d.attrNames.put(token(name)), token(value), -1, 0);
     d.insert(s);
     return new DataClip(d, s, d.nodes());
   }

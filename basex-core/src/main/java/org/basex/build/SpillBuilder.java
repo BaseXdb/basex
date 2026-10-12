@@ -93,13 +93,13 @@ public final class SpillBuilder extends Builder {
   }
 
   @Override
-  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId)
-      throws IOException {
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId,
+      final int type) throws IOException {
     if(disk != null) {
-      disk.addAttr(nameId, value, dist, uriId);
+      disk.addAttr(nameId, value, dist, uriId, type);
     } else {
       final int tokens = tokens();
-      data.attr(dist, nameId, value, uriId);
+      data.attr(dist, nameId, value, uriId, type);
       insert(value, tokens);
     }
   }
@@ -166,7 +166,8 @@ public final class SpillBuilder extends Builder {
             Math.min(IO.MAXATTS, data.attSize(pre, kind)), data.uriId(pre, kind), data.nsFlag(pre));
       } else if(kind == Data.ATTR) {
         disk.addAttr(data.nameId(pre), data.text(pre, false),
-            Math.min(IO.MAXATTS, data.dist(pre, kind)), data.uriId(pre, kind));
+            Math.min(IO.MAXATTS, data.dist(pre, kind)), data.uriId(pre, kind),
+            data.attrType(pre));
       } else {
         disk.addText(data.text(pre, true), data.dist(pre, kind), (byte) kind);
       }

@@ -2582,6 +2582,51 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("a2", " <a/>"), IDDOC);
   }
 
+  /** Test method. */
+  @Test public void idDtd() {
+    final String doc = "<!DOCTYPE r [<!ATTLIST p n ID #IMPLIED r IDREFS #IMPLIED>]>"
+        + "<r><p n='x' r='y z'/><p n='y'/><q n='z'/></r>";
+    final String id = ID.args("x y z", " $doc") + " ! @n ! string()";
+    final String idref = IDREF.args("x y", " $doc") + " ! ../@n ! string()";
+
+    // main-memory documents
+    query("let $doc := parse-xml(\"" + doc + "\") return " + id, "x\ny");
+    query("let $doc := parse-xml(\"" + doc + "\") return " + idref, "x");
+
+    // databases, with and without attribute/token index on the declared names
+    for(final boolean intparse : new boolean[] { true, false }) {
+      set(MainOptions.INTPARSE, intparse);
+      set(MainOptions.DTD, true);
+      execute(new CreateDB(NAME, doc));
+      query("let $doc := doc('" + NAME + "') return " + id, "x\ny");
+      query("let $doc := doc('" + NAME + "') return " + idref, "x");
+      set(MainOptions.ATTRINCLUDE, "n");
+      set(MainOptions.TOKENINCLUDE, "r");
+      execute(new CreateDB(NAME, doc));
+      query("let $doc := doc('" + NAME + "') return " + id, "x\ny");
+      query("let $doc := doc('" + NAME + "') return " + idref, "x");
+      set(MainOptions.ATTRINCLUDE, "");
+      set(MainOptions.TOKENINCLUDE, "");
+
+      // copied database nodes keep the flag
+      query(_DB_ADD.args(NAME, " doc('" + NAME + "')", "copy.xml"));
+      final String copy = "let $doc := doc('" + NAME + "/copy.xml') return ";
+      query(copy + id, "x\ny");
+
+      // rebuilt databases keep the flag
+      execute(new OptimizeAll());
+      query(copy + id, "x\ny");
+      query(_DB_CREATE.args(NAME + 2, " (doc('" + NAME + "/copy.xml'), <a/>)",
+          " ('copy.xml', 'a.xml')"));
+      query("let $doc := doc('" + NAME + "2/copy.xml') return " + id, "x\ny");
+      execute(new DropDB(NAME + 2));
+
+      // renamed attributes lose the flag
+      query("rename node doc('" + NAME + "/copy.xml')//p[1]/@n as 'm'");
+      query(copy + ID.args("x", " $doc"), "");
+    }
+  }
+
   /** Tests nested calls of idempotent functions. */
   @Test public void idempotentCalls() {
     final String number = wrap(3.5);

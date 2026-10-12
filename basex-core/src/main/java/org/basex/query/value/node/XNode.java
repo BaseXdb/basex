@@ -324,6 +324,14 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Returns the DTD type flags of an attribute ({@link Data#IS_ID}, {@link Data#IS_IDREFS}).
+   * @return type flags
+   */
+  public int attrType() {
+    return 0;
+  }
+
+  /**
    * Returns a copy of the in-scope namespaces.
    * @param qc query context (can be {@code null})
    * @return namespaces
