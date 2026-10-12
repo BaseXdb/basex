@@ -225,36 +225,22 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   @Override
   public Iterator<StaticVar> iterator() {
-    return new Iterator<>() {
-      /** Iterator over modules. */
-      private final Iterator<QNmMap<StaticVar>> modules = varsByModule.values().iterator();
-      /** Iterator over StaticVar objects of the current module. */
-      private Iterator<StaticVar> vars = Collections.emptyIterator();
+    return list().iterator();
+  }
 
-      @Override
-      public boolean hasNext() {
-        while(!vars.hasNext()) {
-          if(!modules.hasNext()) return false;
-          vars = modules.next().values().iterator();
-        }
-        return true;
-      }
-
-      @Override
-      public StaticVar next() {
-        if(!hasNext()) throw new NoSuchElementException();
-        return vars.next();
-      }
-    };
+  /**
+   * Returns all variables.
+   * @return variables
+   */
+  private ArrayList<StaticVar> list() {
+    final ArrayList<StaticVar> list = new ArrayList<>();
+    for(final QNmMap<StaticVar> vars : varsByModule.values()) vars.values().forEach(list::add);
+    return list;
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    if(varsByModule.isEmpty()) return;
-
-    final ArrayList<ExprInfo> list = new ArrayList<>();
-    for(final StaticVar var : this) list.add(var);
-    plan.add(plan.create(this), list.toArray());
+    if(!varsByModule.isEmpty()) plan.add(plan.create(this), list().toArray(StaticVar[]::new));
   }
 
   @Override

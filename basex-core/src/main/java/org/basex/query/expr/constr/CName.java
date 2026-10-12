@@ -118,9 +118,7 @@ abstract class CName extends CNode {
 
   @Override
   public final int exprSize() {
-    int size = 1;
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size + name.exprSize();
+    return super.exprSize() + name.exprSize();
   }
 
   @Override

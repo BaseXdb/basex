@@ -36,10 +36,7 @@ public final class CNSpace extends CName {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.STRING, cc);
-    if(name instanceof Value) {
-      final byte[] nm = ncname(true, cc.qc);
-      if(nm != null) name = Str.get(nm);
-    }
+    if(name instanceof Value) name = Str.get(ncname(true, cc.qc));
     optValue(cc);
     return this;
   }

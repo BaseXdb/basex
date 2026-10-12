@@ -16,18 +16,14 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Trace extends Clause {
-  /** Traced expression. */
-  Expr expr;
-
+public final class Trace extends SingleClause {
   /**
    * Constructor.
    * @param expr traced expression
    * @param info input info (can be {@code null})
    */
   public Trace(final Expr expr, final InputInfo info) {
-    super(info, Types.ITEM_ZM);
-    this.expr = expr;
+    super(info, Types.ITEM_ZM, expr);
   }
 
   @Override
@@ -48,16 +44,7 @@ public final class Trace extends Clause {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Flag flag : flags) {
-      if(flag == Flag.NDT) return true;
-    }
-    return expr.has(flags);
-  }
-
-  @Override
-  public Trace compile(final CompileContext cc) throws QueryException {
-    expr = expr.compile(cc);
-    return optimize(cc);
+    return Flag.NDT.oneOf(flags) || super.has(flags);
   }
 
   @Override
@@ -66,51 +53,13 @@ public final class Trace extends Clause {
   }
 
   @Override
-  public boolean inlineable(final InlineContext ic) {
-    return expr.inlineable(ic);
-  }
-
-  @Override
-  public VarUsage count(final Var var) {
-    return expr.count(var);
-  }
-
-  @Override
-  public Clause inline(final InlineContext ic) throws QueryException {
-    final Expr inlined = expr.inline(ic);
-    if(inlined == null) return null;
-    expr = inlined;
-    return optimize(ic.cc);
-  }
-
-  @Override
   public Trace copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Trace(expr.copy(cc, vm), info));
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return expr.accept(visitor);
-  }
-
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoUp(expr);
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return obj instanceof final Trace trc && expr.equals(trc.expr);
-  }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), expr);
   }
 
   @Override

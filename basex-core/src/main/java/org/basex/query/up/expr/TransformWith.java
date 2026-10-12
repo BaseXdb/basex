@@ -124,7 +124,7 @@ public final class TransformWith extends Copy {
     if(changed) arg(1, arg -> inlined);
 
     // do not inline context reference in updating expressions
-    changed |= ic.var != null && ic.cc.ok(arg(target()), true, () -> {
+    changed |= ic.var != null && ic.cc.get(arg(target()), true, () -> {
       final Expr expr = arg(update()).inline(ic);
       if(expr == null) return false;
       arg(update(), arg -> expr);

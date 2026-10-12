@@ -173,17 +173,6 @@ public final class StaticVar extends StaticDecl {
     return Strings.concat(Token.cpToken('$'), name.string());
   }
 
-  /**
-   * Indicates if the expression bound to this variable has one of the specified compiler
-   * properties.
-   * @param flags flags
-   * @return result of check
-   * @see Expr#has(Flag...)
-   */
-  boolean has(final Flag... flags) {
-    return check(flags);
-  }
-
   @Override
   public String description() {
     return "variable declaration";

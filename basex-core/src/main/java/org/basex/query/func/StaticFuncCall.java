@@ -179,14 +179,6 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   /**
-   * Assigns an external function call.
-   * @param ext external function call
-   */
-  public void setExternal(final ParseExpr ext) {
-    external = ext;
-  }
-
-  /**
    * Returns the called function if already known.
    * @return function or {@code null}
    */

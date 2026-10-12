@@ -67,28 +67,8 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final boolean isNumber() {
-    return false;
-  }
-
-  @Override
-  public final boolean isUntyped() {
-    return false;
-  }
-
-  @Override
   public final boolean global() {
     return true;
-  }
-
-  @Override
-  public final boolean isStringOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isSortable() {
-    return false;
   }
 
   @Override
@@ -150,11 +130,6 @@ public enum ListType implements Type {
   @Override
   public final ID id() {
     return null;
-  }
-
-  @Override
-  public final boolean nsSensitive() {
-    return false;
   }
 
   @Override

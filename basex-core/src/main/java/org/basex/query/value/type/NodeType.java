@@ -101,11 +101,6 @@ public final class NodeType implements Type {
   }
 
   @Override
-  public boolean isNumber() {
-    return false;
-  }
-
-  @Override
   public boolean isUntyped() {
     return kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.TEXT, Kind.DOCUMENT);
   }
@@ -208,11 +203,6 @@ public final class NodeType implements Type {
   @Override
   public boolean refinable() {
     return kind == Kind.XNODE;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return false;
   }
 
   @Override

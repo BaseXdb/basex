@@ -15,11 +15,9 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract sealed class ForLet extends Clause permits For, Let {
+abstract sealed class ForLet extends SingleClause permits For, Let {
   /** Item variable. */
   public Var var;
-  /** Bound expression. */
-  public Expr expr;
   /** Scoring flag. */
   boolean scoring;
 
@@ -34,39 +32,9 @@ abstract sealed class ForLet extends Clause permits For, Let {
    */
   ForLet(final InputInfo info, final SeqType seqType, final Var var, final Expr expr,
       final boolean scoring, final Var... vars) {
-    super(info, seqType, vars);
+    super(info, seqType, expr, vars);
     this.var = var;
-    this.expr = expr;
     this.scoring = scoring;
-  }
-
-  @Override
-  public final Clause compile(final CompileContext cc) throws QueryException {
-    expr = expr.compile(cc);
-    return optimize(cc);
-  }
-
-  @Override
-  public final boolean has(final Flag... flags) {
-    return expr.has(flags);
-  }
-
-  @Override
-  public final boolean inlineable(final InlineContext v) {
-    return expr.inlineable(v);
-  }
-
-  @Override
-  public final VarUsage count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
-  public final Clause inline(final InlineContext ic) throws QueryException {
-    final Expr inlined = expr.inline(ic);
-    if(inlined == null) return null;
-    expr = inlined;
-    return optimize(ic.cc);
   }
 
   /**
@@ -126,16 +94,6 @@ abstract sealed class ForLet extends Clause permits For, Let {
       // create new filter expression
       expr = Filter.get(cc, info, expr, ex);
     }
-  }
-
-  @Override
-  public final void checkUp() throws QueryException {
-    checkNoUp(expr);
-  }
-
-  @Override
-  public final int exprSize() {
-    return expr.exprSize();
   }
 
   @Override

@@ -3,7 +3,6 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -31,7 +30,6 @@ public final class CComm extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs = simplifyAll(Simplify.STRING, cc);
     optValue(cc);
     return this;
   }

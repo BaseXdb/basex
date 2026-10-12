@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -23,11 +22,6 @@ public abstract class XQStruct extends FItem {
    */
   protected XQStruct(final Type type) {
     super(type);
-  }
-
-  @Override
-  public final AnnList annotations() {
-    return AnnList.EMPTY;
   }
 
   @Override
@@ -49,21 +43,6 @@ public abstract class XQStruct extends FItem {
   public final String funcIdentity() {
     final long size = structSize();
     return description() + size + (size > 0 ? "-" + hashCode() : "");
-  }
-
-  @Override
-  public final Expr inline(final Expr[] exprs, final CompileContext cc) {
-    return null;
-  }
-
-  @Override
-  public final boolean vacuousBody() {
-    return false;
-  }
-
-  @Override
-  public final boolean updating() {
-    return false;
   }
 
   @Override
@@ -142,11 +121,6 @@ public abstract class XQStruct extends FItem {
    */
   protected boolean assignable(@SuppressWarnings("unused") final Type tp) {
     return true;
-  }
-
-  @Override
-  public final int stackFrameSize() {
-    return 0;
   }
 
   /**

@@ -694,6 +694,16 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
+   * Returns the condition of a where or while clause.
+   * @param clause clause
+   * @param where where/while flag
+   * @return condition, or {@code null} if the clause is no clause of the requested kind
+   */
+  private static Expr cond(final Clause clause, final boolean where) {
+    return clause instanceof final FilterClause fc && fc instanceof Where == where ? fc.expr : null;
+  }
+
+  /**
    * Slides where/while clauses upwards and removes those that do not filter anything.
    * @param cc compilation context
    * @param where where/while flag
@@ -702,13 +712,10 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean optimizeCond(final CompileContext cc, final boolean where) throws QueryException {
     boolean changed = false;
-    final java.util.function.Function<Clause, Expr> get = clause ->
-      where ? clause instanceof final Where wh ? wh.expr : null :
-      clause instanceof final While wl ? wl.expr : null;
     final HashSet<ForLet> optimized = new HashSet<>();
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
-      final Expr expr = get.apply(clause);
+      final Expr expr = cond(clause, where);
       if(expr instanceof Bln) {
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         changed = true;
@@ -728,7 +735,7 @@ public final class GFLWOR extends ParseExpr {
           if(curr.has(Flag.NDT) || !curr.skippable(clause)) break;
           // where clauses are always moved to avoid unnecessary computations,
           // but skipping other where/while clauses can cause infinite loops
-          if(!(curr instanceof Where) && !(curr instanceof While)) insert = j;
+          if(!(curr instanceof FilterClause)) insert = j;
         }
         if(insert == -1) {
           insert = c;
@@ -744,7 +751,7 @@ public final class GFLWOR extends ParseExpr {
           for(int i = insert; --i >= 0;) {
             final Clause before = clauses.get(i);
             // skip clauses
-            if(get.apply(before) != null) continue;
+            if(cond(before, where) != null) continue;
             // analyze for/let clauses, abort otherwise
             if(before instanceof final ForLet fl) {
               final Predicate<Expr> varRef = e -> e instanceof final VarRef vr && vr.var == fl.var;
@@ -800,14 +807,14 @@ public final class GFLWOR extends ParseExpr {
       // find where/while clause ($c = 1)
       for(int d = c + 1; d < clauses.size(); d++) {
         final Clause cl = clauses.get(d);
-        final boolean where = cl instanceof Where;
-        if(!where && !(cl instanceof While)) {
+        if(!(cl instanceof final FilterClause fc)) {
           // stop if the clause is no 'for' or 'let' expression or nondeterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }
 
-        Expr expr = where ? ((Where) cl).expr : ((While) cl).expr;
+        final boolean where = fc instanceof Where;
+        Expr expr = fc.expr;
         if(expr instanceof final CmpG cmp) expr = CmpIR.get(cc, cmp, true);
         final boolean match = expr instanceof final CmpIR cmp &&
             cmp.expr instanceof final VarRef vr && vr.var == pos.pos &&
@@ -816,8 +823,8 @@ public final class GFLWOR extends ParseExpr {
         if(!match) {
           // for $e at $p in E where P($e, $p) ... → for $e in E[P(., position())] ...
           if(where && d == c + 1 && count(pos.pos, d + 1) == VarUsage.NEVER &&
-              pos.toPosPredicate(cc, ((Where) cl).expr)) {
-            cc.info(QueryText.OPTPRED_X, ((Where) cl).expr);
+              pos.toPosPredicate(cc, fc.expr)) {
+            cc.info(QueryText.OPTPRED_X, fc.expr);
             clauses.remove(d);
             changed = true;
             break;
@@ -1025,10 +1032,9 @@ public final class GFLWOR extends ParseExpr {
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       final int ls = list.size();
-      final Expr cond = where ? clause instanceof final Where wh ? wh.expr : null :
-        clause instanceof final While wl ? wl.expr : null;
-      if(cond != null) {
-        list.add(cond);
+      final Expr expr = cond(clause, where);
+      if(expr != null) {
+        list.add(expr);
       } else if(ls > 1) {
         merge.accept(c);
         c -= ls + 1;
@@ -1137,8 +1143,7 @@ public final class GFLWOR extends ParseExpr {
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause before = iter.previous();
-      if(before instanceof For || before instanceof Window || before instanceof Where ||
-          before instanceof While) {
+      if(before instanceof For || before instanceof Window || before instanceof FilterClause) {
         iter.next();
         while(iter.hasNext()) {
           iter.next();

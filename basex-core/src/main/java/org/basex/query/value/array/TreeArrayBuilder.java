@@ -6,7 +6,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A builder for creating an {@link XQArray} by prepending and appending members.
+ * A builder for creating an {@link XQArray} by appending members.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -28,43 +28,6 @@ final class TreeArrayBuilder extends ArrBuilder {
   private int mid = CAP / 2;
   /** Number of members in right digit. */
   private int inRight;
-
-  /**
-   * Adds a member to the start of the array.
-   * @param member member to add
-   * @return self reference
-   */
-  TreeArrayBuilder prepend(final Value member) {
-    if(inLeft < TreeArray.MAX_DIGIT) {
-      // just insert the member
-      members[(mid - inLeft + CAP - 1) % CAP] = member;
-      inLeft++;
-    } else if(tree.isEmpty() && inRight < TreeArray.MAX_DIGIT) {
-      // move the middle to the left
-      mid = (mid + CAP - 1) % CAP;
-      members[(mid - inLeft + CAP) % CAP] = member;
-      inRight++;
-    } else {
-      // push leaf node into the tree
-      final Value[] leaf = new Value[NODE_SIZE];
-      final int start = (mid - NODE_SIZE + CAP) % CAP;
-      for(int i = 0; i < NODE_SIZE; i++) leaf[i] = members[(start + i) % CAP];
-      tree.prepend(new LeafNode(leaf));
-
-      // move rest of the nodes to the right
-      final int rest = inLeft - NODE_SIZE;
-      final int p0 = (mid - inLeft + CAP) % CAP;
-      for(int i = 0; i < rest; i++) {
-        final int from = (p0 + i) % CAP, to = (from + NODE_SIZE) % CAP;
-        members[to] = members[from];
-      }
-
-      // insert the member
-      members[(mid - rest + CAP - 1) % CAP] = member;
-      inLeft = rest + 1;
-    }
-    return this;
-  }
 
   @Override
   public TreeArrayBuilder add(final Value member) {

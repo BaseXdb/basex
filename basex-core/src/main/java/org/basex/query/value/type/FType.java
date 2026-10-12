@@ -21,26 +21,6 @@ public abstract class FType implements Type {
   private final SeqType[] seqTypes = SeqType.cache(this);
 
   @Override
-  public final boolean isNumber() {
-    return false;
-  }
-
-  @Override
-  public final boolean isUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isStringOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isSortable() {
-    return false;
-  }
-
-  @Override
   public final SeqType seqType(final Occ occ) {
     return SeqType.get(seqTypes, this, occ);
   }
@@ -49,10 +29,5 @@ public abstract class FType implements Type {
   public final Item cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
     throw FUNCCAST_X_X.get(info, this, value);
-  }
-
-  @Override
-  public final boolean nsSensitive() {
-    return false;
   }
 }

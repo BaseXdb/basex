@@ -80,10 +80,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return Str.get(value, qc, info);
     }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()));
-    }
   },
 
   /** Normalized String type. */
@@ -96,15 +92,6 @@ public enum BasicType implements Type {
       for(final byte b : token) bl.add(b == '\t' || b == '\r' || b == '\n' ? ' ' : b);
       return Str.get(bl.finish(), this);
     }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
-    }
   },
 
   /** Token type. */
@@ -113,15 +100,6 @@ public enum BasicType implements Type {
     public Str cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return Str.get(normalize(item.string(info)), this);
-    }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -134,15 +112,6 @@ public enum BasicType implements Type {
       if(!LANGPATTERN.matcher(string(v)).matches()) throw castError(item, info);
       return Str.get(v, this);
     }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
-    }
   },
 
   /** NMTOKEN type. */
@@ -153,15 +122,6 @@ public enum BasicType implements Type {
       final byte[] v = normalize(item.string(info));
       if(!XMLToken.isNMToken(v)) throw castError(item, info);
       return Str.get(v, this);
-    }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -174,15 +134,6 @@ public enum BasicType implements Type {
       if(!XMLToken.isName(v)) throw castError(item, info);
       return Str.get(v, this);
     }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
-    }
   },
 
   /** NCName type. */
@@ -191,15 +142,6 @@ public enum BasicType implements Type {
     public Str cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return Str.get(checkName(item, info), this);
-    }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -210,15 +152,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return Str.get(checkName(item, info), this);
     }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
-    }
   },
 
   /** IDREF type. */
@@ -228,15 +161,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return Str.get(checkName(item, info), this);
     }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
-    }
   },
 
   /** Entity type. */
@@ -245,15 +169,6 @@ public enum BasicType implements Type {
     public Str cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return Str.get(checkName(item, info), this);
-    }
-    @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
-    public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -265,12 +180,6 @@ public enum BasicType implements Type {
       // return double
       return item.type.isNumber() ? item : Dbl.get(checkNum(item, info).dbl(info));
     }
-    @Override
-    public Item cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      // return double
-      return cast(Str.get(value, qc, info), qc, info);
-    }
   },
 
   /** Float type. */
@@ -279,11 +188,6 @@ public enum BasicType implements Type {
     public Flt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return Flt.get(checkNum(item, info).flt(info));
-    }
-    @Override
-    public Flt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public Flt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -297,11 +201,6 @@ public enum BasicType implements Type {
     public Dbl cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return Dbl.get(checkNum(item, info).dbl(info));
-    }
-    @Override
-    public Dbl cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public Dbl read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -342,10 +241,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return Itr.get(checkLong(value, 0, 0, info));
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong());
-    }
   },
 
   /** Non-positive integer type. */
@@ -359,10 +254,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, Long.MIN_VALUE, 0, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -378,10 +269,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, Long.MIN_VALUE, -1, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Long type. */
@@ -395,10 +282,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, 0, 0, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -414,10 +297,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, -0x80000000, 0x7FFFFFFF, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Short type. */
@@ -431,10 +310,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, -0x8000, 0x7FFF, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -450,10 +325,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, -0x80, 0x7F, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Non-negative integer type. */
@@ -467,10 +338,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, 0, Long.MAX_VALUE, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -505,10 +372,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, 0, 0xFFFFFFFFL, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Unsigned Short type. */
@@ -522,10 +385,6 @@ public enum BasicType implements Type {
     public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return new Itr(checkLong(value, 0, 0xFFFF, info), this);
-    }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -541,10 +400,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, 0, 0xFF, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Positive integer type. */
@@ -559,10 +414,6 @@ public enum BasicType implements Type {
         throws QueryException {
       return new Itr(checkLong(value, 1, Long.MAX_VALUE, info), this);
     }
-    @Override
-    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
-      return Itr.get(in.readLong(), this);
-    }
   },
 
   /** Duration type. */
@@ -573,11 +424,6 @@ public enum BasicType implements Type {
       if(item instanceof final Dur dur) return new Dur(dur);
       if(isString(item)) return new Dur(item.string(info), info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public Dur cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public Dur read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -593,11 +439,6 @@ public enum BasicType implements Type {
       if(item instanceof final Dur dur) return new YMDur(dur);
       if(isString(item)) return new YMDur(item.string(info), info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public YMDur cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public YMDur read(final DataInput in, final QueryContext qc)
@@ -616,11 +457,6 @@ public enum BasicType implements Type {
       throw typeError(item, this, info);
     }
     @Override
-    public DTDur cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
     public DTDur read(final DataInput in, final QueryContext qc)
         throws IOException, QueryException {
       return new DTDur(in.readToken(), null);
@@ -635,11 +471,6 @@ public enum BasicType implements Type {
       if(item.type.oneOf(DATE, DATE_TIME_STAMP)) return new Dtm((ADate) item, DATE_TIME, info);
       if(isString(item)) return new Dtm(item.string(info), DATE_TIME, info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public Dtm cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -657,11 +488,6 @@ public enum BasicType implements Type {
       throw typeError(item, this, info);
     }
     @Override
-    public Dtm cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
     public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
       return new Dtm(in.readToken(), DATE_TIME_STAMP, null);
     }
@@ -675,11 +501,6 @@ public enum BasicType implements Type {
       if(item.type.instanceOf(DATE_TIME)) return new Dat((ADate) item);
       if(isString(item)) return new Dat(item.string(info), info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public Dat cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public Dat read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -697,11 +518,6 @@ public enum BasicType implements Type {
       throw typeError(item, this, info);
     }
     @Override
-    public Tim cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
     public Tim read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
       return new Tim(in.readToken(), null);
     }
@@ -715,11 +531,6 @@ public enum BasicType implements Type {
       if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -737,11 +548,6 @@ public enum BasicType implements Type {
       throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
       return new GDt(in.readToken(), this, null);
     }
@@ -755,11 +561,6 @@ public enum BasicType implements Type {
       if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -777,11 +578,6 @@ public enum BasicType implements Type {
       throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
-    }
-    @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
       return new GDt(in.readToken(), this, null);
     }
@@ -795,11 +591,6 @@ public enum BasicType implements Type {
       if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
-    }
-    @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return cast(Str.get(value, qc, info), qc, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -1009,11 +800,16 @@ public enum BasicType implements Type {
   @Override
   public Item cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    throw FUNCCAST_X_X.get(info, this, value);
+    if(parent == null || oneOf(ANY_ATOMIC_TYPE, ERROR, BINARY)) {
+      throw FUNCCAST_X_X.get(info, this, value);
+    }
+    return cast(Str.get(value, qc, info), qc, info);
   }
 
   @Override
   public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    if(instanceOf(STRING)) return Str.get(qc.shared.token(in.readToken()), this);
+    if(instanceOf(INTEGER)) return Itr.get(in.readLong(), this);
     throw Util.notExpected();
   }
 

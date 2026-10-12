@@ -358,7 +358,8 @@ public final class QueryContext extends Job implements Closeable {
       }
       vars.bindExternal(this, bindings, true);
 
-      return compile(false);
+      compile(false);
+      return null;
     });
   }
 
@@ -384,17 +385,17 @@ public final class QueryContext extends Job implements Closeable {
       }
       if(contextValue != null) finalContext = true;
 
-      return compile(true);
+      compile(true);
+      return null;
     });
   }
 
   /**
    * Compiles the expression.
    * @param dynamic dynamic compilation
-   * @return {@code null}
    * @throws QueryException query exception
    */
-  public Void compile(final boolean dynamic) throws QueryException {
+  public void compile(final boolean dynamic) throws QueryException {
     checkStop();
 
     info.runtime = false;
@@ -428,7 +429,6 @@ public final class QueryContext extends Job implements Closeable {
     } finally {
       info.runtime = true;
     }
-    return null;
   }
 
   /**
@@ -484,7 +484,7 @@ public final class QueryContext extends Job implements Closeable {
     final LockVisitor visitor = new LockVisitor(jobLocks, updating, contextValue == null);
 
     // locks in main module (can be null if parsing failed)
-    boolean local = main == null || main.databases(visitor);
+    boolean local = main == null || main.visit(visitor);
     // thesaurus databases of the full-text options in the prolog
     if(local && ftOpt != null) local = ftOpt.accept(visitor);
     // locks in context expression
@@ -492,7 +492,7 @@ public final class QueryContext extends Job implements Closeable {
       // check if scope may still be overwritten by dynamic context
       if(!finalContext) jobLocks.reads.add(Locking.CONTEXT);
       visitor.resetFocus();
-      local = contextValue.databases(visitor);
+      local = contextValue.visit(visitor);
     }
     // custom locks of the query
     final LockList list = updating ? jobLocks.writes : jobLocks.reads;

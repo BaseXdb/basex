@@ -7,7 +7,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -243,13 +242,12 @@ public abstract class Arr extends ParseExpr {
     exprs = list.next();
 
     // not($a) and not($b) → not($a or $b)
-    final Function not = NOT;
-    final Checks<Expr> fnNot = ex -> not.is(ex) && !(predicate && ex.has(Flag.POS));
+    final Checks<Expr> fnNot = ex -> NOT.is(ex) && !(predicate && ex.has(Flag.POS));
     if(exprs.length > 1 && Checks.all(exprs, fnNot)) {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(expr.arg(0));
       final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
-      exprs = list.add(cc.function(not, info, expr.optimize(cc))).finish();
+      exprs = list.add(cc.function(NOT, info, expr.optimize(cc))).finish();
     }
     return false;
   }
@@ -292,7 +290,7 @@ public abstract class Arr extends ParseExpr {
       return null;
 
     // check if expressions have common operands
-    final java.util.function.Function<Expr, ExprList> entries = ex ->
+    final Function<Expr, ExprList> entries = ex ->
       new ExprList().add(inverse.isInstance(ex) ? ex.args() : new Expr[] { ex });
     final int el = exprs.length;
     final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));
@@ -317,7 +315,7 @@ public abstract class Arr extends ParseExpr {
         // A intersect (A union B) → A
         // (A and B) or (A and B and C) → A
         return left.seqType().type instanceof NodeType && !left.ddo() ?
-          cc.function(Function.DISTINCT_ORDERED_NODES, info, left) : left;
+          cc.function(DISTINCT_ORDERED_NODES, info, left) : left;
       } else if(curr.size() == 1) {
         // single additional test: add this test
         // (A and B) or (A and C) → A and (B or C)

@@ -61,14 +61,8 @@ public final class SmallArray extends TreeArray {
   @Override
   public XQArray removeMember(final long pos, final Job job) {
     job.checkStop();
-    final int ml = members.length;
-    if(ml == 2) return get(members[pos == 0 ? 1 : 0]);
-
-    final int p = (int) pos;
-    final Value[] out = new Value[ml - 1];
-    Array.copy(members, p, out);
-    Array.copy(members, p + 1, ml - 1 - p, out, p);
-    return new SmallArray(out, type);
+    if(members.length == 2) return get(members[pos == 0 ? 1 : 0]);
+    return new SmallArray(Array.remove(members, (int) pos), type);
   }
 
   @Override

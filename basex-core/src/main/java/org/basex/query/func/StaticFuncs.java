@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -65,13 +66,12 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       final Expr expr, final AnnList anns, final String doc, final VarScope vs,
       final InputInfo info) throws QueryException {
 
-    final byte[] modUri = Token.eq(name.uri(), FN_URI) ? FN_URI : QNm.uri(sc.module);
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
     if(get(sc, name, sf.min, sf.arity(), false) != null)
       throw DUPLFUNC_X.get(info, name.prefixString());
 
-    funcsByModule.computeIfAbsent(modUri, QNmMap::new).computeIfAbsent(name, ArrayList::new).
-      add(sf);
+    funcsByModule.computeIfAbsent(moduleUri(sc, name.uri()), QNmMap::new).
+      computeIfAbsent(name, ArrayList::new).add(sf);
     return sf;
   }
 
@@ -111,7 +111,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     } else {
       final JavaCall java = JavaCall.get(name, call.exprs, qc, info);
       if(java == null) throw unknownFunctionError(name, arity, false, info);
-      call.setExternal(java);
+      call.external = java;
       if(java.updating) qc.updating();
     }
   }
@@ -227,8 +227,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   private StaticFunc get(final StaticContext sc, final QNm qname, final int min, final int max,
       final boolean dynamic) {
     final byte[] funcUri = qname.uri();
-    final byte[] modUri = Token.eq(funcUri, FN_URI) ? FN_URI : QNm.uri(sc.module);
-    StaticFunc func = get(modUri, qname, min, max);
+    StaticFunc func = get(moduleUri(sc, funcUri), qname, min, max);
     if(func == null && (dynamic || sc.imports.contains(funcUri))) {
       func = get(funcUri, qname, min, max);
       if(func != null && func.anns.contains(Annotation.PRIVATE)) func = null;
@@ -246,14 +245,32 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @return function if found, {@code null} otherwise
    */
   private StaticFunc get(final byte[] modUri, final QNm qname, final int min, final int max) {
-    final QNmMap<ArrayList<StaticFunc>> funcsByName = funcsByModule.get(modUri);
-    if(funcsByName != null) {
-      final ArrayList<StaticFunc> funcs = funcsByName.get(qname);
-      if(funcs != null) {
-        for(final StaticFunc func : funcs) if(min <= func.arity() && max >= func.min) return func;
-      }
+    for(final StaticFunc func : funcs(modUri, qname)) {
+      if(min <= func.arity() && max >= func.min) return func;
     }
     return null;
+  }
+
+  /**
+   * Returns the functions with the given name from the specified module.
+   * @param modUri module URI
+   * @param qname function name
+   * @return functions
+   */
+  private List<StaticFunc> funcs(final byte[] modUri, final QNm qname) {
+    final QNmMap<ArrayList<StaticFunc>> funcsByName = funcsByModule.get(modUri);
+    final ArrayList<StaticFunc> funcs = funcsByName != null ? funcsByName.get(qname) : null;
+    return funcs != null ? funcs : Collections.emptyList();
+  }
+
+  /**
+   * Returns the URI of the module in which a function is declared or looked up first.
+   * @param sc static context
+   * @param funcUri function URI
+   * @return module URI
+   */
+  private static byte[] moduleUri(final StaticContext sc, final byte[] funcUri) {
+    return Token.eq(funcUri, FN_URI) ? FN_URI : QNm.uri(sc.module);
   }
 
   /**
@@ -292,26 +309,15 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     final StaticFunc sf = get(funcUri, name, arity, arity);
     if(sf != null) return sf.anns.contains(Annotation.PRIVATE) ? FUNCPRIVATE_X.get(info, name)
                                                                : INVISIBLEFUNC_X.get(info, name);
-    final ArrayList<byte[]> modules = new ArrayList<>(2);
-    if(Token.eq(funcUri, FN_URI)) {
-      modules.add(FN_URI);
-    } else {
-      modules.add(QNm.uri(info.sc().module));
-      if(info.sc().imports.contains(funcUri)) modules.add(funcUri);
+    final StaticContext sc = info.sc();
+    final byte[] modUri = moduleUri(sc, funcUri);
+    final ArrayList<StaticFunc> candidates = new ArrayList<>(funcs(modUri, name));
+    if(!Token.eq(funcUri, modUri) && sc.imports.contains(funcUri)) {
+      candidates.addAll(funcs(funcUri, name));
     }
     final IntList arities = new IntList();
-    final ArrayList<StaticFunc> candidates = new ArrayList<>(1);
-    for(final byte[] module : modules) {
-      final QNmMap<ArrayList<StaticFunc>> funcsByName = funcsByModule.get(module);
-      if(funcsByName != null) {
-        final ArrayList<StaticFunc> funcs = funcsByName.get(name);
-        if(funcs != null) {
-          for(final StaticFunc func : funcs) {
-            for(int a = func.min; a <= func.arity(); a++) arities.add(a);
-            candidates.add(func);
-          }
-        }
-      }
+    for(final StaticFunc func : candidates) {
+      for(int a = func.min; a <= func.arity(); a++) arities.add(a);
     }
     if(arities.isEmpty()) return similarError(name, info);
 
@@ -381,33 +387,24 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
 
   @Override
   public Iterator<StaticFunc> iterator() {
-    return new Iterator<>() {
-      final Iterator<QNmMap<ArrayList<StaticFunc>>> modules = funcsByModule.values().iterator();
-      Iterator<ArrayList<StaticFunc>> names = Collections.emptyIterator();
-      Iterator<StaticFunc> funcs = Collections.emptyIterator();
+    return list().iterator();
+  }
 
-      @Override public boolean hasNext() {
-        while(!funcs.hasNext()) {
-          if(names.hasNext()) funcs = names.next().iterator();
-          else if(modules.hasNext()) names = modules.next().values().iterator();
-          else return false;
-        }
-        return true;
-      }
-
-      @Override public StaticFunc next() {
-        if(!hasNext()) throw new NoSuchElementException();
-        return funcs.next();
-      }
-    };
+  /**
+   * Returns all functions.
+   * @return functions
+   */
+  private ArrayList<StaticFunc> list() {
+    final ArrayList<StaticFunc> list = new ArrayList<>();
+    for(final QNmMap<ArrayList<StaticFunc>> funcsByName : funcsByModule.values()) {
+      for(final ArrayList<StaticFunc> funcs : funcsByName.values()) list.addAll(funcs);
+    }
+    return list;
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    if(funcsByModule.isEmpty()) return;
-    final ArrayList<StaticFunc> list = new ArrayList<>();
-    forEach(list::add);
-    plan.add(plan.create(this), list.toArray(StaticFunc[]::new));
+    if(!funcsByModule.isEmpty()) plan.add(plan.create(this), list().toArray(StaticFunc[]::new));
   }
 
   @Override

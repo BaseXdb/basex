@@ -261,14 +261,12 @@ public abstract class Mapping extends Arr {
     if(!next.has(Flag.POS, Flag.HOF)) {
       final InlineContext ic = new InlineContext(null, expr, cc);
       if(ic.inlineable(next)) {
-        Expr inlined;
         try {
-          inlined = ic.inline(next);
+          return ic.inline(next);
         } catch(final QueryException ex) {
           // replace original expression with error
-          inlined = FnError.get(ex);
+          return FnError.get(ex);
         }
-        return inlined;
       }
     }
     return null;

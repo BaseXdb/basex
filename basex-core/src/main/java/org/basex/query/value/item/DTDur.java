@@ -4,11 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.value.item.Dec.*;
 
-import java.io.*;
 import java.math.*;
 import java.util.regex.*;
 
-import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -132,11 +130,6 @@ public final class DTDur extends Dur {
    */
   private void checkSeconds(final InputInfo info) throws QueryException {
     if(!secondsInRange()) throw SECDURRANGE_X.get(info, seconds.doubleValue());
-  }
-
-  @Override
-  public void write(final DataOutput out) throws IOException {
-    out.writeToken(string(null));
   }
 
   /**

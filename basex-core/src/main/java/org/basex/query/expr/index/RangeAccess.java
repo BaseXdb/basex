@@ -68,11 +68,6 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final InlineContext ic) throws QueryException {
-    return inlineDb(ic) ? optimize(ic.cc) : null;
-  }
-
-  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new RangeAccess(info, index, db.copy(cc, vm)));
   }

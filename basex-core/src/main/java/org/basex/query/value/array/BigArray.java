@@ -131,10 +131,7 @@ public final class BigArray extends TreeArray {
       final int p = (int) pos;
       if(ll > MIN_DIGIT) {
         // there is enough space, just delete the member
-        final Value[] newLeft = new Value[ll - 1];
-        Array.copy(left, p, newLeft);
-        Array.copy(left, p + 1, newLeft.length - p, newLeft, p);
-        return new BigArray(newLeft, middle, right, type);
+        return new BigArray(Array.remove(left, p), middle, right, type);
       }
 
       if(middle.isEmpty()) {
@@ -176,10 +173,7 @@ public final class BigArray extends TreeArray {
       final int p = (int) (pos - ro);
       if(rl > MIN_DIGIT) {
         // there is enough space, just delete the member
-        final Value[] newRight = new Value[rl - 1];
-        Array.copy(right, p, newRight);
-        Array.copy(right, p + 1, rl - 1 - p, newRight, p);
-        return new BigArray(left, middle, newRight, type);
+        return new BigArray(left, middle, Array.remove(right, p), type);
       }
 
       if(middle.isEmpty()) {

@@ -327,7 +327,7 @@ public abstract class Step extends Preds {
       ic.cc.get(null, false, () -> ic.inlineOrNull(selector));
     if(s != null) selector = s;
     // predicates are guarded by the existence of a node
-    final boolean preds = ic.cc.ok(this, true, () -> ic.inline(exprs, true));
+    final boolean preds = ic.cc.get(this, true, () -> ic.inline(exprs, true));
     return s != null || preds ? optimize(ic.cc) : null;
   }
 

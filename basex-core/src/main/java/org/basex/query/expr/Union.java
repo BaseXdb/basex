@@ -57,13 +57,8 @@ public final class Union extends Set {
     }
     exprs = list.finish();
 
-    final Expr ex = rewrite(Intersect.class, (invert, ops) ->
+    return rewrite(Intersect.class, (invert, ops) ->
       invert ? new Intersect(info, ops) : new Union(info, ops), cc);
-    if(ex != null) {
-      cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
-      return ex;
-    }
-    return null;
   }
 
   @Override

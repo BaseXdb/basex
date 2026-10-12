@@ -119,7 +119,8 @@ public final class ValueBuilder {
         return this;
       }
       single = null;
-      sb = isItr(sngl) ? itrSeqBuilder(value, capacity) : new ItemSeqBuilder(job);
+      sb = sngl.type == BasicType.INTEGER ? itrSeqBuilder(value, capacity) :
+        new ItemSeqBuilder(job);
       sb = sb.add(sngl);
     }
     builder = sb.add(value);
@@ -164,60 +165,6 @@ public final class ValueBuilder {
    */
   static boolean isStr(final Value value) {
     return value instanceof Str && value.type == BasicType.STRING;
-  }
-
-  /**
-   * Checks if the specified value is an untyped atomic value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isAtm(final Value value) {
-    return value.type == BasicType.UNTYPED_ATOMIC;
-  }
-
-  /**
-   * Checks if the specified value is an integer value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isItr(final Value value) {
-    return value.type == BasicType.INTEGER;
-  }
-
-  /**
-   * Checks if the specified value is a double value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isDbl(final Value value) {
-    return value.type == BasicType.DOUBLE;
-  }
-
-  /**
-   * Checks if the specified value is a float value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isFlt(final Value value) {
-    return value.type == BasicType.FLOAT;
-  }
-
-  /**
-   * Checks if the specified value is a decimal value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isDec(final Value value) {
-    return value.type == BasicType.DECIMAL;
-  }
-
-  /**
-   * Checks if the specified value is a boolean value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isBln(final Value value) {
-    return value.type == BasicType.BOOLEAN;
   }
 
   @Override
@@ -269,7 +216,7 @@ public final class ValueBuilder {
 
     @Override
     public SeqBuilder add(final Item item) {
-      if(isAtm(item)) {
+      if(item.type == BasicType.UNTYPED_ATOMIC) {
         values.add(((Atm) item).string(null));
         return this;
       }
@@ -294,7 +241,7 @@ public final class ValueBuilder {
 
     @Override
     public final SeqBuilder add(final Item item) {
-      return isItr(item) ? add(((Itr) item).itr()) : tree(item);
+      return item.type == BasicType.INTEGER ? add(((Itr) item).itr()) : tree(item);
     }
 
     @Override
@@ -495,7 +442,7 @@ public final class ValueBuilder {
 
     @Override
     public SeqBuilder add(final Item item) {
-      if(isDbl(item)) {
+      if(item.type == BasicType.DOUBLE) {
         values.add(((Dbl) item).dbl());
         return this;
       }
@@ -523,7 +470,7 @@ public final class ValueBuilder {
 
     @Override
     public SeqBuilder add(final Item item) {
-      if(isFlt(item)) {
+      if(item.type == BasicType.FLOAT) {
         values.add(((Flt) item).flt());
         return this;
       }
@@ -551,7 +498,7 @@ public final class ValueBuilder {
 
     @Override
     public SeqBuilder add(final Item item) {
-      if(isDec(item)) {
+      if(item.type == BasicType.DECIMAL) {
         values.add(((Dec) item).dec(null));
         return this;
       }
@@ -579,7 +526,7 @@ public final class ValueBuilder {
 
     @Override
     public SeqBuilder add(final Item item) {
-      if(isBln(item)) {
+      if(item.type == BasicType.BOOLEAN) {
         values.add(((Bln) item).bool(null));
         return this;
       }

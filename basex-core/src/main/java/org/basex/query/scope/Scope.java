@@ -30,10 +30,4 @@ public interface Scope {
    * @throws QueryException query exception
    */
   Expr compile(CompileContext cc) throws QueryException;
-
-  /**
-   * Checks if this scope has already been compiled.
-   * @return result of check
-   */
-  boolean compiled();
 }

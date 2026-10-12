@@ -109,15 +109,6 @@ public class MainModule extends AModule {
     };
   }
 
-  /**
-   * Adds the names of the databases that may be touched by the module.
-   * @param visitor lock visitor
-   * @return result of check
-   */
-  public final boolean databases(final LockVisitor visitor) {
-    return expr.accept(visitor);
-  }
-
   @Override
   public final boolean visit(final ASTVisitor visitor) {
     return expr.accept(visitor);

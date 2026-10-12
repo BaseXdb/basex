@@ -6,10 +6,8 @@ import java.util.*;
 
 import org.basex.core.MainOptions.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -34,11 +32,6 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public AnnList annotations() {
-    return AnnList.EMPTY;
-  }
-
-  @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
     return JavaCall.toValue(value, qc, ii, WrapOptions.NONE);
@@ -47,11 +40,6 @@ public final class XQJava extends FItem {
   @Override
   public byte[] string(final InputInfo ii) {
     return Token.token(Objects.toString(value));
-  }
-
-  @Override
-  public int stackFrameSize() {
-    return 0;
   }
 
   @Override
@@ -73,21 +61,6 @@ public final class XQJava extends FItem {
   @Override
   public QNm paramName(final int pos) {
     return null;
-  }
-
-  @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) {
-    return null;
-  }
-
-  @Override
-  public boolean vacuousBody() {
-    return false;
-  }
-
-  @Override
-  boolean updating() {
-    return false;
   }
 
   @Override

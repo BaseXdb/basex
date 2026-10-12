@@ -113,7 +113,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void optimize() throws QueryException {
-    compile();
+    parse();
     qc.optimize();
   }
 

@@ -249,11 +249,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean compiled() {
-    return true;
-  }
-
-  @Override
   public Object toJava() {
     return this;
   }

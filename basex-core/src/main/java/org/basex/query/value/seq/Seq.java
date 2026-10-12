@@ -3,13 +3,10 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
 import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.data.*;
-import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -283,22 +280,6 @@ public abstract class Seq extends Value {
   }
 
   // STATIC METHODS ===============================================================================
-
-  /**
-   * Creates a value from the input stream.
-   * Called from {@link Stores#read(DataInput, QueryContext)}.
-   * @param in data input
-   * @param type type
-   * @param qc query context
-   * @return value
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public static Value read(final DataInput in, final Type type, final QueryContext qc)
-      throws IOException, QueryException {
-    throw Util.notExpected();
-  }
 
   /**
    * Returns an initial array capacity for the expected result size.

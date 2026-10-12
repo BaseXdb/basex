@@ -288,13 +288,17 @@ public interface Type {
    * Checks if items with this type are numbers.
    * @return result of check
    */
-  boolean isNumber();
+  default boolean isNumber() {
+    return false;
+  }
 
   /**
    * Checks if items with this type are untyped.
    * @return result of check
    */
-  boolean isUntyped();
+  default boolean isUntyped() {
+    return false;
+  }
 
   /**
    * Checks if items with this type are numbers or untyped.
@@ -308,13 +312,17 @@ public interface Type {
    * Checks if items of this type are strings, URIs or untyped.
    * @return result of check
    */
-  boolean isStringOrUntyped();
+  default boolean isStringOrUntyped() {
+    return false;
+  }
 
   /**
    * Checks if items of this type are sortable.
    * @return result of check
    */
-  boolean isSortable();
+  default boolean isSortable() {
+    return false;
+  }
 
   /**
    * Returns the atomic type.
@@ -340,7 +348,9 @@ public interface Type {
    * Checks if the type is namespace-sensitive.
    * @return result of check
    */
-  boolean nsSensitive();
+  default boolean nsSensitive() {
+    return false;
+  }
 
   /**
    * Checks if the type can possibly be refined, e.g. if it has subtypes.

@@ -367,16 +367,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     return declType != null && declType.zero();
   }
 
-  /**
-   * Indicates if an expression has one of the specified compiler properties.
-   * @param flags flags
-   * @return result of check
-   * @see Expr#has(Flag...)
-   */
-  boolean has(final Flag... flags) {
+  @Override
+  public boolean has(final Flag... flags) {
     // function itself does not perform any updates
     final Flag[] flgs = Flag.remove(flags, Flag.UPD);
-    return flgs.length != 0 && check(flgs);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   /**

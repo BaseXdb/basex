@@ -134,16 +134,6 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public boolean isNumber() {
-    return false;
-  }
-
-  @Override
-  public boolean isUntyped() {
-    return false;
-  }
-
-  @Override
   public boolean isStringOrUntyped() {
     return true;
   }
@@ -161,11 +151,6 @@ public final class EnumType implements Type {
   @Override
   public ID id() {
     return ID.ENM;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return false;
   }
 
   @Override

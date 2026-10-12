@@ -1097,7 +1097,7 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    changed |= cc.ok(root, true, () -> {
+    changed |= cc.get(root, true, () -> {
       boolean chngd = false;
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
@@ -1123,7 +1123,7 @@ public abstract class Path extends ParseExpr {
   private Expr mergeSteps(final CompileContext cc) throws QueryException {
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
-    return cc.ok(root, true, () -> {
+    return cc.get(root, true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s];
@@ -1341,7 +1341,7 @@ public abstract class Path extends ParseExpr {
       return null;
     });
 
-    changed |= ic.var != null && cc.ok(focus(rt, cc), true, () -> {
+    changed |= ic.var != null && cc.get(focus(rt, cc), true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s].inline(ic);

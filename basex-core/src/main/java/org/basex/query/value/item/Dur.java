@@ -61,7 +61,9 @@ public class Dur extends ADateDur {
    * @param dur duration
    */
   public Dur(final Dur dur) {
-    this(dur, BasicType.DURATION);
+    this(BasicType.DURATION);
+    months = dur.months;
+    seconds = dur.totalSeconds();
   }
 
   /**
@@ -78,17 +80,6 @@ public class Dur extends ADateDur {
     checkFactor(factor, mult, type, info);
     months = scaleMonths(dur.months, factor, mult, info);
     seconds = scaleSeconds(dur.totalSeconds(), factor, mult);
-  }
-
-  /**
-   * Constructor.
-   * @param dur duration
-   * @param type item type
-   */
-  private Dur(final Dur dur, final Type type) {
-    this(type);
-    months = dur.months;
-    seconds = dur.totalSeconds();
   }
 
   /**

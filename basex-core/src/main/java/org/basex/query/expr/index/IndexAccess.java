@@ -58,6 +58,11 @@ public abstract class IndexAccess extends Simple {
     return db.count(var);
   }
 
+  @Override
+  public Expr inline(final InlineContext ic) throws QueryException {
+    return inlineDb(ic) ? optimize(ic.cc) : null;
+  }
+
   /**
    * Inlines an expression (see {@link Expr#inline(InlineContext)}).
    * @param ic inlining context

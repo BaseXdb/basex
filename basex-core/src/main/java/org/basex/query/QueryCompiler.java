@@ -19,6 +19,8 @@ import org.basex.query.var.*;
 final class QueryCompiler {
   /** Visited scopes. */
   private final Set<Scope> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+  /** Scopes in compilation order (callees first). */
+  private final ArrayList<Scope> order = new ArrayList<>();
   /** Static functions and variables of the query (others belong to bound function items). */
   private final Set<Scope> declared = Collections.newSetFromMap(new IdentityHashMap<>());
   /** Calls of static functions, grouped by function. */
@@ -42,36 +44,23 @@ final class QueryCompiler {
    */
   static void compile(final CompileContext cc) throws QueryException {
     final QueryCompiler qcomp = new QueryCompiler(cc.qc);
-    final ArrayList<Scope> order = new ArrayList<>();
-    qcomp.visit(cc.qc.main, order);
+    qcomp.visit(cc.qc.main);
     if(qcomp.complete) cc.calls = qcomp.calls;
-    for(final Scope scope : order) scope.compile(cc);
+    for(final Scope scope : qcomp.order) scope.compile(cc);
   }
 
   /**
    * Adds the scopes reachable from the specified scope in post-order (callees first).
-   * @param scope current scope
-   * @param order scopes in compilation order
-   */
-  private void visit(final Scope scope, final ArrayList<Scope> order) {
-    if(visited.add(scope)) {
-      scope.reset();
-      for(final Scope neighbor : neighbors(scope)) visit(neighbor, order);
-      order.add(scope);
-    }
-  }
-
-  /**
-   * Fills in all used scopes of the given one.
    * @param curr current scope
-   * @return directly reachable scopes
+   * @return {@code true} for convenience
    */
-  private ArrayList<Scope> neighbors(final Scope curr) {
-    final ArrayList<Scope> neighbors = new ArrayList<>(0);
+  private boolean visit(final Scope curr) {
+    if(!visited.add(curr)) return true;
+    curr.reset();
     curr.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
-        return var != curr && (!declared.contains(var) || add(var));
+        return var != curr && (!declared.contains(var) || visit(var));
       }
 
       @Override
@@ -79,7 +68,7 @@ final class QueryCompiler {
         final StaticFunc func = call.func();
         if(func == null || !declared.contains(func)) return true;
         calls.computeIfAbsent(func, k -> new ArrayList<>(1)).add(call);
-        return add(func);
+        return visit(func);
       }
 
       @Override
@@ -91,7 +80,7 @@ final class QueryCompiler {
 
       @Override
       public boolean funcItem(final FuncItem func) {
-        return add(func);
+        return visit(func);
       }
 
       @Override
@@ -100,17 +89,8 @@ final class QueryCompiler {
         if(!funcItems(value)) complete = false;
         return true;
       }
-
-      /**
-       * Adds a neighbor of the currently inspected scope.
-       * @param scope neighbor
-       * @return {@code true} for convenience
-       */
-      private boolean add(final Scope scope) {
-        neighbors.add(scope);
-        return true;
-      }
     });
-    return neighbors;
+    order.add(curr);
+    return true;
   }
 }

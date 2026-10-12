@@ -290,28 +290,11 @@ public final class CompileContext {
    * @param expr focus expression (can be {@code null})
    * @param item focus single item
    * @param func function to evaluate
-   * @return resulting expression
+   * @param <T> result type
+   * @return result of the function
    * @throws QueryException query exception
    */
-  public Expr get(final Expr expr, final boolean item, final QuerySupplier<Expr> func)
-      throws QueryException {
-    pushFocus(expr, item);
-    try {
-      return func.get();
-    } finally {
-      removeFocus();
-    }
-  }
-
-  /**
-   * Evaluates a function within the focus of the supplied expression.
-   * @param expr focus expression (can be {@code null})
-   * @param item focus single item
-   * @param func function to evaluate
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean ok(final Expr expr, final boolean item, final QuerySupplier<Boolean> func)
+  public <T> T get(final Expr expr, final boolean item, final QuerySupplier<T> func)
       throws QueryException {
     pushFocus(expr, item);
     try {

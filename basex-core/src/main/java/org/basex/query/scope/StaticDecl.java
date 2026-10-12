@@ -52,7 +52,7 @@ public abstract class StaticDecl extends StaticScope {
    * @return result of check
    * @see Expr#has(Flag...)
    */
-  protected final boolean check(final Flag... flags) {
+  public boolean has(final Flag... flags) {
     return expr != null && props.has(flags);
   }
 

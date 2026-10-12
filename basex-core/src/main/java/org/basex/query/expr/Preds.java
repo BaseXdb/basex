@@ -91,7 +91,7 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    return cc.ok(root, true, () -> {
+    return cc.get(root, true, () -> {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();

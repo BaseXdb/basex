@@ -195,7 +195,29 @@ public abstract class FItem extends Item implements XQFunction {
    * Indicates if the function item is updating.
    * @return result of check
    */
-  abstract boolean updating();
+  boolean updating() {
+    return false;
+  }
+
+  @Override
+  public AnnList annotations() {
+    return AnnList.EMPTY;
+  }
+
+  @Override
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+    return null;
+  }
+
+  @Override
+  public boolean vacuousBody() {
+    return false;
+  }
+
+  @Override
+  public int stackFrameSize() {
+    return 0;
+  }
 
   @Override
   public final boolean equals(final Object obj) {

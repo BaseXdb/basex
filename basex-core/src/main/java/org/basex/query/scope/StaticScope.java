@@ -66,7 +66,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     if(string != null) doc = Token.token(string.trim());
   }
 
-  @Override
+  /**
+   * Checks if this scope has already been compiled.
+   * @return result of check
+   */
   public final boolean compiled() {
     return compiled;
   }

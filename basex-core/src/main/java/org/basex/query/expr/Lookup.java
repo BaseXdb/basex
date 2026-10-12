@@ -78,7 +78,7 @@ public final class Lookup extends Arr {
     // pre-evaluate a single-key lookup
     if(is == 1 && inputs instanceof Value && keys instanceof Item) return cc.preEval(this);
 
-    final Expr expr = opt(cc);
+    final Expr expr = opt(tp, cc);
     if(expr != this) return cc.replaceWith(this, expr);
 
     // derive type from input expression
@@ -98,59 +98,57 @@ public final class Lookup extends Arr {
 
   /**
    * Rewrites the lookup to another expression.
+   * @param type type of the input (map or array type)
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr opt(final CompileContext cc) throws QueryException {
+  private Expr opt(final Type type, final CompileContext cc) throws QueryException {
     final Expr inputs = exprs[0], keys = exprs[1];
     final long is = inputs.size();
     final long ks = keys.has(Flag.NDT) ? -1 : keys.atomSize();
     if(ks == 0) return keys;
 
-    final Type it = inputs.seqType().type;
-    final boolean map = it instanceof MapType, array = it instanceof ArrayType;
-    if(map || array) {
-      // keep the lookup if a runtime value could be a strict record that lacks a requested key
-      if(keys != Str.WILDCARD && it instanceof final MapType mt && mayLackField(mt, keys, info)) {
-        return this;
-      }
+    // keep the lookup if a runtime value could be a strict record that lacks a requested key
+    if(keys != Str.WILDCARD && type instanceof final MapType mt && mayLackField(mt, keys, info)) {
+      return this;
+    }
 
-      /* REWRITE LOOKUP:
-       *  MAP?*     → map:items(MAP)
-       *  ARRAY?*   → array:items(ARRAY)
-       *  MAP?KEY   → map:get(INPUT, KEY)
-       *  ARRAY?KEY → array:get(INPUT, KEY) */
-      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == Str.WILDCARD ?
-        cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
-        cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
+    /* REWRITE LOOKUP:
+     *  MAP?*     → map:items(MAP)
+     *  ARRAY?*   → array:items(ARRAY)
+     *  MAP?KEY   → map:get(INPUT, KEY)
+     *  ARRAY?KEY → array:get(INPUT, KEY) */
+    final boolean map = type instanceof MapType;
+    final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == Str.WILDCARD ?
+      cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+      cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
 
-      // single key
-      if(ks == 1) {
-        // single input:  INPUT?KEY → REWRITE(INPUT, KEY)
-        if(is == 1) return rewrite.apply(inputs, keys);
-        // focus-dependent key:  INPUTS?KEY → for $item in INPUTS return REWRITE($item, KEY)
-        if(keys.has(Flag.CTX)) {
-          final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
-          return flwor.finish(inputs, null, rewrite.apply(flwor.ref(flwor.item), keys));
-        }
-        // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
-        return SimpleMap.get(cc, info, inputs,
-            cc.get(inputs, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
-      }
-
-      // multiple deterministic keys, input can be duplicated and is focus-independent
-      if(ks != -1 && inputs.duplicable() && !inputs.has(Flag.CTX)) {
-        // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
-        if(is == 1) return SimpleMap.get(cc, info, keys,
-            cc.get(keys, true, () -> rewrite.apply(inputs, ContextValue.get(cc, info))));
-        // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
+    // single key
+    if(ks == 1) {
+      // single input:  INPUT?KEY → REWRITE(INPUT, KEY)
+      if(is == 1) return rewrite.apply(inputs, keys);
+      // focus-dependent key:  INPUTS?KEY → for $item in INPUTS return REWRITE($item, KEY)
+      if(keys.has(Flag.CTX)) {
         final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
-        final Expr next = cc.get(keys, true, () ->
-          rewrite.apply(flwor.ref(flwor.item), ContextValue.get(cc, info)));
-        final Expr rtrn = SimpleMap.get(cc, info, keys, next);
-        return flwor.finish(inputs, null, rtrn);
+        return flwor.finish(inputs, null, rewrite.apply(flwor.ref(flwor.item), keys));
       }
+      // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
+      return SimpleMap.get(cc, info, inputs,
+          cc.get(inputs, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
+    }
+
+    // multiple deterministic keys, input can be duplicated and is focus-independent
+    if(ks != -1 && inputs.duplicable() && !inputs.has(Flag.CTX)) {
+      // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
+      if(is == 1) return SimpleMap.get(cc, info, keys,
+          cc.get(keys, true, () -> rewrite.apply(inputs, ContextValue.get(cc, info))));
+      // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
+      final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
+      final Expr next = cc.get(keys, true, () ->
+        rewrite.apply(flwor.ref(flwor.item), ContextValue.get(cc, info)));
+      final Expr rtrn = SimpleMap.get(cc, info, keys, next);
+      return flwor.finish(inputs, null, rtrn);
     }
     return this;
   }

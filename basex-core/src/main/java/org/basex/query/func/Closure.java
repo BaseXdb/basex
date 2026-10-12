@@ -493,11 +493,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     });
   }
 
-  @Override
-  public boolean compiled() {
-    return compiled;
-  }
-
   /**
    * Returns an iterator over the non-local bindings of this closure.
    * @return iterator
