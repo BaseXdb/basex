@@ -55,7 +55,7 @@ public abstract class WsTest extends HTTPTest {
    */
   protected static void register(final String functions) throws Exception {
     final String webpath = context.soptions.get(StaticOptions.WEBPATH);
-    for(final IOFile f : new IOFile(webpath).children()) assertTrue(f.delete());
+    for(final IOFile f : new IOFile(webpath).children()) IOFile.delete(f.file().toPath(), null);
     final IOFile module = new IOFile(webpath, NAME + count++ + IO.XQMSUFFIX);
     module.write(HEADER + functions);
     WebModules.get(context).init(false);

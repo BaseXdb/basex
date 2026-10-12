@@ -268,6 +268,7 @@ paste                = Yapıştır
 path                 = Yol
 path_index           = Yol İndeksi
 path_invalid_%       = Yol '%' geçersiz
+path_is_dir_%        = Yol '%' bir dizini gösteriyor
 paths                = Yollar
 perm_required_%      = % yetkisi gerekli
 perm_unknown_%       = % yetkisi bilinmiyor

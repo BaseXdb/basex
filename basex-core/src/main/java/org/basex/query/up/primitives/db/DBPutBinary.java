@@ -46,7 +46,7 @@ public final class DBPutBinary extends DBUpdate {
   public void apply() throws QueryException {
     for(final byte[] path : paths) {
       final IOFile bin = data.meta.file(string(path), ResourceType.BINARY);
-      if(bin.isDir()) bin.delete();
+      if(bin.isDir()) throw DB_PATH_DIR_X.get(info, path);
       final Object source = paths.get(path);
       try(InputStream is = source instanceof final Bin b ? b.input(info) :
           ((IO) source).inputStream()) {

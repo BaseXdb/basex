@@ -274,20 +274,49 @@ final class Docs {
    * @return PRE value, or {@code -1} if the document does not exist or if the path is invalid
    */
   synchronized int doc(final String path) {
-    final String pth = MetaData.normPath(path);
-    if(pth != null && !pth.isEmpty()) {
-      final byte[] npth = key(normalize(token(pth)));
+    final int f = first(path);
+    return f == -1 ? -1 : docs().get(order()[f]);
+  }
+
+  /**
+   * Returns the PRE values of all document nodes whose path equals the specified path.
+   * @param path input path
+   * @return PRE values
+   */
+  synchronized IntList docsAt(final String path) {
+    final IntList il = new IntList();
+    final int f = first(path);
+    if(f != -1) {
       final TokenList paths = paths();
+      final IntList docs = docs();
       final int[] order = order();
-      int l = 0, h = order.length - 1;
-      while(l <= h) {
-        final int m = l + h >>> 1, o = order[m], c = compare(key(paths.get(o)), npth);
-        if(c == 0) return docs().get(o);
-        if(c < 0) l = m + 1;
-        else h = m - 1;
+      final byte[] key = key(paths.get(order[f]));
+      for(int o = f; o < order.length && eq(key(paths.get(order[o])), key); o++) {
+        il.add(docs.get(order[o]));
       }
     }
-    return -1;
+    return il.sort();
+  }
+
+  /**
+   * Returns the position of the first entry in the path order that matches the specified path.
+   * @param path input path
+   * @return position, or {@code -1} if no document has this path or if the path is invalid
+   */
+  private int first(final String path) {
+    final String pth = MetaData.normPath(path);
+    if(pth == null || pth.isEmpty()) return -1;
+    final byte[] npth = key(normalize(token(pth)));
+    final TokenList paths = paths();
+    final int[] order = order();
+    final int ol = order.length;
+    int l = 0, h = ol;
+    while(l < h) {
+      final int m = l + h >>> 1;
+      if(compare(key(paths.get(order[m])), npth) < 0) l = m + 1;
+      else h = m;
+    }
+    return l < ol && eq(key(paths.get(order[l])), npth) ? l : -1;
   }
 
   /**

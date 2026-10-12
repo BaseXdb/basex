@@ -530,14 +530,26 @@ public class CommandTest extends SandboxTest {
     no(new Put(".", "<a/>"));
     no(new Put("..", "<a/>"));
     no(new Put("/", "<a/>"));
-    // create and replace binary file
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('44415441')", "path")));
-    ok(new Put("path", "<b/>"));
-    assertFalse(ok(new XQuery(_DB_GET.args(NAME))).isEmpty());
-    ok(new XQuery(_DB_GET_BINARY.args(NAME, "path")));
     // a failing replace should not remove existing documents
     no(new Put(FN, "<a>"));
     assertEquals("1", ok(new XQuery(count)));
+    // replace binary and value resources with XML document
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('44415441')", "path")));
+    ok(new XQuery(_DB_PUT_VALUE.args(NAME, 1, "path")));
+    ok(new Put("path", "<b/>"));
+    assertEquals("xml", ok(new XQuery(_DB_LIST_DETAILS.args(NAME, "path") + "/@type/string()")));
+    // keep resources below the path
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('44')", "dir/bin")));
+    ok(new Put("dir/doc.xml", "<c/>"));
+    ok(new Put("dir", "<d/>"));
+    assertEquals("dir/doc.xml dir dir/bin",
+        ok(new XQuery("string-join(" + _DB_LIST.args(NAME, "dir") + ", ' ')")));
+    no(new BinaryPut("dir", FILE));
+    // replace value resource with binary resource
+    ok(new XQuery(_DB_PUT_VALUE.args(NAME, 1, "val")));
+    ok(new BinaryPut("val", FILE));
+    assertEquals("binary", ok(new XQuery(_DB_LIST_DETAILS.args(NAME, "val") +
+        "/@type/string()")));
     // GH-2459
     try {
       ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", FN)));

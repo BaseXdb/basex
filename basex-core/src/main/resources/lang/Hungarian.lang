@@ -268,6 +268,7 @@ paste                = Beillesztés
 path                 = Útvonal
 path_index           = Útvonalösszegzés
 path_invalid_%       = '%' útvonal érvénytelen.
+path_is_dir_%        = '%' útvonal egy könyvtárra mutat.
 paths                = Útvonalak
 perm_required_%      = % jogosultság szükséges.
 perm_unknown_%       = % jogosultság ismeretlen.

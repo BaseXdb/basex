@@ -268,6 +268,7 @@ paste                = 粘贴
 path                 = 路径
 path_index           = 路径索引
 path_invalid_%       = '%'路径无效
+path_is_dir_%        = '%'路径指向一个目录
 paths                = 路径
 perm_required_%      = 需要%权限
 perm_unknown_%       = 不知道%权限

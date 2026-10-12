@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.index.resource.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
@@ -30,32 +29,33 @@ public final class DbPut extends DbNew {
     final String path = toDbPath(arg(2), qc);
     final XQMap options = toEmptyMap(arg(3), qc);
 
-    final Updates updates = qc.updates();
-    final IntList docs = data.resources.docs(path);
-    int d = 0;
-
-    if(put(docs, data, path, options)) {
-      if(input instanceof Bin) {
-        // store binary resource
+    if(input instanceof Bin) {
+      // store binary resource
+      final IntList docs = data.resources.docsAt(path);
+      if(put(docs, data.resources.files(path), options)) {
         if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-        updates.add(new DBPutBinary(data, input, path, info), qc);
-      } else {
-        // store XML document: replace existing document or add new one
-        final NewInput ni = toNewInput(input, path, qc);
-        final Update update = docs.isEmpty() ?
-          new DBAdd(data, options, true, qc, info, ni) :
-          new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
-        updates.add(update, qc);
-
-        // delete file resources
-        for(final ResourceType type : Resources.BINARIES) {
-          final IOFile bin = data.meta.file(path, type);
-          if(bin != null) updates.add(new DBDelete(data, bin, type, info), qc);
-        }
+        putFile(data, docs, path, ResourceType.BINARY, new DBPutBinary(data, input, path, info),
+            qc);
       }
-      // delete spare documents
-      final int ds = docs.size();
-      for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
+    } else {
+      // directories and archives replace all documents at and below the path
+      final NewInput ni = toNewInput(input, path, qc);
+      final boolean tree = ni.io != null && (ni.io.isDir() || ni.io.isArchive());
+      final IntList docs = tree ? data.resources.docs(path) : data.resources.docsAt(path);
+      if(put(docs, tree ? 0 : data.resources.files(path), options)) {
+        // store XML documents: replace existing document or add new ones
+        final Updates updates = qc.updates();
+        final XQMap opts = options.remove(REPLACE);
+        int d = 0;
+        final Update update = docs.isEmpty() ?
+          new DBAdd(data, opts, true, qc, info, ni) :
+          new ReplaceDoc(docs.get(d++), data, ni, opts, qc, info);
+        updates.add(update, qc);
+        if(!tree) deleteFiles(data, path, null, qc);
+        // delete spare documents
+        final int ds = docs.size();
+        for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
+      }
     }
     return Empty.VALUE;
   }

@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Grant;
+import org.basex.core.cmd.XQuery;
 import org.basex.http.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -408,6 +409,21 @@ public final class WebDAVTest extends WebappTest {
     // XML input is still parsed
     send(204, "PUT", DB + "/a.xml", "<doc/>", "application/xml");
     assertEquals("<doc/>", send(200, "GET", DB + "/a.xml", null, null).body());
+  }
+
+  /**
+   * Tests that a resource is looked up by its exact path, ignoring documents below it.
+   * @throws Exception exception
+   */
+  @Test public void resourceAboveDocuments() throws Exception {
+    send(201, "MKCOL", DB, null, null);
+    new XQuery("db:put-binary('" + DB + "', xs:hexBinary('42'), 'a'), " +
+      "db:add('" + DB + "', <b/>, 'a/b.xml'), " +
+      "db:add('" + DB + "', <c/>, 'c/d.xml'), " +
+      "db:add('" + DB + "', <c/>, 'c')").execute(HTTPContext.get().context());
+
+    assertEquals("B", send(200, "GET", DB + "/a", null, null).body());
+    assertEquals("<c/>", send(200, "GET", DB + "/c", null, null).body());
   }
 
   /**

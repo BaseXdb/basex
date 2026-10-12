@@ -268,6 +268,7 @@ paste                = Wklej
 path                 = Ścieżka
 path_index           = Indeks ścieżek
 path_invalid_%       = Ścieżka '%' jest nieprawidłowa.
+path_is_dir_%        = Ścieżka '%' wskazuje na katalog.
 paths                = Ścieżki
 perm_required_%      = Wymagane uprawnienie %.
 perm_unknown_%       = Uprawnienie % jest nieznane.

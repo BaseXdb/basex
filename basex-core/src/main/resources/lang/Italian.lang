@@ -268,6 +268,7 @@ paste                = Incolla
 path                 = Percorso
 path_index           = Indice strutturale
 path_invalid_%       = Percorso '%' invalido.
+path_is_dir_%        = Percorso '%' punta a una directory.
 paths                = Percorsi
 perm_required_%      = % permessi richiesti.
 perm_unknown_%       = % permesso sconosciuto.

@@ -252,6 +252,8 @@ public enum QueryError {
   /** Error code. */
   DB_PATH_X(DB, "path", "Invalid path: %."),
   /** Error code. */
+  DB_PATH_DIR_X(DB, "path", "Path points to a directory: %."),
+  /** Error code. */
   DB_PROPERTY_X(DB, "property", "Unknown database property: %."),
   /** Error code. */
   DB_RANGE_X_X(DB, "range", "Database '%' value out of range: %."),

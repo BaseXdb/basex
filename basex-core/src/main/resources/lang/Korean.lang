@@ -268,6 +268,7 @@ paste                = 붙여넣기
 path                 = 경로
 path_index           = 경로 색인
 path_invalid_%       = 경로 '%'이(가) 유효하지 않습니다.
+path_is_dir_%        = 경로 '%'이(가) 디렉터리를 가리킵니다.
 paths                = 경로
 perm_required_%      = % 권한이 필요합니다.
 perm_unknown_%       = % 권한을 알 수 없습니다.

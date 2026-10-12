@@ -3,6 +3,7 @@ package org.basex.index.resource;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.hash.*;
@@ -104,6 +105,15 @@ public final class Resources {
   }
 
   /**
+   * Returns the PRE values of all document nodes whose path equals the specified path.
+   * @param path input path
+   * @return PRE values
+   */
+  public synchronized IntList docsAt(final String path) {
+    return docs.docsAt(path);
+  }
+
+  /**
    * Returns the PRE value of the document node that matches the specified path.
    * @param path input path
    * @return PRE value or {@code -1}
@@ -123,6 +133,43 @@ public final class Resources {
   }
 
   /**
+   * Returns the file of an existing file resource.
+   * @param path path
+   * @param type resource type
+   * @return file, or {@code null} if no file exists at the specified path
+   */
+  public IOFile file(final String path, final ResourceType type) {
+    final IOFile file = data.meta.file(path, type);
+    return file != null && file.exists() && !file.isDir() ? file : null;
+  }
+
+  /**
+   * Returns the number of existing file resources at the specified path.
+   * @param path path
+   * @return number of files
+   */
+  public int files(final String path) {
+    int files = 0;
+    for(final ResourceType type : BINARIES) {
+      if(file(path, type) != null) files++;
+    }
+    return files;
+  }
+
+  /**
+   * Deletes an existing file resource and the directories that have been emptied.
+   * @param path path
+   * @param type resource type
+   */
+  public void delete(final String path, final ResourceType type) {
+    final IOFile file = file(path, type);
+    if(file != null) {
+      file.delete();
+      file.parent().deleteEmpty(data.meta.dir(type));
+    }
+  }
+
+  /**
    * Determines whether the given path is the path to a directory.
    * @param path given path
    * @return result of check
@@ -130,6 +177,16 @@ public final class Resources {
   public synchronized boolean isDir(final String path) {
     return docs.isDir(path) || Binaries.isDir(data, path, ResourceType.BINARY) ||
         Binaries.isDir(data, path, ResourceType.VALUE);
+  }
+
+  /**
+   * Determines whether the given path is the path to a directory of file resources.
+   * @param path given path
+   * @param type resource type
+   * @return result of check
+   */
+  public boolean isDir(final String path, final ResourceType type) {
+    return Binaries.isDir(data, path, type);
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.*;
@@ -21,6 +22,6 @@ public final class DbPutValue extends DbPutBinary {
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw DB_PATH_X.get(info, path);
-    return put(data, path, new DBPut(data, input.shrink(qc), path, info), qc);
+    return put(data, path, ResourceType.VALUE, new DBPut(data, input.shrink(qc), path, info), qc);
   }
 }

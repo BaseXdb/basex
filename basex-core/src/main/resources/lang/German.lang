@@ -268,6 +268,7 @@ paste                = Einfügen
 path                 = Pfad
 path_index           = Pfadindex
 path_invalid_%       = Der Pfad '%' ist ungültig.
+path_is_dir_%        = Der Pfad '%' verweist auf ein Verzeichnis.
 paths                = Pfade
 perm_required_%      = %-Recht benötigt.
 perm_unknown_%       = %-Recht ist unbekannt.

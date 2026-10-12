@@ -268,6 +268,7 @@ paste                = 貼り付け
 path                 = パス
 path_index           = パスサマリー
 path_invalid_%       = '%' は不正なパスです。
+path_is_dir_%        = '%' はディレクトリを指しています。
 paths                = パス
 perm_required_%      = % パーミッションが必要です。
 perm_unknown_%       = % は不明なパーミッションです。

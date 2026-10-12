@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.*;
@@ -1164,6 +1165,10 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('787878')", "10.xml"));
     query(func.args(NAME, "<z/>", "10.xml", " { 'replace': false() }"));
     query(_DB_GET.args(NAME, "10.xml"), "");
+    query(func.args(NAME, "<x/>", "11.xml", " { 'replace': false() }"));
+    query(_DB_GET.args(NAME, "11.xml"), "<x/>");
+    query(func.args(NAME, "<y/>", "11.xml", " { 'replace': true() }"));
+    query(_DB_GET.args(NAME, "11.xml"), "<y/>");
   }
 
   /** Replacing a document must not inflate the reported document count (meta.ndocs). */
@@ -1252,6 +1257,60 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);
     error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), DB_PATH_X);
+  }
+
+  /** Put operations only replace resources at the exact path. */
+  @Test public void putExactPath() {
+    final String list = "string-join(" + _DB_LIST_DETAILS.args(NAME, "a") +
+        " ! `{ @type }:{ . }`, ' ')";
+    query(_DB_ADD.args(NAME, " <b/>", "a/b.xml"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "a"));
+    query(list, "xml:a/b.xml binary:a");
+    query(_DB_PUT.args(NAME, " <a/>", "a"));
+    query(list, "xml:a/b.xml xml:a");
+    query(_DB_PUT_VALUE.args(NAME, 1, "a"));
+    query(list, "xml:a/b.xml value:a");
+    query(_DB_PUT.args(NAME, " <a/>", "a", " { 'replace': false() }"));
+    query(list, "xml:a/b.xml value:a");
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "a"));
+    query(list, "xml:a/b.xml binary:a");
+    query(_DB_PUT_VALUE.args(NAME, 1, "a"));
+    query(list, "xml:a/b.xml value:a");
+    query(_DB_PUT.args(NAME, " xs:hexBinary('41')", "a"));
+    query(list, "xml:a/b.xml binary:a");
+
+    // duplicate documents are merged
+    query(_DB_ADD.args(NAME, " <x/>", "x") + ',' + _DB_ADD.args(NAME, " <y/>", "x"));
+    query(_DB_PUT.args(NAME, " <z/>", "x"));
+    query(_DB_GET.args(NAME, "x"), "<z/>");
+
+    // file resources cannot replace directories
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "dir/bin"));
+    error(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "dir"), DB_PATH_DIR_X);
+    error(_DB_PUT.args(NAME, " xs:hexBinary('41')", "dir"), DB_PATH_DIR_X);
+    query(_DB_PUT.args(NAME, " <dir/>", "dir"));
+    query(_DB_LIST.args(NAME, "dir"), "dir\ndir/bin");
+    query(_DB_PUT_VALUE.args(NAME, 1, "val/x"));
+    error(_DB_PUT_VALUE.args(NAME, 1, "val"), DB_PATH_DIR_X);
+    error(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "y/z") + ',' +
+        _DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "y"), DB_PATH_DIR_X);
+  }
+
+  /**
+   * Directory inputs replace all documents at and below the path.
+   * @throws IOException I/O exception
+   */
+  @Test public void putDirectory() throws IOException {
+    final IOFile dir = new IOFile(sandbox(), "input");
+    new IOFile(dir, "a.xml").write("<a/>");
+    new IOFile(dir, "sub/b.xml").write("<b/>");
+    final String list = "string-join(" + _DB_LIST.args(NAME, "t") + ", ' ')";
+    query(_DB_ADD.args(NAME, " <old/>", "t/old.xml"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "t"));
+    query(_DB_PUT.args(NAME, dir.path(), "t"));
+    query(list, "t/a.xml t/sub/b.xml t");
+    query(_DB_PUT.args(NAME, dir.path(), "t"));
+    query(list, "t/a.xml t/sub/b.xml t");
   }
 
   /** Test method. */

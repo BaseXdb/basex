@@ -65,28 +65,30 @@ public final class BinaryPut extends ACreate {
     if(data.inMemory()) return error(NO_MAINMEM);
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
-    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
     final String pth = path;
-    return update(data, () -> put(data, bin, pth));
+    return update(data, () -> put(data, pth));
   }
 
   /**
    * Puts a binary resource in the specified database.
    * @param data database
-   * @param bin binary file (can be {@code null})
    * @param path target path
    * @return success flag
    * @throws IOException I/O exception
    */
-  private boolean put(final Data data, final IOFile bin, final String path) throws IOException {
-    final IntList docs = data.resources.docs(path);
-    if(options.get(MainOptions.REPLACE) || docs.isEmpty() && !bin.exists()) {
+  private boolean put(final Data data, final String path) throws IOException {
+    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
+    if(bin.isDir()) return error(PATH_IS_DIR_X, path);
+
+    final IntList docs = data.resources.docsAt(path);
+    if(options.get(MainOptions.REPLACE) || docs.isEmpty() && data.resources.files(path) == 0) {
       // delete XML documents
       final AtomicUpdateCache auc = new AtomicUpdateCache(data);
       for(final int pre : docs.toArray()) auc.addDelete(pre);
       auc.execute(false);
 
       put(in, bin);
+      data.resources.delete(path, ResourceType.VALUE);
     }
     return info(QUERY_EXECUTED_X_X, "", jc().performance);
   }

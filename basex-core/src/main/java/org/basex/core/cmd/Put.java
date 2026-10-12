@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.function.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -46,8 +45,8 @@ public final class Put extends ACreate {
   @Override
   protected boolean run() {
     // check if the input source has already been initialized
-    if(in == null) {
-      final IO io = IO.get(args[1]);
+    final IO io = in == null ? IO.get(args[1]) : null;
+    if(io != null) {
       if(io.isExternal() && !context.user().has(Perm.CREATE)) {
         return error(PERM_REQUIRED_X, Perm.CREATE);
       }
@@ -59,64 +58,53 @@ public final class Put extends ACreate {
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
-    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
-
-    return update(data, () -> put(data, bin, path));
+    final boolean tree = io != null && (io.isDir() || io.isArchive());
+    return update(data, () -> put(data, path, tree));
   }
 
   /**
-   * Puts (adds or replaces) resources in the specified database.
+   * Puts (adds or replaces) XML documents in the specified database.
    * @param data database
-   * @param bin binary file (can be {@code null})
    * @param path target path
+   * @param tree replace all documents at and below the path
    * @return success flag
    */
-  private boolean put(final Data data, final IOFile bin, final String path) {
-    final IntList docs = data.resources.docs(path);
-    final int ds = docs.size();
-    int bs = 0;
+  private boolean put(final Data data, final String path, final boolean tree) {
+    final IntList docs = tree ? data.resources.docs(path) : data.resources.docsAt(path);
+    final int ds = docs.size(), fs = tree ? 0 : data.resources.files(path);
 
-    if(options.get(MainOptions.REPLACE) || docs.isEmpty() && (bin == null || !bin.exists())) {
-      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-      final IntConsumer exec = start -> {
-        for(int d = start; d < ds; d++) auc.addDelete(docs.get(d));
-        auc.execute(false);
-      };
-
-      if(bin != null && bin.exists()) {
-        // replace binary file if it already exists
-        final BinaryPut put = new BinaryPut(path);
-        put.setInput(in);
-        put.lock = false;
-        if(!put.run(context)) return error(put.info());
-        bs = 1;
-        exec.accept(0);
-      } else {
-        // otherwise, add new document as xml
-        add = new Add(path);
+    if(options.get(MainOptions.REPLACE) || ds + fs == 0) {
+      add = new Add(path);
+      try {
+        add.setInput(in);
+        add.init(context, out);
         try {
-          add.setInput(in);
-          add.init(context, out);
-          try {
-            if(!pushJob(add).build()) return error(add.info());
-          } finally {
-            popJob();
-          }
-
-          final DataClip clip = new DataClip(add.tmpData);
-          int d = 0;
-          if(docs.isEmpty()) {
-            auc.addInsert(data.nodes(), -1, clip);
-          } else {
-            auc.addReplace(docs.get(d++), clip);
-          }
-          exec.accept(d);
+          if(!pushJob(add).build()) return error(add.info());
         } finally {
-          add.finish();
+          popJob();
         }
+
+        // replace existing document or add new one, delete spare documents
+        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+        final DataClip clip = new DataClip(add.tmpData);
+        int d = 0;
+        if(docs.isEmpty()) {
+          auc.addInsert(data.nodes(), -1, clip);
+        } else {
+          auc.addReplace(docs.get(d++), clip);
+        }
+        for(; d < ds; d++) auc.addDelete(docs.get(d));
+        auc.execute(false);
+      } finally {
+        add.finish();
+      }
+
+      // delete binary and value resources with the same path
+      if(!tree) {
+        for(final ResourceType type : Resources.BINARIES) data.resources.delete(path, type);
       }
     }
-    return info(RES_REPLACED_X_X, ds + bs, jc().performance);
+    return info(RES_REPLACED_X_X, ds + fs, jc().performance);
   }
 
   @Override

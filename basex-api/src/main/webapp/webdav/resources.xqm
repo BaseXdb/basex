@@ -124,12 +124,30 @@ declare function res:lookup(
   } else if ($ref?path = '') {
     res:collection($db, '', $db)
   } else if (db:exists($db, $ref?path)) {
-    res:resource($db, $ref?path, db:list-details($db, $ref?path)[1])
+    res:resource($db, $ref?path, res:at(db:list-details($db, $ref?path), string#1, $ref?path))
   } else if (exists(db:list($db, $ref?path))) {
     res:collection($db, $ref?path, res:name($ref?path))
   } else {
     ()
   }
+};
+
+(:~
+ : Picks the first item stored exactly at a path, falling back to a case-insensitive match.
+ : @param  $items  items stored at or below the path
+ : @param  $key    function returning the database path of an item
+ : @param  $path   database path
+ : @return item
+ :)
+declare function res:at(
+  $items  as item()*,
+  $key    as fn(item()) as xs:string,
+  $path   as xs:string
+) as item()? {
+  head((
+    $items[$key(.) = $path],
+    $items[lower-case($key(.)) = lower-case($path)]
+  ))
 };
 
 (:~
@@ -209,7 +227,7 @@ declare function res:content(
   $rc  as res:resource
 ) as item() {
   switch ($rc?type)
-    case 'xml' return db:get($rc?db, $rc?path)
+    case 'xml' return res:at(db:get($rc?db, $rc?path), db:path#1, $rc?path)
     case 'value' return db:get-value($rc?db, $rc?path)
     default return db:get-binary($rc?db, $rc?path)
 };

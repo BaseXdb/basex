@@ -3,11 +3,10 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.query.*;
-import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
-import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -29,7 +28,7 @@ public class DbPutBinary extends DbNew {
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw DB_PATH_X.get(info, path);
     final Object source = toBinarySource(input, qc);
-    return put(data, path, new DBPutBinary(data, source, path, info), qc);
+    return put(data, path, ResourceType.BINARY, new DBPutBinary(data, source, path, info), qc);
   }
 
   /**
@@ -37,23 +36,18 @@ public class DbPutBinary extends DbNew {
    * and the target path beforehand.
    * @param data data reference
    * @param path target path
+   * @param type resource type
    * @param up update to perform
    * @param qc query context
    * @return empty value
    * @throws QueryException query exception
    */
-  final Empty put(final Data data, final String path, final Update up, final QueryContext qc)
-      throws QueryException {
+  final Empty put(final Data data, final String path, final ResourceType type, final Update up,
+      final QueryContext qc) throws QueryException {
 
     final XQMap options = toEmptyMap(arg(3), qc);
-    final IntList docs = data.resources.docs(path);
-    if(put(docs, data, path, options)) {
-      // delete XML resources
-      final Updates updates = qc.updates();
-      for(final int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);
-      // add binary resource
-      updates.add(up, qc);
-    }
+    final IntList docs = data.resources.docsAt(path);
+    if(put(docs, data.resources.files(path), options)) putFile(data, docs, path, type, up, qc);
     return Empty.VALUE;
   }
 }

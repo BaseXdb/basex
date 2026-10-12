@@ -621,6 +621,8 @@ public interface Text {
   String NAME_INVALID_X = lang("name_invalid_%");
   /** Path invalid. */
   String PATH_INVALID_X = lang("path_invalid_%");
+  /** Path points to a directory. */
+  String PATH_IS_DIR_X = lang("path_is_dir_%");
   /** Database pinned. */
   String DB_PINNED_X = lang("db_pinned_%");
   /** Database updated. */

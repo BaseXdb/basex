@@ -12,7 +12,10 @@ import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -29,6 +32,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class DbNew extends DbAccessFn {
+  /** Key of the replace option. */
+  static final Str REPLACE = Str.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH));
+
   /**
    * Creates a container for the specified XML input. Used by functions that only accept
    * documents/nodes or IO references parsed as XML (e.g. db:add, db:put).
@@ -194,22 +200,52 @@ abstract class DbNew extends DbAccessFn {
   /**
    * Checks if a PUT operation should be performed.
    * @param docs existing documents
-   * @param data data reference
-   * @param path target path
+   * @param files number of existing file resources
    * @param options options
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean put(final IntList docs, final Data data, final String path,
-      final XQMap options) throws QueryException {
-    final Value pr = options.get(Str.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH)));
+  final boolean put(final IntList docs, final int files, final XQMap options)
+      throws QueryException {
+    final Value pr = options.get(REPLACE);
     if(pr.isEmpty() || Strings.toBoolean(Options.serialize(pr, info))) return true;
 
-    boolean add = docs.isEmpty();
+    return docs.isEmpty() && files == 0;
+  }
+
+  /**
+   * Deletes the file resources at the specified path.
+   * @param data data reference
+   * @param path target path
+   * @param keep resource type to keep (can be {@code null})
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final void deleteFiles(final Data data, final String path, final ResourceType keep,
+      final QueryContext qc) throws QueryException {
     for(final ResourceType type : Resources.BINARIES) {
-      final IOFile bin = data.meta.file(path, type);
-      add &= bin == null || !bin.exists();
+      if(type == keep) continue;
+      final IOFile file = data.resources.file(path, type);
+      if(file != null) qc.updates().add(new DBDelete(data, file, type, info), qc);
     }
-    return add;
+  }
+
+  /**
+   * Stores a file resource and deletes the other resources at its path.
+   * @param data data reference
+   * @param docs documents at the target path
+   * @param path target path
+   * @param type resource type
+   * @param up update that stores the resource
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final void putFile(final Data data, final IntList docs, final String path,
+      final ResourceType type, final Update up, final QueryContext qc) throws QueryException {
+    if(data.resources.isDir(path, type)) throw DB_PATH_DIR_X.get(info, path);
+    final Updates updates = qc.updates();
+    for(final int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);
+    updates.add(up, qc);
+    deleteFiles(data, path, type, qc);
   }
 }

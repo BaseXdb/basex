@@ -268,6 +268,7 @@ paste                = Coller
 path                 = Chemin
 path_index           = Index des chemins
 path_invalid_%       = Chemin '%' est invalide.
+path_is_dir_%        = Chemin '%' désigne un répertoire.
 paths                = Chemins
 perm_required_%      = Permission % requise.
 perm_unknown_%       = La permission %  est inconnue.
