@@ -4771,7 +4771,7 @@ public class QueryParser extends InputParser {
         opt.set(ST, using);
       } else if(wsConsumeWs(THESAURUS)) {
         if(opt.th != null) throw error(FTDUP_X, THESAURUS);
-        opt.th = new ThesList();
+        opt.th = new ThesList(!using);
         if(using) {
           final boolean par = wsConsume("(");
           if(!wsConsumeWs(DEFAULT)) ftThesaurusID(opt.th);

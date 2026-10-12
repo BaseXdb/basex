@@ -90,7 +90,7 @@ public final class FTWords extends FTExpr {
     }
     query = query.compile(cc);
     if(db != null) db.compile(cc);
-    if(ftOpt == null) ftOpt = cc.qc.ftOpt().copy();
+    if(ftOpt == null) ftOpt = cc.ftOpt.copy();
 
     return optimize(cc);
   }
@@ -206,11 +206,11 @@ public final class FTWords extends FTExpr {
    * @param ftt full-text tokenizer
    * @param data data reference
    * @param qc query context
-   * @return iterator, or {@code null} if all tokens are stop words
+   * @return iterator, or {@code null} if the term has no tokens to be looked up
    */
   private FTIndexIterator iter(final FTLexer lexer, final FTTokenizer ftt, final Data data,
       final QueryContext qc) {
-    final StopWords sw = ftOpt.sw;
+    final StopWords sw = ftt.sw;
     FTIndexIterator iter = null;
     int d = 0;
     while(lexer.hasNext()) {
@@ -326,15 +326,15 @@ public final class FTWords extends FTExpr {
       return num;
     }
 
-    // find and count all occurrences
+    // find and count all matches: occurrences are multiplied if all tokens must be found
     final boolean all = mode == FTMode.ALL || mode == FTMode.ALL_WORDS;
-    int oc = 0;
+    long oc = 0;
     for(final byte[] input : unique(inputs(qc))) {
       final FTTokens tokens = ftt.cache(input);
       final int o = contains(tokens, lexer, ftt);
       if(all && o == 0) return 0;
       num = Math.max(num, o * tokens.firstSize());
-      oc += o;
+      oc = all && oc != 0 ? oc > Long.MAX_VALUE / o ? Long.MAX_VALUE : oc * o : oc + o;
     }
 
     // check if occurrences are in valid range. if yes, return number of tokens
@@ -431,29 +431,37 @@ public final class FTWords extends FTExpr {
           ftOpt.ln != null && !ftOpt.ln.equals(md.language()) ||
           // tokens exceeding the maximum length are not indexed, but may match
           (ftOpt.is(WC) || ftOpt.is(FZ)) && md.skipped.contains(IndexType.FULLTEXT)) return false;
-      // assign database options
-      ftOpt.assign(md);
+      // assign database options (options may be shared by copies of this expression)
+      ftOpt = ftOpt.copy().assign(md);
     }
 
     // estimate costs if text is not known at compile time
     if(inputs == null) {
+      // stop words at the start or end of a term cannot be checked
+      if(ftOpt.sw != null) return false;
       ii.costs = ii.enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(2, data.nodes() / 30));
     } else {
       // summarize number of hits; break loop if no hits are expected
       ii.costs = IndexCosts.ZERO;
+      final FTTokenizer ftt = get(ii.cc.qc);
+      final StopWords sw = ftt.sw;
       final FTLexer lexer = new FTLexer(ftOpt);
       final TokenSet ts = new TokenSet();
-      final StopWords sw = ftOpt.sw;
       for(final byte[] input : unique(inputs)) {
         // thesaurus: include the terms that extend the query term
         final TokenList terms = new TokenList(1).add(input);
-        if(ftOpt.th != null) terms.add(get(ii.cc.qc).thesaurus(input));
+        if(ftOpt.th != null) terms.add(ftt.thesaurus(input));
         for(final byte[] term : terms) {
           lexer.init(term);
+          boolean first = true, stop = false;
           while(lexer.hasNext()) {
             final byte[] token = lexer.nextToken();
-            if(!ts.add(token) || sw != null && sw.contains(token)) continue;
+            stop = sw != null && sw.contains(token);
+            // stop words at the start of a term are not supported by the index
+            if(stop && first) return false;
+            first = false;
+            if(stop || !ts.add(token)) continue;
 
             // don't use index if token starts with a wildcard
             if(ftOpt.is(WC) && token[0] == '.') return false;
@@ -463,6 +471,8 @@ public final class FTWords extends FTExpr {
             final int r = ic.results();
             if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
           }
+          // stop words at the end of a term are not supported by the index
+          if(stop) return false;
         }
       }
     }
@@ -541,8 +551,7 @@ public final class FTWords extends FTExpr {
 
   @Override
   public int exprSize() {
-    int size = 1;
-    for(final Expr expr : exprs) size += expr.exprSize();
+    int size = super.exprSize();
     if(occ != null) for(final Expr o : occ) size += o.exprSize();
     if(db != null) size += db.exprSize();
     return size + query.exprSize();

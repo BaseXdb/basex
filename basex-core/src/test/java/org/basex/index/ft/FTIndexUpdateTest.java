@@ -571,6 +571,19 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
+   * Stop words are normalized like the indexed tokens.
+   * @throws IOException I/O exception
+   */
+  @Test public void stopwordsNormalized() throws IOException {
+    final IOFile sw = new IOFile(sandbox(), "stopwords.txt");
+    sw.write("ONE");
+    set(MainOptions.STOPWORDS, sw.path());
+    execute(new CreateDB(NAME, "<x><a>one two</a></x>"));
+    search("one");
+    search("two", "one two");
+  }
+
+  /**
    * Indexes are built from partial indexes.
    * @param updindex updindex flag
    */

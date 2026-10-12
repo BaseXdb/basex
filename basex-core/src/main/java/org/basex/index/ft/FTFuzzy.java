@@ -36,13 +36,13 @@ final class FTFuzzy {
   /**
    * Constructor.
    * @param token query token
-   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
+   * @param errors number of allowed errors (dynamic calculation if the value is negative)
    */
   FTFuzzy(final byte[] token, final int errors) {
     query = Levenshtein.normalize(token);
 
     final int ql = query.length;
-    if(errors > 0) {
+    if(errors >= 0) {
       k = errors;
       rejectShort = false;
     } else {

@@ -8,7 +8,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTScope expression.
@@ -34,10 +33,8 @@ public final class FTScope extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
-    for(final FTMatch combo : combine(match)) {
-      if(same ? same(combo, lexer) : different(combo, lexer)) return true;
-    }
-    return false;
+    return select(match, combo -> same ? same(combo, lexer) : different(combo, lexer),
+        (ex, combo) -> keep(ex, combo, lexer));
   }
 
   /**
@@ -58,21 +55,48 @@ public final class FTScope extends FTFilter {
   }
 
   /**
-   * Checks if the string matches of the combination occur in different units.
+   * Checks if all pairs of string matches of the combination occur in different units.
    * @param combo include string matches
    * @param lexer tokenizer
    * @return result of check
    */
   private boolean different(final FTMatch combo, final FTLexer lexer) {
-    int c = 0;
-    final BoolList bl = new BoolList();
-    for(final FTStringMatch sm : combo) {
-      c++;
-      final int pos = pos(sm.start, lexer), size = bl.size();
-      if(pos < size && bl.get(pos) && pos == pos(sm.end, lexer)) return false;
-      bl.set(pos, true);
+    final int cs = combo.size();
+    if(cs < 2) return false;
+    for(int c1 = 0; c1 < cs; c1++) {
+      for(int c2 = c1 + 1; c2 < cs; c2++) {
+        if(!different(combo.get(c1), combo.get(c2), lexer)) return false;
+      }
     }
-    return c > 1;
+    return true;
+  }
+
+  /**
+   * Checks if two string matches do not occur in the same single unit.
+   * @param sm1 first string match
+   * @param sm2 second string match
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean different(final FTStringMatch sm1, final FTStringMatch sm2,
+      final FTLexer lexer) {
+    final int s1 = pos(sm1.start, lexer), s2 = pos(sm2.start, lexer);
+    return s1 != s2 || s1 != pos(sm1.end, lexer) || s2 != pos(sm2.end, lexer);
+  }
+
+  /**
+   * Checks if an exclude is to be kept for the includes of a combination.
+   * @param ex exclude
+   * @param combo include string matches
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean keep(final FTStringMatch ex, final FTMatch combo, final FTLexer lexer) {
+    if(same && pos(ex.start, lexer) != pos(ex.end, lexer)) return false;
+    for(final FTStringMatch sm : combo) {
+      if(different(sm, ex, lexer) == same) return false;
+    }
+    return true;
   }
 
   @Override

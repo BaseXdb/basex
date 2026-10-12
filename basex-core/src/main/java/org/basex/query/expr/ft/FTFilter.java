@@ -1,6 +1,7 @@
 package org.basex.query.expr.ft;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -104,6 +105,38 @@ public abstract class FTFilter extends FTExpr {
       if(sm.exclude) excludes.add(sm);
     }
     return excludes;
+  }
+
+  /**
+   * Checks if a combination of includes is accepted, and removes the excludes that are not kept.
+   * @param match full-text match
+   * @param accept checks if a combination is accepted
+   * @param keep checks if an exclude is kept for an accepted combination
+   * @return result of check
+   */
+  protected static boolean select(final FTMatch match, final Predicate<FTMatch> accept,
+      final BiPredicate<FTStringMatch, FTMatch> keep) {
+    final FTMatch excludes = excludes(match), kept = new FTMatch();
+    final ArrayList<FTMatch> combos = combine(match);
+    if(combos.isEmpty()) combos.add(new FTMatch());
+
+    boolean found = false;
+    for(final FTMatch combo : combos) {
+      if(!accept.test(combo)) continue;
+      found = true;
+      for(final FTStringMatch ex : excludes) {
+        if(!kept.contains(ex) && keep.test(ex, combo)) kept.add(ex);
+      }
+      if(kept.size() == excludes.size()) break;
+    }
+    if(found && kept.size() != excludes.size()) {
+      final FTMatch all = new FTMatch().add(match);
+      match.reset();
+      for(final FTStringMatch sm : all) {
+        if(!sm.exclude || kept.contains(sm)) match.add(sm);
+      }
+    }
+    return found;
   }
 
   /**

@@ -82,6 +82,23 @@ public final class StopWords {
   }
 
   /**
+   * Returns the stop words, normalized like the query tokens.
+   * @param opt full-text options
+   * @return normalized stop words
+   */
+  public StopWords normalize(final FTOpt opt) {
+    final StopWords sw = new StopWords();
+    final FTLexer lexer = new FTLexer(opt);
+    for(final byte[] word : set) {
+      lexer.init(word);
+      final byte[] first = lexer.hasNext() ? lexer.nextToken() : null;
+      // words that are not tokenized to a single token are adopted unchanged
+      sw.add(first != null && !lexer.hasNext() ? first : word);
+    }
+    return sw;
+  }
+
+  /**
    * Removes the specified stopword.
    * @param token token to be removed
    */

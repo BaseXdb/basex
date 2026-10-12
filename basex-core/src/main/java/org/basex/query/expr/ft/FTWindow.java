@@ -89,8 +89,8 @@ public final class FTWindow extends FTFilter {
     int end = first.end;
     boolean gaps = first.gaps;
     for(final FTStringMatch sm : combo) {
-      gaps |= sm.end - end > 1;
-      end = sm.end;
+      gaps |= sm.gaps || sm.start > end + 1;
+      end = Math.max(end, sm.end);
       if(pos(end, lexer) - pos(first.start, lexer) > n) return false;
     }
 
@@ -99,7 +99,7 @@ public final class FTWindow extends FTFilter {
     for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); s++) {
       boolean h = false;
       for(final FTStringMatch sm : excludes) {
-        h = pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
+        h = pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + n;
         if(h) break;
       }
       if(!h) {
@@ -146,9 +146,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public int exprSize() {
-    int size = 1;
-    for(final FTExpr expr : exprs) size += expr.exprSize();
-    return size + win.exprSize();
+    return super.exprSize() + win.exprSize();
   }
 
   @Override

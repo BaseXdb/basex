@@ -89,10 +89,9 @@ final class FTSegment extends IndexSegment implements FTSource {
   }
 
   @Override
-  public void wildcards(final FTWildcard wc, final boolean full, final IntList pres,
-      final IntList poss) {
+  public void wildcards(final FTWildcard wc, final IntList pres, final IntList poss) {
     final byte[] pref = wc.prefix();
-    final int pl = positions.length, l = Math.min(pl - 1, wc.max(full));
+    final int pl = positions.length, l = Math.min(pl - 1, wc.max());
     for(int p = pref.length; p <= l; p++) {
       int start = positions[p];
       if(start == -1) continue;

@@ -22,6 +22,8 @@ import org.basex.util.similarity.*;
 public final class FTTokenizer {
   /** Token comparator. */
   final TokenComparator cmp;
+  /** Normalized stop words (can be {@code null}). */
+  final StopWords sw;
 
   /** Wildcard object cache. */
   private final TokenObjectMap<FTWildcard> wcCache = new TokenObjectMap<>();
@@ -49,8 +51,9 @@ public final class FTTokenizer {
     this.opt = opt;
     this.qc = qc;
 
+    sw = opt.sw != null ? opt.sw.normalize(opt) : null;
     cmp = (in, qu) -> {
-      final Levenshtein ls = opt.is(FZ) ? new Levenshtein(Math.max(0, opt.errors)) : null;
+      final Levenshtein ls = opt.is(FZ) ? new Levenshtein(opt.errors) : null;
       FTWildcard ftw = null;
       if(opt.is(WC)) {
         ftw = wcCache.get(qu);
@@ -66,7 +69,7 @@ public final class FTTokenizer {
       return
         // skip stop words, i.e., if the current query token is a stop word,
         // it is always equal to the corresponding input token:
-        opt.sw != null && opt.sw.contains(qu) ||
+        sw != null && sw.contains(qu) ||
         // fuzzy search:
         (opt.is(FZ) ? ls.similar(in, qu) :
         // wild-card search:

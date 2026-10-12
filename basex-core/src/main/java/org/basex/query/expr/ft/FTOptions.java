@@ -33,15 +33,14 @@ public final class FTOptions extends FTExpr {
 
   @Override
   public FTExpr compile(final CompileContext cc) throws QueryException {
-    final QueryContext qc = cc.qc;
-    final FTOpt tmp = qc.ftOpt();
-    qc.ftOpt(opt.assign(tmp));
-    final Value value = qc.focus.value;
+    final FTOpt tmp = cc.ftOpt;
+    cc.ftOpt = opt.assign(tmp);
+    final Value value = cc.qc.focus.value;
     try {
       if(opt.sw != null && value != null && value.data() != null) opt.sw.compile(value.data());
       return exprs[0].compile(cc);
     } finally {
-      qc.ftOpt(tmp);
+      cc.ftOpt = tmp;
     }
   }
 

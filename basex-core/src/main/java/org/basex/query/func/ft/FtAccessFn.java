@@ -30,16 +30,20 @@ abstract class FtAccessFn extends StandardFunc {
     if(fuzzy != null) opt.set(FZ, fuzzy);
     final Boolean wildcards = opts.get(FtIndexOptions.WILDCARDS);
     if(wildcards != null) opt.set(WC, wildcards);
-    if(opts.contains(FtFuzzyOptions.ERRORS)) opt.errors = opts.get(FtFuzzyOptions.ERRORS);
+    if(opts.contains(FtFuzzyOptions.ERRORS)) {
+      opt.errors = Math.max(-1, opts.get(FtFuzzyOptions.ERRORS));
+    }
     final String[] words = opts.get(FtIndexOptions.STOP_WORDS);
     if(words != null) {
       opt.sw = new StopWords();
       for(final String word : words) opt.sw.add(Token.token(word));
     }
 
-    opt.assign(parent);
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info);
-    return opt;
+    // supplied options take precedence over conflicting inherited ones
+    if(opt.is(FZ)) opt.set(WC, false);
+    else if(opt.is(WC)) opt.set(FZ, false);
+    return opt.assign(parent);
   }
 
   /**

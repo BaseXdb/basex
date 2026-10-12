@@ -17,8 +17,10 @@ public final class IndexEntries implements IndexSearch {
   public boolean descending;
   /** Prefix/traversal flag. */
   public boolean prefix;
-  /** Number of allowed errors for fuzzy traversal ({@code -1}: no fuzzy traversal). */
-  public int errors = -1;
+  /** Fuzzy traversal. */
+  public boolean fuzzy;
+  /** Number of allowed errors for fuzzy traversal (negative: dynamic calculation). */
+  public int errors;
 
   /**
    * Private constructor.
@@ -54,12 +56,13 @@ public final class IndexEntries implements IndexSearch {
   /**
    * Constructor for fuzzy search. Only supported by the full-text index.
    * @param text token
-   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
+   * @param errors number of allowed errors (dynamic calculation if the value is negative)
    * @param type index type
    */
   public IndexEntries(final byte[] text, final int errors, final IndexType type) {
     this(type, text);
     this.errors = errors;
+    fuzzy = true;
   }
 
   @Override

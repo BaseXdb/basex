@@ -29,11 +29,10 @@ interface FTSource {
   /**
    * Collects the live references for all tokens that match a wildcard expression.
    * @param wc wildcard matcher
-   * @param full support full range of Unicode characters
    * @param pres PRE values
    * @param poss positions
    */
-  void wildcards(FTWildcard wc, boolean full, IntList pres, IntList poss);
+  void wildcards(FTWildcard wc, IntList pres, IntList poss);
 
   /**
    * Collects the live references for all tokens that are similar to a token.

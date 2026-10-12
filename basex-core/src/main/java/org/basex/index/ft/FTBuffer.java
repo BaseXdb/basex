@@ -37,10 +37,9 @@ final class FTBuffer extends IndexBuffer implements FTSource {
   }
 
   @Override
-  public void wildcards(final FTWildcard wc, final boolean full, final IntList pres,
-      final IntList poss) {
+  public void wildcards(final FTWildcard wc, final IntList pres, final IntList poss) {
     final byte[] prefix = wc.prefix();
-    collect(prefix.length, wc.max(full), token -> startsWith(token, prefix) && wc.match(token),
+    collect(prefix.length, wc.max(), token -> startsWith(token, prefix) && wc.match(token),
       pres, poss);
   }
 

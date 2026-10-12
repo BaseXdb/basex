@@ -25,8 +25,6 @@ public final class FTLexer extends FTIterator implements IndexSearch {
 
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
-  /** Levenshtein error. */
-  private int errors = -1;
 
   /** Iterator over result tokens. */
   private FTIterator iter;
@@ -66,23 +64,19 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     iter = tokens;
 
     // wrap original iterator
-    if(ftOpt != null) {
-      errors = ftOpt.errors;
-
-      if(ftOpt.is(ST)) {
-        if(ftOpt.sd == null) {
-          // use default stemmer if specific stemmer is not available.
-          Stemmer st = Stemmer.IMPL.getFirst();
-          for(final Stemmer stem : Stemmer.IMPL) {
-            if(stem.supports(lang)) {
-              st = stem;
-              break;
-            }
+    if(ftOpt != null && ftOpt.is(ST)) {
+      if(ftOpt.sd == null) {
+        // use default stemmer if specific stemmer is not available.
+        Stemmer st = Stemmer.IMPL.getFirst();
+        for(final Stemmer stem : Stemmer.IMPL) {
+          if(stem.supports(lang)) {
+            st = stem;
+            break;
           }
-          iter = st.get(lang, iter);
-        } else {
-          iter = new DictionaryStemmer(ftOpt.sd, iter);
         }
+        iter = st.get(lang, iter);
+      } else {
+        iter = new DictionaryStemmer(ftOpt.sd, iter);
       }
     }
   }
@@ -112,14 +106,6 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   public FTLexer init() {
     init(text);
     return this;
-  }
-
-  /**
-   * Returns the number of allowed Levenshtein errors.
-   * @return errors ({@code 0}: dynamic calculation)
-   */
-  public int errors() {
-    return Math.max(0, errors);
   }
 
   @Override

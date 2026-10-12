@@ -31,12 +31,12 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   }
 
   /**
-   * Checks if the match is included in the specified match.
-   * @param sm match to be compared
+   * Checks if the match covers the specified position.
+   * @param p position
    * @return result of check
    */
-  boolean in(final FTStringMatch sm) {
-    return start >= sm.start && end <= sm.end;
+  boolean covers(final int p) {
+    return p >= start && p <= end;
   }
 
   @Override

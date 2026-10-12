@@ -22,6 +22,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -149,6 +150,8 @@ public final class CompileContext {
   private int evals;
   /** Function calls in the query tree, grouped by function (can be {@code null}). */
   Map<StaticFunc, ArrayList<StaticFuncCall>> calls;
+  /** Full-text options of the currently compiled full-text selection (can be {@code null}). */
+  public FTOpt ftOpt;
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();

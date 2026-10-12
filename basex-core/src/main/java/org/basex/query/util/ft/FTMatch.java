@@ -34,9 +34,21 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
    */
   public boolean notin(final FTMatch ftm) {
     for(final FTStringMatch s : this) {
-      for(final FTStringMatch sm : ftm) {
-        if(!s.in(sm)) return true;
+      for(int pos = s.start; pos <= s.end; pos++) {
+        if(!ftm.covers(pos)) return true;
       }
+    }
+    return false;
+  }
+
+  /**
+   * Checks if one of the string matches covers the specified position.
+   * @param pos position
+   * @return result of check
+   */
+  private boolean covers(final int pos) {
+    for(final FTStringMatch sm : this) {
+      if(sm.covers(pos)) return true;
     }
     return false;
   }

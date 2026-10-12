@@ -16,6 +16,16 @@ import org.basex.util.list.*;
 public final class ThesList {
   /** Thesaurus accessors. */
   private final ArrayList<ThesAccessor> list = new ArrayList<>(1);
+  /** Indicates if no thesaurus is to be used. */
+  private final boolean none;
+
+  /**
+   * Constructor.
+   * @param none indicates if no thesaurus is to be used
+   */
+  public ThesList(final boolean none) {
+    this.none = none;
+  }
 
   /**
    * Adds a thesaurus accessor.
@@ -26,15 +36,18 @@ public final class ThesList {
   }
 
   /**
-   * Merges two lists.
+   * Merges the accessors of two lists.
    * @param tl second list
+   * @return new list, or this list if no thesaurus is to be used
    */
-  public void merge(final ThesList tl) {
+  public ThesList merge(final ThesList tl) {
+    if(none) return this;
+    final ThesList merged = new ThesList(false);
+    merged.list.addAll(list);
     for(final ThesAccessor thes : tl.list) {
-      boolean f = false;
-      for(final ThesAccessor th : list) f = f || th.equals(thes);
-      if(!f) list.add(thes);
+      if(!merged.list.contains(thes)) merged.list.add(thes);
     }
+    return merged;
   }
 
   /**

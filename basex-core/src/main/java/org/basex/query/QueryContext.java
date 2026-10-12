@@ -105,7 +105,7 @@ public final class QueryContext extends Job implements Closeable {
   public FTPosData ftPosData;
   /** Current full-text lexer. */
   public FTLexer ftLexer;
-  /** Current full-text options (can be {@code null}). */
+  /** Full-text options of the prolog (can be {@code null}). */
   private FTOpt ftOpt;
   /** Full-text token positions (needed for highlighting full-text results). */
   public int ftPos;
@@ -660,20 +660,12 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns the current full-text options. Creates a new instance if called for the first time.
+   * Returns the full-text options of the prolog.
    * @return full-text options
    */
   public FTOpt ftOpt() {
     if(ftOpt == null) ftOpt = new FTOpt();
     return ftOpt;
-  }
-
-  /**
-   * Assigns full-text options.
-   * @param opt full-text options
-   */
-  public void ftOpt(final FTOpt opt) {
-    ftOpt = opt;
   }
 
   /**

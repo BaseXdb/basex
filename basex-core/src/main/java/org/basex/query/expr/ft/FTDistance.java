@@ -71,24 +71,66 @@ public final class FTDistance extends FTFilter {
     final FTMatch excludes = excludes(match);
     final ArrayList<FTMatch> matches = combine(match);
 
-    // collect matches
+    // collect matches, and excludes within the distance range of an include
     match.reset();
+    if(matches.isEmpty()) return true;
+    final FTMatch kept = new FTMatch();
     for(final FTMatch ftm : matches) {
       ftm.sort();
       final Iterator<FTStringMatch> iter = ftm.iterator();
       final FTStringMatch first = iter.next();
-      for(int end = first.end; end != -1;) {
-        if(iter.hasNext()) {
-          final FTStringMatch sm = iter.next();
-          final int d = pos(sm.start, lexer) - pos(end, lexer) - 1;
-          end = d < mn || d > mx ? -1 : sm.end;
-        } else {
-          match.add(new FTStringMatch(first.start, end, first.pos));
-          break;
+      int last = first.end, end = last;
+      boolean gaps = first.gaps, ok = true;
+      while(ok && iter.hasNext()) {
+        final FTStringMatch sm = iter.next();
+        ok = distance(sm, last, mn, mx, lexer);
+        gaps |= sm.gaps || sm.start > end + 1;
+        last = sm.end;
+        end = Math.max(end, last);
+      }
+      if(ok) {
+        final FTStringMatch joined = new FTStringMatch(first.start, end, first.pos);
+        joined.gaps = gaps;
+        match.add(joined);
+        for(final FTStringMatch ex : excludes) {
+          if(!kept.contains(ex) && in(ex, ftm, mn, mx, lexer)) kept.add(ex);
         }
       }
     }
-    return !match.add(excludes).isEmpty();
+    return !match.add(kept).isEmpty();
+  }
+
+  /**
+   * Checks if the distance between a string match and a preceding end position is in range.
+   * @param sm string match
+   * @param end end position of the preceding string match
+   * @param mn minimum distance
+   * @param mx maximum distance
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean distance(final FTStringMatch sm, final int end, final long mn, final long mx,
+      final FTLexer lexer) {
+    final int d = pos(sm.start, lexer) - pos(end, lexer) - 1;
+    return d >= mn && d <= mx;
+  }
+
+  /**
+   * Checks if an exclude is within the distance range of one of the includes.
+   * @param ex exclude
+   * @param includes includes
+   * @param mn minimum distance
+   * @param mx maximum distance
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean in(final FTStringMatch ex, final FTMatch includes, final long mn,
+      final long mx, final FTLexer lexer) {
+    for(final FTStringMatch sm : includes) {
+      if(sm.compareTo(ex) <= 0 ? distance(ex, sm.end, mn, mx, lexer) :
+        distance(sm, ex.end, mn, mx, lexer)) return true;
+    }
+    return false;
   }
 
   @Override
@@ -98,7 +140,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    return min.inlineable(ic) || max.inlineable(ic) && super.inlineable(ic);
+    return min.inlineable(ic) && max.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -127,9 +169,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public int exprSize() {
-    int size = 1;
-    for(final FTExpr expr : exprs) size += expr.exprSize();
-    return min.exprSize() + max.exprSize() + size;
+    return super.exprSize() + min.exprSize() + max.exprSize();
   }
 
   @Override

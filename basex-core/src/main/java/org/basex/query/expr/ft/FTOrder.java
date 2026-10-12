@@ -27,19 +27,36 @@ public final class FTOrder extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
-    for(final FTMatch combo : combine(match)) {
-      int start = -1;
-      boolean ordered = true;
-      for(final FTStringMatch sm : combo) {
-        if(sm.start <= start) {
-          ordered = false;
-          break;
-        }
-        start = sm.start;
-      }
-      if(ordered) return true;
+    return select(match, FTOrder::ordered, FTOrder::ordered);
+  }
+
+  /**
+   * Checks if the string matches of a combination are ordered by their query positions.
+   * @param combo include string matches, ordered by query position
+   * @return result of check
+   */
+  private static boolean ordered(final FTMatch combo) {
+    int start = -1;
+    for(final FTStringMatch sm : combo) {
+      if(sm.start < start) return false;
+      start = sm.start;
     }
-    return false;
+    return true;
+  }
+
+  /**
+   * Checks if an exclude is ordered relative to all includes of a combination.
+   * @param ex exclude
+   * @param combo include string matches
+   * @return result of check
+   */
+  private static boolean ordered(final FTStringMatch ex, final FTMatch combo) {
+    for(final FTStringMatch sm : combo) {
+      if(!(ex.start <= sm.start && ex.pos <= sm.pos || ex.start >= sm.start && ex.pos >= sm.pos)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

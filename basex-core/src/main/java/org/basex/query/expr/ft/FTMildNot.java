@@ -89,7 +89,7 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    IndexCosts costs = ii.costs;
+    IndexCosts costs = IndexCosts.ZERO;
     for(final FTExpr expr : exprs) {
       if(!expr.indexAccessible(ii)) return false;
       costs = IndexCosts.add(costs, ii.costs);

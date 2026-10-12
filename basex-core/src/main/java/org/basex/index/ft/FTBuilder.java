@@ -63,6 +63,8 @@ public final class FTBuilder extends IndexBuilder {
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
     if(meta.stemming && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
+    // stop words are normalized like the indexed tokens
+    fto.sw = fto.sw.normalize(fto);
     return new FTLexer(fto);
   }
 

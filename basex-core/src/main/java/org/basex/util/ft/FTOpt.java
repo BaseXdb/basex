@@ -47,7 +47,7 @@ public final class FTOpt extends ExprInfo {
     if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
-    else if(opt.th != null) th.merge(opt.th);
+    else if(opt.th != null) th = th.merge(opt.th);
     if(errors == -1) errors = opt.errors;
     return this;
   }

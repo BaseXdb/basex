@@ -200,8 +200,7 @@ public final class FTIndex extends SegmentedIndex {
       if(!wc.valid()) return FTIndexIterator.FTEMPTY;
       if(!wc.simple()) {
         final IntList pres = new IntList(), poss = new IntList();
-        final boolean full = opt.is(DC);
-        for(final FTSource source : sources) source.wildcards(wc, full, pres, poss);
+        for(final FTSource source : sources) source.wildcards(wc, pres, poss);
         return iter(pres, poss, token);
       }
     }
@@ -209,7 +208,7 @@ public final class FTIndex extends SegmentedIndex {
     // fuzzy search
     if(opt.is(FZ)) {
       final IntList pres = new IntList(), poss = new IntList();
-      final FTFuzzy fuzzy = new FTFuzzy(token, ftl.errors());
+      final FTFuzzy fuzzy = new FTFuzzy(token, opt.errors);
       for(final FTSource source : sources) source.fuzzy(fuzzy, pres, poss);
       return iter(pres, poss, token);
     }
@@ -225,7 +224,7 @@ public final class FTIndex extends SegmentedIndex {
   @Override
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
-    final FTFuzzy fuzzy = entries.errors >= 0 ? new FTFuzzy(token, entries.errors) : null;
+    final FTFuzzy fuzzy = entries.fuzzy ? new FTFuzzy(token, entries.errors) : null;
     final FTSource[] sources = sources();
     final int il = sources.length;
     final EntryIterator[] iters = new EntryIterator[il];

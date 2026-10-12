@@ -11,6 +11,8 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.index.*;
+import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -52,26 +54,33 @@ public final class FTContains extends Single {
       int count = 0;
       boolean found = false;
       final FTPosData ftPosData = qc.ftPosData;
-      for(Item item; (item = qc.next(iter)) != null;) {
-        lexer.init(item.string(info));
-        final FTNode it = ftexpr.value(qc);
-        final FTMatches all = it.matches();
-        if(all.matches()) {
-          found = true;
-          // without scores and match positions, the first match is sufficient
-          if(!scoring && ftPosData == null) break;
-          if(scoring) score += it.score();
-          // cache entry for visualizations or ft:mark/ft:extract
-          if(ftPosData != null) {
-            final Language ln = lexer.ftOpt().ln;
-            if(item instanceof final DBNode node) {
-              ftPosData.add(node.data(), node.pre(), all, ln);
-            } else if(item instanceof final XNode node) {
-              ftPosData.add(node, all, ln);
+      loop:
+      for(Item input; (input = qc.next(iter)) != null;) {
+        // arrays are atomized, as in the optimized expression
+        final Value values = input instanceof XQArray ? input.atomValue(qc, info) : input;
+        final long vs = values.size();
+        for(long v = 0; v < vs; v++) {
+          final Item item = values.itemAt(v);
+          lexer.init(item.string(info));
+          final FTNode it = ftexpr.value(qc);
+          final FTMatches all = it.matches();
+          if(all.matches()) {
+            found = true;
+            // without scores and match positions, the first match is sufficient
+            if(!scoring && ftPosData == null) break loop;
+            if(scoring) score += it.score();
+            // cache entry for visualizations or ft:mark/ft:extract
+            if(ftPosData != null) {
+              final Language ln = lexer.ftOpt().ln;
+              if(item instanceof final DBNode node) {
+                ftPosData.add(node.data(), node.pre(), all, ln);
+              } else if(item instanceof final XNode node) {
+                ftPosData.add(node, all, ln);
+              }
             }
           }
+          count++;
         }
-        count++;
       }
       return found && scoring ? Bln.get(Scoring.avg(score, count)) : Bln.get(found);
     } finally {
@@ -81,8 +90,15 @@ public final class FTContains extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    ftexpr = ftexpr.compile(cc);
-    return super.compile(cc);
+    // options of an enclosing full-text selection do not apply
+    final FTOpt tmp = cc.ftOpt;
+    cc.ftOpt = cc.qc.ftOpt();
+    try {
+      ftexpr = ftexpr.compile(cc);
+      return super.compile(cc);
+    } finally {
+      cc.ftOpt = tmp;
+    }
   }
 
   @Override

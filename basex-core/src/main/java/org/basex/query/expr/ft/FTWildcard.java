@@ -112,17 +112,16 @@ public final class FTWildcard {
 
   /**
    * Returns the maximum byte length of a potential match in the index.
-   * @param full support full range of Unicode characters
    * @return maximum length
    */
-  public int max(final boolean full) {
-    int c = 0;
+  public int max() {
+    long c = 0;
     for(int s = 0; s < size; s++) {
       final int m = max[s];
       if(m == Integer.MAX_VALUE) return Integer.MAX_VALUE;
-      c += full ? cps[s] == DOT ? 4 : cpLength(cps[s]) : m;
+      c += cps[s] == DOT ? 4L * m : cpLength(cps[s]);
     }
-    return c;
+    return (int) Math.min(c, Integer.MAX_VALUE);
   }
 
   /**

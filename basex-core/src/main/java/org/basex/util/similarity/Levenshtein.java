@@ -20,19 +20,19 @@ public final class Levenshtein {
   /** Maximum size for compared strings. */
   public static final int MAX_LENGTH = 10000;
 
-  /** Default number of allowed errors; dynamic calculation if value is 0. */
+  /** Default number of allowed errors; dynamic calculation if value is negative. */
   private final int maxErrors;
 
   /**
    * Constructor.
    */
   public Levenshtein() {
-    this(0);
+    this(-1);
   }
 
   /**
    * Constructor.
-   * @param maxErrors maximum number of allowed errors
+   * @param maxErrors maximum number of allowed errors (dynamic calculation if negative)
    */
   public Levenshtein(final int maxErrors) {
     this.maxErrors = maxErrors;
@@ -66,7 +66,7 @@ public final class Levenshtein {
     for(final T obj : objects) {
       final byte[] compare = token(prepare.apply(obj));
       if(compare != null) {
-        final int d = ls.distance(token, compare, 0);
+        final int d = ls.distance(token, compare, -1);
         if(d < err) {
           similar = obj;
           err = d;
@@ -128,7 +128,7 @@ public final class Levenshtein {
    * Compares two tokens for similarity.
    * @param token input token
    * @param compare token to be compared
-   * @param max number of allowed errors; dynamic calculation if value is {@code 0}
+   * @param max number of allowed errors; dynamic calculation if value is negative
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] compare, final int max) {
@@ -139,7 +139,7 @@ public final class Levenshtein {
    * Computes the Levenshtein distance.
    * @param token original token
    * @param compare token to be compared
-   * @param max maximum number of allowed errors; dynamic calculation if value is {@code 0}
+   * @param max maximum number of allowed errors; dynamic calculation if value is negative
    * @return distance
    */
   private int distance(final byte[] token, final byte[] compare, final int max) {
@@ -148,11 +148,11 @@ public final class Levenshtein {
     final int tl = tkn.length, cl = cmp.length;
 
     // use exact search for too short values
-    if(max == 0 && (tl < 4 || cl < 4)) {
+    if(max < 0 && (tl < 4 || cl < 4)) {
       return tl == cl && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
     }
 
-    final int k = max == 0 ? Math.max(1, cl / 4) : max;
+    final int k = max < 0 ? Math.max(1, cl / 4) : max;
     final int dist = distance(tkn, cmp, k);
     return dist == -1 ? Integer.MAX_VALUE : dist;
   }

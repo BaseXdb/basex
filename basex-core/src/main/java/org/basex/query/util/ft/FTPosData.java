@@ -20,24 +20,23 @@ import org.basex.util.list.*;
 public final class FTPosData {
   /** Position references of constructed nodes. */
   private final IdentityHashMap<XNode, FTPos> fragments = new IdentityHashMap<>();
-  /** Position references. */
-  private FTPos[] pos = new FTPos[1];
-  /** Data reference (can be {@code null}). */
-  private Data dt;
+  /** Position references of database nodes. */
+  private final IdentityHashMap<Data, Entries> entries = new IdentityHashMap<>();
+  /** Data reference to which the entries are restricted (can be {@code null}). */
+  private final Data dt;
   /** Language of the tokenized input (can be {@code null}). */
   private Language lang;
-  /** Number of values. */
-  private int size;
 
   /**
    * Constructor.
    */
   public FTPosData() {
+    this(null);
   }
 
   /**
    * Creates a new instance of this class.
-   * @param data data reference
+   * @param data data reference to which the entries are restricted (can be {@code null})
    */
   public FTPosData(final Data data) {
     dt = data;
@@ -52,22 +51,9 @@ public final class FTPosData {
    */
   public synchronized void add(final Data data, final int pre, final FTMatches all,
       final Language language) {
-    if(dt == null) dt = data;
-    else if(dt != data) return;
+    if(dt != null && dt != data) return;
     lang = language;
-
-    final IntList il = positions(all);
-    int c = find(pre);
-    if(c < 0) {
-      c = -c - 1;
-      final int sz = size;
-      if(sz == pos.length) pos = Arrays.copyOf(pos, Array.newCapacity(sz));
-      Array.insert(pos, c, 1, sz, null);
-      pos[c] = new FTPos(pre, il);
-      size++;
-    } else {
-      pos[c].union(il);
-    }
+    entries.computeIfAbsent(data, d -> new Entries()).add(pre, positions(all));
   }
 
   /**
@@ -115,8 +101,10 @@ public final class FTPosData {
    * @return full-text data or {@code null}
    */
   public FTPos get(final Data data, final int pre) {
-    final int p = find(pre);
-    return p < 0 || dt != data ? null : pos[p];
+    final Entries ent = entries.get(data);
+    if(ent == null) return null;
+    final int p = ent.find(pre);
+    return p < 0 ? null : ent.pos[p];
   }
 
   /**
@@ -139,12 +127,13 @@ public final class FTPosData {
     int count = 0;
     if(node instanceof final DBNode dbnode) {
       final Data data = dbnode.data();
-      if(dt != data) return 0;
+      final Entries ent = entries.get(data);
+      if(ent == null) return 0;
       // entries are sorted by PRE value: check the ones inside the node
       final int pre = dbnode.pre(), last = pre + data.size(pre, dbnode.dbKind());
-      final int p = find(pre);
-      for(int i = p < 0 ? -p - 1 : p; i < size && pos[i].pre < last; i++) {
-        count += pos[i].size();
+      final int p = ent.find(pre);
+      for(int i = p < 0 ? -p - 1 : p; i < ent.size && ent.pos[i].pre < last; i++) {
+        count += ent.pos[i].size();
       }
     } else if(!fragments.isEmpty()) {
       for(final GNode nd : node.descendantIter(true)) {
@@ -155,31 +144,13 @@ public final class FTPosData {
     return count;
   }
 
-  /**
-   * Returns the index of the specified PRE value.
-   * @param pre int PRE value
-   * @return index, or negative index -1 if PRE value is not found
-   */
-  private int find(final int pre) {
-    // binary search
-    int l = 0, h = size - 1;
-    while(l <= h) {
-      final int m = l + h >>> 1;
-      final int c = pos[m].pre - pre;
-      if(c == 0) return m;
-      if(c < 0) l = m + 1;
-      else h = m - 1;
-    }
-    return -l - 1;
-  }
-
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof final FTPosData ft)) return false;
-    if(size != ft.size || !fragments.equals(ft.fragments)) return false;
-    for(int p = 0; p < size; p++) {
-      if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;
+    if(!(obj instanceof final FTPosData ft) || !fragments.equals(ft.fragments) ||
+        !entries.keySet().equals(ft.entries.keySet())) return false;
+    for(final Map.Entry<Data, Entries> entry : entries.entrySet()) {
+      if(!entry.getValue().equals(ft.entries.get(entry.getKey()))) return false;
     }
     return true;
   }
@@ -187,10 +158,68 @@ public final class FTPosData {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int p = 0; p < size; p++) {
-      if(!sb.isEmpty()) sb.append('\n');
-      sb.append(pos[p]);
+    for(final Entries ent : entries.values()) {
+      for(int p = 0; p < ent.size; p++) {
+        if(!sb.isEmpty()) sb.append('\n');
+        sb.append(ent.pos[p]);
+      }
     }
     return sb.toString();
+  }
+
+  /**
+   * Position references of the nodes of a database, sorted by PRE values.
+   */
+  private static final class Entries {
+    /** Position references. */
+    private FTPos[] pos = new FTPos[1];
+    /** Number of values. */
+    private int size;
+
+    /**
+     * Adds positions.
+     * @param pre PRE value
+     * @param il sorted positions
+     */
+    void add(final int pre, final IntList il) {
+      int c = find(pre);
+      if(c < 0) {
+        c = -c - 1;
+        if(size == pos.length) pos = Arrays.copyOf(pos, Array.newCapacity(size));
+        Array.insert(pos, c, 1, size, null);
+        pos[c] = new FTPos(pre, il);
+        size++;
+      } else {
+        pos[c].union(il);
+      }
+    }
+
+    /**
+     * Returns the index of the specified PRE value.
+     * @param pre int PRE value
+     * @return index, or negative index -1 if PRE value is not found
+     */
+    int find(final int pre) {
+      // binary search
+      int l = 0, h = size - 1;
+      while(l <= h) {
+        final int m = l + h >>> 1;
+        final int c = pos[m].pre - pre;
+        if(c == 0) return m;
+        if(c < 0) l = m + 1;
+        else h = m - 1;
+      }
+      return -l - 1;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(this == obj) return true;
+      if(!(obj instanceof final Entries ent) || size != ent.size) return false;
+      for(int p = 0; p < size; p++) {
+        if(pos[p].pre != ent.pos[p].pre || !pos[p].equals(ent.pos[p])) return false;
+      }
+      return true;
+    }
   }
 }

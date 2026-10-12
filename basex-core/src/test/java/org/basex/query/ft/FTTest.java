@@ -97,7 +97,9 @@ public class FTTest extends SandboxTest {
     query("true() contains text 'true'", true);
     query("false() contains text 'false'", true);
     query("'text' contains text ''", false);
-    query("'t' contains text ftnot { 't' } distance at most 0 words", false);
+    // excludes are only kept within the distance of an include
+    query("'t' contains text ftnot { 't' } distance at most 0 words", true);
+    query("'a' contains text ftnot 'b' distance at most 1 words", true);
   }
 
   /** Full-text on nodes. */
@@ -196,6 +198,40 @@ public class FTTest extends SandboxTest {
     pre("//w[text() contains text 'h.\\llo' using wildcards]", 14);
   }
 
+  /** Match options are not applied to embedded contains text expressions. */
+  @Test public void embeddedOptions() {
+    query("'a' contains text { if('a' contains text 'A') then 'a' else 'z' } "
+        + "using case sensitive", true);
+    query("declare function local:f() { 'a' contains text 'A' }; "
+        + "'a' contains text { if(local:f()) then 'a' else 'z' } using case sensitive", true);
+    query("'A' contains text ('z' ftor { if('a' contains text 'a') then 'A' else 'z' } "
+        + "using uppercase)", true);
+  }
+
+  /** Options of different databases are not shared by copies of an expression. */
+  @Test public void databaseOptions() {
+    final String db1 = NAME + "stem", db2 = NAME + "nostem";
+    query(_DB_CREATE.args(db1, " <x>house</x>", "x.xml",
+        " { 'ftindex': true(), 'stemming': true() }"));
+    query(_DB_CREATE.args(db2, " <x>house</x>", "x.xml", " { 'ftindex': true() }"));
+    query("declare %basex:inline function local:f($db) { "
+        + "count(db:get($db)//text()[. contains text 'houses']) }; "
+        + "local:f('" + db1 + "'), local:f('" + db2 + "')", "1\n0");
+    query(_DB_DROP.args(db1));
+    query(_DB_DROP.args(db2));
+  }
+
+  /** Wildcards: index entries with multi-byte characters. */
+  @Test public void wildCardMultiByte() {
+    final String db = NAME + "wc", doc = " <x><a>миры</a><a>abcdefg</a></x>";
+    query(_DB_CREATE.args(db, doc, "x.xml", " { 'ftindex': true() }"));
+    query("count(" + _DB_GET.args(db) + "//a[text() contains text 'мир.' using wildcards])", 1);
+    query(_DB_CREATE.args(db, doc, "x.xml", " { 'ftindex': true(), 'diacritics': true() }"));
+    query("count(" + _DB_GET.args(db) + "//a[text() contains text 'a.{5,6}' "
+        + "using wildcards using diacritics sensitive])", 1);
+    query(_DB_DROP.args(db));
+  }
+
   /** Wildcards on strings, including parse errors. */
   @Test public void wildCardBoolean() {
     query("'a' contains text 'a.+' using wildcards", false);
@@ -223,6 +259,11 @@ public class FTTest extends SandboxTest {
     pre("//*[text() contains text 'Databaze' using fuzzy]", 7, 9, 11);
     pre("//*[text() contains text 'Databasing' using fuzzy]");
     query("'abc' contains text 'xyz' using fuzzy 4294967296 errors", true);
+    // no errors: exact matches
+    pre("//*[text() contains text 'Databaze' using fuzzy 0 errors]");
+    pre("//*[text() contains text 'Databases' using fuzzy 0 errors]", 7, 9, 11);
+    query("'house' contains text 'mouse' using fuzzy 0 errors", false);
+    query("'house' contains text 'house' using fuzzy 0 errors", true);
   }
 
   /** Any/all options. */
@@ -266,6 +307,11 @@ public class FTTest extends SandboxTest {
     query("'a a a' contains text 'a a' phrase occurs exactly 2 times", true);
     query("'a b c' contains text '.' occurs exactly 3 times using wildcards", true);
     query("'a b c' contains text '. .' occurs exactly 2 times using wildcards", true);
+    // all: the number of matches is the product of the occurrences
+    query("'a a b' contains text 'a b' all words occurs exactly 2 times", true);
+    query("'a c b' contains text 'a b' all words occurs exactly 2 times", false);
+    query("'a a b b' contains text { 'a', 'b' } all occurs exactly 4 times", true);
+    query("'a a b' contains text { 'a', 'b' } any occurs exactly 3 times", true);
   }
 
   /** ftand/ftor. */
@@ -318,12 +364,27 @@ public class FTTest extends SandboxTest {
   @Test public void stopWords() {
     pre("//*[text() contains text 'and databases' using stop words ('xml', 'and')]", 7, 9, 11);
     pre("//*[text() contains text 'we use xml' using stop words ('use')]", 7);
+    // stop words at the start or end of a phrase
+    pre("//*[text() contains text 'and have xml' using stop words ('and')]", 7);
+    pre("//*[text() contains text 'and we have' using stop words ('and')]");
+    pre("//*[text() contains text 'xml databases and' using stop words ('and')]");
+    // a stop word matches any token
+    pre("//wc/w[text() contains text 'hello' using stop words ('hello')]", 14);
+    // stop words are normalized like query tokens
+    query("'x q y' contains text 'x The y' using stop words ('The')", true);
+    query("'x q y' contains text 'x the y' using stop words ('THE')", true);
+    query("'x q y' contains text 'x thé y' using stop words ('the')", true);
+    query("'x q y' contains text 'x The y' using stop words ('the') using case sensitive", false);
   }
 
   /** Atomization. */
   @Test public void atomization() {
     pre("//at[. contains text 'bad one']", 21);
     pre("//atr[@key contains text 'value']", 35);
+    // arrays are atomized, no matter if they are known at compile time
+    query("[ 'x', 'a' ] contains text 'a'", true);
+    query("(if(random:double() < 2) then [ 'x', 'a' ] else 1) contains text 'a'", true);
+    query("(if(random:double() < 2) then [ 'x', [ 'a' ] ] else 1) contains text 'b'", false);
   }
 
   /** Ordered selection. */
@@ -336,7 +397,12 @@ public class FTTest extends SandboxTest {
     query("'C D' contains text ('A' ftand 'B') ftor ('C' ftand 'D') ordered", true);
     query("'A B C D' contains text ('B' ftand 'A' ordered) ftor "
         + "('C' ftand 'D' ordered) ordered", true);
-    query("'B A' contains text ('A' ftand ftnot 'B') ordered", false);
+    // excludes out of order are ignored
+    query("'B A' contains text ('A' ftand ftnot 'B') ordered", true);
+    query("'A B' contains text ('A' ftand ftnot 'B') ordered", false);
+    query("'B' contains text (ftnot 'A') ordered", true);
+    // includes at the same position
+    query("'A' contains text ('A' ftand 'A') ordered", true);
     query("'A B' contains text 'B' ftor 'A' ordered", true);
     query("'A B' contains text ('B' ftor 'A') ordered", true);
     query("'A B C' contains text ('A' ftor 'C') ftand 'B' ordered", true);
@@ -376,6 +442,14 @@ public class FTTest extends SandboxTest {
     query("'a b c' contains text 'a' ftand 'c' distance at least 4294967297 words", false);
     query("'a b c' contains text 'a' ftand 'c' distance exactly 9223372036854775807 words", false);
 
+    // excludes outside the distance range are ignored
+    query("'a b x x x c' contains text ('a' ftand 'b' ftand ftnot 'c') "
+        + "distance at most 0 words", true);
+    query("'a b c' contains text ('a' ftand 'b' ftand ftnot 'c') distance at most 0 words", false);
+    // includes with gaps do not cover the entire content
+    query("'a b c' contains text ('a' ftand 'c') distance at most 1 words entire content", false);
+    query("'a b' contains text ('a' ftand 'b') distance at most 1 words entire content", true);
+
     // filters with different ranges must not be merged
     query("let $t := 'a b a c' for $f in (fn() { $t contains text 'a' ftand 'c' "
         + "distance at least 5 words }, fn() { $t contains text 'a' ftand 'c' "
@@ -405,6 +479,10 @@ public class FTTest extends SandboxTest {
     query("'a b b' contains text 'a b' all words window 1 words", false);
     query("'a b' contains text 'a' ftand 'b' window 0 words", false);
     query("'a b' contains text 'a' ftand 'b' window -4294967295 words", false);
+    // excludes inside every window
+    query("'a c b' contains text ('a' ftand 'b' ftand ftnot 'c') window 3 words", false);
+    // adjacent phrases cover the entire content
+    query("'a b c d' contains text ('a b' ftand 'c d') window 4 words entire content", true);
     query("'a single event during the custodial history of a manuscript or other object.'"
         + " contains text 'custodial history of a manuscript' all words window 5 words", true);
   }
@@ -420,6 +498,15 @@ public class FTTest extends SandboxTest {
     query("'a b. a b' contains text 'a b' all words same sentence", true);
     query("'a b. a b' contains text 'a b' all words different sentence", true);
     query("'a x. y b' contains text 'a b' all words same sentence", false);
+    // excludes in other units are ignored
+    query("'a. b' contains text ('a' ftand ftnot 'b') same sentence", true);
+    query("'a b' contains text ('a' ftand ftnot 'b') same sentence", false);
+    query("'b' contains text (ftnot 'a') same sentence", true);
+    query("'a. b' contains text (ftnot 'a. b') same sentence", true);
+    query("'a. b. c' contains text ('a' ftand 'b' ftand ftnot 'c') different sentence", false);
+    query("'a. b c' contains text ('a' ftand 'b' ftand ftnot 'c') different sentence", true);
+    // includes spanning several units
+    query("'b a. c' contains text ('a. c' ftand 'b') different sentence", true);
   }
 
   /** Content position. */
@@ -466,6 +553,9 @@ public class FTTest extends SandboxTest {
     query("'a b' contains text 'a b' not in 'a'", true);
     query("'a b a' contains text 'a' not in 'a b'", true);
     query("'a b a b' contains text 'a' not in 'a b'", false);
+    // positions covered by all includes of a match
+    query("'a b' contains text 'a' not in ('a' ftand 'b')", false);
+    query("'a b c' contains text 'a b c' not in ('a' ftand 'c')", true);
     error("'a' contains text 'a' not in ftnot 'a'", FTMILD);
     pre("//w[text() contains text 'xml' not in 'we have']", 3, 5, 7, 9, 11);
   }
@@ -503,6 +593,11 @@ public class FTTest extends SandboxTest {
     // the inner level has no thesaurus, the outer one is added
     query("'lucky' contains text ('happy' using thesaurus default) "
         + "using thesaurus at " + thes, true);
+    // the inner level disables the thesaurus
+    query("'lucky' contains text ('happy' using no thesaurus) "
+        + "using thesaurus at " + thes, false);
+    query("declare ft-option using thesaurus at " + thes + "; "
+        + "'lucky' contains text 'happy' using no thesaurus", false);
   }
 
   /**
@@ -659,6 +754,9 @@ public class FTTest extends SandboxTest {
     query("let $n := 3 return 'a a' contains text 'a' occurs at least $n times", false);
     // search term that is not known at compile time
     pre("//w[text() contains text { " + wrap("hello") + " }]", 14);
+    // focus-dependent variable must not be inlined into a predicate of the search term
+    query("<x>a</x> ! (let $s := string(.) return 'a b' contains text "
+        + "{ tokenize(" + wrap("a z") + ")[. = $s] } all words distance at most 5 words)", true);
   }
 
   /** Weight declarations. */

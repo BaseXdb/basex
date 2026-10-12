@@ -85,7 +85,9 @@ public final class FtModuleTest extends SandboxTest {
     final String long1 = " string-join(replicate('ab', 100))";
     final String long2 = long1 + " => substring(1, 199) || 'x'";
     query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 2 }"), true);
-    query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 0 }"), true);
+    query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 0 }"), false);
+    query(func.args("house", "mouse", " { 'fuzzy': true(), 'errors': 0 }"), false);
+    query(func.args("house", "mouse", " { 'fuzzy': true(), 'errors': -1 }"), true);
 
     // check occurrences
     query(func.args("a b a", "a", " { 'occurs': { 'min': 2 } }"), true);
@@ -110,8 +112,12 @@ public final class FtModuleTest extends SandboxTest {
     error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
     error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args("x", "x", " 1"), INVTYPE_X);
-    error("declare ft-option using fuzzy; " +
-        func.args("x", "x", " { 'wildcards': true() }"), FT_OPTIONS);
+    error(func.args("x", "x", " { 'wildcards': true(), 'fuzzy': true() }"), FT_OPTIONS);
+    // supplied options take precedence over conflicting prolog options
+    query("declare ft-option using fuzzy; " +
+        func.args("hello", "hel.o", " { 'wildcards': true() }"), true);
+    query("declare ft-option using wildcards; " +
+        func.args("hello", "hallo", " { 'fuzzy': true() }"), true);
   }
 
   /** Test method. */
@@ -129,6 +135,11 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" text { 'a b a' }[. contains text 'a']"), 2);
     query(func.args(" <p>a b a</p>//text()[. contains text 'a']"), 2);
     query(func.args(" <p>a</p>//text()[. contains text 'b']"), 0);
+
+    // nodes from different databases
+    final String copies = "(for $s in ('a b', 'a c') return "
+        + "(copy $c := <p>{ $s }</p> modify () return $c))";
+    query(func.args(" " + copies + "[text() contains text 'a']"), 2);
   }
 
   /** Test method. */
@@ -240,6 +251,10 @@ public final class FtModuleTest extends SandboxTest {
     query("let $p := <p>b <i>b</i> b</p> return " +
       func.args(" ($p, $p/i)[. contains text 'b']", "m"),
       "<p><m>b</m> <i><m>b</m></i> <m>b</m></p>\n<i><m>b</m></i>");
+    // nodes from different databases
+    query(func.args(" (for $s in ('a b', 'a c') return "
+        + "(copy $c := <p>{ $s }</p> modify () return $c))[text() contains text 'a']", "m"),
+      "<p><m>a</m> b</p>\n<p><m>a</m> c</p>");
 
     // marker names must be NCNames
     error(func.args(" //*[text() contains text '1'], 'p:m'"), INVALUE_X_X);
@@ -513,11 +528,12 @@ public final class FtModuleTest extends SandboxTest {
     // the counts of the index are preserved
     query(func.args(NAME, "exercse", fuzzy) + "/@count/string()", 2);
 
-    // dynamic number of errors; negative values are treated like 0
+    // dynamic number of errors for negative values; no errors: exact matches
     query(func.args(NAME, "exercse", " { 'fuzzy': true() }") + "/text()", "exercise");
     query("count(" + func.args(NAME, "xnl", " { 'fuzzy': true() }") + ')', 0);
-    query(func.args(NAME, "exercse", " { 'fuzzy': true(), 'errors': 0 }") + "/text()", "exercise");
     query(func.args(NAME, "exercse", " { 'fuzzy': true(), 'errors': -1 }") + "/text()", "exercise");
+    query("count(" + func.args(NAME, "exercse", " { 'fuzzy': true(), 'errors': 0 }") + ')', 0);
+    query(func.args(NAME, "exercise", " { 'fuzzy': true(), 'errors': 0 }") + "/text()", "exercise");
 
     // without a search term, the option has no effect
     query("count(" + func.args(NAME, " ()", " { 'fuzzy': true() }") + ')', 7);
