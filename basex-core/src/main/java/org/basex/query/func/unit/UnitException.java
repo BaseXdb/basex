@@ -1,7 +1,9 @@
 package org.basex.query.func.unit;
 
+import java.util.function.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -37,22 +39,25 @@ final class UnitException extends QueryException {
 
   /**
    * Copies database nodes of the expected and returned items.
+   * @param test test for nodes that can be shared
    * @param qc query context
    * @throws QueryException query exception
    */
-  void materialize(final QueryContext qc) throws QueryException {
-    expected = materialize(expected, qc);
-    returned = materialize(returned, qc);
+  void materialize(final Predicate<Data> test, final QueryContext qc) throws QueryException {
+    expected = materialize(expected, test, qc);
+    returned = materialize(returned, test, qc);
   }
 
   /**
    * Copies an item if it is a database node.
    * @param item item (can be {@code null})
+   * @param test test for nodes that can be shared
    * @param qc query context
    * @return item (can be {@code null})
    * @throws QueryException query exception
    */
-  private static Item materialize(final Item item, final QueryContext qc) throws QueryException {
-    return item == null ? null : (Item) item.materialize(TransferVisitor.SHAREABLE, null, qc);
+  private static Item materialize(final Item item, final Predicate<Data> test,
+      final QueryContext qc) throws QueryException {
+    return item == null ? null : (Item) item.materialize(test, null, qc);
   }
 }

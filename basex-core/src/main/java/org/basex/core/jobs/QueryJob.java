@@ -259,8 +259,12 @@ public final class QueryJob extends Job implements Runnable {
       final Performance perf = new Performance();
       final QueryInfo qi = opts.get(JobOptions.INFO) ? new QueryInfo(ctx, true) : null;
       qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, qi, perm);
-      // modules of the calling application are resolved as they were for the caller
-      if(job.resolver != null) qp.uriResolver(job.resolver);
+      // modules of the calling application are resolved as they were for the caller.
+      // only unscheduled jobs have a resolver; they run once, so it can be released
+      if(job.resolver != null) {
+        qp.uriResolver(job.resolver);
+        job.resolver = null;
+      }
       boolean registered = false;
       try {
         // the job may have been stopped before its execution started
@@ -306,8 +310,8 @@ public final class QueryJob extends Job implements Runnable {
         perf.nanoRuntime();
         if(remove) ctx.jobs.tasks.remove(id);
 
-        // retrieve result; copy persistent database nodes
-        result.value = qp.value().materialize(TransferVisitor.SHAREABLE, null, qp.qc);
+        // retrieve result; copy nodes of databases that can be updated by other queries
+        result.value = qp.value().materialize(TransferVisitor.unshared(ctx), null, qp.qc);
       } catch(final JobException ex) {
         // query was interrupted: report exceeded limits, discard result of a stopped query
         Util.debug(ex);

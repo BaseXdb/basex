@@ -150,8 +150,9 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
     if(!funcs) throw BASEX_FUNCTION_X.get(info(ii), this);
-    final FuncItem func = closure(test, ii, qc);
-    TransferVisitor.check(func, info(ii));
+    final Set<Value> copies = Collections.newSetFromMap(new IdentityHashMap<>());
+    final FuncItem func = closure(test, copies, ii, qc);
+    TransferVisitor.check(func, test, copies, info(ii));
     return func;
   }
 
@@ -159,19 +160,20 @@ public final class FuncItem extends FItem implements Scope {
    * Returns a function item in which the captured values and the captured query focus are
    * materialized.
    * @param test test for data references that can be shared
+   * @param copies set to which the materialized values are added
    * @param ii input info (can be {@code null})
    * @param qc query context
    * @return function item, or this item if nothing needed to be rewritten
    * @throws QueryException query exception
    */
-  private FuncItem closure(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  private FuncItem closure(final Predicate<Data> test, final Set<Value> copies,
+      final InputInfo ii, final QueryContext qc) throws QueryException {
 
     final TypeCheck check = expr instanceof final TypeCheck tc ? tc : null;
     final Expr body = check != null ? check.expr : expr;
     Expr copy = null;
     if(body instanceof final GFLWOR gflwor) {
-      final GFLWOR mat = gflwor.materialize(test, ii, qc);
+      final GFLWOR mat = gflwor.materialize(test, copies, ii, qc);
       if(mat != gflwor) copy = check != null ? new TypeCheck(info, mat, check.seqType()) : mat;
     }
 
@@ -179,6 +181,7 @@ public final class FuncItem extends FItem implements Scope {
     if(!simple && focus != null && focus.value != null) {
       final Value value = focus.value.materialize(test, true, ii, qc);
       if(value != focus.value) {
+        copies.add(value);
         qf = focus.copy();
         qf.value = value;
       }

@@ -697,7 +697,7 @@ public abstract class StandardFunc extends Arr {
     if(function != null) {
       // a service is written to disk, and a scheduled job outlives the query that created it
       if(service || QueryJobSpec.scheduled(options)) throw JOBS_FUNCTION.get(info);
-      // the job must not depend on the query that created it: copy persistent database nodes
+      // the job must not depend on the query that created it: copy database nodes
       final Value[] values = toArguments(args, function, qc);
       for(int v = 0; v < values.length; v++) {
         values[v] = values[v].materialize(TransferVisitor.SHAREABLE, true, info, qc);
@@ -720,9 +720,10 @@ public abstract class StandardFunc extends Arr {
       }
     }
 
-    // copy variable values
+    // copy database nodes of variable values
     for(final Entry<String, Value> binding : bindings.entrySet()) {
-      bindings.put(binding.getKey(), binding.getValue().materialize(n -> false, true, info, qc));
+      bindings.put(binding.getKey(),
+          binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
     return new QueryJobSpec(options, bindings, content, sc().resolver());
   }

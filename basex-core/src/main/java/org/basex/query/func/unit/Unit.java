@@ -8,9 +8,11 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -323,9 +325,10 @@ final class Unit {
         throw UNIT_TIMEOUT_X.get(func.info, timeout / 1000.0);
       } catch(final QueryException ex) {
         // copy database nodes before the opened databases are closed
-        if(ex instanceof final UnitException ue) ue.materialize(qc);
+        final Predicate<Data> test = TransferVisitor.unshared(qc.context);
+        if(ex instanceof final UnitException ue) ue.materialize(test, qc);
         final Value value = ex.value();
-        if(value != null) ex.value(value.materialize(TransferVisitor.SHAREABLE, null, qc));
+        if(value != null) ex.value(value.materialize(test, null, qc));
         throw ex;
       }
     } finally {

@@ -66,6 +66,15 @@ public final class Datas {
   }
 
   /**
+   * Checks if the specified data reference is pinned.
+   * @param data data reference
+   * @return result of check
+   */
+  public synchronized boolean pinned(final Data data) {
+    return list.containsKey(data);
+  }
+
+  /**
    * Returns the number of pins for the database with the specified name,
    * or {@code 0} if the database is not opened.
    * @param name name of the database

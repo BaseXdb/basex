@@ -24,8 +24,8 @@ public final class QueryJobSpec {
   final String query;
   /** Simple query without URI. */
   final boolean simple;
-  /** URI resolver of the calling module (can be {@code null}). */
-  final UriResolver resolver;
+  /** URI resolver of the calling module (can be {@code null}); discarded after job was started. */
+  UriResolver resolver;
   /** Function to be invoked instead of the query; discarded after the job was started. */
   FItem function;
   /** Arguments of the invoked function; discarded after the job was started. */

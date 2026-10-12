@@ -1,5 +1,6 @@
 package org.basex.http.restxq;
 
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -50,5 +51,18 @@ public final class RestXqJobTest extends RestXqTest {
         "    {}, { 'cache': true() })" +
         "  return (job:wait($id), job:result($id)) };",
         "header");
+  }
+
+  /**
+   * Bodies that have not been read by the request are empty in asynchronous jobs.
+   * @throws Exception exception
+   */
+  @Test public void asyncJobUnreadBody() throws Exception {
+    post("0",
+        "declare %R:path('body') %R:POST %output:method('text') function m:f() {" +
+        "  let $id := job:eval('count(Q{http://exquery.org/ns/request}body())'," +
+        "    {}, { 'cache': true() })" +
+        "  return (job:wait($id), job:result($id)) };",
+        "body", "abc", MediaType.APPLICATION_OCTET_STREAM);
   }
 }

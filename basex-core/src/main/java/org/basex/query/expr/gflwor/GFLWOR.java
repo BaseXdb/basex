@@ -61,13 +61,14 @@ public final class GFLWOR extends ParseExpr {
    * Returns a copy of this expression in which the values bound by the let clauses are
    * materialized.
    * @param test test for data references that can be shared
+   * @param copies set to which the materialized values are added
    * @param ii input info (can be {@code null})
    * @param qc query context
    * @return this expression, or a copy
    * @throws QueryException query exception
    */
-  public GFLWOR materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public GFLWOR materialize(final Predicate<Data> test, final Set<Value> copies,
+      final InputInfo ii, final QueryContext qc) throws QueryException {
     final LinkedList<Clause> list = new LinkedList<>();
     boolean copied = false;
     for(final Clause clause : clauses) {
@@ -75,7 +76,10 @@ public final class GFLWOR extends ParseExpr {
         return this;
       }
       final Value mat = value.materialize(test, true, ii, qc);
-      copied |= mat != value;
+      if(mat != value) {
+        copies.add(mat);
+        copied = true;
+      }
       list.add(mat == value ? let : new Let(let.var, mat, let.scoring));
     }
     return copied ? new GFLWOR(info, list, rtrn) : this;

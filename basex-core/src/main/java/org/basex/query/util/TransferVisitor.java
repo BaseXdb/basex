@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -24,41 +25,72 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class TransferVisitor extends ASTVisitor {
-  /** Test for nodes that can be shared with another query context. */
-  public static final Predicate<Data> SHAREABLE = data -> data == null || data.inMemory();
+  /** Test for nodes that can be shared with another query context (databases can be updated). */
+  public static final Predicate<Data> SHAREABLE = data -> data == null;
 
   /** Visited scopes. */
   private final Set<Scope> scopes = Collections.newSetFromMap(new IdentityHashMap<>());
+  /** Test for nodes that can be shared. */
+  private final Predicate<Data> test;
+  /** Values that have already been materialized. */
+  private final Set<Value> copies;
   /** Dependency on the creating query (can be {@code null}). */
   private String dependency;
 
   /**
-   * Returns the dependency that keeps a value from being passed on to another query context.
-   * @param value value
-   * @return dependency, or {@code null} if the value can be passed on
+   * Constructor.
+   * @param test test for nodes that can be shared
+   * @param copies values that have already been materialized
    */
-  public static String dependency(final Value value) {
-    final TransferVisitor visitor = new TransferVisitor();
-    visitor.value(value);
-    return visitor.dependency;
+  private TransferVisitor(final Predicate<Data> test, final Set<Value> copies) {
+    this.test = test;
+    this.copies = copies;
+  }
+
+  /**
+   * Returns a test for nodes that are neither persistent nor shared with other queries.
+   * @param ctx database context
+   * @return test
+   */
+  public static Predicate<Data> unshared(final Context ctx) {
+    final Map<Data, Boolean> pinned = new IdentityHashMap<>();
+    return data -> data == null || data.inMemory() &&
+        !pinned.computeIfAbsent(data, ctx.datas::pinned);
   }
 
   /**
    * Raises an error if a function item cannot be passed on to another query context.
    * @param function function item
+   * @param test test for nodes that can be shared
+   * @param copies values that have already been materialized
    * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public static void check(final FItem function, final InputInfo ii) throws QueryException {
-    final String dep = dependency(function);
-    if(dep != null) throw BASEX_EVAL_X_X.get(ii, dep, function);
+  public static void check(final FItem function, final Predicate<Data> test,
+      final Set<Value> copies, final InputInfo ii) throws QueryException {
+    final TransferVisitor visitor = new TransferVisitor(test, copies);
+    visitor.value(function);
+    if(visitor.dependency != null) throw BASEX_EVAL_X_X.get(ii, visitor.dependency, function);
+  }
+
+  /**
+   * Returns the dependency that keeps a value from being passed on to another query context.
+   * @param value value
+   * @param test test for nodes that can be shared
+   * @return dependency, or {@code null} if the value can be passed on
+   */
+  public static String dependency(final Value value, final Predicate<Data> test) {
+    final TransferVisitor visitor = new TransferVisitor(test, Set.of());
+    visitor.value(value);
+    return visitor.dependency;
   }
 
   @Override
   public boolean value(final Value value) {
+    if(copies.contains(value)) return true;
     // values without function items are checked by a single call
     try {
-      if(value.materialized(SHAREABLE, false, null)) return true;
+      if(value.materialized(test, false, null)) return true;
     } catch(final QueryException ex) {
       Util.debug(ex);
     }
@@ -112,7 +144,7 @@ public final class TransferVisitor extends ASTVisitor {
 
   @Override
   public boolean database(final Data data) {
-    return SHAREABLE.test(data) || reject("database '" + data.meta.name + '\'');
+    return test.test(data) || reject("database '" + data.meta.name + '\'');
   }
 
   @Override
@@ -121,17 +153,17 @@ public final class TransferVisitor extends ASTVisitor {
   }
 
   /**
-   * Checks if an item has no dependency on persistent data.
+   * Checks if an item has no dependency on a database node.
    * @param item item
    * @return result of check
    */
   private boolean materialized(final Item item) {
     try {
-      if(item.materialized(SHAREABLE, false, null)) return true;
+      if(item.materialized(test, false, null)) return true;
     } catch(final QueryException ex) {
       Util.debug(ex);
     }
-    return reject("persistent data");
+    return reject("database node");
   }
 
   /**

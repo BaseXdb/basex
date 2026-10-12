@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -59,14 +60,14 @@ public abstract class FItem extends Item implements XQFunction {
   public Item materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
     if(!funcs) throw BASEX_FUNCTION_X.get(info(ii), this);
-    TransferVisitor.check(this, info(ii));
+    TransferVisitor.check(this, test, Set.of(), info(ii));
     return this;
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    return funcs && TransferVisitor.dependency(this) == null;
+    return funcs && TransferVisitor.dependency(this, test) == null;
   }
 
   /**

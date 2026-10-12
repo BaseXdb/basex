@@ -463,6 +463,16 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("(1 to 1000)[. = 0]"), "");
     query(func.args("(1 to 1000)[. = 1]"), 1);
     error(func.args("1 + ''"), CALCTYPE_X_X_X_X_X);
+    // constructed nodes are passed on unchanged, updatable main-memory nodes are copied
+    query("let $n := <a/> return " +
+        func.args("declare variable $n external; $n", " { 'n': $n }") + " is $n", true);
+    query("let $n := parse-xml('<a/>') return " +
+        func.args("declare variable $n external; $n", " { 'n': $n }") + " is $n", false);
+    query("let $n := parse-xml('<a/>') return " +
+        func.args(" fn($x) { $x }", " [ $n ]") + " is $n", false);
+    // main-memory nodes created by the job are returned unchanged
+    query("let $r := " + func.args("let $d := parse-xml('<a><b/></a>') return ($d, $d//b)") +
+        " return $r[2]/root() is $r[1]", true);
   }
 
   /** Invokes function items instead of query strings. */
@@ -482,6 +492,11 @@ public final class JobModuleTest extends SandboxTest {
     // closures over materialized values
     query("let $a := 40 return " + func.args(" fn() { $a + 2 }"), 42);
     query("let $n := <a>1</a> return " + func.args(" fn() { $n/text() }"), 1);
+    // closures over database nodes, which are copied
+    query("let $n := parse-xml('<a>1</a>') return " + func.args(" fn() { $n/a/text() }"), 1);
+    query("let $n := parse-xml('<a/>') return " + func.args(" fn() { $n }") + " is $n", false);
+    query("let $n := <a/> update { insert node <b>2</b> into . } return " +
+        func.args(" fn() { $n/b/text() }"), 2);
 
     // function items as arguments
     query(func.args(" fn($f) { $f() }", " [ fn() { 7 } ]"), 7);
@@ -530,6 +545,14 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_EVAL_X_X);
     // dependency in a function supplied as argument
     error(func.args(" fn($f) { $f() }", " [ fn() { . } ]"), BASEX_EVAL_X_X);
+    // main-memory node in an evaluated static variable
+    error("declare variable $v := parse-xml('<a/>'); let $c := count($v) return " +
+        func.args(" fn() { $v }"), BASEX_EVAL_X_X);
+    // captured nodes of a persistent database
+    query(_DB_CREATE.args(NAME, "<a/>", "a.xml"));
+    error("let $n := " + _DB_GET.args(NAME) + " return " + func.args(" fn() { $n }"),
+        BASEX_EVAL_X_X);
+    query(_DB_DROP.args(NAME));
 
     // errors of the invoked function are passed on
     error(func.args(" fn() { 1 + '' }"), CALCTYPE_X_X_X_X_X);

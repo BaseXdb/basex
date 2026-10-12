@@ -67,7 +67,7 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void evaluatedStaticVariable() {
     execute(new CreateDB(NAME, "<a/>"));
     try {
-      assertEquals("persistent data in static variable $v", dependency(
+      assertEquals("database node in static variable $v", dependency(
           "declare variable $v := db:get('" + NAME + "'); let $c := count($v) return fn() { $v }"));
     } finally {
       execute(new DropDB(NAME));
@@ -93,7 +93,7 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void persistentNode() {
     execute(new CreateDB(NAME, "<a/>"));
     try {
-      assertEquals("persistent data",
+      assertEquals("database node",
           dependency("let $n := db:get('" + NAME + "') return fn() { $n }"));
     } finally {
       execute(new DropDB(NAME));
@@ -107,7 +107,7 @@ public final class TransferVisitorTest extends SandboxTest {
    */
   private static String dependency(final String query) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      return TransferVisitor.dependency(qp.value());
+      return TransferVisitor.dependency(qp.value(), TransferVisitor.SHAREABLE);
     } catch(final QueryException ex) {
       Util.stack(ex);
       throw new AssertionError(ex);
