@@ -18,7 +18,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnTrimSpace extends StandardFunc {
+public final class FnTrimSpace extends ContextFn {
   /** Options. */
   public static final class TrimOptions extends Options {
     /** Option. */
@@ -27,7 +27,7 @@ public final class FnTrimSpace extends StandardFunc {
 
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item item = arg(0).atomItem(qc, info);
+    final Item item = context(qc).atomItem(qc, info);
     final byte[] value = item.isEmpty() ? EMPTY : item.string(info);
     final Side side = options(1, TrimOptions::new, qc).get(TrimOptions.SIDE);
 
@@ -44,7 +44,7 @@ public final class FnTrimSpace extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // trim-space(<a>{ $x }</a>) → trim-space(xs:string($x))
-    arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
+    if(defined(0)) arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
     super.simplifyArgs(cc);
   }
 

@@ -754,7 +754,7 @@ public enum Function implements AFunction {
   TRANSLATE(FnTranslate::new, "translate(value, replace, with)",
       params(STRING_ZO, STRING_O, STRING_O), STRING_O),
   /** XQuery function. */
-  TRIM_SPACE(FnTrimSpace::new, "trim-space(value, options?)",
+  TRIM_SPACE(FnTrimSpace::new, "trim-space(value?, options?)",
       params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), STRING_O),
   /** XQuery function. */
   TRUE(FnTrue::new, "true()",

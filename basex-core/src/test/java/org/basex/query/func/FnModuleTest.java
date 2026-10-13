@@ -6307,6 +6307,10 @@ return
         empty(func));
     check("boolean(" + func.args(wrap("\t"), " { 'side': 'start' }") + ")", false,
         empty(func));
+    check("(<_> </_>, <_> x </_>)[" + func.args() + "]", "<_> x </_>",
+        empty(func), exists(NORMALIZE_SPACE));
+    check("(<_> </_>, <_> x </_>) ! " + NORMALIZE_SPACE.args(func.args()), "\nx",
+        empty(func), exists(NORMALIZE_SPACE));
 
     error(func.args("a", " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
   }
