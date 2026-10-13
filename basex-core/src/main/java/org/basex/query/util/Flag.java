@@ -21,12 +21,6 @@ public enum Flag {
    */
   CTX,
   /**
-   * Reference to the current value.
-   * Stripped by the binding of a captured current value.
-   * Example: current()
-   */
-  CUR,
-  /**
    * Nondeterministic code. Cannot be relocated, pre-evaluated or optimized away.
    * Implied by {@link #UPD}: see the constructor of {@link FuncDefinition} and
    * {@code org.basex.query.up.expr.Update#has(Flag...)}.

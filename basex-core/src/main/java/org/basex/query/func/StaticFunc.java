@@ -165,14 +165,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // defaults without focus are evaluated once, like global variables
     if(!defaultHas(index, Flag.CTX)) return global(index, prepared, qc).value(qc);
 
-    final Value current = qc.current;
-    qc.current = null;
     final int fp = prepared.scope.enter(qc);
     try {
       return prepared.expr.value(qc);
     } finally {
       prepared.scope.exit(fp, qc);
-      qc.current = current;
     }
   }
 

@@ -322,22 +322,14 @@ public final class XQuery4Test extends SandboxTest {
         + "<a/> ! function-lookup(xs:QName('local:f'), 0)()", "a");
     query("declare function local:f($x := name()) { $x }; "
         + "let $f := <a/> ! function-lookup(xs:QName('local:f'), 0) return <b/> ! $f()", "a");
+  }
 
-    // fn:current is the context value of the query prolog, also within defaults
-    query("declare context value := <global/>; <a/> ! current()", "<global/>");
-    query("declare context value := <global/>; declare variable $v := current(); name($v)",
-        "global");
-    error("<a/> ! current()", NOCTX_X);
-    query("declare context value := <global/>; "
-        + "declare function local:f($n as node() := current()) { name($n) }; <a/>/local:f()",
-        "global");
-    query("declare context value := <global/>; "
-        + "declare function local:f($x := (name(current()), name())) { $x }; <a/> ! local:f()",
-        "global\na");
-    query("declare context value := <global/>; "
-        + "declare function local:f($x := name(current#0())) { $x }; <a/> ! local:f()",
-        "global");
-    error("declare function local:f($x := current()) { $x }; <a/> ! local:f()", NOCTX_X);
+  /** fn:current is not available in XQuery. */
+  @Test public void current() {
+    error("<a/> ! current()", WHICHFUNC_X);
+    error("current#0", WHICHFUNC_X);
+    query("function-lookup(xs:QName('fn:current'), 0)", "");
+    query("declare function local:current() { 1 }; local:current()", 1);
   }
 
   /** Generalized arrow operator. */

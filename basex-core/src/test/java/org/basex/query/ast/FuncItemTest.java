@@ -107,8 +107,6 @@ public final class FuncItemTest extends SandboxTest {
     error("declare function f() {.}; 1!f() ", NOCTX_X);
     error("declare function g($x := .) { $x }; "
         + "let $f := fn() { g() } return 1!$f()", NOCTX_X);
-    // fn:current refers to the context value of the query prolog
-    error("declare function f($a, $b:= current()) { $a + $b }; 1!f(?)(2)", NOCTX_X);
   }
 
   /** Checks that partial application supports function sequences. */
