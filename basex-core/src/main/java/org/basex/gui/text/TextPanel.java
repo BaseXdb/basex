@@ -750,9 +750,10 @@ public class TextPanel extends BaseXPanel {
     if(changed || pos != editor.pos() || selected != editor.isSelected()) {
       update(down ? Align.BOTTOM : Align.TOP);
     }
-    // refresh completions, or show them after a delay if the cursor was moved
+    // refresh visible completions; cursor moves discard a scheduled popup
     if(hist.active() && (moved || edited)) {
-      refreshCompletion(true);
+      if(moved && !completion.visible()) completion.hide();
+      refreshCompletion(false);
       signatureCode.invokeLater(false);
     } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
       // close the popups: the key press will be processed as a shortcut
