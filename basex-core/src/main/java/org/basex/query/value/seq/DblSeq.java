@@ -6,9 +6,11 @@ import java.util.*;
 import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Sequence of items of type {@link Dbl xs:double}, containing at least two of them.
@@ -34,18 +36,19 @@ public final class DblSeq extends NativeSeq {
    * @param in data input
    * @return value
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  public static Value read(final DataInput in) throws IOException {
+  public static Value read(final DataInput in) throws IOException, QueryException {
     final int size = in.readNum();
     final double[] values = new double[size];
-    for(int s = 0; s < size; s++) values[s] = in.readDoubleCompact();
+    for(int s = 0; s < size; s++) values[s] = Dbl.parse(in.readToken(), null);
     return get(values);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final double v : values) out.writeDoubleCompact(v);
+    for(final double v : values) out.writeToken(Token.token(v));
   }
 
   @Override

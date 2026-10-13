@@ -1,5 +1,7 @@
 package org.basex.query.value.seq;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 import java.math.*;
 import java.util.*;
@@ -39,14 +41,14 @@ public final class DecSeq extends NativeSeq {
   public static Value read(final DataInput in) throws IOException {
     final int size = in.readNum();
     final BigDecimal[] values = new BigDecimal[size];
-    for(int s = 0; s < size; s++) values[s] = in.readDecimal();
+    for(int s = 0; s < size; s++) values[s] = new BigDecimal(string(in.readToken()));
     return get(values);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final BigDecimal v : values) out.writeDecimal(v);
+    for(final BigDecimal v : values) out.writeToken(chopNumber(token(v.toPlainString())));
   }
 
   @Override

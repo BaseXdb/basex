@@ -41,14 +41,14 @@ public final class IntSeq extends ItrSeq {
   public static Value read(final DataInput in, final Type type) throws IOException {
     final int size = in.readNum();
     final int[] values = new int[size];
-    for(int s = 0; s < size; s++) values[s] = (int) in.readZigzag();
+    for(int s = 0; s < size; s++) values[s] = (int) in.readLong();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final int v : values) out.writeZigzag(v);
+    for(final int v : values) out.writeLong(v);
   }
 
   @Override

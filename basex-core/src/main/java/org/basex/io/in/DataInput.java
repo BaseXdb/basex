@@ -1,7 +1,6 @@
 package org.basex.io.in;
 
 import java.io.*;
-import java.math.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -50,50 +49,6 @@ public final class DataInput extends BufferInput {
    */
   public double readDouble() throws IOException {
     return Token.toDouble(readToken());
-  }
-
-  /**
-   * Reads a double value that has been written as compact integer or as raw bits.
-   * @return double value
-   * @throws IOException I/O exception
-   */
-  public double readDoubleCompact() throws IOException {
-    final long n = readZigzag();
-    return (n & 1) == 0 ? n >> 1 : Double.longBitsToDouble(read8());
-  }
-
-  /**
-   * Reads the raw bits of a float value.
-   * @return float value
-   * @throws IOException I/O exception
-   */
-  public float readFloatBits() throws IOException {
-    return Float.intBitsToFloat(read4());
-  }
-
-  /**
-   * Reads a decimal value from its scale and unscaled value.
-   * @return decimal value
-   * @throws IOException I/O exception
-   */
-  public BigDecimal readDecimal() throws IOException {
-    final long n = readZigzag();
-    final int scale = (int) (n >> 1);
-    return (n & 1) == 0 ? BigDecimal.valueOf(readZigzag(), scale) :
-      new BigDecimal(new BigInteger(readToken()), scale);
-  }
-
-  /**
-   * Reads a zigzag-encoded long value.
-   * @return read value
-   * @throws IOException I/O exception
-   */
-  public long readZigzag() throws IOException {
-    final int n = readNum();
-    // marker: read full value; otherwise, use compact number
-    final long z = n == 0x3FFF ? read8() : n & 0xFFFFFFFFL;
-    // restore original value
-    return z >>> 1 ^ -(z & 1);
   }
 
   /**
@@ -147,16 +102,7 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public int readNum() throws IOException {
-    return readNum(read());
-  }
-
-  /**
-   * Reads a compressed integer value, the first byte of which has already been read.
-   * @param v first byte
-   * @return read value
-   * @throws IOException I/O exception
-   */
-  public int readNum(final int v) throws IOException {
+    final int v = read();
     return v == -1 ? 0 : switch((v & 0xC0) >>> 6) {
       case 0  -> v;
       case 1  -> (v & 0x3F) << 8 | read();
@@ -195,23 +141,5 @@ public final class DataInput extends BufferInput {
   private long read8() throws IOException {
     return (long) read() << 56 | (long) read() << 48 | (long) read() << 40 | (long) read() << 32 |
         (long) read() << 24 | read() << 16 | read() << 8 | read();
-  }
-
-  /**
-   * Reads an integer value.
-   * @return read value
-   * @throws IOException I/O exception
-   */
-  private int read4() throws IOException {
-    return read() << 24 | read() << 16 | read() << 8 | read();
-  }
-
-  /**
-   * Reads a short value.
-   * @return read value
-   * @throws IOException I/O exception
-   */
-  public short read2() throws IOException {
-    return (short) (read() << 8 | read());
   }
 }

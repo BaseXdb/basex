@@ -60,7 +60,7 @@ public final class RangeSeq extends Seq {
    * @throws IOException I/O exception
    */
   public static Value read(final DataInput in) throws IOException {
-    final long size = in.readLong(), start = in.readZigzag();
+    final long size = in.readLong(), start = in.readLong();
     final boolean ascending = in.readBool();
     return get(start, size, ascending);
   }
@@ -68,7 +68,7 @@ public final class RangeSeq extends Seq {
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeLong(size);
-    out.writeZigzag(start);
+    out.writeLong(start);
     out.writeBool(ascending);
   }
 

@@ -259,13 +259,12 @@ public final class LegacyStorageTest extends SandboxTest {
   }
 
   /**
-   * Reads a store that was written with version 12 and rewrites it in the current format.
+   * Reads a store that was written with version 12, rewrites and reads it again.
    * @throws IOException I/O exception
    */
   @Test public void oldVersionStore() throws IOException {
     final IOFile file = context.soptions.dbPath("store.basex");
-    final byte[] old = new IOFile("src/test/resources/store-v12.basex").read();
-    file.write(old);
+    file.write(new IOFile("src/test/resources/store-v12.basex").read());
     // returns the keys of all entries that differ, and the sign of the stored negative zero
     final String check = """
       declare function local:types($value) {
@@ -310,9 +309,8 @@ public final class LegacyStorageTest extends SandboxTest {
       query(_STORE_READ.args());
       query(check, "-INF");
 
-      // the store is rewritten in the current format
+      // the store is rewritten and read again
       query(_STORE_WRITE.args());
-      assertFalse(Arrays.equals(old, file.read()));
       query(_STORE_READ.args());
       query(check, "-INF");
     } finally {

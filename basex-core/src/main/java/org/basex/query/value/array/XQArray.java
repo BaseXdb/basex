@@ -200,7 +200,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(structSize());
-    for(final Value value : members()) Stores.writeNested(out, value);
+    for(final Value value : members()) Stores.write(out, value);
   }
 
   /**

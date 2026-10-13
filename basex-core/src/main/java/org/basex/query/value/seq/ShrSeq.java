@@ -41,14 +41,14 @@ public final class ShrSeq extends ItrSeq {
   public static Value read(final DataInput in, final Type type) throws IOException {
     final int size = in.readNum();
     final short[] values = new short[size];
-    for(int s = 0; s < size; s++) values[s] = in.read2();
+    for(int s = 0; s < size; s++) values[s] = (short) in.readNum();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final short v : values) out.write2(v);
+    for(final short v : values) out.writeNum(v);
   }
 
   @Override

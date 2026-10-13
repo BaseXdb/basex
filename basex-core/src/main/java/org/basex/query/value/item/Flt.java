@@ -2,10 +2,8 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.math.*;
 
-import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
@@ -47,11 +45,6 @@ public final class Flt extends ANum {
   public static Flt get(final float value) {
     return value == 0 && Float.floatToRawIntBits(value) == 0 ? ZERO : value == 1 ? ONE :
       Float.isNaN(value) ? NAN : new Flt(value);
-  }
-
-  @Override
-  public void write(final DataOutput out) throws IOException {
-    out.writeFloatBits(value);
   }
 
   @Override

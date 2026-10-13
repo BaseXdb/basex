@@ -357,19 +357,11 @@ public final class Stores implements Closeable {
 
   // STATIC FUNCTIONS =============================================================================
 
-  /** Format marker (values without marker were written by BaseX 12 and older). */
-  private static final int MARKER = 0x80;
-  /** Marker flag for single items, which are stored without size. */
-  private static final int SINGLE = 0x20;
-  /** Current format version (1-31). */
-  private static final int VERSION = 1;
   /** Format ID of sequences with arbitrary items. */
   private static final int SEQUENCE = 0x3f;
-  /** Format ID of the prefix that makes BaseX 12 and older reject top-level values. */
-  private static final int VERSIONED = 0x3e;
 
   /**
-   * Writes a top-level value to an output stream.
+   * Writes the specified value to an output stream.
    * @param out data output
    * @param value value to write
    * @throws IOException I/O exception
@@ -377,42 +369,23 @@ public final class Stores implements Closeable {
    */
   public static void write(final DataOutput out, final Value value)
       throws IOException, QueryException {
-    // older versions read a sequence with an unknown format and reject the value
-    out.writeNum(BasicType.STRING.index());
-    out.writeLong(2);
-    out.writeNum(VERSIONED);
-    writeNested(out, value);
-  }
-
-  /**
-   * Writes a value that is nested in a top-level value to an output stream.
-   * @param out data output
-   * @param value value to write
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  public static void writeNested(final DataOutput out, final Value value)
-      throws IOException, QueryException {
     final long size = value.size();
-    out.write1(MARKER | (size == 1 ? SINGLE : 0) | VERSION);
+    final Format format = size > 1 ? Format.get(value) : null;
+    // the type must be refined before it is written
+    final boolean same = size > 1 && format == null && value.refineType();
     out.writeNum(value.seqType().type.index());
+    out.writeLong(size);
     if(size == 1) {
       value.write(out);
-    } else {
-      out.writeLong(size);
-      if(size == 0) return;
-      final Format format = Format.get(value);
-      if(format == null) {
-        out.writeNum(SEQUENCE);
-        final boolean same = value.refineType();
-        out.writeBool(same);
-        for(final Item item : value) {
-          if(!same) out.writeNum(item.type.index());
-          item.write(out);
-        }
-      } else {
-        out.writeNum(format.ordinal());
-        value.write(out);
+    } else if(format != null) {
+      out.writeNum(format.ordinal());
+      value.write(out);
+    } else if(size > 1) {
+      out.writeNum(SEQUENCE);
+      out.writeBool(same);
+      for(final Item item : value) {
+        if(!same) out.writeNum(item.type.index());
+        item.write(out);
       }
     }
   }
@@ -428,38 +401,24 @@ public final class Stores implements Closeable {
   public static Value read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException  {
     qc.checkStop();
-    final int b = in.read(), version, index;
-    final boolean single;
-    if(b < MARKER) {
-      // without marker, the first byte belongs to the compressed type index
-      version = 0;
-      single = false;
-      index = in.readNum(b);
-    } else {
-      version = b & (SINGLE - 1);
-      single = (b & SINGLE) != 0;
-      if(b >= 0xC0 || version == 0 || version > VERSION) throw new IOException(H_STORE_FORMAT);
-      index = in.readNum();
-    }
-    final Type type = type(index);
-    if(single) return item(in, type, version, qc);
+    final Type type = type(in.readNum());
     final long size = in.readLong();
     if(size == 0) return Empty.VALUE;
-    if(size == 1) return item(in, type, version, qc);
+    if(size == 1) return type.read(in, qc);
     final int id = in.readNum();
-    if(version == 0 && id == VERSIONED) return read(in, qc);
     if(id == SEQUENCE) {
       final ValueBuilder vb = new ValueBuilder(qc, size);
       final boolean same = in.readBool();
       for(long s = 0; s < size; s++) {
-        vb.add(item(in, same ? type : type(in.readNum()), version, qc));
+        final Type tp = same ? type : type(in.readNum());
+        vb.add(tp.read(in, qc));
       }
       return vb.value(type);
     }
-    // format is unknown: the store was written by a newer version
+    // format is unknown: the value was written by a newer version
     final Format format = Format.get(id);
     if(format == null) throw new IOException(H_STORE_FORMAT);
-    return version == 0 ? legacySequence(in, format, type, qc) : format.reader.read(in, type, qc);
+    return format.reader.read(in, type, qc);
   }
 
   /**
@@ -470,77 +429,9 @@ public final class Stores implements Closeable {
    */
   private static Type type(final int index) throws IOException {
     final Type type = Types.type(index);
+    // type is unknown: the value was written by a newer version
     if(type == null) throw new IOException(H_STORE_FORMAT);
     return type;
-  }
-
-  /**
-   * Reads a single item.
-   * @param in input stream
-   * @param type type
-   * @param version format version
-   * @param qc query context
-   * @return item
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  private static Item item(final DataInput in, final Type type, final int version,
-      final QueryContext qc) throws IOException, QueryException {
-    return version == 0 ? legacyItem(in, type, qc) : type.read(in, qc);
-  }
-
-  /**
-   * Reads a single item in the format of version 0 (BaseX 12 and older).
-   * @param in input stream
-   * @param type type
-   * @param qc query context
-   * @return item
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  private static Item legacyItem(final DataInput in, final Type type, final QueryContext qc)
-      throws IOException, QueryException {
-    if(type == NodeType.NAMESPACE) return NodeType.NAMESPACE.cast(in.readToken(), qc, null);
-    if(type instanceof final BasicType bt) {
-      // floating-point numbers, decimals and unsigned longs were stored as strings
-      if(bt.oneOf(BasicType.DOUBLE, BasicType.FLOAT, BasicType.DECIMAL, BasicType.UNSIGNED_LONG)) {
-        return bt.cast(Str.get(in.readToken()), qc, null);
-      }
-      // integers were stored without zigzag encoding
-      if(bt.instanceOf(BasicType.INTEGER)) return Itr.get(in.readLong(), bt);
-    }
-    return type.read(in, qc);
-  }
-
-  /**
-   * Reads a sequence in the format of version 0 (BaseX 12 and older).
-   * @param in input stream
-   * @param format sequence format
-   * @param type type
-   * @param qc query context
-   * @return value
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  private static Value legacySequence(final DataInput in, final Format format, final Type type,
-      final QueryContext qc) throws IOException, QueryException {
-    return switch(format) {
-      case DBL, FLT, DEC, BYT, SHR, INT, LONG -> {
-        final int size = in.readNum();
-        final ValueBuilder vb = new ValueBuilder(qc, size);
-        // bytes and shorts were stored as compressed integers
-        final boolean num = format == Format.BYT || format == Format.SHR;
-        for(int s = 0; s < size; s++) {
-          vb.add(num ? Itr.get(in.readNum(), type) : legacyItem(in, type, qc));
-        }
-        yield vb.value(type);
-      }
-      case RANGE -> {
-        final long size = in.readLong(), start = in.readLong();
-        yield RangeSeq.get(start, size, in.readBool());
-      }
-      default -> format.reader.read(in, type, qc);
-    };
   }
 
   /**
@@ -564,7 +455,7 @@ public final class Stores implements Closeable {
    * Sequence formats.
    */
   private enum Format {
-    // ORDER MUST NOT BE CHANGED. MAXIMUM: 62 ENTRIES
+    // ORDER MUST NOT BE CHANGED. MAXIMUM: 62 ENTRIES (0x3e: reserved for new formats)
     /** Booleans. */ BLN(BlnSeq.class, (in, type, qc) -> BlnSeq.read(in)),
     /** Bytes. */ BYT(BytSeq.class, (in, type, qc) -> BytSeq.read(in, type)),
     /** Doubles. */ DBL(DblSeq.class, (in, type, qc) -> DblSeq.read(in)),

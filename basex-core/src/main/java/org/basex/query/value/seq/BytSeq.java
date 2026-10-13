@@ -41,14 +41,14 @@ public final class BytSeq extends ItrSeq {
   public static Value read(final DataInput in, final Type type) throws IOException {
     final int size = in.readNum();
     final byte[] values = new byte[size];
-    in.readNBytes(values, 0, size);
+    for(int s = 0; s < size; s++) values[s] = (byte) in.readNum();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    out.writeBytes(values);
+    for(final byte v : values) out.writeNum(v);
   }
 
   @Override

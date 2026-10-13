@@ -42,14 +42,14 @@ public final class LongSeq extends ItrSeq {
   public static Value read(final DataInput in, final Type type) throws IOException {
     final int size = in.readNum();
     final long[] values = new long[size];
-    for(int s = 0; s < size; s++) values[s] = in.readZigzag();
+    for(int s = 0; s < size; s++) values[s] = in.readLong();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final long v : values) out.writeZigzag(v);
+    for(final long v : values) out.writeLong(v);
   }
 
   @Override

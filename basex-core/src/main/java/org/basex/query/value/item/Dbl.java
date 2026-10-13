@@ -2,10 +2,8 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.math.*;
 
-import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
@@ -47,11 +45,6 @@ public final class Dbl extends ANum {
   public static Dbl get(final double value) {
     return value == 0 && Double.doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
       Double.isNaN(value) ? NAN : new Dbl(value);
-  }
-
-  @Override
-  public void write(final DataOutput out) throws IOException {
-    out.writeDoubleCompact(value);
   }
 
   @Override

@@ -81,7 +81,9 @@ public final class Itr extends ANum {
 
   @Override
   public void write(final DataOutput out) throws IOException {
-    out.writeZigzag(value);
+    // unsigned longs are stored as strings (compatible with BaseX 12)
+    if(type == BasicType.UNSIGNED_LONG) out.writeToken(string());
+    else out.writeLong(value);
   }
 
   @Override

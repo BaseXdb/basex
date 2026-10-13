@@ -56,7 +56,7 @@ public final class SingletonSeq extends Seq {
   @Override
   public void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(count());
-    Stores.writeNested(out, value);
+    Stores.write(out, value);
   }
 
   @Override

@@ -10,6 +10,9 @@ import java.util.Map.*;
 
 import org.basex.*;
 import org.basex.io.*;
+import org.basex.io.out.DataOutput;
+import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -454,5 +457,37 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_READ.args("a"));
     query(_STORE_KEYS.args("a"), "X");
     storeA.delete();
+  }
+
+  /**
+   * Rejects stores that were written by a newer version.
+   * @throws IOException I/O exception
+   */
+  @Test public void newerFormat() throws IOException {
+    // reserved format ID of versioned values
+    newerFormat(BasicType.STRING.index(), 2, 0x3e);
+    // unknown type index
+    newerFormat(100000, 1);
+  }
+
+  /**
+   * Writes the header of a store value and checks that the store is rejected.
+   * @param type type index
+   * @param size number of items
+   * @param ids format IDs
+   * @throws IOException I/O exception
+   */
+  private static void newerFormat(final int type, final long size, final int... ids)
+      throws IOException {
+    final IOFile store = context.soptions.dbPath("store" + IO.BASEXSUFFIX);
+    try(DataOutput out = new DataOutput(store)) {
+      out.writeNum(1);
+      out.writeToken(Token.token("key"));
+      out.writeNum(type);
+      out.writeLong(size);
+      for(final int id : ids) out.writeNum(id);
+    }
+    error(_STORE_READ.args(), STORE_IO_X);
+    store.delete();
   }
 }
