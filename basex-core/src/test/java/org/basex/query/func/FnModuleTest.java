@@ -6412,7 +6412,7 @@ return
     final Function func = UNPARSED_BINARY;
     query(func.args(DOC) + " => bin:length() = (395, 413)", true);
     error(func.args(DOC + ".xyz"), RESWHICH_X);
-    error(func.args(DOC + "#xyz"), RESFRAG_X);
+    error(func.args(DOC + "#xyz"), RESWHICH_X);
   }
 
   /** Test method. */

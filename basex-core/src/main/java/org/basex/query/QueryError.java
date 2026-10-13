@@ -835,8 +835,6 @@ public enum QueryError {
   /** Error code. */
   RESWHICH_X(FOUT, 1170, "Resource cannot be retrieved: %."),
   /** Error code. */
-  RESFRAG_X(FOUT, 1170, "URI contains a fragment identifier: %."),
-  /** Error code. */
   RESURI_X(FOUT, 1170, "Invalid URI: %."),
   /** Error code. */
   RESENCODING_X(FOUT, 1190, "%"),
