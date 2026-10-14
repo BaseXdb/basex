@@ -11,7 +11,7 @@ import org.w3c.dom.CharacterData;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class BXChar extends BXNode implements CharacterData {
+public abstract class BXChar extends BXNode implements CharacterData {
   /**
    * Constructor.
    * @param node node reference

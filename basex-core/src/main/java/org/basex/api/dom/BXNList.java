@@ -10,7 +10,7 @@ import org.w3c.dom.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-class BXNList implements NodeList {
+public class BXNList implements NodeList {
   /** XQuery node set. */
   final GNodeList nodes;
 
