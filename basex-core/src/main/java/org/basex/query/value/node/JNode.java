@@ -125,6 +125,11 @@ public final class JNode extends GNode {
   }
 
   @Override
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    value.cache(lazy, ii);
+  }
+
+  @Override
   public boolean is(final GNode node) {
     return this == node || node instanceof JNode && compare(node) == 0;
   }

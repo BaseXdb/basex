@@ -34,6 +34,8 @@ public final class LazyModuleTest extends SandboxTest {
     query("boolean(" + read + ')', true);
     query("string-length(" + read + ')', 6);
     query("try { (" + _FILE_READ_TEXT.args(invalid) + ", 1) } catch * { 'caught' }", "caught");
+    final String jnode = _LAZY_CACHE.args(" jtree({ 'a': " + _FILE_READ_TEXT.args(invalid) + " })");
+    query("string-length((try { " + jnode + " } catch * { jtree({ 'a': 'caught' }) })/a)", 6);
     query(_LAZY_IS_CACHED.args(" try { " + _FILE_READ_TEXT.args(FILE) + " } catch * { }"), true);
   }
 
