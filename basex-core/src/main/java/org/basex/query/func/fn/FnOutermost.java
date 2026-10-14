@@ -18,18 +18,30 @@ import org.basex.query.value.type.*;
 public class FnOutermost extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return iter(true, qc);
+    final GNodeBuilder list = nodes(qc);
+    final int len = list.size();
+    if(len < 2) return list.value(this).iter();
+
+    // skip nodes in the subtree of the last added node (nodes are in document order)
+    final GNodeBuilder builder = new GNodeBuilder();
+    GNode outer = null;
+    for(int l = 0; l < len; l++) {
+      final GNode node = list.get(l);
+      if(outer == null || !ancestor(outer, node, qc)) {
+        builder.add(node);
+        outer = node;
+      }
+    }
+    return builder.value(this).iter();
   }
 
   /**
-   * Returns the outermost/innermost nodes of a node sequence, i.e. a node is
-   * only contained if none of its ancestors/descendants are.
-   * @param outer outermost flag
+   * Returns the input nodes in document order and without duplicates.
    * @param qc query context
-   * @return outermost/innermost nodes
+   * @return nodes
    * @throws QueryException query exception
    */
-  final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
+  final GNodeBuilder nodes(final QueryContext qc) throws QueryException {
     final Expr nodes = arg(0);
     final Iter ir = nodes.iter(qc);
 
@@ -38,23 +50,23 @@ public class FnOutermost extends StandardFunc {
       list.add(toGNode(item, nodes));
     }
     list.ddo();
+    return list;
+  }
 
-    // only go further if there are at least two nodes
-    final int len = list.size();
-    if(len < 2) return list.value(this).iter();
-
-    // after this, the iterator is sorted and duplicate free
-    final GNodeBuilder builder = new GNodeBuilder();
-    OUTER: for(int l = 0; l < len; l++) {
-      final GNode node = list.get(l);
-      final BasicNodeIter iter = outer ? node.ancestorIter(false) : node.descendantIter(false);
-      for(GNode nd; (nd = iter.next()) != null;) {
-        qc.checkStop();
-        if(list.contains(nd)) continue OUTER;
-      }
-      builder.add(node);
+  /**
+   * Checks if a node is an ancestor of another node.
+   * @param ancestor ancestor
+   * @param node node
+   * @param qc query context
+   * @return result of check
+   */
+  static boolean ancestor(final GNode ancestor, final GNode node, final QueryContext qc) {
+    final BasicNodeIter iter = node.ancestorIter(false);
+    for(GNode nd; (nd = iter.next()) != null;) {
+      qc.checkStop();
+      if(nd.is(ancestor)) return true;
     }
-    return builder.value(this).iter();
+    return false;
   }
 
   @Override

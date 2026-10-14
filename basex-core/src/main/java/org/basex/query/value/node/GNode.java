@@ -110,6 +110,14 @@ public abstract class GNode extends Item {
   public abstract GNode parent();
 
   /**
+   * Indicates if the node is a child of its parent, provided that it has one.
+   * @return result of check
+   */
+  public boolean isChild() {
+    return !kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE);
+  }
+
+  /**
    * Indicates if the node has children.
    * @return result of test
    */
@@ -242,7 +250,7 @@ public abstract class GNode extends Item {
    */
   public BasicNodeIter followingSiblingIter(final boolean self) {
     final GNode root = parent();
-    if(root == null || kind() == Kind.ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || !isChild()) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private final BasicNodeIter iter = root.childIter();
@@ -286,7 +294,7 @@ public abstract class GNode extends Item {
           if(self) list.add(GNode.this);
           GNode node = GNode.this, root = node.parent();
           while(root != null) {
-            if(node.kind() != Kind.ATTRIBUTE) {
+            if(node.isChild()) {
               final GNodeList lst = new GNodeList();
               for(final GNode ch : root.childIter()) {
                 if(ch.is(node)) break;
@@ -312,7 +320,7 @@ public abstract class GNode extends Item {
    */
   public final BasicNodeIter precedingSiblingIter(final boolean self) {
     final GNode root = parent();
-    if(root == null || kind() == Kind.ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || !isChild()) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private GNodeList list;

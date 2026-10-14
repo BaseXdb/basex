@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -21,8 +20,7 @@ public final class FnSiblings extends ContextFn {
     if(node == null) return Empty.ITER;
 
     final GNode parent = node.parent();
-    return parent == null || node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) ? node.iter() :
-      parent.childIter();
+    return parent != null && node.isChild() ? parent.childIter() : node.iter();
   }
 
   @Override

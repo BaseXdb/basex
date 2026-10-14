@@ -1230,6 +1230,8 @@ public enum QueryError {
   /** Error code. */
   ITEMAXIS_X(XPTY, 4, "Item axis: JNode expected, % found."),
   /** Error code. */
+  ATTRAXIS_X(XPTY, 4, "Attribute axis: XNode expected, % found."),
+  /** Error code. */
   INVCONVERT_X_X(XPTY, 4, "% cannot be cast to %."),
 
   /** Error code. */

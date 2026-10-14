@@ -1,5 +1,8 @@
 package org.basex.query.expr.path;
 
+import static org.basex.query.QueryError.*;
+
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -17,7 +20,7 @@ public enum Axis {
   /** Ancestor-or-self axis. */
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.ancestorIter(true);
     }
   },
@@ -25,7 +28,7 @@ public enum Axis {
   /** Ancestor axis. */
   ANCESTOR("ancestor", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.ancestorIter(false);
     }
   },
@@ -33,7 +36,9 @@ public enum Axis {
   /** Attribute axis. */
   ATTRIBUTE("attribute", true) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info)
+      throws QueryException {
+      if(node instanceof JNode) throw ATTRAXIS_X.get(info, node.seqType());
       return node.attributeIter();
     }
   },
@@ -41,7 +46,7 @@ public enum Axis {
   /** Child axis. */
   CHILD("child", true) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.childIter(test, false);
     }
   },
@@ -49,7 +54,7 @@ public enum Axis {
   /** Descendant-or-self axis. */
   DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.descendantIter(true, test);
     }
   },
@@ -57,7 +62,7 @@ public enum Axis {
   /** Descendant axis. */
   DESCENDANT("descendant", true) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.descendantIter(false, test);
     }
   },
@@ -65,7 +70,7 @@ public enum Axis {
   /** Following-sibling-or-self axis. */
   FOLLOWING_SIBLING_OR_SELF("following-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.followingSiblingIter(true);
     }
   },
@@ -73,7 +78,7 @@ public enum Axis {
   /** Following-sibling axis. */
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.followingSiblingIter(false);
     }
   },
@@ -81,7 +86,7 @@ public enum Axis {
   /** Following-or-self axis. */
   FOLLOWING_OR_SELF("following-or-self", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.followingIter(true);
     }
   },
@@ -89,7 +94,7 @@ public enum Axis {
   /** Following axis. */
   FOLLOWING("following", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.followingIter(false);
     }
   },
@@ -97,15 +102,17 @@ public enum Axis {
   /** Item axis (JNodes only). */
   ITEM("item", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
-      return ((JNode) node).itemIter(test);
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info)
+      throws QueryException {
+      if(node instanceof final JNode jnode) return jnode.itemIter(test);
+      throw ITEMAXIS_X.get(info, node.seqType());
     }
   },
 
   /** Parent axis. */
   PARENT("parent", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.parentIter();
     }
   },
@@ -113,7 +120,7 @@ public enum Axis {
   /** Preceding-sibling-or-self axis. */
   PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.precedingSiblingIter(true);
     }
   },
@@ -121,7 +128,7 @@ public enum Axis {
   /** Preceding-sibling axis. */
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.precedingSiblingIter(false);
     }
   },
@@ -129,7 +136,7 @@ public enum Axis {
   /** Preceding-or-self axis. */
   PRECEDING_OR_SELF("preceding-or-self", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.precedingIter(true);
     }
   },
@@ -137,7 +144,7 @@ public enum Axis {
   /** Preceding axis. */
   PRECEDING("preceding", false) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.precedingIter(false);
     }
   },
@@ -145,7 +152,7 @@ public enum Axis {
   /** Self axis. */
   SELF("self", true) {
     @Override
-    BasicNodeIter iter(final GNode node, final Test test) {
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
       return node.selfIter();
     }
   };
@@ -169,9 +176,11 @@ public enum Axis {
    * Returns a node iterator.
    * @param node input node
    * @param test node test
+   * @param info input info (can be {@code null})
    * @return node iterator
+   * @throws QueryException query exception
    */
-  abstract BasicNodeIter iter(GNode node, Test test);
+  abstract BasicNodeIter iter(GNode node, Test test, InputInfo info) throws QueryException;
 
   /**
    * Checks if this is one of the specified candidates.

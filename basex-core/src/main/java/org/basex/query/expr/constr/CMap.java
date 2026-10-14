@@ -161,9 +161,14 @@ public final class CMap extends Arr {
       } else {
         final Iter iter = exprs[e].iter(qc);
         for(Item item; (item = qc.next(iter)) != null;) {
-          final Item it = !(item instanceof final JNode jnode) ? item :
-            jnode.isRoot() ? (Item) jnode.value : XQMap.get(jnode.key, jnode.value);
-          toMap(it).forEach(add);
+          // root JNode: sequence of maps; other JNodes: single entry
+          if(!(item instanceof final JNode jnode)) {
+            toMap(item).forEach(add);
+          } else if(jnode.isRoot()) {
+            for(final Item it : jnode.value) toMap(it).forEach(add);
+          } else {
+            add.accept(jnode.key, jnode.value);
+          }
         }
       }
     }

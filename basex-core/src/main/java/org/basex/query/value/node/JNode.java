@@ -93,7 +93,7 @@ public final class JNode extends GNode {
    *   parent)
    */
   public XQStruct container() {
-    return parent != null && !isItem() && parent.value instanceof final XQStruct struct ?
+    return parent != null && isChild() && parent.value instanceof final XQStruct struct ?
       struct : null;
   }
 
@@ -209,6 +209,11 @@ public final class JNode extends GNode {
   }
 
   @Override
+  public boolean isChild() {
+    return !isItem();
+  }
+
+  @Override
   public boolean hasChildren() {
     return childCount() != 0;
   }
@@ -224,13 +229,15 @@ public final class JNode extends GNode {
   }
 
   /**
-   * Returns the static type of the values of the children.
-   * @return type
+   * Checks if the children are leaves with atomic values.
+   * @return result of check
    */
-  private Type childType() {
-    return (value instanceof final XQMap map ? ((MapType) map.type).valueType() :
-      value instanceof final XQArray array ? ((ArrayType) array.type).valueType() :
-      value.seqType()).type;
+  private boolean atomicLeaves() {
+    // map entries and array members with several items have children
+    final SeqType st = value instanceof final XQMap map ? ((MapType) map.type).valueType() :
+      value instanceof final XQArray array ? ((ArrayType) array.type).valueType() : null;
+    return st != null ? st.instanceOf(Types.ANY_ATOMIC_TYPE_ZO) :
+      value.seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
@@ -246,7 +253,7 @@ public final class JNode extends GNode {
 
     // direct lookup is always possible for the child axis; for the descendant axis it is
     // only safe over atomic-leaf values, as nested structures would hide deeper matches
-    final boolean direct = !descendant || childType().instanceOf(BasicType.ANY_ATOMIC_TYPE);
+    final boolean direct = !descendant || atomicLeaves();
     final Item item = direct && test != null ? test.key() : null;
     if(item != null) {
       final JNode child = child(item);

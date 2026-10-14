@@ -320,10 +320,10 @@ public final class JNodeTest extends SandboxTest {
 
   /** Attribute step. */
   @Test public void axisAttribute() {
-    query(JTREE_STRING + "/@*", "");
-    query(JTREE_STRING + "/attribute::*", "");
-    query(JTREE_STRING + "/attribute::attribute()", "");
-    query(JTREE_STRING + "/attribute::attribute(a)", "");
+    error(JTREE_STRING + "/@*", ATTRAXIS_X);
+    error(JTREE_STRING + "/attribute::*", ATTRAXIS_X);
+    error(JTREE_STRING + "/attribute::attribute()", ATTRAXIS_X);
+    error(JTREE_STRING + "/attribute::attribute(a)", ATTRAXIS_X);
   }
 
   /** Child step. */

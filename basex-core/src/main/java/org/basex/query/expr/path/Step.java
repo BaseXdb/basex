@@ -1,6 +1,5 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
@@ -150,11 +149,8 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
-    final GNode node = toContextNode(qc.focus.value);
-    if(axis == ITEM && !(node instanceof JNode)) throw ITEMAXIS_X.get(info, node.seqType());
+    final BasicNodeIter iter = axis.iter(toContextNode(qc.focus.value), test, info);
     return new BasicNodeIter() {
-      final BasicNodeIter iter = axis.iter(node, test);
-
       @Override
       public GNode next() {
         for(GNode nd; (nd = iter.next()) != null;) {
@@ -246,7 +242,9 @@ public abstract class Step extends Preds {
       test = t;
       exprType.assign(NodeType.get(t));
     }
-    if(t == null || noMatches() || seqType().zero()) {
+    // $jnode/attribute::x: type error at runtime
+    final boolean typeError = axis == ATTRIBUTE && rtype.seqType().mayBeJNode();
+    if(!typeError && (t == null || noMatches() || seqType().zero())) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }

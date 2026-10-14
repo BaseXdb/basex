@@ -96,7 +96,8 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(indent) printChar(' ');
     }
     int cc = 0;
-    if(jnode.value.size() > 1) printChar('(');
+    final boolean par = jnode.value.size() != 1;
+    if(par) printChar('(');
     for(final Item item : jnode.value) {
       if(cc++ > 0) {
         printChar(',');
@@ -104,7 +105,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       }
       super.item(item);
     }
-    if(jnode.value.size() > 1) printChar(')');
+    if(par) printChar(')');
     printChar(')');
     --depth;
   }
