@@ -253,7 +253,9 @@ public abstract class PlanFn extends StandardFunc {
         map.forEach((k, v) -> {
           final byte[] field = k.string(info);
           if(!Token.eq(field, TYPE.string()) && (attr || !Token.eq(field, LAYOUT.string(),
-              CHILD.string()))) throw unexpected(Token.string(field), v, name, info);
+              CHILD.string()))) {
+            throw unexpected(Token.string(field), v.toErrorString(), name, info);
+          }
         });
         final Value layout = map.get(LAYOUT);
         if(!layout.isEmpty()) {

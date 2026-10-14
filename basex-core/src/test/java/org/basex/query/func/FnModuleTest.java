@@ -1645,6 +1645,9 @@ public final class FnModuleTest extends SandboxTest {
         "?a instance of xs:untypedAtomic", true);
     // inferred types never raise an error
     query(func.args(" <a>x</a>") + "?a instance of xs:untypedAtomic", true);
+    // unexpected keys are reported without variable ids
+    query("try { " + func.args(" <a/>", " { 'plan': { 'a': { 'x': fn($v) { $v } } } }") +
+        " } catch * { contains($err:description, '$v_') }", false);
     // attribute types are validated too
     error(func.args(" <a b='x'/>", " { 'plan': { '@b': { 'type': 'integer' } } }"), PLAN_TYPE_X_X);
     query(func.args(" <a b='x'/>", " { 'plan': { '@b': { 'type': 'integer' } }, "

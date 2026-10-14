@@ -16,7 +16,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.hash.ItemSet.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -612,45 +611,6 @@ public abstract class XQMap extends XQStruct {
     return order == Boolean.FALSE ? v2 != null && deep.equal(v1, v2) :
       order == Boolean.TRUE ? k1.atomicEqual(k2) && deep.equal(v1, v2) :
       k1.equals(k2) && v1.equals(v2);
-  }
-
-  @Override
-  public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
-
-    tb.add("{");
-    int c = 0;
-    final IntConsumer addWS = lvl -> {
-      for(int l = 0; l < lvl; l++) tb.add("  ");
-    };
-    for(final Entry entry : entries()) {
-      if(c++ > 0) tb.add(',');
-      if(indent) {
-        tb.add('\n');
-        addWS.accept(level + 1);
-      }
-      tb.add(entry.key()).add(':');
-      if(indent) tb.add(' ');
-      final Value value = entry.value();
-      final boolean par = value.size() != 1;
-      if(par) tb.add('(');
-      int cc = 0;
-      for(final Item item : value) {
-        if(cc++ > 0) {
-          tb.add(',');
-          if(indent) tb.add(' ');
-        }
-        if(item instanceof final XQMap map) map.string(indent, tb, level + 1, ii);
-        else if(item instanceof final XQArray array) array.string(indent, tb, level, ii);
-        else tb.add(item);
-      }
-      if(par) tb.add(')');
-    }
-    if(indent) {
-      tb.add('\n');
-      addWS.accept(level);
-    }
-    tb.add('}');
   }
 
   @Override

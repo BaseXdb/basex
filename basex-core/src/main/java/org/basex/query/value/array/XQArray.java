@@ -19,7 +19,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -284,34 +283,6 @@ public abstract class XQArray extends XQStruct {
     final long size = structSize();
     if(i > 0 && i <= size) return valueAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
-  }
-
-  @Override
-  public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
-
-    tb.add('[');
-    int c = 0;
-    for(final Value value : members()) {
-      if(c++ > 0) {
-        tb.add(',');
-        if(indent) tb.add(' ');
-      }
-      final long vs = value.size();
-      if(vs != 1) tb.add('(');
-      for(long i = 0; i < vs; i++) {
-        if(i > 0) {
-          tb.add(',');
-          if(indent) tb.add(' ');
-        }
-        final Item item = value.itemAt(i);
-        if(item instanceof final XQArray array) array.string(indent, tb, level, ii);
-        else if(item instanceof final XQMap map) map.string(indent, tb, level + 1, ii);
-        else tb.add(item.toString());
-      }
-      if(vs != 1) tb.add(')');
-    }
-    tb.add(']');
   }
 
   @Override

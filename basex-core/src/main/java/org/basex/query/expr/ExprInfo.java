@@ -52,7 +52,6 @@ public abstract class ExprInfo {
 
   /**
    * Returns a string representation of the expression that can be embedded in error messages.
-   * Defaults to {@link #toString()}.
    * @return string representation
    */
   public final String toErrorString() {

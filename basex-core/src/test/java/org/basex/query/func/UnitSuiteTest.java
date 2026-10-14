@@ -108,13 +108,15 @@ public final class UnitSuiteTest extends SandboxTest {
       + "  unit:assert-equals({ 'a': true#0 }, { 'a': false#0 }) };"
       + "declare %unit:test function _:focus() { 1 ! unit:assert-equals(fn() { . }, 2) };"
       + "declare %unit:test function _:jnode() { "
-      + "  unit:assert-equals(jtree({ 'a': (1, 2) })/a, 3) };");
+      + "  unit:assert-equals(jtree({ 'a': (1, 2) })/a, 3) };"
+      + "declare %unit:test function _:inline() { unit:assert-equals(fn($x) { $x }, 1) };");
 
     query(doc + "//testcase[@name = 'err']/error/@type/data()", "Q{_}e");
     query("exists(" + doc + "//testcase[@name = 'equals']/failure)", true);
     query("exists(" + doc + "//testcase[@name = 'focus']/failure)", true);
     query(doc + "//testcase[@name = 'jnode']/failure/returned/@type/data()", "jnode()");
     query(doc + "//testcase[@name = 'jnode']/failure/returned/data()", "jtree(\"a\": (1 to 2))");
+    query("contains(" + doc + "//testcase[@name = 'inline']/failure/returned, '$x_')", false);
   }
 
   /**

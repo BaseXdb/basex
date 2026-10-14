@@ -122,15 +122,4 @@ public abstract class XQStruct extends FItem {
   protected boolean assignable(@SuppressWarnings("unused") final Type tp) {
     return true;
   }
-
-  /**
-   * Returns a string representation of the item.
-   * @param indent indent output
-   * @param tb token builder
-   * @param level current level
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
-   */
-  public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo info)
-      throws QueryException;
 }

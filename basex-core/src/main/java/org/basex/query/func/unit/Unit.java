@@ -323,7 +323,7 @@ final class Unit {
       return item.string(null);
     } catch(final QueryException ex) {
       Util.debug(ex);
-      return token(item.toString());
+      return token(item.toErrorString());
     }
   }
 
