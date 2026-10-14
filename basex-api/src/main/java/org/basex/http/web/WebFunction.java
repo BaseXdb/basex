@@ -205,7 +205,12 @@ public abstract class WebFunction implements Comparable<WebFunction> {
         try {
           args[p] = value.seqType().instanceOf(st) ? value : st.coerce(value, qc, null);
         } catch(final QueryException ex) {
-          throw bindError(input, st, value).cause(ex);
+          if(value.isEmpty()) throw bindError(Util.info(ARG_MISSING_X_X, input, st)).cause(ex);
+          final ItemList items = new ItemList(value.size());
+          for(final Item item : value) {
+            items.add(item instanceof final Atm atm ? Str.get(atm.string(null)) : item);
+          }
+          throw bindError(Util.info(ARG_TYPE_X_X_X, input, st, items.value())).cause(ex);
         }
         break;
       }
@@ -214,13 +219,11 @@ public abstract class WebFunction implements Comparable<WebFunction> {
 
   /**
    * Returns an exception for a value that cannot be bound to a function argument.
-   * @param input input description
-   * @param st expected type
-   * @param value supplied value
+   * @param message error message
    * @return exception
    */
-  protected QueryException bindError(final String input, final SeqType st, final Value value) {
-    return error(ARG_TYPE_X_X_X, input, st, value);
+  protected QueryException bindError(final String message) {
+    return error(message);
   }
 
   /**

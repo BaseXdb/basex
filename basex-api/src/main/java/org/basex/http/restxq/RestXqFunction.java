@@ -379,9 +379,8 @@ public final class RestXqFunction extends WebFunction {
   }
 
   @Override
-  protected QueryException bindError(final String input, final SeqType st, final Value value) {
-    return badRequest(value.isEmpty() ? Util.info(ARG_MISSING_X_X, input, st) :
-      Util.info(ARG_TYPE_X_X_X, input, st, value));
+  protected QueryException bindError(final String message) {
+    return badRequest(message);
   }
 
   /**
