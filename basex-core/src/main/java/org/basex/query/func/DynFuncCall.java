@@ -5,7 +5,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.ann.*;
@@ -259,10 +261,46 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final Expr[] copy = copyAll(cc, vm, exprs);
-    final int last = copy.length - 1;
-    final Expr[] args = Arrays.copyOf(copy, last);
-    return copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
+    return copy(copyAll(cc, vm, exprs));
+  }
+
+  /**
+   * Returns a copy of this expression with the specified operands.
+   * @param ops arguments, followed by the function
+   * @return copy
+   */
+  private DynFuncCall copy(final Expr[] ops) {
+    final int last = ops.length - 1;
+    return copyType(new DynFuncCall(info, updating, ndt, ops[last], Arrays.copyOf(ops, last)));
+  }
+
+  /**
+   * Returns a copy of this expression in which the function and argument values are materialized.
+   * @param test test for data references that can be shared
+   * @param copies set to which the materialized values are added
+   * @param ii input info (can be {@code null})
+   * @param qc query context
+   * @return this expression, or a copy
+   * @throws QueryException query exception
+   */
+  public DynFuncCall materialize(final Predicate<Data> test, final Set<Value> copies,
+      final InputInfo ii, final QueryContext qc) throws QueryException {
+    Expr[] mat = null;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      if(exprs[e] instanceof final Value value) {
+        final Value m = value.materialize(test, true, ii, qc);
+        if(m != value) {
+          copies.add(m);
+          if(mat == null) mat = exprs.clone();
+          mat[e] = m;
+        }
+      }
+    }
+    if(mat == null) return this;
+    final DynFuncCall call = copy(mat);
+    call.tco = tco;
+    return call;
   }
 
   @Override

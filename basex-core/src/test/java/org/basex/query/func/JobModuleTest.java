@@ -497,6 +497,14 @@ public final class JobModuleTest extends SandboxTest {
     query("let $n := parse-xml('<a/>') return " + func.args(" fn() { $n }") + " is $n", false);
     query("let $n := <a/> update { insert node <b>2</b> into . } return " +
         func.args(" fn() { $n/b/text() }"), 2);
+    // partial applications and coercions over database nodes, which are copied
+    // (the random predicate defers evaluation to runtime)
+    final String rt = "[random:double() < 2]";
+    final String n = "let $n := parse-xml('<a>1</a>')" + rt + ' ';
+    query(n + "let $f := (fn($d, $x) { $d/a/text() }, 0)" + rt + "[1] return " +
+        func.args(" $f($n, ?)", " [ 0 ]"), 1);
+    query(n + "let $c := fn($g as fn(xs:string) as xs:string) { $g } return " +
+        func.args(" $c({ 'a': $n })", " [ 'a' ]"), 1);
 
     // function items as arguments
     query(func.args(" fn($f) { $f() }", " [ fn() { 7 } ]"), 7);

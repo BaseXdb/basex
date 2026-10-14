@@ -171,11 +171,14 @@ public final class FuncItem extends FItem implements Scope {
 
     final TypeCheck check = expr instanceof final TypeCheck tc ? tc : null;
     final Expr body = check != null ? check.expr : expr;
-    Expr copy = null;
-    if(body instanceof final GFLWOR gflwor) {
-      final GFLWOR mat = gflwor.materialize(test, copies, ii, qc);
-      if(mat != gflwor) copy = check != null ? new TypeCheck(info, mat, check.seqType()) : mat;
-    }
+    // captured values: let clauses (closures), call operands (coercions, partial applications)
+    final Expr mat = switch(body) {
+      case final GFLWOR gflwor -> gflwor.materialize(test, copies, ii, qc);
+      case final DynFuncCall call -> call.materialize(test, copies, ii, qc);
+      default -> body;
+    };
+    final Expr copy = mat == body ? expr :
+      check != null ? new TypeCheck(info, mat, check.seqType()) : mat;
 
     QueryFocus qf = null;
     if(!simple && focus != null && focus.value != null) {
@@ -187,9 +190,9 @@ public final class FuncItem extends FItem implements Scope {
       }
     }
 
-    if(copy == null && qf == null) return this;
-    return new FuncItem(info, copy != null ? copy : expr, params, anns, funcType(), stackSize,
-        name, qf != null ? qf : focus, simple);
+    if(copy == expr && qf == null) return this;
+    return new FuncItem(info, copy, params, anns, funcType(), stackSize, name,
+        qf != null ? qf : focus, simple);
   }
 
   /**
