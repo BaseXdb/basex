@@ -120,7 +120,7 @@ public abstract class XQShapeMap extends XQMap {
   @Override
   public final boolean materialized(final Predicate<Data> test, final boolean funcs,
       final InputInfo ii) throws QueryException {
-    return shape().detached() && super.materialized(test, funcs, ii);
+    return shape().detached() && valuesMaterialized(test, funcs, ii);
   }
 
   @Override

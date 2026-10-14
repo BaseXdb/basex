@@ -373,6 +373,13 @@ public final class StoreModuleTest extends SandboxTest {
     query(put.args("XQArray4", " array { 1 to 1000 }"));
     query(put.args("XQArray5", " [ 1 to 1000 ]"));
 
+    final String enm = " ('a', 'b') ! (. cast as enum('a', 'b'))";
+    query(put.args("Enum1", enm + "[1]"));
+    query(put.args("Enum2", enm));
+    query(put.args("Enum3", " array {" + enm + " }"));
+    query(put.args("Enum4", " map:build(" + enm + ")"));
+    query(put.args("Enum5", " map:build(" + enm + ", value := fn { . })"));
+
     // write store
     query(_STORE_WRITE.args());
     final HashMap<String, String> values = new HashMap<>();

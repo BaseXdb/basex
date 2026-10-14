@@ -1,6 +1,9 @@
 package org.basex.query.value.seq;
 
+import java.util.function.*;
+
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -31,6 +34,16 @@ public final class ItemSeq extends Seq {
   @Override
   public Item itemAt(final long index) {
     return items[(int) index];
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
+      throws QueryException {
+    final int sz = (int) size;
+    for(int i = 0; i < sz; i++) {
+      if(!items[i].materialized(test, funcs, ii)) return false;
+    }
+    return true;
   }
 
   @Override

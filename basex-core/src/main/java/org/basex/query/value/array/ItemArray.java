@@ -2,7 +2,10 @@ package org.basex.query.value.array;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -47,6 +50,12 @@ public final class ItemArray extends XQArray {
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return members.atomValue(qc, ii);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
+      throws QueryException {
+    return members.materialized(test, funcs, ii);
   }
 
   @Override

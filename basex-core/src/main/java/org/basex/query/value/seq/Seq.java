@@ -191,10 +191,8 @@ public abstract class Seq extends Value {
   @Override
   public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    if(!type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-      for(final Item item : this) {
-        if(!item.materialized(test, funcs, ii)) return false;
-      }
+    for(final Item item : this) {
+      if(!item.materialized(test, funcs, ii)) return false;
     }
     return true;
   }

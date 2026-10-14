@@ -289,7 +289,7 @@ public abstract class XQMap extends XQStruct {
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();
-      mb.put(key, value.materialize(test, funcs, ii, qc));
+      mb.put((Item) key.materialize(test, funcs, ii, qc), value.materialize(test, funcs, ii, qc));
     });
     return mb.map();
   }
@@ -297,8 +297,25 @@ public abstract class XQMap extends XQStruct {
   @Override
   public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    return funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ||
-        test((key, value) -> value.materialized(test, funcs, ii));
+    return test((key, value) -> key.materialized(test, funcs, ii) &&
+        value.materialized(test, funcs, ii));
+  }
+
+  /**
+   * Checks if all values of this map are materialized.
+   * @param test test to check if a node can be adopted unchanged
+   * @param funcs accept function items without dependencies on the current query
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  final boolean valuesMaterialized(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii) throws QueryException {
+    final long is = structSize();
+    for(long i = 0; i < is; i++) {
+      if(!valueAt(i).materialized(test, funcs, ii)) return false;
+    }
+    return true;
   }
 
   @Override

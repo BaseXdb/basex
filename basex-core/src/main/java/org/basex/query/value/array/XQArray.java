@@ -326,12 +326,10 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final boolean funcs,
+  public boolean materialized(final Predicate<Data> test, final boolean funcs,
       final InputInfo ii) throws QueryException {
-    if(!funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-      for(final Value value : members()) {
-        if(!value.materialized(test, funcs, ii)) return false;
-      }
+    for(final Value value : members()) {
+      if(!value.materialized(test, funcs, ii)) return false;
     }
     return true;
   }

@@ -1,5 +1,8 @@
 package org.basex.query.value.seq;
 
+import java.util.function.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -29,6 +32,11 @@ public abstract class NativeSeq extends Seq {
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) { }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii) {
+    return true;
+  }
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) {

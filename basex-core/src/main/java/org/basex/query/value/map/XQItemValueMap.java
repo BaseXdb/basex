@@ -1,11 +1,15 @@
 package org.basex.query.value.map;
 
+import java.util.function.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Map with atomic keys and arbitrary values.
@@ -54,6 +58,13 @@ public final class XQItemValueMap extends XQHashMap {
   @Override
   void valueAt(final int index, final Value value) {
     map.value(index + 1, value);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
+      throws QueryException {
+    return test((key, value) -> key.materialized(test, funcs, ii) &&
+        value.materialized(test, funcs, ii));
   }
 
   @Override

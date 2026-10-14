@@ -1,5 +1,8 @@
 package org.basex.query.value.map;
 
+import java.util.function.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -125,6 +128,13 @@ abstract class XQHashMap extends XQMap {
   final void shrinkValues(final QueryContext qc) throws QueryException {
     final long is = structSize();
     for(int i = 0; i < is; i++) valueAt(i, valueAt(i).shrink(qc));
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
+      throws QueryException {
+    // keys and compact values are stored as integers, doubles or tokens
+    return true;
   }
 
   @Override

@@ -1,9 +1,11 @@
 package org.basex.query.value.seq;
 
 import java.io.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -75,6 +77,17 @@ public final class StrSeq extends NativeSeq {
     // reuse equal tokens across the whole sequence (only worthwhile for retained values)
     qc.shared.tokens(values, qc);
     return this;
+  }
+
+  @Override
+  public Value materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) {
+    return materialized(test, funcs, ii) ? this : get(values);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii) {
+    return !(type instanceof EnumType);
   }
 
   @Override

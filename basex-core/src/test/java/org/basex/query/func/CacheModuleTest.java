@@ -246,6 +246,31 @@ public final class CacheModuleTest extends SandboxTest {
     error(func.args("error", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
   }
 
+  /** Lazy items in sequences and arrays. */
+  @Test public void putLazy() {
+    final String path = sandbox().path() + "lazy.txt", text = _FILE_READ_TEXT.args(path);
+    query(_FILE_WRITE_TEXT.args(path, "old"));
+    query(_CACHE_PUT.args("single", " " + text));
+    query(_CACHE_PUT.args("seq", " (" + text + ", 'x')"));
+    query(_CACHE_PUT.args("any", " (" + text + ", 1)"));
+    query(_CACHE_PUT.args("array", " [ " + text + " ]"));
+    query(_CACHE_PUT.args("map", " { 1: " + text + " }"));
+    query(_CACHE_PUT.args("binary", " (" + _FILE_READ_BINARY.args(path) + ", 1)"));
+    query(_FILE_WRITE_TEXT.args(path, "new"));
+    query(_CACHE_GET.args("single"), "old");
+    query(_CACHE_GET.args("seq") + "[1]", "old");
+    query(_CACHE_GET.args("any") + "[1]", "old");
+    query(_CACHE_GET.args("array") + "?1", "old");
+    query(_CACHE_GET.args("map") + "?1", "old");
+    query(_CACHE_GET.args("binary") + "[1] => bin:decode-string()", "old");
+  }
+
+  /** JNodes in arrays. */
+  @Test public void putJNode() {
+    query(_CACHE_PUT.args("array", " array { jtree({ 'a': (1, 2), 'b': () }) ! (a, b) }"));
+    query("array:for-each(" + _CACHE_GET.args("array") + ", count#1)?*", "2\n0");
+  }
+
   /** Test method. */
   @Test public void remove() {
     final Function func = _CACHE_REMOVE;
