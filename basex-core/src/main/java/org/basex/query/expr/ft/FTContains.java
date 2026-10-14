@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -104,6 +105,9 @@ public final class FTContains extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.STRING, cc);
+    // the stop words of the input database serve as default stop words
+    final Data data = expr.data();
+    if(data != null) ftexpr.stopWords(data);
     return expr.seqType().zero() ? cc.function(Function.BOOLEAN, info, expr) : this;
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.func.ft;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.func.*;
@@ -21,10 +22,12 @@ abstract class FtAccessFn extends StandardFunc {
    * Parses and returns full-text options.
    * @param opts options specified in the query
    * @param parent options to be inherited for unspecified values
+   * @param data   database for default stop words (can be {@code null})
    * @return options
    * @throws QueryException query exception
    */
-  final FTOpt ftOpt(final FtIndexOptions opts, final FTOpt parent) throws QueryException {
+  final FTOpt ftOpt(final FtIndexOptions opts, final FTOpt parent, final Data data)
+      throws QueryException {
     final FTOpt opt = new FTOpt();
     final Boolean fuzzy = opts.get(FtFuzzyOptions.FUZZY);
     if(fuzzy != null) opt.set(FZ, fuzzy);
@@ -43,7 +46,8 @@ abstract class FtAccessFn extends StandardFunc {
     // supplied options take precedence over conflicting inherited ones
     if(opt.is(FZ)) opt.set(WC, false);
     else if(opt.is(WC)) opt.set(FZ, false);
-    return opt.assign(parent);
+    opt.assign(parent);
+    return data != null ? opt.defaults(data) : opt;
   }
 
   /**

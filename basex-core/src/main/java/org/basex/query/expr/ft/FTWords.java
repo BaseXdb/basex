@@ -105,6 +105,11 @@ public final class FTWords extends FTExpr {
     return this;
   }
 
+  @Override
+  void stopWords(final Data data) {
+    if(ftOpt != null) ftOpt = ftOpt.defaults(data);
+  }
+
   /**
    * Prepares query evaluation.
    * @param qc query context
@@ -420,6 +425,7 @@ public final class FTWords extends FTExpr {
     final Data data = ii.db.data();
     if(data == null && !ii.enforce() || occ != null) return false;
 
+    final boolean stopwords = data != null && !data.meta.stopwords.isEmpty();
     if(data != null) {
       /* index will be applied if no explicit match options have been set that
        * conflict with the index options. As a consequence, though, index-based
@@ -429,16 +435,17 @@ public final class FTWords extends FTExpr {
           ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
           ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
           ftOpt.ln != null && !ftOpt.ln.equals(md.language()) ||
-          // tokens exceeding the maximum length are not indexed, but may match
-          (ftOpt.is(WC) || ftOpt.is(FZ)) && md.skipped.contains(IndexType.FULLTEXT)) return false;
+          // too long tokens and stop words are not indexed, but may match
+          (ftOpt.is(WC) || ftOpt.is(FZ)) && (md.skipped.contains(IndexType.FULLTEXT) ||
+          stopwords)) return false;
       // assign database options (options may be shared by copies of this expression)
       ftOpt = ftOpt.copy().assign(md);
     }
 
     // estimate costs if text is not known at compile time
     if(inputs == null) {
-      // stop words at the start or end of a term cannot be checked
-      if(ftOpt.sw != null) return false;
+      // stop words cannot be checked
+      if(ftOpt.sw != null || stopwords) return false;
       ii.costs = ii.enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(2, data.nodes() / 30));
     } else {
@@ -446,6 +453,7 @@ public final class FTWords extends FTExpr {
       ii.costs = IndexCosts.ZERO;
       final FTTokenizer ftt = get(ii.cc.qc);
       final StopWords sw = ftt.sw;
+      final StopWords dbsw = stopwords ? StopWords.get(data).normalize(ftOpt) : null;
       final FTLexer lexer = new FTLexer(ftOpt);
       final TokenSet ts = new TokenSet();
       for(final byte[] input : unique(inputs)) {
@@ -460,6 +468,8 @@ public final class FTWords extends FTExpr {
             stop = sw != null && sw.contains(token);
             // stop words at the start of a term are not supported by the index
             if(stop && first) return false;
+            // stop words of the database are not indexed
+            if(!stop && dbsw != null && dbsw.contains(token)) return false;
             first = false;
             if(stop || !ts.add(token)) continue;
 

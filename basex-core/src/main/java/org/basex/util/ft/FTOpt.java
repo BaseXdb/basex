@@ -110,6 +110,19 @@ public final class FTOpt extends ExprInfo {
     return new FTOpt().assign(this);
   }
 
+  /**
+   * Returns options with the requested default stop words of a database.
+   * @param data data reference
+   * @return new options, or self reference if no defaults were requested
+   */
+  public FTOpt defaults(final Data data) {
+    final StopWords defaults = sw != null ? sw.defaults(data) : null;
+    if(defaults == sw) return this;
+    final FTOpt opt = copy();
+    opt.sw = defaults;
+    return opt;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final FTOpt f && map.equals(f.map) && cs == f.cs &&

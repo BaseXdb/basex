@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -581,6 +582,36 @@ public final class FTIndexUpdateTest extends SandboxTest {
     execute(new CreateDB(NAME, "<x><a>one two</a></x>"));
     search("one");
     search("two", "one two");
+  }
+
+  /**
+   * Stop words of the database are found in queries, and serve as default stop words.
+   * @throws IOException I/O exception
+   */
+  @Test public void stopwordsQuery() throws IOException {
+    final IOFile sw = new IOFile(sandbox(), "stopwords.txt");
+    sw.write("the a of");
+    set(MainOptions.STOPWORDS, sw.path());
+    execute(new CreateDB(NAME, "<x><a>the cat</a><a>a dog of mine</a></x>"));
+    final BiConsumer<String, String> contains = (ft, result) -> query(
+        _DB_GET.args(NAME) + "//a[text() contains text " + ft + "] ! string()", result);
+    contains.accept("'cat'", "the cat");
+    contains.accept("'the'", "the cat");
+    contains.accept("'THE cat'", "the cat");
+    contains.accept("'th.' using wildcards", "the cat");
+    contains.accept("'the' using no stop words", "the cat");
+    contains.accept("'dog x mine' using stop words ('x')", "a dog of mine");
+
+    contains.accept("'a cat' using stop words default", "the cat");
+    contains.accept("'dog the mine' using stop words default", "a dog of mine");
+    contains.accept("'x cat' using stop words default union ('x')", "the cat");
+    contains.accept("'a cat' using stop words default except ('a')", "");
+    contains.accept("'a cat' using stop words ('x') except ('x')", "");
+
+    final String dflt = "declare ft-option using stop words default; ";
+    query(dflt + _FT_SEARCH.args(NAME, "dog the mine") + " ! string()", "a dog of mine");
+    query(dflt + _DB_GET.args(NAME) + "//a ! " + _FT_CONTAINS.args(" text()", "dog the mine"),
+        "false\ntrue");
   }
 
   /**

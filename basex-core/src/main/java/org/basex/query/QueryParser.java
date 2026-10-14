@@ -4785,34 +4785,13 @@ public class QueryParser extends InputParser {
         if(opt.sw != null) throw error(FTDUP_X, STOP + ' ' + WORDS);
         final StopWords sw = new StopWords();
         opt.sw = sw;
-        if(wsConsumeWs(DEFAULT)) {
-          if(!using) throw error(FTSTOP);
-        } else if(using) {
-          boolean union = false, except = false;
-          do {
-            if(wsConsume("(")) {
-              do {
-                final byte[] sl = stringLiteral();
-                if(except) sw.remove(sl);
-                else sw.add(sl);
-              } while(wsConsume(","));
-              wsCheck(")");
-            } else if(wsConsumeWs(AT)) {
-              // optional: resolve URI reference
-              final String location = string(stringLiteral());
-              checkCreate(location, info());
-              final IO fl = qc.resources.stopWords(location, sc);
-              try {
-                opt.sw.read(fl, except);
-              } catch(final IOException ex) {
-                throw error(NOSTOPFILE_X, fl).cause(ex);
-              }
-            } else if(!union && !except) {
-              throw error(FTSTOP);
-            }
-            union = wsConsumeWs(UNION);
-            except = !union && wsConsumeWs(EXCEPT);
-          } while(union || except);
+        if(using) {
+          if(wsConsumeWs(DEFAULT)) sw.requestDefaults();
+          else ftStopWords(sw, false);
+          boolean union;
+          while((union = wsConsumeWs(UNION)) || wsConsumeWs(EXCEPT)) ftStopWords(sw, !union);
+        } else if(wsConsumeWs(DEFAULT)) {
+          throw error(FTSTOP);
         }
       } else if(wsConsumeWs(WILDCARDS)) {
         if(opt.isSet(WC)) throw error(FTDUP_X, WILDCARDS);
@@ -4832,6 +4811,35 @@ public class QueryParser extends InputParser {
       }
     }
     return true;
+  }
+
+  /**
+   * Parses the "FTStopWords" rule.
+   * @param sw stop words
+   * @param except exclude stop words
+   * @throws QueryException query exception
+   */
+  private void ftStopWords(final StopWords sw, final boolean except) throws QueryException {
+    if(wsConsume("(")) {
+      do {
+        final byte[] sl = stringLiteral();
+        if(except) sw.remove(sl);
+        else sw.add(sl);
+      } while(wsConsume(","));
+      wsCheck(")");
+    } else if(wsConsumeWs(AT)) {
+      // optional: resolve URI reference
+      final String location = string(stringLiteral());
+      checkCreate(location, info());
+      final IO fl = qc.resources.stopWords(location, sc);
+      try {
+        sw.read(fl, except);
+      } catch(final IOException ex) {
+        throw error(NOSTOPFILE_X, fl).cause(ex);
+      }
+    } else {
+      throw error(FTSTOP);
+    }
   }
 
   /**

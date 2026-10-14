@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -47,6 +48,14 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
     return this;
+  }
+
+  /**
+   * Adds the stop words of the queried database to requested default stop words.
+   * @param data data reference
+   */
+  void stopWords(final Data data) {
+    for(final FTExpr expr : exprs) expr.stopWords(data);
   }
 
   /**

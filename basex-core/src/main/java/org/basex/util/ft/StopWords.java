@@ -20,6 +20,12 @@ import org.basex.util.hash.*;
 public final class StopWords {
   /** Tokens. */
   private final TokenSet set = new TokenSet();
+  /** Tokens excluded from the default stop words (if {@code null}, no defaults are added). */
+  private TokenSet excluded;
+  /** Stop words with the defaults of {@link #resolvedData} (can be {@code null}). */
+  private StopWords resolved;
+  /** Database of the resolved stop words (can be {@code null}). */
+  private Data resolvedData;
 
   /**
    * Default constructor.
@@ -41,21 +47,51 @@ public final class StopWords {
   }
 
   /**
-   * Compiles the stop word list.
-   * @param data data reference (can be {@code null})
+   * Returns the stop words of a database.
+   * @param data data reference
+   * @return stop words
    */
-  public void compile(final Data data) {
-    // stop words have not been initialized, database is on disk...
-    if(set.isEmpty() && data != null && !data.inMemory()) {
-      // try to parse the stop words file of the current database
-      final IOFile file = data.meta.dbFile(DATASWL);
-      if(!file.exists()) return;
-      try(DataInput in = new DataInput(data.meta.dbFile(DATASWL))) {
-        set.read(in);
-      } catch(final Exception ex) {
-        Util.debug(ex);
+  public static StopWords get(final Data data) {
+    final StopWords sw = new StopWords();
+    final String path = data.meta.stopwords;
+    if(path.isEmpty()) return sw;
+
+    final IOFile file = data.meta.dbFile(DATASWL);
+    try {
+      if(data.inMemory()) {
+        sw.read(IO.get(path), false);
+      } else if(file.exists()) {
+        try(DataInput in = new DataInput(file)) {
+          sw.set.read(in);
+        }
       }
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
+    return sw;
+  }
+
+  /**
+   * Requests the stop words of the database, which are added when the query is optimized.
+   */
+  public void requestDefaults() {
+    excluded = new TokenSet();
+  }
+
+  /**
+   * Returns stop words with the requested stop words of the database.
+   * @param data data reference
+   * @return new stop words, or self reference if no defaults were requested
+   */
+  public StopWords defaults(final Data data) {
+    if(excluded == null) return this;
+    if(resolved == null || resolvedData != data) {
+      resolved = get(data);
+      resolvedData = data;
+      for(final byte[] token : excluded) resolved.set.remove(token);
+      for(final byte[] token : set) resolved.set.add(token);
+    }
+    return resolved;
   }
 
   /**
@@ -67,8 +103,8 @@ public final class StopWords {
   public void read(final IO file, final boolean exclude) throws IOException {
     for(final String term : file.readString().trim().split("\\s+")) {
       final byte[] token = Token.token(term);
-      if(exclude) set.remove(token);
-      else set.add(token);
+      if(exclude) remove(token);
+      else add(token);
     }
   }
 
@@ -104,6 +140,7 @@ public final class StopWords {
    */
   public void remove(final byte[] token) {
     set.remove(token);
+    if(excluded != null) excluded.add(token);
   }
 
   /**
