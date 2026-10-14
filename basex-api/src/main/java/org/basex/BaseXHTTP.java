@@ -96,6 +96,8 @@ public final class BaseXHTTP extends CLI {
     // create jetty instance
     final ServerConnector sc = connector(new IOFile(webapp, JETTYCONF),
         soptions.get(StaticOptions.HTTPPORT), options.containsKey(StaticOptions.HTTPPORT));
+    final String host = soptions.get(StaticOptions.HTTPHOST);
+    if(!host.isEmpty()) sc.setHost(host);
     final int port = sc.getPort();
     jetty = sc.getServer();
     jetty.setHandler(soptions.get(StaticOptions.GZIP) ? gzip(wac) : wac);

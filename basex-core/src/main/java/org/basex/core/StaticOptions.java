@@ -89,6 +89,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption RESTXQERRORS = new BooleanOption("RESTXQERRORS", true);
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", true);
+  /** Host name or IP address the web server is bound to (empty: all interfaces). */
+  public static final StringOption HTTPHOST = new StringOption("HTTPHOST", "");
   /** Port of the web server (cannot be specified in web.xml). */
   public static final NumberOption HTTPPORT = new NumberOption("HTTPPORT", 8080);
   /** Port for stopping the web server. */
