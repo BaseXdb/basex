@@ -55,7 +55,8 @@ public final class PkgParser {
     };
     final Pkg pkg = new Pkg(attribute.apply(Q_NAME));
     pkg.abbrev = attribute.apply(Q_ABBREV);
-    pkg.spec = attribute.apply(Q_SPEC);
+    // mandatory attribute, value is not used
+    attribute.apply(Q_SPEC);
     pkg.version = attribute.apply(Q_VERSION);
 
     parseChildren(node, pkg);

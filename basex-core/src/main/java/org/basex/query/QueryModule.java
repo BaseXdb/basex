@@ -23,9 +23,6 @@ import org.basex.query.iter.*;
  *       be predicted by the XQuery processor. You may annotate a function as
  *       {@link Deterministic} if you know that it will have no side effects and will
  *       always yield the same result.</li>
- *   <li>Java code is treated as "context-independent". If a function accesses
- *       the specified {@link #queryContext}, it should be annotated as
- *       {@link ContextDependent}.</li>
  *   <li>Java code is treated as "focus-independent". If a function accesses
  *       the current context value, position or size, it should be annotated as
  *       {@link FocusDependent}.</li>
@@ -93,14 +90,6 @@ public abstract class QueryModule {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)
   public @interface Deterministic { }
-
-  /**
-   * Java code is treated as "context-independent". If a function accesses the specified
-   * {@link #queryContext}, it should be annotated as {@link ContextDependent}.
-   */
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.METHOD)
-  public @interface ContextDependent { }
 
   /**
    * Java code is treated as "focus-independent". If a function accesses the current

@@ -81,10 +81,10 @@ public class BaseXLabel extends JLabel {
   /**
    * Shows a text. If required, chops the last characters.
    * @param text warning text
-   * @param width maximum width
    * @return self reference
    */
-  public final BaseXLabel setChoppedText(final String text, final int width) {
+  public final BaseXLabel setChoppedText(final String text) {
+    final int width = 600;
     final FontMetrics fm = getFontMetrics(getFont());
     String txt = text;
     if(width < fm.stringWidth(txt)) {

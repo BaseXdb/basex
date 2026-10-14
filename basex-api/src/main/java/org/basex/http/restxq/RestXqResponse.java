@@ -114,7 +114,7 @@ public final class RestXqResponse extends WebResponse {
         final int s = status;
         conn.log(s, s == 302 ? HTTPText.LOCATION + ": " +
           conn.response.getHeader(HTTPText.LOCATION) : "");
-        conn.status(s, null);
+        conn.status(s, null, null);
       }
 
       // serialize result

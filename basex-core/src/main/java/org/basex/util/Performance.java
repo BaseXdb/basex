@@ -49,20 +49,7 @@ public final class Performance {
    * @return runtime
    */
   public String formatRuntime() {
-    return formatRuntime(1);
-  }
-
-  /**
-   * Returns the measured runtime in milliseconds, divided by the number of runs,
-   * and resets the timer.
-   * @param runs number of runs
-   * @return runtime
-   */
-  public String formatRuntime(final int runs) {
-    final long time2 = System.nanoTime();
-    final String t = formatNano(time2 - time, runs);
-    time = time2;
-    return t;
+    return formatNano(nanoRuntime());
   }
 
   /**

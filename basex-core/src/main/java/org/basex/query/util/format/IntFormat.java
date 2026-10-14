@@ -75,14 +75,6 @@ public final class IntFormat extends FormatParser {
   }
 
   /**
-   * Checks if this format is a spell out format.
-   * @return true if this format is a spell out format
-   */
-  public boolean isSpelloutFormat() {
-    return first == 'w';
-  }
-
-  /**
    * Checks if this format generates digits.
    * @return result of check
    */

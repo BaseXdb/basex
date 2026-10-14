@@ -191,8 +191,8 @@ public final class DialogManage extends BaseXDialog {
       refresh = true;
     } else {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
-      doc1.setChoppedText(title, 600);
-      doc2.setChoppedText(BACKUPS + COLS + title, 600);
+      doc1.setChoppedText(title);
+      doc2.setChoppedText(BACKUPS + COLS + title);
 
       boolean active = ctx.soptions.dbExists(db);
       String info = "";

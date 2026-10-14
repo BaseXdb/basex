@@ -23,9 +23,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
-  /** Parser instance (can be {@code null}). */
-  private Parser parser;
-
   /**
    * Default constructor.
    * Input can be set via {@link #setInput(InputStream)}.
@@ -42,14 +39,6 @@ public final class CreateDB extends ACreate {
    */
   public CreateDB(final String name, final String input) {
     super(name, input);
-  }
-
-  /**
-   * Attaches a parser.
-   * @param prsr input parser
-   */
-  public void setParser(final Parser prsr) {
-    parser = prsr;
   }
 
   @Override
@@ -75,15 +64,12 @@ public final class CreateDB extends ACreate {
       return error(ex);
     }
 
-    try {
-      // create parser instance
-      if(source != null) {
-        if(!source.exists()) return error(RES_NOT_FOUND_X, source);
-        parser = new DirParser(source, options);
-      } else if(parser == null) {
-        parser = Parser.emptyParser(options);
-      }
+    // create parser instance
+    if(source != null && !source.exists()) return error(RES_NOT_FOUND_X, source);
+    final Parser parser = source != null ? new DirParser(source, options) :
+      Parser.emptyParser(options);
 
+    try {
       // close open database
       Close.close(context);
 

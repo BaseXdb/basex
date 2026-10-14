@@ -16,7 +16,7 @@ public final class SqlClose extends SqlFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     @SuppressWarnings("resource")
-    final AutoCloseable ac = get(qc, true);
+    final AutoCloseable ac = remove(qc);
     try {
       ac.close();
     } catch(final Exception ex) {

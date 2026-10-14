@@ -260,25 +260,23 @@ public final class PathIndex implements Index {
    * Returns descendant element and attribute names for the specified start key.
    * Called by the GUI.
    * @param name input key
-   * @param desc if false, return only children
    * @param occ true/false: sort by occurrence/lexicographically
    * @return names
    */
-  public TokenList desc(final byte[] name, final boolean desc, final boolean occ) {
+  public TokenList desc(final byte[] name, final boolean occ) {
     final TokenList names = new TokenList();
     if(name.length != 0) names.add(name);
-    return desc(names, desc, occ);
+    return desc(names, occ);
   }
 
   /**
    * Returns descendant element and attribute names for the specified descendant path.
    * Called by the GUI.
    * @param names input steps
-   * @param desc if false, return only children
    * @param occ true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final TokenList names, final boolean desc, final boolean occ) {
+  public TokenList desc(final TokenList names, final boolean occ) {
     // follow the specified descendant/child steps
     ArrayList<PathNode> nodes = desc(root(), true);
 
@@ -290,10 +288,7 @@ public final class PathIndex implements Index {
       final ArrayList<PathNode> list = new ArrayList<>();
       for(final PathNode node : nodes) {
         if(node.name != id || node.kind != kind) continue;
-        for(final PathNode child : node.children) {
-          if(desc) child.addDesc(list, -1);
-          else list.add(child);
-        }
+        for(final PathNode child : node.children) child.addDesc(list, -1);
       }
       nodes = list;
     }

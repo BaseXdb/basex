@@ -74,30 +74,6 @@ public final class LongList extends ElementList {
   }
 
   /**
-   * Returns the uppermost element from the stack.
-   * @return uppermost element
-   */
-  public long peek() {
-    return list[size - 1];
-  }
-
-  /**
-   * Pops the uppermost element from the stack.
-   * @return popped element
-   */
-  public long pop() {
-    return list[--size];
-  }
-
-  /**
-   * Pushes an element onto the stack.
-   * @param element element
-   */
-  public void push(final long element) {
-    add(element);
-  }
-
-  /**
    * Returns an array with all elements.
    * @return array
    */

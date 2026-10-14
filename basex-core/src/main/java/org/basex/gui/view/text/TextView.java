@@ -87,10 +87,6 @@ public final class TextView extends View {
   }
 
   @Override
-  public void refreshFocus() {
-  }
-
-  @Override
   public void refreshMark() {
     final Context context = gui.context;
     final DBNodes nodes = context.marked;

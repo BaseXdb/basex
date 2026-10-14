@@ -52,7 +52,7 @@ public class DbNodeId extends StandardFunc {
    * @throws QueryException query exception
    */
   private int id(final Item item) throws QueryException {
-    return id(toDBNode(item, false));
+    return id(toDBNode(item));
   }
 
   /**

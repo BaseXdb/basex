@@ -318,16 +318,6 @@ public final class HTTPConnection implements ClientInfo {
    * Sets a status and sends an info message.
    * @param code status code
    * @param body message for response body (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  public void status(final int code, final String body) throws IOException {
-    status(code, body, null);
-  }
-
-  /**
-   * Sets a status and sends an info message.
-   * @param code status code
-   * @param body message for response body (can be {@code null})
    * @param type media type of the response body (can be {@code null})
    * @throws IOException I/O exception
    */

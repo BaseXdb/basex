@@ -139,7 +139,7 @@ public final class DialogProps extends BaseXDialog {
 
     final BaseXBack dbPanel = new BaseXBack(new BorderLayout());
     final BaseXLabel db = new BaseXLabel().border(0, 0, 6, 0).large();
-    dbPanel.add(db.setChoppedText(DATABASE + COLS + data.meta.name, 600), BorderLayout.NORTH);
+    dbPanel.add(db.setChoppedText(DATABASE + COLS + data.meta.name), BorderLayout.NORTH);
 
     dbInfo = new TextPanel(this, "", false);
     dbInfo.setFont(infoPanel.getFont());

@@ -1035,27 +1035,16 @@ public final class Token {
    * @return array
    */
   public static byte[][] split(final byte[] token, final int separator) {
-    return split(token, separator, false);
-  }
-
-  /**
-   * Splits a token around matches of the given separator.
-   * @param token token to be split
-   * @param separator separator character
-   * @param empty include empty tokens
-   * @return array
-   */
-  public static byte[][] split(final byte[] token, final int separator, final boolean empty) {
     final TokenList split = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
     forEachCp(token, cp -> {
       if(cp == separator) {
-        if(empty || !tb.isEmpty()) split.add(tb.next());
+        if(!tb.isEmpty()) split.add(tb.next());
       } else {
         tb.add(cp);
       }
     });
-    if(empty || !tb.isEmpty()) split.add(tb.finish());
+    if(!tb.isEmpty()) split.add(tb.finish());
     return split.finish();
   }
 

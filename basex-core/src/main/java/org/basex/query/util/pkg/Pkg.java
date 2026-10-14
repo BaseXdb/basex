@@ -25,8 +25,6 @@ public final class Pkg {
   PkgType type = PkgType.EXPATH;
   /** Package short name. */
   String abbrev;
-  /** Version of packaging specification the package conforms to. */
-  String spec;
   /** Package version. */
   String version = "";
 
@@ -84,14 +82,6 @@ public final class Pkg {
    */
   public String abbrev() {
     return abbrev;
-  }
-
-  /**
-   * Returns the package spec.
-   * @return spec
-   */
-  public String spec() {
-    return spec;
   }
 
   /**

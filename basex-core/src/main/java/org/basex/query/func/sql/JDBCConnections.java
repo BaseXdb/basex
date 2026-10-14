@@ -77,9 +77,13 @@ public final class JDBCConnections implements QueryResource {
   /**
    * Removes either a connection or a prepared statement.
    * @param id connection/prepared statement ID
+   * @return removed connection, prepared statement or {@code null}
    */
-  synchronized void remove(final Uri id) {
+  synchronized AutoCloseable remove(final Uri id) {
+    final AutoCloseable ac = get(id);
     conns.remove(id.string());
+    if(ac instanceof final PreparedStatement ps) genKeys.remove(ps);
+    return ac;
   }
 
   /**

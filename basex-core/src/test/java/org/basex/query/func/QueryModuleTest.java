@@ -52,7 +52,6 @@ public final class QueryModuleTest extends QueryModule {
    * @return default function namespace
    */
   @Requires(Permission.NONE)
-  @ContextDependent
   public Str functionNS() {
     return Str.get(staticContext.funcNS == null ? QueryText.FN_URI : staticContext.funcNS);
   }

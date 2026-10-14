@@ -462,13 +462,12 @@ public abstract class StandardFunc extends Arr {
   /**
    * Converts an item to a compact node.
    * @param item item
-   * @param mainmem accept nodes of main-memory instances
    * @return compact node
    * @throws QueryException query exception
    */
-  protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
-    if(item instanceof final DBNode node && (mainmem || !node.data().inMemory())) return node;
-    throw (mainmem ? DB_COMPACT_X : DB_NODE_X).get(info, item);
+  protected final DBNode toDBNode(final Item item) throws QueryException {
+    if(item instanceof final DBNode node && !node.data().inMemory()) return node;
+    throw DB_NODE_X.get(info, item);
   }
 
   /**

@@ -35,7 +35,7 @@ abstract class SqlFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final PreparedStatement prepared(final QueryContext qc) throws QueryException {
-    return (PreparedStatement) conn(qc, 2, false);
+    return (PreparedStatement) conn(qc, true);
   }
 
   /**
@@ -45,18 +45,20 @@ abstract class SqlFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Connection connection(final QueryContext qc) throws QueryException {
-    return (Connection) conn(qc, 1, false);
+    return (Connection) conn(qc, false);
   }
 
   /**
-   * Returns a connection or prepared statement.
+   * Returns a connection or prepared statement and removes it from the connection handler.
    * @param qc query context
-   * @param close close connection
    * @return connection
    * @throws QueryException query exception
    */
-  final AutoCloseable get(final QueryContext qc, final boolean close) throws QueryException {
-    return conn(qc, 0, close);
+  final AutoCloseable remove(final QueryContext qc) throws QueryException {
+    final Uri id = id(qc);
+    final AutoCloseable ac = jdbc(qc).remove(id);
+    if(ac == null) throw SQL_ID1_X.get(info, id);
+    return ac;
   }
 
   /**
@@ -84,29 +86,26 @@ abstract class SqlFn extends StandardFunc {
   /**
    * Returns a connection or prepared statement.
    * @param qc query context
-   * @param mode mode (0: all; 1: only connections; 2: only prepared statements)
-   * @param close close connection
-   * @return connection
+   * @param prepared prepared statement (otherwise: connection)
+   * @return connection or prepared statement
    * @throws QueryException query exception
    */
-  private AutoCloseable conn(final QueryContext qc, final int mode, final boolean close)
-      throws QueryException {
-
-    final JDBCConnections conns = jdbc(qc);
-    final Uri id = (Uri) checkType(arg(0), BasicType.ANY_URI, qc);
-    final AutoCloseable ac = conns.get(id);
-    switch(mode) {
-      case 1 -> {
-        if(!(ac instanceof Connection)) throw SQL_ID1_X.get(info, id);
-      }
-      case 2 -> {
-        if(!(ac instanceof PreparedStatement)) throw SQL_ID2_X.get(info, id);
-      }
-      default -> {
-        if(ac == null) throw SQL_ID1_X.get(info, id);
-      }
+  private AutoCloseable conn(final QueryContext qc, final boolean prepared) throws QueryException {
+    final Uri id = id(qc);
+    final AutoCloseable ac = jdbc(qc).get(id);
+    if(!(prepared ? ac instanceof PreparedStatement : ac instanceof Connection)) {
+      throw (prepared ? SQL_ID2_X : SQL_ID1_X).get(info, id);
     }
-    if(close) conns.remove(id);
     return ac;
+  }
+
+  /**
+   * Returns the ID of a connection or prepared statement.
+   * @param qc query context
+   * @return ID
+   * @throws QueryException query exception
+   */
+  private Uri id(final QueryContext qc) throws QueryException {
+    return (Uri) checkType(arg(0), BasicType.ANY_URI, qc);
   }
 }

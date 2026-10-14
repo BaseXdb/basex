@@ -158,24 +158,6 @@ public final class Strings {
   }
 
   /**
-   * Deletes a character from a string.
-   * @param string string
-   * @param ch character to be removed
-   * @return resulting token
-   */
-  public static String delete(final String string, final char ch) {
-    if(!contains(string, ch)) return string;
-
-    final int tl = string.length();
-    final StringBuilder sb = new StringBuilder(tl - 1);
-    for(int p = 0; p < tl; p++) {
-      final char c = string.charAt(p);
-      if(c != ch) sb.append(c);
-    }
-    return sb.toString();
-  }
-
-  /**
    * Checks if a string contains a character.
    * @param string string
    * @param ch character to search for

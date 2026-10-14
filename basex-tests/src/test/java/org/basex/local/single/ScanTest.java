@@ -98,7 +98,7 @@ public final class ScanTest extends SandboxTest {
       Util.println(pl);
     }
     // print average runtime
-    Util.println(p.formatRuntime(LOOPS));
+    Util.println(Performance.formatNano(p.nanoRuntime(), LOOPS));
     Util.println("");
   }
 }

@@ -44,18 +44,6 @@ public final class Num {
   }
 
   /**
-   * Creates a compressed representation of the specified value.
-   * @param value value to be compressed
-   * @return new number array
-   */
-  public static byte[] num(final int value) {
-    final int len = length(value);
-    final byte[] array = new byte[len];
-    set(array, value, 0, len);
-    return array;
-  }
-
-  /**
    * Compresses and adds a value to the specified array and
    * returns the resulting array.
    * @param array input array

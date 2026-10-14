@@ -103,7 +103,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   @Override
   public boolean removeAll(final GNode node) {
     if(data != null && ddo && node instanceof final DBNode dbnode) {
-      final int p = binarySearch(dbnode, 0, size);
+      final int p = binarySearch(dbnode);
       if(p < 0) return false;
       remove(p);
       return true;
@@ -114,7 +114,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   @Override
   public boolean contains(final GNode node) {
     if(data != null && ddo) {
-      return node instanceof final DBNode dbnode && binarySearch(dbnode, 0, size) > -1;
+      return node instanceof final DBNode dbnode && binarySearch(dbnode) > -1;
     }
     return super.contains(node);
   }
@@ -126,16 +126,14 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   }
 
   /**
-   * Performs a binary search on the given range of this sequence iterator.
+   * Performs a binary search on this sequence iterator.
    * This works if {@link #data} is assigned.
    * @param node node to find
-   * @param start start of the search interval
-   * @param length length of the search interval
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
-  public int binarySearch(final DBNode node, final int start, final int length) {
-    if(node.data() != data) return -start - 1;
-    int l = start, r = start + length - 1;
+  private int binarySearch(final DBNode node) {
+    if(node.data() != data) return -1;
+    int l = 0, r = size - 1;
     final GNode[] nodes = list;
     while(l <= r) {
       final int m = l + r >>> 1, mpre = ((DBNode) nodes[m]).pre(), npre = node.pre();

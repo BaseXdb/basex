@@ -278,14 +278,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Returns the caret position.
-   * @return caret position
-   */
-  public final int getCaret() {
-    return editor.pos();
-  }
-
-  /**
    * Returns the output text.
    * @return output text
    */
