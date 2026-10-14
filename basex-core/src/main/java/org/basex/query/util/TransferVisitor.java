@@ -15,6 +15,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -30,6 +31,8 @@ public final class TransferVisitor extends ASTVisitor {
 
   /** Visited scopes. */
   private final Set<Scope> scopes = Collections.newSetFromMap(new IdentityHashMap<>());
+  /** Visited values of JNode roots. */
+  private final Set<Value> roots = Collections.newSetFromMap(new IdentityHashMap<>());
   /** Test for nodes that can be shared. */
   private final Predicate<Data> test;
   /** Values that have already been materialized. */
@@ -110,7 +113,12 @@ public final class TransferVisitor extends ASTVisitor {
         }
       } else if(item instanceof XQJava) {
         return reject("Java code");
-      } else if(!materialized(item)) {
+      } else if(item instanceof final JNode node) {
+        final Value root = ((JNode) node.root()).value;
+        if(roots.add(root) && !value(root)) return false;
+      } else if(item instanceof final XNode node) {
+        if(!database(node.data())) return false;
+      } else if(!load(item)) {
         return false;
       }
     }
@@ -153,17 +161,18 @@ public final class TransferVisitor extends ASTVisitor {
   }
 
   /**
-   * Checks if an item has no dependency on a database node.
-   * @param item item
+   * Caches a lazy atomic item.
+   * @param item atomic item
    * @return result of check
    */
-  private boolean materialized(final Item item) {
+  private boolean load(final Item item) {
     try {
-      if(item.materialized(test, false, null)) return true;
+      item.cache(false, null);
+      return true;
     } catch(final QueryException ex) {
       Util.debug(ex);
+      return reject("lazy item");
     }
-    return reject("database node");
   }
 
   /**

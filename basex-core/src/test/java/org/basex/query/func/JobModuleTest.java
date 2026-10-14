@@ -522,6 +522,12 @@ public final class JobModuleTest extends SandboxTest {
         func.args(" fn() { namespace-uri(<a/>) }"), "x");
   }
 
+  /** Invokes function items with pre-evaluated enumeration values. */
+  @Test public void executeFunctionEnum() {
+    inline(true);
+    query(_JOB_EXECUTE.args(" fn() { 'a' cast as enum('a', 'b') }"), "a");
+  }
+
   /** Rejects function items that depend on the calling query. */
   @Test public void executeFunctionErrors() {
     final Function func = _JOB_EXECUTE;
