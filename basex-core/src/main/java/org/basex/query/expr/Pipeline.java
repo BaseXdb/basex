@@ -134,6 +134,6 @@ public final class Pipeline extends Mapping {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " -> ", true);
+    qs.operands(exprs, " -> ");
   }
 }

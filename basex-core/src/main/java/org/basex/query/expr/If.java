@@ -289,7 +289,8 @@ public final class If extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(QueryText.IF).paren(cond).brace(exprs[0]);
+    qs.open().token(QueryText.IF).paren(cond).brace(exprs[0]);
     if(exprs[1] != Empty.VALUE) qs.token(QueryText.ELSE).brace(exprs[1]);
+    qs.close();
   }
 }

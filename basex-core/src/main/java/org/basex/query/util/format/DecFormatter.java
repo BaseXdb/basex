@@ -571,7 +571,7 @@ public final class DecFormatter extends FormatUtil {
       num = num.round(pic.maxFrac, RoundMode.HALF_TO_EVEN);
 
       // convert number to string; chop sign and leading 0
-      String s = Dec.get(decimal(num)).toString();
+      String s = string(Dec.get(decimal(num)).string());
       if(Strings.startsWith(s, '-')) s = s.substring(1);
       if(Strings.startsWith(s, '0')) s = s.substring(1);
 

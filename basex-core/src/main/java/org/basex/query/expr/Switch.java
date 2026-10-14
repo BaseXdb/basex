@@ -364,6 +364,6 @@ public final class Switch extends ParseExpr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(SWITCH).paren(cond).tokens(groups);
+    qs.open().token(SWITCH).paren(cond).tokens(groups).close();
   }
 }

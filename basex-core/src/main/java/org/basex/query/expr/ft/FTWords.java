@@ -593,7 +593,11 @@ public final class FTWords extends FTExpr {
       case PHRASE -> qs.token(PHRASE);
       default -> { }
     }
-    if(occ != null) qs.token(OCCURS).token(occ[0]).token(TO).token(occ[1]).token(TIMES);
+    if(occ != null) {
+      qs.token(OCCURS);
+      range(qs, occ[0], occ[1], Itr.ZERO);
+      qs.token(TIMES);
+    }
     if(ftOpt != null) qs.token(ftOpt);
   }
 }

@@ -23,26 +23,28 @@ public class DbOptionMap extends StandardFunc {
     final MapBuilder map = new MapBuilder();
     final boolean admin = qc.has(Perm.ADMIN, null, info);
     for(final Entry<String, Object> option : qc.context.options(admin).entrySet()) {
-      map.put(option.getKey(), item(option.getValue()));
+      map.put(option.getKey(), toValue(option.getValue()));
     }
     return map.map();
   }
 
   /**
-   * Converts an option value to an XQuery item.
+   * Converts an option value to an XQuery value.
    * @param value value (can be {@code null})
-   * @return item
+   * @return value
    * @throws QueryException query exception
    */
-  static Item item(final Object value) throws QueryException {
+  static Value toValue(final Object value) throws QueryException {
     return switch(value) {
       case null -> Empty.VALUE;
+      case final Value val -> val;
       case final Boolean bln -> Bln.get(bln);
       case final Integer itr -> Itr.get(itr);
+      case final int[] ints -> IntSeq.get(ints);
       case final Options options -> {
         final MapBuilder mb = new MapBuilder();
         for(final Option<?> opt : options) {
-          mb.put(Str.get(opt.name()), item(options.get(opt)));
+          mb.put(Str.get(opt.name()), toValue(options.get(opt)));
         }
         yield mb.map();
       }

@@ -192,7 +192,7 @@ public final class Condition extends Single {
     if(pos  != null) qs.token(AT).token(pos);
     if(prev != null) qs.token(PREVIOUS).token(prev);
     if(next != null) qs.token(NEXT).token(next);
-    qs.token(WHEN).token(expr);
+    qs.token(WHEN).single(expr);
   }
 }
 

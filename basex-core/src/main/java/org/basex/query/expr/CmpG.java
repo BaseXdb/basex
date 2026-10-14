@@ -683,6 +683,6 @@ public class CmpG extends Cmp {
 
   @Override
   public final void toString(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', true);
+    qs.operands(exprs, " " + op + ' ');
   }
 }

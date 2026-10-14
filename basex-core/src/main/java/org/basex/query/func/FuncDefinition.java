@@ -5,6 +5,7 @@ import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.core.users.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -230,7 +231,7 @@ public final class FuncDefinition {
     for(final Object arg : args) {
       if(c++ > 0) tb.add(", ");
       if(arg instanceof final ExprInfo ei) {
-        tb.add(error ? ei.toErrorString() : ei.toString());
+        tb.add(new QueryString(error).single(ei).toString());
       } else if(arg instanceof Number) {
         tb.add(arg);
       } else if(arg instanceof Boolean) {

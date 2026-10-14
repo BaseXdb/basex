@@ -424,7 +424,7 @@ public class DBNode extends XNode {
     if(qs.error() || data.inMemory()) {
       switch(kind()) {
         case ATTRIBUTE ->
-          qs.concat(name(), "=", QueryString.toQuoted(string()));
+          qs.token(QueryString.toAttribute(name(), string()));
         case PROCESSING_INSTRUCTION ->
           qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
         case ELEMENT ->

@@ -875,7 +875,7 @@ public class Options implements Iterable<Option<?>> {
    * @param item item
    * @return string
    */
-  private static String lexical(final Item item) {
+  public static String lexical(final Item item) {
     try {
       return string(item.string(null));
     } catch(final QueryException ex) {

@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.thesaurus.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -248,7 +249,14 @@ public final class ThesAccessor {
 
   @Override
   public String toString() {
-    return "\"" + (db != null ? db : file) + '"';
+    final QueryString qs = new QueryString().token(QueryText.AT);
+    qs.token(QueryString.toQuoted(token(db != null ? db : file.toString())));
+    if(relation.length != 0) qs.token(QueryText.RELATIONSHIP).token(QueryString.toQuoted(relation));
+    if(min != 0 || max != LEVELS) {
+      FTExpr.range(qs, Itr.get(min), Itr.get(max), Itr.ZERO);
+      qs.token(QueryText.LEVELS);
+    }
+    return qs.toString();
   }
 
   /**

@@ -4,6 +4,7 @@ import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -20,6 +21,8 @@ public final class QueryString {
   private final TokenBuilder tb = new TokenBuilder();
   /** Error output. */
   private final boolean error;
+  /** Indicates if the current expression can be added without parentheses. */
+  private boolean bare;
 
   /**
    * Constructor.
@@ -52,9 +55,31 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString token(final Object token) {
+    return token(token, false);
+  }
+
+  /**
+   * Adds a token at a position that accepts any single expression.
+   * @param token token to be added
+   * @return self reference
+   */
+  public QueryString single(final Object token) {
+    return token(token, true);
+  }
+
+  /**
+   * Adds a token.
+   * @param token token to be added
+   * @param sngl token is added at a position that accepts any single expression
+   * @return self reference
+   */
+  private QueryString token(final Object token, final boolean sngl) {
     space();
     if(token instanceof final ExprInfo ei) {
+      final boolean br = bare;
+      bare = sngl;
       ei.toString(this);
+      bare = br;
     } else if(token instanceof final AnnList al) {
       al.toString(this);
     } else {
@@ -62,6 +87,32 @@ public final class QueryString {
       tb.add(last() == ' ' && Token.startsWith(t, ' ') ? Token.substring(t, 1) : t);
     }
     return this;
+  }
+
+  /**
+   * Adds operands, separated by an operator, and wraps them with parentheses if required.
+   * @param operands operands to be added
+   * @param operator operator string
+   * @return self reference
+   */
+  public QueryString operands(final Object[] operands, final String operator) {
+    return tokens(operands, operator, !bare);
+  }
+
+  /**
+   * Adds an opening parenthesis if the current expression must be wrapped.
+   * @return self reference
+   */
+  public QueryString open() {
+    return bare ? this : token("(");
+  }
+
+  /**
+   * Adds a closing parenthesis if the current expression must be wrapped.
+   * @return self reference
+   */
+  public QueryString close() {
+    return bare ? this : token(')');
   }
 
   /**
@@ -121,6 +172,19 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString tokens(final Object[] tokens, final String separator, final boolean paren) {
+    return tokens(tokens, separator, paren, false);
+  }
+
+  /**
+   * Adds multiple tokens, separated by the specified string.
+   * @param tokens tokens to be added
+   * @param separator separator string
+   * @param paren wrap with parentheses
+   * @param sngl tokens are added at positions that accept any single expression
+   * @return self reference
+   */
+  private QueryString tokens(final Object[] tokens, final String separator, final boolean paren,
+      final boolean sngl) {
     if(paren) tb.add('(');
     else space();
 
@@ -132,7 +196,7 @@ public final class QueryString {
       } else {
         more = true;
       }
-      token(token);
+      token(token, sngl);
     }
 
     if(paren) tb.add(')');
@@ -145,7 +209,7 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString params(final Object[] params) {
-    return tokens(params, ", ", true);
+    return tokens(params, ", ", true, true);
   }
 
   /**
@@ -204,6 +268,29 @@ public final class QueryString {
   }
 
   /**
+   * Serializes a chopped version of the specified value as content of a direct constructor.
+   * @param value value
+   * @param attribute attribute value
+   * @return self reference
+   */
+  public QueryString content(final byte[] value, final boolean attribute) {
+    tb.add(toContent(value, attribute));
+    return this;
+  }
+
+  /**
+   * Adds a constructor function call or cast that creates an atomic item of the specified type.
+   * @param type atomic type
+   * @param value value
+   * @return self reference
+   */
+  public QueryString constructor(final Type type, final byte[] value) {
+    if(error) return quoted(value);
+    if(type instanceof BasicType) return token(type).paren(toQuoted(value));
+    return open().quoted(value).token(QueryText.CAST).token(QueryText.AS).token(type).close();
+  }
+
+  /**
    * Adds a braced token.
    * @param open opening brace
    * @param token token to be added
@@ -212,7 +299,7 @@ public final class QueryString {
    */
   public QueryString braced(final String open, final Object token, final String close) {
     tb.add(open);
-    token(token);
+    single(token);
     final byte[] t = Token.token(close);
     tb.add(last() == ' ' && Token.startsWith(t, ' ') ? Token.substring(t, 1) : t);
     return this;
@@ -275,5 +362,47 @@ public final class QueryString {
    */
   public static byte[] toQuoted(final byte[] value) {
     return Serializer.value(value, true, false, true);
+  }
+
+  /**
+   * Serializes an attribute of a direct constructor with a chopped version of its value.
+   * @param name attribute name
+   * @param value attribute value
+   * @return token
+   */
+  public static byte[] toAttribute(final byte[] name, final byte[] value) {
+    return Token.concat(name, "=\"", toContent(value, true), "\"");
+  }
+
+  /**
+   * Serializes a chopped version of the specified value as content of a direct constructor.
+   * @param value value
+   * @param attribute attribute value
+   * @return token
+   */
+  public static byte[] toContent(final byte[] value, final boolean attribute) {
+    // whitespace-only text would be stripped as boundary whitespace
+    final boolean ws = !attribute && Token.ws(value);
+    final TokenBuilder tb = new TokenBuilder();
+    int c = 0;
+    for(final TokenParser tp = new TokenParser(value); tp.more(); c++) {
+      if(c == 200) {
+        tb.add(QueryText.DOTS);
+        break;
+      }
+      final int cp = tp.next();
+      if(ws || cp == '\r' || cp == '\n' || attribute && cp == '\t') {
+        tb.add("&#x").add(Integer.toHexString(cp).toUpperCase()).add(';');
+      } else if(cp == '&') {
+        tb.add(XMLToken.E_AMP);
+      } else if(cp == '<') {
+        tb.add(XMLToken.E_LT);
+      } else if(cp == '{' || cp == '}' || attribute && cp == '"') {
+        tb.add(cp).add(cp);
+      } else {
+        tb.add(cp);
+      }
+    }
+    return tb.finish();
   }
 }

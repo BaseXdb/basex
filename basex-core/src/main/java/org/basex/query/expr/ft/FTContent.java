@@ -86,7 +86,7 @@ public final class FTContent extends FTFilter {
   public void toString(final QueryString qs) {
     qs.token(exprs[0]);
     if(content == FTContents.START) qs.token(AT).token(START);
-    if(content == FTContents.END) qs.token(AT).token(END);
-    qs.token(ENTIRE).token(CONTENT);
+    else if(content == FTContents.END) qs.token(AT).token(END);
+    else qs.token(ENTIRE).token(CONTENT);
   }
 }

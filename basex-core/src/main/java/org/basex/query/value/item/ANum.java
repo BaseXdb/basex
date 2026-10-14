@@ -280,8 +280,26 @@ public abstract class ANum extends Item {
     return h ^ h >>> 7 ^ h >>> 4;
   }
 
+  /**
+   * Returns the value as numeric literal.
+   * @return literal, or {@code null} if the type has no literal form
+   */
+  public final byte[] literal() {
+    // decimal point and exponent tell a decimal and a double from an integer literal
+    if(type == BasicType.INTEGER) return string();
+    final String suffix;
+    if(type == BasicType.DECIMAL) suffix = ".0";
+    else if(type == BasicType.DOUBLE && Double.isFinite(dbl())) suffix = "E0";
+    else return null;
+    final byte[] string = string();
+    return Token.contains(string, suffix.charAt(0)) ? string : Token.concat(string, suffix);
+  }
+
   @Override
   public final void toString(final QueryString qs) {
-    qs.token(string(null));
+    final byte[] literal = qs.error() ? string() : literal();
+    if(literal == null) qs.constructor(type, string());
+    else if(literal[0] == '-') qs.open().token(literal).close();
+    else qs.token(literal);
   }
 }

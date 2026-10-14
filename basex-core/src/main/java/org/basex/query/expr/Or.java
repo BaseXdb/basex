@@ -40,6 +40,6 @@ public final class Or extends Logical {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, ' ' + OR + ' ', true);
+    qs.operands(exprs, ' ' + OR + ' ');
   }
 }

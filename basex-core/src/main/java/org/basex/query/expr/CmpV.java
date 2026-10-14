@@ -155,6 +155,6 @@ public final class CmpV extends Cmp {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " " + op.toValueString() + ' ', true);
+    qs.operands(exprs, " " + op.toValueString() + ' ');
   }
 }

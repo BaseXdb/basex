@@ -94,6 +94,6 @@ public final class CmpN extends Cmp {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " " + op.toNodeString() + ' ', true);
+    qs.operands(exprs, " " + op.toNodeString() + ' ');
   }
 }

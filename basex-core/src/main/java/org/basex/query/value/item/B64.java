@@ -139,12 +139,12 @@ public class B64 extends Bin {
 
   @Override
   public void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder().add('"');
+    final TokenBuilder tb = new TokenBuilder();
     if(data.length > 128) {
       tb.add(Base64.encode(Arrays.copyOf(data, 128))).add(Text.DOTS);
     } else {
       tb.add(Base64.encode(data));
     }
-    qs.token(tb.add('"').finish());
+    qs.constructor(type, tb.finish());
   }
 }

@@ -213,6 +213,6 @@ public final class Range extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, ' ' + TO + ' ', true);
+    qs.operands(exprs, ' ' + TO + ' ');
   }
 }

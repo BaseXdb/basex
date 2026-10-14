@@ -241,7 +241,9 @@ public final class Var extends ExprInfo {
    * @return variable ID
    */
   public byte[] id() {
-    return Token.concat(name.varString(), "_", id);
+    // implicit error variables of catch clauses cannot be renamed
+    final byte[] string = name.varString();
+    return Token.eq(name.uri(), ERROR_URI) ? string : Token.concat(string, "_", id);
   }
 
   @Override

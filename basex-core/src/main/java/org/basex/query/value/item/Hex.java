@@ -96,12 +96,12 @@ public final class Hex extends Bin {
 
   @Override
   public void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder().add('"');
+    final TokenBuilder tb = new TokenBuilder();
     if(data.length > 128) {
       tb.add(Token.hex(Arrays.copyOf(data, 128), true)).add(Text.DOTS);
     } else {
       tb.add(Token.hex(data, true));
     }
-    qs.token(tb.add('"').finish());
+    qs.constructor(type, tb.finish());
   }
 }

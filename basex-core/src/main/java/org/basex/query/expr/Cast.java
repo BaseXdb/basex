@@ -74,6 +74,6 @@ public final class Cast extends Convert {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
+    qs.open().token(expr).token(CAST).token(AS).token(seqType).close();
   }
 }

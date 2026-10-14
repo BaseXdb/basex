@@ -344,7 +344,7 @@ public final class FElem extends FNode {
       tb.add("/>");
     } else {
       final byte[] value = textValue();
-      tb.add('>').add(value != null ? QueryString.toValue(value) : DOTS).
+      tb.add('>').add(value != null ? QueryString.toContent(value, false) : DOTS).
         add("</").add(nm).add('>');
     }
     qs.token(tb.finish());

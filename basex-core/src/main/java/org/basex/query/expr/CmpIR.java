@@ -197,7 +197,7 @@ public final class CmpIR extends CmpRange {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(expr);
+    qs.open().token(expr);
     if(min == max) {
       qs.token("=").token(min);
     } else if(min != MIN_VALUE && max != MAX_VALUE) {
@@ -207,5 +207,6 @@ public final class CmpIR extends CmpRange {
     } else {
       qs.token("<=").token(max);
     }
+    qs.close();
   }
 }

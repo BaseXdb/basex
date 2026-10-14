@@ -151,7 +151,7 @@ public final class FTOpt extends ExprInfo {
     if(is(DC)) list.add(DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) list.add(STEMMING);
     if(ln != null) list.add(LANGUAGE + " \"" + ln + '"');
-    if(th != null) list.add(THESAURUS + " at " + th);
+    if(th != null) list.add(th.toString());
 
     for(final String opt : list) qs.token(USING).token(opt);
   }

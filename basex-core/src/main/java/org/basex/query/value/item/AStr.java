@@ -187,6 +187,7 @@ public abstract class AStr extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.quoted(value);
+    if(type == BasicType.STRING) qs.quoted(value);
+    else qs.constructor(type, value);
   }
 }

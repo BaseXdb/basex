@@ -59,6 +59,6 @@ public final class Delete extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(DELETE).token(NODES).token(arg(0));
+    qs.open().token(DELETE).token(NODES).token(arg(0)).close();
   }
 }

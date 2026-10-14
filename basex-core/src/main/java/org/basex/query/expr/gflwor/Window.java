@@ -341,7 +341,7 @@ public final class Window extends Clause {
   @Override
   public void toString(final QueryString qs) {
     qs.token(FOR).token(sliding ? SLIDING : TUMBLING).token(WINDOW).token(var).token(IN).
-      token(expr).token(start);
+      single(expr).token(start);
     if(end != null) {
       if(only) qs.token(ONLY);
       qs.token(end);

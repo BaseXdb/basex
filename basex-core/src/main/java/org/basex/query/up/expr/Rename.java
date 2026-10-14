@@ -99,6 +99,6 @@ public final class Rename extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(RENAME).token(NODE).token(arg(0)).token(AS).token(arg(1));
+    qs.open().token(RENAME).token(NODE).token(arg(0)).token(AS).token(arg(1)).close();
   }
 }

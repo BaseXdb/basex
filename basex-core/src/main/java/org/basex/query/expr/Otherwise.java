@@ -175,6 +175,6 @@ public final class Otherwise extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, ' ' + OTHERWISE + ' ', true);
+    qs.operands(exprs, ' ' + OTHERWISE + ' ');
   }
 }

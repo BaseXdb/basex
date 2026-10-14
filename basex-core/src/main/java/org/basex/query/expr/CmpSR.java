@@ -201,8 +201,10 @@ public final class CmpSR extends CmpRange {
 
   @Override
   public void toString(final QueryString qs) {
+    qs.open();
     if(min != null) qs.token(expr).token(mni ? ">= " : "> ").quoted(min);
     if(min != null && max != null) qs.token(AND);
     if(max != null) qs.token(expr).token(mxi ? "<= " : "< ").quoted(max);
+    qs.close();
   }
 }

@@ -171,7 +171,8 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.function(Function.POSITION).token("=").token(exprs[0]);
+    qs.open().function(Function.POSITION).token("=").token(exprs[0]);
     if(!exact()) qs.token(TO).token(exprs[1]);
+    qs.close();
   }
 }

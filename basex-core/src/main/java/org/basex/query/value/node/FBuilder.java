@@ -6,6 +6,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Node builder.
@@ -95,7 +96,7 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder text(final Object value) {
-    return value != null ? text(token(value.toString())) : this;
+    return value != null ? text(lexical(value)) : this;
   }
 
   /**
@@ -115,7 +116,7 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder attr(final QNm name, final Object value) {
-    return value != null ? attr(name, token(value.toString())) : this;
+    return value != null ? attr(name, lexical(value)) : this;
   }
 
   /**
@@ -176,5 +177,14 @@ public final class FBuilder {
     final GNode[] ch = children != null ? children.finish() : NO_NODES;
     return root instanceof final FElem felem ? felem.finish(ns, nsInherited, at, ch) :
       ((FDoc) root).finish(ch);
+  }
+
+  /**
+   * Returns the lexical representation of a value.
+   * @param value value
+   * @return token
+   */
+  private static byte[] lexical(final Object value) {
+    return token(value instanceof final Item item ? Options.lexical(item) : value.toString());
   }
 }

@@ -63,6 +63,6 @@ public final class Treat extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(expr).token(TREAT).token(AS).token(check).token(')');
+    qs.open().token(expr).token(TREAT).token(AS).token(check).close();
   }
 }

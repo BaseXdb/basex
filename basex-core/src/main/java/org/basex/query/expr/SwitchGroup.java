@@ -172,6 +172,6 @@ public final class SwitchGroup extends Arr {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) qs.token(CASE).token(exprs[e]);
     if(el == 1) qs.token(DEFAULT);
-    qs.token(RETURN).token(rtrn());
+    qs.token(RETURN).single(rtrn());
   }
 }

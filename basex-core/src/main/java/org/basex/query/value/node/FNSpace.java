@@ -76,9 +76,7 @@ public final class FNSpace extends FNode {
 
   @Override
   public void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder().add(Token.XMLNS);
-    if(name.length != 0) tb.add(':').add(name);
-    tb.add('=').add(QueryString.toQuoted(value));
-    qs.token(tb.finish());
+    final byte[] attr = name.length != 0 ? Token.concat(Token.XMLNS_COLON, name) : Token.XMLNS;
+    qs.token(QueryString.toAttribute(attr, value));
   }
 }

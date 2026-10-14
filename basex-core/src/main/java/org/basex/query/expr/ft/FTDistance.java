@@ -9,6 +9,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -185,6 +186,8 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(exprs[0]).token(DISTANCE).paren(min + "-" + max + ' ' + unit);
+    qs.token(exprs[0]).token(DISTANCE);
+    range(qs, min, max, Itr.MIN);
+    qs.token(unit);
   }
 }

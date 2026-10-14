@@ -146,6 +146,6 @@ public final class TransformWith extends Copy {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(arg(target())).token(UPDATE).brace(arg(update()));
+    qs.open().token(arg(target())).token(UPDATE).brace(arg(update())).close();
   }
 }

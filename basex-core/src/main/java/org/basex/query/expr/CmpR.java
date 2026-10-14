@@ -446,6 +446,7 @@ public final class CmpR extends CmpRange {
 
   @Override
   public void toString(final QueryString qs) {
+    qs.open();
     if(exact()) {
       if(lower != null) qs.token(expr).token(lowerInc ? ">=" : ">").token(lower);
       if(lower != null && upper != null) qs.token(AND);
@@ -457,5 +458,6 @@ public final class CmpR extends CmpRange {
       if(min != NEGATIVE_INFINITY && max != POSITIVE_INFINITY) qs.token(AND);
       if(max != POSITIVE_INFINITY) qs.token(expr).token("<=").token(max);
     }
+    qs.close();
   }
 }

@@ -285,6 +285,6 @@ public final class TypeswitchGroup extends Single {
       if(cases) qs.token(AS);
     }
     if(cases) qs.tokens(seqTypes, "|");
-    qs.token(RETURN).token(expr);
+    qs.token(RETURN).single(expr);
   }
 }

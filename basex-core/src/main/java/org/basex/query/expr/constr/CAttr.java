@@ -92,12 +92,12 @@ public final class CAttr extends CName {
     if(computed) {
       toString(qs, ATTRIBUTE);
     } else {
-      qs.token(((QNm) name).string()).token('=');
-      if(exprs.length == 1 && exprs[0] instanceof final Str str) {
-        qs.quoted(str.string());
-      } else {
-        qs.token("\"{").tokens(exprs, SEP).token("}\"");
+      qs.token(((QNm) name).string()).token('=').token('"');
+      for(final Expr expr : exprs) {
+        if(expr instanceof final Str str) qs.content(str.string(), true);
+        else qs.braced("{ ", expr, " }");
       }
+      qs.token('"');
     }
   }
 }

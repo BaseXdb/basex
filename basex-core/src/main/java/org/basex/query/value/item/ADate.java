@@ -600,6 +600,6 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final void toString(final QueryString qs) {
-    qs.quoted(string(null));
+    qs.constructor(type, string(null));
   }
 }

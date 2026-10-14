@@ -156,6 +156,6 @@ public final class ButWith extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " but with ", true);
+    qs.operands(exprs, " but with ");
   }
 }

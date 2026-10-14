@@ -167,13 +167,13 @@ public final class Transform extends Copy {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(COPY);
+    qs.open().token(COPY);
     boolean more = false;
     for(final Let copy : copies) {
       if(more) qs.token(SEP);
       else more = true;
       qs.token(copy.var.id()).token(":=").token(copy.expr);
     }
-    qs.token(MODIFY).token(arg(update())).token(RETURN).token(arg(target()));
+    qs.token(MODIFY).token(arg(update())).token(RETURN).token(arg(target())).close();
   }
 }

@@ -193,6 +193,6 @@ public final class TypeCheck extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(expr).token(COERCE).token(TO).token(seqType()).token(')');
+    qs.open().token(expr).token(COERCE).token(TO).token(seqType()).close();
   }
 }

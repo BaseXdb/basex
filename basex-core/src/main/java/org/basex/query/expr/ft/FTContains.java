@@ -172,6 +172,6 @@ public final class FTContains extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(expr).token(CONTAINS).token(TEXT).token(ftexpr);
+    qs.open().token(expr).token(CONTAINS).token(TEXT).token(ftexpr).close();
   }
 }

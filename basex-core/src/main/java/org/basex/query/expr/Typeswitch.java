@@ -268,6 +268,6 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(TYPESWITCH).paren(cond).tokens(groups);
+    qs.open().token(TYPESWITCH).paren(cond).tokens(groups).close();
   }
 }

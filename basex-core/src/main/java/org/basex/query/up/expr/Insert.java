@@ -114,7 +114,7 @@ public final class Insert extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(QueryText.INSERT).token(QueryText.NODES).token(arg(1)).token(QueryText.INTO).
-      token(arg(0));
+    qs.open().token(QueryText.INSERT).token(QueryText.NODES).token(arg(1)).
+      token(QueryText.INTO).token(arg(0)).close();
   }
 }

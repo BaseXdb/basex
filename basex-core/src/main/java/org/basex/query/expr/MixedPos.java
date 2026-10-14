@@ -84,6 +84,6 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.function(Function.POSITION).token("=").paren(expr);
+    qs.open().function(Function.POSITION).token("=").paren(expr).close();
   }
 }

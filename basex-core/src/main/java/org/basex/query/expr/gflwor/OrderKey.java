@@ -74,7 +74,7 @@ public final class OrderKey extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(expr);
+    qs.single(expr);
     if(desc) qs.token(DESCENDING);
     qs.token(EMPTYY).token(least ? LEAST : GREATEST);
     if(coll != null) qs.token(COLLATION).token("\"").token(coll.uri()).token('"');

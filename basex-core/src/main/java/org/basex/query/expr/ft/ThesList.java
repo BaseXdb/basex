@@ -79,11 +79,9 @@ public final class ThesList {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final ThesAccessor th : list) {
-      if(!sb.isEmpty()) sb.append(", ");
-      sb.append(th);
-    }
-    return sb.toString();
+    if(none) return QueryText.NO + ' ' + QueryText.THESAURUS;
+    if(list.isEmpty()) return QueryText.THESAURUS + ' ' + QueryText.DEFAULT;
+    return new QueryString().token(QueryText.THESAURUS).
+      tokens(list.toArray(), QueryText.SEP, list.size() > 1).toString();
   }
 }

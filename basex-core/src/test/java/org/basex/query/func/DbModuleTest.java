@@ -1083,6 +1083,13 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args("bindings"), "");
     query(func.args("serializer") + "?indent", "no");
 
+    // values without string representation
+    query(func.args("csvparser") + "?header", false);
+    query(func.args("csvparser") + "?select-columns", "");
+    query(func.args("jsonparser") + "?null", "");
+    query("declare option db:csvparser 'select-columns=2'; "
+        + func.args("csvparser") + "?select-columns", 2);
+
     error(func.args("XYZ"), DB_OPTION_X);
   }
 

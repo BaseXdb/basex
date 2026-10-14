@@ -84,6 +84,6 @@ public final class FAttr extends FNode {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.concat(name.string(), "=", QueryString.toQuoted(value));
+    qs.token(QueryString.toAttribute(name.string(), value));
   }
 }

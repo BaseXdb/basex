@@ -143,25 +143,15 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     final Type type = item.type;
     try {
-      final boolean literal = !expression || type.oneOf(INTEGER, DECIMAL) ||
-        type == DOUBLE && Double.isFinite(((ANum) item).dbl());
+      byte[] literal = null;
+      if(item instanceof final ANum num) literal = expression ? num.literal() : num.jsonString();
       if(type == QNAME) {
         printChar('#');
         printChars(((QNm) item).prefixId());
       } else if(type == BOOLEAN) {
         printChars(Token.token(item));
-      } else if(type.instanceOf(NUMERIC) && literal) {
-        final byte[] number = expression ? item.string(null) : ((ANum) item).jsonString();
-        printChars(number);
-        // decimal point and exponent tell a decimal and a double from an integer literal
-        if(expression) {
-          if(type == DECIMAL && !Token.contains(number, '.')) {
-            printChars(Token.token(".0"));
-          } else if(type == DOUBLE && !Token.contains(number, 'e') &&
-              !Token.contains(number, 'E')) {
-            printChars(Token.token("E0"));
-          }
-        }
+      } else if(literal != null) {
+        printChars(literal);
       } else {
         // the resulting string is serialized with the Text output method
         final Type tp = constructor(type);

@@ -130,7 +130,7 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.function(Function.POSITION);
+    qs.open().function(Function.POSITION);
     if(exact()) {
       qs.token("=").token(min);
     } else if(max == MAX_VALUE) {
@@ -140,5 +140,6 @@ public final class IntPos extends Simple implements CmpPos {
     } else {
       qs.token("=").token(min).token(TO).token(max);
     }
+    qs.close();
   }
 }

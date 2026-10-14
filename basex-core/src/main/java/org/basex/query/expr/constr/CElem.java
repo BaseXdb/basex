@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -206,20 +205,14 @@ public final class CElem extends CName {
           qs.token(expr);
         } else {
           qs.token('>');
-          boolean constr = false;
-          for(int f = e; f < el && !constr; f++) {
-            constr = exprs[f] instanceof final CNode cnode ? !cnode.nested :
-              !(exprs[f] instanceof Str);
-          }
-          if(constr) {
-            qs.token('{').tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
-          } else {
-            for(int f = e; f < el; f++) {
-              if(exprs[f] instanceof final Str str) {
-                qs.value(str.string());
-              } else {
-                qs.token(exprs[f]);
-              }
+          for(int f = e; f < el; f++) {
+            final Expr ex = exprs[f];
+            if(ex instanceof final Str str) {
+              qs.content(str.string(), false);
+            } else if(ex instanceof final CNode cnode && cnode.nested) {
+              ex.toString(qs);
+            } else {
+              qs.braced("{ ", ex, " }");
             }
           }
           qs.token('<').token('/').token(nm).token('>');

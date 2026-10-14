@@ -64,6 +64,6 @@ public final class Castable extends Convert {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(expr).token(CASTABLE).token(AS).token(seqType).token(')');
+    qs.open().token(expr).token(CASTABLE).token(AS).token(seqType).close();
   }
 }

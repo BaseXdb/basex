@@ -138,6 +138,6 @@ public final class Instance extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(expr).token(INSTANCE).token(OF).token(seqType);
+    qs.open().token(expr).token(INSTANCE).token(OF).token(seqType).close();
   }
 }

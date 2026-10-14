@@ -49,6 +49,6 @@ public final class Where extends FilterClause {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(WHERE).token(expr);
+    qs.token(WHERE).single(expr);
   }
 }

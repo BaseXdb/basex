@@ -103,6 +103,6 @@ public final class Atm extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.quoted(value);
+    qs.constructor(type, value);
   }
 }

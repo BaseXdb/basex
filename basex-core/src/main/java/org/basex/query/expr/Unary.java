@@ -100,7 +100,7 @@ public final class Unary extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    if(minus) qs.token("-");
-    qs.token(expr);
+    if(minus) qs.open().token("-").token(expr).close();
+    else qs.token(expr);
   }
 }

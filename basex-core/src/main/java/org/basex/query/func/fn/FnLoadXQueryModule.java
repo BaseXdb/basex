@@ -99,7 +99,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     if(opt.contains(XQUERY_VERSION)) {
-      String version = opt.get(XQUERY_VERSION).toString();
+      String version = Token.string(((Item) opt.get(XQUERY_VERSION)).string(info));
       if(!version.contains(".")) version += ".0";
       if(!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
     }

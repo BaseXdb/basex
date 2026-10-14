@@ -101,6 +101,6 @@ public final class Concat extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " || ", true);
+    qs.operands(exprs, " || ");
   }
 }

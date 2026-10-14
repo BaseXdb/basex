@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -137,5 +138,19 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), exprs);
+  }
+
+  /**
+   * Adds a full-text range to the query string.
+   * @param qs query string
+   * @param min minimum
+   * @param max maximum
+   * @param dflt default minimum
+   */
+  static void range(final QueryString qs, final Expr min, final Expr max, final Itr dflt) {
+    if(min.equals(max)) qs.token(QueryText.EXACTLY).token(min);
+    else if(max.equals(Itr.MAX)) qs.token(QueryText.AT).token(QueryText.LEAST).token(min);
+    else if(min.equals(dflt)) qs.token(QueryText.AT).token(QueryText.MOST).token(max);
+    else qs.token(QueryText.FROM).token(min).token(QueryText.TO).token(max);
   }
 }

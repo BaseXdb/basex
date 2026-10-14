@@ -162,6 +162,6 @@ public final class Arith extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, ' ' + calc.name + ' ', true);
+    qs.operands(exprs, ' ' + calc.name + ' ');
   }
 }

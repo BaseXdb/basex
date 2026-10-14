@@ -20,6 +20,6 @@ public final class DbOption extends DbOptionMap {
 
     final Object value = qc.context.option(Token.string(key), qc.has(Perm.ADMIN, null, info));
     if(value == null) throw DB_OPTION_X.get(info, key);
-    return item(value);
+    return toValue(value);
   }
 }

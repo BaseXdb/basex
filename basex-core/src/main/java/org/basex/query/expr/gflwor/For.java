@@ -264,6 +264,6 @@ public final class For extends ForLet {
     if(empty) qs.token(ALLOWING).token(EMPTYY);
     if(pos != null) qs.token(AT).token(pos);
     if(score != null) qs.token(SCORE).token(score);
-    qs.token(IN).token(expr);
+    qs.token(IN).single(expr);
   }
 }
