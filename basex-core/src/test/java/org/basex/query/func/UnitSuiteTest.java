@@ -100,6 +100,23 @@ public final class UnitSuiteTest extends SandboxTest {
     query(doc + "//testcase[@name = 'fail']/failure/info/b/data()", "B");
   }
 
+  /** Reports errors and failures with function items and JNodes. */
+  @Test public void items() {
+    final String doc = run("items",
+        "declare %unit:test function _:err() { error(xs:QName('_:e'), 'x', fn() { 1 }) };"
+      + "declare %unit:test function _:equals() { "
+      + "  unit:assert-equals({ 'a': true#0 }, { 'a': false#0 }) };"
+      + "declare %unit:test function _:focus() { 1 ! unit:assert-equals(fn() { . }, 2) };"
+      + "declare %unit:test function _:jnode() { "
+      + "  unit:assert-equals(jtree({ 'a': (1, 2) })/a, 3) };");
+
+    query(doc + "//testcase[@name = 'err']/error/@type/data()", "Q{_}e");
+    query("exists(" + doc + "//testcase[@name = 'equals']/failure)", true);
+    query("exists(" + doc + "//testcase[@name = 'focus']/failure)", true);
+    query(doc + "//testcase[@name = 'jnode']/failure/returned/@type/data()", "jnode()");
+    query(doc + "//testcase[@name = 'jnode']/failure/returned/data()", "jtree(\"a\": (1 to 2))");
+  }
+
   /**
    * Runs a unit test module and returns a {@code doc(...)} accessor for its serialized report.
    * @param name base file name

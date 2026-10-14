@@ -5,6 +5,7 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -18,6 +19,10 @@ final class UnitException extends QueryException {
   Item expected;
   /** Returned item (can be {@code null}). */
   Item returned;
+  /** Type of the expected item (can be {@code null}). */
+  final Type expectedType;
+  /** Type of the returned item (can be {@code null}). */
+  final Type returnedType;
   /** Item count. */
   final int count;
 
@@ -34,30 +39,19 @@ final class UnitException extends QueryException {
     super(info, err, count, expected == null ? "()" : expected, returned == null ? "()" : returned);
     this.expected = expected;
     this.returned = returned;
+    expectedType = expected != null ? expected.type : null;
+    returnedType = returned != null ? returned.type : null;
     this.count = count;
   }
 
   /**
-   * Copies database nodes of the expected and returned items.
+   * Replaces the expected and returned items with items that can be reported after the query.
    * @param test test for nodes that can be shared
    * @param qc query context
    * @throws QueryException query exception
    */
-  void materialize(final Predicate<Data> test, final QueryContext qc) throws QueryException {
-    expected = materialize(expected, test, qc);
-    returned = materialize(returned, test, qc);
-  }
-
-  /**
-   * Copies an item if it is a database node.
-   * @param item item (can be {@code null})
-   * @param test test for nodes that can be shared
-   * @param qc query context
-   * @return item (can be {@code null})
-   * @throws QueryException query exception
-   */
-  private static Item materialize(final Item item, final Predicate<Data> test,
-      final QueryContext qc) throws QueryException {
-    return item == null ? null : (Item) item.materialize(test, null, qc);
+  void report(final Predicate<Data> test, final QueryContext qc) throws QueryException {
+    if(expected != null) expected = Unit.report(expected, test, qc);
+    if(returned != null) returned = Unit.report(returned, test, qc);
   }
 }

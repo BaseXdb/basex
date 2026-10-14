@@ -23,6 +23,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -243,8 +244,8 @@ final class Unit {
 
       if(ex instanceof final UnitException ue) {
         // unit exception: add expected and returned values
-        error.node(element(ue.returned, Q_RETURNED, ue.count));
-        error.node(element(ue.expected, Q_EXPECTED, ue.count));
+        error.node(element(ue.returned, ue.returnedType, Q_RETURNED, ue.count));
+        error.node(element(ue.expected, ue.expectedType, Q_EXPECTED, ue.count));
       } else if(!fail) {
         // exception other than failure: add type
         error.attr(Q_TYPE, ex.qname().prefixId(QueryText.ERROR_URI));
@@ -253,7 +254,7 @@ final class Unit {
       // add info
       final Value value = ex.value();
       if(value != null && value.size() == 1) {
-        error.node(element((Item) value, Q_INFO, -1));
+        error.node(element((Item) value, null, Q_INFO, -1));
       } else {
         // otherwise, add error message
         error.node(FElem.build(Q_INFO).text(ex.getLocalizedMessage()));
@@ -278,27 +279,52 @@ final class Unit {
 
   /**
    * Creates a new element.
-   * @param item item (can be {@code null})
+   * @param item item, returned by {@link #report} (can be {@code null})
+   * @param type type of the original item (can be {@code null})
    * @param name name (expected/returned)
    * @param count item count (ignored if {@code -1})
    * @return element
    */
-  private static FBuilder element(final Item item, final QNm name, final int count) {
+  private static FBuilder element(final Item item, final Type type, final QNm name,
+      final int count) {
     final FBuilder elem = FElem.build(name);
     if(item != null) {
       if(item instanceof final XNode node) {
         elem.node(node);
       } else {
-        try {
-          elem.text(item.string(null));
-        } catch(final QueryException ex) {
-          Util.debug(ex);
-          elem.text(item);
-        }
+        elem.text(text(item));
       }
-      if(count != -1) elem.attr(Q_ITEM, count).attr(Q_TYPE, item.type);
+      if(count != -1) elem.attr(Q_ITEM, count).attr(Q_TYPE, type);
     }
     return elem;
+  }
+
+  /**
+   * Returns a node copy or the string representation of an item for the test report.
+   * @param item item
+   * @param test test for nodes that can be shared
+   * @param qc query context
+   * @return node or string
+   * @throws QueryException query exception
+   */
+  static Item report(final Item item, final Predicate<Data> test, final QueryContext qc)
+      throws QueryException {
+    return item instanceof final XNode node ? node.materialize(test, null, qc) :
+      Str.get(text(item));
+  }
+
+  /**
+   * Returns the string value or, if it does not exist, the string representation of an item.
+   * @param item item
+   * @return string
+   */
+  private static byte[] text(final Item item) {
+    try {
+      return item.string(null);
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      return token(item.toString());
+    }
   }
 
   /**
@@ -324,11 +350,11 @@ final class Unit {
         Thread.interrupted();
         throw UNIT_TIMEOUT_X.get(func.info, timeout / 1000.0);
       } catch(final QueryException ex) {
-        // copy database nodes before the opened databases are closed
+        // convert values to reportable items before the opened databases are closed
         final Predicate<Data> test = TransferVisitor.unshared(qc.context);
-        if(ex instanceof final UnitException ue) ue.materialize(test, qc);
+        if(ex instanceof final UnitException ue) ue.report(test, qc);
         final Value value = ex.value();
-        if(value != null) ex.value(value.materialize(test, null, qc));
+        if(value != null) ex.value(value.size() == 1 ? report((Item) value, test, qc) : null);
         throw ex;
       }
     } finally {
