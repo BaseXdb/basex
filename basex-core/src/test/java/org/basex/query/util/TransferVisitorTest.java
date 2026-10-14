@@ -67,7 +67,7 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void evaluatedStaticVariable() {
     execute(new CreateDB(NAME, "<a/>"));
     try {
-      assertEquals("database node in static variable $v", dependency(
+      assertEquals("database '" + NAME + "' in static variable $v", dependency(
           "declare variable $v := db:get('" + NAME + "'); let $c := count($v) return fn() { $v }"));
     } finally {
       execute(new DropDB(NAME));
@@ -93,7 +93,7 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void persistentNode() {
     execute(new CreateDB(NAME, "<a/>"));
     try {
-      assertEquals("database node",
+      assertEquals("database '" + NAME + '\'',
           dependency("let $n := db:get('" + NAME + "') return fn() { $n }"));
     } finally {
       execute(new DropDB(NAME));
