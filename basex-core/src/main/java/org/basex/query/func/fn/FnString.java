@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnString extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).item(qc, info);
+    final Item value = context(qc).unwrappedItem(qc, info);
 
     if(value.isEmpty()) return Str.EMPTY;
     if(value.type == BasicType.STRING) return value;
@@ -29,7 +29,7 @@ public final class FnString extends ContextFn {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).item(qc, info);
+    final Item value = context(qc).unwrappedItem(qc, info);
 
     if(value.isEmpty()) return false;
     if(!(value instanceof FItem) || value instanceof XQJava) return value.string(info).length > 0;
@@ -65,10 +65,10 @@ public final class FnString extends ContextFn {
       // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // boolean(string($number)) → true()
+      if(st.instanceOf(Types.NUMERIC_O)) return Bln.TRUE;
       // boolean(string($node)) → boolean($node/descendant::text())
       expr = simplifyEbv(item, cc, null);
-      // boolean(string($number)) → true()
-      if(item.seqType().instanceOf(Types.NUMERIC_O)) return Bln.TRUE;
     }
     return cc.simplify(this, expr, mode);
   }

@@ -5568,6 +5568,25 @@ return
     check("(1 to 6) ! (. || 'x')[" + func.args() + " = 'x']", "", empty(func));
     check("(1 to 6) ! (. || 'x')[" + func.args(" .") + " = 'x']", "", empty(func));
 
+    // effective boolean value of nodes
+    query("(<a/>, <a><b/></a>, <a><b/>x</a>, <a><b>x</b></a>, document { <a>x</a> })["
+        + func.args() + "] => count()", 3);
+    query("(<a b='x'/>, <!--x-->, <?x y?>, text { 'x' })[" + func.args() + "] ! string()",
+        "x\ny\nx");
+
+    // JNodes
+    final String jtree = " jtree({ 'a': 1, 'b': (), 'c': (1, 2), 'd': [ 1 ], 'e': jtree('x'), "
+        + "'f': <x>t</x> })/";
+    query(func.args(jtree + "a"), 1);
+    query(func.args(jtree + "b"), "");
+    query(func.args(jtree + "e"), "x");
+    query(func.args(jtree + "f"), "t");
+    query("boolean(" + func.args(jtree + "b") + ')', false);
+    query("boolean(" + func.args(jtree + "f") + ')', true);
+    query(jtree.substring(1) + "a ! " + func.args(), 1);
+    error(func.args(jtree + "c"), INVTYPE_X);
+    error(func.args(jtree + "d"), FISTRING_X);
+
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);
     error("true#0 ! " + func.args(), FISTRING_X);
