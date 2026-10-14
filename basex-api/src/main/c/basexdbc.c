@@ -150,7 +150,13 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 		return -1;
 	}
 
-	/* Receive {algorithm}:{salt}\0 */
+	/* Receive {algorithm}:{salt}\0 (servers < 13.0 send \1) */
+	char first;
+	if (read(sfd, &first, 1) != 1 || first == '\1') {
+		warnx("Server does not support salted authentication (BaseX < 13.0).");
+		free(challenge);
+		return -1;
+	}
 	rc = readstring(sfd, &params);
 	if (rc == -1) {
 		warnx("Reading password parameters failed.");

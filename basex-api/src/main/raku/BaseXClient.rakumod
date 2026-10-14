@@ -79,8 +79,9 @@ class	BaseXClient::Session {
 		self.send($username);
 		self.send("");
 
-		# receive password parameters: {algorithm}:{salt}
-		my $salt = split(':', self.receive())[1];
+		# receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+		self.read() == 1 and die "Server does not support salted authentication (BaseX < 13.0).";
+		my $salt = split(':', $!buf ~ self.receive())[1];
 
 		# send hashed password
 		my $code     = sha256-hex($salt ~ $password);

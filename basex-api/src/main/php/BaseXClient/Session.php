@@ -37,7 +37,11 @@ class Session
         // request the password parameters: send username and an empty hash
         $this->send($user.chr(0).chr(0));
 
-        // receive password parameters: {algorithm}:{salt}
+        // receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+        if ($this->read() === chr(1)) {
+            throw new BaseXException("Server does not support salted authentication (BaseX < 13.0).");
+        }
+        $this->bpos--;
         $params = explode(':', $this->readString());
         $salt = $params[1];
 

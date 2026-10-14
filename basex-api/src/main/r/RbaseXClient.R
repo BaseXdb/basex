@@ -25,8 +25,10 @@ BasexClient <- R6Class("BasexClient",
       private$void_send(username)
       private$void_send("")
 
-      # password parameters: {algorithm}:{salt}
-      salt <- strsplit(self$str_receive(), "\\:")[[1]][2]
+      # password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+      first <- readBin(private$sock, what = "raw", n = 1)
+      if (first == 0x01) stop("Server does not support salted authentication (BaseX < 13.0).")
+      salt <- strsplit(self$str_receive(output = first), "\\:")[[1]][2]
 
       code <- sha256(paste(sha256(paste(salt, password, sep = "")), nonce, sep = ""))
       class(code) <- "character"

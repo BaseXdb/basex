@@ -22,8 +22,10 @@ module BaseXClient
       send(username)
       send("")
 
-      # receive password parameters: {algorithm}:{salt}
-      salt = receive.split(':')[1]
+      # receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+      first = read
+      raise "Server does not support salted authentication (BaseX < 13.0)." if first == 1.chr
+      salt = (first + receive).split(':')[1]
 
       # send hashed password
       hash = Digest::SHA256.new

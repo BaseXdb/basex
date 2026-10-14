@@ -37,7 +37,12 @@ namespace BaseXClient
       Send(username);
       Send("");
 
-      // password parameters: {algorithm}:{salt}
+      // password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+      if (Read() == 1)
+      {
+          throw new IOException("Server does not support salted authentication (BaseX < 13.0).");
+      }
+      bpos--;
       string salt = Receive().Split(':')[1];
 
       Send(Hash(Hash(salt + pw) + nonce));

@@ -52,7 +52,11 @@ public final class BaseXClient implements Closeable {
     send("");
     out.flush();
 
-    // receive password parameters: {algorithm}:{salt}
+    // receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+    in.mark(1);
+    if(in.read() == 1) throw new IOException(
+        "Server does not support salted authentication (BaseX < 13.0).");
+    in.reset();
     final String salt = receive().split(":")[1];
 
     // send hashed password

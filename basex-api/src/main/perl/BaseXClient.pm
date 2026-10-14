@@ -6,6 +6,7 @@
 # (C) BaseX Team, BSD License
 
 use Digest::SHA;
+use Encode;
 use IO::Socket;
 use warnings;
 use strict;
@@ -18,7 +19,7 @@ sub new {
   my $port = shift;
   my $user = shift;
   my $pw = shift;
-  my $self = bless({}, $class);
+  my $self = bless({ buf => "", pos => 0 }, $class);
 
   # create server connection
   $self->{sock} = IO::Socket::INET->new(
@@ -32,12 +33,14 @@ sub new {
   $self->send($user);
   $self->send("");
 
-  # receive password parameters: {algorithm}:{salt}
-  my $salt = (split(':', $self->_receive()))[1];
+  # receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+  my $old = $self->_fill() && ord(substr($self->{buf}, $self->{pos}, 1)) == 1;
+  my $salt = $old ? undef : (split(':', $self->_receive()))[1];
+  die "Server does not support salted authentication (BaseX < 13.0)." if !defined($salt);
 
   # send hashed password
-  my $code = Digest::SHA->new(256)->add($salt.$pw)->hexdigest();
-  $self->send(Digest::SHA->new(256)->add($code.$nonce)->hexdigest());
+  my $code = Digest::SHA::sha256_hex(Encode::encode('UTF-8', $salt.$pw));
+  $self->send(Digest::SHA::sha256_hex($code.$nonce));
 
   # evaluate success flag
   return $self if !$self->_read() or die "Access denied.";
@@ -89,17 +92,34 @@ sub close {
 sub _receive {
   my $self = shift;
   my $data = "";
-  while($self->_read()) {
-    $self->_read() if ord($_) == 255;
-    $data .= $_;
+  while($self->_fill()) {
+    # copy all bytes up to the next 0x00 or 0xFF byte
+    pos($self->{buf}) = $self->{pos};
+    $self->{buf} =~ /\G([^\x00\xFF]*)/gc;
+    $data .= $1;
+    $self->{pos} = pos($self->{buf});
+    next if $self->{pos} == length($self->{buf});
+    last if !$self->_read();
+    $data .= chr($self->_read());
   }
-  return $data;
+  return Encode::decode('UTF-8', $data);
 }
 
-# Returns a single byte from the socket.
+# Returns a single byte from the socket, or 0 if the connection was closed.
 sub _read {
-  shift->{sock}->recv($_, 1);
-  return ord();
+  my $self = shift;
+  return 0 if !$self->_fill();
+  return ord(substr($self->{buf}, $self->{pos}++, 1));
+}
+
+# Fills the buffer if it has been consumed and returns the number of available bytes.
+sub _fill {
+  my $self = shift;
+  if($self->{pos} >= length($self->{buf})) {
+    $self->{buf} = "" if !defined($self->{sock}->recv($self->{buf}, 65536));
+    $self->{pos} = 0;
+  }
+  return length($self->{buf}) - $self->{pos};
 }
 
 # Returns success check.
@@ -109,10 +129,16 @@ sub ok {
 
 # Sends the specified string.
 sub send {
+  my $self = shift;
+  $self->_write(Encode::encode('UTF-8', shift));
+}
+
+# Sends the specified bytes.
+sub _write {
   shift->{sock}->send((shift).chr(0));
 }
 
-# Sends the specified input.
+# Sends the specified input (a byte string).
 sub sendInput {
   my $self = shift;
   my $code = shift;
@@ -122,7 +148,7 @@ sub sendInput {
   # prefix 0x00 and 0xFF bytes with 0xFF
   $input =~ s/([\x00\xFF])/\xFF$1/g;
   $self->send(chr($code).$str);
-  $self->send($input);
+  $self->_write($input);
 
   $self->{info} = $self->_receive();
   die $self->{info} if !$self->ok();

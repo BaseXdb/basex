@@ -109,8 +109,10 @@ public class ClientSession extends Session {
     send("");
     sout.flush();
 
-    // receive password parameters: {ALGORITHM}:{SALT}
-    final String[] params = Strings.split(bi.readString(), ':');
+    // receive password parameters: {ALGORITHM}:{SALT} (servers < 13.0 send \1)
+    final int b = bi.read();
+    final String[] params = b > 1 ? Strings.split((char) b + bi.readString(), ':') :
+      new String[0];
     if(params.length < 2) throw new LoginException(
         "Server does not support salted authentication (BaseX < 13.0).");
 

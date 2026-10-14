@@ -115,11 +115,14 @@ class Session:
         self.send(user)
         self.send('')
 
-        # receive password parameters: {algorithm}:{salt}
-        salt = self.recv_c_str().split(':')[1]
+        # receive password parameters: {algorithm}:{salt} (servers < 13.0 send \1)
+        first = self.__swrapper.recv_single_byte()
+        if first == 1:
+            raise IOError('Server does not support salted authentication (BaseX < 13.0).')
+        salt = (chr(first) + self.recv_c_str()).split(':')[1]
 
         # send hashed password
-        code = hashlib.sha256((salt + password).encode('us-ascii')).hexdigest()
+        code = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
         hfun = hashlib.sha256()
         hfun.update(code.encode('us-ascii'))
         hfun.update(nonce.encode('us-ascii'))
