@@ -114,7 +114,7 @@ public class ClientSession extends Session {
     final String[] params = b > 1 ? Strings.split((char) b + bi.readString(), ':') :
       new String[0];
     if(params.length < 2) throw new LoginException(
-        "Server does not support salted authentication (BaseX < 13.0).");
+        "Server does not support salted authentication (BaseX < %).", "13.0");
 
     // send hashed password
     send(Strings.sha256(Strings.sha256(params[1] + password) + nonce));
