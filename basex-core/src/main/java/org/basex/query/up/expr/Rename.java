@@ -56,7 +56,7 @@ public final class Rename extends Update {
         if(element) {
           cname = new CElem(info, false, name, new Atts(), new Atts());
         } else if(attribute) {
-          cname = new CAttr(info, false, name, Empty.VALUE);
+          cname = new CAttr(info, true, name, Empty.VALUE);
         } else {
           cname = new CPI(info, false, name, Empty.VALUE);
         }
@@ -66,23 +66,23 @@ public final class Rename extends Update {
 
       // check for namespace conflicts
       final XNode target = (XNode) item;
-      if(element || attribute) {
-        final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
-        if(element || newPrefix.length > 0) {
-          final Atts nspaces = target.nsScope(qc);
-          final int ns = nspaces.size();
-          for(int n = 0; n < ns; n++) {
-            final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
-            if(eq(prefix, newPrefix) && !eq(uri, newUri))
-              throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
-          }
+      QNm qname = newName;
+      if(attribute) {
+        final XNode parent = target.parent();
+        if(parent != null && newName.hasPrefix()) {
+          qname = checkNS(newName, parent.nsScope(null), qc);
         }
+      } else if(element) {
+        // undeclarations of the default namespace (empty URI) are no bindings
+        final byte[] newPrefix = newName.prefix(), uri = target.nsScope(null).value(newPrefix);
+        if(uri != null && uri.length != 0 && !eq(uri, newName.uri()))
+          throw UPNSCONFL_X_X.get(info, newName, new QNm(newPrefix, uri));
       }
 
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(target, qc);
       checkWrite(dbnode, qc);
-      updates.add(new RenameNode(dbnode.pre(), dbnode.data(), info, newName), qc);
+      updates.add(new RenameNode(dbnode.pre(), dbnode.data(), info, qname), qc);
     }
     return Empty.VALUE;
   }

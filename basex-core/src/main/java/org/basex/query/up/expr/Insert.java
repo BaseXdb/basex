@@ -80,7 +80,7 @@ public final class Insert extends Update {
         final DBNode dbnode = updates.determineDataRef(target, qc);
         checkWrite(dbnode, qc);
         final NodeUpdate up = new InsertAttribute(dbnode.pre(), dbnode.data(), info,
-            checkNS(list, target));
+            checkNS(list, target, qc));
         updates.add(up, qc);
       }
 

@@ -88,7 +88,7 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     roundtrip("<a xml:lang='en'/>");
     roundtrip("<a xmlns='http://e' x='1'/>");
     // attribute prefixes are not preserved: a new prefix is generated
-    serialized("<a xmlns:p='http://p' p:x='1'/>", null, "<a xmlns:ns=\"http://p\" ns:x=\"1\"/>");
+    serialized("<a xmlns:p='http://p' p:x='1'/>", null, "<a xmlns:ns0=\"http://p\" ns0:x=\"1\"/>");
   }
 
   /** Test method. */

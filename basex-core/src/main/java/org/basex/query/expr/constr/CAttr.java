@@ -23,8 +23,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CAttr extends CName {
-  /** Generated namespace. */
-  private static final byte[] NS0 = token("ns0:");
   /** XML prefix. */
   private static final byte[] XML0 = token("xml:");
 
@@ -67,9 +65,9 @@ public final class CAttr extends CName {
       if(eq(nmPrefix, XMLNS) || nmPrefix.length == 0 && eq(nm.string(), XMLNS))
         throw CAINV_X.get(info, nm.string());
 
-      // create new standard namespace to cover most frequent cases
+      // generate a prefix that is unique for the namespace URI within the query
       if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))
-        nm = qc.shared.qName(concat(NS0, nm.string()), nmUri);
+        nm = qc.shared.qName(concat(qc.shared.prefix(nmUri), cpToken(':'), nm.string()), nmUri);
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 

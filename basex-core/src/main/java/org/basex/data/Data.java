@@ -720,10 +720,9 @@ public abstract class Data {
       // check if namespace has changed
       final byte[] prefix = prefix(name);
       final int oldUriId = nspaces.uriIdForPrefix(prefix, pre, this);
-      final boolean nsFlag = oldUriId == 0 && uri.length != 0 && !eq(prefix, XML);
+      final boolean nsFlag = uri.length != 0 && nspaces.declare(oldUriId, uri) && !eq(prefix, XML);
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
-      final int uriId = nsFlag ? declare(nsPre, prefix, uri) :
-        oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
+      final int uriId = nsFlag ? declare(nsPre, prefix, uri) : uri.length == 0 ? 0 : oldUriId;
 
       // write IDs of namespace URI and name
       final ValueIndex[] indexes = meta.updindex ? valueIndexes() : new ValueIndex[0];
@@ -736,8 +735,23 @@ public abstract class Data {
       } else {
         table.write1(pre, 3, uriId);
         table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) | elemNames.put(name));
+        // a new default namespace is not propagated to descendants
+        if(nsFlag && prefix.length == 0) undeclare(pre);
       }
       for(final ValueIndex index : indexes) index.renamed(pre, kind);
+    }
+  }
+
+  /**
+   * Undeclares the default namespace for child elements without own default namespace.
+   * @param pre PRE value of the element that declares the default namespace
+   */
+  private void undeclare(final int pre) {
+    final int end = pre + size(pre, ELEM);
+    for(int p = pre + attSize(pre, ELEM); p < end;) {
+      final int k = kind(p);
+      if(k == ELEM && !namespaces(p).contains(EMPTY)) declare(p, EMPTY, EMPTY);
+      p += size(p, k);
     }
   }
 

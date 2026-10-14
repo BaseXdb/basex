@@ -4942,7 +4942,8 @@ public class QueryParser extends InputParser {
     wsCheck(WITH);
     final Expr src = check(single(), INCOMPLETE);
     qc.updating();
-    return new Replace(info(), trg, src, value);
+    // replace value of: the source is processed like the content of a text constructor
+    return new Replace(info(), trg, value ? new CTxt(info(), src) : src, value);
   }
 
   /**

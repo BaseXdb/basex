@@ -1472,4 +1472,82 @@ public final class UpdateTest extends SandboxTest {
   @Test public void externalFunction() {
     query("declare function local:f() external; delete node <a/>", "");
   }
+
+  /** Namespace nodes in source sequences. */
+  @Test public void namespaceSource() {
+    final String ns = "namespace p { 'u' }";
+    // insert: namespace nodes must precede other nodes and must not conflict
+    query("<t/> update { insert node (" + ns + ", <y/>) into . }", "<t><y/></t>");
+    query("<t/> update { insert node (" + ns + ", " + ns + ", <y/>) into . }", "<t><y/></t>");
+    error("<t/> update { insert node (<x/>, " + ns + ", <y/>) into . }", NONSALL_X);
+    error("<t/> update { insert node (" + ns + ", namespace p { 'v' }, <y/>) into . }",
+        DUPLNSCONS_X);
+
+    // replace node: namespace nodes are rejected
+    error("<t><x/></t> update { replace node x with " + ns + " }", UPWRELMNS_X);
+    error("<t><x/></t> update { replace node x with (<y/>, " + ns + ", <z/>) }", NONSALL_X);
+    error("<t a=''/> update { replace node @a with " + ns + " }", UPWRATTR_X);
+
+    // replace value of node: source is atomized like the content of a text constructor
+    query("<t>x</t> update { replace value of node . with " + ns + " }", "<t>u</t>");
+    query("<t>x</t> update { replace value of node . with (<a>b</a>, 'c', " + ns + ") }",
+        "<t>b c u</t>");
+    query("<t>x</t> update { replace value of node . with (attribute a { 'b' }, 'c') }",
+        "<t>b c</t>");
+    query("<t>x</t> update { replace value of node . with () }", "<t/>");
+    query("<t a='x'/> update { replace value of node @a with ('', '') }", "<t a=\" \"/>");
+  }
+
+  /** Generated attribute prefixes are unique for each namespace URI. */
+  @Test public void generatedPrefixes() {
+    final String a = "attribute { QName('u', 'a') } { }", b = "attribute { QName('w', 'b') } { }";
+    final String result = "<t xmlns:ns0=\"u\" xmlns:ns1=\"w\" ns0:a=\"\" ns1:b=\"\"/>";
+    query("<t/> update { insert node (" + a + ", " + b + ") into . }", result);
+    query("<t/> update { insert node " + a + " into ., insert node " + b + " into . }", result);
+    query("<t c=''/> update { replace node @c with (" + a + ", " + b + ") }", result);
+    query("<t a='' b=''/> update { rename node @a as QName('u', 'a'), "
+        + "rename node @b as QName('w', 'b') }", result);
+    query("<t>{ " + a + ", " + b + " }</t>", result);
+
+    // generated prefixes that are bound by the target are replaced, explicit ones are rejected
+    query("<t xmlns:ns0='x'/> update { insert node " + a + " into . }",
+        "<t xmlns:ns0=\"x\" xmlns:ns0_1=\"u\" ns0_1:a=\"\"/>");
+    query("<t xmlns:ns0='x' c=''/> update { replace node @c with " + a + " }",
+        "<t xmlns:ns0=\"x\" xmlns:ns0_1=\"u\" ns0_1:a=\"\"/>");
+    error("<t xmlns:ns0='x'/> update { insert node attribute { QName('u', 'ns0:a') } { } "
+        + "into . }", UPNSCONFL_X_X);
+
+    // map-to-element uses the same prefixes
+    query("<t/> update { insert node map-to-element({ 'e': { '@Q{u}a': '' } })/@* into . }",
+        "<t xmlns:ns0=\"u\" ns0:a=\"\"/>");
+  }
+
+  /** Rename attributes: new names are processed like names of computed constructors. */
+  @Test public void renameAttribute() {
+    // generated prefix for names with a namespace URI and without prefix
+    query("<t a=''/> update { rename node @a as QName('u', 'a') }",
+        "<t xmlns:ns0=\"u\" ns0:a=\"\"/>");
+    query("<t xmlns:ns0='v' a=''/> update { rename node @a as QName('u', 'a') }",
+        "<t xmlns:ns0=\"v\" xmlns:ns0_1=\"u\" ns0_1:a=\"\"/>");
+    query("<t a=''/> update { rename node @a as QName('http://www.w3.org/XML/1998/namespace', "
+        + "'lang') }", "<t xml:lang=\"\"/>");
+    // the default namespace cannot be adopted as attribute prefix
+    query("(<t xmlns='u' xmlns:ns0='x' a=''/> update { rename node @a as QName('u', 'a') })"
+        + "/@* ! name()", "ns0_1:a");
+    query("<e xmlns='u' xmlns:ns0='x'>{ attribute { QName('u', 'a') } { } }</e>/@* ! name()",
+        "ns0_1:a");
+    // namespaces of enclosing constructors are not in scope of the target
+    query("let $x := <x a=''/> return <r xmlns:p='u1'>{ "
+        + "$x update { rename node @a as QName('u2', 'p:a') } }</r>",
+        "<r xmlns:p=\"u1\"><x xmlns:p=\"u2\" p:a=\"\"/></r>");
+    error("<t a=''/> update { rename node @a as 'xmlns' }", CAINV_X);
+    error("<t a=''/> update { rename node @a as QName('http://www.w3.org/2000/xmlns/', 'x:a') }",
+        CAINV_X);
+
+    // database nodes
+    execute(new CreateDB(NAME, "<t xmlns:ns0='v' a=''/>"));
+    query("rename node /t/@a as QName('u', 'a')");
+    query("/t/@* ! node-name() ! expanded-QName(.)", "Q{u}a");
+    query("/t/@* ! name()", "ns0_1:a");
+  }
 }

@@ -100,16 +100,20 @@ final class NSSets {
   }
 
   /**
-   * Returns the ID of a set that is extended by the specified prefix/URI pair.
+   * Returns the ID of a set in which the specified prefix is bound to the specified URI.
    * @param id set ID
    * @param prefixId prefix reference
    * @param uriId namespace URI reference
    * @return new set ID
    */
   int add(final int id, final int prefixId, final int uriId) {
-    final int[] values = sets[id], vals = Arrays.copyOf(values, values.length + 2);
-    vals[values.length] = prefixId;
-    vals[values.length + 1] = uriId;
+    final int[] values = sets[id];
+    final int vl = values.length;
+    int v = 0;
+    while(v < vl && values[v] != prefixId) v += 2;
+    final int[] vals = v < vl ? values.clone() : Arrays.copyOf(values, vl + 2);
+    vals[v] = prefixId;
+    vals[v + 1] = uriId;
     return put(vals);
   }
 

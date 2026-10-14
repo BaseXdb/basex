@@ -23,6 +23,8 @@ public final class SharedData {
   private final WeakTokenSet tokens = new WeakTokenSet();
   /** Cached record types. */
   private final IntObjectMap<ArrayList<ShapeType>> shapeTypes = new IntObjectMap<>();
+  /** Generated prefixes, indexed by namespace URIs. */
+  private final TokenObjectMap<byte[]> prefixes = new TokenObjectMap<>();
 
   /**
    * Constructor.
@@ -84,6 +86,29 @@ public final class SharedData {
           uri != null ? Token.concat(name, Token.cpToken(' '), uri) : name,
           () -> new QNm(name, uri)
         );
+    }
+  }
+
+  /**
+   * Returns a generated prefix for the specified namespace URI.
+   * @param uri namespace URI
+   * @return prefix ({@code ns0}, {@code ns1}, ...)
+   */
+  public byte[] prefix(final byte[] uri) {
+    synchronized(prefixes) {
+      return prefixes.computeIfAbsent(uri, () -> Token.token("ns" + prefixes.size()));
+    }
+  }
+
+  /**
+   * Checks if the specified prefix was generated for a namespace URI.
+   * @param prefix prefix
+   * @param uri namespace URI
+   * @return result of check
+   */
+  public boolean generated(final byte[] prefix, final byte[] uri) {
+    synchronized(prefixes) {
+      return Token.eq(prefixes.get(uri), prefix);
     }
   }
 

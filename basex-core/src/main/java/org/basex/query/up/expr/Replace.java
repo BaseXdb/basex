@@ -44,6 +44,7 @@ public final class Replace extends Update {
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = arg(0).unwrappedIter(qc);
     FBuilder builder = null;
+    byte[] text = null;
 
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode targ) || targ.kind() == Kind.DOCUMENT)
@@ -53,14 +54,10 @@ public final class Replace extends Update {
       final DBNode dbnode = updates.determineDataRef(targ, qc);
       checkWrite(dbnode, qc);
 
-      // replace node
-      if(builder == null) builder = builder(arg(1), qc);
       final Kind kind = targ.kind();
       if(value) {
-        // replace value of node
-        byte[] text = Token.EMPTY;
-        if(builder.children != null) text = builder.children.get(0).string();
-        else if(builder.attributes != null) text = builder.attributes.get(0).string();
+        // replace value of node: source is a text constructor
+        if(text == null) text = toZeroToken(arg(1), qc);
 
         // check validity of future comments or PIs
         if(kind == Kind.COMMENT) FComm.parse(text, info);
@@ -68,17 +65,23 @@ public final class Replace extends Update {
 
         updates.add(new ReplaceValue(dbnode.pre(), dbnode.data(), info, text), qc);
       } else {
+        // replace node
         final XNode parent = targ.parent();
         if(parent == null) throw UPNOPAR_X.get(info, targ);
 
+        if(builder == null) builder = builder(arg(1), qc);
         final GNodeList list;
+        final Atts ns = builder.namespaces;
         if(kind == Kind.ATTRIBUTE) {
           // replace attribute node
           if(builder.children != null) throw UPWRATTR_X.get(info, builder.children.get(0));
-          list = builder.attributes != null ? checkNS(builder.attributes, parent) : new GNodeList();
+          if(ns != null) throw UPWRATTR_X.get(info, new FNSpace(ns.name(0), ns.value(0)));
+          list = builder.attributes != null ? checkNS(builder.attributes, parent, qc) :
+            new GNodeList();
         } else {
           // replace non-attribute node
           if(builder.attributes != null) throw UPWRELM_X.get(info, targ);
+          if(ns != null) throw UPWRELMNS_X.get(info, targ);
           list = builder.children != null ? builder.children : new GNodeList();
         }
         // conforms to specification: insertion sequence may be empty

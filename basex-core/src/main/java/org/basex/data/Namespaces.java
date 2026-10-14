@@ -524,6 +524,8 @@ public final class Namespaces {
     NSNode nd = current.find(pre, data);
     if(nd.pre() != pre) {
       final NSNode child = new NSNode(pre);
+      // keep the tree nested: namespace nodes of descendants become children of the new node
+      nd.move(child, data);
       nd.add(child);
       nd = child;
     }

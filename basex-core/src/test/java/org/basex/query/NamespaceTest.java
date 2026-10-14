@@ -171,6 +171,17 @@ public final class NamespaceTest extends SandboxTest {
         "element Q{x}b { namespace { '' } { 'x' } } } ! local-name(.)", "a");
     query("element Q{x}a { attribute a {} update {}," +
         "element Q{x}b { namespace { '' } { 'x' } } } ! local-name(.)", "a");
+
+    // prefixes of namespace nodes are never changed
+    error("<e xmlns:p='u'>{ namespace p { 'v' } }</e>", DUPLNSCONS_X);
+    error("<p:e xmlns:p='u'>{ namespace p { 'v' } }</p:e>", DUPLNSCONS_X);
+    query("<e xmlns:p='u'>{ namespace p { 'u' } }</e>", "<e xmlns:p=\"u\"/>");
+    // an undeclared default namespace is no binding
+    query("<p:e xmlns:p='x' xmlns=''>{ namespace { '' } { 'y' } }</p:e>",
+        "<p:e xmlns:p=\"x\" xmlns=\"y\"/>");
+    // prefixes of node names are changed instead
+    query("element { QName('v', 'p:e') } { namespace p { 'u' } }",
+        "<p_1:e xmlns:p=\"u\" xmlns:p_1=\"v\"/>");
   }
 
   /**
@@ -956,7 +967,7 @@ public final class NamespaceTest extends SandboxTest {
         "<c>{attribute {QName('ns1', 'att1')} {}," +
         "attribute {QName('ns2', 'att2')} {}}</c></b></a>",
         "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
-        "<c xmlns:ns0='ns1' xmlns:ns0_1='ns2' ns0:att1='' ns0_1:att2=''/>" +
+        "<c xmlns:ns0='ns1' xmlns:ns1='ns2' ns0:att1='' ns1:att2=''/>" +
         "</b></a>");
   }
 
@@ -1351,6 +1362,37 @@ public final class NamespaceTest extends SandboxTest {
       final String[] doc = DOCS[d - 1];
       execute(new CreateDB(doc[0], doc[1]));
     }
+  }
+
+  /** Renaming an element to a name in a default namespace: no propagation to descendants. */
+  @Test public void renameDefaultNamespace() {
+    execute(new CreateDB(NAME, "<a><b><c><d xmlns='w'><e/></d><f/></c>"
+        + "<p:q xmlns:p='v'><r/></p:q></b></a>"));
+    query("rename node /a/b as QName('u', 'b')");
+    query("/a/*:b", "<b xmlns='u'><c xmlns=''><d xmlns='w'><e/></d><f/></c>"
+        + "<p:q xmlns:p='v' xmlns=''><r/></p:q></b>");
+    query("//*[namespace-uri() = ''] ! in-scope-prefixes(.)[. = '']", "");
+
+    // the namespace tree remains nested
+    assertEquals(NL +
+        "  Pre[2] xmlns=\"u\"" + NL +
+        "    Pre[3] xmlns=\"\"" + NL +
+        "      Pre[4] xmlns=\"w\"" + NL +
+        "    Pre[7] xmlns:p=\"v\" xmlns=\"\"",
+        context.data().nspaces.toString());
+
+    // later updates see the correct bindings
+    query("insert node <g/> into /a/*:b, rename node //f as QName('x', 'f')");
+    query("/a/*:b/*:g ! in-scope-prefixes(.)", "xml");
+    query("//*:f ! namespace-uri()", "x");
+  }
+
+  /** Renaming elements below an undeclared default namespace. */
+  @Test public void renameBelowUndeclaration() {
+    query("<a xmlns='v'><b xmlns=''><c/></b></a> update { rename node .//*:c as QName('u', 'c') }",
+        "<a xmlns='v'><b xmlns=''><c xmlns='u'/></b></a>");
+    query("<a xmlns='v'><b xmlns=''><c/></b></a> update { rename node .//*:b as QName('u', 'b') }",
+        "<a xmlns='v'><b xmlns='u'><c xmlns=''/></b></a>");
   }
 
   /**

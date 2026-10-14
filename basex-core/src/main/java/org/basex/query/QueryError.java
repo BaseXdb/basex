@@ -1424,7 +1424,7 @@ public enum QueryError {
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),
   /** Error code. */
-  NONSALL_X(XQTY, 24, "Namespaces does not follow root element: %."),
+  NONSALL_X(XQTY, 24, "Namespace does not follow root element: %."),
   /** Error code. */
   CONSFUNC_X(XQTY, 105, "Invalid content: %."),
   /** Error code. */
@@ -1449,7 +1449,7 @@ public enum QueryError {
   /** Error code. */
   UPNSCONFL_X_X(XUDY, 23, "Namespace conflicts: % vs. %."),
   /** Error code. */
-  UPNSCONFL2_X_X(XUDY, 24, "Namespaces conflicts: % vs. %."),
+  UPNSCONFL2_X_X(XUDY, 24, "Namespace conflicts: % vs. %."),
   /** Error code. */
   UPPAREMPTY_X(XUDY, 29, "Target has no parent: %."),
   /** Error code. */
@@ -1487,6 +1487,8 @@ public enum QueryError {
   UPTRGNODE_X(XUTY, 8, "Target is not an element, text, attribute, comment or pi: %."),
   /** Error code. */
   UPWRELM_X(XUTY, 10, "Node cannot be replaced with attribute: %."),
+  /** Error code. */
+  UPWRELMNS_X(XUTY, 10, "Node cannot be replaced with namespace: %."),
   /** Error code. */
   UPWRATTR_X(XUTY, 11, "Target is no attribute: %."),
   /** Error code. */

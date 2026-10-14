@@ -225,6 +225,24 @@ final class NSNode {
   }
 
   /**
+   * Moves the children that belong to the subtree of the specified element to its new node.
+   * @param node new namespace node of the element (without children)
+   * @param data data reference
+   */
+  void move(final NSNode node, final Data data) {
+    final int s = find(node.pre) + 1;
+    if(s == size) return;
+
+    final int sz = data.size(node.pre, Data.ELEM), end = node.pre + sz;
+    int e = s;
+    while(e < size && nodes[e].pre < end) e++;
+    if(e == s) return;
+
+    node.children(Arrays.copyOfRange(nodes, s, e));
+    delete(node.pre, sz);
+  }
+
+  /**
    * Assigns the children of this node.
    * @param children child nodes, sorted by their PRE values
    */

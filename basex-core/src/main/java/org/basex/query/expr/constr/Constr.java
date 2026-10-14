@@ -208,6 +208,15 @@ public final class Constr {
   }
 
   /**
+   * Raises an error for misplaced or conflicting namespace nodes.
+   * @throws QueryException query exception
+   */
+  public void checkNS() throws QueryException {
+    if(errNS != null) throw NONSALL_X.get(info, errNS);
+    if(duplNS != null) throw DUPLNSCONS_X.get(info, duplNS);
+  }
+
+  /**
    * Enrich and assign in-scope namespaces.
    * @param staticNs in-scope namespaces
    * @param nm element name
@@ -243,9 +252,14 @@ public final class Constr {
       }
     }
 
-    // add namespaces contributed by namespace nodes in the content sequence
+    // add namespaces contributed by namespace nodes in the content sequence (prefixes are fixed)
     for(int n = 0; n < dNs; n++) {
-      addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n), qc.shared);
+      final byte[] prefix = dynamicNs.name(n), uri = dynamicNs.value(n);
+      final int i = inscopeNS.get(prefix);
+      if(i == -1) add(inscopeNS, prefix, uri);
+      // an undeclared default namespace (empty URI) is no binding
+      else if(inscopeNS.value(i).length == 0) inscopeNS.value(i, qc.shared.token(uri));
+      else if(!eq(inscopeNS.value(i), uri)) throw DUPLNSCONS_X.get(info, prefix);
     }
 
     // bind the prefix of the element name; namespace nodes take precedence, so the element is
@@ -298,10 +312,11 @@ public final class Constr {
     } else if(!eq(u, uri)) {
       // prefixes with different URIs exist; new one must be replaced
       byte[] pref = null;
-      // check if one of the existing prefixes can be adopted
+      // check if one of the existing prefixes (excluding the default) can be adopted
       final int ns = inscopeNS.size();
       for(int n = 0; n < ns; n++) {
-        if(eq(inscopeNS.value(n), uri)) pref = inscopeNS.name(n);
+        final byte[] name = inscopeNS.name(n);
+        if(name.length != 0 && eq(inscopeNS.value(n), uri)) pref = name;
       }
       // if negative, generate a new one that is not used yet
       if(pref == null) {

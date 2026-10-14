@@ -38,8 +38,6 @@ public final class MapToElement {
   private static final Atts NO_NSP = new Atts();
   /** Name of the xsi:nil attribute. */
   private static final QNm NIL = new QNm(token("xsi:nil"), QueryText.XSI_URI);
-  /** Prefix for synthesized namespace prefixes. */
-  private static final byte[] NS = token("ns");
   /** Two dashes. */
   private static final byte[] DASHES = token("--");
   /** Layouts that are inferred from a value if the plan assigns no layout, in order of priority. */
@@ -764,7 +762,8 @@ public final class MapToElement {
     // names in the xml namespace are always bound to the xml prefix
     final boolean xml = eq(qnm.uri(), QueryText.XML_URI);
     if((!element && qnm.uri().length != 0 || xml) && !qnm.hasPrefix()) {
-      qnm = shared.qName(concat(xml ? XML : NS, cpToken(':'), qnm.local()), qnm.uri());
+      final byte[] prefix = xml ? XML : shared.prefix(qnm.uri());
+      qnm = shared.qName(concat(prefix, cpToken(':'), qnm.local()), qnm.uri());
     }
     return qnm;
   }
