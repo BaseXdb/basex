@@ -98,8 +98,9 @@ public final class Arith extends Arr {
               calc).optimize(cc);
         } else if(calc == Calc.DIVIDE) {
           // NUMBER * E div NUMBER → E
-          expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) ? arg2 : this;
-          if(expr != this) expr = new Cast(info, expr, type.seqType()).optimize(cc);
+          final Expr arg = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) ? arg2 : null;
+          final Expr cast = arg != null ? Calc.cast(arg, type, true, info, cc) : null;
+          if(cast != null) expr = cast;
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
           num.dbl() < 0) {

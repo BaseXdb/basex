@@ -28,6 +28,10 @@ public final class Linear {
   private final ArrayList<BigDecimal> factors = new ArrayList<>();
   /** Constant summand. */
   private BigDecimal constant = BigDecimal.ZERO;
+  /** Indicates if a decimal literal was collected. */
+  private boolean decimal;
+  /** Indicates if a non-integer term was cancelled. */
+  private boolean dropped;
   /** Number of collected terms and constants. */
   private int operands;
   /** Number of visited nodes. */
@@ -49,12 +53,15 @@ public final class Linear {
         !composite(arith) || !composite(arith.arg(0)) && !composite(arith.arg(1))) return null;
     // only rewrite if the number of operands decreases (prevents rewrite loops)
     final Linear linear = collect(arith, null);
-    if(linear == null || linear.terms.size() + (linear.constant.signum() != 0 ? 1 : 0) >=
-        linear.operands) return null;
+    if(linear == null) return null;
+    final boolean summand = linear.decimal || linear.constant.signum() != 0;
+    // no rewrite if the result type depends on cancelled terms: $dec - $dec + 1
+    if(linear.dropped && !linear.decimal ||
+        linear.terms.size() + (summand ? 1 : 0) >= linear.operands) return null;
 
-    // decimal results keep decimal constants: $x + 1 + 1.0 → $x + 2.0 (no integer overflow)
+    // decimal literals keep decimal constants: $x + 1 + 1.0 → $x + 2.0 (no integer overflow)
     final BigDecimal constant = linear.terms.isEmpty() ? linear.constant : linear.constant.abs();
-    final ANum num = arith.seqType().type.instanceOf(INTEGER) ? num(constant) : Dec.get(constant);
+    final ANum num = linear.decimal ? Dec.get(constant) : num(constant);
     if(num == null) return null;
     final InputInfo info = arith.info();
     Expr expr = null;
@@ -68,10 +75,11 @@ public final class Linear {
     }
     if(expr == null) {
       expr = num;
-    } else if(linear.constant.signum() != 0) {
+    } else if(summand) {
+      // $x + 1.0 - 1.0 → $x + 0.0
       expr = new Arith(info, expr, num, calc(linear.constant)).optimize(cc);
     }
-    // preserve result type: $x + 1.0 - 1.0 → xs:decimal($x)
+    // preserve result type: xs:byte($x) + 1 - 1 → xs:integer(xs:byte($x))
     final Type type = arith.seqType().type;
     return expr.seqType().type == type ? expr : new Cast(info, expr, type.seqType()).optimize(cc);
   }
@@ -173,7 +181,9 @@ public final class Linear {
     // empty operands must not be dropped: $o - $o + 1
     for(int i = terms.size() - 1; i >= 0; i--) {
       if(factors.get(i).signum() == 0) {
-        if(!terms.get(i).seqType().one()) return false;
+        final SeqType st = terms.get(i).seqType();
+        if(!st.one()) return false;
+        if(!st.type.instanceOf(INTEGER)) dropped = true;
         terms.remove(i);
         factors.remove(i);
       }
@@ -206,7 +216,7 @@ public final class Linear {
   private void add(final Expr expr, final BigDecimal factor) throws QueryException {
     if(++nodes > MAX) return;
     if(expr instanceof final ANum num && num.type.instanceOf(DECIMAL)) {
-      constant = constant.add(factor.multiply(num.dec(null)));
+      constant = constant.add(factor.multiply(dec(num)));
       operands++;
     } else if(!composite(expr)) {
       final int t = terms.size();
@@ -233,9 +243,20 @@ public final class Linear {
           add(expr1, factor);
           add(expr2, factor.negate());
         }
-        default -> add(expr1, factor.multiply(((ANum) expr2).dec(null)));
+        default -> add(expr1, factor.multiply(dec((ANum) expr2)));
       }
     }
+  }
+
+  /**
+   * Returns the decimal value of a literal and registers non-integer literals.
+   * @param num number
+   * @return decimal value
+   * @throws QueryException query exception
+   */
+  private BigDecimal dec(final ANum num) throws QueryException {
+    if(num.type == DECIMAL) decimal = true;
+    return num.dec(null);
   }
 
   /**
@@ -244,7 +265,7 @@ public final class Linear {
    * @return operator
    */
   private static Calc calc(final BigDecimal number) {
-    return number.signum() > 0 ? Calc.ADD : Calc.SUBTRACT;
+    return number.signum() >= 0 ? Calc.ADD : Calc.SUBTRACT;
   }
 
   /**

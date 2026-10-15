@@ -46,7 +46,7 @@ public final class ArithTest extends SandboxTest {
     check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(Arith.class, 2));
     check("xs:decimal(" + wrap(3) + ") ! (. + . + .)", 9, root(Arith.class));
     check(wrap(3) + "! (. + -.)", 0, empty(Unary.class));
-    check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class));
   }
 
   /** Test method. */
@@ -72,7 +72,7 @@ public final class ArithTest extends SandboxTest {
     query("string(xs:dateTime('2017-07-07T18:00:59.1') - xs:dayTimeDuration('PT1M'))",
         "2017-07-07T17:59:59.1");
 
-    check("xs:decimal(" + wrap(3) + ") ! (. - .)", 0, root(Dec.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. - .)", 0, empty(Dec.class));
     // negative zero: -0 - -0 → 0, -0 - 0 → -0, 0 - 0 → 0
     final String z = "xs:double(" + wrap("-0") + ")";
     query(z + "- -0e0", 0);
@@ -125,7 +125,7 @@ public final class ArithTest extends SandboxTest {
     check("for $i in (2, 4)[. != 0] return 1 div $i", "0.5\n0.25", exists(Arith.class));
 
     // neutral number
-    check("for $i in (2.0, 4.0) return $i div 1", "2\n4",
+    check("for $i in (2, 4) return $i div 1", "2\n4",
         empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2e0, 4e0) return $i div 1", "2\n4",
         empty(Arith.class), empty(GFLWOR.class));
@@ -230,6 +230,22 @@ public final class ArithTest extends SandboxTest {
     query(xy + "($x + 1.0 - 1.0) instance of xs:integer", false);
     query(xy + "($x * 0.5 + $x * 0.5) instance of xs:integer", false);
     query(xy + "(xs:byte($x) + 1 - 1) instance of xs:byte", false);
+    final String id = "for $x in (xs:integer(" + wrap(1) + "), xs:decimal(" +
+        wrap(1) + ")) return ";
+    query(id + "((($x + 1) * 2) - 1) instance of xs:integer", "true\nfalse");
+    query(id + "($x - $x + 1) instance of xs:integer", "true\nfalse");
+    query(id + "($x - $x) instance of xs:integer", "true\nfalse");
+    query(id + "($x * 0) instance of xs:integer", "true\nfalse");
+    query(id + "($x mod $x) instance of xs:integer", "true\nfalse");
+    query(id + "($x + 0) instance of xs:integer", "true\nfalse");
+    query(id + "($x - $x + xs:integer(" + wrap(1) + ") + 1) instance of xs:integer", "true\nfalse");
+    query(id + "($x + 0.0) instance of xs:integer", "false\nfalse");
+    query(id + "($x - 0.0) instance of xs:integer", "false\nfalse");
+    query(id + "($x * 1.0) instance of xs:integer", "false\nfalse");
+    query(id + "($x div 1) instance of xs:integer", "false\nfalse");
+    query(id + "($x * 2 div 2) instance of xs:integer", "false\nfalse");
+    query(id + "($x + 1.0 - 1.0) instance of xs:integer", "false\nfalse");
+    query(id + "($x * 0.5 + $x * 0.5) instance of xs:integer", "false\nfalse");
     // no rewrite: integer overflow
     error(xy + "$x * 9223372036854775807 + $x", RANGE_X);
 
@@ -379,7 +395,7 @@ public final class ArithTest extends SandboxTest {
     check(n + "$n * 6 mod 4", 2, count(Arith.class, 2));
     check(n + "$n mod 4 mod 4", 1, mods + " = 1");
     check(n + "$n mod $n", 0, root(Itr.class));
-    check("xs:decimal(" + wrap("2.5") + ") ! (. mod .)", 0, root(Dec.class));
+    check("xs:decimal(" + wrap("2.5") + ") ! (. mod .)", 0, empty(Dec.class));
     check(d + "$d mod $d", 0, mods + " = 1");
     query("xs:double(" + wrap("INF") + ") ! (. mod .)", "NaN");
     check(d + "$d mod 4 mod 4", 1.5, mods + " = 1");
