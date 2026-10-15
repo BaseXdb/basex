@@ -32,9 +32,7 @@ public final class RandomSeededInteger extends StandardFunc {
       @Override
       public Item next() {
         if(--c < 0) return null;
-        // int bounds: keep sequences of existing seeds
-        return Itr.get(mx == 0 ? r.nextInt() : mx <= Integer.MAX_VALUE ? r.nextInt((int) mx) :
-          r.nextLong(mx));
+        return Itr.get(mx == 0 ? r.nextInt() : r.nextLong(mx));
       }
     };
   }

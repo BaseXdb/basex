@@ -15,7 +15,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -99,12 +98,7 @@ public final class XQueryParse extends StandardFunc {
     if(!defined(1)) return false;
     final Expr options = arg(1) instanceof final JNode jnode ? jnode.value : arg(1);
     if(!(options instanceof final XQMap map)) return true;
-    try {
-      final Value value = map.get(Str.get(XQueryOptions.OPTIMIZE.name()));
-      return !value.isEmpty() && value != Bln.FALSE;
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return true;
-    }
+    final Value value = map.value(Str.get(XQueryOptions.OPTIMIZE.name()));
+    return value != null && !value.isEmpty() && value != Bln.FALSE;
   }
 }

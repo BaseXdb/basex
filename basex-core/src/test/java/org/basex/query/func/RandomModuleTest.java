@@ -62,7 +62,7 @@ public final class RandomModuleTest extends SandboxTest {
     // queries
     final int s = 12345;
     query(func.args(s, 1), new SplittableRandom(s).nextInt());
-    query(func.args(s, 1, 1000000), new SplittableRandom(s).nextInt(1000000));
+    query(func.args(s, 1, 1000000), new SplittableRandom(s).nextLong(1000000));
     // neighboring seeds yield unrelated first numbers
     query("count(distinct-values((1 to 100) ! " + func.args(" .", 1, 64) + ")) > 30", true);
     error(func.args(1, -1), QueryError.RANGE_NEGATIVE_X);
