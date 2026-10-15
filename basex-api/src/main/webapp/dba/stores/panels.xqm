@@ -39,13 +39,14 @@ declare function panels:stores(
         (: the values of a known format get the width they need; the name takes the rest :)
         { 'key': 'label', 'label': 'Name' },
         { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
-          'width': '4rem' },
-        { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
+          'width': 'calc(7ch + 0.5rem)' },
+        { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+          'width': 'calc(9ch + 0.5rem)' },
         { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '6.5rem' }
+          'width': 'calc(11ch + 0.5rem)' }
       )
       let $entries :=
-        for $store in utils:slice($names, $page, $sort)
+        for $store in utils:slice($names, $page, $sort, 'label')
         let $info := store:info($store)
         return {
           'name': $store,

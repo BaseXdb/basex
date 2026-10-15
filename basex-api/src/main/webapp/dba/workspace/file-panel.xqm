@@ -34,8 +34,10 @@ declare function panel:files(
       { 'key': 'name', 'label': 'Name' },
       (: the size never grows beyond four digits and a unit, the short date beyond 11 characters;
          the name takes the rest :)
-      { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4rem' },
-      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '6.5rem' }
+      { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+        'width': 'calc(9ch + 0.5rem)' },
+      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+        'width': 'calc(11ch + 0.5rem)' }
     )
     let $entries := (
       let $limit := config:get($config:MAXCHARS)

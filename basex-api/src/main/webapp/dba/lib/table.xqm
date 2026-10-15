@@ -146,8 +146,10 @@ declare function table:create(
 ) as element()+ {
   (: sort entries :)
   let $sort := $options?sort
+  (: entries in their given order may be a slice; their total is then supplied as 'count' :)
+  let $presorted := not($sort) or $sort = $options?presort
   let $sorted-entries := (
-    if (not($sort) or $sort = $options?presort) then (
+    if ($presorted) then (
       $entries
     ) else (
       let $header := $headers[?key = $sort]
@@ -185,7 +187,7 @@ declare function table:create(
   ) else (
     $config:ROWS
   )
-  let $count-option := $options?count[not($sort)]
+  let $count-option := $options?count[$presorted]
   let $page := max(($options?page, 1))
   let $entries := $count-option otherwise count($sorted-entries)
   (: the entries of the shown pages, but not more than a table is meant to hold :)
@@ -310,8 +312,11 @@ declare function table:create(
       (: entries that follow are shown by asking for the next page, up to the limit :)
       if ($last < $entries) {
         if ($last < $config:MAX-SHOWN) then (
-          (: an empty block that asks for the next page as soon as it is scrolled to; see js.js :)
-          <div class='more' data-more='{ $page + 1 }'/>
+          (: a block that asks for the next page as soon as it is scrolled to, or via its button
+             if the panels are stacked; see js.js :)
+          <div class='more' data-more='{ $page + 1 }'>
+            <button type='button' title='Show the entries that follow'>More</button>
+          </div>
         ) else (
           <div class='note'>{
             ``[Only the first `{ format-integer($last, '#,##0') }` entries are shown. ]``,

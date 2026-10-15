@@ -110,12 +110,6 @@ declare function html:wrap(
                   <b>{ $user }</b> · <form method='post' action='logout'>
                     <button type='submit' class='link'>logout</button>
                   </form>
-                  {
-                    (: every view is described in a section of its own :)
-                    $view[. = $config:VIEWS] ! (' · ', <a target='_blank' rel='noopener'
-                      href='https://docs.basex.org/main/DBA#{ . }'
-                      title='{ 'Documentation of the ' || utils:capitalize(.) || ' view' }'>?</a>)
-                  }
                 </div>
               }
             }

@@ -20,11 +20,11 @@ declare variable $dba:MAX-ENTRIES := 10000;
 (:~ Table columns. :)
 declare variable $dba:COLUMNS := (
   (: the values of a known format get the width they need; the text takes the rest :)
-  { 'key': 'time', 'label': 'Time', 'order': 'desc', 'width': '7rem' },
+  { 'key': 'time', 'label': 'Time', 'order': 'desc', 'width': 'calc(12ch + 0.5rem)' },
   { 'key': 'address', 'label': 'Address', 'width': '11rem' },
   { 'key': 'user', 'label': 'User', 'width': '11rem' },
-  { 'key': 'type', 'label': 'Type', 'width': '4.5rem' },
-  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
+  { 'key': 'type', 'label': 'Type', 'width': 'calc(8ch + 0.5rem)' },
+  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': 'calc(8ch + 0.5rem)' },
   { 'key': 'text', 'label': 'Text' }
 );
 

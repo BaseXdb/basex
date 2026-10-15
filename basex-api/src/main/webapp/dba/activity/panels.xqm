@@ -54,14 +54,18 @@ declare function panels:jobs(
   return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <h2>Jobs</h2>
     {
+      (: the values of a known format get the width they need; the id takes the rest :)
       let $headers := (
         { 'key': 'job', 'label': 'ID' },
-        { 'key': 'state', 'label': 'State' },
-        { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
-        { 'key': 'user', 'label': 'User' },
-        { 'key': 'locks', 'label': 'Locks' },
-        { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc' },
-        { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
+        { 'key': 'type', 'label': 'Type', 'width': 'calc(10ch + 0.5rem)' },
+        { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
+        { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc',
+          'width': 'calc(6ch + 0.5rem)' },
+        { 'key': 'user', 'label': 'User', 'width': '6rem' },
+        { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
+          'width': 'calc(8ch + 0.5rem)' },
+        { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc',
+          'width': 'calc(8ch + 0.5rem)' }
       )
       let $services := job:services()
       (: the job that renders this table is of no interest :)
@@ -79,12 +83,12 @@ declare function panels:jobs(
         return {
           'id': $id,
           'job': panels:job-link($id),
-          'state': panels:job-state($details/@state, $services/@id = $id),
+          'type': string($details/@type),
+          'state': panels:job-state($details/@state),
           'duration': html:duration($sec),
           (: the address of the client is rarely of interest; the session that the job was
              started from lists it in the Clients panel :)
           'user': panels:job-user($details),
-          'locks': panels:job-locks($details),
           'time': $time,
           'start': $start otherwise $time
         },
@@ -95,7 +99,7 @@ declare function panels:jobs(
         return {
           'id': $id,
           'job': panels:job-link($id),
-          'state': panels:job-state('registered', false())
+          'state': panels:job-state('registered')
         }
       )
       let $buttons := (
@@ -157,27 +161,20 @@ declare function panels:job-view(
 
 (:~
  : Creates the state of a job, with what it means as tooltip.
- : @param  $state    state
- : @param  $service  whether the job is registered as service
+ : @param  $state  state
  : @return function creating the state
  :)
 declare %private function panels:job-state(
-  $state    as xs:string,
-  $service  as xs:boolean
-) as fn() as item()+ {
+  $state  as xs:string
+) as fn() as element() {
   fn() {
     (: a queued job waits for the locks of another one: it is what a user asks about :)
     element { if ($state = 'queued') then 'b' else 'span' } {
       attribute title { $panels:STATES?$state },
       $state
-    },
-    if ($service) {
-      html:symbol(' · ', ', '),
-      <span title='{ $panels:STATES?registered }'>service</span>
     }
   }
 };
-
 (:~
  : Creates the user of a job, with the address of its client as tooltip.
  : @param  $details  job details
@@ -584,7 +581,7 @@ declare %private function panels:job-row(
       Job { panels:job-link($job/@id)() }
     </td>
     <td>{
-      panels:job-state($job/@state, false())(),
+      panels:job-state($job/@state)(),
       (: what is locked is only stated if there is anything :)
       if (some $locks in ($job/@reads, $job/@writes) satisfies not($locks = ('', '(none)'))) {
         html:symbol(' · ', ', '), panels:job-locks($job)()

@@ -700,20 +700,26 @@ function shownPages(id) {
 }
 
 /**
- * Asks for the next page of a list once the block below it is scrolled close to view.
+ * Asks for the next page of a list once the block below it is scrolled close to view, or via
+ * a button if the panels are stacked.
  * @param {HTMLElement} block block that names the next page
  */
 function loadMore(block) {
-  // the viewport is the root: a stacked pane grows with its content and would always contain
-  // the block. A pane that scrolls on its own clips the block anyway; scrollMargin extends it
+  // the viewport is the root: a pane that scrolls on its own clips the block; scrollMargin
+  // extends it. Stacked panels follow each other on the page, and endless loading would never
+  // reach the next one: they ask via the button
   const observer = new IntersectionObserver(entries => {
-    if(entries.some(entry => entry.isIntersecting)) {
-      observer.disconnect();
-      // the shown order is kept
-      const id = Object.keys(_panel_requests).find(key => block.closest(`#${key}`));
-      if(id) _panel_requests[id](undefined, Number(block.dataset.more));
-    }
+    if(!stacked() && entries.some(entry => entry.isIntersecting)) load();
   }, { rootMargin: "200px", scrollMargin: "200px" });
+  const button = block.querySelector("button");
+  const load = () => {
+    observer.disconnect();
+    button.disabled = true;
+    // the shown order is kept
+    const id = Object.keys(_panel_requests).find(key => block.closest(`#${key}`));
+    if(id) _panel_requests[id](undefined, Number(block.dataset.more));
+  };
+  button.onclick = load;
   observer.observe(block);
 }
 

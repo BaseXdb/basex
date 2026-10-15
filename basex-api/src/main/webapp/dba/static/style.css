@@ -209,6 +209,10 @@ input[type=checkbox] {
 label:has(> input[type=checkbox]) {
   line-height: 1.6;
 }
+/* a checkbox that heads a group lines up with the plain headings beside it */
+h3 > label:has(> input[type=checkbox]) {
+  line-height: inherit;
+}
 
 /* a checkbox and the value beside it belong on one line: a column that is sized by its content
    grows for them, rather than wrapping the value underneath the box */
@@ -672,9 +676,13 @@ header {
   color: var(--muted);
 }
 
-/* the empty block below a list that loads the entries that follow, as soon as it is in view */
+/* the block below a list that loads the entries that follow, as soon as it is in view */
 .more {
   height: 1px;
+}
+/* the button is only shown once the panels are stacked */
+.more button {
+  display: none;
 }
 
 /* logs: a failed request is set off as a badge, so that it stands out in a long list */
@@ -1125,6 +1133,27 @@ dialog:has(.field-columns) {
 dialog:has(.field-columns > :nth-child(3)) {
   max-width: min(90vw, 72rem);
 }
+dialog:has(.field-columns > :nth-child(4)) {
+  max-width: min(90vw, 84rem);
+}
+/* a control fills its column instead of running into the next one */
+dialog .field-columns > div {
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+dialog .field-columns :is(input[type=text], input[type=file], select) {
+  width: 100%;
+}
+/* a label that wraps continues below its text, not below its checkbox */
+dialog .field-columns label:has(> input[type=checkbox]) {
+  display: inline-block;
+  padding-left: 20px;
+  text-indent: -20px;
+}
+/* the names an index is restricted to: below its checkbox, in line with its label */
+dialog .field-columns input.include {
+  width: calc(100% - 20px);
+  margin: .1rem 0 .3rem 20px;
+}
 /* the shortcuts are described in a line each, and their keys can be long */
 #shortcuts {
   max-width: min(90vw, 62rem);
@@ -1240,7 +1269,11 @@ button.collapse .label {
     height: auto;
     overflow: visible;
   }
-  .content.fill :is(.cm-editor, .pane) {
+  /* the panels keep the height of their contents instead of sharing what the viewport leaves */
+  body:has(.content.fill) main {
+    display: block;
+  }
+  .content.fill :is(.cm-editor, textarea) {
     min-height: 200px;
   }
   .content.divided > .panel ~ .panel::before {
@@ -1272,6 +1305,22 @@ button.collapse .label {
   }
   .logbar #ignore {
     width: 100%;
+  }
+  /* the entries that follow a list are asked for via a button */
+  .more {
+    height: auto;
+    margin-top: var(--space);
+  }
+  .more button {
+    display: inline-block;
+  }
+  /* logs: the text of an entry is what is read, the other columns are scrolled past */
+  .logbar + #output {
+    --free-column: 20rem;
+  }
+  /* workspace: the result is read below the editor, and needs more lines than the editor */
+  .panel:has(> #output-hint) > :is(.cm-editor, textarea) {
+    min-height: 40vh;
   }
 }
 

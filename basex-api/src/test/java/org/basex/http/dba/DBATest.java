@@ -267,6 +267,33 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * Automatic optimization and the names of the value indexes reach the new database, and are
+     * offered again by the optimize dialog.
+     * @throws IOException I/O exception
+     */
+    @Test public void createWithNames() throws IOException {
+      post("databases/create", Map.of("name", DB, "opts", "autooptimize",
+          "textinclude", "a", "attrinclude", "b", "tokeninclude", "c"));
+      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      assertTrue(dialog.contains("value=\"autooptimize\" checked"), "optimization not enabled");
+      assertTrue(dialog.contains("name=\"textinclude\" value=\"a\""), "text names not offered");
+      assertTrue(dialog.contains("name=\"attrinclude\" value=\"b\""), "attribute names lost");
+      assertTrue(dialog.contains("name=\"tokeninclude\" value=\"c\""), "token names lost");
+    }
+
+    /**
+     * Incremental indexing can be changed by the optimize dialog: the optimization is then full.
+     * @throws IOException I/O exception
+     */
+    @Test public void optimizeIncremental() throws IOException {
+      post("databases/create", Map.of("name", DB, "opts", "textindex"));
+      final String page = post("databases/optimize-db", Map.of("name", DB, "opts", "updindex"));
+      assertTrue(page.contains("optimized"), "optimization failed");
+      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      assertTrue(dialog.contains("value=\"updindex\" checked"), "incremental indexing not enabled");
+    }
+
+    /**
      * Creates a database from an input that the server reads, and adds the same input again:
      * a target path is what an input is stored under, and what a second run replaces.
      * @throws Exception exception
@@ -1544,6 +1571,20 @@ public final class DBATest extends WebappTest {
 
       final String page = get("stores");
       assertTrue(page.indexOf(STORE) < page.indexOf(OTHER), "stores not sorted, ignoring case");
+    }
+
+    /**
+     * A store list that exceeds a page offers the entries that follow.
+     * @throws Exception exception
+     */
+    @Test public void storePages() throws Exception {
+      final String names = "(1 to 150) ! `" + STORE + "-{ format-integer(., '000') }`";
+      execute(names + " ! store:put('key', 1, .)");
+      try {
+        assertTrue(get("stores").contains("data-more=\"2\""), "no further page offered");
+      } finally {
+        discard(names + " ! store:delete(.)");
+      }
     }
 
     /**

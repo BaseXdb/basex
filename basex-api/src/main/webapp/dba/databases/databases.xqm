@@ -240,7 +240,7 @@ function dba:create() {
               $input
             ),
             (map:keys($files), $input ! ''), {
-              form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
+              form:index-map($args),
               form:parsing-map($args?opts, $args?filter, $args?parser)
             })
         )
@@ -288,14 +288,20 @@ declare
   %rest:POST
   %rest:path('/dba/databases/optimize-db')
 function dba:optimize-db() {
-  utils:dispatch($dba:CAT, fn($args) { {
-    'params': { 'name': $args?name },
-    'info'  : utils:info($args?name, 'database', 'optimized'),
-    'run'   : %updating fn() {
-      db:optimize($args?name, boolean($args?all),
-        form:index-map($args?opts, $args?lang, $args?ftinclude, false()))
+  utils:dispatch($dba:CAT, fn($args) {
+    (: incremental indexing changes the structure of the indexes, which are then rebuilt :)
+    let $options := form:index-map($args)
+    let $all := boolean($args?all) or
+      $options?updindex != (db:info($args?name)//updindex = 'true')
+    return {
+      'params': { 'name': $args?name },
+      'info'  : utils:info($args?name, 'database', 'optimized'),
+      'run'   : %updating fn() {
+        db:optimize($args?name, $all,
+          if ($all) then $options else map:remove($options, 'updindex'))
+      }
     }
-  } })
+  })
 };
 
 (:~

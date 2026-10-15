@@ -368,16 +368,18 @@ declare function utils:job-options(
  : @param  $entries  all entries
  : @param  $page     number of shown pages
  : @param  $sort     sort key
+ : @param  $presort  key of the order the entries are already sorted by
  : @return entries to display
  :)
 declare function utils:slice(
   $entries  as item()*,
   $page     as xs:integer,
-  $sort     as xs:string
+  $sort     as xs:string,
+  $presort  as xs:string? := ()
 ) as item()* {
   (: while a table is being sorted, all entries are returned: sorting and slicing are then
      performed by the table itself :)
-  if ($page and not($sort)) then (
+  if ($page and (not($sort) or $sort = $presort)) then (
     subsequence($entries, 1, min(($page * $config:ROWS, $config:MAX-SHOWN)))
   ) else (
     $entries

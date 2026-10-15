@@ -29,7 +29,7 @@ declare function panels:users(
     let $headers := (
       (: the values of a known format get the width they need; the name takes the rest :)
       { 'key': 'name', 'label': 'Name' },
-      { 'key': 'permission', 'label': 'Permission', 'width': '6.5rem' },
+      { 'key': 'permission', 'label': 'Permission', 'width': 'calc(12ch + 0.5rem)' },
       { 'key': 'you', 'label': 'You', 'width': '3rem' }
     )
     let $entries := (

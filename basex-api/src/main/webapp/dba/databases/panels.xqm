@@ -36,13 +36,14 @@ declare function panels:databases(
           (: the values of a known format get the width they need; the name takes the rest :)
           { 'key': 'name', 'label': 'Name' },
           { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
-            'width': '4rem' },
-          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
+            'width': 'calc(7ch + 0.5rem)' },
+          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+            'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-            'width': '6.5rem' },
+            'width': 'calc(11ch + 0.5rem)' },
           (: what Restore falls back to, and where a backup that was just written shows up :)
           { 'key': 'backup', 'label': 'Backup', 'type': 'dateTime', 'order': 'desc',
-            'width': '6.5rem' }
+            'width': 'calc(11ch + 0.5rem)' }
         )
         (: the date of the latest backup of each database; the backups are listed with the most
            recent one first :)
@@ -99,8 +100,8 @@ declare function panels:databases(
     (: a new database is named and configured in one dialog; the defaults are the ones a
        database gets when nothing is chosen :)
     form:dialog('create', 'New Database', 'databases/create', true(), (
-      (: the database and what is added, how it is parsed, and what is indexed: a column each,
-         as one would be a list that is longer than the screen :)
+      (: the database and what is added, how it is parsed, the value indexes and the full-text
+         index: a column each, of similar length, so the dialog fits on the screen :)
       <div class='field-columns'>{
         <div>{
           <h3>Database</h3>,
@@ -108,19 +109,15 @@ declare function panels:databases(
           (: the initial content is uploaded, or addressed on the server; a database that is
              created without it is empty :)
           form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
-          form:field('Input:', <input type='text' name='input' class='wide'
+          form:field('Input:', <input type='text' name='input'
                                       placeholder='File, directory, archive or URL'/>),
           form:parsing-fields(),
           form:checkbox('binary', 'true', false(), 'Binary Storage',
-            title := 'Store the uploaded files as binary data, without parsing them'),
-          (: the defaults of the server: incremental indexing is enabled :)
-          form:index-options('updindex', true())
+            title := 'Store the uploaded files as binary data, without parsing them')
         }</div>,
         <div>{ form:parsing-options(()) }</div>,
-        <div>{
-          <h3>Indexes</h3>,
-          form:index-fields(('textindex', 'attrindex'), 'English')
-        }</div>
+        (: the defaults of the server: incremental indexing is enabled :)
+        form:index-fields(('textindex', 'attrindex', 'updindex'), { 'language': 'English' })
       }</div>
     ))
   )
@@ -185,10 +182,11 @@ declare %private function panels:resource-list(
       let $headers := (
         (: the values of a known format get the width they need; the name takes the rest :)
         { 'key': 'name', 'label': 'Name' },
-        { 'key': 'type', 'label': 'Type', 'width': '3.5rem' },
-        { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '4.5rem' },
+        { 'key': 'type', 'label': 'Type', 'width': 'calc(6ch + 0.5rem)' },
+        { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc',
+          'width': 'calc(9ch + 0.5rem)' },
         { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '6.5rem' }
+          'width': 'calc(11ch + 0.5rem)' }
       )
       (: one level of the database, directories first; a level is what a database of many
          resources is browsed by, and what its total is counted over. A filter looks past the
@@ -338,12 +336,14 @@ declare %private function panels:optimize-dialog(
   $name  as xs:string
 ) as element(dialog) {
   (: the index configuration is not a report: it is what the next optimization applies :)
-  (: one read of the database properties supplies both the index flags and the language :)
-  let $info := db:info($name)
+  (: one read of the database properties supplies both the index flags and the text values :)
+  let $indexes := db:info($name)//indexes/*
   return form:dialog('optimize', 'Database Options', 'databases/optimize-db', false(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     form:checkbox('all', 'true', false(), 'Full optimization'),
-    form:index-fields($info//*[text() = 'true']/name(), $info//language, $info//ftinclude)
+    <div class='field-columns'>{
+      form:index-fields($indexes[. = 'true']/name(), map:build($indexes, name#1, string#1))
+    }</div>
   ))
 };
 
@@ -713,8 +713,9 @@ declare %private function panels:backup-section(
           (: a backup is named after its timestamp and a size never grows beyond four digits
              and a unit: both are of a known length and take no more than they need. The
              comment is free text, and is given whatever is left :)
-          { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': '11.5rem' },
-          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.5rem' },
+          { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': 'calc(19ch + 0.5rem)' },
+          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+            'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'comment', 'label': 'Comment' }
         )
         let $entries :=

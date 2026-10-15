@@ -214,53 +214,55 @@ declare function form:prompt(
 };
 
 (:~ Index options that can be assigned when a database is created and optimized. :)
-(: the full-text index heads the options that refine it; 'create' marks the ones that are
-   reserved for new databases :)
+(: the full-text index heads the options that refine it; 'include' is the option with the names
+   an index is restricted to :)
 declare %private variable $form:INDEX-OPTIONS := (
-  { 'name': 'textindex', 'label': 'Text Index' },
-  { 'name': 'attrindex', 'label': 'Attribute Index' },
-  { 'name': 'tokenindex', 'label': 'Token Index' },
-  { 'name': 'updindex', 'label': 'Incremental Indexing', 'create': true() },
-  { 'name': 'ftindex', 'label': 'Full-Text', 'heading': true() },
-  { 'name': 'ftmixed', 'label': 'Mixed Content' },
-  { 'name': 'stemming', 'label': 'Stemming' },
-  { 'name': 'casesens', 'label': 'Case Sensitivity' },
-  { 'name': 'diacritics', 'label': 'Diacritics' }
+  { 'name': 'textindex', 'label': 'Text Index', 'include': {
+    'name': 'textinclude', 'kind': 'Elements', 'title': 'Elements whose texts are indexed' } },
+  { 'name': 'attrindex', 'label': 'Attribute Index', 'include': {
+    'name': 'attrinclude', 'kind': 'Attributes', 'title': 'Attributes whose values are indexed' } },
+  { 'name': 'tokenindex', 'label': 'Token Index', 'include': {
+    'name': 'tokeninclude', 'kind': 'Attributes',
+    'title': 'Attributes whose values are indexed as tokens' } },
+  (: changing it requires a full optimization :)
+  { 'name': 'updindex', 'label': 'Incremental Indexing' },
+  { 'name': 'autooptimize', 'label': 'Automatic Optimization' },
+  (: the names are what Mixed Content refers to: string values are indexed for these
+     elements, so the option is rejected if no name is supplied :)
+  { 'name': 'ftindex', 'label': 'Full-Text', 'heading': true(), 'fulltext': true(), 'include': {
+    'name': 'ftinclude', 'kind': 'Elements',
+    'title': 'Elements whose texts are indexed; with Mixed Content, their whole string values' } },
+  { 'name': 'ftmixed', 'label': 'Mixed Content', 'fulltext': true() },
+  { 'name': 'stemming', 'label': 'Stemming', 'fulltext': true() },
+  { 'name': 'casesens', 'label': 'Case Sensitivity', 'fulltext': true() },
+  { 'name': 'diacritics', 'label': 'Diacritics', 'fulltext': true() }
 );
 
 (:~
- : Creates the index options of a database dialog.
+ : Creates the index columns of a database dialog: the value indexes and the full-text index.
  : @param  $opts    checked options
- : @param  $create  show the options that are reserved for new databases, instead of the others
- : @return form fields
- :)
-declare function form:index-options(
-  $opts    as xs:string*,
-  $create  as xs:boolean := false()
-) as node()+ {
-  (: kept next to form:index-map, which turns the same options into the arguments of the
-     database operation :)
-  for $option in $form:INDEX-OPTIONS[$create = exists(?create)]
-  let $checkbox := form:option($option?name, $option?label, $opts)
-  return if ($option?heading) then <h3>{ $checkbox }</h3> else $checkbox
-};
-
-(:~
- : Creates the index fields of a database dialog: the options, and the full-text settings.
- : @param  $opts     checked options
- : @param  $lang     language
- : @param  $include  element names of the full-text index
- : @return form fields
+ : @param  $values  values of the text options, and the language
+ : @return a column each
  :)
 declare function form:index-fields(
-  $opts     as xs:string*,
-  $lang     as xs:string?,
-  $include  as xs:string? := ()
-) as node()+ {
-  form:index-options($opts),
-  (: the full-text settings follow the full-text options they refine :)
-  form:language-field($lang),
-  form:ftinclude-field($include)
+  $opts    as xs:string*,
+  $values  as map(*)
+) as element(div)+ {
+  (: kept next to form:index-map, which turns the same options into the arguments of the
+     database operation. The names of an index follow its checkbox :)
+  for $fulltext in (false(), true())
+  return <div>{
+    if (not($fulltext)) { <h3>Indexes</h3> },
+    for $option in $form:INDEX-OPTIONS[$fulltext = exists(?fulltext)]
+    let $checkbox := form:option($option?name, $option?label, $opts)
+    return (
+      if ($option?heading) then <h3>{ $checkbox }</h3> else $checkbox,
+      $option?include ! <input type='text' class='include' name='{ ?name }'
+        value='{ $values?(?name) }' placeholder='{ ?kind }: name, *:name, Q{{uri}}name'
+        title='{ ?title }'/>
+    ),
+    if ($fulltext) { form:language-field($values?language) }
+  }</div>
 };
 
 (:~
@@ -305,43 +307,23 @@ declare %private function form:language(
 };
 
 (:~
- : Creates the field that restricts the full-text index to specific element names.
- : @param  $names  element names
- : @return form field
- :)
-declare function form:ftinclude-field(
-  $names  as xs:string? := ()
-) as element(div) {
-  (: the names are what Mixed Content refers to: string values are indexed for these
-     elements, so the option is rejected if no name is supplied :)
-  form:field('Full-text names:', <input type='text' name='ftinclude' value='{ $names }'
-    placeholder='name, *:name, Q{{uri}}name'/>,
-    title := 'Elements whose texts are indexed; with Mixed Content, their whole string values')
-};
-
-(:~
  : Returns the index options of a database dialog as database options.
- : @param  $opts     checked options
- : @param  $lang     language
- : @param  $include  element names of the full-text index
- : @param  $create   include the options that are reserved for new databases
+ : @param  $args  request parameters
  : @return database options
  :)
 declare function form:index-map(
-  $opts     as xs:string*,
-  $lang     as xs:string?,
-  $include  as xs:string?,
-  $create   as xs:boolean
+  $args  as map(*)
 ) as map(*) {
   {
-    for $option in $form:INDEX-OPTIONS[$create or empty(?create)]
-    return { $option?name: $opts = $option?name },
+    for $option in $form:INDEX-OPTIONS
+    return { $option?name: $args?opts = $option?name },
     (: an unknown language would be ignored by the full-text index without notice :)
-    $lang[.] ! (
+    $args?lang[.] ! (
       if (form:language(.)) then { 'language': . }
       else error((), `Unknown language: "{ . }".`)
     ),
-    $include ! { 'ftinclude': . }
+    for $include in $form:INDEX-OPTIONS?include
+    return $args?($include?name) ! { $include?name: . }
   }
 };
 
