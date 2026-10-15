@@ -329,7 +329,7 @@ public final class HTTPConnection implements ClientInfo {
             authMethod + " " + AuthParam.REALM + "=\"" + Prop.NAME + '"');
       }
 
-      response.setStatus(code < 0 || code > 999 ? 500 : code);
+      response.setStatus(HTTPText.validStatus(code) ? code : SC_INTERNAL_SERVER_ERROR);
       if(body != null) {
         contentType(type != null ? type : MediaType.TEXT_PLAIN, Strings.UTF8);
         response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());

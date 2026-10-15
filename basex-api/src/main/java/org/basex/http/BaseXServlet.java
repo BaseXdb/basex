@@ -128,7 +128,7 @@ public abstract class BaseXServlet extends HttpServlet {
         final byte[] local = qname.local();
         final int status = Token.startsWith(local, QueryText.STATUS) ?
           Token.toInt(Token.substring(local, QueryText.STATUS.length)) : -1;
-        if(status >= 100 && status <= 599) code = status;
+        if(HTTPText.validStatus(status)) code = status;
         full = false;
       } else if(QueryError.BASEX_PERMISSION_X_X.eq(qname)) {
         // insufficient permissions of an authenticated user

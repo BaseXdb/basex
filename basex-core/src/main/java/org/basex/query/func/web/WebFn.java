@@ -76,7 +76,7 @@ public abstract class WebFn extends StandardFunc {
    * @throws QueryException query exception
    */
   static int status(final long status, final InputInfo info) throws QueryException {
-    if(status <= 0 || status > 999) throw QueryError.WEB_STATUS_X.get(info, status);
+    if(!HTTPText.validStatus(status)) throw QueryError.WEB_STATUS_X.get(info, status);
     return (int) status;
   }
 

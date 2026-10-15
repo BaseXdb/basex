@@ -58,12 +58,12 @@ public final class WebModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void error() {
     final Function func = _WEB_ERROR;
-    query("try { " + func.args(1, "x") + " } catch rest:status1 { 'x' }", "x");
+    query("try { " + func.args(100, "x") + " } catch rest:status100 { 'x' }", "x");
     query("try { " + func.args(400, "x") + " } catch rest:status400 { 'x' }", "x");
-    query("try { " + func.args(999, "x") + " } catch rest:* { 'x' }", "x");
+    query("try { " + func.args(599, "x") + " } catch rest:* { 'x' }", "x");
     error(func.args(-1, "x"), WEB_STATUS_X);
-    error(func.args(0, "x"), WEB_STATUS_X);
-    error(func.args(1000, "x"), WEB_STATUS_X);
+    error(func.args(99, "x"), WEB_STATUS_X);
+    error(func.args(600, "x"), WEB_STATUS_X);
 
     // error value carries the message (string body)
     query("try { " + func.args(400, "bad") + " } catch * { $err:value }", "bad");
@@ -89,8 +89,8 @@ public final class WebModuleTest extends SandboxTest {
         "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
     query(func.args("a/b", " status := 301") +
         "/*:response/@status/number()", 301);
-    error(func.args("a", " {}", "", 0), WEB_STATUS_X);
-    error(func.args("a", " {}", "", 1000), WEB_STATUS_X);
+    error(func.args("a", " {}", "", 99), WEB_STATUS_X);
+    error(func.args("a", " {}", "", 600), WEB_STATUS_X);
 
     // GH-1585
     query("count((" + func.args("a") + " update {})/http:response)", 1);
@@ -123,8 +123,8 @@ public final class WebModuleTest extends SandboxTest {
     // status/message arguments
     query(func.args(" {}", " {}", " { 'status': 200, 'message': 'OK' }") +
         "/http:response ! (@status, @message) ! string()", "200\nOK");
-    error(func.args(" {}", " {}", " { 'status': 0 }"), WEB_STATUS_X);
-    error(func.args(" {}", " {}", " { 'status': 1000 }"), WEB_STATUS_X);
+    error(func.args(" {}", " {}", " { 'status': 99 }"), WEB_STATUS_X);
+    error(func.args(" {}", " {}", " { 'status': 600 }"), WEB_STATUS_X);
 
     // GH-1585
     query("count((" + func.args() + " update {})/http:response)", 1);

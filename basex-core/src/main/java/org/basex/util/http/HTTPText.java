@@ -130,4 +130,13 @@ public interface HTTPText {
 
   /** Carriage return/line feed. */
   byte[] CRLF = { '\r', '\n' };
+
+  /**
+   * Checks if a status code is in the range defined by HTTP (100-599).
+   * @param status status code
+   * @return result of check
+   */
+  static boolean validStatus(final long status) {
+    return status >= 100 && status <= 599;
+  }
 }

@@ -138,13 +138,13 @@ public final class RestXqFilterTest extends RestXqTest {
     final String f = "declare %R:path('') function m:f() { " +
         "<R:response><http:response status='CODE'/></R:response> };";
     get(200, f.replace("CODE", "200"), "");
-    get(999, f.replace("CODE", "999"), "");
+    get(599, f.replace("CODE", "599"), "");
     // invalid status codes are rejected as in web:error
     register(f.replace("CODE", "abc"));
     assertContains(get(500, ""), "Invalid status code: abc");
-    register(f.replace("CODE", "0"));
-    assertContains(get(500, ""), "Invalid status code: 0");
-    register(f.replace("CODE", "1000"));
-    assertContains(get(500, ""), "Invalid status code: 1000");
+    register(f.replace("CODE", "99"));
+    assertContains(get(500, ""), "Invalid status code: 99");
+    register(f.replace("CODE", "600"));
+    assertContains(get(500, ""), "Invalid status code: 600");
   }
 }

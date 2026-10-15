@@ -191,7 +191,9 @@ public final class RestXqResponse extends WebResponse {
         if(sta != null) {
           // the status code is validated as in web:error
           final int code = toInt(sta);
-          if(code <= 0 || code > 999) throw QueryError.WEB_STATUS_X.get(func.function.info, sta);
+          if(!HTTPText.validStatus(code)) {
+            throw QueryError.WEB_STATUS_X.get(func.function.info, sta);
+          }
           status = code;
         }
 
