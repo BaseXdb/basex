@@ -173,7 +173,7 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 	*salt++ = '\0';
 
 #if DEBUG
-	warnx("algorithm, salt : %s, %s", params, salt);
+	warnx("algorithm, salt : %c%s, %s", first, params, salt);
 #endif
 
 	/* Compute sha256(salt + password), then sha256 of that plus the nonce. */

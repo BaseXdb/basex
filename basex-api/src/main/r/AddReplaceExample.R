@@ -51,7 +51,7 @@ Session$add(path = Path1, Simple1)
 Session$add(path = Path2, Simple2)
 print(Session$command("xquery collection('Learn')")$result)
 
-Session$replace(path = Path2, Replace)
+Session$put(path = Path2, Replace)
 print(Session$command("xquery collection('Learn')")$result)
 
 Session$add(path = Path3, Simple3)

@@ -33,10 +33,10 @@ Session$command("delete /")
 bais <- raw()
 for (b in 252:256) bais <- c(bais, c(b)) %>% as.raw()
 
-test <- Session$store("test.bin", bais)
+test <- Session$put_binary("test.bin", bais)
 print(test$success)
 
-baos <- Session$command("retrieve test.bin")
+baos <- Session$command("binary get test.bin")
 print(bais)
 print(baos$result)
 

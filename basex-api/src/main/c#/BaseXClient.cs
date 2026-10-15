@@ -90,14 +90,14 @@ namespace BaseXClient
       Send(s);
     }
     
-    public void Replace(string path, Stream s)
+    public void Put(string path, Stream s)
     {
       stream.WriteByte(12);
       Send(path);
       Send(s);
     }
     
-    public void Store(string path, Stream s)
+    public void PutBinary(string path, Stream s)
     {
       stream.WriteByte(13);
       Send(path);

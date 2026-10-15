@@ -35,7 +35,7 @@ BasexClient <- R6Class("BasexClient",
       private$void_send(code)
       if (!self$bool_test_sock()) stop("Access denied")},
     command = function(command = command) {
-      bin <- if (grepl("retrieve\\s+", command, ignore.case = TRUE)) TRUE
+      bin <- if (grepl("binary\\s+get\\s+", command, ignore.case = TRUE)) TRUE
       else FALSE
       private$void_send(command)
       private$result <- self$str_receive(bin = bin)
@@ -63,14 +63,14 @@ BasexClient <- R6Class("BasexClient",
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
     },
-    replace = function(path = path, input = input) {
+    put = function(path = path, input = input) {
       writeBin(as.raw(0x0C), private$sock)
       private$void_send(path)
       private$void_send(input)
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
     },
-    store = function(path = path, input = input) {
+    put_binary = function(path = path, input = input) {
       writeBin(as.raw(0x0D), private$sock)
       private$void_send(path)
       private$void_send(input)
