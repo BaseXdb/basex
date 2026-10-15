@@ -44,6 +44,11 @@ public final class XQIntValueMap extends XQHashMap {
   }
 
   @Override
+  public Item key(final Item key) throws QueryException {
+    return key(key, BasicType.INTEGER);
+  }
+
+  @Override
   public Value keys() {
     return IntSeq.get(map.keys());
   }

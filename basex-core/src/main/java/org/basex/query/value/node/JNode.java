@@ -305,15 +305,18 @@ public final class JNode extends GNode {
   public JNode child(final Item item) {
     if(value instanceof final XQMap map) {
       final Value v = map.value(item);
-      return v != null ? new JNode(item, v, this, -1) : null;
+      if(v == null) return null;
+      try {
+        return new JNode(map.key(item), v, this, -1);
+      } catch(final QueryException ex) {
+        // the exception is only caused by atomizing the key
+        throw Util.notExpected(ex);
+      }
     }
     if(item instanceof final ANum num) {
       final double d = num.dbl();
       final long i = (long) d - 1;
-      if(d == i + 1 && i >= 0 && i < childCount()) {
-        return new JNode(item, value instanceof final XQArray array ? array.valueAt(i) :
-          value.itemAt(i), this, (int) i);
-      }
+      if(d == i + 1 && i >= 0 && i < childCount()) return new JNode(this, (int) i);
     }
     return null;
   }

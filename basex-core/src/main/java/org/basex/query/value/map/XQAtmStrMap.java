@@ -43,6 +43,11 @@ public final class XQAtmStrMap extends XQHashMap {
   }
 
   @Override
+  public Item key(final Item key) throws QueryException {
+    return key(key, BasicType.UNTYPED_ATOMIC);
+  }
+
+  @Override
   public Value keys() {
     return StrSeq.get(map.keys(), BasicType.UNTYPED_ATOMIC);
   }

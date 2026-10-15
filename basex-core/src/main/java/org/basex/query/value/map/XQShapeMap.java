@@ -38,6 +38,11 @@ public abstract class XQShapeMap extends XQMap {
   }
 
   @Override
+  public final Item key(final Item key) throws QueryException {
+    return key(key, BasicType.STRING);
+  }
+
+  @Override
   public final Value keys() {
     return StrSeq.get(fields().keys());
   }

@@ -1176,6 +1176,9 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME, "11.xml"), "<x/>");
     query(func.args(NAME, "<y/>", "11.xml", " { 'replace': true() }"));
     query(_DB_GET.args(NAME, "11.xml"), "<y/>");
+
+    error(func.args(NAME, " xs:hexBinary('41')", ""), DB_PATH_X);
+    error(func.args(NAME, " xs:hexBinary('41')", "a/"), DB_PATH_X);
   }
 
   /** Replacing a document must not inflate the reported document count (meta.ndocs). */

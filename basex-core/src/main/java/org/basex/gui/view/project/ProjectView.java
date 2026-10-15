@@ -157,7 +157,7 @@ public final class ProjectView extends BaseXPanel {
 
     SwingUtilities.invokeLater(() -> {
       final IOFile io = file.normalize();
-      if(io.path().startsWith(root.file.path())) {
+      if(root.file.contains(io)) {
         if(xquery) ProjectFiles.parse(file.path(), gui.context, files.errors());
         refreshTree(io);
       }
@@ -195,9 +195,8 @@ public final class ProjectView extends BaseXPanel {
    * @return result of check
    */
   private static boolean find(final Set<String> errPaths, final IOFile file) {
-    final String path = file.path();
     for(final String errPath : errPaths) {
-      if(errPath.startsWith(path)) return true;
+      if(file.contains(new IOFile(errPath))) return true;
     }
     return false;
   }
@@ -257,7 +256,7 @@ public final class ProjectView extends BaseXPanel {
 
     if(file != null) {
       final IOFile fl = file.normalize();
-      if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
+      if(root.file.contains(fl)) tree.expand(root, fl.path());
     }
     if(focus) tree.requestFocusInWindow();
   }

@@ -661,6 +661,18 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Checks if the specified file is this directory or one of its descendants.
+   * @param io file to check
+   * @return result of check
+   */
+  public boolean contains(final IOFile io) {
+    final int dl = pth.length() - (Strings.endsWith(pth, '/') ? 1 : 0);
+    final String path = io.pth;
+    return path.regionMatches(!Prop.CASE, 0, pth, 0, dl) &&
+      (path.length() == dl || path.charAt(dl) == '/');
+  }
+
+  /**
    * Checks if this file and the specified file are the same existing file on the file system.
    * @param io file to compare
    * @return result of check

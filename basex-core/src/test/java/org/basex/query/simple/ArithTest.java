@@ -244,6 +244,12 @@ public final class ArithTest extends SandboxTest {
     check(xy + "$x + 1 < $x + 2", true, root(Bln.class));
     // no rewrite: floating-point numbers
     query("let $d := xs:double(" + wrap("1e-20") + ") return $d + 1 = 1", true);
+    // no overflow by moving constants to positions: the shifted value is computed as decimal
+    final String bc = "let $b := xs:integer(" + wrap(Long.MAX_VALUE - 1) +
+        ") let $c := xs:integer(" + wrap(Long.MIN_VALUE + 1) + ") return ";
+    query(bc + "(1 to 3)[position() + $c = 5]", "");
+    // decimal results keep decimal constants
+    query(bc + "$b + 1 + 1.0", "9223372036854775808");
   }
 
   /** Identities that also apply to floating-point numbers. */
@@ -315,9 +321,14 @@ public final class ArithTest extends SandboxTest {
   /** Ranges. */
   @Test public void range() {
     final String n = "let $n := xs:integer(" + wrap(3) + ") return ";
-    check(n + "(1 to $n) ! (. + 1)", "2\n3\n4", root(Range.class));
-    check(n + "($n to 5) ! (. - 2)", "1\n2\n3", root(Range.class));
-    check(n + "(5 to $n) ! (. + 1)", "", root(Range.class));
+    // dynamic bounds: no rewrite (shifted bounds may overflow)
+    check(n + "(1 to $n) ! (. + 1)", "2\n3\n4", root(SimpleMap.class));
+    check(n + "($n to 5) ! (. - 2)", "1\n2\n3", root(SimpleMap.class));
+    check(n + "(5 to $n) ! (. + 1)", "", root(SimpleMap.class));
+    final String max = "let $n := xs:integer(" + wrap(Long.MAX_VALUE) + ") return ";
+    query(max + "count(($n to 1) ! (. + 1))", 0);
+    query(max + "head((1 to $n) ! (. + 1))", 2);
+    query(n + "count((1 to $n - 3) ! (. + 9223372036854775807))", 0);
     // known result size
     check(n + "($n to $n + 10) ! (. + 1)", "4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14",
         "//Range/@size = 11");
@@ -326,8 +337,6 @@ public final class ArithTest extends SandboxTest {
     check(n + "count($n to $n + random:integer(9) - random:integer(9)) >= 0", true,
         "empty(//Range/@size)");
     check(n + "$n to $n - 1 + random:integer(9) * 0", "", exists(Function._RANDOM_INTEGER));
-    // untyped bounds: no rewrite (double arithmetic)
-    check("(1 to " + wrap(3) + ") ! (. + 1)", "2\n3\n4", exists(SimpleMap.class));
   }
 
   /** Arithmetic positions and lengths. */

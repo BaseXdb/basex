@@ -233,15 +233,19 @@ abstract class DbNew extends DbAccessFn {
   /**
    * Stores a file resource and deletes the other resources at its path.
    * @param data data reference
-   * @param docs documents at the target path
    * @param path target path
    * @param type resource type
    * @param up update that stores the resource
+   * @param options options
    * @param qc query context
    * @throws QueryException query exception
    */
-  final void putFile(final Data data, final IntList docs, final String path,
-      final ResourceType type, final Update up, final QueryContext qc) throws QueryException {
+  final void putFile(final Data data, final String path, final ResourceType type,
+      final Update up, final XQMap options, final QueryContext qc) throws QueryException {
+    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
+    if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
+    final IntList docs = data.resources.docsAt(path);
+    if(!put(docs, data.resources.files(path), options)) return;
     if(data.resources.isDir(path, type)) throw DB_PATH_DIR_X.get(info, path);
     final Updates updates = qc.updates();
     for(final int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);

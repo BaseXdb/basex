@@ -57,17 +57,27 @@ public final class Caches {
    * @param name name of cache
    * @return value or {@code null}
    */
-  public synchronized Value get(final String key, final String name) {
+  public Value get(final String key, final String name) {
+    return lookup(key, name, true);
+  }
+
+  /**
+   * Returns a value.
+   * @param key key
+   * @param name name of cache
+   * @param count update hit and miss statistics
+   * @return value or {@code null}
+   */
+  private synchronized Value lookup(final String key, final String name, final boolean count) {
     final Cache cache = caches.get(name);
     if(cache == null) return null;
     cache.cleanup();
     final CacheEntry entry = cache.get(key);
-    if(entry == null) {
-      cache.misses++;
-      return null;
+    if(count) {
+      if(entry == null) cache.misses++;
+      else cache.hits++;
     }
-    cache.hits++;
-    return entry.value;
+    return entry != null ? entry.value : null;
   }
 
   /**
@@ -99,7 +109,7 @@ public final class Caches {
         throw new JobException(Text.INTERRUPTED, ex);
       }
       try {
-        value = get(key, name);
+        value = lookup(key, name, false);
         if(value == null) {
           value = compute.get();
           put(key, value, name);

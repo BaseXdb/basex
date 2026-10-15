@@ -52,7 +52,9 @@ public final class Linear {
     if(linear == null || linear.terms.size() + (linear.constant.signum() != 0 ? 1 : 0) >=
         linear.operands) return null;
 
-    final ANum num = num(linear.terms.isEmpty() ? linear.constant : linear.constant.abs());
+    // decimal results keep decimal constants: $x + 1 + 1.0 → $x + 2.0 (no integer overflow)
+    final BigDecimal constant = linear.terms.isEmpty() ? linear.constant : linear.constant.abs();
+    final ANum num = arith.seqType().type.instanceOf(INTEGER) ? num(constant) : Dec.get(constant);
     if(num == null) return null;
     final InputInfo info = arith.info();
     Expr expr = null;

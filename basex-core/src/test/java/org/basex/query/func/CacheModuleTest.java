@@ -113,10 +113,16 @@ public final class CacheModuleTest extends SandboxTest {
     query(func.args() + "?hits", 1);
     query(_CACHE_GET.args("unknown"), "");
     query(func.args() + "?misses", 1);
+    // a computed value counts as a single miss
+    query(_CACHE_GET_OR_PUT.args("computed", " fn() { 1 }"), 1);
+    query(func.args() + "?misses", 2);
+    query(_CACHE_GET_OR_PUT.args("computed", " fn() { 1 }"), 1);
+    query(func.args() + "?hits", 2);
+    query(_CACHE_REMOVE.args("computed"));
 
     query(_CACHE_REMOVE.args("key"));
     query(func.args() + "?entries", 0);
-    query(func.args() + "?hits", 1);
+    query(func.args() + "?hits", 2);
 
     query(_CACHE_PUT.args("key", "INFO", "cache"));
     query(func.args("cache") + "?entries", 1);

@@ -52,7 +52,7 @@ final class RESTRun extends RESTQuery {
       if(!file.exists()) file = new IOFile(root, path + IO.BXSSUFFIX);
     }
 
-    if(!file.exists() || file.isDir() || !file.path().startsWith(root.path()))
+    if(!file.exists() || file.isDir() || !root.contains(file))
       throw HTTPStatus.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
 
     // retrieve file contents

@@ -47,6 +47,11 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
+  public Item key(final Item key) throws QueryException {
+    return key(key, BasicType.STRING);
+  }
+
+  @Override
   public Value keys() {
     return StrSeq.get(map.keys());
   }

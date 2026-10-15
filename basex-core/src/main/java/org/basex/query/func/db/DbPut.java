@@ -1,7 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
@@ -31,12 +29,8 @@ public final class DbPut extends DbNew {
 
     if(input instanceof Bin) {
       // store binary resource
-      final IntList docs = data.resources.docsAt(path);
-      if(put(docs, data.resources.files(path), options)) {
-        if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-        putFile(data, docs, path, ResourceType.BINARY, new DBPutBinary(data, input, path, info),
-            qc);
-      }
+      putFile(data, path, ResourceType.BINARY, new DBPutBinary(data, input, path, info), options,
+          qc);
     } else {
       // directories and archives replace all documents at and below the path
       final NewInput ni = toNewInput(input, path, qc);

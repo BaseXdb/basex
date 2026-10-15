@@ -1,17 +1,12 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
-import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -19,35 +14,15 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbPutBinary extends DbNew {
+public final class DbPutBinary extends DbNew {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Item input = arg(1).unwrappedItem(qc, info);
     final String path = toDbPath(arg(2), qc);
-    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-    if(path.isEmpty()) throw DB_PATH_X.get(info, path);
     final Object source = toBinarySource(input, qc);
-    return put(data, path, ResourceType.BINARY, new DBPutBinary(data, source, path, info), qc);
-  }
-
-  /**
-   * Performs a put operation. The caller is expected to validate the database state
-   * and the target path beforehand.
-   * @param data data reference
-   * @param path target path
-   * @param type resource type
-   * @param up update to perform
-   * @param qc query context
-   * @return empty value
-   * @throws QueryException query exception
-   */
-  final Empty put(final Data data, final String path, final ResourceType type, final Update up,
-      final QueryContext qc) throws QueryException {
-
-    final XQMap options = toEmptyMap(arg(3), qc);
-    final IntList docs = data.resources.docsAt(path);
-    if(put(docs, data.resources.files(path), options)) putFile(data, docs, path, type, up, qc);
+    putFile(data, path, ResourceType.BINARY, new DBPutBinary(data, source, path, info),
+        toEmptyMap(arg(3), qc), qc);
     return Empty.VALUE;
   }
 }

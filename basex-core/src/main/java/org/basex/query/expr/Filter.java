@@ -225,19 +225,19 @@ public abstract class Filter extends Preds {
             ex = cc.function(TRUNK, info, add.apply(expr));
           } else if(arg1 instanceof final Arith arth1 && LAST.is(arth1.arg(0)) &&
               arth1.calc == Calc.SUBTRACT && simpleInt.test(arth1.arg(1)) && arg2 == Itr.MAX) {
-            // E[pos: last() - INT to MAX] → reverse(subsequence(reverse(E), 1, INT + 1))
+            // E[pos: last() - INT to MAX] → reverse(subsequence(reverse(E), 1, INT + 1.0))
             ex = cc.function(REVERSE, info, cc.function(SUBSEQUENCE, info,
                 cc.function(REVERSE, info, add.apply(expr)), Itr.ONE,
-                new Arith(info, arg1.arg(1), Itr.ONE, Calc.ADD).optimize(cc)));
+                new Arith(info, arg1.arg(1), Dec.ONE, Calc.ADD).optimize(cc)));
           }
         } else if(LAST.is(posExpr)) {
           // E[pos: last()] → foot(E)
           ex = cc.function(FOOT, info, add.apply(expr));
         } else if(posExpr instanceof final Arith arth && LAST.is(arth.arg(0)) &&
             arth.calc == Calc.SUBTRACT && simpleInt.test(arth.arg(1))) {
-          // E[pos: last() - INT] → items-at(reverse(E), INT + 1)
-          ex = cc.function(ITEMS_AT, info, cc.function(REVERSE, info, add.apply(expr)),
-              new Arith(info, posExpr.arg(1), Itr.ONE, Calc.ADD).optimize(cc));
+          // E[pos: last() - INT] → subsequence(reverse(E), INT + 1.0, 1)
+          ex = cc.function(SUBSEQUENCE, info, cc.function(REVERSE, info, add.apply(expr)),
+              new Arith(info, posExpr.arg(1), Dec.ONE, Calc.ADD).optimize(cc), Itr.ONE);
         }
       } else if(pred instanceof final MixedPos pos) {
         final Expr posExpr = pos.expr;

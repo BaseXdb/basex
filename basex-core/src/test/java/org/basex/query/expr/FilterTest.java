@@ -585,6 +585,17 @@ public final class FilterTest extends SandboxTest {
     final String func = "declare %basex:inline(0) function local:f($n, $e) { ";
     query(func + "$e[position() = 2 to $n] }; local:f(" + max + ", " + e + ")", "2\n3");
     query(func + "$e[position() = $n to 2] }; local:f(-9223372036854775806, " + e + ")", "1\n2");
+    // dynamic integer bounds at the limits
+    final String p = "let $p := xs:integer(" + wrap(max) + ") return ";
+    final String q = "let $q := xs:integer(" + wrap("-9223372036854775808") + ") return ";
+    query(p + e + "[position() > $p]", "");
+    query(p + e + "[$p < position()]", "");
+    query(q + e + "[position() < $q]", "");
+    query(q + e + "[position() >= $q]", "1\n2\n3");
+    query(p + e + "[last() - $p]", "");
+    query(p + e + "[position() >= last() - $p]", "1\n2\n3");
+    query(p + e + "[position() - 1 = $p]", "");
+    query(q + e + "[position() + 1 >= $q]", "1\n2\n3");
 
     // relative to the last position
     query(e + "[position() > last() - 113667776004]", "1\n2\n3");

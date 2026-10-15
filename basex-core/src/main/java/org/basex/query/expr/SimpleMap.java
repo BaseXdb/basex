@@ -201,14 +201,6 @@ public abstract sealed class SimpleMap extends Mapping
           }
         }
       }
-      // (1 to $n) ! (. + 1) → 2 to $n + 1
-      if(expr instanceof final Range range && range.integers() &&
-          next instanceof final Arith arith && arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) &&
-          arith.arg(0) instanceof ContextValue && arith.arg(1) instanceof final Itr itr) {
-        final Expr min = new Arith(info, range.arg(0), itr, arith.calc).optimize(cc);
-        final Expr max = new Arith(info, range.arg(1), itr, arith.calc).optimize(cc);
-        return new Range(info, min, max).optimize(cc);
-      }
 
       // try to merge deterministic expressions
       Expr input = expr;

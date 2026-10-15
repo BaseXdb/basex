@@ -400,6 +400,28 @@ public final class JNodeTest extends SandboxTest {
     // namespaced and local name tests never select JNodes
     query(flat + " -> count(descendant::Q{urn:x}a)", 0);
     query(flat + " -> count(descendant::*:a)", 0);
+
+    // selectors: array members are keyed by integers
+    query("jtree([ 10, 20 ])/2.0 ! jkey() ! (. instance of xs:integer)", true);
+    query("jtree((10, 20))/2.0 ! jkey() ! (. instance of xs:integer)", true);
+    query("jtree([ 10, 20 ])/2.5", "");
+    // selectors: map entries keep their stored keys
+    query("jtree({ 1: 'a' })/1.0 ! jkey() ! (. instance of xs:integer)", true);
+    query("jtree({ 'x': 'a' })/xs:untypedAtomic('x') ! jkey() ! (. instance of xs:string)",
+        true);
+    query("jtree({ 'x': 'a', 'y': 'b' })/y ! path()", "/y");
+    query("let $j := jtree({ 'x': 'a', 'y': 'b' }) return $j/y is $j/*[2]", true);
+    // typed maps
+    final String ints = "jtree(map:merge((1 to 100) ! { .: string(.) }))";
+    query(ints + "/50.0 ! jkey() ! (. instance of xs:integer)", true);
+    final String strs = "jtree(map:merge((1 to 100) ! { string(.): . }))";
+    query(strs + "/xs:untypedAtomic('50') ! jkey() ! (. instance of xs:string)", true);
+    final String atms = "jtree(map:merge((1 to 100) ! { xs:untypedAtomic(.): . }))";
+    query(atms + "/child::{ '50' } ! jkey() ! (. instance of xs:untypedAtomic)", true);
+    // trie map
+    final String trie = "jtree(map:put(map:merge((1 to 100) ! { .: . }), 'x', 0))";
+    query(trie + "/50.0 ! jkey() ! (. instance of xs:integer)", true);
+    query("let $j := " + trie + " return $j/50 is $j/*[50]", true);
   }
 
   /** Ancestor step. */

@@ -170,5 +170,15 @@ public final class RESTGetTest extends RESTTest {
 
     new IOFile(path, "script.bxs").write("<set option='unknown'>123</set>");
     get(500, "", "run", "script.bxs");
+
+    // files in a sibling directory with the same prefix are rejected
+    final IOFile root = context.soptions.restPath();
+    final IOFile sibling = new IOFile(root.parent(), root.name() + "2");
+    try {
+      new IOFile(sibling, "query.xq").write("'" + sibling + "'");
+      get(404, "", "run", "../" + sibling.name() + "/query.xq");
+    } finally {
+      sibling.delete();
+    }
   }
 }

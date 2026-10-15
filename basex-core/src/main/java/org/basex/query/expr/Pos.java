@@ -100,6 +100,9 @@ public final class Pos extends Single {
     final Type type = st.type;
     final boolean integer = type.instanceOf(BasicType.INTEGER);
     if(st.zeroOrOne() && type.isNumberOrUntyped()) {
+      // positional bounds (e.g. last()) keep integers; other bounds get decimal offsets,
+      // which cannot overflow
+      final Expr one = pos.has(Flag.POS) ? Itr.ONE : Dec.ONE;
       Expr min = null, max = null;
       switch(op) {
         case EQ -> min = pos;
@@ -109,7 +112,7 @@ public final class Pos extends Single {
         }
         case GT -> {
           min = new Arith(info, integer ? pos :
-            cc.function(Function.FLOOR, info, pos), Itr.ONE, Calc.ADD).optimize(cc);
+            cc.function(Function.FLOOR, info, pos), one, Calc.ADD).optimize(cc);
           max = Itr.MAX;
         }
         case LE -> {
@@ -119,7 +122,7 @@ public final class Pos extends Single {
         case LT -> {
           min = Itr.ONE;
           max = new Arith(info, integer ?
-            pos : cc.function(Function.CEILING, info, pos), Itr.ONE, Calc.SUBTRACT).optimize(cc);
+            pos : cc.function(Function.CEILING, info, pos), one, Calc.SUBTRACT).optimize(cc);
         }
         default -> { }
       }
@@ -129,7 +132,10 @@ public final class Pos extends Single {
         // position() = last() → pos: last()
         if(max == null) return ref instanceof Pos ? null : new Pos(info, min);
         // position() < last() → position() = 1 to last() - 1
-        if(integer) return get(new Range(info, min, max).optimize(cc), CmpOp.EQ, info, cc, ref);
+        if(min.seqType().type.instanceOf(BasicType.INTEGER) &&
+            max.seqType().type.instanceOf(BasicType.INTEGER)) {
+          return get(new Range(info, min, max).optimize(cc), CmpOp.EQ, info, cc, ref);
+        }
       }
     }
 
