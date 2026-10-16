@@ -7,7 +7,6 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 import jakarta.servlet.http.*;
 
@@ -36,6 +35,8 @@ public final class WebModules {
 
   /** RESTXQ path. */
   private final IOFile path;
+  /** Idle time in milliseconds after which modules are checked for changes. */
+  private final long idle;
 
   /** Module cache. */
   private HashMap<String, WebModule> modules = new HashMap<>();
@@ -53,25 +54,9 @@ public final class WebModules {
   private WebModules(final Context ctx) {
     final StaticOptions sopts = ctx.soptions;
     path = sopts.restxqPath();
-
-    // RESTXQ parsing
+    // speed up permission checks: keep cache for a minimum of time even if caching is disabled
     final int sec = sopts.get(StaticOptions.PARSERESTXQ);
-    // < 0: process until cache is invalidated
-    if(sec >= 0) {
-      // speed up permission checks: keep cache for a minimum of time even if caching is disabled
-      final int ms = sec == 0 ? 10 : sec * 1000;
-      final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
-          runnable -> {
-            final Thread thread = new Thread(runnable, "basex-restxq-cache");
-            thread.setDaemon(true);
-            return thread;
-          });
-      scheduler.scheduleAtFixedRate(() -> {
-        synchronized(WebModules.this) {
-          if(System.currentTimeMillis() - access >= ms) init(true);
-        }
-      }, 0, 100, TimeUnit.MILLISECONDS);
-    }
+    idle = sec < 0 ? Long.MAX_VALUE : sec == 0 ? 10 : sec * 1000L;
   }
 
   /**
@@ -102,7 +87,7 @@ public final class WebModules {
    */
   public FNode wadl(final HttpServletRequest request, final Context ctx) throws QueryException {
     try {
-      return new RestXqWadl(request).create(cache(ctx));
+      return new RestXqWadl(request).create(cache(ctx, true));
     } catch(final IOException ex) {
       throw QueryError.BASEX_ERROR_X.get(null, ex);
     }
@@ -177,7 +162,7 @@ public final class WebModules {
 
     // nothing was found: report modules that could not be parsed
     if(conn.context.soptions.get(StaticOptions.RESTXQERRORS)) {
-      for(final WebModule module : cache(conn.context).values()) {
+      for(final WebModule module : cache(conn.context, true).values()) {
         final QueryException ex = module.error();
         if(ex != null) throw ex;
       }
@@ -226,7 +211,7 @@ public final class WebModules {
   private ArrayList<RestXqFunction> collect(final HTTPConnection conn,
       final Checks<RestXqFunction> constraint) throws IOException {
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final WebModule module : cache(conn.context).values()) {
+    for(final WebModule module : cache(conn.context, true).values()) {
       for(final RestXqFunction func : module.functions()) {
         if(constraint.ok(func)) list.add(func);
       }
@@ -280,13 +265,14 @@ public final class WebModules {
    * @param pth concrete connection path
    * @param ctx database context
    * @param ann annotation (can be {@code null})
+   * @param request HTTP request (postpones the next check for changes)
    * @return matching functions
    * @throws IOException I/O exception
    */
-  private ArrayList<WsFunction> findWs(final String pth, final Context ctx, final Annotation ann)
-      throws IOException {
+  private ArrayList<WsFunction> findWs(final String pth, final Context ctx, final Annotation ann,
+      final boolean request) throws IOException {
     final ArrayList<WsFunction> funcs = new ArrayList<>();
-    for(final WebModule mod : cache(ctx).values()) {
+    for(final WebModule mod : cache(ctx, request).values()) {
       for(final WsFunction func : mod.wsFunctions()) {
         if(func.matches(ann, pth)) funcs.add(func);
       }
@@ -303,7 +289,7 @@ public final class WebModules {
    * @throws IOException I/O exception
    */
   public WsFunction websocket(final String pth, final Context ctx) throws IOException {
-    final ArrayList<WsFunction> funcs = findWs(pth, ctx, null);
+    final ArrayList<WsFunction> funcs = findWs(pth, ctx, null, true);
     return funcs.isEmpty() ? null : funcs.getFirst();
   }
 
@@ -337,7 +323,7 @@ public final class WebModules {
       throws QueryException, IOException {
 
     // collect and sort all function candidates
-    final ArrayList<WsFunction> funcs = findWs(ws.path, ws.context, ann);
+    final ArrayList<WsFunction> funcs = findWs(ws.path, ws.context, ann, false);
     if(funcs.isEmpty()) return null;
 
     // multiple functions: check specificity
@@ -472,15 +458,19 @@ public final class WebModules {
   /**
    * Returns the module cache.
    * @param ctx database context
+   * @param request HTTP request (postpones the next check for changes)
    * @return module cache
    * @throws IOException I/O exception
    */
-  private synchronized HashMap<String, WebModule> cache(final Context ctx) throws IOException {
+  private synchronized HashMap<String, WebModule> cache(final Context ctx, final boolean request)
+      throws IOException {
+    if(System.currentTimeMillis() - access >= idle) parsed = false;
 
     final HashMap<String, WebModule> cache;
     if(parsed) {
       // module cache is still up-to-date
       cache = modules;
+      if(!request) return cache;
     } else {
       // module cache needs to be updated
       if(!path.exists()) throw HTTPStatus.NO_RESTXQ_DIRECTORY.get();

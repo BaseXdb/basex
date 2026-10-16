@@ -90,6 +90,50 @@ public final class RestXqModuleTest extends RestXqTest {
   }
 
   /**
+   * New functions are registered after a syntax error in an imported module has been fixed.
+   * @throws Exception exception
+   */
+  @Test public void newRouteAfterSyntaxError() throws Exception {
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
+    final String header = "module namespace m = 'm';" +
+      "import module namespace lib = 'lib' at 'lib/lib.xqm';" +
+      "declare %rest:path('/{$p=.+}') function m:all($p) { 'all' };";
+    final String ok = "module namespace lib = 'lib'; declare function lib:f() { 'x' };";
+    final IOFile lib = new IOFile(path, "lib/lib.xqm"), mod = new IOFile(path, "m.xqm");
+    // clear web directory
+    register("declare %R:path('dummy') function m:dummy() { 'x' };");
+    lib.write(ok);
+    mod.write(header);
+    assertEquals("all", get(200, "new/1"));
+
+    // add function, break library
+    mod.write(header + "declare %rest:path('/new/{$id}') function m:new($id) { lib:f() };");
+    lib.write("module namespace lib = 'lib'; declare function lib:f() { 'x' ");
+    WebModules.get(context).init(true);
+    assertContains(get(500, "new/1"), "lib.xqm");
+
+    // fix library
+    lib.write(ok);
+    WebModules.get(context).init(true);
+    assertEquals("x", get(200, "new/1"));
+  }
+
+  /**
+   * Functions of an imported module with the same file name are registered only once.
+   * @throws Exception exception
+   */
+  @Test public void sameFileName() throws Exception {
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
+    // clear web directory
+    register("declare %R:path('dummy') function m:dummy() { 'x' };");
+    new IOFile(path, "lib/m.xqm").write("module namespace lib = 'lib';" +
+      "declare %rest:path('lib') function lib:f() { 'x' };");
+    new IOFile(path, "m.xqm").write("module namespace m = 'm';" +
+      "import module namespace lib = 'lib' at 'lib/m.xqm';");
+    assertEquals("x", get(200, "lib"));
+  }
+
+  /**
    * Directories with an ignore file are skipped.
    * @throws Exception exception
    */

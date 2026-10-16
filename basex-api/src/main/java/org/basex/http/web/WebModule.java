@@ -9,6 +9,7 @@ import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.scope.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
 
@@ -20,9 +21,9 @@ import org.basex.util.log.*;
  */
 public final class WebModule {
   /** Supported methods. */
-  private final ArrayList<RestXqFunction> functions = new ArrayList<>();
+  private volatile ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** Supported WebSocket methods. */
-  private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
+  private volatile ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** Timestamps of the module file and its imports, indexed by file path. */
   private final HashMap<String, Long> files = new HashMap<>();
   /** File reference. */
@@ -33,7 +34,7 @@ public final class WebModule {
   /** File content. */
   private String content;
   /** Error that occurred while parsing the module (can be {@code null}). */
-  private QueryException error;
+  private volatile QueryException error;
 
   /**
    * Constructor.
@@ -60,36 +61,34 @@ public final class WebModule {
     content = file.readString();
     files.clear();
 
-    functions.clear();
-    wsFunctions.clear();
-    error = null;
-
     final QueryContext qc = new QueryContext(ctx);
     try(qc) {
-      parse(qc);
-      // loop through all functions
-      final String name = file.name();
-      for(final StaticFunc sf : qc.functions) {
-        // only add functions that are defined in the same module (file)
-        if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
+      // new lists are assigned: requests may still iterate the old ones
+      final ArrayList<RestXqFunction> funcs = new ArrayList<>();
+      final ArrayList<WsFunction> wsFuncs = new ArrayList<>();
+      for(final StaticFunc sf : parse(qc).funcs) {
+        if(sf.expr != null) {
           final RestXqFunction rxf = new RestXqFunction(sf, this, qc, 0);
           if(rxf.parseAnnotations(null)) {
-            functions.add(rxf);
+            funcs.add(rxf);
             // register an additional instance for each further path annotation
             for(int p = 1; p < rxf.paths(); p++) {
               final RestXqFunction func = new RestXqFunction(sf, this, qc, p);
               func.parseAnnotations(null);
-              functions.add(func);
+              funcs.add(func);
             }
           }
           final WsFunction wxq = new WsFunction(sf, this, qc);
-          if(wxq.parseAnnotations(null)) wsFunctions.add(wxq);
+          if(wxq.parseAnnotations(null)) wsFuncs.add(wxq);
         }
       }
+      functions = funcs;
+      wsFunctions = wsFuncs;
+      error = null;
     } catch(final QueryException ex) {
       // skip modules that cannot be parsed; all other modules stay available
-      functions.clear();
-      wsFunctions.clear();
+      functions = new ArrayList<>();
+      wsFunctions = new ArrayList<>();
       error = ex;
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
     } finally {
@@ -152,15 +151,16 @@ public final class WebModule {
   /**
    * Parses the module with the specified query context.
    * @param qc query context
+   * @return parsed module
    * @throws QueryException query exception
    */
-  private void parse(final QueryContext qc) throws QueryException {
+  private AModule parse(final QueryContext qc) throws QueryException {
     final StaticContext sc = archive == null ? null :
       new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
     // modules of the web application may access external resources
     qc.parseResources = true;
     try {
-      qc.parse(content, file.path(), sc);
+      return qc.parse(content, file.path(), sc);
     } finally {
       qc.parseResources = false;
     }
