@@ -81,6 +81,11 @@ public final class NewlineInput extends TextInput {
     return '\n';
   }
 
+  @Override
+  int copyText(final TokenBuilder tb) {
+    return next == -2 ? super.copyText(tb) : 0;
+  }
+
   /**
    * Reads and returns a single line.
    * @return line or {@code null}

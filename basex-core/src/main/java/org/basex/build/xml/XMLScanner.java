@@ -338,8 +338,9 @@ final class XMLScanner extends Job {
           }
           prev(1);
         }
-        // add character to cached content
+        // add character to cached content, followed by plain ASCII text
         token.add(c);
+        input.copyText(token);
       }
       c = consume();
       f = false;

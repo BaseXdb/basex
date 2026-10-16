@@ -114,7 +114,7 @@ abstract class TextDecoder {
   }
 
   /** UTF8 Decoder. */
-  private static final class UTF8 extends TextDecoder {
+  static final class UTF8 extends TextDecoder {
     /** Constructor. */
     UTF8() {
       super(UTF8);

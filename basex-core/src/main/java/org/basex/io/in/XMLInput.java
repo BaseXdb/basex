@@ -84,6 +84,14 @@ public class XMLInput extends InputStream {
   }
 
   /**
+   * Copies plain ASCII text from the main input to the token builder.
+   * @param tb token builder
+   */
+  public void copyText(final TokenBuilder tb) {
+    if(pp == 0 && ip == 0) column += inputs[0].copyText(tb);
+  }
+
+  /**
    * Inserts some bytes in the input stream.
    * @param value values to insert
    * @param spaces add spaces

@@ -161,6 +161,23 @@ public class TextInput extends BufferInput {
     return cp;
   }
 
+  /**
+   * Copies buffered ASCII characters to the token builder, up to the next control character
+   * or XML delimiter.
+   * @param tb token builder
+   * @return number of copied characters
+   */
+  int copyText(final TokenBuilder tb) {
+    if(!(decoder instanceof TextDecoder.UTF8)) return 0;
+    final byte[] buf = array;
+    final int s = bpos, e = bsize;
+    int p = s;
+    for(byte b; p < e && (b = buf[p]) >= ' ' && b != '<' && b != '&' && b != ']'; p++);
+    tb.add(buf, s, p);
+    bpos = p;
+    return p - s;
+  }
+
   @Override
   public byte[] content() throws IOException {
     // read input in one go; adopt it verbatim, or decode it in memory
