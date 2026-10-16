@@ -4,6 +4,7 @@ import java.nio.*;
 import java.util.function.*;
 
 import org.basex.core.jobs.*;
+import org.basex.http.web.*;
 import org.basex.http.ws.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -39,7 +40,8 @@ public final class WsEval extends WsFn {
       }
     };
 
-    final QueryJob job = new QueryJob(spec, qc.context.detach(), info, notify, null);
+    final QueryJob job = new QueryJob(spec, WebText.WEBSOCKET, qc.context.detach(), info, notify,
+        null);
     return Str.get(job.jc().id());
   }
 

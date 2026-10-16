@@ -12,6 +12,13 @@ public interface JobsText {
   /** Error message. */
   String SERVICE_ID_X = "Service id already exists: %.";
 
+  /** Job type: job. */
+  String JOB = "Job";
+  /** Job type: service. */
+  String SERVICE = "Service";
+  /** Job type: client query. */
+  String CLIENT = "Client";
+
   /** QName. */
   QNm Q_JOBS = new QNm("jobs");
   /** QName. */

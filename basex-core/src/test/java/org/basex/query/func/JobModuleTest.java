@@ -321,6 +321,7 @@ public final class JobModuleTest extends SandboxTest {
     try {
       query("count(" + _JOB_SERVICES.args() + "[@id = 'DEF']/(@memory, @permission, @timeout))", 0);
       query(_JOB_SERVICES.args() + "[@id = 'DEF']/@start/string()", "P1D");
+      query(_JOB_LIST_DETAILS.args("DEF") + "/@type/string()", JobsText.SERVICE);
     } finally {
       query(_JOB_REMOVE.args("DEF", " { 'service': true() }"));
     }
@@ -862,6 +863,7 @@ public final class JobModuleTest extends SandboxTest {
     try {
       final String list = query(_JOB_LIST_DETAILS.args() + "[@id = '" + id + "']");
       query(list + "/@user/string()", UserText.ADMIN);
+      query(list + "/@type/string()", JobsText.JOB);
       query(list + "/@state/string() = ('running', 'queued')", true);
       query(list + "/@duration/string() castable as xs:dayTimeDuration", true);
     } finally {

@@ -45,7 +45,7 @@ public final class Services {
     final Iterator<QueryJobSpec> iter = list.iterator();
     while(iter.hasNext()) {
       try {
-        new QueryJob(iter.next(), context, null, null, null);
+        new QueryJob(iter.next(), JobsText.SERVICE, context, null, null, null);
       } catch(final QueryException ex) {
         Util.errln(ex);
         iter.remove();

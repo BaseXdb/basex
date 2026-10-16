@@ -49,8 +49,8 @@ public class JobEval extends StandardFunc {
     final boolean sync = synchronous();
     final Locks locks = qc.jc().locks;
     final Locks held = sync && qc.context.locking.holds(locks) ? locks : null;
-    final QueryJob job = new QueryJob(spec, sync ? qc.context : qc.context.detach(), info, null,
-        held);
+    final QueryJob job = new QueryJob(spec, service ? JobsText.SERVICE : JobsText.JOB,
+        sync ? qc.context : qc.context.detach(), info, null, held);
 
     // add service
     if(service) {

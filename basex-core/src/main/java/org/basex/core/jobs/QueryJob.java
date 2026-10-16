@@ -50,18 +50,21 @@ public final class QueryJob extends Job implements Runnable {
   /**
    * Constructor, which creates and registers the specified job.
    * @param job job info
+   * @param type job type
    * @param context database context
    * @param info input info (can be {@code null})
    * @param notify notify function (ignored if {@code null})
    * @param callerLocks locks held by a caller that waits for this job (can be {@code null})
    * @throws QueryException query exception
    */
-  public QueryJob(final QueryJobSpec job, final Context context, final InputInfo info,
-      final Consumer<QueryJobResult> notify, final Locks callerLocks) throws QueryException {
+  public QueryJob(final QueryJobSpec job, final String type, final Context context,
+      final InputInfo info, final Consumer<QueryJobResult> notify, final Locks callerLocks)
+      throws QueryException {
 
     this.job = job;
     this.notify = notify;
     this.info = info;
+    jc().type(type);
     jc().context = context;
     jc().locks.caller(callerLocks);
 

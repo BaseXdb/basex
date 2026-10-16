@@ -41,6 +41,7 @@ public final class ServerQuery extends Job {
   public ServerQuery(final String query, final Context ctx) {
     this.query = query;
     this.ctx = ctx;
+    jc().type(JobsText.CLIENT);
   }
 
   /**
