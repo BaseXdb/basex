@@ -48,6 +48,10 @@ public final class NameTest extends Test {
   public byte[] name;
   /** Database name; assigned if the test matches a single name (can be {@code null}). */
   private byte[] dbName;
+  /** Database to which {@link #dbId} refers (can be {@code null}). */
+  private Data dbData;
+  /** ID of the database name in {@link #dbData}, or {@code 0}. */
+  private int dbId;
 
   /** JNode key; assigned if the test can select a single JNode key (can be {@code null}). */
   private final Item jkey;
@@ -111,6 +115,8 @@ public final class NameTest extends Test {
     final TokenList all = names.lexical(qname.local(), !data.nspaces.isEmpty());
     final TokenList matches = matches(all, data);
     dbName = matches != null && matches.size() == 1 ? matches.get(0) : null;
+    dbData = dbName != null ? data : null;
+    dbId = dbName != null ? names.index(dbName) : 0;
     if(matches == null) return this;
     // no matching name: no results
     if(matches.isEmpty()) return null;
@@ -168,6 +174,10 @@ public final class NameTest extends Test {
     final Kind nodeKind = node.kind();
     if(kind == Kind.NODE ? !nodeKind.oneOf(Kind.ELEMENT, Kind.JNODE) : kind != nodeKind)
       return false;
+
+    // database node with a resolved name: compare name IDs
+    if(dbId != 0 && node instanceof final DBNode dbnode && dbnode.data() == dbData)
+      return dbData.nameId(dbnode.pre()) == dbId;
 
     if(node instanceof final JNode jnode) {
       // JNodes
