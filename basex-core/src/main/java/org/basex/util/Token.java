@@ -85,6 +85,10 @@ public final class Token {
   private static final int MAX_INT = Integer.MAX_VALUE / 10;
   /** Maximum values for converting tokens to long values. */
   private static final long MAX_LONG = Long.MAX_VALUE / 10;
+  /** Exact powers of ten for converting decimal tokens to double values. */
+  private static final double[] POWERS = {
+    1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15
+  };
 
   /** Table for converting integers to tokens. */
   private static final byte[] PAIRS = new byte[200];
@@ -535,28 +539,20 @@ public final class Token {
     while(++s < tl && ws(token[s]));
     if(s == tl) return Double.NaN;
 
-    // check for integer value
+    // find end of value, reject invalid and trailing characters
     int e = s;
-    boolean f = false;
-    for(int p = s; p < tl; p++) {
-      final byte b = token[p];
-      if(e == s) {
-        if(digit(b) || b == '+') continue;
-        if(ws(b)) {
-          e = p + 1;
-        } else {
-          f = b == 'e' || b == 'E' || b == '.' || b == '-';
-          if(!f) return Double.NaN;
-        }
-      } else if(!ws(b)) {
-        return Double.NaN;
-      }
+    for(; e < tl; e++) {
+      final byte b = token[e];
+      if(ws(b)) break;
+      if(!digit(b) && b != '+' && b != '-' && b != '.' && b != 'e' && b != 'E') return Double.NaN;
     }
-    if(e == s) e = tl;
-    if(!f && e - s <= 9) {
-      final int d = toInt(token, s, e);
-      return d == Integer.MIN_VALUE ? Double.NaN : d;
+    for(int p = e; p < tl; p++) {
+      if(!ws(token[p])) return Double.NaN;
     }
+
+    // plain decimal value
+    final double dec = toDecimal(token, s, e);
+    if(!Double.isNaN(dec)) return dec;
 
     // check if the value is a double
     final int l = e - s;
@@ -585,6 +581,38 @@ public final class Token {
     } catch(final NumberFormatException ignore) {
       return Double.NaN;
     }
+  }
+
+  /**
+   * Converts a plain decimal token with up to 15 digits into a double value.
+   * @param token token
+   * @param start start position
+   * @param end end position
+   * @return double value, or {@link Double#NaN} if the token is no such decimal
+   */
+  private static double toDecimal(final byte[] token, final int start, final int end) {
+    int p = start;
+    final boolean neg = token[p] == '-';
+    if(neg || token[p] == '+') p++;
+    long value = 0;
+    int digits = 0, scale = 0;
+    boolean dot = false;
+    for(; p < end; p++) {
+      final byte b = token[p];
+      if(digit(b)) {
+        if(++digits >= POWERS.length) return Double.NaN;
+        value = value * 10 + b - '0';
+        if(dot) scale++;
+      } else if(b == '.' && !dot) {
+        dot = true;
+      } else {
+        return Double.NaN;
+      }
+    }
+    if(digits == 0) return Double.NaN;
+    // exact: both operands are exact doubles, and the division is correctly rounded
+    final double d = value / POWERS[scale];
+    return neg ? -d : d;
   }
 
   /**
@@ -632,19 +660,8 @@ public final class Token {
    * @return resulting integer value
    */
   public static int toInt(final byte[] token) {
-    return toInt(token, 0, token.length);
-  }
-
-  /**
-   * Converts the specified token into an integer value.
-   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
-   * @param token token to be converted
-   * @param start first byte to be parsed
-   * @param end last byte to be parsed (exclusive)
-   * @return resulting integer value
-   */
-  private static int toInt(final byte[] token, final int start, final int end) {
-    int p = start;
+    final int end = token.length;
+    int p = 0;
     while(p < end && ws(token[p])) ++p;
     if(p == end) return Integer.MIN_VALUE;
     boolean m = false;
