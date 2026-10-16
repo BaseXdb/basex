@@ -34,8 +34,8 @@ public final class JNode extends GNode {
 
   /** Parent node (can be {@code null}). */
   private final JNode parent;
-  /** Child index ({@code -1} if not initialized yet). */
-  private int index;
+  /** Child index ({@code -1} for root node, {@link #ITEM} for item node). */
+  private final int index;
 
   /**
    * Root node constructor.
@@ -61,9 +61,9 @@ public final class JNode extends GNode {
    * @param key key ({@link Empty#VALUE} for root node)
    * @param value value
    * @param parent parent node (can be {@code null})
-   * @param index index ({@code -1} if not initialized yet)
+   * @param index child index ({@code -1} for root node, {@link #ITEM} for item node)
    */
-  public JNode(final Item key, final Value value, final JNode parent, final int index) {
+  private JNode(final Item key, final Value value, final JNode parent, final int index) {
     super(NodeType.JNODE);
     this.key = key;
     this.value = value;
@@ -131,7 +131,13 @@ public final class JNode extends GNode {
 
   @Override
   public boolean is(final GNode node) {
-    return this == node || node instanceof JNode && compare(node) == 0;
+    if(!(node instanceof final JNode jnode)) return false;
+    // compare the positions of both ancestor chains until a shared node is found
+    for(JNode n1 = this, n2 = jnode; n1 != null && n2 != null; n1 = n1.parent, n2 = n2.parent) {
+      if(n1 == n2) return true;
+      if(n1.index != n2.index) return false;
+    }
+    return false;
   }
 
   @Override
@@ -160,32 +166,10 @@ public final class JNode extends GNode {
     final int[] path = new int[depth];
     JNode n = this;
     for(int i = depth - 1; i >= 0; i--) {
-      path[i] = n.index();
+      path[i] = n.index;
       n = n.parent;
     }
     return path;
-  }
-
-  /**
-   * Computes or returns the child index of the key.
-   * @return index ({@code -1} for root node)
-   */
-  private int index() {
-    if(parent == null) return -1;
-
-    int i = index;
-    if(i != -1) return i;
-    if(parent.value instanceof final XQMap map) {
-      i = 0;
-      for(final Item k : map.keys()) {
-        if(JNodeTest.equals(k, key)) break;
-        i++;
-      }
-    } else {
-      i = (int) (((Itr) key).itr() - 1);
-    }
-    index = i;
-    return i;
   }
 
   @Override
@@ -198,7 +182,7 @@ public final class JNode extends GNode {
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder(Token.ID);
     for(JNode n = this; n != null; n = n.parent) {
-      tb.addLong(n.parent == null ? n.id : n.isItem() ? 0 : n.index() + 1).add('j');
+      tb.addLong(n.parent == null ? n.id : n.isItem() ? 0 : n.index + 1).add('j');
     }
     return tb.removeLast().finish();
   }
@@ -304,10 +288,9 @@ public final class JNode extends GNode {
    */
   public JNode child(final Item item) {
     if(value instanceof final XQMap map) {
-      final Value v = map.value(item);
-      if(v == null) return null;
       try {
-        return new JNode(map.key(item), v, this, -1);
+        final int i = map.index(item);
+        return i != -1 ? new JNode(this, i) : null;
       } catch(final QueryException ex) {
         // the exception is only caused by atomizing the key
         throw Util.notExpected(ex);

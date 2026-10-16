@@ -32,14 +32,17 @@ public abstract class XQShapeMap extends XQMap {
   }
 
   @Override
-  public final Value getOrNull(final Item key) throws QueryException {
-    final int i = field(key);
-    return i != 0 ? valueAt(i - 1) : null;
-  }
-
-  @Override
-  public final Item key(final Item key) throws QueryException {
-    return key(key, BasicType.STRING);
+  public final int index(final Item key) throws QueryException {
+    if(!key.type.isStringOrUntyped()) return -1;
+    final byte[] name = key.string(null);
+    final TokenObjectMap<ShapeField> fields = fields();
+    final int fs = fields.size();
+    if(fs > 8) return fields.index(name) - 1;
+    // few fields: comparing the names is cheaper than hashing the key
+    for(int f = 0; f < fs; f++) {
+      if(Token.eq(name, fields.key(f + 1))) return f;
+    }
+    return -1;
   }
 
   @Override
@@ -54,8 +57,8 @@ public abstract class XQShapeMap extends XQMap {
 
   @Override
   public final XQMap put(final Item key, final Value value) throws QueryException {
-    final int i = field(key);
-    if(i != 0) return putAt(i - 1, value);
+    final int i = index(key);
+    if(i != -1) return putAt(i, value);
 
     if(key.type == BasicType.STRING) {
       final ShapeType sh = shape().put(key.string(null), value.seqType());
@@ -80,10 +83,10 @@ public abstract class XQShapeMap extends XQMap {
 
   @Override
   public final XQMap remove(final Item key) throws QueryException {
-    final int i = field(key);
-    if(i == 0) return this;
+    final int i = index(key);
+    if(i == -1) return this;
     if(structSize() == 1) return empty();
-    return get(shape().remove(fields().key(i)), Array.remove(values(), i - 1));
+    return get(shape().remove(fields().key(i + 1)), Array.remove(values(), i));
   }
 
   @Override
@@ -147,25 +150,6 @@ public abstract class XQShapeMap extends XQMap {
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) values[f] = valueAt(f);
     return values;
-  }
-
-  /**
-   * Returns the index of the field that is addressed by the specified key.
-   * @param key key to look for
-   * @return index (starting with 1), or {@code 0} if the key is no field name
-   * @throws QueryException query exception
-   */
-  private int field(final Item key) throws QueryException {
-    if(!key.type.isStringOrUntyped()) return 0;
-    final byte[] name = key.string(null);
-    final TokenObjectMap<ShapeField> fields = fields();
-    final int fs = fields.size();
-    if(fs > 8) return fields.index(name);
-    // few fields: comparing the names is cheaper than hashing the key
-    for(int f = 1; f <= fs; f++) {
-      if(Token.eq(name, fields.key(f))) return f;
-    }
-    return 0;
   }
 
   /**

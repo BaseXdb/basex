@@ -32,7 +32,7 @@ abstract class XQHashMap extends XQMap {
   public abstract long structSize();
 
   @Override
-  public abstract Value getOrNull(Item key) throws QueryException;
+  public abstract int index(Item key) throws QueryException;
 
   @Override
   public final XQMap put(final Item key, final Value value) throws QueryException {
@@ -56,7 +56,7 @@ abstract class XQHashMap extends XQMap {
 
   @Override
   public final XQMap remove(final Item key) throws QueryException {
-    return getOrNull(key) == null ? this : trie().remove(key);
+    return index(key) == -1 ? this : trie().remove(key);
   }
 
   /**
@@ -188,12 +188,23 @@ abstract class XQHashMap extends XQMap {
   }
 
   /**
-   * Returns the index of a numeric key in the specified set.
+   * Returns the position of a numeric key in the specified set.
    * @param set integer set
    * @param key key
-   * @return index, or {@code 0} if the key is not found
+   * @return position (starting with 0), or {@code -1} if the key is not found
    */
   static int index(final IntSet set, final Item key) {
-    return key instanceof final ANum num ? set.index(num.toInt()) : 0;
+    return key instanceof final ANum num ? set.index(num.toInt()) - 1 : -1;
+  }
+
+  /**
+   * Returns the position of a string key in the specified set.
+   * @param set token set
+   * @param key key
+   * @return position (starting with 0), or {@code -1} if the key is not found
+   * @throws QueryException query exception
+   */
+  static int index(final TokenSet set, final Item key) throws QueryException {
+    return key.type.isStringOrUntyped() ? set.index(key.string(null)) - 1 : -1;
   }
 }

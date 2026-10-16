@@ -34,17 +34,8 @@ public final class XQStrIntMap extends XQHashMap {
   }
 
   @Override
-  public Value getOrNull(final Item key) throws QueryException {
-    if(key.type.isStringOrUntyped()) {
-      final int i = map.index(key.string(null));
-      if(i != 0) return valueAt(i - 1);
-    }
-    return null;
-  }
-
-  @Override
-  public Item key(final Item key) throws QueryException {
-    return key(key, BasicType.STRING);
+  public int index(final Item key) throws QueryException {
+    return index(map, key);
   }
 
   @Override

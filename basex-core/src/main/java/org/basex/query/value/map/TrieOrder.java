@@ -1,5 +1,7 @@
 package org.basex.query.value.map;
 
+import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -18,6 +20,8 @@ final class TrieOrder {
   private final TrieKeys removed;
   /** Resolved keys, memoized. */
   private volatile TrieKeys resolved;
+  /** Positions of the resolved keys, memoized. */
+  private volatile HashItemSet positions;
 
   /**
    * Constructor.
@@ -54,6 +58,23 @@ final class TrieOrder {
    */
   Item keyAt(final int index) {
     return resolved().keyAt(index);
+  }
+
+  /**
+   * Returns the position of the specified key.
+   * @param key key to look for
+   * @return position (starting with 0), or {@code -1} if the key does not exist
+   * @throws QueryException query exception
+   */
+  int index(final Item key) throws QueryException {
+    HashItemSet p = positions;
+    if(p == null) {
+      final TrieKeys keys = resolved();
+      p = new HashItemSet(ItemSet.Mode.ATOMIC, null, keys.size());
+      for(final Item k : keys) p.add(k);
+      positions = p;
+    }
+    return p.index(key) - 1;
   }
 
   /**

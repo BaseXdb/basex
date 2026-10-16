@@ -34,14 +34,8 @@ public final class XQIntStrMap extends XQHashMap {
   }
 
   @Override
-  public Value getOrNull(final Item key) {
-    final int i = index(map, key);
-    return i != 0 ? valueAt(i - 1) : null;
-  }
-
-  @Override
-  public Item key(final Item key) throws QueryException {
-    return key(key, BasicType.INTEGER);
+  public int index(final Item key) {
+    return index(map, key);
   }
 
   @Override

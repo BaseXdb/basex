@@ -54,6 +54,11 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
+  public int index(final Item key) throws QueryException {
+    return order != null ? order.index(key) : super.index(key);
+  }
+
+  @Override
   public Value valueAt(final long index) {
     return value(keyAt(index));
   }

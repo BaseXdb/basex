@@ -37,12 +37,6 @@ public final class XQSmallMap extends XQMap {
   }
 
   @Override
-  public Value getOrNull(final Item key) throws QueryException {
-    final int i = index(key);
-    return i != -1 ? entries[i + 1] : null;
-  }
-
-  @Override
   public Value keys() {
     final int el = entries.length;
     final Item[] keys = new Item[el / 2];
@@ -63,7 +57,7 @@ public final class XQSmallMap extends XQMap {
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     final int i = index(key);
-    if(i != -1) return putAt(i / 2, value);
+    if(i != -1) return putAt(i, value);
 
     final int el = entries.length;
     if(el < MAX_SIZE * 2) {
@@ -93,9 +87,10 @@ public final class XQSmallMap extends XQMap {
     final int el = entries.length;
     if(el == 2) return empty();
 
+    final int o = i * 2;
     final Value[] copy = new Value[el - 2];
-    Array.copy(entries, i, copy);
-    Array.copy(entries, i + 2, el - i - 2, copy, i);
+    Array.copy(entries, o, copy);
+    Array.copy(entries, o + 2, el - o - 2, copy, o);
     return new XQSmallMap(copy);
   }
 
@@ -104,16 +99,11 @@ public final class XQSmallMap extends XQMap {
     return rebuild(qc);
   }
 
-  /**
-   * Returns the offset of the entry with the specified key.
-   * @param key key to look for
-   * @return offset, or {@code -1} if the key does not exist
-   * @throws QueryException query exception
-   */
-  private int index(final Item key) throws QueryException {
+  @Override
+  public int index(final Item key) throws QueryException {
     final int el = entries.length;
     for(int e = 0; e < el; e += 2) {
-      if(key.atomicEqual((Item) entries[e])) return e;
+      if(key.atomicEqual((Item) entries[e])) return e / 2;
     }
     return -1;
   }

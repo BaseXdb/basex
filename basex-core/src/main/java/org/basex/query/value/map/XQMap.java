@@ -164,32 +164,23 @@ public abstract class XQMap extends XQStruct {
    * @return value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Value getOrNull(Item key) throws QueryException;
-
-  /**
-   * Returns the stored key that matches the specified key, which must exist in this map.
-   * @param key key to look for
-   * @return stored key
-   * @throws QueryException query exception
-   */
-  public Item key(final Item key) throws QueryException {
-    final long size = structSize();
-    for(long i = 0; i < size; i++) {
-      final Item k = keyAt(i);
-      if(key.atomicEqual(k)) return k;
-    }
-    throw Util.notExpected(key);
+  public Value getOrNull(final Item key) throws QueryException {
+    final int i = index(key);
+    return i != -1 ? valueAt(i) : null;
   }
 
   /**
-   * Returns the stored key of a map whose keys share a single type.
-   * @param key existing key to look for
-   * @param kt key type ({@code xs:string}, {@code xs:untypedAtomic} or {@code xs:integer})
-   * @return stored key
+   * Returns the position of the specified key.
+   * @param key key to look for
+   * @return position (starting with 0), or {@code -1} if the key does not exist
    * @throws QueryException query exception
    */
-  final Item key(final Item key, final BasicType kt) throws QueryException {
-    return key.type == kt ? key : kt.cast(key, null, null);
+  public int index(final Item key) throws QueryException {
+    final long size = structSize();
+    for(int i = 0; i < size; i++) {
+      if(key.atomicEqual(keyAt(i))) return i;
+    }
+    return -1;
   }
 
   /**

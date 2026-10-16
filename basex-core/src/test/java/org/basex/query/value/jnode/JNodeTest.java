@@ -195,6 +195,38 @@ public final class JNodeTest extends SandboxTest {
     query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[2] << (*/a)[1])", false);
   }
 
+  /** Identity, order and IDs of looked-up children, for all map representations. */
+  @Test public void mapIndex() {
+    final String keys = "(1 to 12) ! ";
+    for(final String map : new String[] {
+      "{ 1: 1 }",
+      "{ 1: 1, 'b': 2 }",
+      "{ 'a': 1, 'b': 2, 'c': 3 }",
+      "{ 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10 }",
+      "map:build(" + keys + "`k{ . }`, value := fn { 1 })",
+      "map:build(" + keys + "`k{ . }`)",
+      "map:build(" + keys + "`k{ . }`, value := fn { xs:double(1) })",
+      "map:build(" + keys + "`k{ . }`, value := fn { (., .) })",
+      "map:build(" + keys + "xs:untypedAtomic(.), value := string#1)",
+      "map:build(" + keys + "xs:untypedAtomic(.), value := fn { 1 })",
+      "map:build(" + keys + "xs:untypedAtomic(.), value := fn { (., .) })",
+      "map:build(1 to 12)",
+      "map:build(1 to 12, value := string#1)",
+      "map:build(1 to 12, value := fn { (., .) })",
+      "map:build((1, 'a', 2.5, xs:date('2000-01-01'), true(), 'b'))",
+      "fold-left(1 to 12, {}, fn($m, $i) { map:put($m, $i, $i) })",
+      "fold-left(1 to 12, {}, fn($m, $i) { map:put($m, $i, $i) }) => map:remove(3)"
+    }) {
+      final String let = "let $m := " + map + " let $j := jtree($m) let $k := map:keys($m) ";
+      query(let + "return every $p in 1 to count($k) satisfies ("
+          + "let $c := $j/child::{ $k[$p] } return $c is $j/*[$p] and not($c is $j/*[$p + 1]) "
+          + "and generate-id($c) = generate-id($j/*[$p]) and ($p = 1 or $j/*[$p - 1] << $c))",
+          true);
+      query(let + "return deep-equal($j/(for $i in reverse($k) return child::{ $i }) ! jkey(), $k)",
+          true);
+    }
+  }
+
   /** Root. */
   @Test public void root() {
     for(int i = 1; i < nodes.length; i++) {

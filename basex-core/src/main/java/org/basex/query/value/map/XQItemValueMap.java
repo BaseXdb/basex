@@ -36,8 +36,8 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  public Value getOrNull(final Item key) throws QueryException {
-    return map.get(key);
+  public int index(final Item key) throws QueryException {
+    return map.index(key) - 1;
   }
 
   @Override
