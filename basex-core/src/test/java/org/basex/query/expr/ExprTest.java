@@ -14,6 +14,8 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Timeout.*;
 
 /**
  * Checks the rewritings of specific expressions.
@@ -318,6 +320,22 @@ public final class ExprTest extends SandboxTest {
   /** Comparison expressions. */
   @Test public void cmpG() {
     check("count(let $s := (-1, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
+  }
+
+  /** Comparison expressions: hashing of cached path results. */
+  @Test @Timeout(value = 30, threadMode = ThreadMode.SEPARATE_THREAD) public void cmpGPath() {
+    check("let $doc := document { <r>{ (1 to 100000) ! <b id='{ . }'/> }</r> } "
+        + "return count($doc/r/b[not(@id = /r/b/@id)])", 0, exists(CmpHashG.class));
+  }
+
+  /** Comparison expressions: recursive evaluation of a hashed comparison. */
+  @Test public void cmpGRecursive() {
+    check("declare %basex:inline(0) function f($d, $n) {\n"
+        + "  let $v := if($d = 1) then ('p', 'q') else ('z', 's')\n"
+        + "  return count($v) = 2 and ($n/@x ! (if(. = 'w' and $d = 1 and f(2, $n)) "
+        + "then 'p' else string(.))) = $v\n"
+        + "};\n"
+        + "f(1, (<a x='z'/>, <a x='w'/>))", true, exists(CmpHashG.class));
   }
 
   /** Comparisons of values with different types. */

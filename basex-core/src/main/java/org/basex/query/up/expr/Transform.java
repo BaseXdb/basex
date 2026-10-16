@@ -96,6 +96,8 @@ public final class Transform extends Copy {
       if(!arg(update()).value(qc).isEmpty()) throw UPMODIFY.get(info);
       updates.prepare(qc);
       updates.apply(qc);
+      // cached results may refer to the updated copies
+      if(!updates.isEmpty()) qc.caches.clear();
     } finally {
       qc.updates = tmp;
     }

@@ -74,18 +74,21 @@ public final class CmpHashG extends CmpG {
     if(size1 == 0) return false;
 
     // stable right-hand operand: probe against populated cache without re-evaluating expr2
-    final CmpCache cache = qc.caches.get(this, () -> new CmpCache(info));
-    if(stable && cache.value != null) return probe(iter1, cache, qc);
+    // recursive evaluation of the same expression: skip the cache, which is in use
+    final CmpCache cc = qc.caches.get(this, () -> new CmpCache(info));
+    final CmpCache cache = cc.busy ? null : cc;
+    if(cache != null && stable && cache.value != null) return probe(iter1, cache, qc);
 
     // dynamic right-hand operand: evaluate, consult cache, fall back if not eligible
+    // check the node iterator, as atomizing iterators are not based on values
     final Expr expr2 = exprs[1];
-    final Iter iter2 = expr2.atomIter(qc, info);
+    final Iter iter = expr2.iter(qc);
+    final Value value2 = iter.eagerValue();
+    final Iter iter2 = (value2 != null ? value2 : expr2).toAtomIter(iter, qc, info);
     final long size2 = iter2.size();
     if(size2 == 0) return false;
     // check if iterator is based on value with more than one item, check if caching is enabled
-    Value value2 = iter2.eagerValue();
-    if(value2 == null && expr2 instanceof VarRef) value2 = expr2.value(qc);
-    if(value2 != null && value2.size() > 1 && !(value2 instanceof RangeSeq) &&
+    if(cache != null && value2 != null && value2.size() > 1 && !(value2 instanceof RangeSeq) &&
         cache.active(value2, iter2)) {
       return probe(iter1, cache, qc);
     }
@@ -103,12 +106,17 @@ public final class CmpHashG extends CmpG {
   private boolean probe(final Iter iter1, final CmpCache cache, final QueryContext qc)
       throws QueryException {
     final Value value2 = cache.value;
-    for(Item item1; (item1 = qc.next(iter1)) != null;) {
-      if(cache.set != null ? find(item1, value2, cache, qc) : compare(item1, value2, qc)) {
-        return true;
+    cache.busy = true;
+    try {
+      for(Item item1; (item1 = qc.next(iter1)) != null;) {
+        if(cache.set != null ? find(item1, value2, cache, qc) : compare(item1, value2, qc)) {
+          return true;
+        }
       }
+      return false;
+    } finally {
+      cache.busy = false;
     }
-    return false;
   }
 
   /**

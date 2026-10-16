@@ -28,6 +28,8 @@ public final class CmpCache {
   Type family;
   /** Indicates if at least one cache hit occurred since the last (re-)initialization. */
   boolean hit;
+  /** Indicates if the cache is being probed. */
+  boolean busy;
 
   /**
    * Constructor.

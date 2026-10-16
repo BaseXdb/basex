@@ -44,6 +44,13 @@ public final class QueryCaches {
   }
 
   /**
+   * Removes the caches of all expressions.
+   */
+  public void clear() {
+    if(!caches.isEmpty()) caches.clear();
+  }
+
+  /**
    * Returns the per-thread compiled-result cache.
    * @return compiled module cache
    */

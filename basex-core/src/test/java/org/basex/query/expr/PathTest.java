@@ -228,6 +228,18 @@ public final class PathTest extends SandboxTest {
     query("//b[/a]", "<b/>\n<b/>");
   }
 
+  /** Caching of path expression results: updated copies. */
+  @Test public void cacheTransform() {
+    query("declare %basex:inline(0) function local:f($n) { count($n ! /r/a) }; "
+        + "copy $c := document { <r><a/></r> } "
+        + "modify (if (sum((1 to 3) ! local:f($c/r)) = 3) then insert node <a/> into $c/r else ()) "
+        + "return local:f($c/r)", 2);
+    query("declare %basex:inline(0) function local:f($n) { count($n ! /r/a) }; "
+        + "(document { <r><a/></r> } transform with { let $d := . return "
+        + "if (sum((1 to 3) ! local:f($d)) = 3) then insert node <a/> into r else () }) "
+        + "! local:f(.)", 2);
+  }
+
   /** Utilization of database statistics. */
   @Test public void gh1202() {
     execute(new CreateDB(NAME, "<x/>"));

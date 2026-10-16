@@ -113,7 +113,20 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   protected final Iter toAtomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = iter(qc);
+    return toAtomIter(iter(qc), qc, ii);
+  }
+
+  /**
+   * Returns an iterator for the atomized items of an iterator that has been created by this
+   * expression.
+   * @param iter iterator of this expression
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  protected final Iter toAtomIter(final Iter iter, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
 

@@ -84,6 +84,8 @@ public final class TransformWith extends Copy {
         if(!updates.isEmpty()) {
           updates.prepare(qc);
           updates.apply(qc);
+          // cached results may refer to the updated copy
+          qc.caches.clear();
         }
         vb.add(copy);
         qf.pos++;
