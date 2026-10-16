@@ -228,6 +228,26 @@ public final class PathTest extends SandboxTest {
     query("//b[/a]", "<b/>\n<b/>");
   }
 
+  /** Caching of path expression results: constructed nodes. */
+  @Test public void cacheConstructed() {
+    query("declare %basex:inline(0) function local:f($n) { $n ! (<a><b/></a>/b) }; "
+        + "let $r := (1 to 3) ! local:f(.) return ($r[1] is $r[2], $r[2] is $r[3])",
+        "false\nfalse");
+    query("let $r := { 'a': { 'b': 1 } } ! (for $i in 1 to 3 return a) "
+        + "return ($r[1] is $r[2], $r[2] is $r[3])", "false\nfalse");
+  }
+
+  /** Caching of path expression results: free variables. */
+  @Test public void cacheVariables() {
+    query("for $d in (<x><a/></x>, <x><a/><a/></x>) return count((1 to 100)[. <= count($d/a)])",
+        "1\n2");
+    query("let $f := function($d) { count((1 to 100)[. <= count($d/a)]) } "
+        + "return sum((1 to 20) ! $f(<x>{ (1 to .) ! <a/> }</x>))", 210);
+    query("declare %basex:inline(0) function local:f($d, $k) { "
+        + "if ($k > 0) then (count((1 to 100)[. <= count($d/a)]), "
+        + "local:f(<x>{ $d/a, <a/> }</x>, $k - 1)) }; local:f(<x><a/></x>, 3)", "1\n2\n3");
+  }
+
   /** Caching of path expression results: updated copies. */
   @Test public void cacheTransform() {
     query("declare %basex:inline(0) function local:f($n) { count($n ! /r/a) }; "

@@ -328,6 +328,21 @@ public final class ExprTest extends SandboxTest {
         + "return count($doc/r/b[not(@id = /r/b/@id)])", 0, exists(CmpHashG.class));
   }
 
+  /** Comparison expressions: hashing of cached path results after a change of the context. */
+  @Test @Timeout(value = 30, threadMode = ThreadMode.SEPARATE_THREAD) public void cmpGPathKeys() {
+    check("for $d in (document { <r><b id='0'/></r> }, "
+        + "document { <r>{ (1 to 100000) ! <b id='{ . }'/> }</r> }) "
+        + "return count($d/r/b[not(@id = /r/b/@id)])", "0\n0", exists(CmpHashG.class));
+  }
+
+  /** Comparison expressions: hashing of cached path results with free variables. */
+  @Test @Timeout(value = 30, threadMode = ThreadMode.SEPARATE_THREAD) public void cmpGPathVar() {
+    check("let $books := (1 to 100000) ! <book><publisher id='{ . }'/></book> "
+        + "let $publishers := (1 to 100000) ! <publisher id='{ . }'/> "
+        + "return count($publishers[not(@id = $books/publisher/@id)])", 0,
+        exists(CmpHashG.class));
+  }
+
   /** Comparison expressions: recursive evaluation of a hashed comparison. */
   @Test public void cmpGRecursive() {
     check("declare %basex:inline(0) function f($d, $n) {\n"

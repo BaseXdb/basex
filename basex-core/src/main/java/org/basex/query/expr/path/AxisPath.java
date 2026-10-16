@@ -2,6 +2,7 @@ package org.basex.query.expr.path;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.util.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -36,7 +37,9 @@ public abstract class AxisPath extends Path {
    * Assigns the properties that control the caching of results.
    */
   void optimize() {
-    cacheable = !hasFreeVars() && !has(Flag.NDT);
+    // util:root only constructs nodes for JNodes, which are rejected by the cache
+    final Expr rt = root instanceof UtilRoot ? root.arg(0) : root;
+    cacheable = !has(Flag.NDT) && (rt == null || !rt.has(Flag.CNS));
     staticRoot = root != null && !root.has(Flag.CTX);
   }
 
@@ -79,30 +82,15 @@ public abstract class AxisPath extends Path {
   private Value cache(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
     if(root == null && value == Empty.VALUE) return value;
+    if(!cacheable) return null;
 
-    final PathCache cache = qc.caches.get(this, PathCache::new);
-    switch(cache.state) {
-      case INIT ->
-        // first invocation: find out if caching is possible
-        cache.init(value, this);
-      case ENABLED -> {
-        // second invocation (ready for caching): cache result
-        if(cache.valid(value)) {
-          cache.cache(nodes(qc));
-        } else {
-          // disable caching otherwise (expected to change frequently)
-          cache.disable();
-        }
-      }
-      case CACHED -> {
-        // further invocations (result is cached): cache again if context has changed
-        if(!cache.valid(value)) {
-          cache.update(value, nodes(qc));
-        }
-      }
-      case DISABLED -> { }
+    final PathCache cache = qc.caches.get(this, () -> new PathCache(this, value));
+    Value result = cache.get(value, qc);
+    if(result == null && cache.ready()) {
+      result = nodes(qc);
+      cache.cache(value, result, qc);
     }
-    return cache.result;
+    return result;
   }
 
   /**

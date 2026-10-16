@@ -549,8 +549,18 @@ public abstract class Expr extends ExprInfo {
    *         {@code false} otherwise
    */
   public boolean hasFreeVars() {
+    final Var[] vars = freeVars();
+    return vars == null || vars.length != 0;
+  }
+
+  /**
+   * Returns the variables that are used but not declared in this expression.
+   * @return variables, or {@code null} if they cannot be determined
+   */
+  public final Var[] freeVars() {
     final BitSet declared = new BitSet();
-    return !accept(new ASTVisitor() {
+    final VarStack vars = new VarStack();
+    return accept(new ASTVisitor() {
       @Override
       public boolean variable(final Var var) {
         declared.set(var.id);
@@ -559,9 +569,15 @@ public abstract class Expr extends ExprInfo {
 
       @Override
       public boolean used(final VarRef ref) {
-        return declared.get(ref.var.id);
+        // free variables are marked as declared after their first occurrence
+        final Var var = ref.var;
+        if(!declared.get(var.id)) {
+          declared.set(var.id);
+          vars.add(var);
+        }
+        return true;
       }
-    });
+    }) ? vars.finish() : null;
   }
 
   /**
