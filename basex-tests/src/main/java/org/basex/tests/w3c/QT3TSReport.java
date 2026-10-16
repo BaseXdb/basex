@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.func.validate.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -64,7 +65,9 @@ public final class QT3TSReport {
     { "xml-version", "1.0", "true" },
     { "xml-version", "1.1", "false" },
     { "xml-version", "1.0:4-", "false" },
-    { "xml-version", "1.0:5+ 1.1", "true" }
+    { "xml-version", "1.0:5+ 1.1", "true" },
+    { "xsd-version", "1.0", String.valueOf(ValidateXsd.version().equals("1.0")) },
+    { "xsd-version", "1.1", String.valueOf(ValidateXsd.version().equals("1.1")) }
   };
 
   /** URI of test suite. */

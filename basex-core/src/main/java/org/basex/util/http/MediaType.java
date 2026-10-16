@@ -50,6 +50,8 @@ public final class MediaType implements Comparable<MediaType> {
   public static final MediaType APPLICATION_HTML_XML = new MediaType("application/html+xml");
   /** Media type: application/json. */
   public static final MediaType APPLICATION_JSON = new MediaType("application/json");
+  /** Media type: application/jsonl. */
+  public static final MediaType APPLICATION_JSONL = new MediaType("application/jsonl");
   /** Media type: application/octet-stream. */
   public static final MediaType APPLICATION_OCTET_STREAM =
       new MediaType("application/octet-stream");
@@ -198,7 +200,7 @@ public final class MediaType implements Comparable<MediaType> {
    * @return result of check
    */
   public boolean isTextual() {
-    return isText() || isXml() || isJSON() || isCSV() || isXQuery();
+    return isText() || isXml() || isJSON() || is(APPLICATION_JSONL) || isCSV() || isXQuery();
   }
 
   /**

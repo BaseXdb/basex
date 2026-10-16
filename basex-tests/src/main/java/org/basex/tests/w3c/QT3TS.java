@@ -21,6 +21,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.validate.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
@@ -721,8 +722,9 @@ public final class QT3TS extends Main {
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip tests locked to a historical Unicode version (JDK uses a much newer one)
       "@type = 'unicode-version' and @value = ('5.2', '6.0', '6.2') or " +
-      // skip xml/xsd 1.1 tests
-      "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
+      // skip xml 1.1 tests and tests for other xsd versions than the one of the schema processor
+      "@type = 'xml-version' and @value = ('1.1', '1.0:4-') or " +
+      "@type = 'xsd-version' and @value != '" + ValidateXsd.version() + "' or " +
       // skip default-language
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests

@@ -1313,6 +1313,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:float(7.5)", 2) + "?remainder", 1.5);
     query(func.args(" <_>7</_>", 2) + "?quotient", 3);
 
+    // out-of-range precision is clamped
+    query("string(" + func.args(1, 3, Integer.MAX_VALUE) + "?quotient) => string-length()", 16386);
+    query(func.args(1, 3, Integer.MIN_VALUE) + "?remainder", 1);
+
     error(func.args(" xs:double('INF')", 2), INVALUE_X_X);
     error(func.args(" '7'", 2), INVTYPE_X);
   }
@@ -3546,7 +3550,14 @@ return
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", ".", "j"), REGFLAG_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
-    error(func.args("-", "([\\d-z]+)"), REGINVALID_X);
+    error(func.args("-", "[--z]"), REGINVALID_X);
+    error(func.args("-", "[!--]"), REGINVALID_X);
+
+    // XSD 1.1: hyphens in character groups
+    query(func.args("-", "^[\\d-z]+$"), true);
+    query(func.args("a-1x-7", "^[a-c-1-4x-z-7-9]+$"), true);
+    query(func.args("b", "^[a-c-[b]]$"), false);
+    query(func.args("-", "^[a--[b]]$"), true);
   }
 
   /** Test method. */

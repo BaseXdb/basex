@@ -18,6 +18,9 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class FnDivideDecimals extends StandardFunc {
+  /** Maximum supported precision. */
+  private static final int MAX_PRECISION = 1 << 14;
+
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
@@ -26,8 +29,8 @@ public final class FnDivideDecimals extends StandardFunc {
     final Item prec = precision.atomItem(qc, info);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);
 
-    final int scale = prec.isEmpty() ? 0 : (int) Math.max(-1 << 20,
-        Math.min(1 << 20, toLong(prec, precision)));
+    final int scale = prec.isEmpty() ? 0 : (int) Math.max(-MAX_PRECISION,
+        Math.min(MAX_PRECISION, toLong(prec, precision)));
     final BigDecimal quotient = value.divide(divisor, scale, RoundingMode.DOWN);
     final BigDecimal remainder = value.subtract(quotient.multiply(divisor));
     return XQMap.get(Records.DIVISION.get(), Dec.get(quotient), Dec.get(remainder));

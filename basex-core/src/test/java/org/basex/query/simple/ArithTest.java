@@ -520,6 +520,9 @@ public final class ArithTest extends SandboxTest {
     error("-9223372036854775808 idiv -1", RANGE_X);
     error("-9223372036854775807 - 1024", RANGE_X);
     error("-9223372036854775808 - 1", RANGE_X);
+    error("xs:double(<_>9223372036854775808</_>) idiv 1", RANGE_X);
+    error("xs:float(<_>9223372036854775808</_>) idiv 1", RANGE_X);
+    query("xs:double(<_>-9223372036854775808</_>) idiv 1", Long.MIN_VALUE);
 
     // unsigned long values beyond the integer range
     error("xs:unsignedLong('18446744073709551615')", INTRANGE_X);
@@ -536,6 +539,14 @@ public final class ArithTest extends SandboxTest {
     query("count(" + e + "[. = 9223372036854775806])", 1);
     query("count(" + e + "[. < -9223372036854775808])", 0);
     query("count(" + e + "[. <= 9223372036854775807])", 3);
+
+    // no overflows by rewritten constants
+    final String f = "declare %basex:inline(0) function f($a) { $a }; ";
+    query(f + "f(0) * 4611686018427387904 * 4", 0);
+    query(f + "f(1) + (-9223372036854775807 - 1)", -9223372036854775807L);
+    query(f + "f(-1) - (-9223372036854775807 - 1)", Long.MAX_VALUE);
+    query(f + "f(1) * 3 * 2", 6);
+    query(f + "f(1) + -2", -1);
   }
 
   /** Arithmetics with durations. */
@@ -567,5 +578,18 @@ public final class ArithTest extends SandboxTest {
     query("string(xs:dayTimeDuration('PT9223372036854775806S') + xs:dayTimeDuration('PT1S'))",
         "P106751991167300DT15H30M7S");
     error(dt + " + xs:dayTimeDuration('PT1S')", SECDURRANGE_X);
+  }
+
+  /** Static types of operands with non-specific numeric types. */
+  @Test public void numericTypes() {
+    final String d = "xs:double(" + wrap("1.5") + ")";
+    query("declare %basex:inline(0) function f($n as xs:numeric) { $n + 1.5 };"
+        + "f(" + d + ") instance of xs:double", true);
+    query("declare %basex:inline(0) function f($n as xs:numeric) { $n + xs:float(1.5) };"
+        + "f(" + d + ") instance of xs:double", true);
+    query("declare %basex:inline(0) function f($n as (xs:double | xs:decimal)) { $n + 1.5 };"
+        + "f(" + d + ") instance of xs:double", true);
+    query("declare %basex:inline(0) function f($n as (xs:double | xs:decimal)) { +$n };"
+        + "f(" + d + ") instance of xs:double", true);
   }
 }

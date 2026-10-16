@@ -92,8 +92,10 @@ public final class Arith extends Arr {
           type1.instanceOf(BasicType.DECIMAL) && type2.instanceOf(BasicType.DECIMAL)) {
         // exact arithmetic only: no floating-point numbers
         final Expr arg1 = arth1.arg(0), arg2 = arth1.arg(1);
-        if(calc == Calc.MULTIPLY && arg2 instanceof ANum && expr2 instanceof ANum) {
-          // E * 3 * 2 → E * (3 * 2)
+        if(calc == Calc.MULTIPLY && arg2 instanceof ANum && expr2 instanceof ANum &&
+            !(arg2 instanceof final Itr i1 && expr2 instanceof final Itr i2 &&
+            Util.multiply(i1.itr(), i2.itr()) == Long.MIN_VALUE)) {
+          // E * 3 * 2 → E * (3 * 2), unless the integer product overflows
           expr = new Arith(info, arg1, new Arith(info, arg2, expr2, calc).optimize(cc),
               calc).optimize(cc);
         } else if(calc == Calc.DIVIDE) {
@@ -103,7 +105,7 @@ public final class Arith extends Arr {
           if(cast != null) expr = cast;
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
-          num.dbl() < 0) {
+          num.dbl() < 0 && !(num instanceof final Itr itr && itr.itr() == Long.MIN_VALUE)) {
         // E + -1 → E - 1
         // E - -1 → E + 1
         final Expr inv2 = new Unary(info, num, true).optimize(cc);

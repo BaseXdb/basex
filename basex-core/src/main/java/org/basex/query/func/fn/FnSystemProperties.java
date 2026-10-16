@@ -4,6 +4,7 @@ import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.validate.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -17,7 +18,7 @@ public final class FnSystemProperties extends StandardFunc {
   /** XPath version. */
   private static final Dec XPATH_VERSION = Dec.get(BigDecimal.valueOf(4));
   /** XSD version. */
-  private static final Dec XSD_VERSION = Dec.get(BigDecimal.valueOf(11, 1));
+  private static final Dec XSD_VERSION = Dec.get(new BigDecimal(ValidateXsd.version()));
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
@@ -30,8 +31,7 @@ public final class FnSystemProperties extends StandardFunc {
       put(property("accepts-typed-data"), Bln.FALSE).
       put(property("supports-xinclude"), Bln.TRUE).
       put(property("supports-dtd-validation"), Bln.TRUE).
-      // supports-dtd-attribute-typing: false, ID/IDREF attributes are detected by name
-      put(property("supports-dtd-attribute-typing"), Bln.FALSE).
+      put(property("supports-dtd-attribute-typing"), Bln.TRUE).
       put(property("supports-invisible-xml"), Bln.get(FnInvisibleXml.available())).
       put(property("supports-dynamic-xquery"), Bln.TRUE).
       put(property("supports-dynamic-xslt"), Bln.TRUE).

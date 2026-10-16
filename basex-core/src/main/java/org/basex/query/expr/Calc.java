@@ -486,10 +486,11 @@ public enum Calc {
   public static BasicType numType(final Type type1, final Type type2) {
     if(!type1.isNumberOrUntyped() || !type2.isNumberOrUntyped()) return ANY_ATOMIC_TYPE;
     if(type1 == DOUBLE || type2 == DOUBLE || type1.isUntyped() || type2.isUntyped()) return DOUBLE;
-    if(type1 == FLOAT || type2 == FLOAT) return FLOAT;
-    if(type1 == DECIMAL || type2 == DECIMAL) return DECIMAL;
-    if(type1 == NUMERIC || type2 == NUMERIC) return NUMERIC;
-    return INTEGER;
+    final boolean dec1 = type1.instanceOf(DECIMAL), dec2 = type2.instanceOf(DECIMAL);
+    if(dec1 && dec2) {
+      return type1.instanceOf(INTEGER) && type2.instanceOf(INTEGER) ? INTEGER : DECIMAL;
+    }
+    return (dec1 || type1 == FLOAT) && (dec2 || type2 == FLOAT) ? FLOAT : NUMERIC;
   }
 
   /**

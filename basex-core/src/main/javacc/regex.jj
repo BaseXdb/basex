@@ -375,7 +375,7 @@ PARSER_END(RegExParser)
     final RegExpList cg = new RegExpList();
     RegExp sub = null;
   } {
-    ( LOOKAHEAD(3) sub = charRange(cg.isEmpty()) { cg.add(sub); }
+    ( LOOKAHEAD(3) sub = charRange() { cg.add(sub); }
     | (<SINGLE_ESC> | <MULTI_ESC>| <CAT_ESC>) {
         for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
       }
@@ -389,19 +389,19 @@ PARSER_END(RegExParser)
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp charRange(boolean isBegin) : {
+  RegExp charRange() : {
     int a = -1, b = -1;
   } {
     ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image)
-        && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF })
+        && getToken(3).kind != BR_CLOSE && getToken(3).kind != TO && getToken(3).kind != EOF }) {
+        if("-".equals(getToken(1).image) || "-".equals(getToken(3).image))
+          throw new ParseException("Unescaped hyphen in character range.");
+      }
       (a = charOrEsc() <CHAR> b = charOrEsc()) {
         if(a > b) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));
       }
-    | a = XmlChar() {
-        if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != EOF) throw new ParseException(
-          "The - character is a valid character range only at the beginning or end of a positive character group.");
-      }
+    | a = XmlChar()
     ) {
       return b == -1 ? new Literal(a, insensitive) : new CharRange(a, b, insensitive);
     }

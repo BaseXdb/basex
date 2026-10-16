@@ -314,7 +314,10 @@ public final class SerializerOptions extends Options {
     if(sm.oneOf(SerialMethod.BASEX, SerialMethod.ADAPTIVE, SerialMethod.XML))
       return MediaType.APPLICATION_XML;
     if(sm.oneOf(SerialMethod.XHTML, SerialMethod.HTML)) return MediaType.TEXT_HTML;
-    if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
+    if(sm == SerialMethod.JSON) {
+      return get(JSON_LINES) == YesNo.YES ? MediaType.APPLICATION_JSONL :
+        MediaType.APPLICATION_JSON;
+    }
     if(sm == SerialMethod.CSV) return MediaType.TEXT_CSV;
     return MediaType.TEXT_PLAIN;
   }

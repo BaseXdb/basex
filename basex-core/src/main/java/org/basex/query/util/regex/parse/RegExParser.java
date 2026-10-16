@@ -569,7 +569,7 @@ group.negative = true;
     label_4:
     while (true) {
       if (jj_2_3(3)) {
-        sub = charRange(cg.isEmpty());
+        sub = charRange();
 cg.add(sub);
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -618,9 +618,11 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp charRange(boolean isBegin) throws ParseException {int a = -1, b = -1;
+  final public   RegExp charRange() throws ParseException {int a = -1, b = -1;
     if (getToken(2).kind == CHAR && "-".equals(getToken(2).image)
-            && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF) {
+            && getToken(3).kind != BR_CLOSE && getToken(3).kind != TO && getToken(3).kind != EOF) {
+if("-".equals(getToken(1).image) || "-".equals(getToken(3).image))
+          {if (true) throw new ParseException("Unescaped hyphen in character range.");}
       a = charOrEsc();
       jj_consume_token(CHAR);
       b = charOrEsc();
@@ -631,8 +633,6 @@ if(a > b) {if (true) throw new ParseException("Illegal range: " +
       case CHAR:
       case DIGIT:{
         a = XmlChar();
-if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != EOF) {if (true) throw new ParseException(
-          "The - character is a valid character range only at the beginning or end of a positive character group.");}
         break;
         }
       default:
@@ -895,7 +895,7 @@ re = LookAround.get(behind, positive, re);
     xsp = jj_scanpos;
     jj_lookingAhead = true;
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
-        && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
+        && getToken(3).kind != BR_CLOSE && getToken(3).kind != TO && getToken(3).kind != EOF;
     jj_lookingAhead = false;
     if (!jj_semLA || jj_3R_charRange_395_7_8()) {
     jj_scanpos = xsp;

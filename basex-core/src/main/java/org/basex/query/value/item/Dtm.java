@@ -73,6 +73,7 @@ public final class Dtm extends ADate {
     if(i == -1) throw dateError(dateTime, XDTM, info);
     date(Token.substring(dateTime, 0, i), XDTM, info);
     time(Token.substring(dateTime, i + 1), XDTM, info);
+    if(type == BasicType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, dateTime);
   }
 
   /**

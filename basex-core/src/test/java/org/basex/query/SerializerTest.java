@@ -1,12 +1,14 @@
 package org.basex.query;
 
 import static org.basex.query.QueryError.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import static org.basex.io.serial.SerializerOptions.*;
 
 import org.basex.*;
+import org.basex.io.serial.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -431,6 +433,12 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[1], { '2': 3 }", "[1]\n{\"2\":3}");
 
     query(option + INDENT.arg("yes") + "[1], { '2': 3 }", "[ 1 ]\n{ \"2\": 3 }");
+
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(METHOD, SerialMethod.JSON);
+    assertEquals("application/json", sopts.mediaType().toString());
+    sopts.set(JSON_LINES, YesNo.YES);
+    assertEquals("application/jsonl", sopts.mediaType().toString());
   }
 
   /** Test: expression. */
