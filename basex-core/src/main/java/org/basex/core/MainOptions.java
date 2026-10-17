@@ -25,8 +25,6 @@ public final class MainOptions extends Options {
 
   /** Flag for creating a main memory database. */
   public static final BooleanOption MAINMEM = new BooleanOption("MAINMEM", false);
-  /** Flag for closing a database after creating it. */
-  public static final BooleanOption CREATEONLY = new BooleanOption("CREATEONLY", false);
 
   // Parsing
 

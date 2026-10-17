@@ -112,8 +112,6 @@ public final class CreateDB extends ACreate {
         DropDB.drop(data, soptions);
         return false;
       }
-
-      if(options.get(MainOptions.CREATEONLY)) Close.close(context);
       return true;
     } catch(final JobException ex) {
       throw ex;
