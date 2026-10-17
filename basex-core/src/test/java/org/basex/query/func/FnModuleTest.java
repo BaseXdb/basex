@@ -5456,7 +5456,7 @@ return
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'z')"), false);
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
-        exists(CmpG.class), empty(EVERY));
+        root(EXISTS), empty(EVERY));
 
     query(func.args(1, " op('=')"), true);
     query(func.args(2, " op('=')"), false);

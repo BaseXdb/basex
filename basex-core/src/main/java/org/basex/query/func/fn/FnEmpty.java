@@ -75,6 +75,9 @@ public class FnEmpty extends StandardFunc {
     if(input instanceof final Filter filter) {
       // rewrite filter:  exists($a[text() = string]) → $a/text() = string
       input = filter.flattenEbv(filter.root, false, cc);
+    } else if(input instanceof final Path path) {
+      // rewrite path:  empty($a/b[@id = string]) → not($a/b/@id = string)
+      input = path.flattenEbv(false, cc);
     } else if(INDEX_OF.is(input)) {
       // rewrite index-of:  exists(index-of($texts, string)) → $texts = string
       final Expr[] args = input.args();

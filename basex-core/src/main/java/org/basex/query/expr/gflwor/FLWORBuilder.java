@@ -79,6 +79,15 @@ public final class FLWORBuilder {
     Expr func = sf.coerceFunc(i, cc, Math.min(2, arity));
     // coerce function once, not in each iteration
     if(!func.duplicable()) {
+      // closure of the required type: coercion is redundant, inline the function body
+      // some($e, fn($i) { $i = $x }) → (for $item in $e return $item = $x) = true()
+      if(sf.arg(i) instanceof final Closure closure) {
+        final FuncType ft = closure.funcType();
+        if(FuncType.get(ft.anns, ft.refinedType, ft.argTypes).instanceOf(func.funcType())) {
+          final Expr call = new DynFuncCall(info, updating, false, closure, refs()).optimize(cc);
+          if(!(call instanceof DynFuncCall)) return call;
+        }
+      }
       final Var var = cc.vs().addNew(new QNm("action"), null, cc.qc, info);
       action = new Let(var, func).optimize(cc);
       func = ref(var);

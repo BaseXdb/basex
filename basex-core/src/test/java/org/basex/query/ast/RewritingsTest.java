@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
@@ -2701,6 +2702,45 @@ public final class RewritingsTest extends SandboxTest {
     // key depends on a variable that changes between evaluations
     check(cs + "for $i in 1 to 4 return string-join($cs[number(@n) + $i = 5]/@n, ',')",
         "4\n3\n2\n1", empty(HashFilter.class));
+    // several predicates: hash one, apply the others to the result
+    check(cs + "for $o in ('0', '1', '2', '3') return string-join($cs[@id = $o][@n > 1]/@n, ',')",
+        "3\n4\n2,5\n", exists(HashFilter.class), exists(IterFilter.class));
+    check(cs + "for $o in ('0', '1', '2', '3') return string-join($cs[@n > 1][@id = $o]/@n, ',')",
+        "3\n4\n2,5\n", exists(HashFilter.class), exists(IterFilter.class));
+    // untyped keys, integer and decimal probes
+    check("let $cs := ('1', '01', ' 1 ', '1.0', '1e0', '1e-1', '0.1', '-0', 'INF', 'NaN', '2') "
+        + "! <c id='{ . }'/> for $i in (1, 0, 0.1, 1.0, 2, 3, 1, 0) "
+        + "return string-join($cs[@id = $i]/@id, '|')",
+        "1|01| 1 |1.0|1e0\n-0\n0.1\n1|01| 1 |1.0|1e0\n2\n\n1|01| 1 |1.0|1e0\n-0",
+        exists(HashFilter.class));
+    // untyped keys that cannot be cast to numbers
+    query("let $cs := ('1', 'x') ! <c id='{ . }'/> for $i in (1, 2, 3) "
+        + "return try { count($cs[@id = $i]) } catch * { string($err:code) }",
+        "err:FORG0001\nerr:FORG0001\nerr:FORG0001");
+    // positional predicates
+    query(cs + "for $o in ('0', '1', '2', '3') return string-join($cs[@id = $o][1]/@n, ',')",
+        "3\n1\n2\n");
+    query(cs + "for $o in ('0', '1', '2', '3') "
+        + "return string-join($cs[position() > 1][@id = $o]/@n, ',')", "3\n4\n2,5\n");
+  }
+
+  /** Predicates of the last step that reference outer variables are split from the path. */
+  @Test public void splitPathFilter() {
+    execute(new CreateDB(NAME, "<x><c id='1'/><c id='2'/><c id='2'/>"
+        + "<o r='2'/><o r='1'/><o r='3'/></x>"));
+    final String db = _DB_GET.args(NAME);
+    // equality comparison: hash filter on the path
+    check("for $o in " + db + "/x/o return count(" + db + "/x/c[lower-case(@id) = $o/@r])",
+        "2\n1\n0", exists(HashFilter.class));
+    // range comparison: filter on the path
+    check("for $o in " + db + "/x/o return count(" + db + "/x/c[@id > $o/@r])",
+        "0\n2\n0", exists(IterFilter.class));
+    // positional predicate: no split
+    check("for $o in " + db + "/x/o return string(" + db + "/x/c[number($o/@r)]/@id)",
+        "2\n1\n2", empty(IterFilter.class));
+    // index access: no split
+    check("for $o in " + db + "/x/o return count(" + db + "/x/c[@id = $o/@r])",
+        "2\n1\n0", exists(ValueAccess.class), empty(HashFilter.class));
   }
 
   /** Comparisons with unions are only distributed if the other operand is a value. */
@@ -2790,10 +2830,60 @@ public final class RewritingsTest extends SandboxTest {
     query("(1, 2)[xs:token('')]", "");
   }
 
+  /** Existential boolean maps, rewritten to filters. */
+  @Test public void existentialMap() {
+    final String doc = "<_><a k='1'>x</a><a k='2'>y</a><a/></_>";
+    check(doc + "/(some $a in a satisfies $a/@k = 2)", true, empty(DualMap.class));
+    check(doc + "/(some $a in a satisfies $a/@k = 3)", false, empty(DualMap.class));
+    check(doc + "/(some $a in a satisfies contains($a, 'y'))", true, empty(DualMap.class));
+    check(doc + "/((a ! (if(@k) then false() else ())) = true())", false,
+        empty(DualMap.class));
+    check(doc + "/((a ! (@k = 2)) != false())", true, empty(DualMap.class));
+    check(doc + "/((a ! (position() = 2)) = true())", true, root(CmpG.class));
+    check("for $i in (2, 3) let $d := " + doc + " return some $a in $d/a satisfies $a/@k = $i",
+        "true\nfalse", exists(CmpG.class), empty(EXISTS));
+  }
+
+  /** Existence checks of paths with predicates, rewritten to comparisons. */
+  @Test public void existencePathPredicate() {
+    final String flwor = "for $i in (2, 3) let $d := <_><b k='1'/><b k='2'/></_> return ";
+    check(flwor + "empty($d/b[@k = $i])", "false\ntrue", empty(EMPTY), exists(NOT));
+    check(flwor + "exists($d/b[@k = $i])", "true\nfalse", empty(EXISTS));
+    query(flwor + "empty($d/b[@k])", "false\nfalse");
+    check(flwor + "empty($d/b[@k = $i][1])", "false\ntrue", empty(EMPTY));
+  }
+
+  /** Closures of the required type are inlined by higher-order functions. */
+  @Test public void inlineClosure() {
+    inline(true);
+    check("for $a in (2, 4) return some((1, 2, 3), fn($b) { $b = $a })", "true\nfalse",
+        empty(Closure.class), empty(DynFuncCall.class));
+    check("for $a in (1, 4) return every((1, 2, 3), fn($b) { $b != $a })", "false\ntrue",
+        empty(Closure.class), empty(DynFuncCall.class));
+    // coercion required
+    query("for $a in (2, 4) return some((1, 2, 3), fn($b as xs:integer) { $b = $a })",
+        "true\nfalse");
+    query("for $a in (2, 4) return try { some((1, 2, 3), fn($b) { $b + $a }) } "
+        + "catch * { string($err:code) }", "err:XPTY0004\nerr:XPTY0004");
+  }
+
   /** Branches with string sequences of different types must not be merged. */
   @Test public void stringSeqTypes() {
     query("(if(random:double() > 2) then ('a', 'b') "
         + "else (xs:untypedAtomic('a'), xs:untypedAtomic('b'))) ! (. instance of xs:untypedAtomic)",
         "true\ntrue");
+  }
+
+  /** Distributed predicates: operands without results are removed. */
+  @Test public void distributeEmpty() {
+    set(MainOptions.TEXTINDEX, false);
+    try {
+      execute(new CreateDB(NAME, "<r><a>1</a><b>v1</b><b>v2</b></r>"));
+      final String db = _DB_GET.args(NAME);
+      check("(" + db + "/r/a | " + db + "/r/b)[. = 'v1']", "<b>v1</b>", empty(Union.class));
+      check("(" + db + "/r/a, " + db + "/r/b)[. = 'v1']", "<b>v1</b>", empty(List.class));
+    } finally {
+      set(MainOptions.TEXTINDEX, true);
+    }
   }
 }

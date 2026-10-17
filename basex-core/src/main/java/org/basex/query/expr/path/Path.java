@@ -202,6 +202,8 @@ public abstract class Path extends ParseExpr {
      * - //B [. = '...'] → IA('...', B)
      * - /A/B[. = '...'] → IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
+    // split predicates with outer variables: R/a[$v] → (R/a)[$v]
+    if(expr == this) expr = splitPredicates(cc);
     // return optimized expression
     if(expr != this) return expr;
 
@@ -225,14 +227,8 @@ public abstract class Path extends ParseExpr {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // drop irrelevant predicate. example: if(a[1]) → if(a)
       expr = dropPredicate(cc);
-      if(expr == this) {
-        // merge nested predicates. examples: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
-        final Expr last = steps[steps.length - 1];
-        if(last instanceof final Step step) {
-          final Expr ex = step.flattenEbv(this, true, cc);
-          if(ex != step) expr = ex;
-        }
-      }
+      // merge nested predicates. examples: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
+      if(expr == this) expr = flattenEbv(true, cc);
     }
     if(expr == this && this instanceof final CachedPath cp && mode.oneOf(Simplify.EBV,
         Simplify.PREDICATE, Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
@@ -265,13 +261,62 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public final Expr removePredicate(final CompileContext cc) throws QueryException {
-    final ExprList list = new ExprList(steps.length).add(steps);
-    final Step step = ((Step) list.pop()).removePredicate();
-    // context of the last step: previous step or root
-    final Expr ctx = list.isEmpty() ? root : list.peek();
-    list.add(cc.get(ctx, true, () -> step.optimize(cc)));
     // the type is not adopted: the path may yield more results without the predicate
-    return get(cc, info, root, list.finish());
+    return withLastStep(((Step) steps[steps.length - 1]).removePredicate(), cc);
+  }
+
+  /**
+   * Flattens the predicates of the last step for boolean evaluation.
+   * @param ebv EBV check
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  public final Expr flattenEbv(final boolean ebv, final CompileContext cc) throws QueryException {
+    if(!(steps[steps.length - 1] instanceof final Step step)) return this;
+    final Expr expr = step.flattenEbv(this, ebv, cc);
+    return expr != step ? expr : this;
+  }
+
+  /**
+   * Replaces the last step and returns the optimized path.
+   * @param step new last step
+   * @param cc compilation context
+   * @return new path
+   * @throws QueryException query exception
+   */
+  private Expr withLastStep(final Step step, final CompileContext cc) throws QueryException {
+    final int sl = steps.length;
+    // context of the last step: previous step or root
+    final Expr ctx = sl == 1 ? root : steps[sl - 2];
+    final Expr[] st = steps.clone();
+    st[sl - 1] = cc.get(ctx, true, () -> step.optimize(cc));
+    return get(cc, info, root, st);
+  }
+
+  /**
+   * Splits predicates with free variables from the last step to make the remaining path cacheable.
+   * @param cc compilation context
+   * @return original or new expression
+   * @throws QueryException query exception
+   */
+  private Expr splitPredicates(final CompileContext cc) throws QueryException {
+    // for $o in O return db:get('db')/a/b[@id > $o/@r] → (db:get('db')/a/b)[@id > $o/@r]
+    final int last = steps.length - 1;
+    if(!(root instanceof Value) || root instanceof Dummy ||
+        !(steps[last] instanceof final Step step) || step.mayBePositional()) return this;
+
+    final Expr[] preds = step.exprs;
+    final int p = Checks.index(preds, Expr::hasFreeVars);
+    if(p == -1) return this;
+    for(int s = 0; s < last; s++) {
+      if(steps[s].hasFreeVars()) return this;
+    }
+
+    final Expr path = withLastStep(step.rebuild(Arrays.copyOf(preds, p)), cc);
+    if(!(path instanceof final AxisPath ap) || !ap.isSimple()) return this;
+    return cc.replaceWith(this,
+      Filter.split(cc, info, ap, Arrays.copyOfRange(preds, p, preds.length)));
   }
 
   /**

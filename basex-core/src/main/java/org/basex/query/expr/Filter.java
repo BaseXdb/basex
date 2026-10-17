@@ -176,13 +176,7 @@ public abstract class Filter extends Preds {
         return List.get(cc, info, results.finish());
       }
 
-      // equality predicate with a context-independent operand: hash filter
-      // example: for $o in $orders return $customers[@id = $o/@customer]
-      final int key = HashFilter.key(root, exprs);
-      if(key != -1) return copyType(new HashFilter(info, root, first, key));
-
-      // otherwise, return iterative filter
-      return copyType(new IterFilter(info, root, exprs));
+      return iterative();
     }
 
     // rewrite loop-invariant predicates
@@ -270,6 +264,44 @@ public abstract class Filter extends Preds {
     return copyType(new CachedFilter(info, root, exprs));
   }
 
+  /**
+   * Creates a filter for predicates that have been split from the last step of a path.
+   * @param cc compilation context
+   * @param info input info (can be {@code null})
+   * @param path path without the predicates
+   * @param preds non-positional predicates
+   * @return filter or empty sequence
+   * @throws QueryException query exception
+   */
+  public static Expr split(final CompileContext cc, final InputInfo info, final AxisPath path,
+      final Expr... preds) throws QueryException {
+    // only the predicates are optimized: Filter.optimize(cc) would merge them into the path again
+    final Filter filter = new CachedFilter(info, path, preds);
+    return filter.optimize(cc, path) ? cc.emptySeq(filter) : filter.iterative();
+  }
+
+  /**
+   * Returns a hash filter or an iterative filter for non-positional predicates.
+   * @return filter
+   */
+  private Expr iterative() {
+    // equality predicate with a context-independent operand: hash filter
+    // example: for $o in $orders return $customers[@id = $o/@customer]
+    // $customers[@type = 'b'][@id = $o/@customer] → $customers[@id = $o/@customer][@type = 'b']
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      final int key = HashFilter.key(root, exprs[e]);
+      if(key != -1) {
+        final HashFilter hash = new HashFilter(info, root, exprs[e], key);
+        if(el == 1) return copyType(hash);
+        hash.assignType(null);
+        return copyType(new IterFilter(info, hash, Array.remove(exprs, e)));
+      }
+    }
+    // otherwise, return iterative filter
+    return copyType(new IterFilter(info, root, exprs));
+  }
+
   @Override
   public final void checkUp() throws QueryException {
     checkNoUp(root);
@@ -330,12 +362,11 @@ public abstract class Filter extends Preds {
    * Attaches the predicates to the specified operands.
    * @param operands operands of a list or union expression
    * @param cc compilation context
-   * @return new operands, or {@code null} if no index is used
+   * @return new operands, or {@code null} if no index is used and no operand is empty
    * @throws QueryException query exception
    */
   private Expr[] distribute(final Expr[] operands, final CompileContext cc)
       throws QueryException {
-
     // nondeterministic predicates would be evaluated twice for nodes in two operands
     if(Checks.any(exprs, expr -> expr.has(Flag.NDT))) return null;
 
@@ -345,7 +376,7 @@ public abstract class Filter extends Preds {
       // the operands are copied, as the rewrite will be discarded if no index can be applied
       final IntObjectMap<Var> vm = new IntObjectMap<>();
       final Expr filter = get(cc, info, operand.copy(cc, vm), Arr.copyAll(cc, vm, exprs));
-      applied = applied || IndexAccess.applied(filter);
+      applied = applied || IndexAccess.applied(filter) || filter.seqType().zero();
       list.add(filter);
     }
     return applied ? list.finish() : null;
@@ -404,6 +435,7 @@ public abstract class Filter extends Preds {
 
   @Override
   protected final void rootToString(final QueryString qs) {
-    qs.token(root);
+    if(root instanceof Path) qs.paren(root);
+    else qs.token(root);
   }
 }

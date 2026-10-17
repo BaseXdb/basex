@@ -268,6 +268,11 @@ public abstract class Cmp extends Arr {
                 return cmp.with(map.remove(cc, al), cc);
               }
             }
+
+            // (E ! C) = true() → exists(E[C])
+            if(t && last.seqType().zeroOrOne() && !last.has(Flag.POS)) {
+              return cc.function(EXISTS, info, Filter.get(cc, info, map.remove(cc, al), last));
+            }
           }
         }
       }

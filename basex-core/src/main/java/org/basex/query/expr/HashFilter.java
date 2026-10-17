@@ -28,7 +28,7 @@ public final class HashFilter extends Filter {
    * @param info input info (can be {@code null})
    * @param root root expression
    * @param pred hashable predicate
-   * @param key position of the context-dependent operand (see {@link #key(Expr, Expr[])})
+   * @param key position of the context-dependent operand (see {@link #key(Expr, Expr)})
    */
   HashFilter(final InputInfo info, final Expr root, final Expr pred, final int key) {
     super(info, root, pred);
@@ -38,17 +38,19 @@ public final class HashFilter extends Filter {
   /**
    * Returns the position of the context-dependent operand of a hashable filter predicate.
    * @param root root expression
-   * @param preds predicates
-   * @return position of the operand, or {@code -1} if the filter cannot be hashed
+   * @param pred predicate
+   * @return position of the operand, or {@code -1} if the predicate cannot be hashed
    */
-  static int key(final Expr root, final Expr[] preds) {
-    if(preds.length != 1 || root.seqType().zeroOrOne() || !(preds[0] instanceof final CmpG cmp) ||
+  static int key(final Expr root, final Expr pred) {
+    if(root.seqType().zeroOrOne() || !(pred instanceof final CmpG cmp) ||
         cmp.op != CmpOp.EQ || cmp.sc().collation != null) return -1;
     for(int k = 0; k < 2; k++) {
       final Expr kx = cmp.arg(k), px = cmp.arg(1 - k);
+      final Type kt = kx.seqType().type, pt = px.seqType().type;
       if(kx.has(Flag.CTX) && !kx.has(Flag.POS, Flag.NDT) && !(px instanceof Value) &&
-          !px.has(Flag.CTX, Flag.POS, Flag.NDT) &&
-          CmpHashG.hashable(kx.seqType().type, px.seqType().type) && !kx.hasFreeVars()) return k;
+          !px.has(Flag.CTX, Flag.POS, Flag.NDT) && (CmpHashG.hashable(kt, pt) ||
+          kt.isUntyped() && pt.instanceOf(BasicType.DECIMAL)) &&
+          !kx.hasFreeVars()) return k;
     }
     return -1;
   }
@@ -83,7 +85,9 @@ public final class HashFilter extends Filter {
     if(cache.root != value) {
       cache.root = value;
       cache.index = null;
+      cache.numbers = null;
       cache.family = null;
+      cache.noNumbers = false;
       return null;
     }
 
@@ -96,19 +100,17 @@ public final class HashFilter extends Filter {
       if(cache.index == null) return null;
     }
     if(cache.index.isEmpty()) return Empty.VALUE;
-    // probe values must belong to the family of the keys
-    for(final Item item : probes) {
-      if(CmpHashG.family(item.type) != cache.family) return null;
-    }
+    final ItemObjectMap<IntList> index = select(probes, cache);
+    if(index == null) return null;
 
     IntList positions;
     if(probes.size() == 1) {
-      positions = cache.index.get(probes.itemAt(0));
+      positions = index.get(probes.itemAt(0));
       if(positions == null) return Empty.VALUE;
     } else {
       positions = new IntList();
       for(final Item item : probes) {
-        final IntList list = cache.index.get(item);
+        final IntList list = index.get(item);
         if(list != null) positions.add(list.toArray());
       }
       positions.ddo();
@@ -154,6 +156,60 @@ public final class HashFilter extends Filter {
     return index;
   }
 
+  /**
+   * Returns the index for the specified probe values.
+   * @param probes probe values
+   * @param cache cache
+   * @return index, or {@code null} if the filter must be evaluated sequentially
+   * @throws QueryException query exception
+   */
+  private ItemObjectMap<IntList> select(final Value probes, final Cache cache)
+      throws QueryException {
+    // probes of the family of the keys, or integer and decimal probes for untyped keys
+    boolean family = true, numeric = cache.family == BasicType.STRING && !cache.noNumbers;
+    for(final Item item : probes) {
+      family &= CmpHashG.family(item.type) == cache.family;
+      numeric &= item instanceof final ANum num && !num.floating();
+      if(!family && !numeric) return null;
+    }
+    if(family) return cache.index;
+    if(cache.numbers == null) {
+      cache.numbers = numbers(cache.index);
+      if(cache.numbers == null) cache.noNumbers = true;
+    }
+    return cache.numbers;
+  }
+
+  /**
+   * Creates a hash index from untyped keys, cast to numbers (see {@link ANum#decimal(Item,
+   * InputInfo)}), to the positions of the items.
+   * @param index index with string keys
+   * @return index, or {@code null} if a key is no untyped value or cannot be cast
+   * @throws QueryException query exception
+   */
+  private ItemObjectMap<IntList> numbers(final ItemObjectMap<IntList> index)
+      throws QueryException {
+    final ItemObjectMap<IntList> numbers = new ItemObjectMap<>(ItemSet.Mode.EQUAL, info);
+    final int is = index.size();
+    for(int i = 1; i <= is; i++) {
+      final Item item = index.key(i);
+      if(!item.type.isUntyped()) return null;
+      final ANum num;
+      try {
+        num = ANum.decimal(item, info);
+      } catch(final QueryException ex) {
+        // the error will be raised by the sequential evaluation
+        Util.debug(ex);
+        return null;
+      }
+      // equal numbers ('1', '01'): merge positions
+      final IntList positions = index.value(i), list = numbers.get(num);
+      numbers.put(num, list == null ? positions :
+        new IntList(list.toArray()).add(positions.toArray()).ddo());
+    }
+    return numbers;
+  }
+
   @Override
   public HashFilter copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new HashFilter(info, root.copy(cc, vm), exprs[0].copy(cc, vm), key));
@@ -167,7 +223,11 @@ public final class HashFilter extends Filter {
     Value root;
     /** Index from keys to item positions (built on the second evaluation). */
     ItemObjectMap<IntList> index;
+    /** Index from untyped keys, cast to numbers, to item positions (built on demand). */
+    ItemObjectMap<IntList> numbers;
     /** Family of the keys ({@link BasicType#ITEM}: keys cannot be indexed). */
     Type family;
+    /** Indicates if the keys cannot be cast to numbers. */
+    boolean noNumbers;
   }
 }
