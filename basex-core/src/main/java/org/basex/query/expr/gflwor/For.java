@@ -207,7 +207,9 @@ public final class For extends ForLet {
     final Expr pred = cc.get(expr, true, () -> {
       final InlineContext icPos = new InlineContext(pos, cc.function(POSITION, info), cc);
       final InlineContext icVar = new InlineContext(var, new ContextValue(info), cc);
-      return icPos.inlineable(ex) && icVar.inlineable(ex) ? icPos.inline(icVar.inline(ex)) : null;
+      if(!icPos.inlineable(ex) || !icVar.inlineable(ex)) return null;
+      cc.info(OPTPRED_X, ex);
+      return icPos.inline(icVar.inline(ex));
     });
     if(pred == null) return false;
 

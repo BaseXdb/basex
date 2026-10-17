@@ -65,6 +65,7 @@ abstract sealed class ForLet extends SingleClause permits For, Let {
 
     final InlineContext ic = new InlineContext(var, new ContextValue(info), cc);
     if(!ic.inlineable(ex)) return false;
+    cc.info(QueryText.OPTPRED_X, ex);
 
     // reset context value (will not be accessible in predicate)
     Expr pred = cc.get(expr, true, () -> ic.inline(ex));

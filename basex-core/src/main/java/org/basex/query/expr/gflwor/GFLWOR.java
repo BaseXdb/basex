@@ -432,9 +432,9 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = clauses.get(c);
       if(clause instanceof final For fr) {
         if(fr.expr.size() == 0 && !fr.empty) {
+          cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
           for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(c);
           rtrn = fr.expr;
-          cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
           changed = true;
         }
       }
@@ -775,7 +775,6 @@ public final class GFLWOR extends ParseExpr {
                 // let $a := <a/> where $a = '' return $a/self::a → let $a := <a/>[. = ''] ...
                 optimized.add(fl);
                 clauses.remove(insert);
-                cc.info(QueryText.OPTPRED_X, expr);
                 changed = true;
                 c--;
               }
@@ -826,7 +825,6 @@ public final class GFLWOR extends ParseExpr {
           // for $e at $p in E where P($e, $p) ... → for $e in E[P(., position())] ...
           if(where && d == c + 1 && count(pos.pos, d + 1) == VarUsage.NEVER &&
               pos.toPosPredicate(cc, fc.expr)) {
-            cc.info(QueryText.OPTPRED_X, fc.expr);
             clauses.remove(d);
             changed = true;
             break;
@@ -1225,8 +1223,7 @@ public final class GFLWOR extends ParseExpr {
       if(max == -1 || max > 1) return null;
     }
     // (for $x in E return R) ! F → for $x in E return R ! F
-    rtrn = func.apply(rtrn);
-    return optimize(cc);
+    return new GFLWOR(info, new LinkedList<>(clauses), func.apply(rtrn)).optimize(cc);
   }
 
   @Override

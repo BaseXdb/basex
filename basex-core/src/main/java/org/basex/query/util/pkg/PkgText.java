@@ -93,5 +93,5 @@ public interface PkgText {
   /** No public classes registered. */
   String NOCLASSES = "No public classes specified";
   /** No main class found in Java manifest. */
-  String MANIFEST = "No 'Main-Class' attribute found: %/META-INF/MANIFEST.MF.";
+  String MANIFEST = "No 'Main-Class' attribute found in " + MANIFEST_MF;
 }

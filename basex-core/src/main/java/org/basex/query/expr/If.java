@@ -53,8 +53,9 @@ public final class If extends Arr {
     // branches without items (empty sequence, error) are kept
     final boolean none1 = exprs[0].seqType().itemless(), none2 = exprs[1].seqType().itemless();
     if(none1 == none2) return null;
-    arg(none1 ? 1 : 0, func);
-    return optimize(cc);
+    final Expr branch1 = none1 ? exprs[0] : func.apply(exprs[0]);
+    final Expr branch2 = none1 ? func.apply(exprs[1]) : exprs[1];
+    return new If(info, cond, branch1, branch2).optimize(cc);
   }
 
   @Override

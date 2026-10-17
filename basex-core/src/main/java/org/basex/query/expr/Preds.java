@@ -131,6 +131,7 @@ public abstract class Preds extends Arr {
     }
 
     // inline root item (ignore nodes): 1[. = 1] → 1[1 = 1]
+    Expr input = pred;
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
       try {
         expr = new InlineContext(null, root, cc).inline(expr);
@@ -138,6 +139,8 @@ public abstract class Preds extends Arr {
         // replace original expression with error
         expr = FnError.get(ex);
       }
+      // the inlining changes the predicate in place and logs its own infos
+      input = expr;
     }
 
     // merge node tests with steps; remove redundant node tests: child::node()[self::*] → child::*
@@ -183,7 +186,7 @@ public abstract class Preds extends Arr {
     }
 
     // add predicate to list
-    if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr, Simplify.PREDICATE));
+    if(expr != Bln.TRUE) list.add(cc.simplify(input, expr, Simplify.PREDICATE));
   }
 
   /**

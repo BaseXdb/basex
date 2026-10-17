@@ -215,8 +215,8 @@ public abstract class Arr extends ParseExpr {
         invert == or ? new And(info, args) : new Or(info, args);
       final Expr tmp = rewrite(clazz, func, cc);
       if(tmp != null) {
-        exprs = new Expr[] { tmp };
         cc.info(QueryText.OPTREWRITE_X_X, (Supplier<?>) this::description, this);
+        exprs = new Expr[] { tmp };
       }
     }
 

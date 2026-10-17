@@ -228,7 +228,8 @@ public abstract class Mapping extends Arr {
     final int ls = list.size();
     if(ls == el) return null;
 
-    cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    // operands may have been changed in place: no expression string
+    cc.info(OPTMERGE_X, (Supplier<?>) this::description);
     return list.finish();
   }
 
