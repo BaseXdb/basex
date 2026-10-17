@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <geotools.version>34.5</geotools.version>
+    <geotools.version>35.1</geotools.version>
     <hsqldb.version>2.7.4</hsqldb.version>
     <gt-epsg-hsql.version>34.5-C321</gt-epsg-hsql.version>
   </properties>
