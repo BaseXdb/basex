@@ -215,6 +215,39 @@ public enum Kind {
 
   /**
    * Checks if this is one of the specified kinds.
+   * @param kind1 first kind
+   * @param kind2 second kind
+   * @return result of check
+   */
+  public boolean oneOf(final Kind kind1, final Kind kind2) {
+    return this == kind1 || this == kind2;
+  }
+
+  /**
+   * Checks if this is one of the specified kinds.
+   * @param kind1 first kind
+   * @param kind2 second kind
+   * @param kind3 third kind
+   * @return result of check
+   */
+  public boolean oneOf(final Kind kind1, final Kind kind2, final Kind kind3) {
+    return this == kind1 || this == kind2 || this == kind3;
+  }
+
+  /**
+   * Checks if this is one of the specified kinds.
+   * @param kind1 first kind
+   * @param kind2 second kind
+   * @param kind3 third kind
+   * @param kind4 fourth kind
+   * @return result of check
+   */
+  public boolean oneOf(final Kind kind1, final Kind kind2, final Kind kind3, final Kind kind4) {
+    return this == kind1 || this == kind2 || this == kind3 || this == kind4;
+  }
+
+  /**
+   * Checks if this is one of the specified kinds.
    * @param kinds kinds
    * @return result of check
    */

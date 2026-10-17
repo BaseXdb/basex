@@ -48,10 +48,10 @@ public final class NameTest extends Test {
   public byte[] name;
   /** Database name; assigned if the test matches a single name (can be {@code null}). */
   private byte[] dbName;
-  /** Database to which {@link #dbId} refers (can be {@code null}). */
+  /** Database to which {@link #dbFilter} refers (can be {@code null}). */
   private Data dbData;
-  /** ID of the database name in {@link #dbData}, or {@code 0}. */
-  private int dbId;
+  /** Filter with the ID of the database name in {@link #dbData} (can be {@code null}). */
+  private DBFilter dbFilter;
 
   /** JNode key; assigned if the test can select a single JNode key (can be {@code null}). */
   private final Item jkey;
@@ -83,7 +83,8 @@ public final class NameTest extends Test {
    * @param ns default element namespace (used for optimizations, can be {@code null})
    */
   NameTest(final QNm qname, final Scope scope, final Kind kind, final byte[] ns) {
-    super(kind);
+    super(kind, new DBFilter(kind == Kind.NODE ? Data.ELEM : XNode.dbKind(kind), 0,
+      scope == Scope.ALL));
     this.qname = qname;
     this.scope = scope;
     this.ns = ns != null ? ns : Token.EMPTY;
@@ -116,7 +117,7 @@ public final class NameTest extends Test {
     final TokenList matches = matches(all, data);
     dbName = matches != null && matches.size() == 1 ? matches.get(0) : null;
     dbData = dbName != null ? data : null;
-    dbId = dbName != null ? names.index(dbName) : 0;
+    dbFilter = dbName != null ? new DBFilter(filter.kind(), names.index(dbName), true) : null;
     if(matches == null) return this;
     // no matching name: no results
     if(matches.isEmpty()) return null;
@@ -170,14 +171,8 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
-    final int k = kind == Kind.NODE ? Data.ELEM : XNode.dbKind(kind);
-    return k == dbKind && (data != dbData || data.nameId(pre) == dbId);
-  }
-
-  @Override
-  public boolean exact(final Data data) {
-    return data == dbData;
+  public DBFilter filter(final Data data) {
+    return data == dbData ? dbFilter : filter;
   }
 
   @Override
@@ -187,8 +182,8 @@ public final class NameTest extends Test {
       return false;
 
     // database node with a resolved name: compare name IDs
-    if(dbId != 0 && node instanceof final DBNode dbnode && dbnode.data() == dbData)
-      return dbData.nameId(dbnode.pre()) == dbId;
+    if(node instanceof final DBNode dbnode && dbnode.data() == dbData)
+      return dbData.nameId(dbnode.pre()) == dbFilter.nameId();
 
     if(node instanceof final JNode jnode) {
       // JNodes

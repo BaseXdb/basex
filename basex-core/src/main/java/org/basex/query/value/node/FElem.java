@@ -11,7 +11,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -268,13 +267,13 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public BasicNodeIter attributeIter() {
-    return GNodeList.iter(attributes);
+  public BasicNodeIter attributeIter(final Test test) {
+    return iter(attributes, test);
   }
 
   @Override
   public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    return GNodeList.iter(children());
+    return iter(children(), descendant ? null : test);
   }
 
   @Override

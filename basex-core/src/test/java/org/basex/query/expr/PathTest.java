@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.index.*;
@@ -1007,5 +1008,65 @@ public final class PathTest extends SandboxTest {
     // positional access
     check("<a><b n='1'/><b n='2'/></a>/b/(if (position() = 1) then . else ()) ! string(@n)",
         "1", cached);
+  }
+
+  /** Name tests on all axes of persistent, main-memory and updated databases. */
+  @Test public void dbAxes() {
+    final StringBuilder xml = new StringBuilder("<x>");
+    for(int i = 0; i < 10; i++) {
+      xml.append("<a n='1'><b/>t<a><b m='2'/>u</a><!--c--><?p i?></a><b n='3'><a/></b>v");
+    }
+    xml.append("</x>");
+    final String[] axes = { "ancestor", "ancestor-or-self", "attribute", "child", "descendant",
+      "descendant-or-self", "following", "following-or-self", "following-sibling",
+      "following-sibling-or-self", "parent", "preceding", "preceding-or-self", "preceding-sibling",
+      "preceding-sibling-or-self", "self" };
+    final String db = _DB_GET.args(NAME), nodes = "(" + db + "/descendant-or-self::node(), " + db
+        + "//@*) ! (%s ! (count(ancestor::node()) || ':' || count(preceding::node())))";
+
+    for(final boolean mainmem : new boolean[] { false, true }) {
+      set(MainOptions.MAINMEM, mainmem);
+      try {
+        execute(new CreateDB(NAME, xml.toString()));
+        execute(new Add("doc2.xml", xml.toString()));
+        for(int u = 0; u < 2; u++) {
+          for(final String axis : axes) {
+            for(final String name : new String[] { "a", "b", "n", "m", "x" }) {
+              query("deep-equal(" + String.format(nodes, axis + "::" + name) + ", "
+                  + String.format(nodes, axis + "::*[name() = '" + name + "']") + ')', true);
+            }
+          }
+          query("insert node <a n='4'><b/></a> after (" + db + "//b)[5]");
+        }
+      } finally {
+        set(MainOptions.MAINMEM, false);
+      }
+    }
+  }
+
+  /** Name tests in child and descendant steps of persistent, main-memory and updated databases. */
+  @Test public void dbNameTests() {
+    final StringBuilder xml = new StringBuilder("<x>");
+    for(int i = 1; i <= 10000; i++) xml.append("<a>").append(i).append("</a><b/>t");
+    final String x = _DB_GET.args(NAME) + "/x", check = "let $x := " + x + " return ("
+        + "deep-equal($x/a, $x/node()[name() = 'a']), deep-equal($x//a, $x//node()[name() = 'a']))";
+
+    for(final boolean mainmem : new boolean[] { false, true }) {
+      set(MainOptions.MAINMEM, mainmem);
+      try {
+        execute(new CreateDB(NAME, xml + "</x>"));
+        query("count(" + x + "/a)", 10000);
+        query(check, "true\ntrue");
+        query(x + "/a[5000] ! (insert node <a>0</a> before ., "
+            + "insert node (1 to 5000) ! <b/> after .)");
+        query("count(" + x + "/a)", 10001);
+        query(check, "true\ntrue");
+        query("delete node " + x + "/a[position() mod 3 = 0]");
+        query("count(" + x + "/a)", 6668);
+        query(check, "true\ntrue");
+      } finally {
+        set(MainOptions.MAINMEM, false);
+      }
+    }
   }
 }

@@ -265,44 +265,51 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final BasicNodeIter ancestorIter(final boolean self) {
-    if(root != null) return super.ancestorIter(self);
+  public final BasicNodeIter ancestorIter(final boolean self, final Test test) {
+    if(root != null) return super.ancestorIter(self, test);
 
     final int first = self ? pre : data.parent(pre, dbKind());
     if(first == -1) return BasicNodeIter.EMPTY;
 
-    return new DBNodeIter(data) {
+    return new AxisIter(test) {
       int curr = first;
 
       @Override
       public DBNode next() {
-        if(curr == -1) return null;
-        final int c = curr, k = data.kind(c);
-        curr = data.parent(c, k);
-        return new DBNode(DBNode.this, c, k);
+        while(curr != -1) {
+          final int c = curr, k = data.kind(c);
+          curr = data.parent(c, k);
+          final DBNode node = node(c, k);
+          if(node != null) return node;
+        }
+        return null;
       }
     };
   }
 
   @Override
-  public final BasicNodeIter attributeIter() {
+  public final BasicNodeIter attributeIter(final Test test) {
     final int kind = dbKind(), first = pre + 1, last = pre + data.attSize(pre, kind);
     if(first == last) return BasicNodeIter.EMPTY;
 
-    return new DBNodeIter(data) {
+    return new AxisIter(test) {
       int curr = first;
 
       @Override
       public DBNode next() {
-        return curr == last ? null : new DBNode(DBNode.this, curr++, Data.ATTR);
+        while(curr != last) {
+          final DBNode node = node(curr++, Data.ATTR);
+          if(node != null) return node;
+        }
+        return null;
       }
       @Override
       public XNode get(final long i) {
-        return new DBNode(DBNode.this, pre + 1 + (int) i, Data.ATTR);
+        return new DBNode(DBNode.this, first + (int) i, Data.ATTR);
       }
       @Override
       public long size() {
-        return last - first;
+        return test == null ? last - first : -1;
       }
     };
   }
@@ -311,23 +318,7 @@ public class DBNode extends XNode {
   public final BasicNodeIter childIter(final Test test, final boolean descendant) {
     final int kind = dbKind();
     final int first = pre + data.attSize(pre, kind), last = pre + data.size(pre, kind);
-    if(first == last) return BasicNodeIter.EMPTY;
-
-    // children of skipped nodes may still match a descendant test
-    final Test tst = descendant ? null : test;
-    return new DBNodeIter(data) {
-      int curr = first;
-
-      @Override
-      public DBNode next() {
-        while(curr != last) {
-          final int c = curr, k = data.kind(c);
-          curr = c + data.size(c, k);
-          if(tst == null || tst.mayMatch(data, c, k)) return new DBNode(DBNode.this, c, k);
-        }
-        return null;
-      }
-    };
+    return siblings(first, last, descendant ? null : test);
   }
 
   @Override
@@ -336,7 +327,7 @@ public class DBNode extends XNode {
     final int first = pre + (self ? 0 : data.attSize(pre, kind)), last = pre + data.size(pre, kind);
     if(first == last) return BasicNodeIter.EMPTY;
 
-    return new DBNodeIter(data) {
+    return new AxisIter(test) {
       int curr = first;
 
       @Override
@@ -344,7 +335,8 @@ public class DBNode extends XNode {
         while(curr != last) {
           final int c = curr, k = data.kind(c);
           curr = c + data.attSize(c, k);
-          if(test == null || test.mayMatch(data, c, k)) return new DBNode(DBNode.this, c, k);
+          final DBNode node = node(c, k);
+          if(node != null) return node;
         }
         return null;
       }
@@ -352,61 +344,167 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final BasicNodeIter followingIter(final boolean self) {
-    if(root != null) return super.followingIter(self);
+  public final BasicNodeIter followingIter(final boolean self, final Test test) {
+    if(root != null) return super.followingIter(self, test);
 
-    return new DBNodeIter(data) {
-      DBNode node = DBNode.this;
-      int curr = self ? -2 : -1, size;
+    return new AxisIter(test) {
+      boolean slf = self;
+      int curr = -1, size;
 
       @Override
       public DBNode next() {
+        if(slf) {
+          slf = false;
+          final DBNode node = node(pre, dbKind());
+          if(node != null) return node;
+        }
         // initialize iterator: find last node that needs to be scanned
-        if(curr == -2) {
-          ++curr;
-        } else {
-          if(curr == -1) {
-            // attribute: continue after the attributes of the parent element
-            final int kind = dbKind(), par = data.parent(pre, kind);
-            curr = kind == Data.ATTR && par != -1 ? par + data.attSize(par, Data.ELEM) :
-              pre + data.size(pre, kind);
-            if(data.meta.ndocs > 1) {
-              int p = pre;
-              for(final GNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
-              size = p + data.size(p, data.kind(p));
-            } else {
-              size = data.nodes();
-            }
+        if(curr == -1) {
+          // attribute: continue after the attributes of the parent element
+          final int kind = dbKind(), par = data.parent(pre, kind);
+          curr = kind == Data.ATTR && par != -1 ? par + data.attSize(par, Data.ELEM) :
+            pre + data.size(pre, kind);
+          if(data.meta.ndocs > 1) {
+            int p = pre, k = kind;
+            for(int q; (q = data.parent(p, k)) != -1; p = q) k = data.kind(q);
+            size = p + data.size(p, k);
+          } else {
+            size = data.nodes();
           }
-          if(curr == size) return null;
-
+        }
+        while(curr != size) {
           final int c = curr, k = data.kind(c);
           curr = c + data.attSize(c, k);
-          node = new DBNode(DBNode.this, c, k);
+          final DBNode node = node(c, k);
+          if(node != null) return node;
         }
-        return node;
+        return null;
       }
     };
   }
 
   @Override
-  public final BasicNodeIter followingSiblingIter(final boolean self) {
+  public final BasicNodeIter followingSiblingIter(final boolean self, final Test test) {
     final int kind = dbKind(), parent = data.parent(pre, kind);
-    if(parent == -1 && root != null) return super.followingSiblingIter(self);
-    if(parent == -1 || kind == Data.ATTR) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(parent == -1 && root != null) return super.followingSiblingIter(self, test);
+    if(parent == -1 || kind == Data.ATTR) return self ? selfIter(test) : BasicNodeIter.EMPTY;
 
-    return new DBNodeIter(data) {
-      final int last = parent + data.size(parent, data.kind(parent));
-      int curr = pre + (self ? 0 : data.size(pre, dbKind()));
+    final int first = pre + (self ? 0 : data.size(pre, kind));
+    final int last = parent + data.size(parent, data.kind(parent));
+    return siblings(first, last, test);
+  }
+
+  @Override
+  public final BasicNodeIter precedingIter(final boolean self, final Test test) {
+    if(root != null) return super.precedingIter(self, test);
+
+    return new AxisIter(test) {
+      boolean slf = self;
+      int curr = pre - 1, ancestor = data.parent(pre, dbKind());
 
       @Override
       public DBNode next() {
-        if(curr == last) return null;
-        final int c = curr, k = data.kind(c);
-        curr = c + data.size(c, k);
-        return new DBNode(DBNode.this, c, k);
+        if(slf) {
+          slf = false;
+          final DBNode node = node(pre, dbKind());
+          if(node != null) return node;
+        }
+        // scan backwards, skip ancestors and attributes, stop after the topmost ancestor
+        while(ancestor != -1) {
+          final int c = curr--, k = data.kind(c);
+          if(c == ancestor) {
+            ancestor = data.parent(c, k);
+          } else if(k != Data.ATTR) {
+            final DBNode node = node(c, k);
+            if(node != null) return node;
+          }
+        }
+        return null;
       }
     };
+  }
+
+  @Override
+  public final BasicNodeIter precedingSiblingIter(final boolean self, final Test test) {
+    final int kind = dbKind(), parent = data.parent(pre, kind);
+    if(parent == -1 && root != null) return super.precedingSiblingIter(self, test);
+    if(parent == -1 || kind == Data.ATTR) return self ? selfIter(test) : BasicNodeIter.EMPTY;
+
+    final int first = parent + data.attSize(parent, data.kind(parent));
+    return new AxisIter(test) {
+      int curr = self ? pre : pre - 1;
+
+      @Override
+      public DBNode next() {
+        while(curr >= first) {
+          // climb from the last descendant of the preceding sibling to the sibling
+          int c = curr, k = data.kind(c);
+          for(int p; (p = data.parent(c, k)) != parent; c = p) k = data.kind(p);
+          curr = c - 1;
+          final DBNode node = node(c, k);
+          if(node != null) return node;
+        }
+        return null;
+      }
+    };
+  }
+
+  /**
+   * Returns an iterator for the siblings in the specified range that match the specified test.
+   * @param first PRE value of the first sibling
+   * @param last PRE value after the last sibling
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  private BasicNodeIter siblings(final int first, final int last, final Test test) {
+    if(first == last) return BasicNodeIter.EMPTY;
+
+    return new AxisIter(test) {
+      int curr = first;
+
+      @Override
+      public DBNode next() {
+        while(curr != last) {
+          final int c = curr, k = data.kind(c);
+          curr = c + data.size(c, k);
+          final DBNode node = node(c, k);
+          if(node != null) return node;
+        }
+        return null;
+      }
+    };
+  }
+
+  /**
+   * Axis iterator, returning the nodes that match a node test.
+   */
+  private abstract class AxisIter extends DBNodeIter {
+    /** Filter for database nodes. */
+    private final DBFilter filter;
+    /** Node test that is not decided by the filter (can be {@code null}). */
+    private final Test test;
+
+    /**
+     * Constructor.
+     * @param test node test (can be {@code null})
+     */
+    AxisIter(final Test test) {
+      super(DBNode.this.data);
+      filter = test != null ? test.filter(data) : DBFilter.ALL;
+      this.test = filter.exact() ? null : test;
+    }
+
+    /**
+     * Returns the node with the specified PRE value if it matches the node test.
+     * @param p PRE value
+     * @param k database kind of the node
+     * @return node or {@code null}
+     */
+    final DBNode node(final int p, final int k) {
+      if(!filter.mayMatch(data, p, k)) return null;
+      final DBNode node = p == pre ? DBNode.this : new DBNode(DBNode.this, p, k);
+      return matches(node, test) ? node : null;
+    }
   }
 
   @Override

@@ -1,8 +1,12 @@
 package org.basex.query.value.node;
 
 import org.basex.api.dom.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -69,7 +73,7 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public BasicNodeIter attributeIter() {
+  public BasicNodeIter attributeIter(final Test test) {
     return BasicNodeIter.EMPTY;
   }
 
@@ -133,6 +137,51 @@ public abstract class FNode extends XNode {
         default -> { }
       }
     }
+  }
+
+  /**
+   * Returns an iterator for the nodes that match the specified test.
+   * @param nodes nodes
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  static BasicNodeIter iter(final GNode[] nodes, final Test test) {
+    final int nl = nodes.length;
+    if(nl == 0) return BasicNodeIter.EMPTY;
+
+    if(test != null) return new BasicNodeIter() {
+      int pos;
+
+      @Override
+      public GNode next() {
+        while(pos < nl) {
+          final GNode node = nodes[pos++];
+          if(test.matches(node)) return node;
+        }
+        return null;
+      }
+    };
+
+    return new BasicNodeIter() {
+      int pos;
+
+      @Override
+      public long size() {
+        return nl;
+      }
+      @Override
+      public GNode next() {
+        return pos < nl ? nodes[pos++] : null;
+      }
+      @Override
+      public GNode get(final long i) {
+        return nodes[(int) i];
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) {
+        return ItemSeq.get(nodes, nl, NodeType.NODE.refine(expr));
+      }
+    };
   }
 
   @Override

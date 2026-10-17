@@ -126,36 +126,54 @@ public abstract class GNode extends Item {
   /**
    * Returns an ancestor-or-self axis iterator.
    * @param self include self node
+   * @param test node test (can be {@code null})
    * @return iterator
    */
-  public BasicNodeIter ancestorIter(final boolean self) {
+  public BasicNodeIter ancestorIter(final boolean self, final Test test) {
     return new BasicNodeIter() {
-      private GNode node = GNode.this;
-      private boolean slf = self;
+      private GNode node = self ? GNode.this : parent();
 
       @Override
       public GNode next() {
-        if(slf) {
-          slf = false;
-        } else {
-          node = node.parent();
+        while(node != null) {
+          final GNode nd = node;
+          node = nd.parent();
+          if(matches(nd, test)) return nd;
         }
-        return node;
+        return null;
       }
     };
   }
+
+  /**
+   * Returns an ancestor-or-self axis iterator.
+   * @param self include self node
+   * @return iterator
+   */
+  public final BasicNodeIter ancestorIter(final boolean self) {
+    return ancestorIter(self, null);
+  }
+
+  /**
+   * Returns an attribute axis iterator.
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  public abstract BasicNodeIter attributeIter(Test test);
 
   /**
    * Returns an attribute axis iterator with {@link Iter#size()} and
    * {@link Iter#get(long)} implemented.
    * @return iterator
    */
-  public abstract BasicNodeIter attributeIter();
+  public final BasicNodeIter attributeIter() {
+    return attributeIter(null);
+  }
 
   /**
    * Returns a child axis iterator.
    * @param test node test (can be {@code null})
-   * @param descendant part of descendant traversal
+   * @param descendant part of descendant traversal (the test may then be ignored)
    * @return iterator
    */
   public abstract BasicNodeIter childIter(Test test, boolean descendant);
@@ -182,16 +200,17 @@ public abstract class GNode extends Item {
       @Override
       public GNode next() {
         if(!init) {
-          stack.push(self ? selfIter() : childIter(test, true));
+          stack.push(self ? selfIter(null) : childIter(test, true));
           init = true;
         }
         while(!stack.isEmpty()) {
           final GNode node = stack.peek().next();
           if(node != null) {
             stack.push(node.childIter(test, true));
-            return node;
+            if(matches(node, test)) return node;
+          } else {
+            stack.pop();
           }
-          stack.pop();
         }
         return null;
       }
@@ -210,9 +229,10 @@ public abstract class GNode extends Item {
   /**
    * Returns a following axis iterator.
    * @param self include self node
+   * @param test node test (can be {@code null})
    * @return node iterator
    */
-  public BasicNodeIter followingIter(final boolean self) {
+  public BasicNodeIter followingIter(final boolean self, final Test test) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -220,7 +240,7 @@ public abstract class GNode extends Item {
       public GNode next() {
         if(iter == null) {
           final GNodeList list = new GNodeList();
-          if(self) list.add(GNode.this);
+          if(self && matches(GNode.this, test)) list.add(GNode.this);
           GNode node = GNode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
@@ -229,10 +249,7 @@ public abstract class GNode extends Item {
                 if(nd.is(node)) break;
               }
             }
-            for(final GNode nd : ir) {
-              list.add(nd);
-              addDescendants(nd.childIter(), list);
-            }
+            for(final GNode nd : ir) add(nd, test, list);
             node = root;
             root = root.parent();
           }
@@ -246,11 +263,12 @@ public abstract class GNode extends Item {
   /**
    * Returns a following-sibling axis iterator.
    * @param self include self node
+   * @param test node test (can be {@code null})
    * @return iterator
    */
-  public BasicNodeIter followingSiblingIter(final boolean self) {
+  public BasicNodeIter followingSiblingIter(final boolean self, final Test test) {
     final GNode root = parent();
-    if(root == null || !isChild()) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || !isChild()) return self ? selfIter(test) : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private final BasicNodeIter iter = root.childIter();
@@ -261,29 +279,42 @@ public abstract class GNode extends Item {
         for(GNode n; !found && (n = iter.next()) != null;) {
           if(n.is(GNode.this)) {
             found = true;
-            if(self) return n;
+            if(self && matches(n, test)) return n;
           }
         }
-        return iter.next();
+        for(GNode n; (n = iter.next()) != null;) {
+          if(matches(n, test)) return n;
+        }
+        return null;
       }
     };
   }
 
   /**
-   * Returns a parent axis iterator.
+   * Returns a following-sibling axis iterator.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter parentIter() {
-    final GNode parent = parent();
-    return parent != null ? singleIter(parent) : BasicNodeIter.EMPTY;
+  public final BasicNodeIter followingSiblingIter(final boolean self) {
+    return followingSiblingIter(self, null);
+  }
+
+  /**
+   * Returns a parent axis iterator.
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  public final BasicNodeIter parentIter(final Test test) {
+    return singleIter(parent(), test);
   }
 
   /**
    * Returns a preceding axis iterator.
    * @param self include self node
+   * @param test node test (can be {@code null})
    * @return iterator
    */
-  public BasicNodeIter precedingIter(final boolean self) {
+  public BasicNodeIter precedingIter(final boolean self, final Test test) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -291,15 +322,14 @@ public abstract class GNode extends Item {
       public GNode next() {
         if(iter == null) {
           final GNodeList list = new GNodeList();
-          if(self) list.add(GNode.this);
+          if(self && matches(GNode.this, test)) list.add(GNode.this);
           GNode node = GNode.this, root = node.parent();
           while(root != null) {
             if(node.isChild()) {
               final GNodeList lst = new GNodeList();
               for(final GNode ch : root.childIter()) {
                 if(ch.is(node)) break;
-                lst.add(ch);
-                addDescendants(ch.childIter(), lst);
+                add(ch, test, lst);
               }
               for(int t = lst.size() - 1; t >= 0; t--) list.add(lst.get(t));
             }
@@ -316,11 +346,12 @@ public abstract class GNode extends Item {
   /**
    * Returns a preceding-sibling axis iterator.
    * @param self include self node
+   * @param test node test (can be {@code null})
    * @return iterator
    */
-  public final BasicNodeIter precedingSiblingIter(final boolean self) {
+  public BasicNodeIter precedingSiblingIter(final boolean self, final Test test) {
     final GNode root = parent();
-    if(root == null || !isChild()) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || !isChild()) return self ? selfIter(test) : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private GNodeList list;
@@ -332,7 +363,7 @@ public abstract class GNode extends Item {
           list = new GNodeList();
           for(final GNode node : root.childIter()) {
             final boolean last = node.is(GNode.this);
-            if(!last || self) list.add(node);
+            if((!last || self) && matches(node, test)) list.add(node);
             if(last) break;
           }
           l = list.size();
@@ -343,19 +374,32 @@ public abstract class GNode extends Item {
   }
 
   /**
-   * Returns a self axis iterator.
+   * Returns a preceding-sibling axis iterator.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter selfIter() {
-    return singleIter(this);
+  public final BasicNodeIter precedingSiblingIter(final boolean self) {
+    return precedingSiblingIter(self, null);
   }
 
   /**
-   * Returns an iterator for a single item.
-   * @param node node
+   * Returns a self axis iterator.
+   * @param test node test (can be {@code null})
    * @return iterator
    */
-  final BasicNodeIter singleIter(final GNode node) {
+  public final BasicNodeIter selfIter(final Test test) {
+    return singleIter(this, test);
+  }
+
+  /**
+   * Returns an iterator for a single node if it matches the specified test.
+   * @param node node (can be {@code null})
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  static BasicNodeIter singleIter(final GNode node, final Test test) {
+    if(node == null || !matches(node, test)) return BasicNodeIter.EMPTY;
+
     return new BasicNodeIter() {
       private boolean called;
 
@@ -378,6 +422,16 @@ public abstract class GNode extends Item {
         return node;
       }
     };
+  }
+
+  /**
+   * Checks if a node matches the specified test.
+   * @param node node
+   * @param test node test (can be {@code null})
+   * @return result of check
+   */
+  static boolean matches(final GNode node, final Test test) {
+    return test == null || test.matches(node);
   }
 
   /**
@@ -406,14 +460,13 @@ public abstract class GNode extends Item {
       QueryContext qc) throws QueryException;
 
   /**
-   * Adds nodes of a child iterator and its descendants.
-   * @param children child nodes
+   * Adds a node and its descendants that match the specified test.
+   * @param node node
+   * @param test node test (can be {@code null})
    * @param nodes node cache
    */
-  private static void addDescendants(final BasicNodeIter children, final GNodeList nodes) {
-    for(final GNode node : children) {
-      nodes.add(node);
-      addDescendants(node.childIter(), nodes);
-    }
+  private static void add(final GNode node, final Test test, final GNodeList nodes) {
+    if(matches(node, test)) nodes.add(node);
+    for(final GNode child : node.childIter()) add(child, test, nodes);
   }
 }

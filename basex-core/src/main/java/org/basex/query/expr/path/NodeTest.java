@@ -54,7 +54,7 @@ public class NodeTest extends Test {
    * @param kind node kind
    */
   private NodeTest(final Kind kind) {
-    super(kind);
+    super(kind, new DBFilter(XNode.dbKind(kind), 0, !kind.oneOf(Kind.NAMESPACE, Kind.JNODE)));
   }
 
   /**
@@ -94,17 +94,6 @@ public class NodeTest extends Test {
   @Override
   public boolean matches(final GNode node) {
     return node.kind() == kind;
-  }
-
-  @Override
-  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
-    final int k = XNode.dbKind(kind);
-    return k != -1 ? k == dbKind : kind != Kind.JNODE;
-  }
-
-  @Override
-  public boolean exact(final Data data) {
-    return kind != Kind.NAMESPACE;
   }
 
   @Override

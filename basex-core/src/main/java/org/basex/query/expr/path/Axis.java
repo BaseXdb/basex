@@ -21,7 +21,7 @@ public enum Axis {
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.ancestorIter(true);
+      return node.ancestorIter(true, test);
     }
   },
 
@@ -29,7 +29,7 @@ public enum Axis {
   ANCESTOR("ancestor", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.ancestorIter(false);
+      return node.ancestorIter(false, test);
     }
   },
 
@@ -39,7 +39,7 @@ public enum Axis {
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info)
       throws QueryException {
       if(node instanceof JNode) throw ATTRAXIS_X.get(info, node.seqType());
-      return node.attributeIter();
+      return node.attributeIter(test);
     }
   },
 
@@ -71,7 +71,7 @@ public enum Axis {
   FOLLOWING_SIBLING_OR_SELF("following-sibling-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.followingSiblingIter(true);
+      return node.followingSiblingIter(true, test);
     }
   },
 
@@ -79,7 +79,7 @@ public enum Axis {
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.followingSiblingIter(false);
+      return node.followingSiblingIter(false, test);
     }
   },
 
@@ -87,7 +87,7 @@ public enum Axis {
   FOLLOWING_OR_SELF("following-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.followingIter(true);
+      return node.followingIter(true, test);
     }
   },
 
@@ -95,7 +95,7 @@ public enum Axis {
   FOLLOWING("following", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.followingIter(false);
+      return node.followingIter(false, test);
     }
   },
 
@@ -113,7 +113,7 @@ public enum Axis {
   PARENT("parent", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.parentIter();
+      return node.parentIter(test);
     }
   },
 
@@ -121,7 +121,7 @@ public enum Axis {
   PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.precedingSiblingIter(true);
+      return node.precedingSiblingIter(true, test);
     }
   },
 
@@ -129,7 +129,7 @@ public enum Axis {
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.precedingSiblingIter(false);
+      return node.precedingSiblingIter(false, test);
     }
   },
 
@@ -137,7 +137,7 @@ public enum Axis {
   PRECEDING_OR_SELF("preceding-or-self", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.precedingIter(true);
+      return node.precedingIter(true, test);
     }
   },
 
@@ -145,7 +145,7 @@ public enum Axis {
   PRECEDING("preceding", false) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.precedingIter(false);
+      return node.precedingIter(false, test);
     }
   },
 
@@ -153,7 +153,7 @@ public enum Axis {
   SELF("self", true) {
     @Override
     BasicNodeIter iter(final GNode node, final Test test, final InputInfo info) {
-      return node.selfIter();
+      return node.selfIter(test);
     }
   };
 
@@ -181,6 +181,27 @@ public enum Axis {
    * @throws QueryException query exception
    */
   abstract BasicNodeIter iter(GNode node, Test test, InputInfo info) throws QueryException;
+
+  /**
+   * Checks if this is one of the specified axes.
+   * @param axis1 first axis
+   * @param axis2 second axis
+   * @return result of check
+   */
+  public boolean oneOf(final Axis axis1, final Axis axis2) {
+    return this == axis1 || this == axis2;
+  }
+
+  /**
+   * Checks if this is one of the specified axes.
+   * @param axis1 first axis
+   * @param axis2 second axis
+   * @param axis3 third axis
+   * @return result of check
+   */
+  public boolean oneOf(final Axis axis1, final Axis axis2, final Axis axis3) {
+    return this == axis1 || this == axis2 || this == axis3;
+  }
 
   /**
    * Checks if this is one of the specified candidates.

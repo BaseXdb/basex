@@ -94,8 +94,11 @@ public class DBNodeSeq extends NativeSeq {
    * @return resulting nodes, or {@code null} if a test cannot be checked on the table
    */
   public final Value steps(final Step[] steps, final Expr expr, final QueryContext qc) {
-    for(final Step step : steps) {
-      if(!step.test.exact(data)) return null;
+    final int sl = steps.length;
+    final DBFilter[] filters = new DBFilter[sl];
+    for(int s = 0; s < sl; s++) {
+      filters[s] = steps[s].test.filter(data);
+      if(!filters[s].exact()) return null;
     }
 
     final int pl = pres.length;
@@ -103,13 +106,13 @@ public class DBNodeSeq extends NativeSeq {
     NODES: for(int i = 0; i < pl; i++) {
       if((i & 0xFFF) == 0) qc.checkStop();
       int pre = pres[i], kind = data.kind(pre);
-      for(final Step step : steps) {
-        if(step.axis == Axis.PARENT) {
+      for(int s = 0; s < sl; s++) {
+        if(steps[s].axis == Axis.PARENT) {
           pre = data.parent(pre, kind);
           if(pre == -1) continue NODES;
           kind = data.kind(pre);
         }
-        if(!step.test.mayMatch(data, pre, kind)) continue NODES;
+        if(!filters[s].mayMatch(data, pre, kind)) continue NODES;
       }
       // skip parents shared by consecutive nodes
       if(list.isEmpty() || list.peek() != pre) list.add(pre);

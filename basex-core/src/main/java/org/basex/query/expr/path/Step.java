@@ -149,17 +149,7 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
-    final BasicNodeIter iter = axis.iter(toContextNode(qc.focus.value), test, info);
-    return new BasicNodeIter() {
-      @Override
-      public GNode next() {
-        for(GNode nd; (nd = iter.next()) != null;) {
-          qc.checkStop();
-          if(test.matches(nd)) return nd;
-        }
-        return null;
-      }
-    };
+    return axis.iter(toContextNode(qc.focus.value), test, info);
   }
 
   /**

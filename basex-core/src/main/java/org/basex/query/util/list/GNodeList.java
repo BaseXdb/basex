@@ -85,33 +85,4 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
   public boolean equals(final Object obj) {
     return obj == this || obj instanceof GNodeList && super.equals(obj);
   }
-
-  /**
-   * Returns a node iterator.
-   * @param nodes nodes
-   * @return iterator
-   */
-  public static BasicNodeIter iter(final GNode[] nodes) {
-    final int nl = nodes.length;
-    return nl == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
-      int pos;
-
-      @Override
-      public long size() {
-        return nl;
-      }
-      @Override
-      public GNode next() {
-        return pos < nl ? nodes[pos++] : null;
-      }
-      @Override
-      public GNode get(final long i) {
-        return nodes[(int) i];
-      }
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(nodes, nl, NodeType.NODE.refine(expr));
-      }
-    };
-  }
 }

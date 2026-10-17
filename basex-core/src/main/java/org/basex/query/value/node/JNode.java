@@ -230,7 +230,7 @@ public final class JNode extends GNode {
   }
 
   @Override
-  public BasicNodeIter attributeIter() {
+  public BasicNodeIter attributeIter(final Test test) {
     return BasicNodeIter.EMPTY;
   }
 
@@ -240,16 +240,25 @@ public final class JNode extends GNode {
     final long cs = childCount();
     if(cs == 0) return BasicNodeIter.EMPTY;
 
-    // direct lookup is always possible for the child axis; for the descendant axis it is
-    // only safe over atomic-leaf values, as nested structures would hide deeper matches
-    final boolean direct = !descendant || atomicLeaves();
-    final Item item = direct && test != null ? test.key() : null;
-    if(item != null) {
-      final JNode child = child(item);
-      return child != null ? singleIter(child) : BasicNodeIter.EMPTY;
-    }
+    // for the descendant axis, direct lookup is only safe over atomic-leaf values
+    final Item item = test == null || descendant && !atomicLeaves() ? null : test.key();
+    final Test tst = descendant ? null : test;
+    if(item != null) return singleIter(child(item), tst);
 
     // map, array or sequence: sequential scan
+    if(tst != null) return new BasicNodeIter() {
+      int s;
+
+      @Override
+      public GNode next() {
+        while(s < cs) {
+          final JNode node = new JNode(JNode.this, s++);
+          if(tst.matches(node)) return node;
+        }
+        return null;
+      }
+    };
+
     return new BasicNodeIter() {
       long s;
 
@@ -277,7 +286,7 @@ public final class JNode extends GNode {
   public BasicNodeIter itemIter(final Test test) {
     final long size = value.size();
     return size > 1 ? childIter(test, false) : size == 0 ? BasicNodeIter.EMPTY :
-      singleIter(new JNode(Itr.ONE, value, this, ITEM));
+      singleIter(new JNode(Itr.ONE, value, this, ITEM), test);
   }
 
   /**

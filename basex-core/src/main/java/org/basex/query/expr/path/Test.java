@@ -21,13 +21,25 @@ import org.basex.util.*;
 public abstract class Test extends ExprInfo {
   /** Node kind. */
   public final Kind kind;
+  /** Filter for database nodes. */
+  final DBFilter filter;
 
   /**
    * Constructor.
    * @param kind node kind
    */
   Test(final Kind kind) {
+    this(kind, new DBFilter(XNode.dbKind(kind), 0, false));
+  }
+
+  /**
+   * Constructor with a filter for database nodes.
+   * @param kind node kind
+   * @param filter filter for database nodes
+   */
+  Test(final Kind kind, final DBFilter filter) {
     this.kind = kind;
+    this.filter = filter;
   }
 
   /**
@@ -119,26 +131,13 @@ public abstract class Test extends ExprInfo {
   public abstract boolean matches(GNode node);
 
   /**
-   * Checks if a database node may match the test, never rejecting a node accepted by
-   * {@link #matches(GNode)}.
+   * Returns a filter for the nodes of the specified database.
    * @param data data reference
-   * @param pre PRE value
-   * @param dbKind database node kind
-   * @return {@code false} if the node does not match
+   * @return filter
    */
   @SuppressWarnings("unused")
-  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
-    return true;
-  }
-
-  /**
-   * Checks if {@link #mayMatch(Data, int, int)} yields exact results for the specified database.
-   * @param data data reference
-   * @return result of check
-   */
-  @SuppressWarnings("unused")
-  public boolean exact(final Data data) {
-    return false;
+  public DBFilter filter(final Data data) {
+    return filter;
   }
 
   /**
