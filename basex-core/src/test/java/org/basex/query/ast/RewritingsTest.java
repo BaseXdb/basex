@@ -2743,6 +2743,51 @@ public final class RewritingsTest extends SandboxTest {
         "2\n1\n0", exists(ValueAccess.class), empty(HashFilter.class));
   }
 
+  /** Range filters on reused roots are evaluated via a sorted index. */
+  @Test public void rangeFilter() {
+    final String cs = "let $cs := (1 to 5) ! <c n='{ . }'/> ";
+    check(cs + "for $o in (2.5e0, 0e0, 4e0) return string-join($cs[@n < $o]/@n, ',')",
+        "1,2\n\n1,2,3", exists(RangeFilter.class));
+    check(cs + "for $o in (2e0, 5e0, 2e0) return string-join($cs[@n <= $o]/@n, ',')",
+        "1,2\n1,2,3,4,5\n1,2", exists(RangeFilter.class));
+    check(cs + "for $o in (3e0, 5e0, 0e0) return string-join($cs[$o < @n]/@n, ',')",
+        "4,5\n\n1,2,3,4,5", exists(RangeFilter.class));
+    check(cs + "for $o in (3e0, 6e0, 3e0) return string-join($cs[@n >= $o]/@n, ',')",
+        "3,4,5\n\n3,4,5", exists(RangeFilter.class));
+    // double keys, untyped probes
+    check(cs + "for $o in (<o v='2.5'/>, <o v='4'/>, <o v='1'/>) "
+        + "return string-join($cs[@n * 1e0 < $o/@v]/@n, ',')", "1,2\n1,2,3\n",
+        exists(RangeFilter.class));
+    // several key values per item
+    final String ks = "let $cs := (<c><k>1</k><k>9</k></c>, <c><k>5</k></c>) ";
+    check(ks + "for $o in (2e0, 6e0, 0.5e0) return count($cs[k < $o])", "1\n2\n0",
+        exists(RangeFilter.class));
+    check(ks + "for $o in (6e0, 8e0, 9e0) return count($cs[k > $o])", "1\n1\n0",
+        exists(RangeFilter.class));
+    // several probe values
+    check(cs + "for $i in 1 to 3 return string-join($cs[@n < ($i * 1e0, 2e0)]/@n, ',')",
+        "1\n1\n1,2", exists(RangeFilter.class));
+    check(cs + "for $i in 1 to 3 return string-join($cs[@n > ($i * 1e0, 4e0)]/@n, ',')",
+        "2,3,4,5\n3,4,5\n4,5", exists(RangeFilter.class));
+    // empty probe
+    check(cs + "for $o in (<o/>, <o/>, <o/>) return count($cs[@n < xs:double($o/@x)])",
+        "0\n0\n0", exists(RangeFilter.class));
+    // NaN keys and probes
+    check("let $cs := (<c n='1'/>, <c n='NaN'/>, <c n='2'/>) "
+        + "for $o in (xs:double('NaN'), 3e0, xs:double('NaN'), 3e0) "
+        + "return string-join($cs[@n < $o]/@n, ',')", "\n1,2\n\n1,2",
+        exists(RangeFilter.class));
+    // decimal probes, untyped probes: sequential evaluation
+    check(cs + "for $o in (2.5, 4.5, 1.5) return string-join($cs[@n < $o]/@n, ',')",
+        "1,2\n1,2,3,4\n1", empty(RangeFilter.class));
+    check(cs + "for $o in (<o v='2'/>, <o v='4'/>, <o v='10'/>) "
+        + "return string-join($cs[@n < $o/@v]/@n, ',')", "1\n1,2,3\n1",
+        empty(RangeFilter.class));
+    // keys that cannot be cast
+    error("let $cs := (<c n='a'/>, <c n='1'/>) "
+        + "for $o in (2e0, 2e0, 2e0) return count($cs[@n < $o])", FUNCCAST_X_X);
+  }
+
   /** Comparisons with unions are only distributed if the other operand is a value. */
   @Test public void unionComparison() {
     check("(<a>1</a> | <b>2</b>) = (" + wrap(2) + ", " + wrap(3) + ')', true, empty(Or.class));

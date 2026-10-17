@@ -279,7 +279,7 @@ public abstract class Filter extends Preds {
   }
 
   /**
-   * Returns a hash filter or an iterative filter for non-positional predicates.
+   * Returns a keyed filter or an iterative filter for non-positional predicates.
    * @return filter
    */
   private Expr iterative() {
@@ -289,15 +289,28 @@ public abstract class Filter extends Preds {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       final int key = HashFilter.key(root, exprs[e]);
-      if(key != -1) {
-        final HashFilter hash = new HashFilter(info, root, exprs[e], key);
-        if(el == 1) return copyType(hash);
-        hash.assignType(null);
-        return copyType(new IterFilter(info, hash, Array.remove(exprs, e)));
-      }
+      if(key != -1) return keyed(new HashFilter(info, root, exprs[e], key), e);
+    }
+    // numeric range predicate with a context-independent operand: range filter
+    // example: for $p in $persons return $auctions[initial * 5000 < $p/@income]
+    for(int e = 0; e < el; e++) {
+      final int key = RangeFilter.key(root, exprs[e]);
+      if(key != -1) return keyed(new RangeFilter(info, root, exprs[e], key), e);
     }
     // otherwise, return iterative filter
     return copyType(new IterFilter(info, root, exprs));
+  }
+
+  /**
+   * Returns a keyed filter, followed by the remaining predicates.
+   * @param filter keyed filter
+   * @param e position of the indexed predicate
+   * @return filter
+   */
+  private Expr keyed(final KeyedFilter<?> filter, final int e) {
+    if(exprs.length == 1) return copyType(filter);
+    filter.assignType(null);
+    return copyType(new IterFilter(info, filter, Array.remove(exprs, e)));
   }
 
   @Override

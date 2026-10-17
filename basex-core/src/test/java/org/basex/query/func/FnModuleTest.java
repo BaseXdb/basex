@@ -263,8 +263,8 @@ public final class FnModuleTest extends SandboxTest {
     check("declare default collation '?lang=de';" + func.args(wrap(1), "1"), true, root(func));
     check(func.args(" array:build((1 to 10)[. = 1] ! string())", "1"), true, root(func));
     check(func.args("1", " array:build((1 to 10)[. = 1] ! string())"), true, root(func));
-    check(func.args("1", " ([ <?_ 1?> ], 1)[. instance of array(*)]"), true, root(func));
-    check(func.args(" ([ <?_ 1?> ], 1)[. instance of array(*)]", "1"), true, root(func));
+    check(func.args("1", " ([ <?_ 1?> ], 1)[xs:integer(<?_ 1?>)]"), true, root(func));
+    check(func.args(" ([ <?_ 1?> ], 1)[xs:integer(<?_ 1?>)]", "1"), true, root(func));
     check(func.args(" #a", " <?_ 1?>"), false, root(func));
     check(func.args(" <?_ 1?>", " #a"), false, root(func));
     check(func.args(" <?_ 1?>", " true()"), false, root(func));

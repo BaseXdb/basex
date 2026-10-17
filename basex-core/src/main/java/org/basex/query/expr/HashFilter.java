@@ -1,8 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -19,10 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class HashFilter extends Filter {
-  /** Position of the predicate operand that depends on the context. */
-  private final int key;
-
+public final class HashFilter extends KeyedFilter<HashFilter.Cache> {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -31,8 +26,7 @@ public final class HashFilter extends Filter {
    * @param key position of the context-dependent operand (see {@link #key(Expr, Expr)})
    */
   HashFilter(final InputInfo info, final Expr root, final Expr pred, final int key) {
-    super(info, root, pred);
-    this.key = key;
+    super(info, root, pred, key);
   }
 
   /**
@@ -42,55 +36,18 @@ public final class HashFilter extends Filter {
    * @return position of the operand, or {@code -1} if the predicate cannot be hashed
    */
   static int key(final Expr root, final Expr pred) {
-    if(root.seqType().zeroOrOne() || !(pred instanceof final CmpG cmp) ||
-        cmp.op != CmpOp.EQ || cmp.sc().collation != null) return -1;
-    for(int k = 0; k < 2; k++) {
-      final Expr kx = cmp.arg(k), px = cmp.arg(1 - k);
-      final Type kt = kx.seqType().type, pt = px.seqType().type;
-      if(kx.has(Flag.CTX) && !kx.has(Flag.POS, Flag.NDT) && !(px instanceof Value) &&
-          !px.has(Flag.CTX, Flag.POS, Flag.NDT) && (CmpHashG.hashable(kt, pt) ||
-          kt.isUntyped() && pt.instanceOf(BasicType.DECIMAL)) &&
-          !kx.hasFreeVars()) return k;
-    }
-    return -1;
+    return key(root, pred, cmp -> cmp.op == CmpOp.EQ && cmp.sc().collation == null,
+      (kt, pt) -> CmpHashG.hashable(kt, pt) || kt.isUntyped() && pt.instanceOf(BasicType.DECIMAL));
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = root.iter(qc);
-    final Value hashed = hashed(iter, qc);
-    return hashed != null ? hashed.iter() : filterIter(iter, qc);
+  Cache cache() {
+    return new Cache();
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = root.iter(qc);
-    final Value hashed = hashed(iter, qc);
-    return hashed != null ? hashed : filterValue(iter, qc);
-  }
-
-  /**
-   * Evaluates the filter via the hash index of a root value that has been filtered before.
-   * @param iter iterator of the root expression
-   * @param qc query context
-   * @return result, or {@code null} if the filter must be evaluated sequentially
-   * @throws QueryException query exception
-   */
-  private Value hashed(final Iter iter, final QueryContext qc) throws QueryException {
-    final Value value = iter.eagerValue();
-    if(value == null || value.size() < 2 || value.size() > Integer.MAX_VALUE) return null;
-
-    // first evaluation with this root: remember it, evaluate sequentially
-    final Cache cache = qc.caches.get(this, Cache::new);
-    if(cache.root != value) {
-      cache.root = value;
-      cache.index = null;
-      cache.numbers = null;
-      cache.family = null;
-      cache.noNumbers = false;
-      return null;
-    }
-
+  Value indexed(final Value value, final Cache cache, final QueryContext qc)
+      throws QueryException {
     // keys of different or unsupported families: evaluate sequentially
     if(cache.family == BasicType.ITEM) return null;
     final Value probes = exprs[0].arg(1 - key).atomValue(qc, info);
@@ -115,12 +72,7 @@ public final class HashFilter extends Filter {
       }
       positions.ddo();
     }
-
-    final int ps = positions.size();
-    if(ps == 1) return value.itemAt(positions.get(0));
-    final ValueBuilder vb = new ValueBuilder(qc, ps);
-    for(int p = 0; p < ps; p++) vb.add(value.itemAt(positions.get(p)));
-    return vb.value(this);
+    return items(value, positions, qc);
   }
 
   /**
@@ -133,27 +85,16 @@ public final class HashFilter extends Filter {
    */
   private ItemObjectMap<IntList> index(final Value value, final Cache cache,
       final QueryContext qc) throws QueryException {
-    final Expr kx = exprs[0].arg(key);
     final ItemObjectMap<IntList> index = new ItemObjectMap<>(ItemSet.Mode.EQUAL, info);
-    final QueryFocus qf = qc.focus;
-    final Value qv = qf.value;
-    try {
-      final int vs = (int) value.size();
-      for(int p = 0; p < vs; p++) {
-        qc.checkStop();
-        qf.value = value.itemAt(p);
-        final Iter iter = kx.atomIter(qc, info);
-        for(Item item; (item = qc.next(iter)) != null;) {
-          cache.family = CmpHashG.family(cache.family, item);
-          if(cache.family == BasicType.ITEM) return null;
-          final IntList list = index.computeIfAbsent(item, () -> new IntList(1));
-          if(list.isEmpty() || list.peek() != p) list.add(p);
-        }
+    return keys(value, qc, (p, iter) -> {
+      for(Item item; (item = qc.next(iter)) != null;) {
+        cache.family = CmpHashG.family(cache.family, item);
+        if(cache.family == BasicType.ITEM) return false;
+        final IntList list = index.computeIfAbsent(item, () -> new IntList(1));
+        if(list.isEmpty() || list.peek() != p) list.add(p);
       }
-    } finally {
-      qf.value = qv;
-    }
-    return index;
+      return true;
+    }) ? index : null;
   }
 
   /**
@@ -217,9 +158,7 @@ public final class HashFilter extends Filter {
   /**
    * Hash index of the last filtered root value.
    */
-  public static final class Cache {
-    /** Last filtered root value (compared by identity). */
-    Value root;
+  static final class Cache {
     /** Index from keys to item positions (built on the second evaluation). */
     ItemObjectMap<IntList> index;
     /** Index from untyped keys, cast to numbers, to item positions (built on demand). */
