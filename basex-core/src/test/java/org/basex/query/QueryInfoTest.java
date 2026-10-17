@@ -110,7 +110,8 @@ public final class QueryInfoTest extends SandboxTest {
     execute(query);
     final String info = String.join("\n", QueryInfo.lines(query.sections().sections().
         get("compilation")));
-    assertTrue(info.contains("-> (<a><b/></a>/b)[c]"), info);
+    assertTrue(info.contains("merge: pipeline"), info);
+    assertFalse(info.contains("/b[c]"), info);
   }
 
   /** Messages for flattened and internal expressions. */
