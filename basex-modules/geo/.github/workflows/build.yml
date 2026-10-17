@@ -1,0 +1,47 @@
+name: Build and Test BaseX Geo Module
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  # weekly run (Mondays), to verify the module against the latest BaseX snapshot
+  schedule:
+    - cron: '30 4 * * 1'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Set up Java
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      # Build the project using Maven (-U: always fetch the latest BaseX snapshot)
+      - name: Build with Maven
+        run: mvn -B -U clean verify
+
+      # Archive test reports and possible dumps in case of failure
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: |
+            **/target/surefire-reports/*.xml
+            **/target/surefire-reports/*.txt
+            **/*.dump
+            **/*.dumpstream
