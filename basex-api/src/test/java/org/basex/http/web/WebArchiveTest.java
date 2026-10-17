@@ -3,6 +3,7 @@ package org.basex.http.web;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
@@ -89,8 +90,7 @@ public final class WebArchiveTest extends HTTPTest {
   @Test public void repository() throws Exception {
     // identity is adopted from the descriptor, not from the versioned file name
     final RepoManager repo = new RepoManager(HTTPContext.get().context());
-    final Pkg pkg = repo.packages().stream().filter(p -> p.type() == PkgType.WEB).
-        findFirst().orElseThrow();
+    final Pkg pkg = web(repo).get(0);
     assertEquals("demo", pkg.name());
     assertEquals("1.2", pkg.version());
 
@@ -99,19 +99,55 @@ public final class WebArchiveTest extends HTTPTest {
     assertFalse(repo.ids().contains("demo"));
 
     // reinstall under a different file name; the old archive must not survive
-    final IOFile source = new IOFile(Prop.TEMPDIR, "demo-1.3" + IO.ZIPSUFFIX);
-    source.write(archive(ENTRIES));
-    try {
-      repo.install(source.path());
-      repo.install(source.path());
-    } finally {
-      source.delete();
-    }
-    assertEquals(1, repo.packages().stream().filter(p -> p.type() == PkgType.WEB).count());
+    install(repo, "demo-1.3" + IO.ZIPSUFFIX);
+    install(repo, "demo-1.3" + IO.ZIPSUFFIX);
+    assertEquals(1, web(repo).size());
 
     // restore the original file name for the remaining tests
     repo.delete("demo");
     archive().write(archive(ENTRIES));
+  }
+
+  /**
+   * Installs an application that is packaged as JAR file.
+   * @throws Exception exception
+   */
+  @Test public void jar() throws Exception {
+    final RepoManager repo = new RepoManager(HTTPContext.get().context());
+    install(repo, "modules-demo-1.3" + IO.JARSUFFIX);
+    // the archive replaces the existing application and is stored with the archive suffix
+    final List<Pkg> web = web(repo);
+    assertEquals(1, web.size());
+    assertEquals("demo" + IO.ZIPSUFFIX, repo.path(web.get(0)).name());
+
+    // restore the original file name for the remaining tests
+    repo.delete("demo");
+    archive().write(archive(ENTRIES));
+  }
+
+  /**
+   * Installs the test application from a temporary file.
+   * @param repo repository manager
+   * @param name file name
+   * @throws Exception exception
+   */
+  private static void install(final RepoManager repo, final String name) throws Exception {
+    final IOFile source = new IOFile(Prop.TEMPDIR, name);
+    source.write(archive(ENTRIES));
+    try {
+      repo.install(source.path());
+    } finally {
+      source.delete();
+    }
+  }
+
+  /**
+   * Returns the installed web applications.
+   * @param repo repository manager
+   * @return packages
+   */
+  private static List<Pkg> web(final RepoManager repo) {
+    return repo.packages().stream().filter(p -> p.type() == PkgType.WEB).toList();
   }
 
   /**

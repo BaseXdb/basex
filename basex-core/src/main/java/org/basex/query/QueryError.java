@@ -418,6 +418,9 @@ public enum QueryError {
   REPO_PARSE_X_X(REPO, "parse", "%: %."),
   /** Error code. */
   REPO_VERSION(REPO, "version", "Package version is not supported."),
+  /** Error code. */
+  REPO_VERSION_X_X_X(REPO, "version",
+      "No version of '%' is compatible with BaseX %; available: %."),
 
   // Request Module
 

@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -27,6 +28,15 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
+  /** Module name pattern, with optional version. */
+  private static final Pattern MODULE =
+      Pattern.compile("^([a-z][-a-z0-9]*)(?::(\\d+(?:\\.\\d+)*(?:-SNAPSHOT)?))?$");
+  /** Release version pattern. */
+  private static final Pattern RELEASE = Pattern.compile("\\d+(?:\\.\\d+)*");
+  /** Suffix of snapshot versions. */
+  private static final String SNAPSHOT = "-SNAPSHOT";
+  /** URL prefix of the BaseX modules in the Maven repository. */
+  private static final String MODULES_URL = FILES_URL + "/maven/org/basex/modules/";
   /** Context. */
   private final Context context;
   /** Input info (can be {@code null}). */
@@ -52,13 +62,13 @@ public final class RepoManager {
 
   /**
    * Installs a package.
-   * @param source source
+   * @param source path, URL, or name of a BaseX module (with optional version)
    * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    */
   public boolean install(final String source) throws QueryException {
     // check if package exists, and cache contents
-    final IO io = IO.get(source);
+    final IO io = IO.get(resolve(source));
     final byte[] content;
     try {
       content = io.read();
@@ -68,10 +78,13 @@ public final class RepoManager {
 
     try {
       if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, source);
-      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(content, source);
       final byte[] desc = new RepoArchive(content).entry(WEBDESCRIPTOR);
-      return desc != null ? installWeb(content, io.name(), webPkg(desc, io.name())) :
-        installXAR(content);
+      if(desc != null) {
+        // web applications in other files (e.g., JAR files) are stored as ZIP archives
+        final Pkg pkg = webPkg(desc, io.name());
+        return installWeb(content, io.isArchive() ? io.name() : pkg.name() + IO.ZIPSUFFIX, pkg);
+      }
+      return io.hasSuffix(IO.JARSUFFIX) ? installJAR(content, source) : installXAR(content);
     } catch(final IOException ex) {
       throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
@@ -212,6 +225,94 @@ public final class RepoManager {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Resolves the name of a BaseX module to the URL of its JAR file in the Maven repository.
+   * @param source path, URL, or module name
+   * @return URL of the module, or original source
+   * @throws QueryException query exception
+   */
+  private String resolve(final String source) throws QueryException {
+    final Matcher module = MODULE.matcher(source);
+    final IOFile file = new IOFile(source);
+    if(!module.matches() || file.exists() && !file.isDir()) return source;
+
+    final String name = module.group(1), artifact = "modules-" + name;
+    final String url = MODULES_URL + artifact + '/';
+    final String version = module.group(2) != null ? module.group(2) : version(name, url);
+    final String dir = url + version + '/';
+    String id = version;
+    if(version.endsWith(SNAPSHOT)) {
+      // file names of snapshots include timestamp and build number
+      final DBNode doc = metadata(dir, name);
+      final StringList timestamp = values(doc, "timestamp"), build = values(doc, "buildNumber");
+      if(!timestamp.isEmpty() && !build.isEmpty()) {
+        id = version.replace(SNAPSHOT, '-' + timestamp.get(0) + '-' + build.get(0));
+      }
+    }
+    return dir + artifact + '-' + id + IO.JARSUFFIX;
+  }
+
+  /**
+   * Returns the highest version of a BaseX module that is compatible with the BaseX version.
+   * @param name module name
+   * @param url URL of the module directory
+   * @return version
+   * @throws QueryException query exception
+   */
+  private String version(final String name, final String url) throws QueryException {
+    final String current = Prop.VERSION.replaceAll(" .*", "");
+    final Version max = new Version(current), major = new Version(current.replaceAll("\\..*", ""));
+    final StringList versions = values(metadata(url, name), "version");
+    if(versions.isEmpty()) throw REPO_NOTFOUND_X.get(info, name);
+
+    String best = null;
+    for(final String string : versions) {
+      if(!RELEASE.matcher(string).matches()) continue;
+      final Version version = new Version(string);
+      if(version.isCompatible(major) && version.compareTo(max) <= 0 &&
+          (best == null || version.compareTo(new Version(best)) > 0)) best = string;
+    }
+    // beta versions of BaseX: prefer snapshot of the current version to older releases
+    final String snapshot = current + SNAPSHOT;
+    if(!current.equals(Prop.VERSION) && versions.contains(snapshot) &&
+        (best == null || new Version(best).compareTo(max) < 0)) best = snapshot;
+
+    if(best == null) {
+      throw REPO_VERSION_X_X_X.get(info, name, current, String.join(", ", versions.finish()));
+    }
+    return best;
+  }
+
+  /**
+   * Parses the Maven metadata of a module directory.
+   * @param url URL of the directory
+   * @param name module name
+   * @return document node
+   * @throws QueryException query exception
+   */
+  private DBNode metadata(final String url, final String name) throws QueryException {
+    try {
+      return new DBNode(IO.get(url + "maven-metadata.xml"));
+    } catch(final IOException ex) {
+      throw REPO_NOTFOUND_X.get(info, name).cause(ex);
+    }
+  }
+
+  /**
+   * Returns the string values of all elements with the specified name.
+   * @param doc document node
+   * @param name element name
+   * @return values
+   */
+  private static StringList values(final DBNode doc, final String name) {
+    final StringList values = new StringList();
+    final byte[] nm = token(name);
+    for(final GNode node : doc.descendantIter(false)) {
+      if(node.kind() == Kind.ELEMENT && eq(node.name(), nm)) values.add(string(node.string()));
+    }
+    return values;
+  }
 
   /**
    * Adds a package to the specified map.
