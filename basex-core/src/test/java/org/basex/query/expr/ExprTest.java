@@ -343,6 +343,17 @@ public final class ExprTest extends SandboxTest {
         exists(CmpHashG.class));
   }
 
+  /** Comparison expressions: numeric probes against untyped values. */
+  @Test @Timeout(value = 30, threadMode = ThreadMode.SEPARATE_THREAD) public void cmpGNumeric() {
+    check("let $ids := (1 to 100000) ! <b id='{ . }'/>/@id "
+        + "return count((1 to 100000)[. = $ids])", 100000, exists(CmpHashG.class));
+    check("let $ids := (<b id='01'/>, <b id='2.0'/>, <b id='3.5'/>)/@id "
+        + "return (0 to 4, 3.5)[. = $ids]", "1\n2\n3.5", exists(CmpHashG.class));
+    check("let $ids := (<b id='1'/>, <b id='x'/>)/@id return (1, 1)[. = $ids]", "1\n1",
+        exists(CmpHashG.class));
+    error("let $ids := (<b id='1'/>, <b id='x'/>)/@id return (2, 3)[. = $ids]", FUNCCAST_X_X);
+  }
+
   /** Comparison expressions: recursive evaluation of a hashed comparison. */
   @Test public void cmpGRecursive() {
     check("declare %basex:inline(0) function f($d, $n) {\n"

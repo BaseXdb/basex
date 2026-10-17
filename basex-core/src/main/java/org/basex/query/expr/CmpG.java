@@ -131,12 +131,15 @@ public class CmpG extends Cmp {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() &&
-          CmpHashG.hashable(type1, type2)) {
+          CmpHashG.hashable(type2, type1)) {
         // hash-based comparisons
         if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
         // range comparisons
         if(!(this instanceof CmpRangeG)) expr = copyType(new CmpRangeG(expr1, expr2, op, info));
+      } else if(getClass() != CmpG.class) {
+        // operands have been swapped or inlined: default comparison
+        expr = copyType(new CmpG(info, expr1, expr2, op));
       }
 
       // pre-evaluate expression

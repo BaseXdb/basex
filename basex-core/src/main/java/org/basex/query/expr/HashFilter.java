@@ -37,7 +37,7 @@ public final class HashFilter extends KeyedFilter<HashFilter.Cache> {
    */
   static int key(final Expr root, final Expr pred) {
     return key(root, pred, cmp -> cmp.op == CmpOp.EQ && cmp.sc().collation == null,
-      (kt, pt) -> CmpHashG.hashable(kt, pt) || kt.isUntyped() && pt.instanceOf(BasicType.DECIMAL));
+      CmpHashG::hashable);
   }
 
   @Override
@@ -107,10 +107,10 @@ public final class HashFilter extends KeyedFilter<HashFilter.Cache> {
   private ItemObjectMap<IntList> select(final Value probes, final Cache cache)
       throws QueryException {
     // probes of the family of the keys, or integer and decimal probes for untyped keys
-    boolean family = true, numeric = cache.family == BasicType.STRING && !cache.noNumbers;
+    boolean family = true, numeric = !cache.noNumbers;
     for(final Item item : probes) {
       family &= CmpHashG.family(item.type) == cache.family;
-      numeric &= item instanceof final ANum num && !num.floating();
+      numeric &= CmpHashG.numeric(cache.family, item);
       if(!family && !numeric) return null;
     }
     if(family) return cache.index;
@@ -132,16 +132,8 @@ public final class HashFilter extends KeyedFilter<HashFilter.Cache> {
     final ItemObjectMap<IntList> numbers = new ItemObjectMap<>(ItemSet.Mode.EQUAL, info);
     final int is = index.size();
     for(int i = 1; i <= is; i++) {
-      final Item item = index.key(i);
-      if(!item.type.isUntyped()) return null;
-      final ANum num;
-      try {
-        num = ANum.decimal(item, info);
-      } catch(final QueryException ex) {
-        // the error will be raised by the sequential evaluation
-        Util.debug(ex);
-        return null;
-      }
+      final ANum num = CmpHashG.number(index.key(i), info);
+      if(num == null) return null;
       // equal numbers ('1', '01'): merge positions
       final IntList positions = index.value(i), list = numbers.get(num);
       numbers.put(num, list == null ? positions :

@@ -2662,7 +2662,7 @@ public final class RewritingsTest extends SandboxTest {
     check(func + "for $s in (<a>x</a>, <a>01</a>) return local:f($s, ('x', 1))", "true\ntrue",
         exists(CmpHashG.class));
     check(func + "for $s in (<a>01</a>, <a>1</a>) return local:f($s, (1, 2))", "true\ntrue",
-        exists(CmpHashG.class));
+        empty(CmpHashG.class));
   }
 
   /** Equality filters on reused roots are evaluated via a hash index. */
@@ -2886,7 +2886,7 @@ public final class RewritingsTest extends SandboxTest {
     check(doc + "/((a ! (@k = 2)) != false())", true, empty(DualMap.class));
     check(doc + "/((a ! (position() = 2)) = true())", true, root(CmpG.class));
     check("for $i in (2, 3) let $d := " + doc + " return some $a in $d/a satisfies $a/@k = $i",
-        "true\nfalse", exists(CmpG.class), empty(EXISTS));
+        "true\nfalse", exists(CmpHashG.class), empty(EXISTS));
   }
 
   /** Existence checks of paths with predicates, rewritten to comparisons. */

@@ -58,13 +58,41 @@ public final class CmpHashG extends CmpG {
 
   /**
    * Checks if values of the specified types may be compared via hashing.
-   * @param type1 first type
-   * @param type2 second type
+   * @param keys type of the hashed values
+   * @param probes type of the probed values
    * @return result of check
    */
-  static boolean hashable(final Type type1, final Type type2) {
-    final Type f1 = family(type1), f2 = family(type2);
-    return f1 != null && f2 != null && (f1 == f2 || f1 == BasicType.ITEM || f2 == BasicType.ITEM);
+  static boolean hashable(final Type keys, final Type probes) {
+    final Type f1 = family(keys), f2 = family(probes);
+    return f1 != null && f2 != null && (f1 == f2 || f1 == BasicType.ITEM || f2 == BasicType.ITEM) ||
+      keys.isUntyped() && probes.instanceOf(BasicType.DECIMAL);
+  }
+
+  /**
+   * Checks if an item can be probed against keys of the specified family, cast to numbers.
+   * @param family family of the keys
+   * @param probe probed item
+   * @return result of check
+   */
+  static boolean numeric(final Type family, final Item probe) {
+    return family == BasicType.STRING && probe instanceof final ANum num && !num.floating();
+  }
+
+  /**
+   * Casts an untyped key to a number (see {@link ANum#decimal(Item, InputInfo)}).
+   * @param key key
+   * @param info input info (can be {@code null})
+   * @return number, or {@code null} if the key is no untyped value or cannot be cast
+   */
+  static ANum number(final Item key, final InputInfo info) {
+    if(!key.type.isUntyped()) return null;
+    try {
+      return ANum.decimal(key, info);
+    } catch(final QueryException ex) {
+      // the error will be raised by the sequential evaluation
+      Util.debug(ex);
+      return null;
+    }
   }
 
   @Override
@@ -132,33 +160,40 @@ public final class CmpHashG extends CmpG {
       final QueryContext qc) throws QueryException {
     final HashItemSet set = cache.set;
     final Type family = family(item1.type);
-    if(cache.family != null && family != cache.family) return compare(item1, value2, qc);
-    if(set.contains(item1)) {
-      cache.hit = true;
-      return true;
-    }
+    if(cache.family != null && family != cache.family) return findNumber(item1, value2, cache, qc);
+    if(cache.contains(set, item1)) return true;
 
     // cache remaining items (stop after first hit)
     final Iter ir2 = cache.iter;
     if(ir2 != null) {
       for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        cache.family = family(cache.family, item2);
-        // items of different or unsupported families: dismiss cache, compare sequentially
-        if(cache.family == BasicType.ITEM) {
-          cache.dismiss();
-          return compare(item1, value2, qc);
-        }
-        set.add(item2);
-        if(family != cache.family) return compare(item1, value2, qc);
-        if(set.contains(item1)) {
-          cache.hit = true;
-          return true;
-        }
+        // items of different or unsupported families: compare sequentially
+        if(!cache.add(item2)) return compare(item1, value2, qc);
+        if(family != cache.family) return findNumber(item1, value2, cache, qc);
+        if(cache.contains(set, item1)) return true;
       }
       // iterator exhausted, all items are cached
       cache.iter = null;
     }
     return false;
+  }
+
+  /**
+   * Looks up an integer or decimal item in the cached untyped items, cast to numbers.
+   * @param item1 item of the left-hand operand
+   * @param value2 right-hand operand
+   * @param cache active cache
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean findNumber(final Item item1, final Value value2, final CmpCache cache,
+      final QueryContext qc) throws QueryException {
+    if(numeric(cache.family, item1)) {
+      final HashItemSet numbers = cache.numbers(qc);
+      if(numbers != null) return cache.contains(numbers, item1);
+    }
+    return compare(item1, value2, qc);
   }
 
   /**
