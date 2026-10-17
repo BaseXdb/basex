@@ -321,7 +321,9 @@ public final class RepoManager {
    * @param map map
    */
   private static void add(final String name, final String path, final TreeMap<String, Pkg> map) {
-    add(new Pkg(name).path(path), map);
+    // ignore files that are neither XQuery modules nor JAR files
+    final Pkg pkg = new Pkg(name).path(path);
+    if(pkg.type() != PkgType.EXPATH) add(pkg, map);
   }
 
   /**

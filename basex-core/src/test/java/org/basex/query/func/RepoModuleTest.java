@@ -73,6 +73,8 @@ public final class RepoModuleTest extends SandboxTest {
     contains(func.toString(), PKG4);
     query("every $package in " + func.args() + " satisfies $package instance of element(package)",
         true);
+    // ignore files that are no packages
+    query(func.args() + "[ends-with(@path, '.xar')]", "");
     query(_REPO_DELETE.args(PKG4));
     query(_REPO_DELETE.args(PKG3));
   }
