@@ -2,8 +2,6 @@ package org.basex.query.util;
 
 import static org.basex.query.value.type.Types.*;
 
-import java.text.*;
-
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -45,8 +43,8 @@ public final class DeepEqualOptions extends Options {
   /** Option: nilled-property. */
   public static final BooleanOption NILLED_PROPERTY = new BooleanOption("nilled-property", false);
   /** Option: normalization-form. */
-  public static final EnumOption<Normalizer.Form> NORMALIZATION_FORM =
-      new EnumOption<>("normalization-form", Normalizer.Form.class, STRING_ZO);
+  public static final EnumOption<NormalizationForm> NORMALIZATION_FORM =
+      new EnumOption<>("normalization-form", NormalizationForm.class, STRING_ZO);
   /** Option: ordered. */
   public static final BooleanOption ORDERED = new BooleanOption("ordered", true);
   /** Option: processing-instructions. */

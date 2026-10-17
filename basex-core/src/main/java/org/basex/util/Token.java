@@ -712,8 +712,12 @@ public final class Token {
    * @return true if the tokens are equal
    */
   public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
-    final Normalizer.Form form = deep.normalization;
-    byte[] t1 = normalize(token1, form), t2 = normalize(token2, form);
+    final NormalizationForm form = deep.normalization;
+    byte[] t1 = token1, t2 = token2;
+    if(form != null) {
+      t1 = form.normalize(t1);
+      t2 = form.normalize(t2);
+    }
     if(deep.whitespace) {
       t1 = normalize(t1);
       t2 = normalize(t2);

@@ -1125,6 +1125,12 @@ public final class FnModuleTest extends SandboxTest {
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_001)", false);
     // options supplied as JNode
     query(func.args(1, 1, " jtree({ 'o': { 'debug': false() } })/o"), true);
+    // normalization forms
+    final String ae = " 'a' || char(0x308)", ui = " char(0x308) || 'u'";
+    query(func.args(ae, "ä", " { 'normalization-form': 'NFC' }"), true);
+    query(func.args(ae, "ä", " { 'normalization-form': 'FULLY-NORMALIZED' }"), true);
+    query(func.args(ui, " ' ' || " + ui, " { 'normalization-form': 'FULLY-NORMALIZED' }"), true);
+    query(func.args(ui, " ' ' || " + ui, " { 'normalization-form': 'NFC' }"), false);
 
     // function items are compared for equivalence
     query(func.args(" true#0", " true#0"), true);
@@ -3818,6 +3824,30 @@ return
     query("boolean(" + func.args(" <?_ x?>") + ')', true);
     query("boolean(" + func.args(" <?_  x ?>") + ')', true);
     query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
+  }
+
+  /** Test method. */
+  @Test public void normalizeUnicode() {
+    final Function func = NORMALIZE_UNICODE;
+    final String full = "FULLY-NORMALIZED";
+    final java.util.function.Function<String, String> cps = arg ->
+      "string-join(string-to-codepoints(" + func.args(" codepoints-to-string(" + arg + ")", full) +
+      "), ' ')";
+
+    query(func.args("", full), "");
+    query(func.args("blah", full), "blah");
+    query(func.args("blah", " 'fully-normalized'"), "blah");
+    // composing characters: second character of decomposition, non-zero combining class
+    query(cps.apply("2494"), "32 2494");
+    query(cps.apply("769"), "32 769");
+    query(cps.apply("820"), "32 820");
+    query(cps.apply("(2494, 97)"), "32 2494 97");
+    // no composing characters
+    query(cps.apply("(101, 769)"), "233");
+    query(cps.apply("(97, 769)"), "225");
+    query(cps.apply("(2503, 2494)"), "2507");
+
+    error(func.args("blah", "X"), NORMUNI_X);
   }
 
   /** Test method. */

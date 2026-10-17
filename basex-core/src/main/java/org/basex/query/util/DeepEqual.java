@@ -1,6 +1,5 @@
 package org.basex.query.util;
 
-import java.text.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -32,7 +31,7 @@ public final class DeepEqual {
   /** Options. */
   public final DeepEqualOptions options;
   /** Unicode normalization form for strings (can be {@code null}). */
-  public final Normalizer.Form normalization;
+  public final NormalizationForm normalization;
   /** Whitespace normalization for strings. */
   public final boolean whitespace;
   /** Compare type annotations of atomic items. */

@@ -3,8 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.text.Normalizer.Form;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -22,17 +20,14 @@ public final class FnNormalizeUnicode extends StandardFunc {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] form = toTokenOrNull(arg(1), qc);
 
-    Form frm = Form.NFC;
+    NormalizationForm nf = NormalizationForm.NFC;
     if(form != null) {
       final byte[] norm = uc(trim(form));
       if(norm.length == 0) return value;
-      try {
-        frm = Form.valueOf(string(norm));
-      } catch(final IllegalArgumentException ex) {
-        throw NORMUNI_X.get(info, form).cause(ex);
-      }
+      nf = Enums.get(NormalizationForm.class, string(norm));
+      if(nf == null) throw NORMUNI_X.get(info, form);
     }
-    final byte[] bytes = value.string(info), normalized = Token.normalize(bytes, frm);
-    return normalized == bytes ? value : Str.get(normalized);
+    final byte[] string = value.string(info), normalized = nf.normalize(string);
+    return normalized == string ? value : Str.get(normalized);
   }
 }
