@@ -702,6 +702,30 @@ public final class XQuery4Test extends SandboxTest {
     error("declare variable $x := 1 idiv 0; if(<a/>/b) then $x else 1", DIVZERO_X);
   }
 
+  /** Guarded expressions: positions are guarded by a non-empty input. */
+  @Test public void guardedPositions() {
+    final String input = "let $e := 1 to xs:integer(" + wrap(0) + ") return ";
+    final String pos = "xs:integer(" + wrap("a") + ")";
+
+    query(input + "$e[" + pos + "]", "");
+    query(input + "$e[position() = " + pos + "]", "");
+    query(input + "$e[position() = 1 to " + pos + "]", "");
+    query(input + "$e[(" + pos + ", 1)]", "");
+    query(input + "$e[position() != " + pos + "]", "");
+    query(input + "for $p at $i in $e where $i = " + pos + " return $p", "");
+    query(input + ITEMS_AT.args(" $e", " " + pos), "");
+    query(input + ITEMS_AT.args(" $e", " (" + pos + ", 1)"), "");
+    query(input + SUBSEQUENCE.args(" $e", " " + pos), "");
+    query(input + _UTIL_RANGE.args(" $e", " " + pos, 2), "");
+    query(input + REMOVE.args(" $e", " " + pos), "");
+
+    final String nonEmpty = "let $e := 1 to xs:integer(" + wrap(2) + ") return ";
+    error(nonEmpty + "$e[" + pos + "]", FUNCCAST_X_X);
+    error(nonEmpty + "$e[(" + pos + ", 1)]", FUNCCAST_X_X);
+    error(nonEmpty + SUBSEQUENCE.args(" $e", " " + pos), FUNCCAST_X_X);
+    error(nonEmpty + REMOVE.args(" $e", " " + pos), FUNCCAST_X_X);
+  }
+
   /** Window expression. */
   @Test public void window() {
     query("for tumbling window $w in 1 to 2 "

@@ -418,6 +418,25 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an argument that is guarded by a non-empty input (first argument).
+   * @param <T> result type
+   * @param supplier argument evaluation
+   * @param empty result for an empty input
+   * @param qc query context
+   * @return result of the evaluation, or the empty result if it failed and the input is empty
+   * @throws QueryException query exception
+   */
+  protected final <T> T guarded(final QuerySupplier<T> supplier, final T empty,
+      final QueryContext qc) throws QueryException {
+    try {
+      return supplier.get();
+    } catch(final QueryException ex) {
+      if(qc.next(arg(0).iter(qc)) != null) throw ex;
+      return empty;
+    }
+  }
+
+  /**
    * Evaluates an expression to a date.
    * @param expr expression
    * @param qc query context

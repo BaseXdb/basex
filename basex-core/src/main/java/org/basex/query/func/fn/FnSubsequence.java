@@ -36,7 +36,7 @@ public class FnSubsequence extends StandardFunc {
     if(eager()) return value(qc).iter();
 
     // no range: return empty sequence
-    final SeqRange sr = range(qc);
+    final SeqRange sr = guarded(() -> range(qc), EMPTY, qc);
     if(sr == EMPTY) return Empty.ITER;
 
     // return iterator if all results are returned, or if iterator yields no items
@@ -89,7 +89,7 @@ public class FnSubsequence extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // no range: return empty sequence
-    final SeqRange sr = range(qc);
+    final SeqRange sr = guarded(() -> range(qc), EMPTY, qc);
     if(sr == EMPTY) return Empty.VALUE;
 
     // return iterator if all results are returned, or if iterator yields no items

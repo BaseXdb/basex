@@ -47,7 +47,7 @@ public final class FnItemsAt extends StandardFunc {
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
     final Expr at = arg(1);
-    final Item pos = at.atomItem(qc, info);
+    final Item pos = guarded(() -> at.atomItem(qc, info), Empty.VALUE, qc);
     if(!pos.isEmpty()) {
       // retrieve (possibly invalid) position
       long l = Pos.position(toNumber(pos, at)) - 1;
@@ -86,6 +86,7 @@ public final class FnItemsAt extends StandardFunc {
    */
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
+    if(input.isEmpty()) return Empty.ITER;
     final Expr at = arg(1);
     final Iter iter = at.atomIter(qc, info);
     // hidden option, indicates whether the positions are sorted

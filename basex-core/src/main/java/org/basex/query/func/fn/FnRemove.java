@@ -22,8 +22,8 @@ public final class FnRemove extends StandardFunc {
     if(eager()) return value(qc).iter();
 
     final Iter iter = arg(0).iter(qc);
-    final LongList pos = positions(qc);
-    if(pos.isEmpty()) return iter;
+    final LongList pos = guarded(() -> positions(qc), null, qc);
+    if(pos == null || pos.isEmpty()) return iter;
 
     // value-based iterator
     final Value value = iter.eagerValue();
@@ -53,6 +53,7 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
+    if(input.isEmpty()) return input;
     final LongList positions = positions(qc);
     return value(input, positions, qc);
   }
