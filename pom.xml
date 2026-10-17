@@ -10,6 +10,7 @@
 
   <modules>
     <module>basex-core</module>
+    <module>basex-webapps</module>
     <module>basex-api</module>
   </modules>
 
@@ -323,6 +324,13 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>basex-publish</publishingServerId>
+              <!-- web applications are only published in the BaseX Maven repository -->
+              <excludeArtifacts>
+                <excludeArtifact>basex-webapps</excludeArtifact>
+                <excludeArtifact>modules-chat</excludeArtifact>
+                <excludeArtifact>modules-dba</excludeArtifact>
+                <excludeArtifact>modules-webdav</excludeArtifact>
+              </excludeArtifacts>
               <autoPublish>true</autoPublish>
               <waitUntil>published</waitUntil>
             </configuration>
@@ -473,6 +481,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.2.0</version>
+          <inherited>true</inherited>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.5.1</version>
           <inherited>true</inherited>
         </plugin>
 

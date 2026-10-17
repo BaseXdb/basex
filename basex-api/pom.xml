@@ -71,6 +71,25 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
     </dependency>
+    <!-- web applications: build order for the bundling executions below -->
+    <dependency>
+      <groupId>org.basex.modules</groupId>
+      <artifactId>modules-chat</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.basex.modules</groupId>
+      <artifactId>modules-dba</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.basex.modules</groupId>
+      <artifactId>modules-webdav</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -103,31 +122,75 @@
           <includeScope>compile</includeScope>
           <excludeArtifactIds>xstream</excludeArtifactIds>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
+          <!-- web applications as archives (ZIP distribution) -->
           <execution>
             <id>web-archives</id>
             <phase>package</phase>
             <goals>
-              <goal>run</goal>
+              <goal>copy</goal>
             </goals>
             <configuration>
-              <target>
-                <!-- package the web applications of the webapp directory -->
-                <zip destfile="${project.build.directory}/webapp/chat.zip"
-                     basedir="${basedir}/src/main/webapp/chat"/>
-                <zip destfile="${project.build.directory}/webapp/dba.zip"
-                     basedir="${basedir}/src/main/webapp/dba"/>
-                <zip destfile="${project.build.directory}/webapp/webdav.zip"
-                     basedir="${basedir}/src/main/webapp/webdav"/>
-              </target>
+              <outputDirectory>${project.build.directory}/webapp</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-chat</artifactId>
+                  <destFileName>chat.zip</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-dba</artifactId>
+                  <destFileName>dba.zip</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-webdav</artifactId>
+                  <destFileName>webdav.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <!-- web applications as directories (WAR file) -->
+          <execution>
+            <id>web-directories</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <excludes>META-INF/**</excludes>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-chat</artifactId>
+                  <outputDirectory>${project.build.directory}/webapps/chat</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-dba</artifactId>
+                  <outputDirectory>${project.build.directory}/webapps/dba</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.basex.modules</groupId>
+                  <artifactId>modules-webdav</artifactId>
+                  <outputDirectory>${project.build.directory}/webapps/webdav</outputDirectory>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${project.build.directory}/webapps</directory>
+            </resource>
+          </webResources>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.eclipse.jetty.ee10</groupId>

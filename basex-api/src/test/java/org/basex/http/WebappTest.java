@@ -56,6 +56,17 @@ public abstract class WebappTest extends HTTPTest {
   }
 
   /**
+   * Returns the source directory of a web application.
+   * @param app name of the application
+   * @return directory
+   */
+  public static File source(final String app) {
+    final String path = "basex-webapps/" + app + "/src/main/resources";
+    final File file = new File("../" + path);
+    return file.exists() ? file : new File(path);
+  }
+
+  /**
    * Clears the module cache so subsequent test classes do not see the deployed modules.
    */
   @AfterAll public static void clearCache() {
@@ -68,9 +79,7 @@ public abstract class WebappTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   private static void deploy(final String dir) throws IOException {
-    File src = new File("src/main/webapp/" + dir);
-    if(!src.exists()) src = new File("basex-api/src/main/webapp/" + dir);
-    final Path from = src.toPath();
+    final Path from = source(dir).toPath();
     final Path to = new File(context.soptions.get(StaticOptions.WEBPATH), dir).toPath();
     try(Stream<Path> paths = Files.walk(from)) {
       for(final Path path : (Iterable<Path>) paths::iterator) {

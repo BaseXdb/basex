@@ -24,8 +24,6 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class WebappArchiveTest extends HTTPTest {
-  /** Source directory of the shipped applications. */
-  private static final IOFile SOURCE = new IOFile("src/main/webapp");
   /** Shipped applications. */
   private static final String[] APPS = { "chat", "webdav", "dba" };
 
@@ -35,7 +33,7 @@ public final class WebappArchiveTest extends HTTPTest {
    */
   @BeforeAll public static void start() throws Exception {
     init(HTTP_ROOT, true);
-    for(final String app : APPS) archive(app).write(zip(new IOFile(SOURCE, app)));
+    for(final String app : APPS) archive(app).write(zip(new IOFile(WebappTest.source(app))));
     WebModules.get(HTTPContext.get().context()).init(false);
   }
 
