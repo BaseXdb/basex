@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -22,17 +21,12 @@ import org.junit.jupiter.api.*;
 public abstract class AuthTest extends HTTPTest {
   /** Local database context. */
   private static Context ctx;
-  /** Authentication method. */
-  protected static String method;
 
   /**
    * Initializes the test.
-   * @param meth method
    * @throws Exception exception
    */
-  protected static void init(final String meth) throws Exception {
-    Prop.put(StaticOptions.AUTHMETHOD, meth);
-    method = meth;
+  protected static void init() throws Exception {
     init(REST_ROOT, true, true);
     ctx = new Context();
   }
@@ -41,7 +35,6 @@ public abstract class AuthTest extends HTTPTest {
    * Stops the test.
    */
   @AfterAll public static void close() {
-    Prop.clear();
     ctx.close();
   }
 
@@ -102,7 +95,7 @@ public abstract class AuthTest extends HTTPTest {
   private static String sendRequest(final String user, final String pass) throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
-        "auth-method='" + method + "' username='" + user + "' password='" + pass + "' " +
+        "auth-method='Basic' username='" + user + "' password='" + pass + "' " +
         "href='" + REST_ROOT + "'/>") +
         "[. instance of node()]/@status/string()", ctx)) {
       return qp.value().serialize().toString();

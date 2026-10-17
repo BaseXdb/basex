@@ -58,6 +58,8 @@ public abstract class BaseXServlet extends HttpServlet {
     try {
       conn.authenticate(username);
       run(conn);
+      // otherwise, the connection may be closed if the body arrives after the response
+      conn.discardBody();
     } catch(final Exception ex) {
       error(conn, ex);
     } finally {

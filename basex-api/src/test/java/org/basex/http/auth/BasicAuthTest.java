@@ -23,7 +23,7 @@ public final class BasicAuthTest extends AuthTest {
    * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
-    init("Basic");
+    init();
   }
 
   /**

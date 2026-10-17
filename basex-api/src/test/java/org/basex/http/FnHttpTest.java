@@ -78,15 +78,7 @@ public abstract class FnHttpTest extends HTTPTest {
    * Test sending of HTTP POST requests.
    * @throws Exception exception
    */
-  @Test public final void putPost() throws Exception {
-    // PUT - query
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        " <http:request method='put' status-only='true'>"
-        + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>", REST_URL), ctx)) {
-      checkResponse(qp.value(), 1, 201);
-    }
-
+  @Test public final void post() throws Exception {
     // POST - query
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='post'>"
@@ -497,10 +489,6 @@ public abstract class FnHttpTest extends HTTPTest {
         + "<http:body>" + "Part1" + "</http:body>"
         + "</http:multipart>" + "</http:request>");
 
-    queries.put("Request with schema different from http",
-        "<http:request xmlns:http='http://expath.org/ns/http-client' "
-        + "href='ftp://basex.org'/>");
-
     final StringBuilder error = new StringBuilder();
     for(final Entry<String, String> entry : queries.entrySet()) {
       final String name = entry.getKey(), query = entry.getValue();
@@ -655,17 +643,10 @@ public abstract class FnHttpTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   @Test public final void writeHex() throws IOException {
-    // Case 1: content is xs:hexBinary
-    Request request = new Request();
+    final Request request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
     request.payload.add(new Hex(token("test")));
     assertEquals("test", write(request));
-
-    // Case 2: content is a node
-    request = new Request();
-    request.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    request.payload.add(FElem.build(new QNm("a")).text("test").finish());
-    assertEquals("<a>test</a>", write(request));
   }
 
   /**

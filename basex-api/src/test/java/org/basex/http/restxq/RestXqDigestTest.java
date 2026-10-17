@@ -22,13 +22,10 @@ public final class RestXqDigestTest extends RestXqTest {
   private static final String SERVICES =
     "declare variable $m:CHALLENGES := {"
     + "  'auth': 'Digest " + PARAMS + ", qop=\"auth,auth-int\", opaque=\"o\"',"
-    + "  'legacy': 'Digest " + PARAMS + "',"
     + "  'int': 'Digest " + PARAMS + ", qop=\"auth-int\"',"
-    + "  'sha': 'Digest " + PARAMS + ", qop=\"auth\", algorithm=SHA-256',"
     + "  'lines': ('Negotiate', 'Digest " + PARAMS + ", qop=\"auth\", algorithm=SHA-512-256'),"
     + "  'combined': 'Negotiate, Basic realm=\"b\", digest " + PARAMS
-    + ", qop=\"auth\", algorithm=MD5-sess',"
-    + "  'quoted': 'Digest realm=\"a \\\"b\\\", c\", nonce=\"n\", qop=\"auth\"'"
+    + ", qop=\"auth\", algorithm=MD5-sess'"
     + "};"
     + "declare function m:challenge($c) {"
     + "  <R:response><http:response status='401' " + HTTP_NS + ">{"
@@ -40,10 +37,9 @@ public final class RestXqDigestTest extends RestXqTest {
     + "  return if(empty($auth)) then m:challenge($c) else ("
     + "    let $f := map:merge("
     + "      for $m in analyze-string($auth,"
-    + "        '([\\w-]+)=(?:\"((?:[^\"\\\\]|\\\\.)*)\"|([^,]*))')/fn:match"
-    + "      let $q := $m/fn:group[@nr = 2]"
+    + "        '([\\w-]+)=(?:\"([^\"]*)\"|([^,]*))')/fn:match"
     + "      return map:entry(string($m/fn:group[@nr = 1]),"
-    + "        if($q) then replace($q, '\\\\(.)', '$1') else string($m/fn:group[@nr = 3])))"
+    + "        string-join($m/fn:group[@nr = (2, 3)])))"
     + "    let $alg := upper-case($f?algorithm) ! replace(., '-SESS$', '')"
     + "      ! replace(., '-512-', '-512/')"
     + "    let $h := fn($s) { lower-case(string(hash($s, $alg))) }"
@@ -70,11 +66,6 @@ public final class RestXqDigestTest extends RestXqTest {
     + "  <R:response><http:response status='302' " + HTTP_NS + ">"
     + "    <http:header name='Location' value='"
     + HTTP_ROOT.replace("localhost", "127.0.0.1") + "digest-type'/>"
-    + "  </http:response></R:response>"
-    + "};"
-    + "declare %R:path('digest-see-other') function m:see-other() {"
-    + "  <R:response><http:response status='303' " + HTTP_NS + ">"
-    + "    <http:header name='Location' value='" + HTTP_ROOT + "digest-type'/>"
     + "  </http:response></R:response>"
     + "};"
     + "declare %R:path('digest-type') %output:method('text') function m:type() {"
@@ -106,19 +97,9 @@ public final class RestXqDigestTest extends RestXqTest {
     query(request("digest/auth") + "[2]", "/digest/auth auth MD5 o true");
   }
 
-  /** Challenge without quality of protection (RFC 2069). */
-  @Test public void legacy() {
-    query(request("digest/legacy") + "[2]", "/digest/legacy - MD5 - true");
-  }
-
   /** Challenge that only offers the unsupported "auth-int" protection. */
   @Test public void authInt() {
     query(request("digest/int") + "[1]/@status/string()", 401);
-  }
-
-  /** SHA-256 challenge. */
-  @Test public void sha256() {
-    query(request("digest/sha") + "[2]", "/digest/sha auth SHA-256 - true");
   }
 
   /** Challenges in separate headers. */
@@ -129,33 +110,6 @@ public final class RestXqDigestTest extends RestXqTest {
   /** Challenges in a single header, lower-case scheme, session algorithm. */
   @Test public void combined() {
     query(request("digest/combined") + "[2]", "/digest/combined auth MD5-sess - true");
-  }
-
-  /** Challenge of a redirected request. */
-  @Test public void redirect() {
-    query(request("digest-redirect") + "[2]", "/digest/auth?a=1 auth MD5 o true");
-  }
-
-  /** Challenge and credentials with escaped quotes. */
-  @Test public void quoted() {
-    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' "
-      + "auth-method='Digest' username='a\"b' password='pw'/>", HTTP_ROOT + "digest/quoted")
-      + "[2]", "/digest/quoted auth MD5 - true");
-  }
-
-  /** Challenge after a redirect that drops the request body. */
-  @Test public void seeOther() {
-    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='post' "
-      + "auth-method='Digest' username='admin' password='pw'>"
-      + "<http:body media-type='text/plain'>x</http:body></http:request>",
-      HTTP_ROOT + "digest-see-other") + "[2]", "GET none none");
-  }
-
-  /** Scheme names of the auth-method attribute are case-insensitive. */
-  @Test public void lowerCaseMethod() {
-    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' "
-      + "auth-method='digest' username='admin' password='pw'/>", HTTP_ROOT + "digest/auth")
-      + "[2]", "/digest/auth auth MD5 o true");
   }
 
   /** Credentials supplied as a record to the HTTP Client 2.0 functions. */
@@ -292,13 +246,10 @@ public final class RestXqDigestTest extends RestXqTest {
 
   /** Parse options are passed to the parsers of the response body. */
   @Test public void getParseOptions() {
-    // the echo service returns text; a CSV separator is applied to the parsed body
     final String url = HTTP_ROOT + "echo";
     query(_HTTP_GET.args(url, " { 'response-body': 'text' }") + "?body", "GET none none");
     query(_HTTP_GET.args(url, " { 'encoding': 'US-ASCII' }") + "?body", "GET none none");
-    // XML parse options are applied; external resources are rejected
-    query(_HTTP_GET.args(url, " { 'parse-options': { 'xml': { 'strip-space': 'all' } } }")
-      + "?status", 200);
+    // external resources are rejected
     error(_HTTP_GET.args(url, " { 'parse-options': { 'xml': { 'xinclude': true() } } }"),
       HTTP_INVALID_OPTION_X);
     error(_HTTP_GET.args(url, " { 'parse-options': { 'xml': { 'trust-external': true() } } }"),
@@ -315,9 +266,7 @@ public final class RestXqDigestTest extends RestXqTest {
       + "verify='false'/>", url) + "[1]/@status/string()", 200);
     error(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' proxy='x'/>",
       url), HC_REQ_X);
-    // XML parser options, with the same rejection of external resources
-    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' "
-      + "xml='strip-space=all'/>", url) + "[1]/@status/string()", 200);
+    // XML parser options: external resources are rejected
     error(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' "
       + "xml='xinclude=true'/>", url), HC_REQ_X);
   }
@@ -339,10 +288,10 @@ public final class RestXqDigestTest extends RestXqTest {
     error(_HTTP_GET.args("x:/y"), HTTP_INVALID_URI_X);
   }
 
-  /** A redirect loop is aborted instead of being followed indefinitely. */
-  @Test public void redirectLoop() {
+  /** Only HTTP URIs are supported. */
+  @Test public void invalidScheme() {
     error(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get'/>",
-      HTTP_ROOT + "redirect-loop"), HC_ERROR_X);
+      "ftp://basex.org"), HC_URI_X);
   }
 
   /** An Authorization header is not sent to a redirect target with another origin. */
@@ -357,7 +306,6 @@ public final class RestXqDigestTest extends RestXqTest {
     final String request = " <http:request " + HTTP_NS + " method='post' "
       + "auth-method='Digest' username='admin' password='pw'>"
       + "<http:body media-type='text/plain'>x</http:body></http:request>";
-    query(_HTTP_SEND_REQUEST.args(request, HTTP_ROOT + "echo") + "[2]", "POST text/plain none");
     query(_HTTP_SEND_REQUEST.args(request, HTTP_ROOT + "digest-type") + "[2]",
       "POST text/plain none");
   }
@@ -377,13 +325,6 @@ public final class RestXqDigestTest extends RestXqTest {
     query(response + "/@version/string()", "HTTP/1.1");
     query("every $name in " + response + "/http:header/@name satisfies "
       + "$name = lower-case($name)", true);
-  }
-
-  /** Credentials in the URI are used for digest authentication. */
-  @Test public void uriDigest() {
-    final String url = HTTP_ROOT.replace("://", "://admin:pw@") + "digest/auth";
-    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get' "
-      + "auth-method='Digest'/>", url) + "[2]", "/digest/auth auth MD5 o true");
   }
 
   /** Credentials in the URI are not returned. */

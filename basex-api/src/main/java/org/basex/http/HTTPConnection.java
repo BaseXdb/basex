@@ -355,12 +355,10 @@ public final class HTTPConnection implements ClientInfo {
     response.setHeader(SERVER_TIMING, String.join(",", list.finish()));
   }
 
-  // PRIVATE METHODS ==============================================================================
-
   /**
-   * Discards an unconsumed request body before an error response is returned.
+   * Discards an unconsumed request body.
    */
-  private void discardBody() {
+  void discardBody() {
     try {
       request.getInputStream().transferTo(OutputStream.nullOutputStream());
     } catch(final IOException | IllegalStateException ex) {
@@ -368,6 +366,8 @@ public final class HTTPConnection implements ClientInfo {
       Util.debug(ex);
     }
   }
+
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Normalizes the specified path.

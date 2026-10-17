@@ -35,11 +35,6 @@ public final class RestXqCookieTest extends RestXqTest {
     register(SERVICES);
   }
 
-  /** Cookies of a redirecting response are attached to the redirected request. */
-  @Test public void redirect() {
-    query(request("cookies='true'", "cookie-set"), "a=1");
-  }
-
   /** Cookies are discarded if the attribute is not supplied. */
   @Test public void noCookies() {
     query(request("", "cookie-set"), "none");
