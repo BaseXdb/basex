@@ -2931,4 +2931,12 @@ public final class RewritingsTest extends SandboxTest {
       set(MainOptions.TEXTINDEX, true);
     }
   }
+
+  /** Flattened predicates: paths on items other than nodes must not be rewritten to paths. */
+  @Test public void flattenEbvItems() {
+    check("some $s in ('<a>B</a>', '<a>C</a>') satisfies parse-xml($s)//a = 'B'",
+        true, root(CmpG.class), exists(SimpleMap.class));
+    check("exists(('<a>B</a>', '<a>C</a>')[parse-xml(.)/a = 'B'])",
+        true, root(CmpG.class), exists(SimpleMap.class));
+  }
 }

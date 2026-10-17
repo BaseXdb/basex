@@ -727,7 +727,7 @@ public abstract class Path extends ParseExpr {
         path.steps.length == 1 ? path.steps[0] : branch;
       final Axis ax = axis(br);
       if(ax == null || !ax.oneOf(SELF, CHILD, ATTRIBUTE)) return null;
-      if(ax != SELF) axis = axis == SELF || axis == ax ? ax : CHILD;
+      if(ax != SELF) axis = axis.oneOf(SELF, ax) ? ax : CHILD;
     }
     return axis;
   }
@@ -1334,7 +1334,7 @@ public abstract class Path extends ParseExpr {
     if(expr instanceof final Step step) {
       final Axis axis = step.axis;
       if(!step.mayBePositional()) {
-        if(axis == CHILD || axis == DESCENDANT) return DESCENDANT;
+        if(axis.oneOf(CHILD, DESCENDANT)) return DESCENDANT;
         if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
       }
     }

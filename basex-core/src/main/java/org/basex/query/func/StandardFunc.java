@@ -482,11 +482,17 @@ public abstract class StandardFunc extends Arr {
   /**
    * Converts an item to a compact node.
    * @param item item
+   * @param qc query context
    * @return compact node
    * @throws QueryException query exception
    */
-  protected final DBNode toDBNode(final Item item) throws QueryException {
-    if(item instanceof final DBNode node && !node.data().inMemory()) return node;
+  protected final DBNode toDBNode(final Item item, final QueryContext qc) throws QueryException {
+    if(item instanceof final DBNode node) {
+      // fragments are unnamed; named main-memory instances are databases if MAINMEM is enabled
+      final Data data = node.data();
+      if(!data.inMemory() || !data.meta.name.isEmpty() &&
+          qc.context.options.get(MainOptions.MAINMEM)) return node;
+    }
     throw DB_NODE_X.get(info, item);
   }
 

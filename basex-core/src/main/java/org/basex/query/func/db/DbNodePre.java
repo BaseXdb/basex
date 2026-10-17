@@ -18,11 +18,12 @@ public final class DbNodePre extends DbNodeId {
   }
 
   @Override
-  void addIds(final Value nodes, final ValueBuilder vb) throws QueryException {
+  void addIds(final Value nodes, final ValueBuilder vb, final QueryContext qc)
+      throws QueryException {
     if(nodes instanceof final DBNodeSeq seq) {
       for(final int pre : seq.pres()) vb.add(pre);
     } else {
-      super.addIds(nodes, vb);
+      super.addIds(nodes, vb, qc);
     }
   }
 }

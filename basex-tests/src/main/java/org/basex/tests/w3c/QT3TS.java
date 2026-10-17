@@ -668,12 +668,12 @@ public final class QT3TS extends Main {
     "'CondExpr-Braced-010', 'CondExpr-Braced-011', 'CondExpr-Braced-012', 'CondExpr-Braced-013', " +
     "'CondExpr-Braced-014', 'CondExpr-Braced-015', 'CondExpr-Braced-016', 'CondExpr-Braced-017', " +
     "'CondExpr-Braced-018', 'CondExpr-Braced-020', 'CondExpr-Braced-021', 'CondExpr-Braced-022', " +
-    "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', 'braced-if-006', " +
+    "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', " +
     "'braced-if-007', 'braced-if-008', 'PathExpr-10', " +
     // reserved keywords in computed node constructors (supported by the BaseX parser)
     "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
-    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', " +
-    "'K2-ComputeConElem-26', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
+    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-26', " +
+    "'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
     "'K2-ForExprWithout-42a', 'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
     "'nscons-047', 'nscons-048', " +
     // use-character-maps can be declared in the prolog: BaseX supports a lexical string syntax
@@ -697,8 +697,7 @@ public final class QT3TS extends Main {
     "'id-insert-expr-085-no-inherit', 'id-insert-expr-086-no-inherit', " +
     "'id-rename-expr-033-no-inherit', 'id-rename-expr-034-no-inherit', " +
     "'id-replace-expr-045-no-inherit', " +
-    "'propagateNamespaces02', 'propagateNamespaces03', 'propagateNamespaces04', " +
-    "'propagateNamespaces06', " +
+    "'propagateNamespaces02', 'propagateNamespaces06', " +
     // ID attributes are detected by their name
     "'removeType-valskip-ren-003a', " +
     "'')";
@@ -718,8 +717,9 @@ public final class QT3TS extends Main {
       "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
       // skip revalidation modes other than skip, and tests that ask for non-support of skip
       "@type = 'revalidation' and (@value = 'skip') = (@satisfied = 'false') or " +
-      // skip fully-normalized Unicode tests
-      "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
+      // skip fully-normalized Unicode tests that ask for non-support
+      "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' and " +
+      "@satisfied = 'false' or " +
       // skip tests locked to a historical Unicode version (JDK uses a much newer one)
       "@type = 'unicode-version' and @value = ('5.2', '6.0', '6.2') or " +
       // skip xml 1.1 tests and tests for other xsd versions than the one of the schema processor

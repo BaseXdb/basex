@@ -34,11 +34,10 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   public GNodeBuilder add(final GNode node) {
     if(isEmpty()) {
       // empty list: assign initial database reference (can be null)
-      data = node.data();
+      data = data(node);
     } else {
       // check if new node is in same database
-      final Data dt = data;
-      if(dt != null && dt != node.data()) data = null;
+      if(data != null && data != data(node)) data = null;
 
       // check if new node is identical to last one, or destroys distinct document order
       if(ddo) {
@@ -66,12 +65,9 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
 
     // check if compact sequence with single database instance can be created
     if(data != null) {
-      final GNode parent = list[0].parent();
-      if(parent == null || parent.data() == data) {
-        final int[] pres = new int[sz];
-        for(int l = 0; l < sz; l++) pres[l] = ((DBNode) list[l]).pre();
-        return DBNodeSeq.get(pres, data, expr);
-      }
+      final int[] pres = new int[sz];
+      for(int l = 0; l < sz; l++) pres[l] = ((DBNode) list[l]).pre();
+      return DBNodeSeq.get(pres, data, expr);
     }
 
     // otherwise, create default sequence
@@ -132,7 +128,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
   private int binarySearch(final DBNode node) {
-    if(node.data() != data) return -1;
+    if(data(node) != data) return -1;
     int l = 0, r = size - 1;
     final GNode[] nodes = list;
     while(l <= r) {
@@ -166,6 +162,15 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Returns the database of an unattached database node.
+   * @param node node
+   * @return database or {@code null}
+   */
+  private static Data data(final GNode node) {
+    return node instanceof final DBNode dbnode && !dbnode.attached() ? dbnode.data() : null;
+  }
 
   /**
    * Recursively sorts the specified items via QuickSort (derived from Java's sort algorithms).

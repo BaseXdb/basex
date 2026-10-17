@@ -55,6 +55,7 @@ public final class DbModuleTest extends SandboxTest {
 
   /** Finalizes a test. */
   @AfterEach public void finish() {
+    set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
@@ -691,6 +692,15 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(dbName));
     query(_DB_EXISTS.args(dbName), false);
 
+    // drop database that has been opened by the query
+    for(final boolean mainmem : new boolean[] { false, true }) {
+      query(_DB_CREATE.args(dbName, " <dummy/>", "doc.xml"));
+      set(MainOptions.MAINMEM, mainmem);
+      query("if(" + _DB_GET.args(dbName) + ") { " + func.args(dbName) + " }");
+      query(_DB_EXISTS.args(dbName), false);
+      set(MainOptions.MAINMEM, false);
+    }
+
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to drop non-existing DB
@@ -965,6 +975,16 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_NODE_PRE;
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");
+    error(func.args(" <x/> update {}"), DB_NODE_X);
+
+    // main-memory database
+    set(MainOptions.MAINMEM, true);
+    execute(new CreateDB(NAME, XML));
+    query(func.args(" /html"), 1);
+    query(func.args(_DB_GET.args(NAME) + "/html"), 1);
+    query(_DB_NODE_ID.args(" /html"), 1);
+    query(_DB_NAME.args(" /html"), NAME);
+    query(_DB_PATH.args(" /html"), XML.replaceAll(".*/", ""));
     error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 

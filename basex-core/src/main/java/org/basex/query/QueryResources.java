@@ -319,7 +319,7 @@ public final class QueryResources {
     for(int d = globalData ? 1 : 0; d < ds; d++) {
       final Data data = datas.get(d);
       // default mode: skip main-memory database instances (which may result from fn:doc calls)
-      if(data.meta.name.equals(name) && !(data.inMemory() || mainmem)) {
+      if(data.meta.name.equals(name) && !(data.inMemory() && !mainmem)) {
         Close.close(data, context);
         datas.remove(d);
         originals.remove(data);

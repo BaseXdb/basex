@@ -56,7 +56,7 @@ import org.basex.util.options.*;
 public class QueryParser extends InputParser {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
-      "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module .*");
+      "(xquery( version ?['\"].*?['\"])?( ?encoding ?['\"].*?['\"])? ?; ?)?module ");
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
   /** Absolute value of the minimum integer (2^63). */
@@ -5439,7 +5439,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   public static boolean isLibrary(final String query) {
-    return LIBMOD_PATTERN.matcher(removeComments(query, 80)).matches();
+    return LIBMOD_PATTERN.matcher(removeComments(query, 80)).lookingAt();
   }
 
   /**
@@ -5454,7 +5454,6 @@ public class QueryParser extends InputParser {
     final int ql = query.length();
     for(int m = 0, c = 0; c < ql && sb.length() < max; c++) {
       final char ch = query.charAt(c);
-      if(ch == 0x0d) continue;
       if(ch == '(' && c + 1 < ql && query.charAt(c + 1) == ':') {
         if(m == 0 && !s) {
           sb.append(' ');

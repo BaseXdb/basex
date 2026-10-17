@@ -1044,6 +1044,26 @@ public final class PathTest extends SandboxTest {
     }
   }
 
+  /** Name tests on all axes of fragments with embedded database nodes. */
+  @Test public void fragmentAxes() {
+    final String xml = "<x><a n='1'><b/>t<a><b m='2'/>u</a><!--c--><?p i?></a><b n='3'><a/></b>v"
+        + "<a n='1'><b/>t<a><b m='2'/>u</a></a></x>";
+    final String[] axes = { "ancestor", "ancestor-or-self", "attribute", "child", "descendant",
+      "descendant-or-self", "following", "following-or-self", "following-sibling",
+      "following-sibling-or-self", "parent", "preceding", "preceding-or-self", "preceding-sibling",
+      "preceding-sibling-or-self", "self" };
+    final String nodes = "let $f := document { parse-xml(\"" + xml + "\")/node() } "
+        + "return ($f/descendant-or-self::node(), $f//@*) ! "
+        + "(%s ! (count(ancestor::node()) || ':' || count(preceding::node())))";
+
+    for(final String axis : axes) {
+      for(final String name : new String[] { "a", "b", "n", "m", "x" }) {
+        query("deep-equal(" + String.format(nodes, axis + "::" + name) + ", "
+            + String.format(nodes, axis + "::*[name() = '" + name + "']") + ')', true);
+      }
+    }
+  }
+
   /** Name tests in child and descendant steps of persistent, main-memory and updated databases. */
   @Test public void dbNameTests() {
     final StringBuilder xml = new StringBuilder("<x>");
@@ -1068,5 +1088,33 @@ public final class PathTest extends SandboxTest {
         set(MainOptions.MAINMEM, false);
       }
     }
+  }
+
+  /** Database nodes attached to a fragment parent. */
+  @Test public void attachedDbNodes() {
+    final String doc = "let $d := document { parse-xml('<x><a><b/></a><a><b/></a></x>')/node() } ";
+    query(doc + "return $d//b/ancestor::a ! (root() is $d)", "true\ntrue");
+    query(doc + "return $d//b/ancestor::a ! path()", "/Q{}x[1]/Q{}a[1]\n/Q{}x[1]/Q{}a[2]");
+    query(doc + "let $s := siblings($d/x/a[1]) return ($s, $s) ! (root() is $d)",
+        "true\ntrue\ntrue\ntrue");
+  }
+
+  /** Document order of fragments that share database instances. */
+  @Test public void attachedDbNodesOrder() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<x><a/><b/></x>"));
+    execute(new Add("b.xml", "<x><a/><b/></x>"));
+    final String docs = "let $d := db:get('" + NAME + "') ! document { node() } ";
+    query(docs + "return $d//node() ! name()", "x\na\nb\nx\na\nb");
+    query(docs + "return ($d[2], $d[1]/x) ! (. is $d[1]/x)", "false\ntrue");
+    query(docs + "let $n := $d/descendant-or-self::node() "
+        + "return every $i in 2 to count($n) satisfies $n[$i - 1] << $n[$i]", true);
+    query(docs + "return $d[1] << $d[1]/x", true);
+    query(docs + "return $d[2] << $d[1]/x", false);
+
+    final String elem = "let $e := <e a='1'>{ db:get('" + NAME + "')[1]/x/a }</e> ";
+    query(elem + "return $e/@a << $e/a", true);
+    query(elem + "return $e/a << $e/@a", false);
+    query(elem + "return ($e/a | $e/@a) ! (. instance of attribute())", "true\nfalse");
   }
 }

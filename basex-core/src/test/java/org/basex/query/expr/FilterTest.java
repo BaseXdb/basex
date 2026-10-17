@@ -449,7 +449,7 @@ public final class FilterTest extends SandboxTest {
     check(pre + "=  0         to last()    " + post, "", empty(Pos.class), root(IterFilter.class));
     check(pre + "=  1         to last() + 1" + post, "", empty(Pos.class), root(IterFilter.class));
     check(pre + "= -2         to last() + 2" + post, "", empty(Pos.class), root(IterFilter.class));
-    check(pre + "= last()     to 1         " + post, "", empty());
+    check(pre + "= last() + 2 to 1         " + post, "", empty());
     check(pre + "= last() + 1 to last() + 2" + post, "", empty());
 
     check(pre + "= last() to last() - 1" + post, "", empty());
@@ -645,5 +645,20 @@ public final class FilterTest extends SandboxTest {
     check("(" + let + ")[. > 4]", "5\n6", root(GFLWOR.class));
     check("(" + let + ")[1]", 3, root(GFLWOR.class));
     check("(for $i in 1 to <_>2</_> for $j in 1 to $i return $j)[2]", 1, root(ITEMS_AT));
+  }
+
+  /** Positional ranges with fixed and last()-relative bounds. */
+  @Test public void rangeMixedBounds() {
+    final String pre = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][";
+    final String post = "] ! name(.) => string-join()";
+
+    query(pre + "last() - 4 to 3" + post, "BC");
+    query(pre + "position() = last() - 4 to 3" + post, "BC");
+    query(pre + "last() - 1 to 3" + post, "");
+    query(pre + "1 to last() - 4" + post, "AB");
+    query(pre + "position() <= 7 to last()" + post, "");
+    query(pre + "position() <= 1 to last()" + post, "ABCDEF");
+    query(pre + "position() >= 1 to last() - 7" + post, "");
+    query("<r>{ (1 to 10) ! <i/> }</r>/i[last() - 4 to 7] => count()", 2);
   }
 }

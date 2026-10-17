@@ -44,6 +44,29 @@ public final class RestXqDrainTest extends RestXqTest {
   }
 
   /**
+   * The response is returned if a huge unread body is still being sent.
+   * @throws Exception exception
+   */
+  @Test public void hugeBody() throws Exception {
+    try(Socket socket = new Socket("localhost", 9865)) {
+      socket.setSoTimeout(5000);
+      final OutputStream out = socket.getOutputStream();
+      send(out, "POST /ignore HTTP/1.1\r\nHost: localhost\r\n"
+        + "Content-Type: text/plain\r\nContent-Length: 100000000000\r\n\r\n");
+      final Thread writer = new Thread(() -> {
+        final byte[] chunk = new byte[1 << 16];
+        try {
+          while(true) out.write(chunk);
+        } catch(final IOException ex) {
+          Util.debug(ex);
+        }
+      });
+      writer.start();
+      assertTrue(response(socket.getInputStream()).startsWith("HTTP/1.1 200"));
+    }
+  }
+
+  /**
    * Sends a string.
    * @param out output stream
    * @param string string

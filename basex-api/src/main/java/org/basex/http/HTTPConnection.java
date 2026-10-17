@@ -30,6 +30,9 @@ import org.basex.util.log.*;
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
+  /** Maximum number of bytes of an unconsumed request body to be discarded. */
+  private static final int MAX_DISCARD = 1 << 16;
+
   /** HTTP servlet request. */
   public final HttpServletRequest request;
   /** HTTP servlet response. */
@@ -356,11 +359,11 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Discards an unconsumed request body.
+   * Discards an unconsumed request body up to a maximum size.
    */
   void discardBody() {
     try {
-      request.getInputStream().transferTo(OutputStream.nullOutputStream());
+      request.getInputStream().skip(MAX_DISCARD);
     } catch(final IOException | IllegalStateException ex) {
       // body may already be consumed, or a reader may have been requested instead
       Util.debug(ex);

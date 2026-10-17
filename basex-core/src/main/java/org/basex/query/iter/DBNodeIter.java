@@ -29,8 +29,17 @@ public abstract class DBNodeIter extends BasicNodeIter {
   @Override
   public abstract DBNode next();
 
+  /**
+   * Indicates if the returned nodes can be stored as PRE values.
+   * @return result of check
+   */
+  protected boolean compact() {
+    return true;
+  }
+
   @Override
-  public Value value(final QueryContext qc, final Expr expr) {
+  public Value value(final QueryContext qc, final Expr expr) throws QueryException {
+    if(!compact()) return super.value(qc, expr);
     final IntList il = new IntList();
     for(DBNode node; (node = next()) != null;) {
       qc.checkStop();

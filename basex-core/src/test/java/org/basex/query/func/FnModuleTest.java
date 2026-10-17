@@ -3175,6 +3175,13 @@ return
     query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare function m:f($a := upper-case(\"x\")) { $a };' }") + "?functions?#Q{m}f?0()",
         "X");
+    query(func.args("m", " { 'content': `module namespace m='m'; declare variable $m:v := "
+        + "'{ codepoints-to-string((0x85, 0x2028, 0x2029)) }';` }") + "?variables?#Q{m}v "
+        + "=> string-to-codepoints()", "133\n8232\n8233");
+    query(func.args("m", " { 'content': `xquery version\"4.0\"encoding\"UTF-8\"; "
+        + "module namespace m='m'; declare variable $m:v := 1;` }") + "?variables?#Q{m}v", 1);
+    query(func.args("m", " { 'content': `module{ char(13) }namespace m='m'; "
+        + "declare variable $m:v := 1;` }") + "?variables?#Q{m}v", 1);
 
     // GH-2640
     error("<e xmlns:p='p'>{\n"

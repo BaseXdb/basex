@@ -229,17 +229,24 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   private void printEscaped(final int cp) throws IOException {
     if(Character.isBmpCodePoint(cp)) {
-      out.print('\\');
-      out.print('u');
-      out.print(hex(cp, 4));
+      printUnicode(cp);
     } else {
-      out.print('\\');
-      out.print('u');
-      out.print(hex(Character.highSurrogate(cp), 4));
-      out.print('\\');
-      out.print('u');
-      out.print(hex(Character.lowSurrogate(cp), 4));
+      printUnicode(Character.highSurrogate(cp));
+      printUnicode(Character.lowSurrogate(cp));
     }
+  }
+
+  /**
+   * Prints a UTF-16 code unit as Unicode escape sequence.
+   * @param cu code unit
+   * @throws IOException I/O exception
+   */
+  private void printUnicode(final int cu) throws IOException {
+    // RFC 8785 requires lowercase hexadecimal digits
+    final byte[] hex = hex(cu, 4);
+    out.print('\\');
+    out.print('u');
+    out.print(canonical ? lc(hex) : hex);
   }
 
   @Override

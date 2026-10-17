@@ -170,7 +170,7 @@ public abstract class Preds extends Arr {
     // $child/..[pos: 2, 5] → $child/..[false()]
     if(root instanceof final Step step) {
       final Axis axis = step.axis;
-      if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof final IntPos pos) {
+      if(axis.oneOf(Axis.SELF, Axis.PARENT) && expr instanceof final IntPos pos) {
         expr = Bln.get(pos.min == 1);
       }
     }
@@ -254,12 +254,13 @@ public abstract class Preds extends Arr {
       el > 1 ? Filter.get(cc, info, root, Arrays.copyOfRange(exprs, 0, el - 1)) : root;
     final QueryFunction<Expr, Expr> createSimpleMap = rhs ->
       SimpleMap.get(cc, info, createRoot.get(), rhs);
+    final boolean nodes = rst.type instanceof NodeType;
     final QueryBiFunction<Expr, Boolean, Expr> createExpr = (rhs, compare) ->
-      rhs instanceof ContextValue ? createRoot.get() :
-      rhs instanceof Path         ? Path.get(cc, info, createRoot.get(), rhs) :
-      compare                     ? createSimpleMap.apply(rhs) : this;
+      rhs instanceof ContextValue  ? createRoot.get() :
+      rhs instanceof Path && nodes ? Path.get(cc, info, createRoot.get(), rhs) :
+      compare                      ? createSimpleMap.apply(rhs) : this;
 
-    if(rst.type instanceof NodeType) {
+    if(nodes) {
       // rewrite to path: root[path] → root/path
       final Expr expr = createExpr.apply(last, false);
       if(expr != this) return expr;

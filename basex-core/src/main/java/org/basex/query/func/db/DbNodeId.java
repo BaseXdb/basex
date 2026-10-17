@@ -26,11 +26,11 @@ public class DbNodeId extends StandardFunc {
       @Override
       public Itr next() throws QueryException {
         final Item item = qc.next(nodes);
-        return item != null ? Itr.get(id(item)) : null;
+        return item != null ? Itr.get(id(item, qc)) : null;
       }
       @Override
       public Itr get(final long i) throws QueryException {
-        return Itr.get(id(nodes.get(i)));
+        return Itr.get(id(nodes.get(i), qc));
       }
       @Override
       public long size() {
@@ -39,7 +39,7 @@ public class DbNodeId extends StandardFunc {
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
         final ValueBuilder vb = new ValueBuilder(q, size);
-        addIds(nodes.value(qc, expr), vb);
+        addIds(nodes.value(qc, expr), vb, qc);
         return vb.value(BasicType.INTEGER);
       }
     };
@@ -48,11 +48,12 @@ public class DbNodeId extends StandardFunc {
   /**
    * Returns a node ID.
    * @param item item
+   * @param qc query context
    * @return node ID
    * @throws QueryException query exception
    */
-  private int id(final Item item) throws QueryException {
-    return id(toDBNode(item));
+  private int id(final Item item, final QueryContext qc) throws QueryException {
+    return id(toDBNode(item, qc));
   }
 
   /**
@@ -68,10 +69,12 @@ public class DbNodeId extends StandardFunc {
    * Adds the IDs.
    * @param nodes nodes
    * @param vb value builder
+   * @param qc query context
    * @throws QueryException query exception
    */
-  void addIds(final Value nodes, final ValueBuilder vb) throws QueryException {
-    for(final Item node : nodes) vb.add(id(node));
+  void addIds(final Value nodes, final ValueBuilder vb, final QueryContext qc)
+      throws QueryException {
+    for(final Item node : nodes) vb.add(id(node, qc));
   }
 
   @Override

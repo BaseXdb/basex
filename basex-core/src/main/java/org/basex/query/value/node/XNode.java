@@ -435,20 +435,23 @@ public abstract class XNode extends GNode {
     // cache parents of first node
     final GNodeList nl = new GNodeList();
     for(XNode node = node1; node != null; node = node.parent()) {
-      if(node == node2) return 1;
+      if(node.is(node2)) return 1;
       nl.add(node);
     }
     // find the lowest common ancestor
     GNode c2 = node2;
     LOOP:
     for(GNode node = node2; (node = node.parent()) != null;) {
+      if(node.is(node1)) return -1;
       final int is = nl.size();
       for(int i = 1; i < is; i++) {
-        if(node == node1) return -1;
         if(!nl.get(i).is(node)) continue;
         // check which node appears as first LCA child
         final GNode c1 = nl.get(i - 1);
-        for(final GNode c : node.childIter()) {
+        // attributes precede children
+        final boolean ch1 = c1.isChild();
+        if(ch1 != c2.isChild()) return ch1 ? 1 : -1;
+        for(final GNode c : ch1 ? node.childIter() : node.attributeIter()) {
           if(c.is(c1)) return -1;
           if(c.is(c2)) return 1;
         }
@@ -456,7 +459,10 @@ public abstract class XNode extends GNode {
       }
       c2 = node;
     }
-    return Integer.signum(node1.id - node2.id);
+    // distinct trees: compare roots, database trees first
+    final XNode root1 = (XNode) nl.peek(), root2 = ((XNode) c2).root();
+    final boolean db1 = root1 instanceof DBNode, db2 = root2 instanceof DBNode;
+    return db1 == db2 ? root1.compare(root2) : db1 ? -1 : 1;
   }
 
   @Override

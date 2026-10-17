@@ -210,19 +210,20 @@ public class DBNode extends XNode {
 
   @Override
   public final boolean is(final GNode node) {
-    return this == node || data == node.data() && pre == ((DBNode) node).pre;
+    return this == node || node instanceof final DBNode dbnode && data == dbnode.data &&
+      pre == dbnode.pre && root == dbnode.root;
   }
 
   @Override
   public final int compare(final GNode node) {
     if(this == node) return 0;
-    if(node instanceof final DBNode dbnode) {
+    if(node instanceof final DBNode dbnode && root == dbnode.root) {
       // comparison of database nodes: compare PRE values or database IDs
       final Data ndata = dbnode.data();
       return data == ndata ? Integer.signum(pre - dbnode.pre) :
         Integer.signum(data.dbid - ndata.dbid);
     }
-    // comparison of database and fragment: find LCA
+    // different trees: find LCA
     if(node instanceof final XNode xnode) {
       return compare(this, xnode);
     }
@@ -251,6 +252,14 @@ public class DBNode extends XNode {
   public final void parent(final FNode par) {
     // supplied parent node will be set as parent of the database instance
     root = par;
+  }
+
+  /**
+   * Indicates if the database instance is attached to a fragment parent.
+   * @return result of check
+   */
+  public final boolean attached() {
+    return root != null;
   }
 
   @Override
@@ -504,6 +513,11 @@ public class DBNode extends XNode {
       if(!filter.mayMatch(data, p, k)) return null;
       final DBNode node = p == pre ? DBNode.this : new DBNode(DBNode.this, p, k);
       return matches(node, test) ? node : null;
+    }
+
+    @Override
+    protected boolean compact() {
+      return !attached();
     }
   }
 

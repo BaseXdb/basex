@@ -668,5 +668,8 @@ public final class SerializerTest extends SandboxTest {
     // canonical serialization leaves C1 control characters unescaped
     query("string-to-codepoints(serialize(codepoints-to-string(127), "
         + "map { 'method': 'json', 'canonical': true() }))", "34\n127\n34");
+    // canonical serialization uses lowercase hexadecimal digits
+    query("serialize(char(0xB) || char(0x1F), map { 'method': 'json', 'canonical': true() })",
+        "\"\\u000b\\u001f\"");
   }
 }

@@ -141,9 +141,12 @@ public final class Range extends Arr {
 
     final Expr[] minMax = exprs.clone();
     final double mn = pos(minMax[0]), mx = pos(minMax[1]);
-    if(mx < mn) return Bln.FALSE;
+    // bounds relative to last() can only be compared directly with each other
+    final boolean last = offset(minMax[0]) && offset(minMax[1]);
+    if(last ? mx < mn : bound(minMax[0], mn, false) > bound(minMax[1], mx, true)) return Bln.FALSE;
 
-    final boolean results = mn <= mx;
+    final boolean results = last ? mn <= mx :
+      bound(minMax[0], mn, true) <= bound(minMax[1], mx, false);
     // position() = 1 to last() → true(), position() = 0 to $n → position() = 1 to $n
     switch(op) {
       case EQ -> {
@@ -202,6 +205,29 @@ public final class Range extends Arr {
       };
     }
     return Double.NaN;
+  }
+
+  /**
+   * Checks if the specified expression is {@code last()} with an optional integer offset.
+   * @param expr expression
+   * @return result of check
+   */
+  private static boolean offset(final Expr expr) {
+    return Function.LAST.is(expr) || expr instanceof final Arith arth &&
+      (arth.calc == Calc.ADD || arth.calc == Calc.SUBTRACT) &&
+      Function.LAST.is(expr.arg(0)) && expr.arg(1) instanceof Itr;
+  }
+
+  /**
+   * Returns the smallest or largest dynamic value of a positional value.
+   * @param expr expression
+   * @param pos positional value
+   * @param upper largest value
+   * @return value or {@code Double#NaN}
+   */
+  private static double bound(final Expr expr, final double pos, final boolean upper) {
+    return expr instanceof Itr ? pos : !offset(expr) ? Double.NaN :
+      upper ? Double.POSITIVE_INFINITY : pos - LAST + 1;
   }
 
   @Override
