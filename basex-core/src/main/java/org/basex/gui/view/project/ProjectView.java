@@ -255,7 +255,8 @@ public final class ProjectView extends BaseXPanel {
     if(getWidth() == 0) return;
 
     if(file != null) {
-      final IOFile fl = file.normalize();
+      // keep paths below links to the root unresolved
+      final IOFile fl = root.file.contains(file) ? file : file.normalize();
       if(root.file.contains(fl)) tree.expand(root, fl.path());
     }
     if(focus) tree.requestFocusInWindow();

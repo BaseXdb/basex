@@ -43,7 +43,7 @@ final class ProjectList extends JList<String> implements ProjectCommands {
     setCellRenderer(new CellRenderer());
     addMouseListener((MouseClickedListener) e -> {
       if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-        view.open(selectedFile(), search);
+        open(selectedFile());
       }
     });
 
@@ -209,5 +209,11 @@ final class ProjectList extends JList<String> implements ProjectCommands {
   @Override
   public void refresh() {
     view.refresh();
+  }
+
+  @Override
+  public void open(final IOFile file) {
+    view.open(file, search);
+    view.jumpTo(file, false);
   }
 }

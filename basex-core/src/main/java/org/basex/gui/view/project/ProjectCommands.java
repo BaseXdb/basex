@@ -49,6 +49,14 @@ interface ProjectCommands {
   void refresh();
 
   /**
+   * Opens the specified file.
+   * @param file file to be opened
+   */
+  default void open(final IOFile file) {
+    view().open(file, search());
+  }
+
+  /**
    * Returns the popup menu commands.
    * @param edit commands for editing files
    * @return commands
@@ -58,7 +66,7 @@ interface ProjectCommands {
 
     commands.add(new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
       @Override public void execute() {
-        for(final IOFile file : selectedFiles()) view().open(file, search());
+        for(final IOFile file : selectedFiles()) open(file);
       }
       @Override public boolean enabled(final GUI main) {
         return Checks.all(selectedFiles(), file -> !file.isDir());
