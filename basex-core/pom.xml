@@ -7,13 +7,14 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <relativePath>..</relativePath>
   </parent>
 
   <name>BaseX Core</name>
 
   <dependencies>
+    <!-- provided: org.basex.core.Sandbox in src/main/java uses JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
@@ -85,7 +86,6 @@
   </dependencies>
 
   <build>
-    <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

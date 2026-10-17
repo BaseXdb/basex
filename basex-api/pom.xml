@@ -7,13 +7,9 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <relativePath>..</relativePath>
   </parent>
-
-  <properties>
-    <jettyVersion>12.1.14</jettyVersion>
-  </properties>
 
   <name>BaseX API</name>
 
@@ -93,7 +89,6 @@
   </dependencies>
 
   <build>
-    <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -120,7 +115,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <includeScope>compile</includeScope>
-          <excludeArtifactIds>xstream</excludeArtifactIds>
         </configuration>
         <executions>
           <!-- web applications as archives (ZIP distribution) -->

@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>13.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -15,6 +15,8 @@
   </modules>
 
   <properties>
+    <!-- version of all modules -->
+    <revision>13.0-SNAPSHOT</revision>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -29,12 +31,6 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-commons</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
@@ -168,7 +164,7 @@
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>13.0</version>
+        <version>13.1</version>
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
@@ -259,10 +255,9 @@
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>3.8.0</version>
-            <inherited>true</inherited>
             <executions>
               <execution>
-                <id>create-executable-jar</id>
+                <id>source-archives</id>
                 <phase>package</phase>
                 <goals>
                   <goal>single</goal>
@@ -303,7 +298,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>3.12.0</version>
-            <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
             </configuration>
@@ -320,7 +314,7 @@
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.11.1</version>
+            <version>0.12.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>basex-publish</publishingServerId>
@@ -351,7 +345,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
           <version>3.2.1</version>
-          <inherited>true</inherited>
           <executions>
             <execution>
               <id>generate-all-parsers</id>
@@ -370,7 +363,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.16.0</version>
-          <inherited>true</inherited>
         </plugin>
 
         <plugin>
@@ -396,7 +388,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.5.1</version>
-          <inherited>true</inherited>
           <configuration>
             <archive>
               <manifest>
@@ -413,17 +404,12 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.6.0</version>
-          <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>3.4.0</version>
-          <inherited>true</inherited>
-          <configuration>
-            <outputDirectory>target</outputDirectory>
-          </configuration>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -437,20 +423,8 @@
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>3.3.1</version>
-          <configuration>
-            <tagNameFormat>@{project.version}</tagNameFormat>
-            <releaseProfiles>central</releaseProfiles>
-            <scmCommentPrefix>Release: </scmCommentPrefix>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.11.0</version>
-          <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
             <includeScope>runtime</includeScope>
@@ -470,7 +444,6 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.6.4</version>
-          <inherited>true</inherited>
           <executions>
             <execution>
               <goals>
@@ -484,21 +457,18 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.2.0</version>
-          <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
           <version>3.5.1</version>
-          <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.6.0</version>
-          <inherited>true</inherited>
           <executions>
             <execution>
               <phase>test</phase>
@@ -520,7 +490,51 @@
       </plugins>
     </pluginManagement>
 
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.6.3</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.6.3</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- installed and deployed POMs: ${revision} is replaced with the version -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.8.0</version>
+        <configuration>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <updatePomFile>true</updatePomFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
     <extensions>
+      <!-- scpexe:// deployment to the BaseX Maven repository (altDeploymentRepository in settings.xml) -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
