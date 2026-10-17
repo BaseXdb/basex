@@ -158,17 +158,7 @@ public abstract class JavaCall extends Arr {
 
     // convert empty array to target type
     if(arg instanceof XQArray && arg.structSize() == 0 && param.isArray()) {
-      final Class<?> atype = param.getComponentType();
-      if(atype == boolean.class) return new boolean[0];
-      if(atype == byte.class) return new byte[0];
-      if(atype == short.class) return new short[0];
-      if(atype == char.class) return new char[0];
-      if(atype == int.class) return new int[0];
-      if(atype == long.class) return new long[0];
-      if(atype == float.class) return new float[0];
-      if(atype == double.class) return new double[0];
-      if(atype == String.class) return new String[0];
-      return new Object[0];
+      return Array.newInstance(param.getComponentType(), 0);
     }
 
     // convert number to the target type

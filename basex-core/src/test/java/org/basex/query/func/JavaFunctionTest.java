@@ -305,6 +305,7 @@ public final class JavaFunctionTest extends SandboxTest {
     final String ns = "declare namespace String = 'java:java.lang.String'; ";
     query(ns + "String:new(array { xs:unsignedShort(33) })()", "!");
     query(ns + "String:new·char...(array { xs:unsignedShort(33) })()", "!");
+    query("Q{java:java.nio.file.Files}exists(Q{java:java.nio.file.Path}of('.', []), [])", true);
     query(ns + "String:new·char...(array { (65 to 69) ! xs:unsignedShort(.) })()", "ABCDE");
     query(ns + "String:new·char...·int·int(" +
         "  array { (65 to 69) ! xs:unsignedShort(.) }, xs:int(1), xs:int(3)" +
