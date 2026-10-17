@@ -25,7 +25,7 @@ on:
 
 env:
   # major lines that receive weekly rebuilds
-  SUPPORTED_MAJORS: '12'
+  SUPPORTED_MAJORS: '12 13'
 
 jobs:
   versions:

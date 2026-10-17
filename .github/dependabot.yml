@@ -1,7 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: "maven"
-    directory: "/"
+    # basex-tests and basex-examples are not modules of the root POM
+    directories:
+      - "/"
+      - "/basex-tests"
+      - "/basex-examples"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
@@ -10,3 +14,19 @@ updates:
       - dependency-name: "net.xqj:basex-xqj"
       - dependency-name: "org.apache:lucene-stemmers"
       - dependency-name: "jp.sourceforge.igo:igo"
+      # GeoSolutions lists customer builds (C105.*, *-EOWS-*); bumped by hand with geotools.version
+      - dependency-name: "org.geotools:gt-epsg-hsql"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "weekly"

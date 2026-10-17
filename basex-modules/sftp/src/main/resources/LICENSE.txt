@@ -7,7 +7,7 @@ is provided for informational purposes and does not modify the license terms of
 any third-party component.
 
 JSch License (BSD-style)
-- com.github.mwiede:jsch:2.28.7
+- com.github.mwiede:jsch:2.28.8
   Copyright (c) 2002-2015 Atsuhiko Yamanaka, JCraft,Inc.
   All rights reserved.
   The JSch JAR bundles the following components, which are covered by the
