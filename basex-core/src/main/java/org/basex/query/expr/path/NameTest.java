@@ -170,6 +170,12 @@ public final class NameTest extends Test {
   }
 
   @Override
+  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
+    final int k = kind == Kind.NODE ? Data.ELEM : XNode.dbKind(kind);
+    return k == dbKind && (data != dbData || data.nameId(pre) == dbId);
+  }
+
+  @Override
   public boolean matches(final GNode node) {
     final Kind nodeKind = node.kind();
     if(kind == Kind.NODE ? !nodeKind.oneOf(Kind.ELEMENT, Kind.JNODE) : kind != nodeKind)

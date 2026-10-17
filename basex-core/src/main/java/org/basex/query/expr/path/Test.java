@@ -119,6 +119,19 @@ public abstract class Test extends ExprInfo {
   public abstract boolean matches(GNode node);
 
   /**
+   * Checks if a database node may match the test, never rejecting a node accepted by
+   * {@link #matches(GNode)}.
+   * @param data data reference
+   * @param pre PRE value
+   * @param dbKind database node kind
+   * @return {@code false} if the node does not match
+   */
+  @SuppressWarnings("unused")
+  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
+    return true;
+  }
+
+  /**
    * Returns the JNode key that is exclusively addressed by this test.
    * @return key, or {@code null} if no or more than one key is addressed
    */

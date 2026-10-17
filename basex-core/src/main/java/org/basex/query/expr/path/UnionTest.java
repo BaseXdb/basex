@@ -61,6 +61,14 @@ public final class UnionTest extends Test {
   }
 
   @Override
+  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
+    for(final Test test : tests) {
+      if(test.mayMatch(data, pre, dbKind)) return true;
+    }
+    return false;
+  }
+
+  @Override
   public Boolean subsumes(final Type type) {
     for(final Test test : tests) {
       final Boolean b = test.subsumes(type);

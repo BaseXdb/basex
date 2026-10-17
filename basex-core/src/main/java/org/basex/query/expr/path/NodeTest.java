@@ -97,6 +97,12 @@ public class NodeTest extends Test {
   }
 
   @Override
+  public boolean mayMatch(final Data data, final int pre, final int dbKind) {
+    final int k = XNode.dbKind(kind);
+    return k != -1 ? k == dbKind : kind != Kind.JNODE;
+  }
+
+  @Override
   public Boolean subsumes(final Type type) {
     // <yes/>/self::node();
     if(kind == Kind.NODE) return Boolean.TRUE;

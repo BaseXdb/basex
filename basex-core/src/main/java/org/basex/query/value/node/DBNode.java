@@ -269,7 +269,9 @@ public class DBNode extends XNode {
     if(root != null) return super.ancestorIter(self);
 
     final int first = self ? pre : data.parent(pre, dbKind());
-    return first == -1 ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
+    if(first == -1) return BasicNodeIter.EMPTY;
+
+    return new DBNodeIter(data) {
       int curr = first;
 
       @Override
@@ -285,7 +287,9 @@ public class DBNode extends XNode {
   @Override
   public final BasicNodeIter attributeIter() {
     final int kind = dbKind(), first = pre + 1, last = pre + data.attSize(pre, kind);
-    return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
+    if(first == last) return BasicNodeIter.EMPTY;
+
+    return new DBNodeIter(data) {
       int curr = first;
 
       @Override
@@ -307,15 +311,21 @@ public class DBNode extends XNode {
   public final BasicNodeIter childIter(final Test test, final boolean descendant) {
     final int kind = dbKind();
     final int first = pre + data.attSize(pre, kind), last = pre + data.size(pre, kind);
-    return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
+    if(first == last) return BasicNodeIter.EMPTY;
+
+    // children of skipped nodes may still match a descendant test
+    final Test tst = descendant ? null : test;
+    return new DBNodeIter(data) {
       int curr = first;
 
       @Override
       public DBNode next() {
-        if(curr == last) return null;
-        final int c = curr, k = data.kind(c);
-        curr = c + data.size(c, k);
-        return new DBNode(DBNode.this, c, k);
+        while(curr != last) {
+          final int c = curr, k = data.kind(c);
+          curr = c + data.size(c, k);
+          if(tst == null || tst.mayMatch(data, c, k)) return new DBNode(DBNode.this, c, k);
+        }
+        return null;
       }
     };
   }
@@ -324,15 +334,19 @@ public class DBNode extends XNode {
   public final BasicNodeIter descendantIter(final boolean self, final Test test) {
     final int kind = dbKind();
     final int first = pre + (self ? 0 : data.attSize(pre, kind)), last = pre + data.size(pre, kind);
-    return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
+    if(first == last) return BasicNodeIter.EMPTY;
+
+    return new DBNodeIter(data) {
       int curr = first;
 
       @Override
       public DBNode next() {
-        if(curr == last) return null;
-        final int c = curr, k = data.kind(c);
-        curr = c + data.attSize(c, k);
-        return new DBNode(DBNode.this, c, k);
+        while(curr != last) {
+          final int c = curr, k = data.kind(c);
+          curr = c + data.attSize(c, k);
+          if(test == null || test.mayMatch(data, c, k)) return new DBNode(DBNode.this, c, k);
+        }
+        return null;
       }
     };
   }
