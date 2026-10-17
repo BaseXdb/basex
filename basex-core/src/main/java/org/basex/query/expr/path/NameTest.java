@@ -176,6 +176,11 @@ public final class NameTest extends Test {
   }
 
   @Override
+  public boolean exact(final Data data) {
+    return data == dbData;
+  }
+
+  @Override
   public boolean matches(final GNode node) {
     final Kind nodeKind = node.kind();
     if(kind == Kind.NODE ? !nodeKind.oneOf(Kind.ELEMENT, Kind.JNODE) : kind != nodeKind)

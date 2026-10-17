@@ -103,6 +103,11 @@ public class NodeTest extends Test {
   }
 
   @Override
+  public boolean exact(final Data data) {
+    return kind != Kind.NAMESPACE;
+  }
+
+  @Override
   public Boolean subsumes(final Type type) {
     // <yes/>/self::node();
     if(kind == Kind.NODE) return Boolean.TRUE;

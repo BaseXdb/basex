@@ -69,6 +69,14 @@ public final class UnionTest extends Test {
   }
 
   @Override
+  public boolean exact(final Data data) {
+    for(final Test test : tests) {
+      if(!test.exact(data)) return false;
+    }
+    return true;
+  }
+
+  @Override
   public Boolean subsumes(final Type type) {
     for(final Test test : tests) {
       final Boolean b = test.subsumes(type);

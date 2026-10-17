@@ -656,6 +656,29 @@ public final class IndexOptimizeTest extends SandboxTest {
         + "local:f('" + NAME + "')", "<a>abc</a>", exists(ValueAccess.class));
   }
 
+  /** Parent steps after index access are evaluated on PRE values. */
+  @Test public void parentSteps() {
+    execute(new CreateDB(NAME, "<x><a i='1' j='1'/><b i='1'/><c><a i='1'/></c>"
+        + "<p:a xmlns:p='P' p:i='1'/><a i='2'/></x>"));
+    check("//a[@i = '1']", "<a i=\"1\" j=\"1\"/>\n<a i=\"1\"/>", exists(ValueAccess.class));
+    check("//a[@* = '1']", "<a i=\"1\" j=\"1\"/>\n<a i=\"1\"/>", exists(ValueAccess.class));
+    check("//*[@i = '1']", "<a i=\"1\" j=\"1\"/>\n<b i=\"1\"/>\n<a i=\"1\"/>",
+        exists(ValueAccess.class));
+    check("//c[a/@i = '1']", "<c><a i=\"1\"/></c>", exists(ValueAccess.class));
+    check("declare namespace p = 'P'; //p:a[@p:i = '1']", "<p:a xmlns:p=\"P\" p:i=\"1\"/>",
+        exists(ValueAccess.class));
+  }
+
+  /** Index access with multiple search terms. */
+  @Test public void multipleTerms() {
+    execute(new CreateDB(NAME, "<x><a i='1'>A</a><b i='2'>B</b><a i='2' j='1'>C</a><a>D</a></x>"));
+    final String result = "<a i=\"1\">A</a>\n<a i=\"2\" j=\"1\">C</a>";
+    check("//a[@i = ('1', '2')]", result, exists(ValueAccess.class));
+    check("//a[@* = ('1', '2')]", result, exists(ValueAccess.class));
+    check("//a[text() = ('C', 'A', 'X')]", result, exists(ValueAccess.class));
+    check("count(//@*[. = ('2', '1')])", 4, exists(ValueAccess.class));
+  }
+
   /**
    * Creates a test database.
    */

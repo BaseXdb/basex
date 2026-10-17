@@ -7,6 +7,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -35,10 +36,16 @@ public final class CachedPath extends AxisPath {
 
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
-    final GNodeBuilder list = new GNodeBuilder();
-
-    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    final QueryFocus focus = qc.focus;
     final Value rt = root != null ? root.value(qc) : focus.value;
+    if(rt instanceof final DBNodeSeq seq) {
+      final Step[] stps = parentSteps();
+      final Value nodes = stps != null ? seq.steps(stps, this, qc) : null;
+      if(nodes != null) return nodes;
+    }
+
+    final GNodeBuilder list = new GNodeBuilder();
+    final QueryFocus qf = new QueryFocus();
     qc.focus = qf;
     try {
       if(rt != null) {
@@ -54,6 +61,21 @@ public final class CachedPath extends AxisPath {
       qc.focus = focus;
     }
     return list.value(this);
+  }
+
+  /**
+   * Returns the steps if they are self and parent steps without predicates.
+   * @return steps, or {@code null} if other steps exist
+   */
+  private Step[] parentSteps() {
+    final int sl = steps.length;
+    final Step[] stps = new Step[sl];
+    for(int s = 0; s < sl; s++) {
+      if(!(steps[s] instanceof final Step step) || step.exprs.length != 0 ||
+          step.selector != null || !step.axis.oneOf(Axis.SELF, Axis.PARENT)) return null;
+      stps[s] = step;
+    }
+    return stps;
   }
 
   /**

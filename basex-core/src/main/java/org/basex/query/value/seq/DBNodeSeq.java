@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -83,6 +84,37 @@ public class DBNodeSeq extends NativeSeq {
    */
   public final int pre(final int index) {
     return pres[index];
+  }
+
+  /**
+   * Evaluates self and parent steps without predicates on the PRE values.
+   * @param steps steps
+   * @param expr expression that is evaluated (used for typing)
+   * @param qc query context
+   * @return resulting nodes, or {@code null} if a test cannot be checked on the table
+   */
+  public final Value steps(final Step[] steps, final Expr expr, final QueryContext qc) {
+    for(final Step step : steps) {
+      if(!step.test.exact(data)) return null;
+    }
+
+    final int pl = pres.length;
+    final IntList list = new IntList(pl);
+    NODES: for(int i = 0; i < pl; i++) {
+      if((i & 0xFFF) == 0) qc.checkStop();
+      int pre = pres[i], kind = data.kind(pre);
+      for(final Step step : steps) {
+        if(step.axis == Axis.PARENT) {
+          pre = data.parent(pre, kind);
+          if(pre == -1) continue NODES;
+          kind = data.kind(pre);
+        }
+        if(!step.test.mayMatch(data, pre, kind)) continue NODES;
+      }
+      // skip parents shared by consecutive nodes
+      if(list.isEmpty() || list.peek() != pre) list.add(pre);
+    }
+    return get(list.ddo().finish(), data, expr);
   }
 
   /**

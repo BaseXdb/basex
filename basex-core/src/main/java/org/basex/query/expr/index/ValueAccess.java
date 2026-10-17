@@ -14,7 +14,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -109,15 +108,18 @@ public final class ValueAccess extends IndexAccess {
     final Data data = db.data(qc, type);
     if(c == 1) return iter(cache.key(1), data);
 
-    // multiple search terms: collect results, return result iterator
-    final GNodeBuilder nodes = new GNodeBuilder();
+    // multiple search terms: collect PRE values, return result iterator
+    final IntList pres = new IntList();
     for(final byte[] token : cache) {
-      for(final GNode node : iter(token, data)) {
-        qc.checkStop();
-        nodes.add(node);
+      qc.checkStop();
+      final Value value = iter(token, data).value(qc, this);
+      if(value instanceof final DBNodeSeq seq) {
+        pres.add(seq.pres());
+      } else {
+        for(final Item item : value) pres.add(((DBNode) item).pre());
       }
     }
-    return nodes.value(this).iter();
+    return DBNodeSeq.get(pres.ddo().finish(), data, this).iter();
   }
 
   /**

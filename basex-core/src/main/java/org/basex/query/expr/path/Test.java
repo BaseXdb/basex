@@ -132,6 +132,16 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
+   * Checks if {@link #mayMatch(Data, int, int)} yields exact results for the specified database.
+   * @param data data reference
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  public boolean exact(final Data data) {
+    return false;
+  }
+
+  /**
    * Returns the JNode key that is exclusively addressed by this test.
    * @return key, or {@code null} if no or more than one key is addressed
    */
