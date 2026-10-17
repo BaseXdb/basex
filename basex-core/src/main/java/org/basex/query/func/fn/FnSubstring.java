@@ -31,12 +31,12 @@ public final class FnSubstring extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // empty argument: return empty string
+    // empty argument: substring((), $n) → ''
     final Expr value = arg(0), len = arg(2);
     if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
     if(arg(1) instanceof Value) {
-      // invalid start offset: return empty string
+      // invalid start offset: substring($string, xs:double('NaN')) → ''
       final double start = start(cc.qc).dbl();
       if(Double.isNaN(start)) return Str.EMPTY;
 
@@ -59,7 +59,7 @@ public final class FnSubstring extends StandardFunc {
         return cc.function(Function.SUBSTRING, info, value, start);
       }
     }
-    // zero, negative or invalid length: return empty string
+    // zero, negative or invalid length: substring($string, $n, 0) → ''
     if(len instanceof Value) {
       final ANum length = length(cc.qc);
       if(length != null && !(length.dbl() > 0)) return Str.EMPTY;

@@ -69,6 +69,7 @@ public class FnContainsSubsequence extends StandardFunc {
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), subsequence = arg(1);
     final SeqType ist = input.seqType(), sst = subsequence.seqType();
+    // contains-subsequence($seq, ()) → true()
     if(sst.zero()) return cc.voidAndReturn(input, Bln.TRUE, info);
 
     if(defined(2)) {

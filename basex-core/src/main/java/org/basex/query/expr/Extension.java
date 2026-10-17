@@ -54,6 +54,7 @@ public final class Extension extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) {
+    // (# basex:lazy #) { 1 } → 1
     return pragma.simplify() && expr instanceof Value &&
         !expr.seqType().mayBeWrapped() ? expr : adoptType(expr);
   }

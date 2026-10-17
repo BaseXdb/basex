@@ -57,8 +57,7 @@ public final class Response {
    * @param options main options
    * @param resources query resources
    */
-  public Response(final InputInfo info, final MainOptions options,
-      final QueryResources resources) {
+  public Response(final InputInfo info, final MainOptions options, final QueryResources resources) {
     this(info, options, resources, Function._HTTP_SEND_REQUEST.definition());
   }
 

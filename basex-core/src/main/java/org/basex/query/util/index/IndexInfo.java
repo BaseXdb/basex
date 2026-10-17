@@ -210,6 +210,7 @@ public final class IndexInfo {
     final Data data = db.data();
     if(type == null || search == null || data == null && !enforce()) return false;
 
+    // //a[text() = 'x'] → db:text('db', 'x')/parent::a
     if(search instanceof final Value value) {
       // loop through all items; collect tokens, accumulate costs, and track the result size.
       // prerequisites for an exact size estimate:
@@ -260,6 +261,7 @@ public final class IndexInfo {
     // estimate costs for dynamic query terms
     costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
       IndexCosts.get(Math.max(1, data.nodes() / 10));
+    // //a[text() = $s] → db:text('db', $s)/parent::a
     final ValueAccess va = new ValueAccess(info, search, type, test, db);
     return create(va, false, Util.info(OPTINDEX_X_X, type, search), info);
   }

@@ -25,6 +25,7 @@ public final class FnFunctionLookup extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     if(values(false, cc)) {
       // compile the referenced function, discard a lookup that yields no result
+      // function-lookup(#fn:true, 0) → fn:true#0
       final Expr expr = lookup(cc.qc);
       return expr == null ? cc.emptySeq(this) : cc.dynamic ? expr : expr.compile(cc);
     }

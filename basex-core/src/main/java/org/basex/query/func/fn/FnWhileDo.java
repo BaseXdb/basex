@@ -43,6 +43,7 @@ public class FnWhileDo extends StandardFunc {
 
       final SeqType[] types = { st, Types.INTEGER_O };
       arg(p, arg -> predicate.refineFunc(cc, types));
+      // while-do(E, fn { false() }, ACTION) → E
       if(!until && arg(p) instanceof final FuncItem fi && fi.expr == Bln.FALSE) return input;
 
       exprType.assign(st);

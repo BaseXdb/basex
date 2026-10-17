@@ -73,11 +73,14 @@ public final class UtilCountWithin extends StandardFunc {
     final long[] minMax = minMaxValues(cc.qc);
     if(minMax != null && !ndt) {
       final long min = minMax[0], max = minMax[1];
+      // util:count-within($seq, 3, 2) → false()
       if(min > max) return Bln.FALSE;
+      // util:count-within($seq, 0) → true()
       if(min <= 0 && max == Long.MAX_VALUE) return Bln.TRUE;
 
       // evaluate static result size
       final long size = input.size();
+      // util:count-within((1, 2), 1, 3) → true()
       if(size >= 0) return Bln.get(size >= min && size <= max);
 
       // util:count-within($seq, 0, 0) → empty($seq)
@@ -86,6 +89,7 @@ public final class UtilCountWithin extends StandardFunc {
       if(min == 1 && max == Long.MAX_VALUE) return cc.function(EXISTS, info, input);
 
       if(input.seqType().zeroOrOne()) {
+        // util:count-within($x, 0, 1) → true(), util:count-within($x, 2) → false()
         if(min < 1 && max <= 1) return Bln.TRUE;
         if(min >= 2) return Bln.FALSE;
       }

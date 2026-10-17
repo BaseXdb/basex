@@ -120,8 +120,7 @@ public final class DBNew {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Data build(final String name, final boolean create)
-      throws IOException, QueryException {
+  private Data build(final String name, final boolean create) throws IOException, QueryException {
     // single node: create main-memory copy
     final NewInput first = inputs.getFirst();
     if(inputs.size() == 1 && first.node != null) {

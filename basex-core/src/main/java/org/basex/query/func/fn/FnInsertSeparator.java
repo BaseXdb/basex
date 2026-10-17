@@ -34,6 +34,7 @@ public final class FnInsertSeparator extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), separator = arg(1);
     final SeqType st = values.seqType(), stSep = separator.seqType();
+    // insert-separator($x, E) → $x, insert-separator($seq, ()) → $seq
     if(st.zeroOrOne() || separator == Empty.VALUE) return cc.voidAndReturn(separator, values, info);
 
     final long size = values.size(), sizeSep = separator.size();

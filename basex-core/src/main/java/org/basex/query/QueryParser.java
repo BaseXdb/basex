@@ -1525,26 +1525,24 @@ public class QueryParser extends InputParser {
       if(fr != null) {
         clauses.add(new For(fr, at, score, expr, empty));
       } else if(member != null) {
-        // for member $m in EXPR → for $a in EXPR ! array:split(.) let $m := array:items($a)
+        // for member $m in E → for $a in E ! array:split(.) let $m := array:items($a)
         final Var split = new Var(member.name, null, qc, ii);
         localVars.add(split, member);
         clauses.add(new For(split, at, score, forEach(Function._ARRAY_SPLIT, expr, ii), false));
         clauses.add(new Let(member, Function._ARRAY_ITEMS.get(ii, new VarRef(ii, split))));
       } else if(value == null) {
-        // for key $k in EXPR
-        // → for $k in EXPR ! map:keys(.)
+        // for key $k in E → for $k in E ! map:keys(.)
         localVars.add(key);
         clauses.add(new For(key, at, score, forEach(Function._MAP_KEYS, expr, ii), false));
       } else if(key == null) {
-        // for value $v in EXPR
-        // → for $e in EXPR ! map:entries(.) let $v := map:items($e)
+        // for value $v in E → for $e in E ! map:entries(.) let $v := map:items($e)
         final Var entries = new Var(value.name, null, qc, ii);
         localVars.add(entries, value);
         clauses.add(new For(entries, at, score, forEach(Function._MAP_ENTRIES, expr, ii), false));
         clauses.add(new Let(value, Function._MAP_ITEMS.get(ii, new VarRef(ii, entries))));
       } else {
-        // for key $k value $v in EXPR
-        // → for $e in EXPR ! map:entries(.) let $k := map:keys($e) let $v := map:items($e)
+        // for key $k value $v in E
+        // → for $e in E ! map:entries(.) let $k := map:keys($e) let $v := map:items($e)
         final Var entries = localVars.add(new Var(value.name, null, qc, ii));
         localVars.add(entries, key, value);
         clauses.add(new For(entries, at, score, forEach(Function._MAP_ENTRIES, expr, ii), false));

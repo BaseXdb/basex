@@ -69,7 +69,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate expression
+    // typeswitch(1) case xs:integer return A default return B → A
     if(cond instanceof final Value value) {
       for(final TypeswitchGroup group : groups) {
         if(group.match(value, null)) {
@@ -108,6 +108,7 @@ public final class Typeswitch extends ParseExpr {
             }
           }
         }
+        // typeswitch($i) case xs:integer return A default return B → A
         if(!branch) tg = groups[g];
         break;
       }
@@ -116,12 +117,14 @@ public final class Typeswitch extends ParseExpr {
     if(tg == null) {
       boolean opt = true;
       for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].noMatches(ct);
+      // typeswitch($i) case xs:string return A default return B → B
       if(opt) tg = groups[gl - 1];
     }
     // choose first branch if all return expressions are equal
     if(tg == null) {
       boolean opt = true;
       for(int g = 1; opt && g < gl; g++) opt = groups[0].expr.equals(groups[g].expr);
+      // typeswitch(E) case xs:string return A default return A → void(E), A
       if(opt) tg = groups[0];
     }
 
@@ -130,6 +133,8 @@ public final class Typeswitch extends ParseExpr {
       expr = tg.rewrite(cond, cc);
     } else if(gl < 3 && groups[0].seqTypes.length == 1 && !cond.has(Flag.NDT)) {
       // otherwise, rewrite to 'if' expression if one or two branches are left
+      // typeswitch(E) case xs:string return A default return B →
+      // if(E instance of xs:string) then A else B
       final Expr iff = new Instance(info, cond, groups[0].seqTypes[0]).optimize(cc);
       final Expr thn = groups[0].rewrite(cond, cc), els = groups[1].rewrite(cond, cc);
       expr = new If(info, iff, thn, els).optimize(cc);

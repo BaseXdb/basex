@@ -55,8 +55,7 @@ public final class Concat extends Arr {
     // <a>{ $x }</a> || 'b' → xs:string($x) || 'b'
     exprs = simplifyAll(Simplify.STRING, cc);
 
-    // merge adjacent values, ignore empty sequences
-    // 'a' || 'b' || $x → 'ab' || $x
+    // merge adjacent values, ignore empty sequences: 'a' || 'b' || $x → 'ab' || $x
     final int el = exprs.length;
     final ExprList list = new ExprList(el);
     final TokenBuilder tb = new TokenBuilder();
@@ -73,8 +72,7 @@ public final class Concat extends Arr {
     if(list.isEmpty()) return cc.replaceWith(this, Str.get(tb.finish()));
     if(!tb.isEmpty()) list.add(Str.get(tb.finish()));
 
-    // single expression left: replace with string call
-    // $x || '' → string($x)
+    // single expression left: $x || '' → string($x)
     final int ls = list.size();
     if(ls == 1) {
       final Expr arg = list.peek();

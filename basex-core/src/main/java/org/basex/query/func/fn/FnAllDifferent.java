@@ -42,10 +42,11 @@ public final class FnAllDifferent extends StandardFunc {
     if(!defined(1)) {
       final SeqType st = values.seqType();
       final BasicType type = st.type.atomic();
+      // all-different(()) → true(), all-different($string) → true()
       if(st.zero() || st.atomOcc().max <= 1 && type != null)
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // all-different(1 to 10) → true
+      // all-different(1 to 10) → true()
       if(values instanceof RangeSeq) return Bln.TRUE;
       // all-different(reverse($data)) → all-different($data)
       final Expr reordered = reordered(values);

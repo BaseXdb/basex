@@ -104,6 +104,29 @@ public final class QueryInfoTest extends SandboxTest {
     assertTrue(info.contains("db:get-pre"), info);
   }
 
+  /** Adding predicates to a path does not change the original path. */
+  @Test public void pathPredicates() {
+    final XQuery query = new XQuery("count(<a><b/></a>/b -> .[c])");
+    execute(query);
+    final String info = String.join("\n", QueryInfo.lines(query.sections().sections().
+        get("compilation")));
+    assertTrue(info.contains("-> (<a><b/></a>/b)[c]"), info);
+  }
+
+  /** Messages for flattened and internal expressions. */
+  @Test public void internalExprs() {
+    final XQuery query = new XQuery("declare variable $n external := <a><b/><c/></a>; "
+        + "declare variable $i external := random:integer(9); "
+        + "declare variable $b external := random:integer(2) = 1; "
+        + "($n/b | $n/c, $n/b/string(), $b or ($i = 1 or $i = 2))");
+    execute(query);
+    final String info = String.join("\n", QueryInfo.lines(query.sections().sections().
+        get("compilation")));
+    assertTrue(info.contains("flatten nested or: "), info);
+    assertFalse(info.contains("instance of"), info);
+    assertFalse(info.contains("true() or true()"), info);
+  }
+
   /** The query plan is only included if it was requested. */
   @Test public void plan() {
     final XQuery query = new XQuery("1");

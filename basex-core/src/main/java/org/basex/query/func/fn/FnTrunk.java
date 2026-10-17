@@ -88,6 +88,7 @@ public final class FnTrunk extends StandardFunc {
     if(input instanceof Value) return value(cc.qc);
 
     final SeqType st = input.seqType();
+    // trunk($x) → ()
     if(st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
     // trunk(TWO-ITEMS) → head(TWO-ITEMS)

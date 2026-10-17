@@ -41,8 +41,7 @@ final class XQueryTask extends RecursiveTask<Value> {
    * @param start first call to evaluate
    * @param end last call to evaluate
    */
-  private XQueryTask(final TaskContext tc, final List<Call> calls, final int start,
-      final int end) {
+  private XQueryTask(final TaskContext tc, final List<Call> calls, final int start, final int end) {
     this.tc = tc;
     this.calls = calls;
     this.start = start;

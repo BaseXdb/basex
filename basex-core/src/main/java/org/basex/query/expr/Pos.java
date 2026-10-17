@@ -46,29 +46,31 @@ public final class Pos extends Single {
   public static Expr get(final Expr positions, final CmpOp op, final InputInfo info,
       final CompileContext cc, final Expr ref) throws QueryException {
 
-    // static result. example: position() > 0 → true
+    // static result: position() > 0 → true()
     Expr pos = positions.optimizePos(op, cc);
     if(pos instanceof Bln) return pos;
 
     if(op == CmpOp.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
       if(cc.values(true, pos)) pos = ddo((Value) pos, cc.qc);
+      // position() = (0, -1) → false()
       if(pos == Empty.VALUE) return Bln.FALSE;
 
-      // range sequence. example: position() = 5 to 10
+      // range sequence: position() = 5 to 10
       if(pos instanceof final RangeSeq rs) {
         return IntPos.get(rs.min(), rs.max(), info);
       }
-      // range. example: position() = 3 to $max
+      // range: position() = 3 to $max
       if(pos instanceof final Range rng && rng.integers()) {
         if(pos.isSimple()) return new SimplePos(info, pos.args());
         return ref instanceof Pos ? null : new Pos(info, pos);
       }
     }
 
-    // integer tests. example: position() > 5
+    // integer tests: position() > 5
     if(pos instanceof final ANum num) {
       final double d = num.dbl();
+      // position() = xs:double('NaN') → false()
       if(Double.isNaN(d)) return Bln.get(op == CmpOp.NE);
       // floor, saturated at the long limits; exact if the number is a representable integer
       final long p;
@@ -84,6 +86,7 @@ public final class Pos extends Single {
         p = bd.setScale(0, RoundingMode.FLOOR).max(Dec.BD_MINLONG).min(Dec.BD_MAXLONG).longValue();
         exact = bd.compareTo(BigDecimal.valueOf(p)) == 0;
       }
+      // position() > 5 → position() >= 6, position() = 1.5 → false()
       return switch(op) {
         case EQ -> exact ? IntPos.get(p, p, info) : Bln.FALSE;
         case GE -> exact ? IntPos.get(p, MAX_VALUE, info) :

@@ -95,6 +95,7 @@ public final class CmpIR extends CmpRange {
     // MIN_VALUE/MAX_VALUE indicate unbounded limits: skip rewrite if they are real bounds
     if(mn == MIN_VALUE && (cmp.op == CmpOp.EQ || cmp.op == CmpOp.GE) ||
        mx == MAX_VALUE && (cmp.op == CmpOp.EQ || cmp.op == CmpOp.LE)) return cmp;
+    // $i > 2 → $i >= 3, $i < 2 → $i <= 1
     switch(cmp.op) {
       case GE: mx = MAX_VALUE; break;
       case GT: if(mn == MAX_VALUE) return cmp; mn++; mx = MAX_VALUE; break;
@@ -142,8 +143,7 @@ public final class CmpIR extends CmpRange {
   }
 
   @Override
-  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
-      throws QueryException {
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc) throws QueryException {
 
     Long newMin = null, newMax = null;
     if(ex instanceof final CmpIR cmp) {
@@ -157,6 +157,7 @@ public final class CmpIR extends CmpRange {
     if(newMin == null || or && (max < newMin || min > newMax)) return null;
 
     // determine common minimum and maximum value
+    // $i >= 1 and $i <= 5 → $i = 1 to 5, $i = 1 to 3 or $i = 2 to 5 → $i = 1 to 5
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);
     newMax = or ? Math.max(max, newMax) : Math.min(max, newMax);
     return get(cc, info, expr, newMin, newMax);

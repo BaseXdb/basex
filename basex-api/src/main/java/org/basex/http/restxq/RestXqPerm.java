@@ -41,8 +41,7 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @return permission information
    * @throws QueryException query exception
    */
-  static XQMap map(final WebFunction func, final HTTPConnection conn)
-      throws QueryException {
+  static XQMap map(final WebFunction func, final HTTPConnection conn) throws QueryException {
     final TokenList allows = func instanceof final RestXqFunction rxf ? rxf.allows :
       new TokenList(0);
     return new MapBuilder().

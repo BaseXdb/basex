@@ -60,6 +60,7 @@ public final class UtilValuesExcept extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), except = arg(1);
     final SeqType st = values.seqType();
+    // util:values-except((), $except) → ()
     if(st.zero()) return values;
 
     final BasicType type = st.type.atomic();

@@ -52,12 +52,14 @@ public final class Range extends Arr {
         // identical operands: $int to $int
         final SeqType st = min.seqType();
         exprType.assign(st.atomOcc() == Occ.EXACTLY_ONE ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+        // $int to $int → $int
         if(integers()) expr = min;
       } else if(integers()) {
         // known result size: . to . + 10, $x - 1 to $x + 1
         final BigDecimal diff = Linear.difference(min, max);
         if(diff != null && !has(Flag.NDT)) {
           if(diff.signum() < 0) {
+            // $x + 1 to $x → ()
             expr = Empty.VALUE;
           } else if(diff.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) < 0) {
             exprType.assign(seqType(), diff.longValue() + 1);
@@ -142,6 +144,7 @@ public final class Range extends Arr {
     if(mx < mn) return Bln.FALSE;
 
     final boolean results = mn <= mx;
+    // position() = 1 to last() → true(), position() = 0 to $n → position() = 1 to $n
     switch(op) {
       case EQ -> {
         if(mn <= 1 && mx >= LAST) return Bln.TRUE;

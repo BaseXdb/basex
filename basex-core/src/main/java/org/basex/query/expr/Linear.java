@@ -74,6 +74,7 @@ public final class Linear {
         factor.signum() > 0 ? term : new Unary(info, term, true).optimize(cc);
     }
     if(expr == null) {
+      // $x + 1 - $x → 1
       expr = num;
     } else if(summand) {
       // $x + 1.0 - 1.0 → $x + 0.0
@@ -149,8 +150,7 @@ public final class Linear {
    * @return difference, or {@code null} if it is not constant
    * @throws QueryException query exception
    */
-  public static BigDecimal difference(final Expr expr, final Expr... exprs)
-      throws QueryException {
+  public static BigDecimal difference(final Expr expr, final Expr... exprs) throws QueryException {
     // $x + 10 - ($x - 1) → 11
     final Linear linear = new Linear();
     for(final Expr ex : exprs) linear.add(ex, BigDecimal.ONE);

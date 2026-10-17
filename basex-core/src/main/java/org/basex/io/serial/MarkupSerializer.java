@@ -170,8 +170,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @param expand apply character mapping and normalization
    * @throws IOException I/O exception
    */
-  protected final void attributeValue(final byte[] value, final boolean expand)
-      throws IOException {
+  protected final void attributeValue(final byte[] value, final boolean expand) throws IOException {
     out.print(ATT1);
     if(expand) expand(value, this::attributeChars);
     else attributeChars(value);

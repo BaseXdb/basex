@@ -228,8 +228,7 @@ public final class CmpR extends CmpRange {
   }
 
   @Override
-  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
-      throws QueryException {
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
     final ArrayList<Stats> list = Path.stats(expr, nodes, data);
     return list != null && noMatches(list);
   }
@@ -260,8 +259,7 @@ public final class CmpR extends CmpRange {
   }
 
   @Override
-  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
-      throws QueryException {
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc) throws QueryException {
 
     // exact bounds: create intersection with other exact range or with single value
     if(exact()) {
@@ -312,7 +310,8 @@ public final class CmpR extends CmpRange {
     }
     if(newMin == null || or && (max < newMin || min > newMax)) return null;
 
-    // determine common minimum and maximum value
+    // determine common minimum and maximum value:
+    // ($d >= 1 and $d <= 5) or ($d >= 3 and $d <= 8) → $d >= 1 and $d <= 8
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);
     newMax = or ? Math.max(max, newMax) : Math.min(max, newMax);
     return get(cc, info, expr, newMin, newMax);

@@ -42,6 +42,7 @@ public final class XQueryForkJoin extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr functions = arg(0), options = arg(1);
     final SeqType st = functions.seqType();
+    // xquery:fork-join(()) → ()
     if(st.zero()) return functions;
     // xquery:fork-join($function) → $function()
     if(st.one() && options == Empty.UNDEFINED) {

@@ -28,6 +28,7 @@ public final class MapRemove extends MapFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1);
+    // map:remove({}, $keys) → {}
     if(map == XQMap.empty()) return map;
 
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);

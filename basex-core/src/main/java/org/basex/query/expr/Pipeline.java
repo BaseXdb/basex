@@ -119,6 +119,7 @@ public final class Pipeline extends Mapping {
 
   @Override
   Expr merge(final Expr expr, final Expr next, final CompileContext cc) {
+    // $a -> 1 → 1, $a -> (. + 1) → $a + 1
     return expr.has(Flag.NDT) ? null : next.has(Flag.CTX) ? inline(expr, next, cc) : next;
   }
 

@@ -93,6 +93,7 @@ public final class Try extends Single {
       }
     }
     if(e != null) {
+      // try { 1 } catch * { 2 } → 1, try { error() } catch * { 2 } → 2
       if(fnlly == Empty.VALUE) return cc.replaceWith(this, e);
       expr = e;
       catches = new Catch[0];

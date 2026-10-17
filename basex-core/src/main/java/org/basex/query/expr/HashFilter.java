@@ -187,8 +187,7 @@ public final class HashFilter extends Filter {
    * @return index, or {@code null} if a key is no untyped value or cannot be cast
    * @throws QueryException query exception
    */
-  private ItemObjectMap<IntList> numbers(final ItemObjectMap<IntList> index)
-      throws QueryException {
+  private ItemObjectMap<IntList> numbers(final ItemObjectMap<IntList> index) throws QueryException {
     final ItemObjectMap<IntList> numbers = new ItemObjectMap<>(ItemSet.Mode.EQUAL, info);
     final int is = index.size();
     for(int i = 1; i <= is; i++) {

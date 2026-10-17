@@ -99,6 +99,7 @@ public final class Otherwise extends Arr {
 
     el = exprs.length;
     if(el == 0) return cc.emptySeq(this);
+    // () otherwise $x → $x
     if(el == 1) return cc.replaceWith(this, exprs[0]);
 
     // determine result type

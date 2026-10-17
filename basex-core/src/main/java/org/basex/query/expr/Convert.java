@@ -36,6 +36,7 @@ abstract class Convert extends Single {
     // only atomizing casts benefit from string simplification (not item(), arrays, maps, records)
     final Type dt = TypeRef.deref(seqType.type);
     if(dt != BasicType.ITEM && !(dt instanceof FType)) {
+      // xs:integer(string($string)) → xs:integer($string)
       expr = expr.simplifyFor(Simplify.STRING, cc);
     }
     return this;
@@ -93,8 +94,7 @@ abstract class Convert extends Single {
     final SeqType est = expr.seqType();
     Expr arg = null;
     if(est.atomOcc() == Occ.EXACTLY_ONE && castType.type.instanceOf(BasicType.NUMERIC)) {
-      // xs:int(string(I))
-      // xs:int(xs:double(I)) → xs:int(I)
+      // xs:int(string(I)) → xs:int(I), xs:int(xs:double(I)) → xs:int(I)
       arg = FnNumber.simplify(expr, cc);
       if(arg == null && expr instanceof final Cast cast && (
         castType.type.instanceOf(est.type) ||

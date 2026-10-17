@@ -47,6 +47,7 @@ public final class IntPos extends Simple implements CmpPos {
    */
   public static Expr get(final long min, final long max, final InputInfo info) {
     // assumption: positions do not exceed bounds of long values
+    // pos: 3, 2 → false(), pos: 1, MAX → true()
     return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == MAX_VALUE ? Bln.TRUE :
       new IntPos(Math.max(1, min), Math.max(1, max), info);
   }
@@ -85,6 +86,7 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public Expr invert(final CompileContext cc) throws QueryException {
+    // not(pos: 3) → position() != 3, not(pos: 1, 3) → pos: 4, MAX
     if(exact()) {
       final Expr pos = cc.function(Function.POSITION, info);
       return new CmpG(info, pos, Itr.get(min), CmpOp.NE).optimize(cc);

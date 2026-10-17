@@ -406,8 +406,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr simplifyFunc(final Simplify mode, final CompileContext cc)
-      throws QueryException {
+  public Expr simplifyFunc(final Simplify mode, final CompileContext cc) throws QueryException {
     return this;
   }
 
@@ -529,8 +528,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
-      throws QueryException {
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
     return false;
   }
 

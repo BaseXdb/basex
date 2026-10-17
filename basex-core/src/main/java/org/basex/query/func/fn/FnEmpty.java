@@ -34,6 +34,7 @@ public class FnEmpty extends StandardFunc {
 
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
+    // exists(distinct-values($seq)) → exists($seq)
     arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.EXISTENCE, cc));
   }
 
@@ -45,11 +46,12 @@ public class FnEmpty extends StandardFunc {
 
     // ignore nondeterministic expressions (e.g.: empty(error()))
     if(!input.has(Flag.NDT)) {
+      // empty(()) → true(), exists(1 to 10) → true()
       if(st.zero()) return Bln.get(!exists);
       if(st.oneOrMore()) return Bln.get(exists);
     }
 
-    // static integer will always be greater than 1
+    // static integer will always be greater than 1: exists(replicate(E, 2)) → exists(E)
     if(REPLICATE.is(input) && input.arg(1) instanceof Itr) {
       input = input.arg(0);
     }

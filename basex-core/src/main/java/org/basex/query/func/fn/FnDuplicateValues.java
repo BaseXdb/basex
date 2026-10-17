@@ -85,6 +85,7 @@ public class FnDuplicateValues extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
     final SeqType st = values.seqType();
+    // duplicate-values(()) → ()
     if(st.zero()) return values;
 
     final BasicType type = st.type.atomic();

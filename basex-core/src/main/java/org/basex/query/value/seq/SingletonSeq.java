@@ -81,6 +81,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Value insertValue(final long pos, final Value val, final Job job) {
+    // insert-before(replicate('a', 2), 1, 'a') → replicate('a', 3)
     if(pos % value.size() == 0) {
       if(val.equals(value)) return get(value, count() + 1);
       if(val instanceof final SingletonSeq ss && value.equals(ss.value)) {
@@ -92,11 +93,13 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Value removeItem(final long pos, final Job job) {
+    // remove(replicate('a', 3), 2) → replicate('a', 2)
     return singleItem() ? get(value, size - 1) : super.removeItem(pos, job);
   }
 
   @Override
   public Value reverse(final Job job) {
+    // reverse(replicate((1, 2), 3)) → replicate((2, 1), 3)
     return singleItem() ? this : get(value.reverse(job), count());
   }
 
@@ -108,15 +111,18 @@ public final class SingletonSeq extends Seq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
+    // distinct-values(replicate((1, 2), 3)) → distinct-values((1, 2)), E[replicate(1, 3)] → E[1]
     if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
         mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
     } else if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) &&
         type.instanceOf(NodeType.XNODE)) {
+      // string-join(replicate(<a>A</a>, 2)) → string-join(replicate('A', 2))
       expr = get((Value) value.simplifyFor(mode, cc), count());
     } else if(mode.atomizing()) {
       final Type at = type.atomic();
       if(at != null && at != type) {
+        // data(replicate(<a>A</a>, 2)) → data(replicate(xs:untypedAtomic('A'), 2))
         expr = get((Value) value.simplifyFor(mode, cc), count());
       }
     }
@@ -196,6 +202,7 @@ public final class SingletonSeq extends Seq {
 
     // if all items are equal, reduce value to single item
     Value val = value;
+    // replicate(replicate(1, 2), 3) → replicate(1, 6), replicate((1, 1), 2) → replicate(1, 4)
     if(val instanceof final SingletonSeq ss) {
       val = ss.value;
     } else if(vs > 1) {

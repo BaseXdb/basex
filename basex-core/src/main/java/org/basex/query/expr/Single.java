@@ -106,6 +106,7 @@ public abstract class Single extends ParseExpr {
          mode == Simplify.NUMBER && (et.isUntyped() && dt == BasicType.DOUBLE ||
            et.instanceOf(BasicType.INT) && et.instanceOf(dt)) ||
          mode == Simplify.DATA && et.atomic() == dt) {
+        // string(xs:string($s)) → string($s)
         ex = expr;
       }
     }

@@ -210,8 +210,7 @@ public final class RequestParser {
    * @return boolean value
    * @throws QueryException query exception
    */
-  private boolean bool(final RequestAttribute attribute, final String value)
-      throws QueryException {
+  private boolean bool(final RequestAttribute attribute, final String value) throws QueryException {
     if(Strings.isTrue(value)) return true;
     if(Strings.isFalse(value)) return false;
     throw HC_REQ_X.get(info, "Value of '" + attribute + "' attribute is no boolean: " + value);

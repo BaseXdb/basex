@@ -47,6 +47,7 @@ abstract class Set extends Arr {
     if(expr == null) {
       final int el = exprs.length;
       if(el == 0) return Empty.VALUE;
+      // A union () → distinct-ordered-nodes(A)
       if(el == 1) return cc.function(Function.DISTINCT_ORDERED_NODES, info, exprs[0]);
       // try to merge operands
       expr = mergePaths(cc);
@@ -243,10 +244,15 @@ abstract class Set extends Arr {
     }
     if(test == null) return null;
 
-    final ExprList list = new ExprList(sl);
-    for(final Step step : steps) list.add(newPredicate(step.exprs, cc));
-    preds = new Expr[] { cc.get(root, true,
-        () -> mergePredicates(list.finish(), cc).optimize(cc)) };
+    // a[b] union a[c] → a[b or c]
+    if(preds == null) {
+      final ExprList list = new ExprList(sl);
+      for(final Step step : steps) list.add(newPredicate(step.exprs, cc));
+      preds = new Expr[] { cc.get(root, true,
+          () -> mergePredicates(list.finish(), cc).optimize(cc)) };
+    } else {
+      preds = preds.clone();
+    }
 
     final Expr step = Step.get(cc, root, info, axis, test, preds);
     return Path.get(cc, info, root, step);
@@ -278,6 +284,7 @@ abstract class Set extends Arr {
       }
       list.add(newPredicate(preds, cc));
     }
+    // $n[@a] union $n[@b] → $n[@a or @b]
     final Expr pred = mergePredicates(list.finish(), cc).optimize(cc);
     return Filter.get(cc, info, root, pred);
   }

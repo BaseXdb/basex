@@ -79,8 +79,7 @@ abstract class Update extends Arr {
    * @return name, or name with another prefix if the generated prefix was already bound
    * @throws QueryException query exception
    */
-  final QNm checkNS(final QNm name, final Atts scope, final QueryContext qc)
-      throws QueryException {
+  final QNm checkNS(final QNm name, final Atts scope, final QueryContext qc) throws QueryException {
     final byte[] prefix = name.prefix(), uri = name.uri(), bound = scope.value(prefix);
     if(bound == null || eq(bound, uri)) return name;
     if(!qc.shared.generated(prefix, uri)) throw UPNSCONFL_X_X.get(info, uri, bound);

@@ -117,8 +117,7 @@ public final class XmlParser {
    * @param name property name
    * @param value property value
    */
-  public static void property(final PropertySetter setter, final String name,
-      final Object value) {
+  public static void property(final PropertySetter setter, final String name, final Object value) {
     try {
       setter.set(name, value);
     } catch(final SAXException ex) {

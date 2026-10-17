@@ -33,8 +33,7 @@ public abstract class CNode extends Arr {
    * @param computed computed constructor
    * @param exprs expressions
    */
-  CNode(final InputInfo info, final SeqType seqType, final boolean computed,
-      final Expr... exprs) {
+  CNode(final InputInfo info, final SeqType seqType, final boolean computed, final Expr... exprs) {
     super(info, seqType, exprs);
     this.computed = computed;
   }
@@ -100,6 +99,7 @@ public abstract class CNode extends Arr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // ignore PIs and attributes as values must be normalized
     // single item required: a node with empty content is atomized to an empty string
+    // data(<e>{ $x }</e>) → xs:untypedAtomic($x), string(text { $x }) → xs:string($x)
     SeqType st = null;
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
       final SeqType st1 = exprs[0].seqType();
@@ -131,7 +131,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    // do not change context of constructed nodes:  <x/> ! <y xmlns='y'>{ <x/> }</y>
+    // do not change context of constructed nodes: <x/> ! <y xmlns='y'>{ <x/> }</y>
     return !ic.expr.has(Flag.CNS) && super.inlineable(ic);
   }
 

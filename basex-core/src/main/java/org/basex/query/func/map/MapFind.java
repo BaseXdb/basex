@@ -28,6 +28,7 @@ public final class MapFind extends MapFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
+    // map:find((), $key) → []
     if(input.seqType().zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
     // map:find({}, $key) → [], map:find([], $key) → []

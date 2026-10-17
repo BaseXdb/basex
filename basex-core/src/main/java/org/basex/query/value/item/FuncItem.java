@@ -263,6 +263,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(QueryText.OPTINLINE_X, this);
+    // fn($x) { $x * 2 }(E) → let $x := E return $x * 2
     return cc.inline(params, exprs, null, expr, null, info);
   }
 

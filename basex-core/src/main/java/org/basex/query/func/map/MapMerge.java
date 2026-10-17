@@ -94,7 +94,7 @@ public class MapMerge extends MapFn {
     prepareMerge(1, Duplicates.USE_FIRST, cc);
 
     if(arg(0).seqType().type instanceof MapType) {
-      // remove empty entries
+      // map:merge(({}, $map, {})) → map:merge($map)
       if(arg(0) instanceof List &&
           Checks.any(arg(0).args(), arg -> arg == XQMap.empty())) {
         final ExprList list = new ExprList();

@@ -143,8 +143,7 @@ public final class AnnList implements Iterable<Ann> {
    * @return self reference
    * @throws QueryException query exception
    */
-  public AnnList check(final boolean variable, final boolean visible)
-      throws QueryException {
+  public AnnList check(final boolean variable, final boolean visible) throws QueryException {
     boolean up = false, vis = false;
     for(final Ann ann : anns) {
       final Annotation def = ann.definition;

@@ -44,6 +44,7 @@ public final class MapBuild extends MapMerge {
 
     final Expr input = arg(0), keys = arg(1), value = arg(2);
     final SeqType st = input.seqType(), s1t = st.with(Occ.EXACTLY_ONE);
+    // map:build((), $keys, $value) → {}
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
     final boolean fiKey = keys instanceof FuncItem || keys instanceof Closure;

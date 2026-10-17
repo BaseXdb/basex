@@ -141,10 +141,12 @@ public final class Switch extends ParseExpr {
         final Expr expr = group.exprs[e];
         // check if same case expression exists more than once
         // (nondeterministic duplicates are kept, as they would otherwise lose their side effects)
+        // case 'a' return A case 'a' return B → case 'a' return A
         boolean remove = cases.contains(expr) && !expr.has(Flag.NDT);
         if(!remove && cnd != null) {
           // pre-evaluate values; skip remaining checks if match is found
           if(expr instanceof Value) {
+            // switch('a') case 'a' return A default return B → A
             if(group.match(cnd, e, cc.qc)) return group.rtrn();
             remove = true;
           } else {
@@ -171,8 +173,10 @@ public final class Switch extends ParseExpr {
       final SwitchGroup group1 = g > 0 ? tmpGroups.get(g - 1) : null, group2 = tmpGroups.get(g);
       if(g > 0 && group1.rtrn().equals(group2.rtrn())) {
         if(g + 1 == tmpGroups.size() && !group1.has(Flag.NDT)) {
+          // case 'a' return A default return A → default return A
           tmpGroups.set(g - 1, group2);
         } else {
+          // case 'a' return A case 'b' return A → case 'a' case 'b' return A
           final ExprList list = new ExprList(group1.exprs.length + group2.exprs.length - 1);
           list.add(group1.exprs).add(Arrays.copyOfRange(group2.exprs, 1, group2.exprs.length));
           tmpGroups.set(g - 1, new SwitchGroup(group1.info, list.finish()).optimize(cc));
@@ -197,7 +201,7 @@ public final class Switch extends ParseExpr {
    * @return new or original expression
    */
   private Expr toBranch() {
-    // only the default branch may be left at this stage
+    // only the default branch may be left at this stage: switch($x) default return A → A
     final Expr expr = groups[0].rtrn();
     for(int g = groups.length - 1; g >= 1; g--) {
       if(!expr.equals(groups[g].rtrn())) return this;

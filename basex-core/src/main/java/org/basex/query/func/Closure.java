@@ -184,12 +184,14 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Expr ex = entry.getValue();
 
         Expr inline = null;
+        // let $a := 1 return fn() { $a } → fn() { 1 }
         if(ex instanceof final Value value) {
           // values are always inlined into the closure
           inline = var.checkType(value, cc.qc, cc);
         } else if(ex instanceof final Closure cl) {
           // nested closures are inlined if their size and number of closed-over variables is small,
           // and if they do not capture the focus at creation time
+          // let $f := fn($x) { $x } return fn() { $f(1) } → fn() { fn($x) { $x }(1) }
           if(!cl.has(Flag.NDT) && !(cl.focus() && cl.has(Flag.CTX)) && cl.global.size() < 5
               && expr.count(var) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
             cc.info(OPTINLINE_X, entry);
@@ -283,8 +285,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr simplifyFunc(final Simplify mode, final CompileContext cc)
-      throws QueryException {
+  public Expr simplifyFunc(final Simplify mode, final CompileContext cc) throws QueryException {
     cc.pushScope(vs, anns);
     try {
       final Expr ex = expr.simplifyFor(mode, cc);
@@ -360,6 +361,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
+    // fn($x) { $x + 1 }(E) → let $x := E return $x + 1
     return cc.inline(params, exprs, global, expr, declType, info);
   }
 

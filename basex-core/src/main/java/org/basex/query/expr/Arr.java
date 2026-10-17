@@ -134,9 +134,10 @@ public abstract class Arr extends ParseExpr {
     final ExprList list = new ExprList(exprs.length);
     final Class<? extends Arr> clazz = getClass();
     for(final Expr expr : exprs) {
+      // A or (B or C) → A or B or C, (A, (B, C)) → (A, B, C)
       if(clazz.isInstance(expr)) {
         list.add(expr.args());
-        cc.info(QueryText.OPTFLAT_X_X, expr, (Supplier<?>) this::description);
+        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) expr::description, expr);
       } else {
         list.add(expr);
       }
@@ -151,6 +152,7 @@ public abstract class Arr extends ParseExpr {
   protected final void removeEmpty(final CompileContext cc) {
     if(!Checks.any(exprs, expr -> expr == Empty.VALUE)) return;
 
+    // (A, (), B) → (A, B)
     final ExprList list = new ExprList(exprs.length - 1);
     for(final Expr expr : exprs) {
       if(expr != Empty.VALUE) list.add(expr);
@@ -317,8 +319,7 @@ public abstract class Arr extends ParseExpr {
         return left.seqType().type instanceof NodeType && !left.ddo() ?
           cc.function(DISTINCT_ORDERED_NODES, info, left) : left;
       } else if(curr.size() == 1) {
-        // single additional test: add this test
-        // (A and B) or (A and C) → A and (B or C)
+        // single additional test: (A and B) or (A and C) → A and (B or C)
         rights.add(curr.get(0));
       } else {
         // multiple additional tests: simplify expression

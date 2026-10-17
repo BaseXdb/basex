@@ -68,8 +68,7 @@ final class FTSegmentWriter implements SegmentWriter {
   }
 
   @Override
-  public void write(final byte[] token, final IntList ids, final IntList poss)
-      throws IOException {
+  public void write(final byte[] token, final IntList ids, final IntList poss) throws IOException {
     final int count = ids.size();
     entry(token, count);
     for(int c = 0; c < count; c++) {

@@ -81,17 +81,20 @@ public class FnSum extends NumericFn {
       return cc.function(avg ? Function.AVG : Function.SUM, info, args);
     }
 
+    // sum(1 to 10) → 55, avg(1 to 10) → 5.5
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
     } else if(!avg && !defined(1) && values instanceof final SimpleMap map) {
       return linear(map, cc);
     } else if(values instanceof final SingletonSeq ss && ss.singleItem()) {
       // exact arithmetic only: floating-point results depend on the summation order
+      // sum(replicate(2, 5)) → 10, avg(replicate(2, 5)) → 2.0
       final Item item = ss.itemAt(0);
       if(item.type.instanceOf(DECIMAL)) {
         return avg ? Dec.get(item.dec(info)) : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
       }
     } else if(values instanceof final Path path) {
+      // sum(db:get('db')//price) → 1234.5e0
       final ArrayList<Stats> list = path.pathStats();
       if(list != null) {
         // negative zero: result if all values are negative zeros

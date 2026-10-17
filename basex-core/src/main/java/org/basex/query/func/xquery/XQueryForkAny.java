@@ -37,6 +37,7 @@ public final class XQueryForkAny extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr functions = arg(0);
     final SeqType st = functions.seqType();
+    // xquery:fork-any(()) → ()
     if(st.zero()) return functions;
     // xquery:fork-any($function) → $function()
     if(st.one() && arg(1) == Empty.UNDEFINED) {

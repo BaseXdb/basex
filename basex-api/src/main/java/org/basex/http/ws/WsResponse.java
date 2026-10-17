@@ -37,8 +37,7 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  protected Expr[] init(final WebFunction function, final Object data)
-      throws QueryException {
+  protected Expr[] init(final WebFunction function, final Object data) throws QueryException {
 
     qc = function.module.qc(ctx);
     qc.jc().type(WEBSOCKET);

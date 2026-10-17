@@ -102,18 +102,18 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // flatten nested filters
+    // ($seq[A])[B] → $seq[A][B]
     if(root instanceof final Filter filter) {
       root = filter.root;
       exprs = ExprList.concat(filter.exprs, exprs);
     }
 
-    // return empty root
+    // ()[A] → ()
     if(root.seqType().zero()) return cc.replaceWith(this, root);
 
-    // optimize predicates
+    // E[false()] → ()
     if(optimize(cc, root)) return cc.emptySeq(this);
-    // no predicates: return root
+    // E[true()] → E
     if(exprs.length == 0) return root;
 
     // independent deterministic single filter, rewritten to 'if' expression below
@@ -163,8 +163,7 @@ public abstract class Filter extends Preds {
         return cc.replaceWith(this, iff);
       }
 
-      // unroll filters with few items
-      // example: (1, 2)[. = 1] → 1[. = 1], 2[. = 1]
+      // unroll filters with few items: (1, 2)[. = 1] → 1[. = 1], 2[. = 1]
       final ExprList unroll = cc.unroll(root, false);
       if(unroll != null) {
         final int us = unroll.size();
@@ -179,8 +178,7 @@ public abstract class Filter extends Preds {
       return iterative();
     }
 
-    // rewrite loop-invariant predicates
-    // example: for $i in (1, 'a') return $seq[$i]
+    // rewrite loop-invariant predicates: for $i in (1, 'a') return $seq[$i]
     if(Checks.all(exprs, Expr::isSimple)) {
       return copyType(new HoistedFilter(info, root, exprs));
     }
@@ -365,8 +363,7 @@ public abstract class Filter extends Preds {
    * @return new operands, or {@code null} if no index is used and no operand is empty
    * @throws QueryException query exception
    */
-  private Expr[] distribute(final Expr[] operands, final CompileContext cc)
-      throws QueryException {
+  private Expr[] distribute(final Expr[] operands, final CompileContext cc) throws QueryException {
     // nondeterministic predicates would be evaluated twice for nodes in two operands
     if(Checks.any(exprs, expr -> expr.has(Flag.NDT))) return null;
 

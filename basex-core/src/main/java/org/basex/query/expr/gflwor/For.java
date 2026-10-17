@@ -181,6 +181,7 @@ public final class For extends ForLet {
       return true;
     }
     if(!st.one()) return false;
+    // for $x at $p in E → let $x := E let $p := 1  (E yields a single item)
     clauses.set(p, new Let(var, expr).optimize(cc));
     if(score != null) {
       clauses.add(p + 1, new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
@@ -202,6 +203,7 @@ public final class For extends ForLet {
     if(pos == null || empty || scoring || var.declType != null || !ex.uses(pos) ||
         ex.has(Flag.CTX, Flag.POS)) return false;
 
+    // for $x at $p in E where $p > 2 → for $x in E[position() > 2]
     final Expr pred = cc.get(expr, true, () -> {
       final InlineContext icPos = new InlineContext(pos, cc.function(POSITION, info), cc);
       final InlineContext icVar = new InlineContext(var, new ContextValue(info), cc);

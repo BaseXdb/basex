@@ -225,14 +225,14 @@ public abstract class Path extends ParseExpr {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // drop irrelevant predicate. example: if(a[1]) → if(a)
+      // drop irrelevant predicate: if(a[1]) → if(a)
       expr = dropPredicate(cc);
-      // merge nested predicates. examples: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
+      // merge nested predicates: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
       if(expr == this) expr = flattenEbv(true, cc);
     }
     if(expr == this && this instanceof final CachedPath cp && mode.oneOf(Simplify.EBV,
         Simplify.PREDICATE, Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
-      // skip sorting. example: count(preceding-sibling::a) → unordered path
+      // skip sorting if order is irrelevant: count(preceding-sibling::a)
       expr = cp.copyCache(new UnorderedPath(info, root, steps));
     }
     return cc.simplify(this, expr, mode);
@@ -376,7 +376,7 @@ public abstract class Path extends ParseExpr {
     boolean changed = false;
     final ExprList tmp = new ExprList(steps.length);
 
-    // flatten nested path
+    // ($a/b)/c → $a/b/c
     Expr rt = root;
     if(rt instanceof final Path path) {
       tmp.add(path.steps);
@@ -390,6 +390,7 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof final Path path) {
         // flatten nested path; keep non-node roots nested to preserve map/array coercion
+        // $a/(b/c) → $a/b/c
         final Expr proot = path.root;
         final boolean rootStep = proot != null && !(proot instanceof ContextValue);
         if(!rootStep || proot.seqType().type instanceof NodeType) {
@@ -413,7 +414,7 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr cleanSteps(final CompileContext cc) throws QueryException {
-    // root yields no result
+    // ()/a → ()
     if(root != null && root.seqType().zero()) return cc.emptySeq(this);
 
     // find empty results, remove redundant steps
@@ -426,6 +427,7 @@ public abstract class Path extends ParseExpr {
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         final Type pt = seqType.type;
+        // $node/./a → $node/a, a/self::node()/b → a/b
         if(pt instanceof NodeType && (step instanceof ContextValue ||
             step instanceof final Step stp && stp.remove(seqType))) {
           removed = true;
@@ -439,14 +441,13 @@ public abstract class Path extends ParseExpr {
         }
       }
 
-      // step is empty sequence. example: $doc/NON-EXISTING-STEP → $doc/() → ()
+      // $doc/() → ()
       if(step == Empty.VALUE) return cc.emptySeq(this);
 
       // add step to list
       list.add(step);
 
-      // ignore remaining steps if step yields no results
-      // example: A/void(.)/B → A/void(.)
+      // ignore remaining steps if step yields no results: A/void(.)/B → A/void(.)
       if(step.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         break;
@@ -454,6 +455,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // self step was removed: ensure that result will be in distinct document order
+    // $nodes/. → distinct-ordered-nodes($nodes)
     if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = ContextValue.get(cc, info);
       if(!root.ddo() && root.seqType().type instanceof NodeType) {
@@ -769,7 +771,7 @@ public abstract class Path extends ParseExpr {
    * @return number of results (or {@code -1})
    */
   private long size(final Expr rt, final Data data) {
-    // check if a step will yield no results. example: A/void(.)
+    // check if a step will yield no results: A/void(.)
     for(final Expr step : steps) {
       if(step.size() == 0) return 0;
     }
@@ -813,6 +815,7 @@ public abstract class Path extends ParseExpr {
   private Expr removeEmpty(final CompileContext cc, final Expr rt) throws QueryException {
     final ArrayList<PathNode> rn = rootNodes(rt, data(), false);
     final ArrayList<PathNode> nodes = rn != null ? pathNodes(rn, false) : null;
+    // $doc/NON-EXISTING/PATH → ()
     if(nodes != null ? nodes.isEmpty() : emptySteps(rt)) {
       cc.info(QueryText.OPTPATH_X, this);
       return Empty.VALUE;
@@ -860,6 +863,7 @@ public abstract class Path extends ParseExpr {
         if(test == null) return this;
         tests.add(test);
       }
+      // $doc//c → $doc/a/b/c  (path summary)
       cc.info(QueryText.OPTCHILD_X, steps[s]);
 
       // build new steps
@@ -1343,7 +1347,7 @@ public abstract class Path extends ParseExpr {
     if(ic.var != null) {
       final boolean ctx = ic.expr.has(Flag.CTX);
       for(final Expr step : steps) {
-        // do not replace $v with .:  EXPR/$v
+        // do not replace $v with .: E/$v
         if(ctx && step.uses(ic.var) || !step.inlineable(ic)) return false;
       }
     }

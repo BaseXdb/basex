@@ -125,8 +125,8 @@ public abstract class Mapping extends Arr {
       final boolean items = items();
       final int el = exprs.length;
       for(int e = 1; e < el && uses != VarUsage.MORE_THAN_ONCE; e++) {
-        // EXPR -> ($a) ...single usage
-        // EXPR ! ($a)  ...multiple usages
+        // E -> ($a) ...single usage
+        // E ! ($a)  ...multiple usages
         final VarUsage vu = exprs[e].count(var);
         if(vu != VarUsage.NEVER) uses = items ? VarUsage.MORE_THAN_ONCE : uses.plus(vu);
       }
@@ -136,7 +136,7 @@ public abstract class Mapping extends Arr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    // do not replace $v with .:  EXPR ! $v
+    // do not replace $v with .: E ! $v
     if(ic.var != null && ic.expr.has(Flag.CTX)) {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
@@ -220,8 +220,7 @@ public abstract class Mapping extends Arr {
       if(pushed) cc.removeFocus();
     }
 
-    // remove context value references (ignore first expression)
-    // (1 to 10) ! . → (1 to 10)
+    // remove context value references (ignore first expression): (1 to 10) ! . → (1 to 10)
     for(int n = list.size() - 1; n > 0; n--) {
       if(list.get(n) instanceof ContextValue) list.remove(n);
     }

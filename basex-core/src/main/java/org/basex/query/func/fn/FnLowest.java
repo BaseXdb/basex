@@ -81,9 +81,10 @@ public class FnLowest extends StandardFunc {
       arg(2, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
       final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
+      // lowest($x) → $x
       if(st.zeroOrOne() && noCheck.test(st.type)) return input;
 
-      // lowest(1 to 10) → 1 to 10
+      // lowest(1 to 10) → 1, highest(1 to 10) → 10
       if(input instanceof final RangeSeq rs) {
         return (rs.ascending() ? rs : rs.reverse(null)).itemAt(min ? 0 : rs.size() - 1);
       }

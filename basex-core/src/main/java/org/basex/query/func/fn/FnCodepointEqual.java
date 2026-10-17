@@ -47,6 +47,7 @@ public final class FnCodepointEqual extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value1 = arg(0), value2 = arg(1);
     final SeqType st1 = value1.seqType(), st2 = value2.seqType();
+    // codepoint-equal((), $b) → (), codepoint-equal($a, ()) → ()
     if(st1.zero()) return cc.voidAndReturn(value2, value1, info);
     if(st2.zero()) return cc.voidAndReturn(value1, value2, info);
     if(st1.atomOcc().min >= 1 && st2.atomOcc().min >= 1)

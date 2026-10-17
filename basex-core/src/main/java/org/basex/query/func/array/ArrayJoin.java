@@ -50,7 +50,7 @@ public final class ArrayJoin extends ArrayFn {
     final SeqType ast = arrays.seqType();
 
     if(ast.type instanceof ArrayType) {
-      // remove empty entries
+      // array:join(([], $a, [], $b)) → array:join(($a, $b))
       final Expr[] args = arrays.args();
       if(arrays instanceof List && Checks.any(args, arg -> arg == XQArray.empty())) {
         final ExprList list = new ExprList();

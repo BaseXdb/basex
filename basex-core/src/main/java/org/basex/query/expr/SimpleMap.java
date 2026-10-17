@@ -91,7 +91,7 @@ public abstract sealed class SimpleMap extends Mapping
    * @throws QueryException query exception
    */
   public Expr remove(final CompileContext cc, final int e) throws QueryException {
-    final ExprList list = new ExprList(exprs);
+    final ExprList list = new ExprList(exprs.length).add(exprs);
     list.remove(e);
     return get(cc, info, list.finish());
   }
@@ -105,9 +105,10 @@ public abstract sealed class SimpleMap extends Mapping
   private Expr flattenMaps(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList();
     for(final Expr expr : exprs) {
+      // A ! (B ! C) → A ! B ! C
       if(expr instanceof SimpleMap && !(expr instanceof CachedMap)) {
         list.add(expr.args());
-        cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
+        cc.info(OPTFLAT_X_X, (Supplier<?>) expr::description, expr);
       } else {
         list.add(expr);
       }
@@ -247,8 +248,7 @@ public abstract sealed class SimpleMap extends Mapping
       }
     }
 
-    // merge filter with context value as root
-    // A ! .[B] → A[B]
+    // merge filter with context value as root: A ! .[B] → A[B]
     Preds preds = null;
     if(next instanceof final Filter filter) {
       if(filter.root instanceof ContextValue) preds = filter;
@@ -347,8 +347,7 @@ public abstract sealed class SimpleMap extends Mapping
     final Expr path = Path.get(cc, info, root, stps);
     if(e == el) return path;
 
-    // create expression with path and remaining operands
-    //   a ! b ! string() → a/b ! string()
+    // create expression with path and remaining operands: a ! b ! string() → a/b ! string()
     final ExprList list = new ExprList(el - e + 1).add(path);
     for(; e < el; e++) list.add(exprs[e]);
     return get(cc, info, list.finish());
@@ -381,13 +380,14 @@ public abstract sealed class SimpleMap extends Mapping
       }
     }
     final int ls = list.size();
+    // $x ! () ! B → $x ! ()
     if(ls != exprs.length) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
       return get(cc, info, list.finish());
     }
 
     exprType.assign(exprs[ls - 1], new long[] { min, max });
-    // do not drop a map with an empty result that may still have side effects
+    // drop a map with an empty result unless it may have side effects: $x ! () → ()
     return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
   }
 

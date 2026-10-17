@@ -129,6 +129,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Value insertValue(final long pos, final Value val, final Job job) {
+    // insert-before(2 to 4, 1, 1) → 1 to 4, insert-before(1 to 3, 4, 4) → 1 to 4
     if(val instanceof final Itr itr) {
       // check for overflow: (MAX, MIN) is no range
       final long i = itr.itr(), step = ascending ? 1 : -1, last = get(size - 1);

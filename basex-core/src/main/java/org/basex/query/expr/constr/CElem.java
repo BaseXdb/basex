@@ -74,6 +74,7 @@ public final class CElem extends CName {
     final Predicate<Expr> text = arg -> arg instanceof CTxt && arg.arg(0) instanceof Item;
     final TokenBuilder tb = new TokenBuilder();
     final ExprList list = new ExprList(exprs.length);
+    // <e>{ (1, 2) }</e> → <e>{ '1 2' }</e>, <e>{ () }</e> → <e/>
     for(final Expr expr : exprs) {
       if(expr instanceof List && small(expr.args()) && Checks.all(expr.args(),
           arg -> text.test(arg) || arg instanceof Value && atomic.test(arg))) {
@@ -105,6 +106,7 @@ public final class CElem extends CName {
     }
     exprs = list.next();
 
+    // <e>{ 1 }{ text { 'b' } }</e> → <e>{ '1b' }</e>
     if(exprs.length > 1 || exprs.length == 1 && !(exprs[0] instanceof Str)) {
       for(final Expr expr : exprs) {
         if(expr instanceof final Item item && atomic.test(item)) {

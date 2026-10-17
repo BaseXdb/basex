@@ -67,6 +67,7 @@ public class CmpG extends Cmp {
     final Type t1 = exprs[0].seqType().type.atomic(), t2 = exprs[1].seqType().type.atomic();
     if(t1 != null && t2 != null) {
       if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
+        // $node[string() = 'x'] → $node[. = 'x']
         exprs = simplifyAll(Simplify.STRING, cc);
       } else if(t1.isNumber() && t2.isNumber()) {
         exprs = simplifyAll(Simplify.NUMBER, cc);
@@ -80,7 +81,7 @@ public class CmpG extends Cmp {
     // simplify operands
     exprs = simplifyAll(Simplify.SET, cc);
 
-    // swap operands
+    // 'a' = $x → $x = 'a', $x < count(E) → count(E) > $x
     if(swap()) {
       cc.info(QueryText.OPTSWAP_X, this);
       Collections.reverse(Arrays.asList(exprs));
@@ -340,8 +341,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
-      throws QueryException {
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
 
     final Expr expr2 = exprs[1];
     if(!byCodepoint(CmpOp.EQ) || !(expr2 instanceof final Value value) ||

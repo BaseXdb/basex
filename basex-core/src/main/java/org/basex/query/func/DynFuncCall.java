@@ -81,8 +81,7 @@ public final class DynFuncCall extends FuncCall {
     // ()() → ()
     if(func.seqType().zero()) return func;
 
-    // unroll calls with multiple functions
-    // example: (true#0, false#0)() → true#0(), false#0()
+    // (true#0, false#0)() → true#0(), false#0()
     final ExprList unroll = cc.unroll(func, false);
     if(unroll != null) {
       final ExprList results = new ExprList(unroll.size());
@@ -129,6 +128,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // try to inline the function; avoid recursive inlining
+    // fn($x) { $x + 1 }(E) → let $x := E return $x + 1
     if(func instanceof final XQFunctionExpr fe) {
       final Expr inlined = cc.enter(fe, () -> {
         checkUp(fe, updating);

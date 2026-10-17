@@ -68,13 +68,12 @@ public final class PartFunc extends Arr {
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
         // all arguments are placeholders in the original order: return original function
+        // local:f(?, ?) → local:f#2
         if(named && placeholders == nargs && placeholderPerm == null) {
           return cc.replaceWith(this, func);
         }
 
-        // FUNC(?, ARG) → fn($param) { FUNC($param, ARG) }: makes the call inlineable.
-        // supplied arguments must already match the parameter types: a closure would coerce them
-        // when the function is called, but coercion errors must be raised by the application
+        // FUNC(?, ARG) → fn($param) { FUNC($param, ARG) }: makes the call inlineable
         boolean rewrite = true;
         for(int e = 0; e < nargs && rewrite; e++) {
           rewrite = placeholder(exprs[e]) || exprs[e].seqType().instanceOf(ft.argTypes[e]);

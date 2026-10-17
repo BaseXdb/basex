@@ -38,6 +38,7 @@ public final class ArraySort extends ArraySortBy {
     // optimize sort on arrays
     final Expr array = arg(0);
     final long size = structSize();
+    // array:sort([]) → []
     if(size == 0) return array;
 
     if(array.seqType().type instanceof final ArrayType at) {
@@ -51,7 +52,7 @@ public final class ArraySort extends ArraySortBy {
           final XQArray quick = quickValue(value, cc.qc);
           if(quick != null) return quick;
         } else if(_ARRAY_SORT.is(array) && array.args().length == 1) {
-          // array:sort(array:sort(EXPR)) → array:sort(EXPR)
+          // array:sort(array:sort(E)) → array:sort(E)
           return array;
         }
       }

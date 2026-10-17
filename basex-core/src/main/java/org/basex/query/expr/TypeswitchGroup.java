@@ -83,8 +83,10 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
+    // typeswitch(E) case T return R → void(E), R
     if(var == null) return cc.voidAndReturn(cond, expr, info);
 
+    // typeswitch(E) case $v as T return R → let $v := E return R
     final IntObjectMap<Var> vm = new IntObjectMap<>();
     final Let let = new Let(cc.copy(var, vm), cond).optimize(cc);
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
@@ -112,6 +114,7 @@ public final class TypeswitchGroup extends Single {
     };
 
     // remove specific types
+    // typeswitch($i) case xs:string | xs:integer return R → case xs:integer return R
     final ArrayList<SeqType> tmp = new ArrayList<>(sl);
     for(final SeqType st : seqTypes) {
       if(remove.test(st)) {

@@ -237,9 +237,10 @@ public class FnSubsequence extends StandardFunc {
     long sz = -1;
     final SeqRange sr = range(cc);
     if(sr != null) {
-      // no results
+      // subsequence(E, 1, 0) → ()
       if(sr == EMPTY) return cc.voidAndReturn(input, Empty.VALUE, info);
       // all values?
+      // subsequence(E, 1) → E
       if(sr == ALL) return input;
       // ignore standard limitation for large values to speed up evaluation of result
       if(input instanceof Value) return value(cc.qc);
@@ -247,6 +248,7 @@ public class FnSubsequence extends StandardFunc {
       // check if result size is statically known
       final long size = sr.adjust(input.size());
       if(size != -1) {
+        // subsequence(($a, $b), 1, 5) → ($a, $b)
         if(sr.length == size) return input;
         // subsequence(E, last) → foot(E)
         if(sr.start == size - 1) return cc.function(FOOT, info, input);
@@ -257,6 +259,7 @@ public class FnSubsequence extends StandardFunc {
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
+        // subsequence($x, 1, 2) → $x, subsequence($x, 2) → ()
         return sr.start == 0 ? input : cc.voidAndReturn(input, Empty.VALUE, info);
       }
 
@@ -315,9 +318,9 @@ public class FnSubsequence extends StandardFunc {
     } else if(second instanceof final Itr itr) {
       if(!range() && first.seqType().instanceOf(Types.INTEGER_O)) {
         final long length = itr.itr();
-        // subsequence(EXPR, START, 1) → items-at(EXPR, START)
+        // subsequence(E, $start, 1) → items-at(E, $start)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
-        // subsequence(EXPR, START, 0) → ()
+        // subsequence(E, $start, 0) → ()
         if(length <= 0) return Empty.VALUE;
       }
     } else if(first.seqType().instanceOf(Types.INTEGER_O) &&

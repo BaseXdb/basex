@@ -114,10 +114,12 @@ public class DBNodeSeq extends NativeSeq {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
+      // string-join((<a>A</a>, <b>B</b>)) → string-join(('A', 'B'))
       final TokenList list = new TokenList(size);
       for(final Item item : this) list.add(item.string(null));
       expr = StrSeq.get(list);
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      // data((<a>A</a>, <b>B</b>)) → data((xs:untypedAtomic('A'), xs:untypedAtomic('B')))
       expr = atomValue(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);

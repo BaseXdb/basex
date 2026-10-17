@@ -43,8 +43,7 @@ public final class Arith extends Arr {
     exprs = simplifyAll(Simplify.NUMBER, cc);
     if(values(false, cc)) return cc.preEval(this);
 
-    // move values to second position
-    // 1 + position() → position() + 1
+    // move values to second position: 1 + position() → position() + 1
     Expr expr1 = exprs[0], expr2 = exprs[1];
     if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
         expr1.seqType().type.isNumberOrUntyped() && !(expr2 instanceof Value)) {

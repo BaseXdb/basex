@@ -40,6 +40,7 @@ public final class FnDropWhile extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // drop-while((), $f) → ()
     if(st.zero()) return input;
 
     arg(1, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));

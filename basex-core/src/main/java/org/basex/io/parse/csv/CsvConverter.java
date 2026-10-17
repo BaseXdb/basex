@@ -151,6 +151,5 @@ public abstract class CsvConverter extends Job {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected abstract Value finish(InputInfo ii, QueryContext qc)
-      throws QueryException, IOException;
+  protected abstract Value finish(InputInfo ii, QueryContext qc) throws QueryException, IOException;
 }

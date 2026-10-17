@@ -34,8 +34,11 @@ public final class MathPow extends MathFn {
 
     if(exp instanceof final ANum num && st.type.isNumberOrUntyped()) {
       final double e = num.dbl();
+      // math:pow($x, 0) → 1e0
       if(e == 0 && st.one()) return Dbl.ONE;
+      // math:pow($x, 1) → xs:double($x)
       if(e == 1) return new Cast(info, base, Types.DOUBLE_ZO).optimize(cc);
+      // math:pow($x, -1) → 1e0 div $x
       if(e == -1) return new Arith(info, Dbl.ONE, base, Calc.DIVIDE).optimize(cc);
     }
     return super.opt(cc);

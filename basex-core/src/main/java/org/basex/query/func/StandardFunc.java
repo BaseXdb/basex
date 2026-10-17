@@ -111,6 +111,7 @@ public abstract class StandardFunc extends Arr {
       // consider variable-size parameters
       final int p = Math.min(a, definition.types.length - 1);
       final Type type = definition.types[p].type;
+      // string-length(string($elem)) → string-length($elem)
       if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
         final Simplify mode = type.instanceOf(BasicType.NUMERIC) ? Simplify.NUMBER :
             type.instanceOf(BasicType.STRING) ? Simplify.STRING : Simplify.DATA;
@@ -403,7 +404,7 @@ public abstract class StandardFunc extends Arr {
   protected Expr embed(final CompileContext cc, final boolean skip) throws QueryException {
     // head($nodes ! name()) → head($nodes) ! name()
     // foot((1 to 8) ! <_>{ . }</_>) → foot((1 to 8)) ! <_>{ . }</_>
-    // do not rewrite positional access:  foot($nodes ! position())
+    // do not rewrite positional access: foot($nodes ! position())
     // do not rewrite non-deterministic expressions: foot($nodes ! file:append($name, .))
     if(arg(0) instanceof SimpleMap) {
       final Expr[] ops = arg(0).args();
@@ -969,8 +970,7 @@ public abstract class StandardFunc extends Arr {
    * @param qc query context
    * @return result of check
    */
-  protected final boolean trusted(final Options options, final String name,
-      final QueryContext qc) {
+  protected final boolean trusted(final Options options, final String name, final QueryContext qc) {
     final Object trusted = options.get(name);
     // untrusted code cannot grant itself access
     return trusted(qc) && (trusted != null ? (Boolean) trusted :

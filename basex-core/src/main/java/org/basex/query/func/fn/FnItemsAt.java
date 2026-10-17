@@ -124,8 +124,9 @@ public final class FnItemsAt extends StandardFunc {
       if(at instanceof Item) {
         // check for fractional or negative number
         final long l = Pos.position(toNumber((Item) at)) - 1;
+        // items-at(E, 0) → ()
         if(l < 0) return Empty.VALUE;
-        // single expression with static position
+        // single expression with static position: items-at($x, 1) → $x, items-at($x, 2) → ()
         if(ist.zeroOrOne()) return l == 0 ? input : Empty.VALUE;
 
         final long size = input.size();
@@ -139,6 +140,7 @@ public final class FnItemsAt extends StandardFunc {
             return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size - l));
           occ = Occ.EXACTLY_ONE;
         }
+        // items-at(E, 1) → head(E)
         if(l == 0) return cc.function(HEAD, info, input);
 
         // items-at(tail(E), pos) → items-at(E, pos + 1)

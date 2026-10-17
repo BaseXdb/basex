@@ -54,12 +54,17 @@ public final class DynamicStep extends Single {
     if(expr.has(Flag.UPD)) return compile ? expr.compile(cc) : expr;
 
     final Expr ctx = new ContextValue(info).optimize(cc);
-    final Expr cond = new Instance(info, ctx, Types.XNODE_O).optimize(cc);
+    // static checks first: no info output for the internal instance test
+    final SeqType st = ctx.seqType();
+    final Expr cond = st.instanceOf(Types.XNODE_O) ? Bln.TRUE :
+      st.intersect(Types.XNODE_O) == null ? Bln.FALSE :
+      new Instance(info, ctx, Types.XNODE_O).optimize(cc);
     if(cond == Bln.TRUE) return compile ? expr.compile(cc) : expr;
 
     // the selector is compiled with an absent focus
     final boolean both = cond != Bln.FALSE;
     if(!both && expr.has(Flag.CTX)) throw QueryError.SELECTORCTX_X.get(expr.info(info), expr);
+    // $map/E → $map/child::{ E }
     final Expr step = new SelectorStep(info, Axis.CHILD,
         both ? expr.copy(cc, new IntObjectMap<>()) : expr);
     final Expr selector = compile ? step.compile(cc) : step.optimize(cc);

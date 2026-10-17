@@ -306,8 +306,7 @@ public final class FTIndex extends SegmentedIndex {
    * @param token index token
    * @return iterator
    */
-  private static FTIndexIterator iter(final IntList pres, final IntList poss,
-      final byte[] token) {
+  private static FTIndexIterator iter(final IntList pres, final IntList poss, final byte[] token) {
     if(pres.isEmpty()) return FTIndexIterator.FTEMPTY;
 
     final int[] order = Array.createOrder(pack(pres, poss), true);
@@ -516,8 +515,7 @@ public final class FTIndex extends SegmentedIndex {
   }
 
   @Override
-  protected void unit(final int pre, final TokenList keys, final IntList poss)
-      throws IOException {
+  protected void unit(final int pre, final TokenList keys, final IntList poss) throws IOException {
     if(lexer == null) lexer = FTBuilder.lexer(data);
     FTBuilder.tokens(lexer, data.meta, data.atom(pre), (token, pos) -> {
       keys.add(token);

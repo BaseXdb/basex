@@ -58,8 +58,7 @@ public final class ThesList {
    * @return result list
    * @throws QueryException query exception
    */
-  byte[][] find(final byte[] term, final FTOpt opt, final QueryContext qc)
-      throws QueryException {
+  byte[][] find(final byte[] term, final FTOpt opt, final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
     for(final ThesAccessor th : list) tl.add(th.find(term, opt, qc));
     return tl.finish();

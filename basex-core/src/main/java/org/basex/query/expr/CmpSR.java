@@ -95,8 +95,7 @@ public final class CmpSR extends CmpRange {
   }
 
   @Override
-  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
-      throws QueryException {
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc) throws QueryException {
 
     if(or) return null;
     Collation coll = null;
@@ -135,10 +134,10 @@ public final class CmpSR extends CmpRange {
 
     if(newMin != null && newMax != null) {
       final int diff = Token.compare(newMin, newMax);
-      // return comparison for exact hit
+      // return comparison for exact hit: $s >= 'a' and $s <= 'a' → $s = 'a'
       if(diff == 0 && newMni && newMxi) return
           new CmpG(info, expr, Str.get(newMin), CmpOp.EQ).optimize(cc);
-      // remove comparisons that will never yield results
+      // remove comparisons that will never yield results: $s > 'b' and $s < 'a' → false()
       if(diff >= 0) return Bln.FALSE;
     }
     return new CmpSR(expr, newMin, newMni, newMax, newMxi, info).optimize(cc);

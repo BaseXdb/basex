@@ -29,6 +29,7 @@ public class FnNodeName extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr expr = optFirst(false, false, cc.qc.focus.value);
+    // node-name($text) → ()
     return expr != this ? expr : empty(cc, true) ? Empty.VALUE : this;
   }
 

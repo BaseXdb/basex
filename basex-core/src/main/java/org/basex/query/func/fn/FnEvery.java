@@ -42,6 +42,7 @@ public class FnEvery extends StandardFunc {
     final Expr input = arg(0), predicate = arg(1);
     final SeqType st = input.seqType();
     final boolean some = some();
+    // every((), $f) → true(), some((), $f) → false()
     if(st.zero()) return cc.voidAndReturn(input, Bln.get(!some), info);
     final boolean pred = defined(1);
     final int arity = pred ? arity(predicate) : 1;

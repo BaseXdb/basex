@@ -30,6 +30,7 @@ public final class MapGet extends MapFn {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1);
     final boolean dflt = defined(2);
+    // map:get({}, $key) → (), map:get({}, $key, $default) → $default
     if(map == XQMap.empty()) return dflt ? arg(2) : Empty.VALUE;
 
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);

@@ -46,6 +46,7 @@ final class SimplePos extends Arr implements CmpPos {
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.NUMBER, cc);
 
+    // pos: 2.0 → pos: 2
     final QueryFunction<Expr, Expr> simplify = expr -> {
       if(expr instanceof final ANum num && !(num instanceof Itr)) {
         final long p = num.itr();
@@ -135,6 +136,7 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public Expr invert(final CompileContext cc) throws QueryException {
+    // not(pos: $p) → position() != $p, not(pos: 1, $p) → position() > $p
     if(exprs[0].seqType().one()) {
       final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
       if(exact()) return new CmpG(info, pos.get(), exprs[0], CmpOp.NE).optimize(cc);

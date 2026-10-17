@@ -39,8 +39,10 @@ public final class FnMatches extends RegExFn {
     final SeqType st = value.seqType();
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         pattern instanceof final Str str && !defined(2)) {
+      // matches($string, '') → true()
       if(str == Str.EMPTY) return Bln.TRUE;
       // rewrite literal match to fn:contains (which, unlike fn:matches, respects collations)
+      // matches($string, 'abc') → contains($string, 'abc')
       if(sc().collation == null && literal(str.string(), Token.EMPTY) != null) {
         return cc.function(CONTAINS, info, args());
       }

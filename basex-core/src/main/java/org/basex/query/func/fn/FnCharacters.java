@@ -59,6 +59,7 @@ public final class FnCharacters extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr value = arg(0);
+    // characters(()) → ()
     return value.seqType().zero() ? value : this;
   }
 }

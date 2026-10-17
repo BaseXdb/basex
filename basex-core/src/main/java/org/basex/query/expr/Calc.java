@@ -58,7 +58,6 @@ public enum Calc {
           (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) < 0)) {
         return cast(expr1, type, num.type == DECIMAL, info, cc);
       }
-      // merge arithmetical expressions
       // $x + $x → $x * 2
       if(expr1.equals(expr2)) {
         return new Arith(info, expr1, Itr.get(2), MULTIPLY).optimize(cc);
@@ -202,9 +201,9 @@ public enum Calc {
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof final ANum num) {
         final double dbl2 = num.dbl();
-        // check for neutral number
+        // check for neutral number: $x * 1 → $x
         if(dbl2 == 1) return cast(expr1, type, num.type == DECIMAL, info, cc);
-        // check for absorbing number
+        // check for absorbing number: $x * 0 → 0
         if(dbl2 == 0) return type == INTEGER ? Itr.ZERO :
           type == DECIMAL && num.type == DECIMAL ? Dec.ZERO : null;
       }
@@ -272,6 +271,7 @@ public enum Calc {
       // check for neutral number
       final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
       final Type type = numType(type1, type2);
+      // $x div 1 → xs:decimal($x)
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return cast(expr1, type(type1, type2), true, info, cc);
       }
@@ -323,6 +323,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      // $x idiv 1 → xs:integer($x)
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
       }
@@ -378,6 +379,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      // $x mod 1 → 0
       if(type == INTEGER && expr2 == Itr.ONE) return Itr.ZERO;
       // $x mod $x → 0; ignore floating numbers (NaN, INF) and decimals (may be integers)
       if(expr1.equals(expr2)) return type == INTEGER ? Itr.ZERO : null;

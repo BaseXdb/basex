@@ -45,10 +45,11 @@ public final class FnAllEqual extends StandardFunc {
     if(!defined(1)) {
       final SeqType st = values.seqType();
       final BasicType type = st.type.atomic();
+      // all-equal(()) → true(), all-equal($string) → true()
       if(st.zero() || st.atomOcc().max <= 1 && type != null)
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // all-equal(1 to 10) → false
+      // all-equal(1 to 10) → false()
       if(values instanceof RangeSeq) return Bln.FALSE;
       // all-equal(reverse($data)) → all-equal($data)
       final Expr reordered = reordered(values);

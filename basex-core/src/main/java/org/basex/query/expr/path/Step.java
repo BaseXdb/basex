@@ -244,12 +244,13 @@ public abstract class Step extends Preds {
     }
     // $jnode/attribute::x: type error at runtime
     final boolean typeError = axis == ATTRIBUTE && rtype.seqType().mayBeJNode();
+    // attribute::element() → (), parent::comment() → ()
     if(!typeError && (t == null || noMatches() || seqType().zero())) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
 
-    // optimize predicates
+    // a[false()] → ()
     if(optimize(cc, this)) return cc.emptySeq(this);
 
     // performed after predicate optimization: adopt final sequence type if it is more specific

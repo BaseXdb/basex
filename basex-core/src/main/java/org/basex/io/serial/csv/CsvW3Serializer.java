@@ -25,8 +25,7 @@ public final class CsvW3Serializer extends CsvSerializer {
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvW3Serializer(final OutputStream os, final SerializerOptions sopts)
-      throws IOException {
+  public CsvW3Serializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
     super(os, sopts);
   }
 

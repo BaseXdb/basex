@@ -81,8 +81,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    * @param info input info (can be {@code null})
    * @return function returning random numbers
    */
-  private static FuncItem takeFunc(final long state, final QueryContext qc,
-      final InputInfo info) {
+  private static FuncItem takeFunc(final long state, final QueryContext qc, final InputInfo info) {
     final Var var = new Var(Q_COUNT, null, qc, info, 0, null);
     final Take take = new Take(info, state, new VarRef(info, var));
     return new FuncItem(info, take, new Var[] { var }, AnnList.EMPTY, TAKE_TYPE, 1, null);

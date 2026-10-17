@@ -36,6 +36,7 @@ public final class FnHead extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // head($x) → $x
     if(st.zeroOrOne()) return input;
 
     final long size = input.size();

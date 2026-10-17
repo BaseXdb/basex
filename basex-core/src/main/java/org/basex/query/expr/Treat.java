@@ -33,7 +33,7 @@ public final class Treat extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // skip check if return type is already correct
+    // skip check if return type is already correct: count(E) treat as xs:integer → count(E)
     if(expr.seqType().instanceOf(check)) return cc.replaceWith(this, expr);
     return expr instanceof Value ? cc.preEval(this) : this;
   }

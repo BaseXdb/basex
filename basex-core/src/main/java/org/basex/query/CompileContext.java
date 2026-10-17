@@ -194,8 +194,7 @@ public final class CompileContext {
    * @return result, or {@code null} if the body is already being compiled or inlined
    * @throws QueryException query exception
    */
-  public <T> T enter(final XQFunctionExpr func, final QuerySupplier<T> code)
-      throws QueryException {
+  public <T> T enter(final XQFunctionExpr func, final QuerySupplier<T> code) throws QueryException {
     if(entered.contains(func)) return null;
     entered.push(func);
     try {
@@ -592,6 +591,7 @@ public final class CompileContext {
     // create the return clause
     final Expr expr = body.copy(this, vm).optimize(this);
     final Expr rtrn = declType == null ? expr : new TypeCheck(info, expr, declType).optimize(this);
+    // declare function f($x) { $x + 1 }; f(E) → let $x := E return $x + 1
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(this);
   }
 }

@@ -69,6 +69,7 @@ public final class List extends Arr {
 
     final int el = exprs.length;
     if(el == 0) return cc.emptySeq(this);
+    // ((), $x) → $x
     if(el == 1) return cc.replaceWith(this, exprs[0]);
 
     // determine result type, compute number of results, set expression type
@@ -97,6 +98,7 @@ public final class List extends Arr {
     while(++e <= el) {
       if(e == el || !exprs[e].equals(exprs[s])) {
         if(e - s > 1) {
+          // ($x, $x, $x) → replicate($x, 3)
           list.add(cc.replicate(exprs[s], Itr.get(e - s), info));
           cc.info(OPTMERGE_X, list.peek());
         } else {

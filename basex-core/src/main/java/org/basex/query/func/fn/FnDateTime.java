@@ -32,6 +32,7 @@ public final class FnDateTime extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr date = arg(0), time = defined(1) ? arg(1) : Str.EMPTY;
     final SeqType stDate = date.seqType(), stTime = time.seqType();
+    // dateTime((), $time) → (), dateTime($date, ()) → ()
     if(stDate.zero()) return cc.voidAndReturn(time, date, info);
     if(stTime.zero()) return cc.voidAndReturn(date, time, info);
     if(stDate.atomOcc().min >= 1 && stTime.atomOcc().min >= 1) exprType.assign(Occ.EXACTLY_ONE);

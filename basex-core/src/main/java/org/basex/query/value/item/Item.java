@@ -85,8 +85,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return unwrappedValue(qc).item(qc, ii);
   }
 
@@ -238,6 +237,7 @@ public abstract class Item extends Value {
 
   @Override
   public final Value insertValue(final long pos, final Value value, final Job job) {
+    // ('a', 'a') → replicate('a', 2)
     if(equals(value)) return SingletonSeq.get(this, 2);
 
     final ValueBuilder vb = new ValueBuilder(job, value.size() + 1);

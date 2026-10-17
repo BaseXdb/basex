@@ -318,8 +318,7 @@ public abstract class Formatter extends FormatUtil {
    * @return index ({@code 0}: ISO, {@code 1}: AD or calendar in a namespace, otherwise unsupported)
    * @throws QueryException query exception
    */
-  private static int calendar(final byte[] calendar, final InputInfo info)
-      throws QueryException {
+  private static int calendar(final byte[] calendar, final InputInfo info) throws QueryException {
 
     final QNm qnm;
     try {

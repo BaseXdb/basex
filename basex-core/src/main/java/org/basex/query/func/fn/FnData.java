@@ -31,6 +31,7 @@ public final class FnData extends ContextFn {
 
     if(input != null) {
       final SeqType st = input.seqType();
+      // data(()) → ()
       if(st.zero()) return input;
       final BasicType type = st.type.atomic();
       if(type == st.type) {

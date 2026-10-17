@@ -33,6 +33,7 @@ public final class Castable extends Convert {
 
     final SeqType st = castType();
     final Boolean test = castable(st);
+    // xs:int(E) castable as xs:int? → true()
     if(test != null) return cc.replaceWith(this, Bln.get(test));
 
     final Expr arg = simplify(st, cc);

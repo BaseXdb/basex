@@ -105,8 +105,7 @@ public abstract class RegExFn extends StandardFunc {
    * @return pattern
    * @throws QueryException query exception
    */
-  private RegExpr parse(final byte[] regex, final byte[] modifiers)
-      throws QueryException {
+  private RegExpr parse(final byte[] regex, final byte[] modifiers) throws QueryException {
 
     // process modifiers (case variants for the 'i' flag are added to the pattern)
     int flags = 0;

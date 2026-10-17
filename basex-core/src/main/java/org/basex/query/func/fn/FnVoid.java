@@ -38,8 +38,10 @@ public final class FnVoid extends StandardFunc {
     ndt = input.has(Flag.NDT);
     if(ndt) {
       // keep wrapper if input is not vacuous (required for bodies of updating functions)
+      // void(file:write($path, E)) → file:write($path, E)
       if(input.size() == 0 && input.vacuous()) return input;
     } else if(defined(1) && arg(1) instanceof Value && toBoolean(arg(1), cc.qc)) {
+      // void(E, true()) → ()
       return Empty.VALUE;
     }
     return this;

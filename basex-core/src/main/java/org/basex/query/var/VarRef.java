@@ -42,6 +42,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
+    // variable of type empty-sequence(): $x → ()
     return var.seqType().zero() ? Empty.VALUE : assignType();
   }
 

@@ -432,8 +432,7 @@ public final class MapToElement {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void node(final GNode node, final XmlHandler handler)
-      throws QueryException, IOException {
+  private void node(final GNode node, final XmlHandler handler) throws QueryException, IOException {
     switch(node.kind()) {
       case ELEMENT -> {
         final ArrayList<FAttr> attributes = new ArrayList<>();

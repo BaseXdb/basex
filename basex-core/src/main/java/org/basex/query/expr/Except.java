@@ -39,6 +39,7 @@ public final class Except extends Set {
   Expr opt(final CompileContext cc) throws QueryException {
     // determine type
     final SeqType st = exprs[0].seqType();
+    // () except A → ()
     if(st.zero()) return exprs[0];
     if(!(st.type instanceof NodeType)) return null;
 
@@ -54,15 +55,9 @@ public final class Except extends Set {
       if(expr == Empty.VALUE || !list.isEmpty() && st.intersect(expr.seqType()) == null) {
         // ignore empty operands or incompatible node types
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else if(!expr.has(Flag.CNS, Flag.NDT)) {
-        final int same = Checks.index(list, ex -> ex.equals(expr));
-        // identical to first operand: return empty sequence
-        // example: text() except text() → ()
-        if(same == 0) return Empty.VALUE;
-        // identical to subsequent operand: remove duplicate
-        // example: node() except * except * → node() except *
-        if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        else list.add(expr);
+      } else if(!list.isEmpty() && !expr.has(Flag.CNS, Flag.NDT) && expr.equals(list.get(0))) {
+        // identical to first operand: text() except text() → ()
+        return Empty.VALUE;
       } else {
         list.add(expr);
       }

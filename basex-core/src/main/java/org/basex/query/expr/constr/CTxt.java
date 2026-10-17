@@ -41,6 +41,7 @@ public final class CTxt extends CNode {
 
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
+    // text { () } → ()
     if(st.zero()) return cc.replaceWith(this, expr);
 
     if(st.atomOcc().min >= 1) exprType.assign(Occ.EXACTLY_ONE);

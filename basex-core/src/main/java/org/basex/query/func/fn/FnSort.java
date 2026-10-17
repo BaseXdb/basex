@@ -47,7 +47,7 @@ public final class FnSort extends FnSortBy {
         final Value quick = quickValue(value);
         if(quick != null) return quick;
       } else if(SORT.is(input) && input.args().length == 1) {
-        // sort(sort(EXPR)) → sort(EXPR)
+        // sort(sort(E)) → sort(E)
         return cc.function(SORT, info, input.arg(0));
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
         // sort(replicate(10, 5)) → replicate(10, 5)

@@ -41,6 +41,7 @@ public final class XQueryForEach extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), action = arg(1);
+    // xquery:for-each((), $action) → ()
     if(input.seqType().zero()) return input;
     optOptions(2, TaskOptions::new, cc);
     // default options: results are collected in input order

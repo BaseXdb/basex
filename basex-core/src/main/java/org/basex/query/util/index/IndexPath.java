@@ -90,6 +90,7 @@ class IndexPath extends IndexPred {
       Filter.get(cc, path.info(), root, lastStep.exprs) : root;
 
     // attribute index request: start inverted path with attribute step
+    // //b[@n = 'y'] → db:attribute('db', 'y')/self::attribute(n)/parent::b
     if(!info.text && (lastStep.test instanceof NameTest || lastStep.test instanceof UnionTest)) {
       steps.add(Step.self(cc, rt, lastStep.info(), lastStep.test));
     }

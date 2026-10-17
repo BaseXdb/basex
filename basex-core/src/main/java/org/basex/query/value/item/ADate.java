@@ -191,8 +191,7 @@ public abstract class ADate extends ADateDur {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void calc(final DTDur dur, final boolean plus, final InputInfo info)
-      throws QueryException {
+  final void calc(final DTDur dur, final boolean plus, final InputInfo info) throws QueryException {
     add(plus ? dur.seconds : dur.seconds.negate(), info);
   }
 

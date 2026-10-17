@@ -108,6 +108,7 @@ public final class FTContains extends Single {
     // the stop words of the input database serve as default stop words
     final Data data = expr.data();
     if(data != null) ftexpr.stopWords(data);
+    // () contains text 'a' → boolean(())
     return expr.seqType().zero() ? cc.function(Function.BOOLEAN, info, expr) : this;
   }
 

@@ -78,8 +78,7 @@ public final class FTScope extends FTFilter {
    * @param lexer tokenizer
    * @return result of check
    */
-  private boolean different(final FTStringMatch sm1, final FTStringMatch sm2,
-      final FTLexer lexer) {
+  private boolean different(final FTStringMatch sm1, final FTStringMatch sm2, final FTLexer lexer) {
     final int s1 = pos(sm1.start, lexer), s2 = pos(sm2.start, lexer);
     return s1 != s2 || s1 != pos(sm1.end, lexer) || s2 != pos(sm2.end, lexer);
   }

@@ -806,8 +806,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    * @param color color of the highlighting
    */
-  private void mark(final int[] range, final Layout layout, final Graphics g,
-      final Color color) {
+  private void mark(final int[] range, final Layout layout, final Graphics g, final Color color) {
     if(range != null) {
       final TextIterator iter = layout.iter;
       final int pos = iter.pos(), posEnd = iter.posEnd();

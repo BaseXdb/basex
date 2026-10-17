@@ -86,6 +86,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
+    // distinct-values(replicate($seq, 2)) → distinct-values($seq)
     if(!defined(1)) arg(0, arg -> arg.simplifyFor(Simplify.DISTINCT, cc));
   }
 
@@ -93,6 +94,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
     final SeqType st = values.seqType();
+    // distinct-values(()) → ()
     if(st.zero()) return values;
 
     // X => sort() => distinct-values() → X => distinct-values() => sort()
@@ -106,6 +108,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // distinct-values(distinct-values($data)) → distinct-values($data)
     if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;
 
+    // distinct-values(db:get('db')//@lang) → ('de', 'en')
     final Expr opt = optStats(cc);
     if(opt != null) return opt;
 
@@ -142,9 +145,12 @@ public final class FnDistinctValues extends FnDuplicateValues {
    * @throws QueryException query exception
    */
   public Expr duplicates(final CmpOp op, final CompileContext cc) throws QueryException {
+    // count(E) < count(distinct-values(E)) → false()
     if(op == CmpOp.LT) return Bln.FALSE;
+    // count(E) >= count(distinct-values(E)) → true()
     if(op == CmpOp.GE) return Bln.TRUE;
 
+    // count(E) = count(distinct-values(E)) → empty(duplicate-values(E))
     final Expr dupl = cc.function(DUPLICATE_VALUES, info, exprs);
     return cc.function(op.oneOf(CmpOp.LE, CmpOp.EQ) ? EMPTY : EXISTS, info, dupl);
   }

@@ -106,7 +106,7 @@ public final class If extends Arr {
    * @throws QueryException query exception
    */
   private Expr opt(final CompileContext cc) throws QueryException {
-    // choose static branch at compile time
+    // if(true()) then A else B → A
     if(cond instanceof Value) return expr(cc.qc);
 
     // if(...empty sequence...) then A else B → B
@@ -147,6 +147,7 @@ public final class If extends Arr {
       if(br2 == Bln.FALSE) return
         new And(info, cond, br1).optimize(cc);
 
+      // if(A) then B else not(B) → boolean(A) = B, if(A) then not(C) else C → boolean(A) != C
       if(contradict(br1, br2, false)) return new CmpG(
           info, cc.function(BOOLEAN, info, cond), br1, CmpOp.EQ).optimize(cc);
       if(contradict(br2, br1, false)) return new CmpG(

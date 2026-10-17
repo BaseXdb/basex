@@ -20,6 +20,7 @@ public class FnName extends FnNodeName {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
+    // name($text) → ''
     return empty(cc, false) ? Str.EMPTY : this;
   }
 

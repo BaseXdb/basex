@@ -72,6 +72,7 @@ public final class FnTail extends StandardFunc {
     if(input instanceof Value) return value(cc.qc);
 
     final SeqType st = input.seqType();
+    // tail($x) → ()
     if(st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
     // tail(TWO-ITEMS) → foot(TWO-ITEMS)

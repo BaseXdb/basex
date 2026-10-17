@@ -239,8 +239,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param size size of all nodes combined
    * @return constructed tree
    */
-  static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n,
-      final long size) {
+  static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n, final long size) {
 
     if(n == 0) return EmptyTree.getInstance();
     if(n == 1) return new SingletonTree<>(nodes[0]);

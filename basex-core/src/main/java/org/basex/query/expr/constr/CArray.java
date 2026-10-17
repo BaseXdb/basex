@@ -35,8 +35,7 @@ public final class CArray extends Arr {
     if(el == 0) return XQArray.empty();
     if(el == 1) return cc.replaceWith(this, cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
 
-    // if possible, rewrite to curly array constructor
-    // [ 1, 2, 3 ] → array { 1, 2, 3 }
+    // if possible, rewrite to curly array constructor: [ 1, 2, 3 ] → array { 1, 2, 3 }
     if(Checks.all(exprs, expr -> expr.seqType().one())) {
       return cc.replaceWith(this, new CItemArray(info, List.get(cc, info, exprs)).optimize(cc));
     }

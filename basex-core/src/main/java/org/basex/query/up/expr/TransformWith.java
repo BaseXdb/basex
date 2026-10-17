@@ -109,7 +109,7 @@ public final class TransformWith extends Copy {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    // do not replace $v with .:  EXPR update { rename node . as $v }
+    // do not replace $v with .: E update { rename node . as $v }
     return arg(target()).inlineable(ic) && !(ic.expr.has(Flag.CTX) && arg(update()).uses(ic.var));
   }
 

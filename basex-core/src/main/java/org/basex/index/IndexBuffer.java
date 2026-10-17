@@ -75,8 +75,7 @@ public class IndexBuffer {
    * @param poss positions
    * @throws IOException I/O exception
    */
-  public final void put(final int id, final TokenList toks, final IntList poss)
-      throws IOException {
+  public final void put(final int id, final TokenList toks, final IntList poss) throws IOException {
     final int ts = toks.size();
     if(loaded) index(id, toks, poss);
     else appended += ts;

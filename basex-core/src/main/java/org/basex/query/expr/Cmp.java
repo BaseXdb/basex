@@ -301,14 +301,14 @@ public abstract class Cmp extends Arr {
 
     if(COUNT.is(count)) {
       final Expr carg = count.arg(0);
-      // count(E) = count(distinct-values(E))
+      // count(E) = count(distinct-values(E)) → empty(duplicate-values(E))
       if(DISTINCT_VALUES.is(carg) && arg.equals(carg.arg(0)) && !arg.seqType().mayBeWrapped())
         return ((FnDistinctValues) carg).duplicates(op, cc);
-      // count(distinct-values(E)) = count(E)
+      // count(distinct-values(E)) < count(E) → exists(duplicate-values(E))
       if(DISTINCT_VALUES.is(arg) && arg.arg(0).equals(carg) && !carg.seqType().mayBeWrapped())
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
-    // count(distinct-values(E)) = int
+    // count(distinct-values(($a, $b))) = 2 → empty(duplicate-values(($a, $b)))
     if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr) {
       final long size = arg.arg(0).atomSize();
       if(size != -1 && size == itr.itr()) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
@@ -334,6 +334,7 @@ public abstract class Cmp extends Arr {
       final long[] counts = countRange(op, cnt);
       // count(A) >= 0 → true()
       if(counts == COUNT_TRUE) return Bln.TRUE;
+      // count(A) < 0 → false()
       if(counts == COUNT_FALSE) return Bln.FALSE;
       // count(A) > 0 → exists(A)
       if(counts == COUNT_EMPTY) return cc.function(EMPTY, info, arg);
@@ -411,11 +412,13 @@ public abstract class Cmp extends Arr {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType();
     if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.EMPTY) {
+      // $s < '' → false(), $s >= '' → true()
       if(op == CmpOp.LT) return Bln.FALSE;
       if(op == CmpOp.GE) return Bln.TRUE;
       // do not rewrite GT, as it may be rewritten to a range expression later on
       if(op != CmpOp.GT) {
         // EQ and LE can be treated identically
+        // $s = '' → not(data($s)), $s != '' → boolean(data($s))
         final Function func = op == CmpOp.NE ? BOOLEAN : NOT;
         return cc.function(func, info, cc.function(DATA, info, exprs[0]));
       }

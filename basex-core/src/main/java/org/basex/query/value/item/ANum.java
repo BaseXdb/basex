@@ -253,6 +253,7 @@ public abstract class ANum extends Item {
     final double d = dbl();
     // exact position, or 0 if the number is fractional or out of range
     final long l = Pos.position(this);
+    // position() = 1.5 → false(), position() != 0 → true(), position() >= 1 → true()
     switch(op) {
       case EQ: if(l <= 0) return Bln.FALSE; break;
       case NE: if(l <= 0) return Bln.TRUE; break;
@@ -262,6 +263,7 @@ public abstract class ANum extends Item {
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;
     }
     // convert numbers without fractional part
+    // position() = 2.0 → position() = 2
     return this instanceof Itr || l <= 0 ? this : Itr.get(l);
   }
 

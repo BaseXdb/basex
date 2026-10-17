@@ -135,6 +135,7 @@ public class FnMin extends StandardFunc {
       }
     }
 
+    // max(db:get('db')//price) → 99e0
     if(noColl && values instanceof final Path path) {
       final ArrayList<Stats> list = path.pathStats();
       if(list != null) {

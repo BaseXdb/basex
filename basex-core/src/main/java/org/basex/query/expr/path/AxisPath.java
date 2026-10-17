@@ -128,7 +128,7 @@ public abstract class AxisPath extends Path {
   public final Expr addPredicates(final CompileContext cc, final Expr... preds)
       throws QueryException {
 
-    final ExprList list = new ExprList(steps);
+    final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).addPredicates(preds);
     // context of the last step: previous step or root
     final Expr ctx = list.isEmpty() ? root : list.peek();
@@ -141,6 +141,7 @@ public abstract class AxisPath extends Path {
   @Override
   public final Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
+    // $a/b or $c/d → $a/b | $c/d
     return or && expr instanceof AxisPath ? new Union(info, this, expr).optimize(cc) : null;
   }
 

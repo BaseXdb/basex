@@ -120,7 +120,7 @@ public final class FnRemove extends StandardFunc {
     if(pos instanceof Item) {
       // position is static...
       final long p = toLong(pos, cc.qc);
-      // return all items
+      // remove($seq, 0) → $seq
       final long size = input.size();
       if(p < 1 || size > 0 && p > size) return input;
       // skip first item: remove($seq, 1) → tail($seq)

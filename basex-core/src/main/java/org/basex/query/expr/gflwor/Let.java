@@ -96,7 +96,7 @@ public final class Let extends ForLet {
 
   @Override
   public Let optimize(final CompileContext cc) throws QueryException {
-    // skip redundant type check
+    // skip redundant type check: let $x as xs:int := (E coerce to xs:int) → let $x as xs:int := E
     if(!scoring && expr instanceof final TypeCheck tc) {
       if(var.declType != null && var.declType.coercible(expr.seqType()) ||
           var.adoptCheck(expr.seqType())) {

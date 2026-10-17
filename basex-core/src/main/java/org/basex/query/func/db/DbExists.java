@@ -45,6 +45,7 @@ public final class DbExists extends DbAccessFn {
     try {
       return compileData(cc);
     } catch(final QueryException ex) {
+      // db:exists('unknown-db') → false()
       if(ex.error() == DB_GET2_X) return Bln.FALSE;
       throw ex;
     }

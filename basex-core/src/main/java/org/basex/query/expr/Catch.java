@@ -146,13 +146,13 @@ public final class Catch extends Single {
     final Checks<Test> wildcard = t -> t instanceof final NameTest nt &&
         nt.scope == NameTest.Scope.ALL;
 
-    // check if all errors are already caught
+    // check if all errors are already caught: catch * { A } catch err:X { B } → catch * { A }
     if(Checks.any(list, wildcard)) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
       return false;
     }
 
-    // drop remaining tests in favor of wildcard test
+    // drop remaining tests in favor of wildcard test: catch err:X | * { A } → catch * { A }
     final int w = Checks.index(tests, wildcard);
     if(w != -1 && tests.size() != 1) {
       final Test test = tests.get(w);
@@ -162,6 +162,7 @@ public final class Catch extends Single {
     }
 
     // remove redundant tests
+    // catch err:X { A } catch err:X | err:Y { B } → catch err:X { A } catch err:Y { B }
     final Iterator<Test> iter = tests.iterator();
     while(iter.hasNext()) {
       final Test test = iter.next();

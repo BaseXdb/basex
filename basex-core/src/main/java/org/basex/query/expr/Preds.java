@@ -140,8 +140,7 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // merge node tests with steps; remove redundant node tests
-    // child::node()[self::*] → child::*
+    // merge node tests with steps; remove redundant node tests: child::node()[self::*] → child::*
     if(expr instanceof final SingleIterPath path) {
       final Step predStep = (Step) path.steps[0];
       if(predStep.axis == Axis.SELF && predStep.selector == null && !predStep.mayBePositional() &&
@@ -204,9 +203,9 @@ public abstract class Preds extends Arr {
         // use minimum of old value and 1
         max = Math.min(max, 1);
       } else if(expr instanceof final IntPos pos) {
-        // subtract start position. example: ...[pos: 1, 2][2] → 2 → 1
+        // subtract start position: (1, 2, 3)[position() >= 2] → 2 items
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[pos: 1, 5] → 5
+        // use minimum of old value and range: E[position() = 2 to 4] → at most 3 items
         max = Math.min(max, pos.max - pos.min + 1);
       } else {
         // resulting size will be unknown for any other filter
@@ -335,7 +334,7 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    // do not replace $v with .:  EXPR[. = $v]
+    // do not replace $v with .: E[. = $v]
     if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr expr : exprs) {
         if(expr.uses(ic.var)) return false;

@@ -43,6 +43,7 @@ public final class Cast extends Convert {
 
     final Boolean test = castable(st);
     if(test == Boolean.FALSE) throw typeError(expr, seqType, info);
+    // xs:int(E) cast as xs:int? → xs:int(E)
     if(test == Boolean.TRUE) return cc.replaceWith(this, expr);
 
     final Expr arg = simplify(st, cc);

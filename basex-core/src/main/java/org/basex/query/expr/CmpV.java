@@ -43,7 +43,7 @@ public final class CmpV extends Cmp {
     exprs = simplifyAll(Simplify.STRING, cc);
     if(values(false, cc)) return cc.preEval(this);
 
-    // swap operands
+    // 'a' eq $x → $x eq 'a'
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       Collections.reverse(Arrays.asList(exprs));
@@ -51,6 +51,7 @@ public final class CmpV extends Cmp {
     }
 
     Expr expr = emptyExpr();
+    // count(E) eq 1 → count(E) = 1
     if(expr == this) expr = toGeneral(cc, true);
     if(expr == this) expr = opt(cc);
     if(expr == this) {

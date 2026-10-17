@@ -20,6 +20,7 @@ public final class FnIdentity extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    // identity(E) → E
     return arg(0);
   }
 }

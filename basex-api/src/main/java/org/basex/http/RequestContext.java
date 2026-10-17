@@ -137,8 +137,7 @@ public final class RequestContext implements RequestScope {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap formValues(final MainOptions options)
-      throws QueryException, IOException {
+  public XQMap formValues(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       // no live request (WebSocket connection, detached job): no form body
       final MediaType mt = request != null ? state.mediaType() : null;

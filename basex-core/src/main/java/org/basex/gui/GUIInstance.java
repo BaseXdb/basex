@@ -56,8 +56,7 @@ public final class GUIInstance {
    * @param files files that have been opened by this instance
    * @param handler handler for the received files
    */
-  public static void listen(final GUI gui, final String[] files,
-      final Consumer<String[]> handler) {
+  public static void listen(final GUI gui, final String[] files, final Consumer<String[]> handler) {
     final ServerSocket server;
     try {
       server = new ServerSocket();

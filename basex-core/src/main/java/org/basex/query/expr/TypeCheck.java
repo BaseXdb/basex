@@ -56,7 +56,7 @@ public final class TypeCheck extends Single {
     final boolean atomic = type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
 
     if(atomic) {
-      // data(EXPR) coerce to xs:int → EXPR coerce to xs:int
+      // data(E) coerce to xs:int → E coerce to xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
@@ -96,7 +96,7 @@ public final class TypeCheck extends Single {
 
     // remove redundant type check
     if(expr instanceof final TypeCheck tc && st.coercible(et)) {
-      // (EXPR coerce to xs:integer) coerce to xs:int → EXPR coerce to xs:int
+      // (E coerce to xs:integer) coerce to xs:int → E coerce to xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }
 

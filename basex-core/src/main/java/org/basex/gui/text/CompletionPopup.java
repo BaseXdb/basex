@@ -181,8 +181,7 @@ final class CompletionPopup extends TextPopup {
   }
 
   /** Renderer that highlights the matched characters of a candidate. */
-  private final class CandidateRenderer extends JComponent
-      implements ListCellRenderer<Completion> {
+  private final class CandidateRenderer extends JComponent implements ListCellRenderer<Completion> {
     /** Label of the rendered candidate. */
     private String label = "";
     /** Indicates if the candidate is selected. */

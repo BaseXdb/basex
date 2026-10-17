@@ -115,6 +115,7 @@ public abstract class XQArray extends XQStruct {
     Expr expr = this;
     if(mode.atomizing()) {
       final Type at = type.atomic();
+      // data([ 1, 2 ]) → data((1, 2))
       if(at != null && at != type) expr = atomValue(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);

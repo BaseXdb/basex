@@ -22,8 +22,7 @@ public final class FnExists extends FnEmpty {
   }
 
   @Override
-  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
-      throws QueryException {
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
     return arg(0).noMatches(nodes, data);
   }
 

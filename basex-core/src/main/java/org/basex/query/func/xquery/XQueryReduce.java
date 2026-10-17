@@ -31,6 +31,7 @@ public final class XQueryReduce extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), init = arg(1);
+    // xquery:reduce((), $init, $action, $combine) → $init
     if(input.seqType().zero()) return init;
     optOptions(4, TaskOptions::new, cc);
     // result type: union of the seed type and the declared action/combine types

@@ -136,8 +136,7 @@ public final class ThesAccessor {
    * @return source
    * @throws QueryException query exception
    */
-  private synchronized Source source(final FTOpt opt, final QueryContext qc)
-      throws QueryException {
+  private synchronized Source source(final FTOpt opt, final QueryContext qc) throws QueryException {
     // database that may contain a thesaurus index
     final Data thesData = db != null ? qc.resources.database(db, qc, false, info) : null;
     DiskData data = null;

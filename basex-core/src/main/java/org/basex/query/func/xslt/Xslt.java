@@ -106,8 +106,7 @@ public final class Xslt {
    * @return input reference
    * @throws QueryException query exception
    */
-  public static IO io(final XNode node, final Uri uri, final InputInfo info)
-      throws QueryException {
+  public static IO io(final XNode node, final Uri uri, final InputInfo info) throws QueryException {
     try {
       return new IOContent(node.serialize().finish(), string(uri.string()));
     } catch(final QueryIOException ex) {

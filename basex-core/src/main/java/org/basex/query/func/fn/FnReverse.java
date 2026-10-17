@@ -72,6 +72,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
+    // reverse($x) → $x
     if(input.seqType().zeroOrOne()) return input;
     if(input instanceof final Value value) return value.reverse(cc.qc);
 

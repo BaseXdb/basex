@@ -118,10 +118,10 @@ public final class SelectorStep extends Step {
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     selector = cc.get(null, false, () -> selector.optimize(cc));
 
-    // no keys: no results
+    // no keys: child::{ () } → ()
     if(selector.seqType().zero()) return cc.emptySeq(this);
 
-    // constant keys: rewrite to a static test
+    // constant keys: $node/child::{ #a } → $node/child::a
     if(selector instanceof final Value value) {
       final Expr in = root != null ? root : cc.qc.focus.value;
       final Type it = in != null ? in.seqType().type : null;

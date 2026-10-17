@@ -26,6 +26,7 @@ public final class FnIsNaN extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    // is-NaN($decimal) → false()
     return arg(0).seqType().instanceOf(Types.DECIMAL_O) ? Bln.FALSE : this;
   }
 }

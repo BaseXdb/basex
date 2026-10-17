@@ -49,7 +49,9 @@ public abstract class Logical extends Arr {
     if(optimizeEbv(or, false, cc)) return cc.replaceWith(this, Bln.get(or));
 
     final int el = exprs.length;
+    // true() and true() → true()
     if(el == 0) return Bln.get(!or);
+    // A and true() → boolean(A)
     if(el == 1) return cc.function(Function.BOOLEAN, info, exprs);
     return this;
   }

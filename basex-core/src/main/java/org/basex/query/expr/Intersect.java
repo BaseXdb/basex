@@ -44,7 +44,7 @@ public final class Intersect extends Set {
       if(!st2.zero()) {
         if(!(st2.type instanceof NodeType)) return null;
         st = st.intersect(st2);
-        // check for incompatible node types
+        // check for incompatible node types: text() intersect @a → ()
         if(st == null) return Empty.VALUE;
       }
     }

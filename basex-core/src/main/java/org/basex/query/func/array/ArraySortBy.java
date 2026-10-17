@@ -51,6 +51,7 @@ public class ArraySortBy extends SortFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
+    // array:sort-by([], $keys) → []
     if(array == XQArray.empty()) return array;
 
     coerceKeys(cc);

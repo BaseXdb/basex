@@ -42,6 +42,7 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // count(data($x)) → count($x)
     arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 
@@ -52,6 +53,7 @@ public final class FnCount extends StandardFunc {
 
     // return static result size
     final long size = input.size();
+    // count(1 to 10) → 10
     if(size >= 0 && !ndt) return Itr.get(size);
 
     // count(map:keys(E)) → map:size(E)

@@ -68,6 +68,7 @@ public final class Lookup extends Arr {
     cacheKeys = !keys.has(Flag.NDT);
     single = inputs.seqType().zeroOrOne();
     final long is = inputs.size();
+    // ()?key → ()
     if(is == 0) return cc.replaceWith(this, inputs);
 
     // skip optimizations if input may yield items other than maps or arrays
@@ -107,6 +108,7 @@ public final class Lookup extends Arr {
     final Expr inputs = exprs[0], keys = exprs[1];
     final long is = inputs.size();
     final long ks = keys.has(Flag.NDT) ? -1 : keys.atomSize();
+    // $map?(()) → ()
     if(ks == 0) return keys;
 
     // keep the lookup if a runtime value could be a strict record that lacks a requested key

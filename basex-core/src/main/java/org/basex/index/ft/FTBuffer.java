@@ -86,8 +86,7 @@ final class FTBuffer extends IndexBuffer implements FTSource {
    * @param matcher token matcher
    * @return entry iterator
    */
-  private EntryIterator entries(final int first, final int last,
-      final Predicate<byte[]> matcher) {
+  private EntryIterator entries(final int first, final int last, final Predicate<byte[]> matcher) {
     final int l = Math.min(buckets() - 1, last);
     return new EntryIterator() {
       int s = first - 1, i, nr;
