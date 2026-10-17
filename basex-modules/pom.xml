@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Modules and web applications: each module is packaged as JAR file, which can be
+       installed with REPO INSTALL [name]. Web applications are located in src/main/resources. -->
+  <groupId>org.basex.modules</groupId>
+  <artifactId>basex-modules</artifactId>
+  <packaging>pom</packaging>
+  <name>BaseX Modules</name>
+
+  <parent>
+    <groupId>org.basex</groupId>
+    <artifactId>basex-parent</artifactId>
+    <version>13.0-SNAPSHOT</version>
+  </parent>
+
+  <modules>
+    <module>chat</module>
+    <module>dba</module>
+    <module>geo</module>
+    <module>mail</module>
+    <module>sftp</module>
+    <module>webdav</module>
+  </modules>
+
+  <properties>
+    <!-- only published in the BaseX Maven repository: no javadoc, assembly or signature -->
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <assembly.skipAssembly>true</assembly.skipAssembly>
+    <gpg.skip>true</gpg.skip>
+    <!-- Java modules: runtime dependencies are bundled in the lib directory of the JAR file -->
+    <project.lib.directory>${project.build.directory}/classes/lib</project.lib.directory>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.basex</groupId>
+        <artifactId>basex</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy-libs</id>
+              <phase>prepare-package</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <useModulePath>false</useModulePath>
+          </configuration>
+        </plugin>
+        <!-- Java modules: licenses of the bundled dependencies are checked -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>2.7.1</version>
+          <executions>
+            <execution>
+              <id>add-third-party</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>add-third-party</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}/license</outputDirectory>
+                <addOutputDirectoryAsResourceDir>false</addOutputDirectoryAsResourceDir>
+                <includedScopes>compile,runtime</includedScopes>
+                <failOnMissing>true</failOnMissing>
+                <failOnBlacklist>true</failOnBlacklist>
+                <licenseMerges>
+                  <licenseMerge>Apache License|Apache License, Version 2.0|The Apache License, Version 2.0|Apache-2.0|The Apache Software License, Version 2.0</licenseMerge>
+                  <licenseMerge>BSD 3-Clause License|BSD|BSD 3-Clause|Revised BSD|EDL 1.0|Eclipse Distribution License - v 1.0</licenseMerge>
+                  <licenseMerge>Eclipse Public License - v 1.0|The Eclipse Public License Version 1.0</licenseMerge>
+                  <licenseMerge>Eclipse Public License - v 2.0|EPL 2.0|Eclipse Public License, Version 2.0</licenseMerge>
+                  <licenseMerge>GNU Lesser General Public License (LGPL)|Lesser General Public License (LGPL)</licenseMerge>
+                  <licenseMerge>ISC License|ISC</licenseMerge>
+                  <licenseMerge>MIT License|The MIT License(MIT)</licenseMerge>
+                </licenseMerges>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

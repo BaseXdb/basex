@@ -10,7 +10,7 @@
 
   <modules>
     <module>basex-core</module>
-    <module>basex-webapps</module>
+    <module>basex-modules</module>
     <module>basex-api</module>
   </modules>
 
@@ -324,11 +324,14 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>basex-publish</publishingServerId>
-              <!-- web applications are only published in the BaseX Maven repository -->
+              <!-- modules are only published in the BaseX Maven repository -->
               <excludeArtifacts>
-                <excludeArtifact>basex-webapps</excludeArtifact>
+                <excludeArtifact>basex-modules</excludeArtifact>
                 <excludeArtifact>modules-chat</excludeArtifact>
                 <excludeArtifact>modules-dba</excludeArtifact>
+                <excludeArtifact>modules-geo</excludeArtifact>
+                <excludeArtifact>modules-mail</excludeArtifact>
+                <excludeArtifact>modules-sftp</excludeArtifact>
                 <excludeArtifact>modules-webdav</excludeArtifact>
               </excludeArtifacts>
               <autoPublish>true</autoPublish>

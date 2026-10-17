@@ -61,7 +61,7 @@ public abstract class WebappTest extends HTTPTest {
    * @return directory
    */
   public static File source(final String app) {
-    final String path = "basex-webapps/" + app + "/src/main/resources";
+    final String path = "basex-modules/" + app + "/src/main/resources";
     final File file = new File("../" + path);
     return file.exists() ? file : new File(path);
   }

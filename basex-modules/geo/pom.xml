@@ -2,31 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.basex.modules</groupId>
   <artifactId>modules-geo</artifactId>
-  <version>13.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-
   <name>BaseX Geo Module</name>
   <description>EXPath Geo module implementation for BaseX</description>
-  <url>https://basex.org</url>
+
+  <parent>
+    <groupId>org.basex.modules</groupId>
+    <artifactId>basex-modules</artifactId>
+    <version>13.0-SNAPSHOT</version>
+  </parent>
 
   <properties>
-    <maven.compiler.release>21</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <basex.version>13.0-SNAPSHOT</basex.version>
     <geotools.version>34.5</geotools.version>
-    <junit.version>6.1.3</junit.version>
     <hsqldb.version>2.7.4</hsqldb.version>
     <gt-epsg-hsql.version>34.5-C321</gt-epsg-hsql.version>
   </properties>
 
   <repositories>
-    <repository>
-      <id>basex</id>
-      <name>BaseX Maven Repository</name>
-      <url>https://files.basex.org/maven</url>
-    </repository>
     <repository>
       <id>osgeo</id>
       <name>Open Source Geospatial Foundation Repository</name>
@@ -43,15 +35,11 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
-      <version>${basex.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -89,54 +77,20 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.16.0</version>
-        <configuration>
-          <release>${maven.compiler.release}</release>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-          <useModulePath>false</useModulePath>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.11.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
-              <includeScope>runtime</includeScope>
-              <excludeGroupIds>org.apiguardian</excludeGroupIds>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <excludeGroupIds>org.apiguardian</excludeGroupIds>
+        </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.5.1</version>
         <configuration>
           <archive>
             <manifest>
               <mainClass>org.expath.ns.Geo</mainClass>
             </manifest>
-            <manifestEntries>
-              <Implementation-Title>${project.name}</Implementation-Title>
-              <Implementation-Version>${project.version}</Implementation-Version>
-              <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
-            </manifestEntries>
           </archive>
         </configuration>
       </plugin>
@@ -144,51 +98,20 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>2.7.1</version>
-        <executions>
-          <execution>
-            <id>add-third-party</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>add-third-party</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/license</outputDirectory>
-              <addOutputDirectoryAsResourceDir>false</addOutputDirectoryAsResourceDir>
-              <includedScopes>compile,runtime</includedScopes>
-              <excludedGroups>org.apiguardian</excludedGroups>
-              <failOnMissing>true</failOnMissing>
-              <failOnBlacklist>true</failOnBlacklist>
-              <includedLicenses>
-                <includedLicense>Apache License</includedLicense>
-                <includedLicense>BSD 3-Clause License</includedLicense>
-                <includedLicense>Eclipse Public License - v 1.0</includedLicense>
-                <includedLicense>Eclipse Public License - v 2.0</includedLicense>
-                <includedLicense>Go License</includedLicense>
-                <includedLicense>GNU Lesser General Public License (LGPL)</includedLicense>
-                <includedLicense>HSQLDB License, a BSD open source license</includedLicense>
-                <includedLicense>MIT License</includedLicense>
-              </includedLicenses>
-              <licenseMerges>
-                <licenseMerge>Apache License|Apache License, Version 2.0|The Apache License, Version 2.0|Apache-2.0|The Apache Software License, Version 2.0</licenseMerge>
-                <licenseMerge>BSD 3-Clause License|BSD|BSD 3-Clause</licenseMerge>
-                <licenseMerge>Eclipse Public License - v 1.0|The Eclipse Public License Version 1.0</licenseMerge>
-                <licenseMerge>Eclipse Public License - v 2.0|EPL 2.0|Eclipse Public License, Version 2.0</licenseMerge>
-                <licenseMerge>GNU Lesser General Public License (LGPL)|Lesser General Public License (LGPL)</licenseMerge>
-                <licenseMerge>MIT License|The MIT License(MIT)</licenseMerge>
-              </licenseMerges>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <excludedGroups>org.apiguardian</excludedGroups>
+          <includedLicenses>
+            <includedLicense>Apache License</includedLicense>
+            <includedLicense>BSD 3-Clause License</includedLicense>
+            <includedLicense>Eclipse Public License - v 1.0</includedLicense>
+            <includedLicense>Eclipse Public License - v 2.0</includedLicense>
+            <includedLicense>Go License</includedLicense>
+            <includedLicense>GNU Lesser General Public License (LGPL)</includedLicense>
+            <includedLicense>HSQLDB License, a BSD open source license</includedLicense>
+            <includedLicense>MIT License</includedLicense>
+          </includedLicenses>
+        </configuration>
       </plugin>
     </plugins>
-
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>3.5.3</version>
-      </extension>
-    </extensions>
   </build>
 </project>

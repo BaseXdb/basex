@@ -1,7 +1,7 @@
 BaseX Mail Module
 -----------------
 
-The BaseX Mail Module provides functions for sending e-mail from XQuery, built on [Apache Commons Email]. Messages are described by an XML element that carries both the SMTP connection settings and the message body.
+The BaseX Mail Module provides functions for sending e-mail from XQuery, built on [Apache Commons Email]. Messages are described by a map that carries both the SMTP connection settings and the message.
 
 Example
 -------
@@ -31,34 +31,15 @@ For details of the functions supported by this module, see [Mail Functions] in t
 Installation
 ------------
 
-### Using a pre-built release
-
-Pre-built module jars are available at:
-https://files.basex.org/modules/mail/
-
-Download the jar matching your BaseX release and install it with:
+The version matching your BaseX release is retrieved from the BaseX Maven repository:
 
 ```sh
-basex -c "repo install <jar>"
+basex -c "repo install mail"
 ```
-
-where `<jar>` must be replaced by the path to the module jar.
 
 ### Building from source
 
-The prerequisites for building the module are a JDK 21 and Maven.
-
-Use the Mail Module release whose version matches the target BaseX version. For building the module, check out the source code and run
-
-```sh
-mvn clean install
-```
-
-This will compile the module and leave the module jar in the `target` folder, as well as in the local Maven repository at `~/.m2/repository/org/basex/modules/modules-mail`.
-
-The module jar contains all required dependencies.
-
-To install the built jar, use the `repo install` command shown above, replacing `<jar>` with the path to the generated file.
+The module is built with BaseX: `mvn install` in the repository root (or `mvn install -pl basex-modules/mail` for the module only) compiles the module, runs the tests, and leaves the module jar in the `target` folder. The jar contains all required dependencies and can be installed with `repo install <jar>`.
 
 License
 -------

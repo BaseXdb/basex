@@ -28,39 +28,20 @@ For details of the functions supported by this module, see [Geo Functions] in th
 Installation
 ------------
 
-### Using a pre-built release
-
-Pre-built module jars are available at:
-https://files.basex.org/modules/expath/
-
-Download the jar matching your BaseX release and install it with:
+The version matching your BaseX release is retrieved from the BaseX Maven repository:
 
 ```sh
-basex -c "repo install <jar>"
+basex -c "repo install geo"
 ```
-
-where `<jar>` must be replaced by the path to the module jar.
 
 ### Building from source
 
-The prerequisites for building the module are a JDK 21 and Maven. 
-
-Use the Geo Module release whose version matches the target BaseX version. For building the module, check out the source code and run
-
-```sh
-mvn clean install
-```
-   
-This will compile the module, run the tests, and leave the module jar in the `target` folder, as well as in the local Maven repository at `~/.m2/repository/org/basex/modules/modules-geo`.
-
-The module jar contains all required dependencies.
-
-To install the built jar, use the `repo install` command shown above, replacing `<jar>` with the path to the generated file.
+The module is built with BaseX: `mvn install` in the repository root (or `mvn install -pl basex-modules/geo` for the module only) compiles the module, runs the tests, and leaves the module jar in the `target` folder. The jar contains all required dependencies and can be installed with `repo install <jar>`.
 
 License
 -------
 
-The Geo Module is provided under the BSD 3-Clause License. It depends on BaseX, JUnit, and GeoTools, the latter transitively adding further dependencies.
+The Geo Module is provided under the BSD 3-Clause License. It depends on BaseX and GeoTools, the latter transitively adding further dependencies.
 
 An overview of the licenses of these components is available in [LICENSE.txt].
 
