@@ -37,6 +37,16 @@ public abstract class Bin extends Item {
     return data;
   }
 
+  /**
+   * Returns the number of bytes of the binary content.
+   * @param info input info (can be {@code null})
+   * @return length
+   * @throws QueryException query exception
+   */
+  public long length(final InputInfo info) throws QueryException {
+    return binary(info).length;
+  }
+
   @Override
   public final boolean comparable(final Item item) {
     return item instanceof Bin;

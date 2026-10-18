@@ -169,7 +169,7 @@ public class Options implements Iterable<Option<?>> {
       }
       final TokenBuilder tb = new TokenBuilder();
       for(final String line : lines) tb.add(line).add(NL);
-      file.write(tb.finish());
+      file.writeAtomic(tb.finish());
       for(final Option<?> option : changed) persisted[index(option)] = get(option);
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);

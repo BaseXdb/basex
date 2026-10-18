@@ -51,7 +51,7 @@ public final class XMLAccess {
    * @throws IOException I/O exception
    */
   public static void write(final IOFile file, final FNode node) throws IOException {
-    file.write(node.serialize(SerializerMode.INDENT.get()).finish());
+    file.writeAtomic(node.serialize(SerializerMode.INDENT.get()).finish());
   }
 
   /**

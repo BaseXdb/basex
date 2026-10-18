@@ -308,12 +308,19 @@ public final class Stores implements Closeable {
       if(size == 0) {
         file.delete();
       } else {
-        try(DataOutput out = new DataOutput(file)) {
-          out.writeNum((int) size);
-          for(final XQMap.Entry e : map.entries()) {
-            out.writeToken(e.key().string(null));
-            write(out, e.value());
+        // write to a temporary file that atomically replaces the store file
+        final IOFile tmp = file.tmp();
+        try {
+          try(DataOutput out = new DataOutput(tmp)) {
+            out.writeNum((int) size);
+            for(final XQMap.Entry e : map.entries()) {
+              out.writeToken(e.key().string(null));
+              write(out, e.value());
+            }
           }
+          file.replaceWith(tmp);
+        } finally {
+          tmp.delete();
         }
       }
       entry.dirty = false;

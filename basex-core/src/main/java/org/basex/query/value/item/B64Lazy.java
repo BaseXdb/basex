@@ -34,11 +34,20 @@ public abstract class B64Lazy extends B64 implements Lazy {
    * @throws IOException I/O exception
    */
   private BufferInput open() throws IOException {
+    return BufferInput.get(contents());
+  }
+
+  /**
+   * Returns the contents of the uncached value.
+   * @return input reference
+   * @throws IOException I/O exception
+   */
+  private IO contents() throws IOException {
     if(contents == null) {
       contents = source();
       if(contents instanceof IOContent) data = contents.read();
     }
-    return BufferInput.get(contents);
+    return contents;
   }
 
   /**
@@ -53,6 +62,21 @@ public abstract class B64Lazy extends B64 implements Lazy {
   public final byte[] binary(final InputInfo info) throws QueryException {
     cache(info);
     return data;
+  }
+
+  @Override
+  public final long length(final InputInfo ii) throws QueryException {
+    if(cache) cache(ii);
+    if(!isCached()) {
+      try {
+        // length of remote inputs may be unknown
+        final long length = contents().length();
+        if(length >= 0) return length;
+      } catch(final IOException ex) {
+        throw exception(ex, ii);
+      }
+    }
+    return super.length(ii);
   }
 
   @Override

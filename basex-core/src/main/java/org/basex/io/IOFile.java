@@ -176,8 +176,8 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public FileInputStream inputStream() throws IOException {
-    return new FileInputStream(file);
+  public InputStream inputStream() throws IOException {
+    return Files.newInputStream(toPath());
   }
 
   /**
@@ -185,7 +185,7 @@ public final class IOFile extends IO {
    * @return output stream
    * @throws IOException I/O exception
    */
-  public FileOutputStream outputStream() throws IOException {
+  public OutputStream outputStream() throws IOException {
     return outputStream(false);
   }
 
@@ -195,9 +195,9 @@ public final class IOFile extends IO {
    * @return output stream
    * @throws IOException I/O exception
    */
-  public FileOutputStream outputStream(final boolean append) throws IOException {
-    createParent();
-    return new FileOutputStream(file, append);
+  public OutputStream outputStream(final boolean append) throws IOException {
+    return Files.newOutputStream(createParent(), StandardOpenOption.CREATE,
+      append ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING);
   }
 
   /**
@@ -429,6 +429,49 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Writes the specified byte array to a temporary file that atomically replaces this file.
+   * @param bytes bytes
+   * @throws IOException I/O exception
+   */
+  public void writeAtomic(final byte[] bytes) throws IOException {
+    final IOFile tmp = tmp();
+    try {
+      tmp.write(bytes);
+      replaceWith(tmp);
+    } finally {
+      tmp.delete();
+    }
+  }
+
+  /**
+   * Replaces this file with the contents of a temporary file.
+   * @param tmp temporary file in the same directory
+   * @throws IOException I/O exception
+   */
+  public void replaceWith(final IOFile tmp) throws IOException {
+    final Path path = toPath();
+    // symbolic links are preserved
+    if(!Files.isSymbolicLink(path)) {
+      try {
+        replace(tmp.toPath(), path);
+        return;
+      } catch(final IOException ex) {
+        // file cannot be replaced (e.g. bind-mounted file): overwrite its contents
+        Util.debug(ex);
+      }
+    }
+    write(tmp.inputStream(), outputStream());
+  }
+
+  /**
+   * Returns a unique temporary file in the directory of this file.
+   * @return temporary file
+   */
+  public IOFile tmp() {
+    return new IOFile(pth + '.' + UUID.randomUUID() + TMPSUFFIX);
+  }
+
+  /**
    * Writes the specified input. The input stream is not closed; the caller is responsible.
    * @param is input stream
    * @throws IOException I/O exception
@@ -555,7 +598,7 @@ public final class IOFile extends IO {
    */
   public void copyTo(final IOFile target) throws IOException {
     // copy via stream: a path-based copy locks out readers (database files are opened in rw mode)
-    try(InputStream in = Files.newInputStream(toPath())) {
+    try(InputStream in = inputStream()) {
       target.write(in);
     }
   }
@@ -583,7 +626,11 @@ public final class IOFile extends IO {
       new CopyOption[] { StandardCopyOption.REPLACE_EXISTING } : new CopyOption[0];
     final String s = src.getFileName().toString(), t = trg.getFileName().toString();
     if(s.equals(t) || !s.equalsIgnoreCase(t) || !Objects.equals(src.getParent(), trg.getParent())) {
-      Files.move(src, trg, options);
+      if(replace && !Files.isDirectory(trg, LinkOption.NOFOLLOW_LINKS)) {
+        replace(src, trg);
+      } else {
+        Files.move(src, trg, options);
+      }
     } else {
       // case-only rename: move via an intermediate path, restore the source if this fails
       final Path tmp = src.resolveSibling(UUID.randomUUID().toString());
@@ -599,6 +646,30 @@ public final class IOFile extends IO {
         throw ex;
       }
     }
+  }
+
+  /**
+   * Moves a file and atomically replaces an existing target file.
+   * @param src source path
+   * @param trg target path
+   * @throws IOException I/O exception
+   */
+  private static void replace(final Path src, final Path trg) throws IOException {
+    // Windows: REPLACE_EXISTING deletes the target first, which is then missing for readers
+    for(int r = 0; r < 100; r++) {
+      try {
+        Files.move(src, trg, StandardCopyOption.ATOMIC_MOVE);
+        return;
+      } catch(final AtomicMoveNotSupportedException ex) {
+        Util.debug(ex);
+        break;
+      } catch(final AccessDeniedException ex) {
+        // Windows: the target is opened by another reader
+        Util.debug(ex);
+        Performance.sleep(1);
+      }
+    }
+    Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
   }
 
   /**

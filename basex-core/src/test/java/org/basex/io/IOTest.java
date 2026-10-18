@@ -2,6 +2,9 @@ package org.basex.io;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
+import java.nio.file.*;
+
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -12,6 +15,9 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class IOTest {
+  /** Name of test files. */
+  private static final String NAME = Util.className(IOTest.class);
+
   /** URL to file conversions. */
   @Test public void urlToFile() {
     if(Prop.WIN) {
@@ -105,6 +111,51 @@ public final class IOTest {
         IOUrl.toAscii("https://bücher.example#frag"));
     assertEquals("https://user@xn--bcher-kva.example:8080/p",
         IOUrl.toAscii("https://user@bücher.example:8080/p"));
+  }
+
+  /**
+   * Opened files can be replaced and deleted.
+   * @throws IOException I/O exception
+   */
+  @Test public void replaceOpened() throws IOException {
+    final IOFile file = new IOFile(Prop.TEMPDIR, NAME + ".txt");
+    file.write("old");
+    try(InputStream in = file.inputStream()) {
+      file.writeAtomic(Token.token("new"));
+      assertEquals("old", Token.string(in.readAllBytes()));
+    }
+    assertEquals("new", file.readString());
+    try(InputStream in = file.inputStream()) {
+      assertTrue(file.delete());
+      assertEquals("new", Token.string(in.readAllBytes()));
+    }
+    assertFalse(file.exists());
+  }
+
+  /**
+   * Atomic writes preserve symbolic links.
+   * @throws IOException I/O exception
+   */
+  @Test public void writeAtomicLink() throws IOException {
+    final IOFile target = new IOFile(Prop.TEMPDIR, NAME + "-target.txt");
+    final IOFile link = new IOFile(Prop.TEMPDIR, NAME + "-link.txt");
+    target.write("old");
+    link.delete();
+    try {
+      Files.createSymbolicLink(link.file().toPath(), target.file().toPath());
+    } catch(final IOException | UnsupportedOperationException ex) {
+      // Windows: symbolic links require privileges
+      target.delete();
+      Assumptions.abort(ex.getMessage());
+    }
+    try {
+      link.writeAtomic(Token.token("new"));
+      assertTrue(Files.isSymbolicLink(link.file().toPath()));
+      assertEquals("new", target.readString());
+    } finally {
+      link.delete();
+      target.delete();
+    }
   }
 
   /** JAR URL merges. */

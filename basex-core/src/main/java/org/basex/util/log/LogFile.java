@@ -16,7 +16,7 @@ public final class LogFile {
   /** File reference. */
   private final IOFile file;
   /** Output stream (can be {@code null}). */
-  private FileOutputStream fos;
+  private OutputStream out;
 
   /**
    * Creates a new writable log file for the specified date.
@@ -27,7 +27,7 @@ public final class LogFile {
    */
   static LogFile create(final String name, final IOFile dir) throws IOException {
     final LogFile lf = new LogFile(name, dir);
-    lf.fos = lf.file.outputStream(true);
+    lf.out = lf.file.outputStream(true);
     return lf;
   }
 
@@ -45,7 +45,7 @@ public final class LogFile {
    * @return result of check
    */
   public boolean current() {
-    return fos != null;
+    return out != null;
   }
 
   /**
@@ -90,8 +90,8 @@ public final class LogFile {
    */
   void write(final byte[] line) throws IOException {
     synchronized(file) {
-      fos.write(line);
-      fos.flush();
+      out.write(line);
+      out.flush();
     }
   }
 
@@ -101,9 +101,9 @@ public final class LogFile {
    */
   void close() throws IOException {
     synchronized(file) {
-      if(fos != null) {
-        fos.close();
-        fos = null;
+      if(out != null) {
+        out.close();
+        out = null;
       }
     }
   }
