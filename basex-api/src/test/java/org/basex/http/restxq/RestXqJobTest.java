@@ -54,6 +54,20 @@ public final class RestXqJobTest extends RestXqTest {
   }
 
   /**
+   * Finished requests are listed for a while, with their path.
+   * @throws Exception exception
+   */
+  @Test public void listed() throws Exception {
+    register("declare %R:path('id') %output:method('text') function m:id() { job:current() };" +
+        "declare %R:path('details/{$id}') %output:method('text') function m:details($id) {" +
+        "  job:list-details($id) ! `{ @state } { @type } { @path }" +
+        " { normalize-space(substring-after(., ':)')) }`" +
+        "};");
+    final String id = get(200, "id");
+    get("finished RESTXQ /id m:id#0", "details/" + id);
+  }
+
+  /**
    * Bodies that have not been read by the request are empty in asynchronous jobs.
    * @throws Exception exception
    */

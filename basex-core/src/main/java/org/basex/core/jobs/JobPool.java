@@ -21,10 +21,14 @@ public final class JobPool {
   static final int MAX_RUNNING = 1 << 10;
   /** Maximum number of cached jobs. */
   static final int MAX_CACHED = 1 << 10;
+  /** Maximum number of listed finished jobs per job type. */
+  static final int MAX_FINISHED = 100;
   /** Maximum number of registered jobs. */
   static final int MAX_REGISTERED = 1 << 20;
   /** Interval between two memory checks (ms). */
   private static final long MEMORY_INTERVAL = 250;
+  /** Time for which finished jobs are listed (ms). */
+  private static final long FINISHED_TIME = 30000;
 
   /** Queued or running jobs. */
   public final Map<String, Job> active = new ConcurrentHashMap<>();
@@ -32,6 +36,10 @@ public final class JobPool {
   public final Map<String, QueryJobResult> results = new ConcurrentHashMap<>();
   /** Scheduled tasks. */
   public final Map<String, QueryJobTask> tasks = new ConcurrentHashMap<>();
+  /** Finished jobs, in the order of their completion. */
+  private final LinkedHashMap<String, JobSnapshot> finished = new LinkedHashMap<>();
+  /** Finished jobs, grouped by their type, in the order of their completion. */
+  private final HashMap<String, ArrayDeque<JobSnapshot>> finishedTypes = new HashMap<>();
 
   /** Scheduler for delayed and periodic job tasks. */
   private final ScheduledThreadPoolExecutor scheduler =
@@ -251,13 +259,82 @@ public final class JobPool {
   private record Watch(long limit, Thread thread, long allocated) { }
 
   /**
+   * Lists a finished job.
+   * @param job snapshot of the job
+   */
+  void finish(final JobSnapshot job) {
+    synchronized(finished) {
+      unfinish(job.id());
+      finished.put(job.id(), job);
+      final ArrayDeque<JobSnapshot> jobs =
+          finishedTypes.computeIfAbsent(job.type(), type -> new ArrayDeque<>());
+      jobs.add(job);
+      if(jobs.size() > MAX_FINISHED) remove(jobs.getFirst());
+      prune();
+    }
+  }
+
+  /**
+   * Returns a finished job.
+   * @param id ID
+   * @return snapshot of the job, or {@code null} if it is not listed
+   */
+  public JobSnapshot finished(final String id) {
+    synchronized(finished) {
+      prune();
+      return finished.get(id);
+    }
+  }
+
+  /**
+   * Removes a finished job.
+   * @param id ID
+   */
+  void unfinish(final String id) {
+    synchronized(finished) {
+      final JobSnapshot job = finished.get(id);
+      if(job != null) remove(job);
+    }
+  }
+
+  /**
+   * Removes the finished jobs that are listed for too long.
+   */
+  private void prune() {
+    final long min = System.currentTimeMillis() - FINISHED_TIME;
+    while(!finished.isEmpty()) {
+      final JobSnapshot job = finished.firstEntry().getValue();
+      if(job.end() >= min) break;
+      remove(job);
+    }
+  }
+
+  /**
+   * Removes a finished job from both lists.
+   * @param job snapshot of the job
+   */
+  private void remove(final JobSnapshot job) {
+    finished.remove(job.id());
+    final ArrayDeque<JobSnapshot> jobs = finishedTypes.get(job.type());
+    jobs.remove(job);
+    if(jobs.isEmpty()) finishedTypes.remove(job.type());
+  }
+
+  /**
    * Returns all registered IDs.
+   * @param fin include finished jobs
    * @return sorted ID list
    */
-  public TokenList ids() {
+  public TokenList ids(final boolean fin) {
     final Set<String> set = new HashSet<>(results.keySet());
     set.addAll(active.keySet());
     set.addAll(tasks.keySet());
+    if(fin) {
+      synchronized(finished) {
+        prune();
+        set.addAll(finished.keySet());
+      }
+    }
 
     // compare generated IDs by their job counter, custom IDs as strings
     final int pl = JobContext.PREFIX.length();
@@ -301,6 +378,7 @@ public final class JobPool {
     if(job != null) job.stop();
     // remove potentially cached result
     results.remove(id);
+    unfinish(id);
 
     notifyChange();
     return job != null || task != null;

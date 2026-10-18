@@ -122,6 +122,7 @@ public final class QueryJob extends Job implements Runnable {
         if(JobContext.generated(id)) throw JOBS_ID_INVALID_X.get(info, id);
         if(jobs.tasks.containsKey(id) || jobs.active.containsKey(id) ||
            jobs.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
+        jobs.unfinish(id);
         jc().id(id);
       } else {
         id = jc().id();
@@ -341,6 +342,17 @@ public final class QueryJob extends Job implements Runnable {
           }
         }
 
+        // the state is reset below, as the job may be repeated
+        final JobState outcome = outcome();
+        // no measurement if the job failed to start
+        if(registered) result.time += perf.nanoRuntime();
+        // an empty result is dropped, unless query information is attached to it
+        if(result.value != null && result.value.isEmpty() && result.info == null)
+          ctx.jobs.results.remove(id);
+        // a last run is listed for a while; before unregistering, so that no removal is undone
+        if(remove && outcome != JobState.STOPPED && !ctx.jobs.results.containsKey(id)) {
+          ctx.jobs.finish(JobSnapshot.get(jc, outcome, result.time / 1000000));
+        }
         try {
           // close and invalidate query after result has been assigned. order is important!
           if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
@@ -355,8 +367,6 @@ public final class QueryJob extends Job implements Runnable {
             if(registered) {
               unregister(ctx);
               popJob();
-              // no measurement if the job failed to start
-              if(jc.performance != null) result.time += jc.performance.nanoRuntime();
             }
             qp = null;
           }
@@ -378,9 +388,6 @@ public final class QueryJob extends Job implements Runnable {
           jc.performance = null;
 
           ctx.jobs.notifyChange();
-          // an empty result is dropped, unless query information is attached to it
-          if(result.value != null && result.value.isEmpty() && result.info == null)
-            ctx.jobs.results.remove(id);
           if(notify != null) notify.accept(result);
         }
       }

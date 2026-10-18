@@ -159,19 +159,19 @@ declare
 function dba:job-result(
   $id  as xs:string
 ) as item()+ {
-  let $details := job:list-details($id)
-  return if (empty($details)) then (
-    dba:result($id, false(), 'Job has expired.')
-  ) else if ($details/@state != 'cached') then (
-    dba:result($id, false(), 'Result is not available yet.')
-  ) else (
-    try {
+  let $state := job:list-details($id)/@state
+  return switch () {
+    case empty($state) return dba:result($id, false(), 'Job has expired.')
+    case $state = ('scheduled', 'queued', 'running')
+      return dba:result($id, false(), 'Result is not available yet.')
+    case $state != 'cached' return dba:result($id, false(), 'Result was not cached.')
+    default return try {
       dba:result($id, true(), job:result($id))
     } catch * {
       dba:result($id, false(), utils:error-message($err:module, $err:line-number,
         $err:column-number, $err:description))
     }
-  )
+  }
 };
 
 (:~

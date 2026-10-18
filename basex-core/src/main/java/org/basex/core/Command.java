@@ -73,6 +73,7 @@ public abstract class Command extends Job {
     this.perm = perm;
     this.openDB = openDB;
     this.args = args;
+    jc().listed = true;
   }
 
   /**

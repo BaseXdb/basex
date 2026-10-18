@@ -44,7 +44,8 @@ public final class JobContext {
   public Performance performance;
   /** Database context (can be {@code null}). */
   public Context context;
-
+  /** Indicates if the root job is listed for a while after it has finished. */
+  public boolean listed;
   /** Root job. */
   private final Job job;
   /** Job ID. Will be set while job is registered (can be {@code null}). */

@@ -312,6 +312,14 @@ public final class Context {
   }
 
   /**
+   * Returns the path of the HTTP request of a client.
+   * @return path (can be {@code null})
+   */
+  public String clientPath() {
+    return client != null ? client.clientPath() : null;
+  }
+
+  /**
    * Assigns an external object.
    * @param object external object
    */

@@ -22,24 +22,40 @@ declare %private variable $panels:STATES := {
   'queued'    : 'Waiting for locks held by other jobs',
   'running'   : 'Being evaluated',
   'cached'    : 'Finished; the result is kept until it is fetched',
+  'finished'  : 'Finished; it is listed for 30 seconds',
+  'stopped'   : 'Stopped; it will be discarded',
+  'timeout'   : 'Stopped because the timeout was exceeded',
+  'memory'    : 'Stopped because the memory limit was exceeded',
   'registered': 'Registered as service; it is scheduled when the server starts'
 };
 
 (:~
  : Indicates whether a job was started by the DBA itself.
- : @param  $id  job id
+ : @param  $job  job details
  : @return result of check
  :)
 declare function panels:dba-job(
-  $id  as xs:string
+  $job  as element(job)
 ) as xs:boolean {
-  (: see utils:job-id :)
-  starts-with($id, 'dba:')
+  (: see utils:job-id; requests of the DBA are identified by their path :)
+  starts-with($job/@id, 'dba:') or panels:dba-path($job/@path)
+};
+
+(:~
+ : Indicates whether a request path belongs to the DBA.
+ : @param  $path  path (can be empty)
+ : @return result of check
+ :)
+declare %private function panels:dba-path(
+  $path  as xs:string?
+) as xs:boolean {
+  (: the handshake of a WebSocket connection is requested below /ws :)
+  matches($path, '^/?(ws/)?dba(/|$)')
 };
 
 (:~
  : Creates the contents of the jobs panel.
- : @param  $sort  table sort key; empty string for the longest-running jobs first
+ : @param  $sort  table sort key; empty string for the newest jobs first
  : @param  $page  number of shown pages
  : @param  $dba   whether the jobs of the DBA itself are listed as well
  : @return panel contents
@@ -49,7 +65,7 @@ declare function panels:jobs(
   $page  as xs:integer := 1,
   $dba   as xs:boolean := false()
 ) as element()+ {
-  let $presort := 'duration'
+  let $presort := 'time'
   let $sort := $sort[.] otherwise $presort
   return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <h2>Jobs</h2>
@@ -59,38 +75,36 @@ declare function panels:jobs(
         { 'key': 'job', 'label': 'ID' },
         { 'key': 'type', 'label': 'Type', 'width': 'calc(10ch + 0.5rem)' },
         { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
+        { 'key': 'path', 'label': 'Path', 'width': 'calc(12ch + 0.5rem)' },
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc',
           'width': 'calc(6ch + 0.5rem)' },
-        { 'key': 'user', 'label': 'User', 'width': '6rem' },
+        { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
         { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
-          'width': 'calc(8ch + 0.5rem)' },
-        { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc',
-          'width': 'calc(8ch + 0.5rem)' }
+          'width': 'calc(10ch + 0.5rem)' }
       )
       let $services := job:services()
       (: the job that renders this table is of no interest :)
       let $jobs := job:list-details()[not(@id = job:current())]
       (: the queries that are run in the DBA itself are only listed on demand :)
-      let $hidden := $jobs[panels:dba-job(@id)][not($dba)]
+      let $hidden := $jobs[panels:dba-job(.)][not($dba)]
       let $entries := (
         for $details in $jobs except $hidden
         let $id := $details/@id
         let $sec := (xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S'))
           otherwise 0
         let $time := data($details/@time)
-        let $start := data($details/@start)
-        order by $sec descending, $start descending
+        order by $time descending
         return {
           'id': $id,
           'job': panels:job-link($id),
           'type': string($details/@type),
-          'state': panels:job-state($details/@state),
+          'state': panels:job-state($details/@state, $details/@start),
+          'path': string($details/@path),
           'duration': html:duration($sec),
           (: the address of the client is rarely of interest; the session that the job was
              started from lists it in the Clients panel :)
           'user': panels:job-user($details),
-          'time': $time,
-          'start': $start otherwise $time
+          'time': $time
         },
         (: services without a job are dormant: they are rescheduled when the server is restarted :)
         for $service in $services
@@ -118,7 +132,7 @@ declare function panels:jobs(
         <label title='Show the queries that are run in the DBA itself'>{
           <input type='checkbox' id='dba-jobs' onchange='dbaJobsChanged()'>{
             attribute checked { }[$dba]
-          }</input>, ` DBA jobs ({ count($jobs[panels:dba-job(@id)]) })`
+          }</input>, ` DBA jobs ({ count($jobs[panels:dba-job(.)]) })`
         }</label>
       )
       let $options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'select': 'id',
@@ -162,15 +176,19 @@ declare function panels:job-view(
 (:~
  : Creates the state of a job, with what it means as tooltip.
  : @param  $state  state
+ : @param  $start  next start of a scheduled job
  : @return function creating the state
  :)
 declare %private function panels:job-state(
-  $state  as xs:string
+  $state  as xs:string,
+  $start  as xs:string? := ()
 ) as fn() as element() {
   fn() {
     (: a queued job waits for the locks of another one: it is what a user asks about :)
     element { if ($state = 'queued') then 'b' else 'span' } {
-      attribute title { $panels:STATES?$state },
+      attribute title {
+        string-join(($panels:STATES?$state, $start ! html:exact(xs:dateTime(.))), ': ')
+      },
       $state
     }
   }
@@ -307,10 +325,9 @@ declare function panels:job-details(
           <h3>Result</h3>,
           <textarea id='output' readonly='' spellcheck='false'>{ $output }</textarea>
         },
-        (: a stored definition can be replaced; a job string is only shown :)
+        (: a stored definition can be replaced; a job string is only shown, highlighted as well :)
         <h3>{ if ($persisted) then 'Query' else 'Job String' }</h3>,
-        <textarea spellcheck='false'>{
-          attribute id { 'job-string' }[$persisted],
+        <textarea id='job-string' spellcheck='false'>{
           attribute name { 'query' }[$persisted],
           attribute readonly { }[not($persisted)],
           $query
@@ -352,8 +369,7 @@ declare function panels:job-done(
 ) as xs:boolean {
   (: a service is done as well: its query is edited in place, and a refresh would replace the
      editor while it is used :)
-  let $details := $job[.] ! job:list-details(.)
-  return empty($details) or $details/@state = 'cached' or
+  not($job[.] = job:list()) or job:list-details($job[.])/@state = 'cached' or
     exists(job:services()[@id = $job])
 };
 
@@ -393,7 +409,7 @@ declare function panels:clients(
   let $sockets := ws:list-details()
   let $jobs := job:list-details()[not(@id = job:current())]
   (: the queries of the DBA are listed as they are in the jobs panel :)
-  let $listed-jobs := $jobs[$dba or not(panels:dba-job(@id))]
+  let $listed-jobs := $jobs[$dba or not(panels:dba-job(.))]
   let $registered := job:list()
   (: a session without connections and jobs that has not been accessed for a while is idle; the
      session of this view never is :)
@@ -538,7 +554,7 @@ declare %private function panels:socket-row(
 ) as element(tr)? {
   let $id := string($ws/@id)
   let $path := string($ws/@path)
-  let $dba := matches($path, '^/?dba(/|$)')
+  let $dba := panels:dba-path($path)
   for $attributes in try {
     [ panels:attributes('websocket', $id,
       map:build(sort(ws:names($id), '?lang=en'), value := fn($name) {

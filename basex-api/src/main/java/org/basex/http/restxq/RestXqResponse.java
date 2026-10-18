@@ -55,6 +55,7 @@ public final class RestXqResponse extends WebResponse {
 
     qc = function.module.qc(ctx);
     qc.jc().type(RESTXQ);
+    qc.jc().listed = true;
     ctx.setExternal(conn.requestCtx);
 
     final RestXqFunction rxf = (RestXqFunction) function;

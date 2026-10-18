@@ -42,6 +42,7 @@ public final class ServerQuery extends Job {
     this.query = query;
     this.ctx = ctx;
     jc().type(JobsText.CLIENT);
+    jc().listed = true;
   }
 
   /**

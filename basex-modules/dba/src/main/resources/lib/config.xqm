@@ -41,6 +41,8 @@ declare variable $config:MEMORY := 'memory';
 declare variable $config:PERMISSION := 'permission';
 (:~ Delay between two requests of a live view, in seconds. :)
 declare variable $config:INTERVAL := 'interval';
+(:~ Maximum delay of a live view, shorter than the time for which finished jobs are listed. :)
+declare variable $config:MAX-INTERVAL := 5;
 
 (:~ Options file. :)
 declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';

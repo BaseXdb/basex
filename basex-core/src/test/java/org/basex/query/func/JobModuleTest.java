@@ -418,8 +418,9 @@ public final class JobModuleTest extends SandboxTest {
     context.services.init(context);
     final String scheduled = query("exists(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
 
-    // the task is dropped from the list as soon as it has been executed
-    final String executed = waitUntil("empty(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
+    // the task is listed as finished as soon as it has been executed
+    final String executed = waitUntil(_JOB_LIST_DETAILS.args("RESTART") +
+        "/@state = 'finished'");
 
     query(_JOB_REMOVE.args("RESTART", " { 'service': true() }"));
     assertEquals("true", scheduled);
@@ -871,6 +872,51 @@ public final class JobModuleTest extends SandboxTest {
     }
   }
 
+  /** Test method. */
+  @Test public void listDetailsCommands() {
+    execute(new org.basex.core.cmd.XQuery("'listed-command'"));
+    query(_JOB_LIST_DETAILS.args() + "[@state = 'finished'][contains(., 'listed-command')]" +
+        "/@type/string()", "XQuery");
+  }
+
+  /** Test method. */
+  @Test public void listDetailsFinished() {
+    final String finished = "/@state = 'finished'";
+
+    // jobs without cached result are listed for a while, but are no longer registered
+    String id = query(_JOB_EVAL.args("1"));
+    assertEquals("true", waitUntil(_JOB_LIST_DETAILS.args(id) + finished));
+    query(_JOB_LIST_DETAILS.args() + "[@id = '" + id + "']" + finished, true);
+    query(_JOB_LIST_DETAILS.args(id) + "/@duration/string() castable as xs:dayTimeDuration",
+        true);
+    query(_JOB_LIST.args() + " = '" + id + '\'', false);
+    query(_JOB_REMOVE.args(id));
+    query(_JOB_LIST_DETAILS.args(id), "");
+
+    // failed jobs, timeouts
+    id = query(_JOB_EVAL.args("error()"));
+    assertEquals("true", waitUntil(_JOB_LIST_DETAILS.args(id) + finished));
+    id = query(_JOB_EVAL.args(VERY_SLOW_QUERY, " ()", " { 'timeout': 0.1 }"));
+    assertEquals("true", waitUntil(_JOB_LIST_DETAILS.args(id) + "/@state = 'timeout'"));
+    query("xs:dayTimeDuration(" + _JOB_LIST_DETAILS.args(id) + "/@duration) >= " +
+        "xs:dayTimeDuration('PT0.1S')", true);
+
+    // stopped jobs are dropped
+    id = verySlowQuery();
+    query(_JOB_REMOVE.args(id));
+    query(_JOB_WAIT.args(id));
+    Performance.sleep(100);
+    query(_JOB_LIST_DETAILS.args(id), "");
+
+    // a reused ID replaces the finished job
+    query(_JOB_EVAL.args("1", " ()", " { 'id': 'FINISHED' }"));
+    assertEquals("true", waitUntil(_JOB_LIST_DETAILS.args("FINISHED") + finished));
+    query(_JOB_EVAL.args("1", " ()", " { 'id': 'FINISHED', 'cache': true() }"));
+    query(_JOB_WAIT.args("FINISHED"));
+    query(_JOB_RESULT.args("FINISHED"), 1);
+    query(_JOB_LIST_DETAILS.args("FINISHED"), "");
+  }
+
   /**
    * Test method.
    * @throws Exception exception */
@@ -927,7 +973,7 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_RESULT;
     final String id = query(_JOB_EVAL.args("()", " ()", " { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
-    query(_JOB_LIST_DETAILS.args(id), "");
+    assertEquals("true", waitUntil(_JOB_LIST_DETAILS.args(id) + "/@state = 'finished'"));
     query(func.args(id), "");
   }
 

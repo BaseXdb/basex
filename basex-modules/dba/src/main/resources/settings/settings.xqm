@@ -77,7 +77,8 @@ function dba:settings() as element(html) {
         $number($config:MAXCHARS, 'Maximum output size', ()),
         $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
         <h3>Live Views</h3>,
-        $number($config:INTERVAL, 'Delay between requests, in seconds', (1, 10))
+        $number($config:INTERVAL, 'Delay between requests, in seconds',
+          (1, $config:MAX-INTERVAL))
       }</form>,
       { 'label': 'Settings' })
   ) => html:wrap({

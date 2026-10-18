@@ -100,11 +100,14 @@ function loadCodeMirror(language, edit, resize) {
       const editorArea = document.getElementById(id);
       if(!editorArea) continue;
       loaded.push(id);
+      // a read-only text area is shown with the same highlighting, but cannot be edited
+      const readOnly = editorArea.readOnly;
       if(_editor) {
-        if(useCM) _editors[id] = CM6.fromTextArea(editorArea, { language });
+        if(useCM) _editors[id] = CM6.fromTextArea(editorArea, { language, readOnly });
       } else if(useCM) {
         _editor = _editors[id] = CM6.fromTextArea(editorArea, {
           language,
+          readOnly,
           // Lezer-driven syntax-error gutter, only for the XQuery editor
           parseErrors: language === "xquery",
           extraKeys: [

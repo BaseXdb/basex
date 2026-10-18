@@ -34,6 +34,14 @@ public interface ClientInfo {
   }
 
   /**
+   * Returns the path of the HTTP request of the current client.
+   * @return path (can be {@code null})
+   */
+  default String clientPath() {
+    return null;
+  }
+
+  /**
    * Returns the name of a client, taken from the specified object or from the logged-in user.
    * @param id object with user ID (can be {@code null})
    * @param ctx database context

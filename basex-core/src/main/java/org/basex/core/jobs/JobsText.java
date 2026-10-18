@@ -44,6 +44,8 @@ public interface JobsText {
   /** QName. */
   QNm Q_SESSION = new QNm("session");
   /** QName. */
+  QNm Q_PATH = new QNm("path");
+  /** QName. */
   QNm Q_READS = new QNm("reads");
   /** QName. */
   QNm Q_WRITES = new QNm("writes");

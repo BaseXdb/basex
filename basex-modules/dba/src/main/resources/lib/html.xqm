@@ -76,7 +76,7 @@ declare function html:wrap(
   let $rows := string-join($options?rows, ' ')
   (: the client cannot tell a context path from a subdirectory, so the server states it :)
   return <html lang='en' data-context='{ request:context-path() }'
-               data-interval='{ config:get($config:INTERVAL) }'
+               data-interval='{ min((config:get($config:INTERVAL), $config:MAX-INTERVAL)) }'
                data-xquery='{ $utils:XQUERY-REGEX }'>
     <head>
       <meta charset='utf-8'/>
@@ -394,7 +394,13 @@ declare function html:time(
   $date  as xs:dateTime
 ) as element(span) {
   let $adjusted := html:adjust($date)
-  return <span title='{ $adjusted }'>{ format-dateTime($adjusted, '[H00]:[m00]:[s00]') }</span>
+  (: a value of another day is shown as its date, which would otherwise be lost :)
+  let $picture := if (xs:date($adjusted) = current-date()) then (
+    '[H00]:[m00]:[s00]'
+  ) else (
+    '[Y0000]-[M00]-[D00]'
+  )
+  return <span title='{ $adjusted }'>{ format-dateTime($adjusted, $picture) }</span>
 };
 
 (:~

@@ -182,6 +182,11 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
   }
 
   @Override
+  public String clientPath() {
+    return path;
+  }
+
+  @Override
   public HttpSession session() {
     return session;
   }

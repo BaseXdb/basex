@@ -26,7 +26,7 @@ public final class JobListDetails extends StandardFunc {
     final Context ctx = qc.context;
     final String id = toStringOrNull(arg(0), qc);
 
-    final TokenList ids = id != null ? new TokenList(1).add(id) : qc.context.jobs.ids();
+    final TokenList ids = id != null ? new TokenList(1).add(id) : qc.context.jobs.ids(true);
     final JobPool jobs = ctx.jobs;
     final ValueBuilder vb = new ValueBuilder(qc);
 
@@ -37,31 +37,38 @@ public final class JobListDetails extends StandardFunc {
       if(job == null && jr != null) job = jr.job;
       final QueryJobTask jt = jobs.tasks.get(key);
       if(job == null && jt != null) job = jt.job;
-      if(job == null) continue;
 
-      final JobContext jc = job.jc();
-      final long ms = jc.performance != null
-          ? jc.performance.nanoRuntime(false) / 1000000 : jr != null
-          ? jr.time / 1000000 : -1;
+      final JobSnapshot js;
+      if(job != null) {
+        final JobContext jc = job.jc();
+        final long ms = jc.performance != null
+            ? jc.performance.nanoRuntime(false) / 1000000 : jr != null
+            ? jr.time / 1000000 : -1;
+        js = JobSnapshot.get(jc, job.state, ms);
+      } else {
+        js = jobs.finished(key);
+        if(js == null) continue;
+      }
 
       final FBuilder elem = FElem.build(Q_JOB);
       elem.attr(Q_ID, key);
-      elem.attr(Q_TYPE, jc.type());
-      elem.attr(Q_STATE, job.state.name().toLowerCase(Locale.ENGLISH));
-      elem.attr(Q_USER, jc.context.clientName());
-      elem.attr(Q_ADDRESS, jc.context.clientAddress());
-      elem.attr(Q_SESSION, jc.context.clientSession());
-      if(ms >= 0) elem.attr(Q_DURATION, DTDur.get(ms).string(info));
+      elem.attr(Q_TYPE, js.type());
+      elem.attr(Q_STATE, js.state().name().toLowerCase(Locale.ENGLISH));
+      elem.attr(Q_USER, js.user());
+      elem.attr(Q_ADDRESS, js.address());
+      elem.attr(Q_SESSION, js.session());
+      elem.attr(Q_PATH, js.path());
+      if(js.ms() >= 0) elem.attr(Q_DURATION, DTDur.get(js.ms()).string(info));
       if(jt != null) {
         elem.attr(Q_START, Dtm.local(jt.start, info).string(info));
         if(jt.end != Long.MAX_VALUE) elem.attr(Q_END, Dtm.local(jt.end, info).string(info));
         if(jt.cron != null) elem.attr(Q_CRON, jt.cron);
         else if(jt.interval != 0) elem.attr(Q_INTERVAL, DTDur.get(jt.interval).string(info));
       }
-      elem.attr(Q_READS, jc.locks.reads);
-      elem.attr(Q_WRITES, jc.locks.writes);
-      elem.attr(Q_TIME, Dtm.local(jc.time, info).string(info));
-      elem.text(Token.token(jc));
+      elem.attr(Q_READS, js.reads());
+      elem.attr(Q_WRITES, js.writes());
+      elem.attr(Q_TIME, Dtm.local(js.time(), info).string(info));
+      elem.text(Token.token(js.string()));
       vb.add(elem.finish());
     }
     return vb.value(this);

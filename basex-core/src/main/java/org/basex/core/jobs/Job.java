@@ -40,6 +40,8 @@ public abstract class Job {
   private Job previous;
   /** Indicates that the job holds a run slot and must give it up again. */
   private boolean registered;
+  /** Time when the job was started (ns; not started: {@code 0}). */
+  private long started;
 
   /**
    * Returns the job context.
@@ -69,6 +71,7 @@ public abstract class Job {
       if(previous == null) ctx.locking.acquire(this, ctx);
       state(JobState.RUNNING);
       jc.performance = new Performance();
+      started = System.nanoTime();
       // non-admin users: stop process after timeout
       if(!ctx.user().has(Perm.ADMIN)) {
         startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
@@ -91,10 +94,26 @@ public abstract class Job {
       stopTimeout();
       // locks are only given back if the acquisition succeeded
       if(previous == null && ctx.locking.held() != null) ctx.locking.release();
+      // listed before the slot is freed, so that no removal is undone
+      final JobState outcome = outcome();
+      if(previous == null && jc.listed && outcome != JobState.STOPPED) {
+        final long ms = started != 0 ? (System.nanoTime() - started) / 1000000 : -1;
+        ctx.jobs.finish(JobSnapshot.get(jc, outcome, ms));
+      }
     } finally {
       // the job must free its run slot, even if it failed to give up its locks
       freeSlot(ctx);
     }
+  }
+
+  /**
+   * Returns the final state of a job that has run.
+   * @return state that stopped the job, or {@link JobState#FINISHED}
+   */
+  final JobState outcome() {
+    final JobState js = state;
+    return js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY ? js :
+      JobState.FINISHED;
   }
 
   /**

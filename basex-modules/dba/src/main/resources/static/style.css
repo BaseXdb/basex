@@ -982,11 +982,11 @@ body:has(.content.fill) main {
   border-radius: var(--radius);
 }
 
-/* the details of a job are opened over the panels, and take most of the page */
+/* the details of a job are opened over the panels, and grow with their texts up to the maximum
+   height of a dialog */
 #details-dialog[open] {
-  width: min(90vw, 72rem);
+  width: min(90vw, 60rem);
   max-width: none;
-  height: 85vh;
   display: flex;
   flex-direction: column;
 }
@@ -1018,9 +1018,14 @@ body:has(.content.fill) main {
 .job-texts > * {
   flex-shrink: 0;
 }
-.job-texts > :is(.cm-editor, textarea) {
-  flex: 1;
-  min-height: 6rem;
+/* a text is at least as high as its lines and the facts beside it, and scrolls when the dialog has
+   reached its maximum. The dialog lies in a filled content area, whose rule for text areas is
+   outweighed by the id */
+#details-dialog .job-texts > :is(.cm-editor, textarea) {
+  flex: 1 1 auto;
+  height: auto;
+  field-sizing: content;
+  min-height: 4lh;
 }
 .job-columns h3:first-child {
   margin-top: 0;

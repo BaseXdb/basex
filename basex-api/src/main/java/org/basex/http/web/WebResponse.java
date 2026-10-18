@@ -6,6 +6,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.util.*;
 
 /**
  * This abstract class defines common methods of Web responses.
@@ -50,7 +51,8 @@ public abstract class WebResponse {
     try {
       final Expr[] args = init(function, data);
       qc.assign(sf, args);
-      qc.jc().description("(: " + sf.info + " :) " + qc.main);
+      qc.jc().description(Strings.concat("(: ", sf.info, " :)\n", sf.funcName().prefixString(),
+          '#', sf.arity()));
       qc.compile();
       return serialize(body);
     } catch(final QueryException ex) {

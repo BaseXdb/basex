@@ -131,14 +131,24 @@ function showActivity(json) {
         }
       }
     }
-    // a running job's details are replaced as well; the final ones are applied once, together
-    // with the editor for its result, and are then left alone
+    // a running job's details are updated as well; the final ones are applied once, together with
+    // the editor for its result, and are then left alone
     const details = document.getElementById("job-details");
     if(details && json.job && details.dataset.done !== "true") {
-      details.innerHTML = json.job;
+      const template = document.createElement("template");
+      template.innerHTML = json.job;
+      const facts = details.querySelector(".job-facts");
+      const update = template.content.querySelector(".job-facts");
+      if(facts && update && !json.done) {
+        // the string of a running job does not change: only its facts are replaced, and the
+        // editor of the string is kept
+        facts.replaceWith(update);
+      } else {
+        details.replaceChildren(template.content);
+        // the query of a service is edited, a job string is only highlighted
+        loadCodeMirror("xquery", [ "job-string" ]);
+      }
       details.dataset.done = json.done;
-      // the query of a service is edited; the result is shown by the same call
-      if(json.done) loadCodeMirror("xquery", [ "job-string" ]);
       buttons();
       markTruncated(details);
     }
