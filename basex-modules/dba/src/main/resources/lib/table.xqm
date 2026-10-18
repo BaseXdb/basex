@@ -159,10 +159,11 @@ declare function table:create(
         let $atomize := fn($v) { if ($v instance of fn(*)) then string-join($v()) else $v }
         let $order := $table:TYPES?($header?sort otherwise $header?type)?order
         let $convert := if ($order = 'number') then (
+          (: a missing value stays empty, and is ordered last; NaN would come first :)
           if ($desc) then (
-            fn { 0 - number() }
+            fn { . ! (0 - number()) }
           ) else (
-            fn { number() }
+            fn { . ! number() }
           )
         ) else if ($order = 'date' and $desc) then (
           (: a date is ordered by its lexical form, which only descending has to turn around :)
