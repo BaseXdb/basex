@@ -263,8 +263,29 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString quoted(final byte[] value) {
-    tb.add(toQuoted(value));
+    tb.add(toQuoted(value, !error));
     return this;
+  }
+
+  /**
+   * Serializes a direct comment constructor with a chopped version of its unescaped value.
+   * @param value value
+   * @return self reference
+   */
+  public QueryString comment(final byte[] value) {
+    return concat(XMLToken.COMM_O, Serializer.value(value, false, false, true, false),
+      XMLToken.COMM_C);
+  }
+
+  /**
+   * Serializes a direct processing instruction with a chopped version of its unescaped value.
+   * @param name name
+   * @param value value
+   * @return self reference
+   */
+  public QueryString pi(final byte[] name, final byte[] value) {
+    return concat(XMLToken.PI_O, name, " ", Serializer.value(value, false, false, true, false),
+      XMLToken.PI_C);
   }
 
   /**
@@ -361,7 +382,17 @@ public final class QueryString {
    * @return token
    */
   public static byte[] toQuoted(final byte[] value) {
-    return Serializer.value(value, true, false, true);
+    return toQuoted(value, true);
+  }
+
+  /**
+   * Serializes a chopped version of the specified value with quotes, optionally without escaping.
+   * @param value value
+   * @param escape escape ampersands and newlines (disabled for error messages)
+   * @return token
+   */
+  public static byte[] toQuoted(final byte[] value, final boolean escape) {
+    return Serializer.value(value, true, false, true, escape);
   }
 
   /**

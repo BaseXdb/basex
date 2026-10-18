@@ -31,6 +31,11 @@ public final class RestXqParamTest extends RestXqTest {
         "function m:f($v) { $v };", "");
     get("2", "declare %R:path('') %R:query-param('a', '{$v}', 4, 8) " +
         "function m:f($v) { count($v) };", "");
+    // string defaults are coerced like request values
+    get("false", "declare %R:path('') %R:query-param('a', '{$v}', 'false') " +
+        "function m:f($v as xs:boolean) { $v };", "");
+    get("3", "declare %R:path('') %R:query-param('a', '{$v}', '1', '2') " +
+        "function m:f($v as xs:integer+) { sum($v) };", "");
     get("6", "declare %R:path('') %R:query-param('a', '{$a}') %R:query-param('b', '{$b}') " +
         "function m:f($a, $b) { $a * $b };", "?a=2&b=3");
 

@@ -11,7 +11,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -130,9 +129,7 @@ public final class FTIndexAccess extends Simple {
   @Override
   public void toString(final QueryString qs) {
     Expr expr = ftexpr;
-    if(ftexpr instanceof final FTWords ftw) {
-      if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) expr = ftw.query;
-    }
+    if(ftexpr instanceof final FTWords ftw && ftw.plain()) expr = ftw.query;
     qs.function(Function._FT_SEARCH, db, expr);
   }
 }

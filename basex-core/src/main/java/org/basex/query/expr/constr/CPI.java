@@ -75,8 +75,7 @@ public final class CPI extends CName {
     if(computed) {
       toString(qs, QueryText.PROCESSING_INSTRUCTION);
     } else {
-      qs.concat(FPI.OPEN, ((Str) name).string(), " ",
-          QueryString.toValue(((Str) exprs[0]).string()), FPI.CLOSE);
+      qs.pi(((Str) name).string(), ((Str) exprs[0]).string());
     }
   }
 }

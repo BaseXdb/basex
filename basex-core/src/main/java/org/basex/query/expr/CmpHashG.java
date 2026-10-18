@@ -18,9 +18,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpHashG extends CmpG {
-  /** Right-hand operand is deterministic and closed: cache is content-stable across calls. */
-  private final boolean stable;
-
   /**
    * Constructor.
    * @param expr1 first expression
@@ -30,7 +27,6 @@ public final class CmpHashG extends CmpG {
    */
   CmpHashG(final Expr expr1, final Expr expr2, final CmpOp op, final InputInfo info) {
     super(info, expr1, expr2, op);
-    stable = expr2.isSimple() && !expr2.hasFreeVars();
   }
 
   /**
@@ -103,13 +99,13 @@ public final class CmpHashG extends CmpG {
 
     // stable right-hand operand: probe against populated cache without re-evaluating expr2
     // recursive evaluation of the same expression: skip the cache, which is in use
-    final CmpCache cc = qc.caches.get(this, () -> new CmpCache(info));
+    final Expr expr2 = exprs[1];
+    final CmpCache cc = qc.caches.get(this, () -> new CmpCache(info, expr2));
     final CmpCache cache = cc.busy ? null : cc;
-    if(cache != null && stable && cache.value != null) return probe(iter1, cache, qc);
+    if(cache != null && cache.stable && cache.value != null) return probe(iter1, cache, qc);
 
     // dynamic right-hand operand: evaluate, consult cache, fall back if not eligible
     // check the node iterator, as atomizing iterators are not based on values
-    final Expr expr2 = exprs[1];
     final Iter iter = expr2.iter(qc);
     final Value value2 = iter.eagerValue();
     final Iter iter2 = (value2 != null ? value2 : expr2).toAtomIter(iter, qc, info);

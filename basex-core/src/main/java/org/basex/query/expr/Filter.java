@@ -120,8 +120,10 @@ public abstract class Filter extends Preds {
     // the predicate is guarded: if the root may be empty, it must not raise errors
     final boolean positional = mayBePositional();
     final Expr first = exprs[0];
+    final SeqType fst = first.seqType();
     final boolean toIf = !positional && exprs.length == 1 && first.isSimple() &&
-      (root.seqType().oneOrMore() || first instanceof Value || first instanceof VarRef);
+      (root.seqType().oneOrMore() || first instanceof VarRef && (fst.type instanceof NodeType ||
+      fst.zeroOrOne() && (fst.type.isStringOrUntyped() || fst.type == BasicType.BOOLEAN)));
 
     // (let $x := E return R)[P] → let $x := E return R[P]
     // (if(C) then A else ())[P] → if(C) then A[P] else ()

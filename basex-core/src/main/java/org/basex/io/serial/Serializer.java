@@ -742,6 +742,20 @@ public abstract class Serializer implements Closeable {
    */
   public static byte[] value(final byte[] value, final boolean quote, final boolean xml,
       final boolean chop) {
+    return value(value, quote, xml, chop, true);
+  }
+
+  /**
+   * Serializes the specified value, optionally without escaping ampersands and newlines.
+   * @param value value
+   * @param quote quote strings
+   * @param xml serialize as XML string value
+   * @param chop chop large tokens
+   * @param escape escape ampersands and newlines
+   * @return value
+   */
+  public static byte[] value(final byte[] value, final boolean quote, final boolean xml,
+      final boolean chop, final boolean escape) {
     final TokenBuilder tb = new TokenBuilder();
     if(quote) tb.add('"');
 
@@ -752,9 +766,9 @@ public abstract class Serializer implements Closeable {
         break;
       }
       final int cp = tp.next();
-      if(cp == '&') tb.add(E_AMP);
-      else if(cp == '\r') tb.add(E_CR);
-      else if(cp == '\n') tb.add(E_NL);
+      if(escape && cp == '&') tb.add(E_AMP);
+      else if(escape && cp == '\r') tb.add(E_CR);
+      else if(escape && cp == '\n') tb.add(E_NL);
       else if(xml && cp == '<') tb.add(E_LT);
       else if(quote && cp == '"') tb.add('"').add('"');
       else tb.add(cp);

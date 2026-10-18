@@ -135,6 +135,14 @@ public final class FTWords extends FTExpr {
     return this;
   }
 
+  /**
+   * Checks if the index access can be represented by the plain query string.
+   * @return result of check
+   */
+  boolean plain() {
+    return simple && ftOpt.th == null && !ftOpt.is(WC) && !ftOpt.is(FZ);
+  }
+
   @Override
   public FTNode value(final QueryContext qc) throws QueryException {
     final FTTokenizer ftt = get(qc);

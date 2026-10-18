@@ -35,6 +35,17 @@ public final class QueryStringTest extends SandboxTest {
     roundtrip("<a b='&#x9;&quot;'>{ " + ZERO + " }</a>");
   }
 
+  /** Comments and processing instructions: contents are not escaped. */
+  @Test public void commentsPIs() {
+    roundtrip("<!--a&amp;b-->");
+    roundtrip("<?pi a&amp;b?>");
+    roundtrip("comment { 'a&amp;b' }");
+    roundtrip("processing-instruction pi { 'a&amp;b' }");
+    roundtrip("comment { 'a&#xA;b' }");
+    roundtrip("<a>{ " + ZERO + " }<!--a&amp;b--><?pi a&amp;b?></a>");
+    roundtrip("parse-xml('<x><!--a&amp;b--><?pi a&amp;b?></x>')/x/node()");
+  }
+
   /** Atomic items. */
   @Test public void atomics() {
     roundtrip("xs:date('2020-01-01')");

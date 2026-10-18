@@ -209,7 +209,7 @@ public class ShapeType extends MapType {
       if(ex.error() != INVTYPE_X) throw ex;
       final String msg = ex.getLocalizedMessage();
       throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(
-        fields.key(f))) + " of " + this + ": " +
+        fields.key(f), false)) + " of " + this + ": " +
         (msg.endsWith(".") ? msg.substring(0, msg.length() - 1) : msg));
     }
   }

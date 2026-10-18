@@ -54,7 +54,7 @@ public final class CComm extends CNode {
     if(computed) {
       toString(qs, COMMENT);
     } else {
-      qs.concat("<!--", QueryString.toValue(((Str) exprs[0]).string()), "-->");
+      qs.comment(((Str) exprs[0]).string());
     }
   }
 }

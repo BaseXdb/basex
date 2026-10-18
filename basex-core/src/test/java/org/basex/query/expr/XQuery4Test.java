@@ -978,6 +978,17 @@ public final class XQuery4Test extends SandboxTest {
         empty(SelectorStep.class));
     check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return "
         + "($m/child::{ ('y', 'z') })[jvalue() > 2] ! jvalue()", 3, empty(SelectorStep.class));
+    // range sequences: keys are matched by their bounds
+    check("[ 1, 2 ]/(1 to 113667776004) ! jvalue()", "1\n2", exists(SelectorStep.class));
+    check("[ 1, 2, 3 ]/(2 to 5) ! jvalue()", "2\n3", exists(SelectorStep.class));
+    check("{ 1: 'a', 2.0: 'b', 2.5: 'c', 'x': 'd' }/(2 to 3) ! jvalue()", "b",
+        exists(SelectorStep.class));
+    check("<a><b/></a>/child::{ 1 to 113667776004 }", "", exists(SelectorStep.class));
+    // duplicate keys: discarded at compile time and at runtime
+    check("[ 1, 2 ]/replicate(1, 100000000) ! jvalue()", 1, empty(SelectorStep.class),
+        empty(REPLICATE));
+    check("declare %basex:inline(0) function f($n) { [ 1, 2 ]/replicate(2, $n) ! jvalue() };"
+        + "f(100000000)", 2, exists(SelectorStep.class));
 
     // focus-dependent selector: evaluated with an absent focus, hence a dynamic error
     error("<a><b name='b'/><c name='x'/></a>/child::{ @name }", NOCTX_X);

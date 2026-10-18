@@ -2939,4 +2939,23 @@ public final class RewritingsTest extends SandboxTest {
     check("exists(('<a>B</a>', '<a>C</a>')[parse-xml(.)/a = 'B'])",
         true, root(CmpG.class), exists(SimpleMap.class));
   }
+
+  /** Guarded predicates: the EBV of a variable must not be computed for an empty root. */
+  @Test public void guardedFilterEbv() {
+    final String f = "declare %basex:inline(0) function local:f($e as item()*, $v as ";
+    query(f + "xs:string*) { $e[$v] }; local:f(1, 'a'), local:f((), ('a', 'b'))", 1);
+    query(f + "xs:QName?) { $e[$v] }; local:f(1, ()), local:f((), xs:QName('a'))", "");
+    query(f + "xs:date?) { $e[$v] }; local:f(1, ()), local:f((), xs:date('2001-01-01'))", "");
+    // the EBV of these types cannot fail: rewrite to if expression
+    check(f + "xs:string?) { $e[$v] }; local:f(1, 'a'), local:f((), ())", 1,
+        exists(If.class));
+  }
+
+  /** Guarded predicates: positions must not be computed for an empty step. */
+  @Test public void guardedStepPositions() {
+    final String f = "declare %basex:inline(0) function local:f($x as element(a), $p as xs:string) "
+        + "{ $x/b[xs:integer($p)] }; ";
+    query(f + "local:f(<a><b/></a>, '1'), local:f(<a/>, 'a')", "<b/>");
+    query(f + "local:f(<a><b/></a>, '1'), local:f(<a><c/></a>, 'a')", "<b/>");
+  }
 }

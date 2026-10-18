@@ -3,6 +3,7 @@ package org.basex.query.expr.path;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -10,6 +11,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -52,7 +54,7 @@ public final class SelectorStep extends Step {
   public Iter iter(final QueryContext qc) throws QueryException {
     // evaluate name keys with an absent focus once
     final QueryFocus focus = qc.focus;
-    final Value keys;
+    Value keys;
     qc.focus = new QueryFocus();
     try {
       keys = selector.atomValue(qc, info);
@@ -66,6 +68,8 @@ public final class SelectorStep extends Step {
     } finally {
       qc.focus = focus;
     }
+    // duplicate keys are irrelevant: replicate(1, $n) → 1
+    if(keys instanceof final SingletonSeq ss && ss.singleItem()) keys = ss.itemAt(0);
 
     final GNodeList list = new GNodeList();
     final Value value = focus.value;
@@ -92,6 +96,11 @@ public final class SelectorStep extends Step {
    * @throws QueryException query exception
    */
   private boolean matches(final Value keys, final GNode node) throws QueryException {
+    // range sequence: compare numeric jkey property with bounds (XNode names never match)
+    if(keys instanceof final RangeSeq rs) {
+      return node instanceof final JNode jnode && jnode.key instanceof final ANum num &&
+          CmpG.compare(num, rs, CmpOp.EQ);
+    }
     if(node instanceof final JNode jnode) {
       // JNode: compare jkey property with atomic values
       final Item jkey = jnode.key;
@@ -116,13 +125,14 @@ public final class SelectorStep extends Step {
 
   @Override
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
-    selector = cc.get(null, false, () -> selector.optimize(cc));
+    // duplicates and order of keys are irrelevant: child::{ replicate(1, 3) } → child::{ 1 }
+    selector = cc.get(null, false, () -> selector.optimize(cc).simplifyFor(Simplify.SET, cc));
 
     // no keys: child::{ () } → ()
     if(selector.seqType().zero()) return cc.emptySeq(this);
 
-    // constant keys: $node/child::{ #a } → $node/child::a
-    if(selector instanceof final Value value) {
+    // constant keys: $node/child::{ #a } → $node/child::a (range sequences are matched by bounds)
+    if(selector instanceof final Value value && !(value instanceof RangeSeq)) {
       final Expr in = root != null ? root : cc.qc.focus.value;
       final Type it = in != null ? in.seqType().type : null;
       final boolean jnode = it != null &&

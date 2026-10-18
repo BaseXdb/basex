@@ -43,12 +43,7 @@ public final class IterPosStep extends Step {
       @Override
       public GNode next() throws QueryException {
         if(skip) return null;
-        if(iter == null) {
-          iter = iterator(qc);
-          for(int e = 0; e < el; e++) {
-            if(exprs[e] instanceof final CmpPos pos) cachedPos[e] = pos.positions(qc);
-          }
-        }
+        if(iter == null) iter = iterator(qc);
         for(final GNode node : iter) {
           if(preds(node)) return node;
         }
@@ -61,8 +56,10 @@ public final class IterPosStep extends Step {
         qf.value = node;
         try {
           for(int e = 0; e < el; e++) {
-            final Value pos = cachedPos[e];
-            if(pos != null) {
+            if(exprs[e] instanceof final CmpPos cp) {
+              // positions are guarded: compute them when the first node reaches the predicate
+              Value pos = cachedPos[e];
+              if(pos == null) pos = cachedPos[e] = cp.positions(qc);
               final long p = ++currPos[e];
               if(!pos.predicate(qc, info, p)) return false;
               // last position reached: early exit

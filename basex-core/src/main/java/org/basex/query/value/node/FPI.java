@@ -84,7 +84,7 @@ public final class FPI extends FNode {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.concat(OPEN, name.string(), " ", QueryString.toValue(value), CLOSE);
+    qs.pi(name.string(), value);
   }
 
   /**

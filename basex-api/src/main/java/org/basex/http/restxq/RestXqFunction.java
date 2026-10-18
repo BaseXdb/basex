@@ -496,7 +496,11 @@ public final class RestXqFunction extends WebFunction {
     // default value
     final long al = value.size();
     final ItemList items = new ItemList(al - 2);
-    for(int a = 2; a < al; a++) items.add(value.itemAt(a));
+    // string defaults are bound as untyped values, just like request values
+    for(int a = 2; a < al; a++) {
+      final Item item = value.itemAt(a);
+      items.add(item instanceof final Str str ? Atm.get(str.string()) : item);
+    }
     return new WebParam(var, name, items.value());
   }
 

@@ -446,7 +446,7 @@ public class CmpG extends Cmp {
    * @return result of check
    * @throws QueryException query exception
    */
-  private static boolean compare(final ANum num, final RangeSeq rs, final CmpOp cmp)
+  public static boolean compare(final ANum num, final RangeSeq rs, final CmpOp cmp)
       throws QueryException {
     final long min = rs.min(), max = rs.max();
     final int cmin, cmax;

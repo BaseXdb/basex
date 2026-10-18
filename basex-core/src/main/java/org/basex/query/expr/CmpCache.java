@@ -20,6 +20,8 @@ import org.basex.util.*;
 public final class CmpCache {
   /** Input info (can be {@code null}). */
   private final InputInfo info;
+  /** Right-hand operand is deterministic and closed: cache is content-stable across calls. */
+  final boolean stable;
   /** Hash set with items of the right-hand operand; {@code null} if caching has been dismissed. */
   HashItemSet set;
   /** Right-hand operand currently being cached (compared by identity). */
@@ -40,9 +42,11 @@ public final class CmpCache {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
+   * @param expr right-hand operand
    */
-  public CmpCache(final InputInfo info) {
+  public CmpCache(final InputInfo info, final Expr expr) {
     this.info = info;
+    stable = expr.isSimple() && !expr.hasFreeVars();
     init();
   }
 

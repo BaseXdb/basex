@@ -552,13 +552,13 @@ public class DBNode extends XNode {
         case ATTRIBUTE ->
           qs.token(QueryString.toAttribute(name(), string()));
         case PROCESSING_INSTRUCTION ->
-          qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
+          qs.pi(name(), string());
         case ELEMENT ->
           qs.concat("<", name(), hasChildren() || hasAttributes() ? DOTS : "", "/>");
         case DOCUMENT ->
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));
         case COMMENT ->
-          qs.concat("<!--", QueryString.toValue(string()), "-->");
+          qs.comment(string());
         default ->
           qs.quoted(string());
       }

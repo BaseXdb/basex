@@ -1808,7 +1808,7 @@ public enum QueryError {
         final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] field : fields) {
           if(map.value(Str.get(field)) == null && fields.get(field).seqType().occ.min > 0) {
-            issue = Token.concat("Field ", QueryString.toQuoted(field), " of ", est.type,
+            issue = Token.concat("Field ", QueryString.toQuoted(field, false), " of ", est.type,
               " missing");
             break;
           }
@@ -1817,8 +1817,8 @@ public enum QueryError {
           for(final Item key : map.keys()) {
             if(key instanceof final Str str && fields.contains(str.string())) continue;
             issue = Token.concat("Field ", key instanceof final Str str ?
-              QueryString.toQuoted(str.string()) : Token.token(key.toString()), " of ", est.type,
-              " unknown");
+              QueryString.toQuoted(str.string(), false) : Token.token(key.toString()),
+              " of ", est.type, " unknown");
             break;
           }
         }

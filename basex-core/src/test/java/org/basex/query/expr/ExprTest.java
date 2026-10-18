@@ -364,6 +364,15 @@ public final class ExprTest extends SandboxTest {
         + "f(1, (<a x='z'/>, <a x='w'/>))", true, exists(CmpHashG.class));
   }
 
+  /** Comparison expressions: hashed comparison with swapped operands. */
+  @Test public void cmpGSwapped() {
+    check("declare %basex:inline function f($a) { $a = (1 to 10) ! string() };\n"
+        + "for $i in 1 to 3\n"
+        + "let $s := (1 to 20) ! string(. + ($i - 1) * 10)\n"
+        + "return [ f($s), $s[1] ]",
+        "[true(),\"1\"]\n[false(),\"11\"]\n[false(),\"21\"]", exists(CmpHashG.class));
+  }
+
   /** Comparisons of values with different types. */
   @Test public void compare() {
     query("xs:QName('b') = attribute a { 'b' }", true);
@@ -917,5 +926,22 @@ public final class ExprTest extends SandboxTest {
     check(EXISTS.args(node + "/b[2]"), false, exists(IntPos.class));
     check(EXISTS.args(node + "/b[1]/c"), true, exists(IntPos.class));
     check(COUNT.args(node + "/b[1]"), 1, exists(IntPos.class));
+  }
+
+  /** Error descriptions: strings are quoted, but not escaped. */
+  @Test public void errorDescription() {
+    final String desc = " } catch * { $err:description }";
+    final String cannot = "Cannot convert to xs:decimal: ";
+    query("try { xs:decimal('Kettle &amp; Pan')" + desc, cannot + "\"Kettle & Pan\".");
+    query("try { xs:decimal('a\"b')" + desc, cannot + "\"a\"\"b\".");
+    query("try { xs:decimal('a&#xA;b')" + desc, cannot + "\"a b\".");
+    query("try { xs:decimal(xs:untypedAtomic('&lt;&amp;'))" + desc, cannot + "\"<&\".");
+
+    // record fields
+    final String field = " } catch * { contains($err:description, 'Field \"a&amp;b\"') }";
+    query("try { let $r as record('a&amp;b' as xs:integer) := {} return $r" + field, true);
+    query("try { let $r as record(x) := { 'x': 1, 'a&amp;b': 1 } return $r" + field, true);
+    query("try { let $r as record('a&amp;b' as xs:integer) := { 'a&amp;b': 'x' } return $r"
+        + field, true);
   }
 }

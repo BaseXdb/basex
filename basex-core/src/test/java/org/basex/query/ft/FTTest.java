@@ -695,6 +695,21 @@ public class FTTest extends SandboxTest {
     query(_DB_DROP.args(db));
   }
 
+  /** Index rewrite: query options are kept in the optimized query. */
+  @Test public void indexRewriteOptions() {
+    final String db = NAME + "ft";
+    query(_DB_CREATE.args(db, " <x><a>lucky</a></x>", "x.xml", " { 'ftindex': true() }"));
+    final String path = "count(" + _DB_GET.args(db) + "//a[text() contains text ";
+    final String search = "ft:search(\"" + db + "\", ";
+    final String query = path + "'happy' using thesaurus at 'src/test/resources/thesaurus.xml'])";
+    query(query, 1);
+    thesInfo(query, search + "\"happy\" using language \"English\" using thesaurus at");
+    // other query options are retained as well
+    thesInfo(path + "'luck.*' using wildcards])", search + "\"luck.*\" using wildcards");
+    thesInfo(path + "'lucki' using fuzzy])", search + "\"lucki\" using fuzzy");
+    query(_DB_DROP.args(db));
+  }
+
   /**
    * Checks that the query info reports the expected thesaurus source.
    * @param query query
