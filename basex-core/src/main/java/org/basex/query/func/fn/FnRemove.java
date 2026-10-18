@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -98,6 +99,13 @@ public final class FnRemove extends StandardFunc {
     final Iter iter = positions.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) pos.add(toLong(item, positions) - 1);
     return pos.ddo();
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    super.simplifyArgs(cc);
+    // remove($seq, replicate(1, 2)) → remove($seq, 1)
+    arg(1, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
   @Override

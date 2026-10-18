@@ -1,6 +1,7 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -23,6 +24,13 @@ public final class MapRemove extends MapFn {
       map = map.remove(toAtomItem(item, qc));
     }
     return map.unannotated();
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    super.simplifyArgs(cc);
+    // map:remove($map, replicate('a', 2)) → map:remove($map, 'a')
+    arg(1, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
   @Override

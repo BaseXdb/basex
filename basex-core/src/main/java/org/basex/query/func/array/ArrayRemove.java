@@ -1,6 +1,7 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.XQArray;
@@ -40,6 +41,13 @@ public final class ArrayRemove extends ArrayFn {
       }
     }
     return arr;
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    super.simplifyArgs(cc);
+    // array:remove($array, replicate(1, 2)) → array:remove($array, 1)
+    arg(1, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
   @Override

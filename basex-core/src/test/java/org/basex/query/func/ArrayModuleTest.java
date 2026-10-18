@@ -350,6 +350,9 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void remove() {
     final Function func = _ARRAY_REMOVE;
+    // duplicate positions: array:remove($array, replicate(1, 3)) → array:remove($array, 1)
+    check(func.args(" [ 1, 2 ]", REPLICATE.args(" random:integer(1) + 1", 3)), "[2]",
+        empty(REPLICATE));
     query(func.args(" [ 1]", 1), "[]");
     query(func.args(" [ 1, 2 ]", 1), "[2]");
     query(func.args(" [ 1, 2 ]", 2), "[1]");

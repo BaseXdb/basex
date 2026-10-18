@@ -534,6 +534,9 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void remove() {
     final Function func = _MAP_REMOVE;
     checkSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
+    // duplicate keys: map:remove($map, replicate(1, 3)) → map:remove($map, 1)
+    check(func.args(" { 1: 2, 3: 4 }", REPLICATE.args(" random:integer(1) + 1", 3)), "{3:4}",
+        empty(REPLICATE));
 
     check("map:remove({}, 'x')", "{}", root(XQTrieMap.class));
 

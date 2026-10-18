@@ -4599,6 +4599,10 @@ return
   @Test public void remove() {
     final Function func = REMOVE;
 
+    // duplicate positions: remove((1, 2, 3), replicate(1, 3)) → remove((1, 2, 3), 1)
+    check(func.args(" (1, 2, 3)", REPLICATE.args(" random:integer(1) + 1", 3)), "2\n3",
+        empty(REPLICATE));
+
     // static rewrites
     query(func.args(" ()", 1), "");
     query(func.args("A", 1), "");
