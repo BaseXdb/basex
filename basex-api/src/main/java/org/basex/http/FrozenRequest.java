@@ -9,7 +9,6 @@ import jakarta.servlet.http.*;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- *
  * @param method method
  * @param query query string (can be {@code null})
  * @param url URL

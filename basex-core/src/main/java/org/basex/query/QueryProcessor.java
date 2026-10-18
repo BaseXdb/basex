@@ -169,8 +169,8 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param value value to be bound (object or XDM {@link Value})
    * @param type type (can be {@code null})
    * @return self reference
-   * @see QueryContext#bind(String, Object, String, StaticContext)
    * @throws QueryException query exception
+   * @see QueryContext#bind(String, Object, String, StaticContext)
    */
   public QueryProcessor variable(final String name, final Object value, final String type)
       throws QueryException {

@@ -42,7 +42,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Binds an initial context.
    * @param value context value to be bound
    * @return self reference
-   * @throws XQueryException exception
    */
   public XQuery context(final XdmValue value) {
     return variable("", value);
@@ -53,7 +52,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @param key key
    * @param value value to be bound
    * @return self reference
-   * @throws XQueryException exception
    */
   public XQuery variable(final String key, final XdmValue value) {
     try {
@@ -100,7 +98,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Adds a collection.
    * @param name name of the collection (can be empty string)
    * @param paths document paths
-   * @throws XQueryException exception
    */
   public void addCollection(final String name, final String[] paths) {
     final StringList sl = new StringList();
@@ -125,7 +122,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Returns a collection of document nodes.
    * @param name name of the collection (empty string for default collection)
    * @return reference
-   * @throws XQueryException exception
    */
   public XdmValue collection(final String name) {
     try {
@@ -140,7 +136,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Returns a document node.
    * @param name name of the document
    * @return reference
-   * @throws XQueryException exception
    */
   public XdmValue document(final String name) {
     try {
@@ -155,7 +150,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Adds a document.
    * @param name name of the document (can be {@code null})
    * @param path document path
-   * @throws XQueryException exception
    */
   public void addDocument(final String name, final String path) {
     try {
@@ -169,7 +163,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Adds a resource.
    * @param name name of the collection
    * @param strings document path and encoding
-   * @throws XQueryException exception
    */
   public void addResource(final String name, final String... strings) {
     qp.qc.resources.addText(name, strings);
@@ -179,7 +172,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Adds a module.
    * @param uri module URI
    * @param file file reference
-   * @throws XQueryException exception
    */
   public void addModule(final String uri, final String file) {
     qp.module(uri, file);
@@ -189,7 +181,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Sets the base URI.
    * @param base base URI
    * @return self reference
-   * @throws XQueryException exception
    */
   public XQuery baseURI(final String base) {
     qp.sc.baseURI(base.equals("#UNDEFINED") ? null : base);
@@ -200,7 +191,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Prepares a sandpit.
    * @param source source directory ({@code null} if no files should be copied)
    * @param dir sandpit directory
-   * @throws XQueryException exception
    */
   public void sandpit(final Path source, final IOFile dir) {
     try {
@@ -218,7 +208,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   /**
    * Returns the next item.
    * @return next result item, or {@code null} if all items have been returned
-   * @throws XQueryException exception
    */
   public XdmItem next() {
     Item item = null;
@@ -236,7 +225,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   /**
    * Returns the result value.
    * @return result value
-   * @throws XQueryException exception
    */
   public XdmValue value() {
     try {

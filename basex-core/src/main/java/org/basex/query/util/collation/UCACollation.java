@@ -43,11 +43,11 @@ final class UCACollation extends Collation {
 
   /**
    * Returns a bit mask for the relevant parts of a collation element per the collator's strength.
+   * @param strength collator strength
+   * @return bit mask
    * @see <a href=
    *      "https://unicode-org.github.io/icu/userguide/collation/architecture#collation-elements"
    *      >Collation Elements</a>
-   * @param strength collator strength
-   * @return bit mask
    */
   private static int mask(final int strength) {
     return switch(strength) {

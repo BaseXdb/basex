@@ -377,8 +377,8 @@ public abstract class Expr extends ExprInfo {
    * @param mode mode of simplification
    * @param cc compilation context
    * @return simplified or original expression
-   * @see Simplify
    * @throws QueryException query exception
+   * @see Simplify
    */
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     return simplify(mode, cc);
@@ -415,8 +415,8 @@ public abstract class Expr extends ExprInfo {
    * @param mode mode of simplification
    * @param cc compilation context
    * @return simplified or original expression
-   * @see Simplify
    * @throws QueryException query exception
+   * @see Simplify
    */
   public final Expr simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;

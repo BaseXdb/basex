@@ -89,9 +89,9 @@ public abstract class CsvConverter extends Job {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
+   * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
-   * @return result
    */
   public final Value convert(final IO input) throws QueryException, IOException {
     try(NewlineInput in = new NewlineInput(input, copts.get(CsvParserOptions.ENCODING))) {

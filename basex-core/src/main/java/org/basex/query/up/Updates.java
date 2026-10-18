@@ -112,8 +112,8 @@ public final class Updates {
   /**
    * Returns the value to be output.
    * @param reset reset cache
-   * @return value
    * @param qc query context
+   * @return value
    */
   public synchronized Value output(final boolean reset, final QueryContext qc) {
     final Value value = output != null ? output.value() : Empty.VALUE;

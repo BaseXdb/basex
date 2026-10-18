@@ -67,8 +67,8 @@ public abstract class Benchmark extends SandboxTest {
 
   /**
    * Performs the specified query n times and returns the result.
-   * @param query query to be evaluated
    * @param n number of runs
+   * @param query query to be evaluated
    * @return resulting string
    * @throws IOException I/O exception
    */

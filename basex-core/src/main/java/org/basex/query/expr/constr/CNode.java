@@ -76,8 +76,8 @@ public abstract class CNode extends Arr {
   /**
    * Returns the atomized node value.
    * @param qc query context
-   * @return resulting value or {@code null}
    * @param empty return empty string
+   * @return resulting value or {@code null}
    * @throws QueryException query exception
    */
   final byte[] atomValue(final QueryContext qc, final boolean empty) throws QueryException {

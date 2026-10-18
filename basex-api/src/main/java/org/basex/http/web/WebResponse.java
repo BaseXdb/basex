@@ -40,8 +40,8 @@ public abstract class WebResponse {
    * @param data additional data (result, function, error, can be {@code null})
    * @param body serialize body
    * @return response type
-   * @throws IOException I/O exception
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   public final Response create(final WebFunction function, final Object data, final boolean body)
       throws QueryException, IOException {

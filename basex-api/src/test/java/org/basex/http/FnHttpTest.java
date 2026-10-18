@@ -729,7 +729,6 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests ResponseHandler.getResponse() with multipart response.
-   * @throws IOException I/O exception
    * @throws Exception exception
    */
   @Test public final void multipartResponse() throws Exception {
@@ -778,7 +777,6 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests ResponseHandler.getResponse() with multipart response having preamble and epilogue.
-   * @throws IOException I/O exception
    * @throws Exception exception
    */
   @Test public final void multipartRespPreamble() throws Exception {

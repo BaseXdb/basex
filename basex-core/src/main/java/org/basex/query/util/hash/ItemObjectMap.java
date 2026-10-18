@@ -75,8 +75,8 @@ public final class ItemObjectMap<E> extends HashItemSet {
    * Stores the specified key and value. If the key exists, the value is updated.
    * @param key key
    * @param value value
-   * @throws QueryException query exception
    * @return old value
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unchecked")
   public E put(final Item key, final E value) throws QueryException {

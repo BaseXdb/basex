@@ -83,7 +83,6 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @param value second value
    * @param ordered ordered results
    * @return result of check
-   * @throws XQueryException exception
    */
   public boolean deepEqual(final XdmValue value, final boolean ordered) {
     try {

@@ -150,7 +150,6 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Returns the first element of this tree.
    * @return first element
-   * @throws NoSuchElementException no such element exception
    */
   public abstract Node<N, E> head();
 
@@ -163,7 +162,6 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Returns the last element of this tree.
    * @return last element
-   * @throws NoSuchElementException no such element exception
    */
   public abstract Node<N, E> foot();
 
@@ -203,7 +201,6 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param pos position of the element to remove
    * @param job interruptible job
    * @return resulting (potentially partial) tree
-   * @throws AssertionError assertion error
    */
   public abstract TreeSlice<N, E> remove(long pos, Job job);
 

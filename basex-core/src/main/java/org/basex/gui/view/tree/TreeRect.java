@@ -2,11 +2,11 @@ package org.basex.gui.view.tree;
 
 /**
  * Tree rectangles.
- * @param x x position
- * @param w width
  *
  * @author BaseX Team, BSD License
  * @author Wolfgang Miller
+ * @param x x position
+ * @param w width
  */
 record TreeRect(int x, int w) {
   /**

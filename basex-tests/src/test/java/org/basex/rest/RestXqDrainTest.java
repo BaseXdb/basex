@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.rest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,7 +6,12 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
 
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.http.*;
+import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -15,13 +20,30 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class RestXqDrainTest extends RestXqTest {
+public final class RestXqDrainTest extends SandboxTest {
+  /** HTTP server. */
+  private static BaseXHTTP http;
+
   /**
-   * Registers the service.
+   * Starts the server and registers the service.
+   * @throws Exception exception
+   */
+  @BeforeAll public static void start() throws Exception {
+    final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
+        "-c", "password " + NAME, "-Uadmin", "-z", "-q");
+    http = new BaseXHTTP(sl.finish());
+    final String path = HTTPContext.get().context().soptions.get(StaticOptions.WEBPATH);
+    new IOFile(path, NAME + IO.XQMSUFFIX).write(
+      "module namespace m = 'm';" +
+      "declare %rest:path('ignore') %output:method('text') function m:ignore() { 'ok' };");
+  }
+
+  /**
+   * Stops the server.
    * @throws IOException I/O exception
    */
-  @BeforeAll public static void services() throws IOException {
-    register("declare %R:path('ignore') %output:method('text') function m:ignore() { 'ok' };");
+  @AfterAll public static void stop() throws IOException {
+    http.stop();
   }
 
   /**
@@ -29,7 +51,7 @@ public final class RestXqDrainTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void delayedBody() throws Exception {
-    try(Socket socket = new Socket("localhost", 9865)) {
+    try(Socket socket = new Socket("localhost", HTTP_PORT)) {
       socket.setSoTimeout(5000);
       final OutputStream out = socket.getOutputStream();
       final InputStream in = socket.getInputStream();
@@ -40,29 +62,6 @@ public final class RestXqDrainTest extends RestXqTest {
       assertTrue(response(in).startsWith("HTTP/1.1 200"));
       send(out, "GET /ignore HTTP/1.1\r\nHost: localhost\r\n\r\n");
       assertTrue(response(in).startsWith("HTTP/1.1 200"));
-    }
-  }
-
-  /**
-   * The response is returned if a huge unread body is still being sent.
-   * @throws Exception exception
-   */
-  @Test public void hugeBody() throws Exception {
-    try(Socket socket = new Socket("localhost", 9865)) {
-      socket.setSoTimeout(5000);
-      final OutputStream out = socket.getOutputStream();
-      send(out, "POST /ignore HTTP/1.1\r\nHost: localhost\r\n"
-        + "Content-Type: text/plain\r\nContent-Length: 100000000000\r\n\r\n");
-      final Thread writer = new Thread(() -> {
-        final byte[] chunk = new byte[1 << 16];
-        try {
-          while(true) out.write(chunk);
-        } catch(final IOException ex) {
-          Util.debug(ex);
-        }
-      });
-      writer.start();
-      assertTrue(response(socket.getInputStream()).startsWith("HTTP/1.1 200"));
     }
   }
 

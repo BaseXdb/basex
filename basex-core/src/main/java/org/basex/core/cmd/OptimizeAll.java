@@ -75,7 +75,6 @@ public final class OptimizeAll extends ACreate {
    * @param options main options
    * @param cmd command reference or {@code null}
    * @throws IOException I/O exception
-   * @throws BaseXException database exception
    */
   public static void optimizeAll(final Data data, final Context context, final MainOptions options,
       final OptimizeAll cmd) throws IOException {

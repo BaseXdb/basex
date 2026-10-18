@@ -59,9 +59,9 @@ public final class XmlParser {
   /**
    * Returns an XML reader.
    * @param options XML parsing options
+   * @return reader
    * @throws SAXException SAX exception
    * @throws ParserConfigurationException parser configuration exception
-   * @return reader
    */
   public static XMLReader reader(final MainOptions options)
       throws SAXException, ParserConfigurationException {

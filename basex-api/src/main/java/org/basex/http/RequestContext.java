@@ -134,8 +134,8 @@ public final class RequestContext implements RequestScope {
    * Returns the form parameters.
    * @param options main options
    * @return parameters
-   * @throws IOException I/O exception
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   public XQMap formValues(final MainOptions options) throws QueryException, IOException {
     if(form == null) {

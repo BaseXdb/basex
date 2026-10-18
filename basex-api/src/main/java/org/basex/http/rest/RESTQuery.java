@@ -37,7 +37,6 @@ class RESTQuery extends RESTCmd {
 
   /**
    * Evaluates the specified query.
-   * @throws HTTPException HTTP exception
    * @throws IOException I/O exception
    */
   private void query() throws IOException {
