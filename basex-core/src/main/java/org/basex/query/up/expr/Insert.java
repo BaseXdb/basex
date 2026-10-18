@@ -113,8 +113,20 @@ public final class Insert extends Update {
   }
 
   @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.MODE, Enums.string(mode)), exprs);
+  }
+
+  @Override
   public void toString(final QueryString qs) {
-    qs.open().token(QueryText.INSERT).token(QueryText.NODES).token(arg(1)).
-      token(QueryText.INTO).token(arg(0)).close();
+    qs.open().token(QueryText.INSERT).token(QueryText.NODES).token(arg(1));
+    switch(mode) {
+      case BEFORE -> qs.token(QueryText.BEFORE);
+      case AFTER -> qs.token(QueryText.AFTER);
+      case FIRST -> qs.token(QueryText.AS).token(QueryText.FIRST).token(QueryText.INTO);
+      case LAST -> qs.token(QueryText.AS).token(QueryText.LAST).token(QueryText.INTO);
+      default -> qs.token(QueryText.INTO);
+    }
+    qs.token(arg(0)).close();
   }
 }

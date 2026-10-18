@@ -367,6 +367,7 @@ public interface QueryText {
   /** Query Info. */ String COLUMN = "column";
   /** Query Info. */ String PATH = "path";
   /** Query Info. */ String SKIPCOPY = "skipCopy";
+  /** Query Info. */ String MODE = "mode";
 
   /** Query Info. */ String MAPASG = ": ";
   /** Query Info. */ String SEP = ", ";

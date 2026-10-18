@@ -103,6 +103,11 @@ public final class Replace extends Update {
   }
 
   @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, VALUEE, value ? true : null), exprs);
+  }
+
+  @Override
   public void toString(final QueryString qs) {
     qs.open().token(REPLACE);
     if(value) qs.token(VALUEE).token(OF);
