@@ -14,6 +14,7 @@ import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -207,18 +208,19 @@ public abstract class Step extends Preds {
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
     final Expr rt = assignType(root != null ? root : cc.qc.focus.value);
-    Type rtype = rt != null ? rt.seqType().type : NodeType.NODE;
-    if(rtype.instanceOf(Types.MAP_OR_ARRAY)) rtype = NodeType.JNODE;
+    final NodeType rnt = rt != null ? nodeType(rt.seqType().type) : NodeType.NODE;
+    final Type rtype = rnt != null ? rnt : rt.seqType().type;
 
     // choose stricter axis
     final Axis old = axis;
     final Type type = seqType().type;
-    if(old == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT) ||
-       old == ANCESTOR_OR_SELF && isLeaf(type.kind())) {
+    if(type instanceof final NodeType tnt &&
+        (old == DESCENDANT_OR_SELF && tnt.root() ||
+         old == ANCESTOR_OR_SELF && tnt.kind().leaf())) {
       // descendant-or-self::document-node() → self::document-node()
       // ancestor-or-self::text() → self::text()
       axis = SELF;
-    } else if(rtype instanceof NodeType && rtype.seqType().type.intersect(type) == null) {
+    } else if(rnt != null && rnt.intersect(type) == null) {
       // root()/descendant-or-self::x → root()/descendant::x
       if(old == DESCENDANT_OR_SELF) axis = DESCENDANT;
       // $text/ancestor-or-self::x → $text/ancestor::x
@@ -258,14 +260,10 @@ public abstract class Step extends Preds {
     test = test.optimize(type.kind(), null);
 
     SeqType st = seqType(axis, test, exprs);
-    final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ?
-      NodeType.get(Empty.VALUE, type.seqType()) : type;
-    if(axis == CHILD && ct instanceof final NodeType nt && nt.test instanceof final JNodeTest pt &&
-        pt.valueType.one()) {
+    final NodeType ct = nodeType(type);
+    if(axis == CHILD && ct != null && ct.test instanceof final JNodeTest pt) {
       // child JNodes: adopt the value type of the map or array: jtree({ 'a': 1 })/a
-      final Type pvt = pt.valueType.type;
-      final SeqType mvt = pvt instanceof final MapType mt ? mt.valueType() :
-        pvt instanceof final ArrayType at ? at.valueType() : null;
+      final SeqType mvt = pt.childType();
       if(mvt != null) {
         final Test it = test.intersect(JNodeTest.get(null, mvt));
         if(it instanceof final JNodeTest jt) {
@@ -276,7 +274,7 @@ public abstract class Step extends Preds {
         }
       }
     }
-    if(expr != null && axis == SELF && ct instanceof NodeType) {
+    if(expr != null && axis == SELF && ct != null) {
       // node test: adopt type of context expression: <a/>/self::node()
       if(test == NodeTest.NODE) st = ct.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
@@ -439,11 +437,9 @@ public abstract class Step extends Preds {
         kind != Kind.ATTRIBUTE;
       // parent::comment()
       case ANCESTOR, PARENT ->
-        isLeaf(kind);
+        kind.leaf();
       // child::attribute()
-      case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
-           FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
-           PRECEDING_SIBLING_OR_SELF ->
+      case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_SIBLING, PRECEDING, PRECEDING_SIBLING ->
         kind.oneOf(Kind.ATTRIBUTE, Kind.DOCUMENT, Kind.NAMESPACE);
       default ->
         false;
@@ -456,36 +452,27 @@ public abstract class Step extends Preds {
    * @return {@code true} if steps will never yield results
    */
   final boolean empty(final SeqType seqType) {
-    if(!(seqType.type instanceof final NodeType nt)) return false;
+    final NodeType nt = nodeType(seqType.type);
+    if(nt == null) return false;
 
-    // checks steps on document nodes
+    // $doc/.. → (), $array/following::* → (), $text/child::x → (), [ 1 ]/*/* → ()
+    final Axis ax = axis(nt);
+    if(ax == null) return true;
+
     final Kind kind = test.kind, nk = nt.kind();
-    if(nk == Kind.DOCUMENT && switch(axis) {
-      case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
-           PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-        !kind.oneOf(Kind.NODE, Kind.XNODE, Kind.DOCUMENT);
-      case CHILD, DESCENDANT ->
-        kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
-      case DESCENDANT_OR_SELF ->
-        kind == Kind.ATTRIBUTE;
-      // $document/item::*: type error at runtime
-      case ITEM ->
-        false;
-      default ->
-        true;
-    }) return true;
-
-    // check step after any other expression
-    return switch(axis) {
-      // $element/self::text(), ...
+    return switch(ax) {
+      // $element/self::text(), $text/descendant-or-self::comment(), ...
       case SELF ->
         test.subsumes(nt) == Boolean.FALSE;
-      // $attribute/descendant::, $text/child::, $comment/attribute::, ...
-      case DESCENDANT, CHILD, ATTRIBUTE ->
-        isLeaf(nk);
-      // $text/descendant-or-self::text(), ...
+      // $doc/child::document-node(), $doc/descendant::attribute()
+      case CHILD, DESCENDANT ->
+        nk == Kind.DOCUMENT && kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
+      // $doc/descendant-or-self::attribute()
       case DESCENDANT_OR_SELF ->
-        isLeaf(nk) && !kind.oneOf(Kind.NODE, Kind.XNODE) && !kind.instanceOf(nk);
+        nk == Kind.DOCUMENT && kind == Kind.ATTRIBUTE;
+      // $doc/attribute::, $comment/attribute:: ($jnode/attribute::: type error at runtime)
+      case ATTRIBUTE ->
+        nk == Kind.DOCUMENT || nk.leaf();
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
         nk == Kind.ATTRIBUTE;
@@ -502,17 +489,72 @@ public abstract class Step extends Preds {
    * @param seqType type of incoming nodes
    * @return {@code true} if the step can be removed
    */
-  boolean remove(final SeqType seqType) {
+  final boolean remove(final SeqType seqType) {
     // <xml/>/. → <xml/>
     // <xml/>/self::node() → <xml/>
     // $text/descendant-or-self::text() → $text
     // $doc/ancestor-or-self::node() → $doc
-    final Type type = seqType.type;
-    return exprs.length == 0 && selector == null && (
-      axis == SELF ||
-      axis == DESCENDANT_OR_SELF && isLeaf(type.kind()) ||
-      axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOCUMENT)
-    ) && test.subsumes(type) == Boolean.TRUE;
+    return exprs.length == 0 && selector == null && axis(seqType) == SELF &&
+      test.subsumes(seqType.type) == Boolean.TRUE;
+  }
+
+  /**
+   * Returns the result size of the step for the specified input.
+   * @param input input expression
+   * @return result size, or {@code -1} if it is unknown
+   */
+  final long size(final Expr input) {
+    final long ss = input.structSize();
+    if(ss == -1 || selector != null) return -1;
+    long count = -1;
+    if(axis == CHILD) {
+      // array { 1 to 3 }/* → 3
+      if(test == NodeTest.JNODE) {
+        count = ss;
+      } else if(test instanceof final JNodeTest jt && jt.key instanceof final Itr key &&
+          jt.valueType.eq(Types.ITEM_ZM) && input.seqType().instanceOf(Types.ARRAY_O)) {
+        // array { 1 to 3 }/2 → 1
+        count = key.itr() >= 1 && key.itr() <= ss ? 1 : 0;
+      }
+    } else if(axis == DESCENDANT_OR_SELF && test == NodeTest.JNODE &&
+        nodeType(input.seqType().type) instanceof final NodeType nt && nt.leafChildren()) {
+      // array { 1 to 3 }/descendant-or-self::* → 4
+      count = ss + 1;
+    }
+    // array { 1 to 3 }/*[1] → 1
+    return count == -1 ? -1 : size(count);
+  }
+
+  /**
+   * Returns the node type of the input; maps and arrays are converted to root JNodes.
+   * @param type input type
+   * @return node type, or {@code null} if the input yields no nodes
+   */
+  private static NodeType nodeType(final Type type) {
+    return type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.get(Empty.VALUE, type.seqType()) :
+      type instanceof final NodeType nt ? nt : null;
+  }
+
+  /**
+   * Returns the axis that is equivalent to the step axis for the specified input.
+   * @param nt input type (can be {@code null})
+   * @return equivalent axis, or {@code null} if no nodes will be returned
+   */
+  private Axis axis(final NodeType nt) {
+    if(nt == null) return axis;
+    Axis ax = nt.root() ? axis.onRoot() : axis;
+    if(ax != null && nt.leaf()) ax = ax.onLeaf();
+    // array { 1 to 3 }/descendant::* → array { 1 to 3 }/child::*
+    return ax == DESCENDANT && nt.leafChildren() ? CHILD : ax;
+  }
+
+  /**
+   * Returns the axis that is equivalent to the step axis for the specified input.
+   * @param seqType input type
+   * @return equivalent axis, or {@code null} if no nodes will be returned
+   */
+  final Axis axis(final SeqType seqType) {
+    return axis(nodeType(seqType.type));
   }
 
   /**
@@ -545,39 +587,29 @@ public abstract class Step extends Preds {
     return rebuild(Arrays.copyOfRange(exprs, 0, exprs.length - 1));
   }
 
-  /**
-   * Checks if the specified type refers to a leaf node.
-   * @param kind kind (can be {@code null})
-   * @return result of check
-   */
-  private boolean isLeaf(final Kind kind) {
-    return kind != null && kind.oneOf(Kind.ATTRIBUTE, Kind.COMMENT,
-      Kind.NAMESPACE, Kind.PROCESSING_INSTRUCTION, Kind.TEXT);
-  }
-
   @Override
-  public boolean has(final Flag... flags) {
+  public final boolean has(final Flag... flags) {
     return selector != null && selector.has(flags) || super.has(flags);
   }
 
   @Override
-  public boolean inlineable(final InlineContext ic) {
+  public final boolean inlineable(final InlineContext ic) {
     return (selector == null || selector.inlineable(ic)) && super.inlineable(ic);
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     final VarUsage vu = super.count(var);
     return selector != null ? selector.count(var).plus(vu) : vu;
   }
 
   @Override
-  public int exprSize() {
+  public final int exprSize() {
     return (selector != null ? selector.exprSize() : 0) + super.exprSize();
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
+  public final boolean accept(final ASTVisitor visitor) {
     if(selector != null && !selector.accept(visitor)) return false;
     for(final Expr pred : exprs) {
       visitor.enterFocus();
@@ -589,7 +621,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     return this == obj || obj instanceof final Step st && axis == st.axis && test.equals(st.test) &&
         Objects.equals(selector, st.selector) && super.equals(obj);
   }
@@ -601,7 +633,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  protected void rootToString(final QueryString qs) {
+  protected final void rootToString(final QueryString qs) {
     if(selector != null) {
       qs.token(axis.name + "::").token("{").token(selector).token("}");
       return;

@@ -95,6 +95,40 @@ public final class NodeType implements Type {
     return get(JNodeTest.get(key, valueType));
   }
 
+  /**
+   * Checks if nodes of this type are root nodes (document nodes or root JNodes).
+   * @return result of check
+   */
+  public boolean root() {
+    return kind == Kind.DOCUMENT || test instanceof final JNodeTest jt && jt.key == Empty.VALUE;
+  }
+
+  /**
+   * Checks if nodes of this type have no children (JNodes may still be parents of item nodes).
+   * @return result of check
+   */
+  public boolean leaf() {
+    return kind.leaf() || test instanceof final JNodeTest jt && leaf(jt.valueType);
+  }
+
+  /**
+   * Checks if the children of nodes of this type have no children.
+   * @return result of check
+   */
+  public boolean leafChildren() {
+    return test instanceof final JNodeTest jt && leaf(jt.childType());
+  }
+
+  /**
+   * Checks if JNodes with values of the specified type have no children.
+   * @param vt value type (can be {@code null})
+   * @return result of check
+   */
+  private static boolean leaf(final SeqType vt) {
+    return vt != null &&
+      (vt.instanceOf(Types.ANY_ATOMIC_TYPE_ZO) || vt.instanceOf(Types.XNODE_ZO));
+  }
+
   @Override
   public Kind kind() {
     return kind;

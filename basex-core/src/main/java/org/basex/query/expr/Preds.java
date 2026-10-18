@@ -195,28 +195,12 @@ public abstract class Preds extends Arr {
    * @return whether the evaluation can be skipped
    */
   private boolean optimizeType(final Expr root) {
-    long max = root.size();
-    boolean exact = max != -1;
-    if(!exact) max = Long.MAX_VALUE;
-
-    // positional predicates
-    for(final Expr expr : exprs) {
-      if(expr instanceof final Pos pos && Function.LAST.is(pos.expr) ||
-          expr instanceof final SimplePos ss && ss.exact() && Function.LAST.is(ss.arg(0))) {
-        // use minimum of old value and 1
-        max = Math.min(max, 1);
-      } else if(expr instanceof final IntPos pos) {
-        // subtract start position: (1, 2, 3)[position() >= 2] → 2 items
-        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range: E[position() = 2 to 4] → at most 3 items
-        max = Math.min(max, pos.max - pos.min + 1);
-      } else {
-        // resulting size will be unknown for any other filter
-        exact = false;
-      }
-      // no results will be returned
-      if(max == 0) return true;
-    }
+    final long size = root.size();
+    final long max = maxSize(size == -1 ? Long.MAX_VALUE : size);
+    // predicates will return no results (keep empty input: may raise a type error)
+    if(size != 0 && max == 0) return true;
+    // resulting size will be unknown for any non-positional filter
+    final boolean exact = size != -1 && positional();
 
     // (1, 'x')[. instance of xs:integer] → xs:integer*
     SeqType st = root.seqType();
@@ -229,6 +213,55 @@ public abstract class Preds extends Arr {
     }
     exprType.assign(max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO), exact ? max : -1);
     return false;
+  }
+
+  /**
+   * Returns the result size for the specified input size.
+   * @param size input size
+   * @return result size, or {@code -1} if it is unknown
+   */
+  protected final long size(final long size) {
+    final long max = maxSize(size);
+    return max == 0 || positional() ? max : -1;
+  }
+
+  /**
+   * Returns the maximum result size for the specified input size.
+   * @param size input size ({@link Long#MAX_VALUE} if unknown)
+   * @return maximum result size ({@link Long#MAX_VALUE} if unknown)
+   */
+  private long maxSize(final long size) {
+    long max = size;
+    for(final Expr expr : exprs) {
+      if(last(expr)) {
+        // use minimum of old value and 1
+        max = Math.min(max, 1);
+      } else if(expr instanceof final IntPos pos) {
+        // subtract start position: (1, 2, 3)[position() >= 2] → 2 items
+        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
+        // use minimum of old value and range: E[position() = 2 to 4] → at most 3 items
+        max = Math.min(max, pos.max - pos.min + 1);
+      }
+    }
+    return max;
+  }
+
+  /**
+   * Checks if all predicates are positional and have a statically known result size.
+   * @return result of check
+   */
+  private boolean positional() {
+    return Checks.all(exprs, pred -> last(pred) || pred instanceof IntPos);
+  }
+
+  /**
+   * Checks if the specified predicate selects the last item.
+   * @param pred predicate
+   * @return result of check
+   */
+  private static boolean last(final Expr pred) {
+    return pred instanceof final Pos pos && Function.LAST.is(pos.expr) ||
+      pred instanceof final SimplePos ss && ss.exact() && Function.LAST.is(ss.arg(0));
   }
 
   /**

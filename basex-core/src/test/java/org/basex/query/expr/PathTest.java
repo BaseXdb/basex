@@ -1117,4 +1117,77 @@ public final class PathTest extends SandboxTest {
     query(elem + "return $e/a << $e/@a", false);
     query(elem + "return ($e/a | $e/@a) ! (. instance of attribute())", "true\nfalse");
   }
+
+  /** Static result size of a step on a single map or array. */
+  @Test public void structStepSize() {
+    final String array = "array { (1 to 5) ! <x>{ . }</x> }";
+    check("count(array { (1 to 1000000) ! <x>{ . }</x> }/*)", 1000000, empty(IterPath.class));
+    check("count([ (), (1, 2), 3 ]/*)", 3, empty(IterPath.class));
+    check("count({ 'a': 1, 'b': (2, 3) }/node())", 2, empty(IterPath.class));
+    check("count([]/*)", 0, empty(IterPath.class));
+
+    check("count(" + array + "/2)", 1, empty(IterPath.class));
+    check("count(" + array + "/0)", 0, empty(IterPath.class));
+    check("count(" + array + "/jnode(6))", 0, empty(IterPath.class));
+    check("count(" + array + "/*[1])", 1, empty(IterPath.class));
+    check("count(" + array + "/*[last()])", 1, empty(IterPath.class));
+    check("count(" + array + "/*[position() < 3])", 2, empty(IterPath.class));
+    check("count(" + array + "/*[position() > 3])", 2, empty(IterPath.class));
+    check("count(" + array + "/*[position() = 2 to 9][1])", 1, empty(IterPath.class));
+    check("count({ 'a': 1, 'b': 2 }/*[last()])", 1, empty(IterPath.class));
+    check("count([]/*[1])", 0, empty(IterPath.class));
+    check("count(" + array + "/..)", 0, empty(IterPath.class));
+    check("count(" + array + "/following-sibling::*)", 0, empty(IterPath.class));
+    check("count(" + array + "/preceding::*[1])", 0, empty(IterPath.class));
+    check("count(" + array + "/descendant::node())", 5, empty(IterPath.class));
+    check("count(" + array + "/descendant-or-self::node())", 6, empty(IterPath.class));
+    check("count(" + array + "/descendant::*[last()])", 1, empty(IterPath.class));
+    check("count(array { 1 to 5 }//*)", 5, empty(IterPath.class));
+    check("count(" + array + "/ancestor-or-self::*)", 1, empty(IterPath.class));
+    check("count(" + array + "/following-sibling-or-self::*)", 1, empty(IterPath.class));
+    check("count(" + array + "/self::jnode(*, map(*)))", 0, empty(IterPath.class));
+
+    // rewrites for unknown sizes
+    final String rnd = "array { 1 to " + _RANDOM_INTEGER.args(1) + " + 2 }";
+    check(rnd + "/..", "", empty(IterPath.class));
+    check(rnd + "/preceding-sibling::*", "", empty(IterPath.class));
+    check("count(jtree([ 1 ])/..)", 0, empty(IterPath.class));
+    check("count(" + rnd + "/ancestor-or-self::*)", 1, "//IterStep/@axis = 'self'");
+    check("count(" + rnd + "//*)", 2, "//IterStep/@axis = 'child'");
+
+    // JNode leaves
+    check("count(" + rnd + "/*/*)", 0, empty(IterPath.class));
+    check("count(" + rnd + "/*/descendant-or-self::*)", 2, count(IterStep.class, 1));
+    check("count([ (1, 2), [ 3 ] ]/*/descendant::*)", 3, exists(IterPath.class));
+
+    // root nodes: documents and JNodes
+    final String doc = "document { <a/> }";
+    check(doc + "/following::node()", "", empty(IterPath.class));
+    check("count(" + doc + "/following-or-self::node())", 1, empty(IterPath.class));
+    check(doc + "/preceding-sibling-or-self::element()", "", empty(IterPath.class));
+    query("count(" + doc + "/following-or-self::document-node())", 1);
+    query("count((" + doc + ", " + doc + "/a)/following-or-self::document-node())", 1);
+    check("count(" + rnd + "/preceding-sibling-or-self::*[1])", 1,
+        "//IterStep/@axis = 'self'");
+
+    // type errors are preserved
+    error("[ 1 ]/attribute::node()", ATTRAXIS_X);
+    error("[ 1 ]/attribute::node()[1]", ATTRAXIS_X);
+
+    // JNodes with leaf values can be parents of item nodes
+    final String item = "jtree([ 1 ])/*/item::*";
+    query("count(" + item + "/parent::jnode(*, xs:integer))", 1);
+    query("count(" + item + "/ancestor-or-self::jnode(*, xs:integer))", 2);
+    query("count(jtree(1)/item::*/parent::jnode((), xs:integer))", 1);
+
+    // -or-self axes on attributes
+    query("count(<a b=''/>/@b/following-sibling-or-self::attribute())", 1);
+    query("count(<a b=''/>/@b/preceding-or-self::attribute())", 1);
+
+    check("count(" + array + "/*[. = '2'])", 1, exists(IterPath.class));
+    check("count([ (), 1, (2, 3) ]/descendant::*)", 5, exists(IterPath.class));
+    check("count({ 1: 1 }/1)", 1, exists(IterPath.class));
+    query("[ (), (1, 2), 3 ]/* ! jkey(.)", "1\n2\n3");
+    query("count([ [ 1, 2 ], [ 3 ] ]/*/*)", 3);
+  }
 }

@@ -259,6 +259,14 @@ public enum Kind {
   }
 
   /**
+   * Checks if nodes of this kind have no children and can never be parents.
+   * @return result of check
+   */
+  public boolean leaf() {
+    return oneOf(ATTRIBUTE, COMMENT, NAMESPACE, PROCESSING_INSTRUCTION, TEXT);
+  }
+
+  /**
    * Returns a node type description.
    * @return kind
    */

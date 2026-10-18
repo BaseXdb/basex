@@ -433,6 +433,14 @@ public abstract class Path extends ParseExpr {
           removed = true;
           continue;
         }
+        // $doc/following-or-self::x → $doc/self::x, $array/descendant::* → $array/child::*
+        if(step instanceof final Step stp) {
+          final Axis axis = stp.axis(seqType);
+          if(axis != null && axis != stp.axis) {
+            step = Step.get(cc, prev, stp.info(info), axis, stp.test, stp.selector, stp.exprs);
+            cc.info(QueryText.OPTREWRITE_X_X, stp.axis, step);
+          }
+        }
         // $map/'X' → $map/child::{ 'X' }; skip context-dependent steps (e.g. $node/jkey())
         if(!(step instanceof Step) && step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) &&
             !step.has(Flag.CTX) &&
@@ -591,9 +599,7 @@ public abstract class Path extends ParseExpr {
     if(rt != null) {
       Expr prev = rt;
       for(final Expr step : steps) {
-        final SeqType seqType = prev.seqType();
-        if(seqType.type instanceof NodeType && step instanceof final Step stp &&
-            stp.empty(seqType)) return true;
+        if(step instanceof final Step stp && stp.empty(prev.seqType())) return true;
         prev = step;
       }
     }
@@ -760,6 +766,9 @@ public abstract class Path extends ParseExpr {
       }
       // more than one result: final size is unknown due to DDO
       if(size > 1) size = -1;
+      if(size == -1 && steps.length == 1 && steps[0] instanceof final Step step) {
+        size = step.size(rt);
+      }
     }
     exprType.assign(st, occ, size).data(data);
   }

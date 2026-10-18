@@ -218,6 +218,31 @@ public enum Axis {
   }
 
   /**
+   * Returns the axis that is equivalent to this axis if it is applied to root nodes.
+   * @return equivalent axis, or {@code null} if no nodes will be returned
+   */
+  public final Axis onRoot() {
+    return switch(this) {
+      case ANCESTOR, FOLLOWING, FOLLOWING_SIBLING, PARENT, PRECEDING, PRECEDING_SIBLING -> null;
+      case ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF, PRECEDING_OR_SELF,
+           PRECEDING_SIBLING_OR_SELF -> SELF;
+      default -> this;
+    };
+  }
+
+  /**
+   * Returns the axis that is equivalent to this axis if it is applied to leaf nodes.
+   * @return equivalent axis, or {@code null} if no nodes will be returned
+   */
+  public final Axis onLeaf() {
+    return switch(this) {
+      case CHILD, DESCENDANT -> null;
+      case DESCENDANT_OR_SELF -> SELF;
+      default -> this;
+    };
+  }
+
+  /**
    * Inverts the axis.
    * @return inverted axis
    */

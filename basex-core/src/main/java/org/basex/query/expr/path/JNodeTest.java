@@ -104,6 +104,17 @@ public final class JNodeTest extends Test {
     return key != Empty.VALUE ? key : null;
   }
 
+  /**
+   * Returns the value type of the children of JNodes with a single map or array.
+   * @return value type, or {@code null} if it is unknown
+   */
+  public SeqType childType() {
+    if(!valueType.one()) return null;
+    final Type type = valueType.type;
+    return type instanceof final MapType mt ? mt.valueType() :
+      type instanceof final ArrayType at ? at.valueType() : null;
+  }
+
   @Override
   public Test copy() {
     return this;
