@@ -229,17 +229,17 @@ final class Docs {
   /**
    * Returns the PRE values of all document nodes matching the specified path.
    * @param path input path
-   * @param dir directory view
+   * @param scope scope of the returned documents
    * @return PRE values (can be internal representation!)
    */
-  synchronized IntList docs(final String path, final boolean dir) {
+  synchronized IntList docs(final String path, final DocScope scope) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
     if(pth == null) return new IntList(0);
 
     // empty path: return all documents
     final IntList docs = docs();
-    if(!dir && pth.isEmpty()) return docs;
+    if(scope == DocScope.ALL && pth.isEmpty()) return docs;
 
     // normalize paths, check for explicit directory indicator
     byte[] exact = EMPTY, prefix = key(normalize(token(pth)));
@@ -249,7 +249,7 @@ final class Docs {
     }
 
     // relevant paths: exact hits and prefixes
-    final TokenSet set = new TokenSet();
+    final TokenSet set = scope == DocScope.DIRECTORY ? new TokenSet() : null;
     final IntList il = new IntList();
     final TokenList paths = paths();
     final int ps = paths.size();
@@ -258,9 +258,9 @@ final class Docs {
       boolean add = eq(pt, exact);
       if(!add) {
         add = startsWith(pt, prefix);
-        if(add && dir) {
+        if(add && scope != DocScope.ALL) {
           final int i = indexOf(pt, cpToken('/'), prefix.length + 1);
-          if(i != -1) add = set.add(substring(pt, prefix.length, i));
+          if(i != -1) add = scope == DocScope.DIRECTORY && set.add(substring(pt, prefix.length, i));
         }
       }
       if(add) il.add(docs.get(p));

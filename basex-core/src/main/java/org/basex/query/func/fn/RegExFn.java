@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.*;
 import org.basex.query.util.regex.parse.*;
+import org.basex.util.*;
 import org.basex.util.Token;
 
 /**
@@ -33,12 +34,26 @@ public abstract class RegExFn extends StandardFunc {
    */
   final RegExpr regExpr(final byte[] pattern, final byte[] flags, final QueryContext qc)
       throws QueryException {
+    return regExpr(pattern, flags, qc, info);
+  }
+
+  /**
+   * Returns a compiled regular expression.
+   * @param pattern pattern
+   * @param flags flags
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return compiled regular expression
+   * @throws QueryException query exception
+   */
+  static RegExpr regExpr(final byte[] pattern, final byte[] flags, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final byte[] key = Token.concat(pattern, '\b', flags);
     synchronized(qc.regex) {
       RegExpr regExpr = qc.regex.get(key);
       if(regExpr == null) {
-        regExpr = parse(pattern, flags);
+        regExpr = parse(pattern, flags, info);
         qc.regex.put(key, regExpr);
       }
       return regExpr;
@@ -89,10 +104,12 @@ public abstract class RegExFn extends StandardFunc {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
+   * @param info input info (can be {@code null})
    * @return pattern
    * @throws QueryException query exception
    */
-  private RegExpr parse(final byte[] regex, final byte[] modifiers) throws QueryException {
+  private static RegExpr parse(final byte[] regex, final byte[] modifiers, final InputInfo info)
+      throws QueryException {
 
     // process modifiers (case variants for the 'i' flag are added to the pattern)
     int flags = 0;

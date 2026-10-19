@@ -628,6 +628,8 @@ public enum QueryError {
   /** Error code. */
   RESDIR_X(FODC, 2, "URI '%' points to a directory."),
   /** Error code. */
+  COLLFORM_X_X(FODC, 2, "Collection form '%' does not apply to '%'."),
+  /** Error code. */
   INVCOLL_X(FODC, 4, "Invalid collection URI: %."),
   /** Error code. */
   INVDOC_X(FODC, 5, "Invalid document URI: %."),

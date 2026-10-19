@@ -91,17 +91,17 @@ public final class Resources {
    * @return PRE values (internal representation!)
    */
   public synchronized IntList docs(final String path) {
-    return docs(path, false);
+    return docs(path, DocScope.ALL);
   }
 
   /**
    * Returns the PRE values of all document nodes that start with the specified path.
    * @param path input path
-   * @param dir directory view
+   * @param scope scope of the returned documents
    * @return PRE values (internal representation!)
    */
-  public synchronized IntList docs(final String path, final boolean dir) {
-    return docs.docs(path, dir);
+  public synchronized IntList docs(final String path, final DocScope scope) {
+    return docs.docs(path, scope);
   }
 
   /**

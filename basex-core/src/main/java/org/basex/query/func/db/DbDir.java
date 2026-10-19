@@ -36,7 +36,7 @@ public final class DbDir extends DbList {
     final Resources resources = data.resources;
 
     // list XML resources
-    final IntList docs = resources.docs(path, true);
+    final IntList docs = resources.docs(path, DocScope.DIRECTORY);
     final long ds = docs.size(), ts = data.meta.time;
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);

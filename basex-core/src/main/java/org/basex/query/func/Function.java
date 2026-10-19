@@ -139,8 +139,8 @@ public enum Function implements AFunction {
   COLLATION_KEY(FnCollationKey::new, "collation-key(value, collation?)",
       params(STRING_O, STRING_ZO), BASE64_BINARY_O),
   /** XQuery function. */
-  COLLECTION(FnCollection::new, "collection(source?)",
-      params(STRING_ZO), ITEM_ZM, flag(NDT)),
+  COLLECTION(FnCollection::new, "collection(source?, options?)",
+      params(ANY_URI_ZO, MAP_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(value1, value2, collation?)",
       params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO, STRING_ZO), INTEGER_ZO),
@@ -788,8 +788,8 @@ public enum Function implements AFunction {
   UPPER_CASE(FnUpperCase::new, "upper-case(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
-  URI_COLLECTION(FnUriCollection::new, "uri-collection(source?)",
-      params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
+  URI_COLLECTION(FnUriCollection::new, "uri-collection(source?, options?)",
+      params(ANY_URI_ZO, MAP_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
   VOID(FnVoid::new, "void(input?, ~skip?)",
       params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),

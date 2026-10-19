@@ -17,7 +17,7 @@ public final class FnUriCollection extends FnCollection {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // URIs of the files of a directory, or documents of a collection
-    final Value value = qc.resources.uriCollection(collectionInput(qc), qc, info);
+    final Value value = collection(true, qc);
     if(value.type.instanceOf(BasicType.ANY_URI)) return value.iter();
 
     final Iter uri = value.iter();

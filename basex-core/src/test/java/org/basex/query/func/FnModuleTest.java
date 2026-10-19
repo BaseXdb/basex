@@ -650,6 +650,120 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void collection() {
+    final Function func = COLLECTION;
+    final String dir = new IOFile(sandbox(), "coll").path();
+    final String zip = new IOFile(sandbox(), "coll.zip").path();
+    write(new IOFile(dir, "a.xml"), "<a/>");
+    write(new IOFile(dir, "sub/b.xml"), "<b/>");
+    query(_FILE_WRITE_BINARY.args(zip,
+        _ARCHIVE_CREATE.args(" ('a.xml', 'sub/b.xml')", " ('<a/>', '<b/>')")));
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("sub/b.xml", "<b/>"));
+
+    // recursive (default)
+    query("count(" + func.args(dir) + ")", 2);
+    query("count(" + func.args(zip) + ")", 2);
+    query("count(" + func.args(NAME) + ")", 2);
+    query("count(" + func.args(" xs:anyURI('" + NAME + "')") + ")", 2);
+    query("count(" + func.args(NAME, " {}") + ")", 2);
+    query("count(" + func.args(NAME, " ()") + ")", 2);
+
+    // non-recursive
+    final String nonrec = " { 'recursive': false() }";
+    query(func.args(dir, nonrec) + "/*/name()", "a");
+    query(func.args(zip, nonrec) + "/*/name()", "a");
+    query(func.args(NAME, nonrec) + "/*/name()", "a");
+    query(func.args(NAME + "/sub", nonrec) + "/*/name()", "b");
+    query(func.args(NAME + "/sub/", nonrec) + "/*/name()", "b");
+    query(func.args(NAME + "/sub/b.xml", nonrec) + "/*/name()", "b");
+
+    // filter by URI
+    query(func.args(dir, " { 'match': 'B\\.xml$', 'match-flags': 'i' }") + "/*/name()", "b");
+    query(func.args(zip, " { 'match': 'a\\.xml' }") + "/*/name()", "a");
+    query(func.args(NAME, " { 'match': 'b\\.xml', 'match-flags': '' }") + "/*/name()", "b");
+    query("count(" + func.args(NAME, " { 'match': 'B\\.xml' }") + ")", 0);
+    error(func.args(NAME, " { 'match': '(' }"), REGINVALID_X);
+    error(func.args(NAME, " { 'match': 'a', 'match-flags': '!' }"), REGFLAG_X);
+
+    // form of the resource
+    query("count(" + func.args(dir, " { 'form': 'directory' }") + ")", 2);
+    query("count(" + func.args(zip, " { 'form': 'archive' }") + ")", 2);
+    query("count(" + func.args(NAME, " { 'form': 'database' }") + ")", 2);
+    query("count(" + func.args(NAME + "/sub", " { 'form': 'database' }") + ")", 1);
+    error(func.args(dir, " { 'form': 'archive' }"), COLLFORM_X_X);
+    error(func.args(dir, " { 'form': 'database' }"), COLLFORM_X_X);
+    error(func.args(zip, " { 'form': 'directory' }"), COLLFORM_X_X);
+    error(func.args(NAME, " { 'form': 'directory' }"), COLLFORM_X_X);
+    error(func.args(dir, " { 'form': 'unknown' }"), COLLFORM_X_X);
+
+    // unstable collections are parsed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " + GENERATE_ID.args(
+        " " + func.args(dir, " { 'stable': false() }") + "[1]") + "))", 2);
+    query("count(distinct-values(for $i in 1 to 2 return " + GENERATE_ID.args(
+        " " + func.args(dir, " { 'stable': true() }") + "[1]") + "))", 1);
+
+    // parsing options, erroneous resources
+    final String dir2 = new IOFile(sandbox(), "coll2").path();
+    write(new IOFile(dir2, "x.xml"), "<x xmlns='u'/>");
+    query(func.args(dir2) + "/*/namespace-uri()", "u");
+    query(func.args(dir2, " { 'xml-options': { 'stripns': true() } }") + "/*/namespace-uri()",
+        "");
+    error(func.args(NAME, " { 'xml-options': { 'stripns': true() } }"), NO_OPTIONS_WITH_DB_X);
+    write(new IOFile(dir2, "y.xml"), "<y");
+    error(func.args(dir2), IOERR_X);
+    query(func.args(dir2, " { 'ignore-errors': true() }") + "/*/name()", "x");
+    // resources that do not match are not parsed
+    query(func.args(dir2, " { 'match': 'x\\.xml' }") + "/*/name()", "x");
+    query(URI_COLLECTION.args(dir2, " { 'match': 'x\\.xml' }") + " ! ends-with(., '/x.xml')",
+        true);
+    // resources in subdirectories are not parsed
+    write(new IOFile(dir, "sub/c.xml"), "<c");
+    query(func.args(dir, nonrec) + "/*/name()", "a");
+    error(func.args(dir), IOERR_X);
+
+    // ignored for databases
+    query("count(" + func.args(NAME, " { 'file-extensions': { 'json': 'text/plain' },"
+        + " 'json-options': {}, 'text-options': {}, 'html-options': {}, 'csv-options': {} }")
+        + ")", 2);
+    error(func.args(NAME, " { 'unknown': 1 }"), INVALIDOPTION_X);
+
+    // resources of directories that are assigned to media types
+    final String dir3 = new IOFile(sandbox(), "coll3").path();
+    write(new IOFile(dir3, "a.xml"), "<a/>");
+    write(new IOFile(dir3, "b.json"), "{ \"b\": 1 }");
+    write(new IOFile(dir3, "c.csv"), "x,y\n1,2");
+    write(new IOFile(dir3, "d.txt"), "d");
+    write(new IOFile(dir3, "e.bin"), "e");
+    write(new IOFile(dir3, "f.xhtml"), "<f/>");
+    final String types = "'file-extensions': { 'json': 'application/json', 'csv': 'text/csv', "
+        + "'txt': 'text/plain', 'bin': 'application/octet-stream', 'xhtml': 'application/xml' }";
+    final String coll = func.args(dir3, " { " + types + " }");
+    query("count(" + func.args(dir3) + ")", 1);
+    query("count(" + coll + ")", 6);
+    query(coll + "[. instance of xs:string]", "d");
+    query(coll + "[. instance of xs:base64Binary] ! string()", "ZQ==");
+    query(coll + "[. instance of map(*)][map:contains(., 'b')]?b", 1);
+    query("sort(" + coll + "[. instance of node()]/*/name())", "a\nf");
+    query(func.args(dir3, " { " + types + ", 'csv-options': { 'header': true() } }")
+        + "[. instance of map(*)][map:contains(., 'columns')]?columns", "x\ny");
+    query("count(" + func.args(dir3, " { " + types + ", 'match': 'json' }") + ")", 1);
+    query("count(" + URI_COLLECTION.args(dir3, " { " + types + " }") + ")", 6);
+    error(func.args(dir3, " { " + types + ", 'json-options': { 'unknown': 1 } }"),
+        INVALIDOPTION_X);
+    write(new IOFile(dir3, "g.json"), "{");
+    error(coll, PARSE_JSON_X_X_X);
+    query("count(" + func.args(dir3, " { " + types + ", 'ignore-errors': true() }") + ")", 6);
+    // invalid parsing options are reported even if errors are ignored
+    error(func.args(dir3, " { " + types + ", 'ignore-errors': true(), "
+        + "'json-options': { 'unknown': 1 } }"), INVALIDOPTION_X);
+
+    execute(new Close());
+    execute(new DropDB(NAME));
+  }
+
+  /** Test method. */
   @Test public void compare() {
     final Function func = COMPARE;
 
@@ -6941,6 +7055,17 @@ return
     query("string-join(sort(" + func.args(dir.path()) + ") ! substring-after(., '/uris/'), ',')",
         "a.xml,dtd.xml");
     error(COLLECTION.args(dir.path()), EXTERNALRESOURCE_X);
+
+    // options
+    final String coll = new IOFile(sandbox(), "uricoll").path();
+    write(new IOFile(coll, "a.xml"), "<a/>");
+    write(new IOFile(coll, "sub/b.xml"), "<b/>");
+
+    query("count(" + func.args(coll) + ")", 2);
+    query(func.args(coll, " { 'recursive': false() }") + " ! ends-with(., '/a.xml')", true);
+    query(func.args(coll, " { 'match': 'b\\.xml$' }") + " ! ends-with(., '/sub/b.xml')", true);
+    query("count(" + func.args(coll, " { 'form': 'directory' }") + ")", 2);
+    error(func.args(coll, " { 'form': 'archive' }"), COLLFORM_X_X);
   }
 
   /** Test method. */

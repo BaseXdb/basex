@@ -48,6 +48,7 @@ public abstract class Docs extends DynamicFn {
   final byte[] staticUri() {
     final Expr source = arg(0);
     return source instanceof final Str str ? str.string() :
+      source instanceof final Uri uri ? uri.string() :
       source instanceof final Atm atm ? atm.string(null) : null;
   }
 
@@ -57,7 +58,7 @@ public abstract class Docs extends DynamicFn {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean stable(final QueryContext qc) throws QueryException {
+  boolean stable(final QueryContext qc) throws QueryException {
     return arg(1) instanceof Value && toOptions(arg(1), new DocOptions(), qc).
         get(DocOptions.STABLE);
   }
