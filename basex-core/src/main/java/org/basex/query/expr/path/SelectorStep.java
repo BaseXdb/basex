@@ -133,7 +133,7 @@ public final class SelectorStep extends Step {
 
     // constant keys: $node/child::{ #a } → $node/child::a (range sequences are matched by bounds)
     if(selector instanceof final Value value && !(value instanceof RangeSeq)) {
-      final Expr in = root != null ? root : cc.qc.focus.value;
+      final Expr in = cc.focusOr(root);
       final Type it = in != null ? in.seqType().type : null;
       final boolean jnode = it != null &&
           (it.instanceOf(NodeType.JNODE) || it.instanceOf(Types.MAP_OR_ARRAY));

@@ -349,7 +349,7 @@ public class CmpG extends Cmp {
     final Expr expr2 = exprs[1];
     if(!byCodepoint(CmpOp.EQ) || !(expr2 instanceof final Value value) ||
         !value.seqType().type.isStringOrUntyped()) return false;
-    final ArrayList<Stats> list = Path.stats(exprs[0], nodes, data);
+    final ArrayList<Stats> list = PathNodes.stats(exprs[0], nodes, data);
     if(list == null || !Checks.all(list, stats -> StatsType.isCategory(stats.type))) return false;
     for(final Item item : value) {
       final byte[] token = item.string(info);

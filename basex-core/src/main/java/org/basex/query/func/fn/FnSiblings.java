@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 public final class FnSiblings extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final GNode node = toGNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(contextArg(qc), qc);
     if(node == null) return Empty.ITER;
 
     final GNode parent = node.parent();

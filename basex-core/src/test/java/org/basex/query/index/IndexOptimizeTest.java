@@ -679,6 +679,14 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("count(//@*[. = ('2', '1')])", 4, exists(ValueAccess.class));
   }
 
+  /** Predicates of wildcard steps before the index step are preserved. */
+  @Test public void wildcardPredicates() {
+    execute(new CreateDB(NAME, "<a id='1'><b>x</b></a>"));
+    check("/*[@id != '1']/b[text() = 'x']", "", exists(ValueAccess.class));
+    check("/*[@id != '2']/b[text() = 'x']", "<b>x</b>", exists(ValueAccess.class));
+    check("/*/b[text() = 'x']", "<b>x</b>", exists(ValueAccess.class));
+  }
+
   /**
    * Creates a test database.
    */

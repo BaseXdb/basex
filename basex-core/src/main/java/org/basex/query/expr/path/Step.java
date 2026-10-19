@@ -207,7 +207,7 @@ public abstract class Step extends Preds {
    */
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr rt = assignType(root != null ? root : cc.qc.focus.value);
+    final Expr rt = assignType(cc.focusOr(root));
     final NodeType rnt = rt != null ? nodeType(rt.seqType().type) : NodeType.NODE;
     final Type rtype = rnt != null ? rnt : rt.seqType().type;
 
@@ -573,7 +573,7 @@ public abstract class Step extends Preds {
    * @param preds predicates to be added
    * @return resulting step instance
    */
-  final Step addPredicates(final Expr... preds) {
+  public final Step addPredicates(final Expr... preds) {
     exprType.assign(seqType().union(Occ.ZERO));
     return copyType(rebuild(ExprList.concat(exprs, preds)));
   }

@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnString extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).unwrappedItem(qc, info);
+    final Item value = contextArg(qc).unwrappedItem(qc, info);
 
     if(value.isEmpty()) return Str.EMPTY;
     if(value.type == BasicType.STRING) return value;
@@ -29,7 +29,7 @@ public final class FnString extends ContextFn {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).unwrappedItem(qc, info);
+    final Item value = contextArg(qc).unwrappedItem(qc, info);
 
     if(value.isEmpty()) return false;
     if(!(value instanceof FItem) || value instanceof XQJava) return value.string(info).length > 0;
@@ -45,8 +45,8 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = contextAccess();
-    final Expr value = context ? cc.qc.focus.value : arg(0);
+    final boolean context = usesContext();
+    final Expr value = contextArg(cc);
     if(value != null && value.seqType().eq(Types.STRING_O)) {
       // string('x') → 'x'
       // $string[string() = 'a'] → $string[. = 'a']
@@ -58,7 +58,7 @@ public final class FnString extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
+    final Expr item = usesContext() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
     if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && st.type.isStringOrUntyped() &&
         st.one()) {

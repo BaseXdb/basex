@@ -24,7 +24,7 @@ public final class FnLang extends ContextFn {
   protected boolean ebv(final QueryContext qc) throws QueryException {
     final byte[] lang = lc(toZeroToken(arg(0), qc));
     XNode node = toNodeOrNull(arg(1), qc);
-    if(node == null) node = toNode(context(qc), qc);
+    if(node == null) node = toNode(contextArg(qc), qc);
 
     for(XNode nd = node; nd != null; nd = nd.parent()) {
       final BasicNodeIter atts = nd.attributeIter();

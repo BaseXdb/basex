@@ -19,14 +19,14 @@ import org.basex.query.value.type.*;
 public final class FnJvalue extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final JNode jnode = toJNodeOrNull(context(qc), qc);
+    final JNode jnode = toJNodeOrNull(contextArg(qc), qc);
     return jnode != null ? jnode.value : Empty.VALUE;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = contextAccess();
-    final Expr input = context ? cc.qc.focus.value : arg(0);
+    final boolean context = usesContext();
+    final Expr input = contextArg(cc);
     // jvalue(jtree(E)) → E
     if(JTREE.is(input)) return input.arg(0);
 

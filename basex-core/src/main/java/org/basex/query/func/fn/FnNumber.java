@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnNumber extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).atomItem(qc, info);
+    final Item value = contextArg(qc).atomItem(qc, info);
     if(value.isEmpty()) return Dbl.NAN;
     // invalid input: NaN is returned
     final Item cast = (Item) DOUBLE.seqType().cast(value, false, qc, info);
@@ -27,8 +27,8 @@ public final class FnNumber extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final boolean context = contextAccess();
-    final Expr value = context ? cc.qc.focus.value : arg(0);
+    final boolean context = usesContext();
+    final Expr value = contextArg(cc);
     final Type type = argType(cc);
 
     // number(1e1) → 1e1
@@ -51,7 +51,7 @@ public final class FnNumber extends ContextFn {
    * @return argument type or {@code null}
    */
   private Type argType(final CompileContext cc) {
-    final Expr value = contextAccess() ? cc.qc.focus.value : arg(0);
+    final Expr value = contextArg(cc);
     if(value != null) {
       final SeqType st = value.seqType();
       if(st.atomOcc() == Occ.EXACTLY_ONE) return st.type.atomic();
@@ -68,7 +68,7 @@ public final class FnNumber extends ContextFn {
   public static Expr simplify(final Expr arg, final CompileContext cc) {
     final Type type = arg.seqType().type;
     if(Function.STRING.is(arg)) {
-      return ((FnString) arg).contextAccess() ? ContextValue.get(cc, arg.info()) : arg.arg(0);
+      return ((FnString) arg).usesContext() ? ContextValue.get(cc, arg.info()) : arg.arg(0);
     } else if(arg instanceof final Cast cast && type.isStringOrUntyped()) {
       return cast.expr;
     } else if(arg instanceof final TypeCheck tc && (type.isUntyped() || type == ANY_ATOMIC_TYPE)) {

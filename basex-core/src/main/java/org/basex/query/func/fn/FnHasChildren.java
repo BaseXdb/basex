@@ -18,7 +18,7 @@ public final class FnHasChildren extends ContextFn {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final GNode node = toGNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(contextArg(qc), qc);
     return node != null && node.hasChildren();
   }
 }

@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
 public final class FnJkey extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final JNode jnode = toJNodeOrNull(context(qc), qc);
+    final JNode jnode = toJNodeOrNull(contextArg(qc), qc);
     return jnode != null ? jnode.key : Empty.VALUE;
   }
 }

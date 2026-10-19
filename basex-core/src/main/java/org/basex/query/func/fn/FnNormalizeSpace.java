@@ -17,13 +17,13 @@ import org.basex.util.*;
 public final class FnNormalizeSpace extends ContextFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item item = context(qc).atomItem(qc, info);
+    final Item item = contextArg(qc).atomItem(qc, info);
     return item.isEmpty() ? Str.EMPTY : Str.get(Token.normalize(item.string(info)));
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    return !Token.ws(toZeroToken(context(qc), qc));
+    return !Token.ws(toZeroToken(contextArg(qc), qc));
   }
 
   @Override
@@ -48,7 +48,7 @@ public final class FnNormalizeSpace extends ContextFn {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // $node[normalize-space(.)] → $node[descendant::text()[normalize-space(.)]]
-      final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
+      final Expr item = usesContext() ? ContextValue.get(cc, info) : arg(0);
       expr = simplifyEbv(item, cc, () -> cc.function(Function.NORMALIZE_SPACE, info));
     }
     return cc.simplify(this, expr, mode);

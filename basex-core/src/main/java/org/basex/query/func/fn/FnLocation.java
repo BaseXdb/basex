@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
 public final class FnLocation extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(contextArg(qc), qc);
     if(!(node instanceof final DBNode dbnode)) return Empty.VALUE;
     final Locations locations = dbnode.data().locations;
     if(locations == null) return Empty.VALUE;

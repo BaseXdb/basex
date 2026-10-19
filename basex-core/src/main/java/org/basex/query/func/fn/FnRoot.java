@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 public final class FnRoot extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final GNode node = toGNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(contextArg(qc), qc);
     return node == null ? Empty.VALUE : node.root();
   }
 

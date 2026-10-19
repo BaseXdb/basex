@@ -40,7 +40,7 @@ public final class FnPath extends ContextFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    GNode node = toGNodeOrNull(context(qc), qc);
+    GNode node = toGNodeOrNull(contextArg(qc), qc);
     final XQMap map = toEmptyMap(arg(1), qc);
     final PathOptions options = options(1, PathOptions::new, qc);
     if(node == null) return Empty.VALUE;

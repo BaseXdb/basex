@@ -14,7 +14,7 @@ import org.basex.query.value.node.*;
 public class FnName extends FnNodeName {
   @Override
   public final Str value(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(contextArg(qc), qc);
     return node == null || empty(node.kind()) ? Str.EMPTY : Str.get(name(node));
   }
 
