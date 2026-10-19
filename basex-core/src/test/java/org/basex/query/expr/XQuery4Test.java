@@ -1110,6 +1110,14 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/name()", "a", empty(SelectorStep.class), empty(If.class));
     error("{ 'a': 1 }/data()", NOCTX_X);
     error("[ 1 ]/string()", NOCTX_X);
+    // the selector is evaluated even if the JNode has no children
+    error("{ 'a': <xml><w/></xml> }/a/jvalue()", SELECTORCTX_X);
+    error("{ 'a': <xml><w/></xml> }/a/jvalue()//w", SELECTORCTX_X);
+    error("{ 'a': 1 }/a/data()", SELECTORCTX_X);
+    final String sel = "declare %basex:inline(0) function f($m, $s) { "
+        + "$m/a/child::{ xs:integer($s) } }; ";
+    error(sel + "f({ 'a': 1 }, 'x')", FUNCCAST_X_X);
+    query(sel + "f({ 'a': { 'b': 1 } }, '1'), f({ 'a': 1 }, '1')", "");
     // mixed input: the interpretation is chosen at evaluation time
     final String func = "declare function local:f($x as item()*) { $x/data() }; ";
     query(func + "local:f(<a>x</a>)", "x");

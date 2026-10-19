@@ -14,6 +14,7 @@ import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -237,7 +238,7 @@ public abstract class Step extends Preds {
     // $jnode/attribute::x: type error at runtime
     final boolean typeError = axis == ATTRIBUTE && rtype.seqType().mayBeJNode();
     // attribute::element() → (), parent::comment() → ()
-    if(!typeError && (t == null || noMatches() || seqType().zero())) {
+    if(!typeError && !selectorMayFail() && (t == null || noMatches() || seqType().zero())) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
@@ -453,7 +454,7 @@ public abstract class Step extends Preds {
    */
   final boolean empty(final SeqType seqType) {
     final NodeType nt = nodeType(seqType.type);
-    if(nt == null) return false;
+    if(nt == null || selectorMayFail()) return false;
 
     // $doc/.. → (), $array/following::* → (), $text/child::x → (), [ 1 ]/*/* → ()
     final Axis ax = axis(nt);
@@ -482,6 +483,14 @@ public abstract class Step extends Preds {
       default ->
         false;
     };
+  }
+
+  /**
+   * Checks if the step has a selector that may raise an error.
+   * @return result of check
+   */
+  private boolean selectorMayFail() {
+    return selector != null && !(selector instanceof Value);
   }
 
   /**
