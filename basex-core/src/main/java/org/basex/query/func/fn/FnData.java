@@ -16,18 +16,18 @@ import org.basex.query.value.type.*;
 public final class FnData extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return context(qc).atomIter(qc, info);
+    return contextArg(qc).atomIter(qc, info);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return context(qc).atomValue(qc, info);
+    return contextArg(qc).atomValue(qc, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = contextAccess();
-    final Expr input = context ? cc.qc.focus.value : arg(0);
+    final boolean context = usesContext();
+    final Expr input = contextArg(cc);
 
     if(input != null) {
       final SeqType st = input.seqType();
@@ -56,7 +56,7 @@ public final class FnData extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    final Expr input = contextAccess() ? ContextValue.get(cc, info) : arg(0);
+    final Expr input = usesContext() ? ContextValue.get(cc, info) : arg(0);
     // data(<a/>) = '' → <a/> = '', A[B ! data() = ''] → A[B ! . = '']
     // count(data($x)) → count($x), string(data($node)) → string($node)
     // arrays are excluded if the wrapper is not atomized: string(data([ 1 ]))
@@ -72,6 +72,6 @@ public final class FnData extends ContextFn {
 
   @Override
   public boolean inlineable() {
-    return contextAccess() || arg(contextIndex()) instanceof ContextValue;
+    return usesContext() || arg(contextIndex()) instanceof ContextValue;
   }
 }

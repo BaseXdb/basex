@@ -14,7 +14,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.index.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
@@ -229,7 +228,7 @@ public final class CmpR extends CmpRange {
 
   @Override
   public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
-    final ArrayList<Stats> list = Path.stats(expr, nodes, data);
+    final ArrayList<Stats> list = PathNodes.stats(expr, nodes, data);
     return list != null && noMatches(list);
   }
 

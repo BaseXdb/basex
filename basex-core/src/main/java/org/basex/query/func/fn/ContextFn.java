@@ -28,10 +28,10 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   /**
-   * Indicates if the function accesses the current context.
+   * Indicates if the function uses the current context.
    * @return result of check
    */
-  public final boolean contextAccess() {
+  public final boolean usesContext() {
     return !defined(contextIndex());
   }
 
@@ -41,19 +41,28 @@ public abstract class ContextFn extends StandardFunc {
    * @return expression
    * @throws QueryException query exception
    */
-  protected final Expr context(final QueryContext qc) throws QueryException {
+  protected final Expr contextArg(final QueryContext qc) throws QueryException {
     final Expr expr = arg(contextIndex());
     return expr != Empty.UNDEFINED ? expr : ctxValue(qc);
   }
 
+  /**
+   * Returns the context argument, or the focus value if it does not exist.
+   * @param cc compilation context
+   * @return expression (can be {@code null})
+   */
+  public final Expr contextArg(final CompileContext cc) {
+    return usesContext() ? cc.qc.focus.value : arg(contextIndex());
+  }
+
   @Override
   public final boolean hasCTX() {
-    return contextAccess();
+    return usesContext();
   }
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (!contextAccess() || visitor.lock(Locking.CONTEXT, hasUPD())) && super.accept(visitor);
+    return (!usesContext() || visitor.lock(Locking.CONTEXT, hasUPD())) && super.accept(visitor);
   }
 
   /**
@@ -61,14 +70,14 @@ public abstract class ContextFn extends StandardFunc {
    * @return result of check
    */
   public boolean inlineable() {
-    return (contextAccess() || arg(contextIndex()) instanceof ContextValue) &&
+    return (usesContext() || arg(contextIndex()) instanceof ContextValue) &&
         definition.seqType.occ == Occ.ZERO_OR_ONE;
   }
 
   @Override
   public final VarUsage count(final Var var) {
     // context reference check: check if function accesses context
-    return (var == null && contextAccess() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
+    return (var == null && usesContext() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
   }
 
   @Override
@@ -77,7 +86,7 @@ public abstract class ContextFn extends StandardFunc {
     final Expr[] args = args();
     Expr inlined = ic.inline(args) ? this : null;
     // create new expression with inlined context value
-    if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
+    if(ic.var == null && !(ic.expr instanceof ContextValue) && usesContext()) {
       // $v ! string() → string($v)
       final int ci = contextIndex();
       final Expr[] ctxArgs = Arrays.copyOf(args, Math.max(args.length, ci + 1));

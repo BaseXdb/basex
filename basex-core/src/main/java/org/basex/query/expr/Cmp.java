@@ -385,7 +385,7 @@ public abstract class Cmp extends Arr {
     if(counts == COUNT_TRUE || counts == COUNT_FALSE) {
       // string-length(A) >= 0 → true()
       // keep nondeterministic input: the rewrite below skips its evaluation
-      final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
+      final Expr arg1 = ((ContextFn) expr1).contextArg(cc);
       if(arg1 != null && !arg1.has(Flag.NDT)) {
         final SeqType st1 = arg1.seqType();
         if(st1.zero() || st1.atomOcc() == Occ.EXACTLY_ONE) {

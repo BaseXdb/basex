@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 public final class FnBaseUri extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(contextArg(qc), qc);
     if(node != null) {
       final Uri uri = node.baseURI(sc().baseURI(), false, info);
       if(uri != null) return uri;

@@ -314,6 +314,15 @@ public final class CompileContext {
   }
 
   /**
+   * Returns the specified expression or, if it is absent, the current focus value.
+   * @param expr expression (can be {@code null})
+   * @return expression or focus value (can be {@code null})
+   */
+  public Expr focusOr(final Expr expr) {
+    return expr != null ? expr : qc.focus.value;
+  }
+
+  /**
    * Indicates if the query focus is nested.
    * @return result of check
    */

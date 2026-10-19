@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public class FnNodeName extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(contextArg(qc), qc);
     if(node == null) return Empty.VALUE;
 
     final Kind kind = node.kind();
@@ -40,7 +40,7 @@ public class FnNodeName extends ContextFn {
    * @return result of check
    */
   final boolean empty(final CompileContext cc, final boolean occ) {
-    final Expr node = contextAccess() ? cc.qc.focus.value : arg(0);
+    final Expr node = contextArg(cc);
     if(node == null) return false;
 
     final SeqType st = node.seqType();

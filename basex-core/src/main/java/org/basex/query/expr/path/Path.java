@@ -9,23 +9,19 @@ import java.util.function.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
-import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
-import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.NameTest.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -133,36 +129,45 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    final Expr rt;
-    if(root != null) {
-      root = root.compile(cc);
-      rt = root;
-    } else {
-      rt = cc.qc.focus.value;
-    }
-
-    cc.get(focus(rt, cc), true, () -> {
-      final int sl = steps.length;
-      for(int s = 0; s < sl; s++) {
-        final Expr step = cc.compileOrError(steps[s], root == null && s == 0);
-        steps[s] = step;
-        cc.updateFocus(step, true);
-      }
-      return null;
-    });
-
+    if(root != null) root = root.compile(cc);
+    updateSteps(focus(cc), cc, s -> cc.compileOrError(steps[s], root == null && s == 0));
     return optimize(cc);
   }
 
   /**
+   * Updates the steps within the focus of their predecessors.
+   * @param focus focus of the first step (can be {@code null})
+   * @param cc compilation context
+   * @param update function that returns a new step for an index, or {@code null}
+   * @return {@code true} if a step has been changed
+   * @throws QueryException query exception
+   */
+  private boolean updateSteps(final Expr focus, final CompileContext cc,
+      final QueryFunction<Integer, Expr> update) throws QueryException {
+    return cc.get(focus, true, () -> {
+      boolean changed = false;
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        final Expr step = update.apply(s);
+        if(step != null && step != steps[s]) {
+          steps[s] = step;
+          changed = true;
+        }
+        cc.updateFocus(steps[s], true);
+      }
+      return changed;
+    });
+  }
+
+  /**
    * Returns the focus of the first step: maps and arrays are converted to JNodes.
-   * @param rt root expression (can be {@code null})
    * @param cc compilation context
    * @return focus expression (can be {@code null})
    * @throws QueryException query exception
    */
-  private Expr focus(final Expr rt, final CompileContext cc) throws QueryException {
+  private Expr focus(final CompileContext cc) throws QueryException {
     // function items other than maps and arrays will be rejected at runtime
+    final Expr rt = cc.focusOr(root);
     return rt != null && rt.seqType().type.instanceOf(Types.FUNCTION) ?
       cc.function(Function.JTREE, info, rt) : rt;
   }
@@ -188,7 +193,7 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr.optimize(cc);
 
     // assign sequence type, compute result size
-    final Expr rt = root != null ? root : cc.qc.focus.value;
+    final Expr rt = cc.focusOr(root);
     seqType(rt);
 
     // remove paths that will yield no result
@@ -196,7 +201,7 @@ public abstract class Path extends ParseExpr {
     // rewrite to simple map
     if(expr == this) expr = toMap(cc);
     // check index access
-    if(expr == this) expr = index(cc, rt);
+    if(expr == this) expr = IndexRewrite.get(this, cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
      * - //B [. = '...'] → IA('...', B)
@@ -244,7 +249,7 @@ public abstract class Path extends ParseExpr {
    * @return result of check
    */
   private boolean unordered(final CompileContext cc) {
-    final Expr rt = root != null ? root : cc.qc.focus.value;
+    final Expr rt = cc.focusOr(root);
     if(rt == null || !rt.seqType().zeroOrOne()) return false;
     final int sl = steps.length;
     for(int s = 1; s < sl; s++) {
@@ -351,7 +356,7 @@ public abstract class Path extends ParseExpr {
    * @param index index
    * @return axis step, or {@code null}
    */
-  private Step axisStep(final int index) {
+  public final Step axisStep(final int index) {
     return steps[index] instanceof final Step step ? step : null;
   }
 
@@ -423,7 +428,7 @@ public abstract class Path extends ParseExpr {
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       Expr step = steps[s];
-      final Expr prev = list.isEmpty() ? root != null ? root : cc.qc.focus.value : list.peek();
+      final Expr prev = list.isEmpty() ? cc.focusOr(root) : list.peek();
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         final Type pt = seqType.type;
@@ -476,118 +481,13 @@ public abstract class Path extends ParseExpr {
     return cc.replaceWith(this, steps.length == 0 ? root : this);
   }
 
-  /**
-   * Returns the path nodes of a root expression.
-   * @param rt root at compile time (can be {@code null})
-   * @param data data reference (can be {@code null})
-   * @param stats assess database statistics
-   * @return path nodes, or {@code null} if nodes cannot be evaluated
-   */
-  private static ArrayList<PathNode> rootNodes(final Expr rt, final Data data,
-      final boolean stats) {
-
-    if(rt == null || data == null || !(stats ? data.meta.uptodate : data.meta.complete))
-      return null;
-    // document nodes: start with the root of the path summary
-    if(rt.seqType().type.instanceOf(NodeType.DOCUMENT)) return data.paths().root();
-    // single database node: resolve its path node (statistics are only exact for documents)
-    if(stats || !(rt instanceof final DBNode node) || node.data() != data) return null;
-    final PathNode pn = data.paths().node(node.pre());
-    if(pn == null) return null;
-    final ArrayList<PathNode> nodes = new ArrayList<>(1);
-    nodes.add(pn);
-    return nodes;
-  }
-
-  /**
-   * Returns the path nodes that will result from this path.
-   * @param nodes current path nodes
-   * @param stats assess database statistics
-   * @return path nodes, or {@code null} if nodes cannot be collected
-   * @throws QueryException query exception
-   */
-  final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats)
-      throws QueryException {
-
-    ArrayList<PathNode> pn = nodes;
-    for(final Expr expr : steps) {
-      if(expr instanceof UtilRoot) {
-        pn = UtilRoot.nodes(pn);
-      } else if(expr instanceof final Step step) {
-        pn = step.nodes(pn, stats);
-        // check if predicates will never match
-        if(!stats && pn != null) {
-          for(final Expr ex : step.exprs) {
-            if(ex.noMatches(pn, step.data())) return new ArrayList<>();
-          }
-        }
-      } else {
-        pn = null;
-      }
-      if(pn == null) break;
-    }
-    return pn;
-  }
-
   @Override
   public final boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
       throws QueryException {
     // a[b]: relative path will yield no results
     if(root != null) return false;
-    final ArrayList<PathNode> pn = pathNodes(nodes, false);
+    final ArrayList<PathNode> pn = PathNodes.get(this, nodes, false);
     return pn != null && pn.isEmpty();
-  }
-
-  /**
-   * Checks if all path nodes are located on the same level.
-   * @param nodes path nodes
-   * @return result of check
-   */
-  private static boolean sameLevel(final ArrayList<PathNode> nodes) {
-    final int level = nodes.isEmpty() ? 0 : nodes.getFirst().level();
-    return Checks.all(nodes, node -> node.level() == level);
-  }
-
-  /**
-   * Returns database statistics for the path nodes that will result from this path.
-   * @return statistics, or {@code null} if they are not available
-   * @throws QueryException query exception
-   */
-  public ArrayList<Stats> pathStats() throws QueryException {
-    return pathStats(null);
-  }
-
-  /**
-   * Returns database statistics for the path nodes that will result from this path.
-   * @param nodes path nodes of the context, or {@code null} to start from the root
-   * @return statistics, or {@code null} if they are not available
-   * @throws QueryException query exception
-   */
-  public ArrayList<Stats> pathStats(final ArrayList<PathNode> nodes) throws QueryException {
-    final Data data = data();
-    if(data == null) return null;
-    final ArrayList<PathNode> start = nodes != null ? nodes : rootNodes(root, data, true);
-    final ArrayList<PathNode> pn = start != null ? pathNodes(start, true) : null;
-    return pn != null ? data.paths().stats(pn) : null;
-  }
-
-  /**
-   * Returns database statistics for the results of an expression.
-   * @param expr expression (path or context value)
-   * @param nodes path nodes of the context (can be {@code null})
-   * @param data data reference (can be {@code null})
-   * @return statistics, or {@code null} if they are not available
-   * @throws QueryException query exception
-   */
-  public static ArrayList<Stats> stats(final Expr expr, final ArrayList<PathNode> nodes,
-      final Data data) throws QueryException {
-
-    if(data == null) return null;
-    if(expr instanceof final AxisPath path) {
-      return (nodes == null || path.root == null) && path.data() == data ?
-        path.pathStats(nodes) : null;
-    }
-    return nodes != null && expr instanceof ContextValue ? data.paths().stats(nodes) : null;
   }
 
   /**
@@ -621,14 +521,14 @@ public abstract class Path extends ParseExpr {
     boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOCUMENT);
     // path nodes of the path summary (null: unknown)
     final Data data = root.data();
-    ArrayList<PathNode> nodes = rootNodes(root, data, false);
+    ArrayList<PathNode> nodes = PathNodes.root(root, data, false);
 
     for(final Expr step : steps) {
       final Axis axis = axis(step);
       if(axis == null) return false;
       if(nodes != null) nodes = step instanceof final Step stp ? stp.nodes(nodes, false) : null;
       // results on the same level are non-overlapping and in document order
-      final boolean level = nodes != null && sameLevel(nodes);
+      final boolean level = nodes != null && PathNodes.sameLevel(nodes);
       switch(axis) {
         case ATTRIBUTE, SELF -> {
           // nothing changes
@@ -747,8 +647,8 @@ public abstract class Path extends ParseExpr {
     final Data data = last.data();
     SeqType st = last.seqType();
     // consider JNodes
-    final Expr prev = steps.length > 1 ? steps[steps.length - 2] : root != null ? root : rt;
-    if(this instanceof MixedPath && st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
+    final Expr prev = steps.length > 1 ? steps[steps.length - 2] : rt;
+    if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
         (prev == null || !prev.seqType().type.instanceOf(NodeType.XNODE))) {
       st = NodeType.JNODE.seqType();
     }
@@ -822,8 +722,8 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr removeEmpty(final CompileContext cc, final Expr rt) throws QueryException {
-    final ArrayList<PathNode> rn = rootNodes(rt, data(), false);
-    final ArrayList<PathNode> nodes = rn != null ? pathNodes(rn, false) : null;
+    final ArrayList<PathNode> rn = PathNodes.root(rt, data(), false);
+    final ArrayList<PathNode> nodes = rn != null ? PathNodes.get(this, rn, false) : null;
     // $doc/NON-EXISTING/PATH → ()
     if(nodes != null ? nodes.isEmpty() : emptySteps(rt)) {
       cc.info(QueryText.OPTPATH_X, this);
@@ -843,8 +743,8 @@ public abstract class Path extends ParseExpr {
     // skip optimization if the path summary is not available for the root nodes,
     // or if the root nodes are located on different levels
     final Data data = data();
-    ArrayList<PathNode> nodes = rootNodes(rt, data, false);
-    if(nodes == null || nodes.isEmpty() || !sameLevel(nodes)) return this;
+    ArrayList<PathNode> nodes = PathNodes.root(rt, data, false);
+    if(nodes == null || nodes.isEmpty() || !PathNodes.sameLevel(nodes)) return this;
     final int rootLevel = nodes.getFirst().level();
 
     final int sl = steps.length;
@@ -859,7 +759,7 @@ public abstract class Path extends ParseExpr {
         break;
       nodes = curr.nodes(nodes, false);
       // stop if no elements are found, or if they occur on different levels
-      if(nodes == null || nodes.isEmpty() || !sameLevel(nodes)) break;
+      if(nodes == null || nodes.isEmpty() || !PathNodes.sameLevel(nodes)) break;
 
       // ignore axes other than descendant, or numeric predicates
       if(curr.axis != DESCENDANT || curr.mayBePositional()) continue;
@@ -930,192 +830,7 @@ public abstract class Path extends ParseExpr {
      * - <a/>/<b/> → <a/> ! <b/>
      * - $a/b/string → $a/b ! string() */
     if(sl > 1) s1 = get(cc, info, root, Arrays.copyOfRange(steps, 0, sl - 1));
-    if(s1 != null) s2 = SimpleMap.get(cc, info, s1, s2);
-    return cc.replaceWith(this, s2);
-  }
-
-  /**
-   * Returns an equivalent expression which accesses an index.
-   * If the expression cannot be rewritten, the original expression is returned.
-   *
-   * The following types of queries can be rewritten (in the examples, the equality comparison
-   * is used, which will be rewritten to {@link ValueAccess} instances):
-   *
-   * <pre>
-   * 1. A[text() = '...']    : IA('...', A)
-   * 2. A[. = '...']         : IA('...', A)
-   * 3. text()[. = '...']    : IA('...')
-   * 4. A[B = '...']         : IA('...', B)/parent::A
-   * 5. A[B/text() = '...']  : IA('...')/parent::B/parent::A
-   * 6. A[B/C = '...']       : IA('...', C)/parent::B/parent::A
-   * 7. A[@a = '...']        : IA('...', @a)/parent::A
-   * 8. @a[. = '...']        : IA('...', @a)</pre>
-   *
-   * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
-   *
-   * @param cc compilation context
-   * @param rt root at compile time (can be {@code null})
-   * @return original or new expression
-   * @throws QueryException query exception
-   */
-  private Expr index(final CompileContext cc, final Expr rt) throws QueryException {
-    // skip optimization if path does not start with document nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT)) return this;
-
-    // cache index access costs
-    IndexInfo index = null;
-    // cheapest predicate and step
-    int predIndex = 0, stepIndex = 0;
-
-    // check if path can be converted to an index access
-    final Data data = data();
-    ArrayList<PathNode> nodes = rootNodes(rt, data, false);
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      // only accept descendant steps without positional predicates
-      // Example for position predicate: child::x[1] != parent::x[1]
-      final Step step = axisStep(s);
-      if(step == null || !step.axis.down || step.selector != null || step.mayBePositional()) break;
-      if(nodes != null) nodes = step.nodes(nodes, false);
-
-      final int el = step.exprs.length;
-      if(el > 0) {
-        // static vs dynamic access
-        final IndexDb db = data != null ?
-          new IndexStaticDb(data, info) :
-          new IndexDynDb(root == null ? new ContextValue(info) : root, info);
-
-        // choose the cheapest index access
-        for(int e = 0; e < el; e++) {
-          final IndexInfo ii = new IndexInfo(db, cc, step, nodes);
-          if(!step.exprs[e].indexAccessible(ii)) continue;
-
-          if(ii.costs.results() == 0) {
-            // no results...
-            cc.info(QueryText.OPTNORESULTS_X, step);
-            return Empty.VALUE;
-          }
-
-          if(index == null || index.costs.compareTo(ii.costs) > 0) {
-            index = ii;
-            predIndex = e;
-            stepIndex = s;
-          }
-        }
-      }
-    }
-
-    // skip rewriting if no index access is possible or if it is too expensive
-    if(index == null || data != null && index.costs.tooExpensive(data)) return this;
-    // skip optimization if root is no value and if index access is not enforced
-    Test rootTest = null;
-    if(rt instanceof final Value value && !(value instanceof Dummy)) {
-      rootTest = InvDocTest.get(value);
-    } else {
-      // continue if index use is enforced (skip context-dependent roots)
-      if(!index.enforce() || rt.has(Flag.CTX)) return this;
-    }
-
-    // rewrite for index access
-    cc.info(index.optInfo);
-
-    // create new root expression
-    final ExprList indexSteps = new ExprList();
-    final Expr indexRoot;
-    if(index.expr instanceof final Path path) {
-      indexRoot = path.root;
-      indexSteps.add(path.steps);
-    } else {
-      indexRoot = index.expr;
-    }
-    // only one hit: update sequence type (a name test may discard the indexed node)
-    if(index.costs.results() == 1 && indexRoot instanceof final ParseExpr expr) {
-      expr.exprType.assign(expr instanceof IndexAccess && index.test == null &&
-        index.costs.size() == 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
-    }
-
-    // invert steps that occur before index step, rewrite them to predicates
-    final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
-    final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
-    if(rootTest != NodeTest.DOCUMENT || data == null || !data.meta.complete ||
-        invertSteps(stepIndex)) {
-      for(int s = stepIndex; s >= 0; s--) {
-        final Axis axis = axisStep(s).axis.invert();
-        InputInfo ii;
-        Axis newAxis;
-        Test newTest;
-        Expr[] newPreds;
-        if(s == 0) {
-          ii = info;
-          newAxis = axis;
-          if(rootTest != null) {
-            // ...::document-node()
-            newTest = rootTest;
-            newPreds = new Expr[0];
-          } else {
-            // index use is enforced: ...::document-node()[db:node-id(.) = db:node-id(ROOT)]
-            newTest = NodeTest.DOCUMENT;
-            newPreds = new Expr[] { new CmpG(info, _DB_NODE_ID.get(info, new ContextValue(ii)),
-              _DB_NODE_ID.get(info, rt), CmpOp.EQ) };
-          }
-        } else {
-          final Step step = axisStep(s - 1);
-          ii = step.info();
-          newAxis = step.axis == ATTRIBUTE ? ATTRIBUTE : axis;
-          newTest = step.test;
-          newPreds = step.exprs;
-        }
-        // skip step if it is always successful
-        if(newAxis != ANCESTOR && newAxis != ANCESTOR_OR_SELF ||
-            newTest != NodeTest.XNODE && newTest != NodeTest.DOCUMENT ||
-            newPreds.length > 0) {
-          final Expr expr = invSteps.isEmpty() ?
-            indexStep != null ? indexStep : indexRoot : invSteps.peek();
-          invSteps.add(Step.get(cc, expr, ii, newAxis, newTest, newPreds));
-        }
-      }
-    }
-    // add created steps, followed by remaining predicates
-    if(!invSteps.isEmpty()) {
-      lastPreds.add(cc.get(indexStep != null ? indexStep : indexRoot, true,
-        () -> get(cc, info, null, invSteps.finish())));
-    }
-    lastPreds.add(Array.remove(index.step.exprs, predIndex));
-
-    // attach predicates to last step or new self::node() step
-    if(!lastPreds.isEmpty()) {
-      indexSteps.add(indexStep instanceof Step
-          ? ((Step) indexSteps.pop()).addPredicates(lastPreds.finish())
-          : Step.self(cc, indexRoot, info, lastPreds.finish()));
-    }
-
-    // add remaining steps
-    for(int s = stepIndex + 1; s < sl; s++) indexSteps.add(steps[s]);
-
-    return indexSteps.isEmpty() ? indexRoot : get(cc, info, indexRoot, indexSteps.finish());
-  }
-
-  /**
-   * Checks if steps before index step need to be inverted and traversed.
-   * @param i index step
-   * @return result of check
-   */
-  private boolean invertSteps(final int i) {
-    for(int s = i; s >= 0; s--) {
-      final Step step = axisStep(s);
-      // ensure that the index step does not use wildcard
-      if(step.test instanceof NodeTest && s != i) continue;
-      // consider child steps with name test and without predicates
-      if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
-          !(step.test instanceof final NameTest test)) return true;
-      // only consider tests that address a single database name
-      final byte[] name = test.dbName();
-      if(name == null) return true;
-      // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data().paths().desc(name);
-      if(pn.size() != 1 || pn.getFirst().level() != s + 1) return true;
-    }
-    return false;
+    return cc.replaceWith(this, SimpleMap.get(cc, info, s1, s2));
   }
 
   /**
@@ -1155,19 +870,9 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    changed |= cc.get(root, true, () -> {
-      boolean chngd = false;
-      final int sl = steps.length;
-      for(int s = 0; s < sl; s++) {
-        final Expr step = rewrite.apply(steps[s], s + 1 < sl ? steps[s + 1] : null);
-        if(step != steps[s]) {
-          steps[s] = step;
-          chngd = true;
-        }
-        cc.updateFocus(step, true);
-      }
-      return chngd;
-    });
+    final int sl = steps.length;
+    changed |= updateSteps(root, cc,
+      s -> rewrite.apply(steps[s], s + 1 < sl ? steps[s + 1] : null));
 
     return changed ? get(info, root, steps) : this;
   }
@@ -1388,29 +1093,11 @@ public abstract class Path extends ParseExpr {
     }
 
     // optimize steps with new root context
+    if(!changed && ic.var == null) return null;
     final CompileContext cc = ic.cc;
-    final int sl = steps.length;
-    final Expr rt = root != null ? root : cc.qc.focus.value;
-    if(changed) cc.get(focus(rt, cc), true, () -> {
-      for(int s = 0; s < sl; s++) {
-        steps[s] = steps[s].optimize(cc);
-        cc.updateFocus(steps[s], true);
-      }
-      return null;
-    });
-
-    changed |= ic.var != null && cc.get(focus(rt, cc), true, () -> {
-      boolean chngd = false;
-      for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s].inline(ic);
-        if(step != null) {
-          steps[s] = step;
-          chngd = true;
-        }
-        cc.updateFocus(steps[s], true);
-      }
-      return chngd;
-    });
+    final Expr focus = focus(cc);
+    if(changed) updateSteps(focus, cc, s -> steps[s].optimize(cc));
+    changed |= ic.var != null && updateSteps(focus, cc, s -> steps[s].inline(ic));
 
     return changed ? optimize(cc) : null;
   }

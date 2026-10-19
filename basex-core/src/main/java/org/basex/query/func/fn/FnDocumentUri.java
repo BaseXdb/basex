@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnDocumentUri extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(contextArg(qc), qc);
     final byte[] uri = node != null ? node.documentURI() : Token.EMPTY;
     return uri.length == 0 ? Empty.VALUE : Uri.get(uri, false);
   }

@@ -14,6 +14,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -95,7 +96,7 @@ public class FnSum extends NumericFn {
       }
     } else if(values instanceof final Path path) {
       // sum(db:get('db')//price) → 1234.5e0
-      final ArrayList<Stats> list = path.pathStats();
+      final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
         // negative zero: result if all values are negative zeros
         double sum = -0d, abs = 0;

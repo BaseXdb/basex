@@ -14,7 +14,7 @@ import org.basex.query.value.node.*;
 public final class FnGenerateId extends ContextFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final GNode node = toGNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(contextArg(qc), qc);
     return node != null ? Str.get(node.id()) : Str.EMPTY;
   }
 

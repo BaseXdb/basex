@@ -13,6 +13,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -164,7 +165,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
   private Expr optStats(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
     if(!defined(1) && values instanceof final Path path) {
-      final ArrayList<Stats> list = path.pathStats();
+      final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         final ItemSet set = ItemSet.get(null, info);

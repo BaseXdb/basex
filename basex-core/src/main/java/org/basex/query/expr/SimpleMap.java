@@ -164,11 +164,11 @@ public abstract sealed class SimpleMap extends Mapping
             // INTEGERS ! items-at(X, .) → items-at(X, INTEGERS)
             return cc.function(ITEMS_AT, info, args[0], expr);
           }
-        } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
+        } else if(DATA.is(next) && (((FnData) next).usesContext() ||
             args[0] instanceof ContextValue)) {
           // E ! data(.) → data(E)
           return cc.function(DATA, info, expr);
-        } else if(JVALUE.is(next) && (((FnJvalue) next).contextAccess() ||
+        } else if(JVALUE.is(next) && (((FnJvalue) next).usesContext() ||
             args[0] instanceof ContextValue)) {
           final Expr values = jvalues(expr, cc);
           if(values != null) return values;

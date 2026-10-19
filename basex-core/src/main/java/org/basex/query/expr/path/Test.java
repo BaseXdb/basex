@@ -7,6 +7,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.NameTest.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -86,6 +87,16 @@ public abstract class Test extends ExprInfo {
       }
     }
     return list.size() == 1 ? list.getFirst() : new UnionTest(list.toArray(Test[]::new));
+  }
+
+  /**
+   * Returns a document test for inverted location paths.
+   * @param root compile time root value
+   * @return document test
+   * @throws QueryException query exception
+   */
+  public static Test inverted(final Value root) throws QueryException {
+    return InvDocTest.get(root);
   }
 
   /**

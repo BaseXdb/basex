@@ -14,6 +14,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -137,7 +138,7 @@ public class FnMin extends StandardFunc {
 
     // max(db:get('db')//price) → 99e0
     if(noColl && values instanceof final Path path) {
-      final ArrayList<Stats> list = path.pathStats();
+      final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
         double v = min ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         for(final Stats stats : list) {

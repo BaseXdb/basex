@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnStringLength extends ContextFn {
   @Override
   public Itr value(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).atomItem(qc, info);
+    final Item value = contextArg(qc).atomItem(qc, info);
     if(value.isEmpty()) return Itr.ZERO;
     // optimization to return pre-computed string length
     if(value instanceof final AStr str) return Itr.get(str.length(info));
@@ -35,7 +35,7 @@ public final class FnStringLength extends ContextFn {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value = arg(0);
     if(STRING.is(value)) {
-      final Expr v = ((FnString) value).contextAccess() ? cc.qc.focus.value : value.arg(0);
+      final Expr v = ((FnString) value).contextArg(cc);
       // string-length(string(E)) → string-length(E)
       if(v != null && !v.seqType().mayBeWrapped()) {
         return cc.function(STRING_LENGTH, info, value.args());

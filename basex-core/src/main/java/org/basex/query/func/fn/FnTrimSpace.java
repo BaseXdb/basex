@@ -27,7 +27,7 @@ public final class FnTrimSpace extends ContextFn {
 
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item item = context(qc).atomItem(qc, info);
+    final Item item = contextArg(qc).atomItem(qc, info);
     final byte[] value = item.isEmpty() ? EMPTY : item.string(info);
     final Side side = options(1, TrimOptions::new, qc).get(TrimOptions.SIDE);
 
