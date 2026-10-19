@@ -3,6 +3,7 @@ package org.basex.io.in;
 import static org.basex.util.Strings.*;
 
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -17,6 +18,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class TextInput extends BufferInput {
+  /** Encoding in an XML declaration. */
+  private static final Pattern XML_ENCODING = Pattern.compile("""
+<\\?xml\\s+version\\s*=\\s*['\"][^'\"]*['\"]\\s+encoding\\s*=\\s*['\"]([A-Za-z][\\w.-]*)['\"]""");
   /** Decoder. */
   private TextDecoder decoder;
   /** Replace invalid input with Unicode replacement character. */
@@ -136,6 +140,24 @@ public class TextInput extends BufferInput {
       decoder.fallback = fallback;
     }
     return this;
+  }
+
+  /**
+   * Adopts the supported encoding of an XML declaration at the start of the input.
+   * @return self reference
+   * @throws IOException I/O exception
+   */
+  public TextInput xmlEncoding() throws IOException {
+    final TextDecoder peek = TextDecoder.get(decoder.encoding);
+    final StringBuilder sb = new StringBuilder();
+    mark(0);
+    for(int cp; sb.length() < 256 && (cp = peek.read(this)) != -1 && cp != '>';) {
+      sb.appendCodePoint(cp);
+    }
+    reset();
+    final Matcher matcher = XML_ENCODING.matcher(sb);
+    return matcher.lookingAt() && checkEncoding(matcher.group(1)) == null ?
+      encoding(matcher.group(1)) : this;
   }
 
   /**
