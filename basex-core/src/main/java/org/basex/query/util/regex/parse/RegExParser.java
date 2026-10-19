@@ -810,6 +810,12 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
+  private boolean jj_3R_charRange_404_7_9()
+ {
+    if (jj_3R_XmlChar_431_5_11()) return true;
+    return false;
+  }
+
   private boolean jj_3R_posCharGroup_379_7_7()
  {
     Token xsp;
@@ -821,12 +827,6 @@ re = LookAround.get(behind, positive, re);
     if (jj_scan_token(20)) return true;
     }
     }
-    return false;
-  }
-
-  private boolean jj_3R_charRange_401_7_9()
- {
-    if (jj_3R_XmlChar_431_5_11()) return true;
     return false;
   }
 
@@ -899,7 +899,7 @@ re = LookAround.get(behind, positive, re);
     jj_lookingAhead = false;
     if (!jj_semLA || jj_3R_charRange_395_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_401_7_9()) return true;
+    if (jj_3R_charRange_404_7_9()) return true;
     }
     return false;
   }

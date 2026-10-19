@@ -18,6 +18,7 @@ import java.util.zip.*;
 
 import javax.net.ssl.*;
 
+import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -949,6 +950,28 @@ public abstract class FnHttpTest extends HTTPTest {
         + " ! (?status, ?href, ?version, ?body instance of document-node(),"
         + " exists(?headers?content-type)), ' ')", ctx)) {
       assertEquals("200 " + REST_ROOT + " 1.1 true true", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests the default formats of parsed response bodies of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getFormats() throws Exception {
+    final String json = REST_ROOT + "?method=json&amp;query=%7B%22a%22:1%7D";
+    final String csv = REST_ROOT + "?method=csv&amp;query=%3Ccsv%3E%3Crecord%3E%3Ca%3E1%3C/a%3E"
+        + "%3C/record%3E%3C/csv%3E";
+    final String html = REST_ROOT + "?method=html&amp;query=%3Chtml/%3E";
+    try(QueryProcessor qp = new QueryProcessor("string-join(("
+        + _HTTP_GET.args(json) + "?body?a,"
+        + _HTTP_GET.args(csv) + "?body?rows?1,"
+        + _HTTP_GET.args(json, " { 'parse-options': { 'json': { 'format': 'direct' } } }")
+        + "?body instance of document-node(),"
+        + _HTTP_GET.args(html) + "?body/*/namespace-uri()), ' ')", ctx)) {
+      // Validator.nu is an optional dependency
+      final boolean nu = HtmlParser.Parser.NU.available(new HtmlOptions());
+      assertEquals("1 1 true " + (nu ? "http://www.w3.org/1999/xhtml" : ""),
+          qp.value().serialize().toString());
     }
   }
 

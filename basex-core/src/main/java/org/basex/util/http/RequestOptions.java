@@ -5,6 +5,7 @@ import static org.basex.util.http.HTTPText.*;
 
 import java.util.*;
 
+import org.basex.build.html.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -78,6 +79,10 @@ public final class RequestOptions extends Options {
       if(error != null) throw HTTP_INVALID_OPTION_X.get(info, error);
       request.charset = Strings.normEncoding(charset, false);
     }
+    // same defaults as fn:parse-csv, fn:parse-json and fn:parse-html
+    request.csv = "format=w3";
+    request.json = "format=w3";
+    if(HtmlParser.Parser.NU.available(new HtmlOptions())) request.html = "method=nu";
     if(get(PARSE_OPTIONS) instanceof final XQMap map) request.parseOptions = map;
     request.cookies = get(COOKIES);
     request.verify = get(VERIFY);
