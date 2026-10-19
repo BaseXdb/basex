@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -6489,8 +6490,11 @@ return
     error(func.args(DOC + "#xyz"), RESWHICH_X);
   }
 
-  /** Test method. */
-  @Test public void unparsedText() {
+  /**
+   * Test method.
+   * @throws IOException I/O exception
+   */
+  @Test public void unparsedText() throws IOException {
     final Function func = UNPARSED_TEXT;
     contains(func.args(DOC), "<html");
     contains(func.args(DOC, "US-ASCII"), "<html");
@@ -6505,6 +6509,20 @@ return
     for(int cp = 1; cp <= 31; cp++) sb.append((char) cp);
     write(file, sb.toString());
     query("string-to-codepoints(" + func.args(file.path()) + ") => count()", 31);
+
+    // XML resources: declared encoding takes precedence
+    final String xml = "<?xml version='1.0' encoding='iso-8859-1'?><a>ü</a>";
+    final byte[] latin1 = xml.getBytes(StandardCharsets.ISO_8859_1);
+    final IOFile latin = new IOFile(sandbox(), "latin.xml");
+    latin.write(latin1);
+    query(func.args(latin.path()), xml);
+    query(func.args(latin.path(), "UTF-8"), xml);
+    final IOFile text = new IOFile(sandbox(), "latin.txt");
+    text.write(latin1);
+    error(func.args(text.path()), RECDECODING_X);
+    // unsupported declared encodings are ignored
+    write(latin, "<?xml version='1.0' encoding='foo'?><a/>");
+    query(func.args(latin.path()), "<?xml version='1.0' encoding='foo'?><a/>");
 
     // credentials are stripped from error messages
     for(final String path : new String[] { "x", "x#frag", "%%" }) {

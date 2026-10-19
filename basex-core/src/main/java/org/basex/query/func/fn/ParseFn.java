@@ -16,6 +16,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -124,6 +125,9 @@ public abstract class ParseFn extends StandardFunc {
         RESENCODING_X);
     final String encoding = enc != null ? enc : testResources != null ? testResources[1] : null;
     final boolean fallback = options.get(CommonOptions.FALLBACK) == Boolean.TRUE;
+    // XML resources: declared encoding takes precedence over the encoding option
+    final boolean xml = (testResources == null || testResources[1] == null) &&
+        MediaType.get(io.path()).isXml();
 
     // newline normalization
     Boolean normalize = (Boolean) options.get(CommonOptions.NORMALIZE_NEWLINES);
@@ -135,6 +139,7 @@ public abstract class ParseFn extends StandardFunc {
 
     // parse text
     try(TextInput ti = normalize ? new NewlineInput(io, encoding) : new TextInput(io, encoding)) {
+      if(xml) ti.xmlEncoding();
       return parse(ti.fallback(fallback), options, qc);
     } catch(final DecodingException ex) {
       throw (enc != null ? RESINPUT_X : RECDECODING_X).get(info, ex);
