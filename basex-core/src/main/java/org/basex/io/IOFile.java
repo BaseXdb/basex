@@ -99,6 +99,13 @@ public final class IOFile extends IO {
    * @return file path
    */
   static String toPath(final String uri) {
+    // fast path: file:/path or file:///path without characters that need to be decoded
+    final int ul = uri.length(), p = uri.startsWith("file:///") ? 7 : 5;
+    if(!uri.startsWith("//", p)) {
+      int u = p;
+      while(u < ul && plain(uri.charAt(u))) u++;
+      if(u == ul) return uri.substring(p);
+    }
     try {
       return new URI(uri).getPath();
     } catch(final Exception ex) {
@@ -927,26 +934,42 @@ public final class IOFile extends IO {
   // PRIVATE METHODS ==============================================================================
 
   /**
+   * Checks if the specified character can be adopted unchanged from a URI path.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean plain(final char ch) {
+    return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' ||
+        Strings.contains("/:.-_~", ch);
+  }
+
+  /**
    * Returns a normalized file path.
    * @param path input path
    * @param directory directory flag
    * @return path
    */
   private static String normalize(final String path, final boolean directory) {
-    final StringList sl = new StringList();
-    final int l = path.length();
-    final StringBuilder sb = new StringBuilder(l);
-    for(int i = 0; i < l; i++) {
-      final char ch = path.charAt(i);
-      if(ch == '\\' || ch == '/') add(sb, sl);
-      else sb.append(ch);
-    }
-    add(sb, sl);
+    final int pl = path.length();
+    final StringBuilder sb = new StringBuilder(pl + 3);
     if(path.startsWith("\\\\") || path.startsWith("//")) sb.append("//");
-    final int size = sl.size();
-    for(int s = 0; s < size; s++) {
-      if(s != 0 || Strings.startsWith(path, '/')) sb.append('/');
-      sb.append(sl.get(s));
+    final int start = sb.length();
+    for(int s = 0, e; s <= pl; s = e + 1) {
+      e = s;
+      while(e < pl && path.charAt(e) != '/' && path.charAt(e) != '\\') e++;
+      final int len = e - s;
+      final boolean first = sb.length() == start;
+      if(len == 2 && path.startsWith("..", s) && !first) {
+        // parent step: remove last segment unless it contains a colon
+        final int last = Math.max(sb.lastIndexOf("/") + 1, start);
+        if(sb.indexOf(":", last) == -1) sb.setLength(Math.max(last - 1, start));
+      } else if(len > 1 || len == 1 && path.charAt(s) != '.') {
+        // skip empty and self steps, switch first Windows letter to upper case
+        if(!first || path.startsWith("/")) sb.append('/');
+        final char ch = path.charAt(s);
+        sb.append(first && len > 1 && path.charAt(s + 1) == ':' ? Character.toUpperCase(ch) : ch);
+        sb.append(path, s + 1, e);
+      }
     }
 
     // add slash if original file ends with a slash, or if path is a Windows root directory
@@ -958,26 +981,5 @@ public final class IOFile extends IO {
     if(dir) sb.append('/');
 
     return sb.toString();
-  }
-
-  /**
-   * Adds a directory/file to the path list.
-   * @param sb entry to be added
-   * @param sl string list
-   */
-  private static void add(final StringBuilder sb, final StringList sl) {
-    String s = sb.toString();
-    // switch first Windows letter to upper case
-    if(s.length() > 1 && s.charAt(1) == ':' && sl.isEmpty()) {
-      s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
-    if("..".equals(s) && !sl.isEmpty()) {
-      // parent step
-      if(sl.peek().indexOf(':') == -1) sl.pop();
-    } else if(!".".equals(s) && !s.isEmpty()) {
-      // skip self and empty steps
-      sl.add(s);
-    }
-    sb.setLength(0);
   }
 }

@@ -126,6 +126,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Counter for variable IDs. */
   public int varIDs;
 
+  /** Real paths of module files, indexed by file path (shared with parent context). */
+  public Map<String, String> realPaths;
   /** Parsed modules, containing the file path and module URI. */
   public final TokenObjectMap<byte[]> modParsed = new TokenObjectMap<>();
   /** Parsed modules, containing the file path and library module. */
@@ -207,6 +209,7 @@ public final class QueryContext extends Job implements Closeable {
     shared = parent != null ? parent.shared : new SharedData();
     regex = parent != null ? parent.regex : new TokenObjectMap<>();
     memo = parent != null ? parent.memo : new ConcurrentHashMap<>();
+    realPaths = parent != null ? parent.realPaths : new ConcurrentHashMap<>();
     globals = parent != null ? parent.globals : new GlobalValues();
     user = parent != null ? parent.user : context.user();
     maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;

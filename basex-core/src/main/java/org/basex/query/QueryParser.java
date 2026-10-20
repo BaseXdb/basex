@@ -116,6 +116,10 @@ public class QueryParser extends InputParser {
   private final TokenBuilder token = new TokenBuilder();
   /** Current XQDoc string. */
   private final TokenBuilder docBuilder = new TokenBuilder();
+  /** Start of the last skipped whitespace without XQDoc comments. */
+  private int wsStart = -1;
+  /** End of the last skipped whitespace without XQDoc comments. */
+  private int wsEnd;
 
   /** Function or variable declaration that is currently parsed (can be {@code null}). */
   private String declaration;
@@ -229,10 +233,7 @@ public class QueryParser extends InputParser {
       namespaces.put(prefix, uri);
       wsCheck(";");
 
-      // get absolute path
-      IO baseO = sc.baseIO();
-      if(baseO instanceof final IOFile file) baseO = file.normalize();
-      final byte[] pth = token(baseO == null ? "" : baseO.path());
+      final byte[] pth = token(modulePath(sc.baseIO()));
       qc.modParsed.put(pth, uri);
       qc.modStack.push(pth);
 
@@ -991,6 +992,17 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Returns the path that identifies a module, resolving capitalization and symbolic links.
+   * @param io module reference (can be {@code null})
+   * @return path
+   */
+  private String modulePath(final IO io) {
+    return io instanceof final IOFile file ?
+      qc.realPaths.computeIfAbsent(file.path(), p -> file.normalize().path()) :
+      io == null ? "" : io.path();
+  }
+
+  /**
    * Parses the specified module, checking function and variable references at the end.
    * @param pth input path
    * @param uri base URI of module
@@ -1000,10 +1012,8 @@ public class QueryParser extends InputParser {
   public final void module(final String pth, final String uri, final InputInfo info)
       throws QueryException {
 
-    // get absolute path; resolve file names with different capitalization and symbolic links
-    IO io = sc.resolve(pth, uri);
-    if(io instanceof final IOFile file) io = file.normalize();
-    final byte[] tPath = token(io.path());
+    final IO io = sc.resolve(pth, uri);
+    final byte[] tPath = token(modulePath(io));
 
     // check if module has already been parsed
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
@@ -5283,23 +5293,35 @@ public class QueryParser extends InputParser {
    */
   private boolean skipWs() throws QueryException {
     final int i = pos;
+    // the same whitespace is skipped again whenever the parser backtracks
+    if(i == wsStart) {
+      pos = wsEnd;
+      return i != pos;
+    }
+    boolean xqdoc = false;
     while(more()) {
       final int cp = current();
       if(cp == '(' && next() == ':') {
-        comment();
+        xqdoc |= comment();
       } else {
-        if(cp == 0 || cp > ' ') return i != pos;
+        if(cp == 0 || cp > ' ') break;
         ++pos;
       }
+    }
+    // XQDoc comments are scanned again: they update the documentation string
+    if(!xqdoc) {
+      wsStart = i;
+      wsEnd = pos;
     }
     return i != pos;
   }
 
   /**
    * Consumes a comment.
+   * @return {@code true} if the comment is an XQDoc comment
    * @throws QueryException query exception
    */
-  private void comment() throws QueryException {
+  private boolean comment() throws QueryException {
     ++pos;
     final boolean xqdoc = next() == '~';
     if(xqdoc) {
@@ -5307,6 +5329,7 @@ public class QueryParser extends InputParser {
       ++pos;
     }
     comment(false, xqdoc);
+    return xqdoc;
   }
 
   /**

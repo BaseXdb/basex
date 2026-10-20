@@ -30,7 +30,8 @@ public class InputParser {
    * @param input input
    */
   public InputParser(final String input) {
-    this.input = input.replaceAll("\r\n?", "\n").codePoints().toArray();
+    this.input = (input.indexOf('\r') == -1 ? input : input.replaceAll("\r\n?", "\n")).
+        codePoints().toArray();
     length = this.input.length;
   }
 

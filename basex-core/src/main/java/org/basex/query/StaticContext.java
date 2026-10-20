@@ -76,8 +76,13 @@ public final class StaticContext {
   /** Sets an XML catalog URI resolver. */
   private final URIResolver uriResolver;
 
+  /** Base URI of the working directory. */
+  private static final Uri WORKDIR = Uri.get(Prop.WORKDIR.url());
+
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
+  /** IO representation of the static base URI (lazily assigned). */
+  private IO baseIO;
 
   /**
    * Constructor.
@@ -130,13 +135,22 @@ public final class StaticContext {
     if(uri != null) {
       // ignore empty URIs
       if(uri.isEmpty()) return;
+      // working directory: adopt cached references
+      if(uri.equals("./") && resolver == null && baseURI == Uri.EMPTY) {
+        baseURI = WORKDIR;
+        baseIO = Prop.WORKDIR;
+        return;
+      }
       // adopt original URIs that do not adhere to a known IO schema
-      string = IO.get(uri) instanceof IOContent ? uri : resolve(uri).url();
+      final IO io = IO.get(uri);
+      string = io instanceof IOContent ? uri :
+        (resolver == null && baseIO() == null ? io : resolve(uri)).url();
       // #1062: check if specified URI points to a directory. if yes, add trailing slash
       if(!Strings.endsWith(string, '/') &&
         (Strings.endsWith(uri, '.') || Strings.endsWith(uri, '/'))) string += '/';
     }
     baseURI = Uri.get(string);
+    baseIO = null;
   }
 
   /**
@@ -144,7 +158,8 @@ public final class StaticContext {
    * @return IO reference (can be {@code null})
    */
   public IO baseIO() {
-    return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));
+    if(baseIO == null && baseURI != Uri.EMPTY) baseIO = IO.get(string(baseURI.string()));
+    return baseIO;
   }
 
   /**
@@ -187,13 +202,13 @@ public final class StaticContext {
       if(io != null) return io;
     }
 
-    final IO baseIO = baseIO();
-    if(baseIO == null) return IO.get(path);
+    final IO base = baseIO();
+    if(base == null) return IO.get(path);
 
     // try to resolve the path against the registered URI resolver
     if(uriResolver != null) {
       try {
-        final Source s = uriResolver.resolve(path, baseIO.path());
+        final Source s = uriResolver.resolve(path, base.path());
         final InputSource is = s instanceof final SAXSource ss ? ss.getInputSource() : null;
         final String id = is != null ? is.getSystemId() : null;
         if(id != null) return IO.get(id);
@@ -201,7 +216,7 @@ public final class StaticContext {
         Util.debug(ex);
       }
     }
-    return baseIO.merge(path);
+    return base.merge(path);
   }
 
   /**

@@ -64,6 +64,8 @@ public final class Prop {
   public static final URL LOCATION;
   /** System's temporary directory. */
   public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
+  /** Working directory. */
+  public static final IOFile WORKDIR = new IOFile("./");
   /** Project home directory. */
   public static final String HOMEDIR;
 
@@ -82,7 +84,7 @@ public final class Prop {
     // check system property 'org.basex.path'
     String homedir = System.getProperty(PATH);
     // check if working directory or one of its ancestors contains configuration file
-    if(homedir == null) homedir = homeDir(System.getProperty("user.dir"));
+    if(homedir == null) homedir = homeDir(WORKDIR.path());
     // check if application directory contains configuration file
     if(homedir == null) homedir = configDir(applicationDir(LOCATION));
     // fallback: choose home directory (linux: check HOME variable, GH-773)

@@ -87,8 +87,8 @@ public final class Performance {
    * @return formatted time in milliseconds with 2 decimal places
    */
   public static String formatNano(final long nano, final int runs) {
-    final String ms = String.format(Locale.ENGLISH, "%.2f", nanoToMilli(nano, runs));
-    return ms + " ms" + (runs > 1 ? " (avg)" : "");
+    final long cs = Math.round(nano / 10000.0d / runs);
+    return cs / 100 + (cs % 100 < 10 ? ".0" : ".") + cs % 100 + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**

@@ -172,6 +172,8 @@ public final class UriParser {
             "(\\?" + QUERY + ")?" +
             "(#" + FRAGMENT + ")?" +
           ")$");
+  /** Index of the scheme group. */
+  private static final int SCHEME_GROUP = URI_REF.namedGroups().get("scheme");
 
   /** Scheme of an absolute URI. */
   private static final Pattern SCHEME_ONLY = Pattern.compile('^' + SCHEME + '$');
@@ -265,7 +267,7 @@ public final class UriParser {
     final Matcher matcher = URI_REF.matcher(uri);
     if(matcher.matches()) {
       final ParsedUri pu = new ParsedUri();
-      pu.absolute = matcher.group("scheme") != null;
+      pu.absolute = matcher.start(SCHEME_GROUP) != -1;
       pu.valid = true;
       return pu;
     }

@@ -30,6 +30,8 @@ import org.basex.util.options.*;
 public final class Log implements QueryTracer {
   /** Server string. */
   private static final String SERVER = "SERVER";
+  /** Whitespace sequences. */
+  private static final Pattern WS = Pattern.compile("\\s+");
 
   /** Static options. */
   private final StaticOptions sopts;
@@ -138,7 +140,7 @@ public final class Log implements QueryTracer {
     final int len = inf.codePointCount(0, inf.length());
     if(len > maxLen) inf = inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "...";
 
-    String addr = address != null ? address.replaceFirst("^/", "") : SERVER;
+    String addr = address == null ? SERVER : address.substring(address.startsWith("/") ? 1 : 0);
     if(maskip) {
       // examples for input strings:
       // IPv4: 192.128.0.1:54321
@@ -226,7 +228,7 @@ public final class Log implements QueryTracer {
    * @return normalized string
    */
   private static String normalize(final String string) {
-    return string != null ? string.trim().replaceAll("\\s+", " ") : "";
+    return string != null ? WS.matcher(string.trim()).replaceAll(" ") : "";
   }
 
   /**

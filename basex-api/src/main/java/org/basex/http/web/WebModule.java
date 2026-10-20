@@ -2,6 +2,7 @@ package org.basex.http.web;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.http.restxq.*;
@@ -24,6 +25,8 @@ public final class WebModule {
   private volatile ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** Supported WebSocket methods. */
   private volatile ArrayList<WsFunction> wsFunctions = new ArrayList<>();
+  /** Real paths of the module file and its imports (replaced whenever modules are checked). */
+  private volatile Map<String, String> realPaths = new ConcurrentHashMap<>();
   /** Timestamps of the module file and its imports, indexed by file path. */
   private final HashMap<String, Long> files = new HashMap<>();
   /** File reference. */
@@ -52,6 +55,8 @@ public final class WebModule {
    * @throws IOException I/O exception
    */
   void parse(final Context ctx) throws IOException {
+    // detect changed symbolic links and capitalizations
+    realPaths = new ConcurrentHashMap<>();
     // archived modules are parsed once (modified archives are reloaded as a whole)
     if(content != null && Checks.all(files.entrySet(),
         entry -> new IOFile(entry.getKey()).timeStamp() == entry.getValue())) return;
@@ -159,6 +164,7 @@ public final class WebModule {
       new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
     // modules of the web application may access external resources
     qc.parseResources = true;
+    qc.realPaths = realPaths;
     try {
       return qc.parse(content, file.path(), sc);
     } finally {

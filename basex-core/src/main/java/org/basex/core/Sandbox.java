@@ -37,8 +37,6 @@ import org.basex.util.options.*;
 public abstract class Sandbox {
   /** Flag for writing queries and results to STDERR; helpful for exporting test cases. */
   private static final boolean OUTPUT = false;
-  /** Base URI. */
-  private static final String BASEURI = new File(".").getAbsolutePath();
 
   /** Database port. */
   protected static final int DB_PORT = 9863;
@@ -280,7 +278,7 @@ public abstract class Sandbox {
     // capture the context once: a query must release locks on the same context it registered with,
     // even if the static field is reassigned (e.g. by another test class) while the query runs
     final Context ctx = context;
-    try(QueryProcessor qp = new QueryProcessor(query, BASEURI, ctx, null)) {
+    try(QueryProcessor qp = new QueryProcessor(query, "", ctx, null)) {
       qp.compile();
       qp.register(ctx);
       try(Serializer ser = qp.serializer(ao)) {

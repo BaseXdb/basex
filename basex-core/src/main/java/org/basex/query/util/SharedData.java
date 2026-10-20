@@ -27,13 +27,6 @@ public final class SharedData {
   private final TokenObjectMap<byte[]> prefixes = new TokenObjectMap<>();
 
   /**
-   * Constructor.
-   */
-  public SharedData() {
-    shape(Types.RECORD);
-  }
-
-  /**
    * Parses and returns a shared QName.
    * @param token QName token
    * @param elem always resolve URI
@@ -153,6 +146,7 @@ public final class SharedData {
    * @return new or already registered shape
    */
   public ShapeType shape(final ShapeType sh) {
+    if(Types.RECORD.eq(sh)) return Types.RECORD;
     synchronized(shapeTypes) {
       final ArrayList<ShapeType> types = shapeTypes.computeIfAbsent(sh.fields().size(),
           ArrayList::new);
