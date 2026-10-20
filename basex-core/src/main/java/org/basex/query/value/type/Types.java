@@ -296,9 +296,13 @@ public final class Types {
   public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP, ARRAY);
   /** Zero or one map or array. */
   public static final SeqType MAP_OR_ARRAY_ZO = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_ONE);
+  /** GNode, map, or array. */
+  public static final Type NODE_OR_MAP_OR_ARRAY = ChoiceItemType.get(NODE, MAP, ARRAY);
+  /** Single GNode, map, or array. */
+  public static final SeqType NODE_OR_MAP_OR_ARRAY_O = NODE_OR_MAP_OR_ARRAY.seqType();
   /** Zero or more GNodes, maps, or arrays. */
   public static final SeqType NODE_OR_MAP_OR_ARRAY_ZM =
-      ChoiceItemType.get(NODE, MAP, ARRAY).seqType(Occ.ZERO_OR_MORE);
+      NODE_OR_MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
 
   /** Single JNode. */
   public static final SeqType JNODE_O = JNODE.seqType();

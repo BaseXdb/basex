@@ -98,4 +98,18 @@ public final class FPI extends FNode {
     if(contains(atom, CLOSE)) throw CPICONT_X.get(info, atom);
     return atom;
   }
+
+  /**
+   * Returns the content of a constructed processing instruction.
+   * @param atom atomized value
+   * @param info input info (can be {@code null})
+   * @return content without leading whitespace
+   * @throws QueryException query exception
+   */
+  public static byte[] content(final byte[] atom, final InputInfo info) throws QueryException {
+    int i = -1;
+    final int al = atom.length;
+    while(++i < al && ws(atom[i]));
+    return parse(substring(atom, i), info);
+  }
 }

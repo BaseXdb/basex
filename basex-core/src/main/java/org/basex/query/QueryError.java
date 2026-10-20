@@ -833,6 +833,16 @@ public enum QueryError {
   UPDBERROR_X_X(FOUP, 2, "Database '%' cannot be %."),
   /** Error code. */
   UPDBERROR_X(FOUP, 2, "%"),
+  /** Error code. */
+  UPSELECT_X(FOUP, 3, "Node cannot be replaced: %."),
+  /** Error code. */
+  UPREPLACE_X_X(FOUP, 4, "% expected as replacement, % found."),
+  /** Error code. */
+  UPREPLACEVALUE_X(FOUP, 4, "Only one item can replace the value of a node: %."),
+  /** Error code. */
+  UPREPLACEATT_X(FOUP, 4, "Duplicate attribute name in replacement: %."),
+  /** Error code. */
+  UPREPLACEKEY_X(FOUP, 4, "Duplicate map key in replacement: %."),
 
   /** Error code. */
   PARSE_URI_X(FOUR, 1, "Invalid IPv6/IPvFuture authority: %."),
