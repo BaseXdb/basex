@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnPartialApply extends StandardFunc {
   /** The type of parameter "arguments". */
-  private static final SeqType ARGS_TYPE = MapType.get(BasicType.POSITIVE_INTEGER,
+  private static final SeqType ARGS_TYPE = MapType.get(BasicType.INTEGER,
       Types.ITEM_ZM).seqType();
   /** The name of parameter "arguments". */
   private static final QNm ARGS_NAME = new QNm("arguments");
@@ -55,7 +55,7 @@ public final class FnPartialApply extends StandardFunc {
     int placeholders = arity;
     for(final XQMap.Entry arg : arguments.entries()) {
       final long index = toLong(arg.key());
-      if(index <= arity) {
+      if(index >= 1 && index <= arity) {
         final int i = (int) index - 1;
         funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i),
             null);

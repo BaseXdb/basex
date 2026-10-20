@@ -113,8 +113,8 @@ public enum Records {
   LOCATION(FN_URI, "location",
     field("system-id", Types.ANY_URI_ZO),
     field("public-id", Types.STRING_ZO),
-    field("line-number", Types.POSITIVE_INTEGER_ZO),
-    field("column-number", Types.POSITIVE_INTEGER_ZO)),
+    field("line-number", Types.INTEGER_ZO),
+    field("column-number", Types.INTEGER_ZO)),
   /** Record definition. */
   MATCHING_SEGMENT(FN_URI, "matching-segment",
     field("substring", Types.STRING_O),
@@ -126,8 +126,8 @@ public enum Records {
     field("columns", Types.STRING_ZM),
     field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
-    field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
-      ChoiceItemType.get(BasicType.POSITIVE_INTEGER, BasicType.STRING).seqType()).seqType())),
+    field("get", FuncType.get(Types.STRING_O, Types.INTEGER_O,
+      ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING).seqType()).seqType())),
   /** Record definition. */
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */

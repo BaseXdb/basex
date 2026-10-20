@@ -22,7 +22,7 @@ public final class FnChar extends StandardFunc {
 
     if(item instanceof Itr) {
       // codepoint integer
-      final long cp = toLong(item, 1);
+      final long cp = toLong(item, value);
       if(cp > 0 && cp <= Integer.MAX_VALUE && XMLToken.valid11((int) cp))
         return Str.get((int) cp);
     } else {

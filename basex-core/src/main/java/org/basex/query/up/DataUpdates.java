@@ -188,11 +188,11 @@ final class DataUpdates {
     /* optional: export file if...
      * - WRITEBACK option is turned on
      * - an original file path exists (and does not start with a tilde)
-     * - data is a main-memory instance, retrieved via fn:doc or fn:collection
+     * - data is a main-memory instance, retrieved via fn:doc, fn:collection or opened in context
      */
     final String original = data.meta.original;
     if(!(original.isEmpty() || Strings.startsWith(original, '~')) && data.inMemory() &&
-        data.meta.docOpts != null) {
+        (data.meta.docOpts != null || data == qc.context.data())) {
       if(writeback) {
         try {
           Export.export(data, original, qc.context.options, null);

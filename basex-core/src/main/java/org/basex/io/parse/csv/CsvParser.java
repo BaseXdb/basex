@@ -173,7 +173,7 @@ public final class CsvParser {
     final int fs = fields.size(), n = select ? selectColumns.length : trimRows ? rowSize : fs;
     for(int i = 0; i < n; i++) {
       final int index = select ? selectColumns[i] - 1 : i;
-      final byte[] f = index < fs ? fields.get(index) : Token.EMPTY;
+      final byte[] f = index >= 0 && index < fs ? fields.get(index) : Token.EMPTY;
       if(data) {
         conv.entry(f);
       } else {

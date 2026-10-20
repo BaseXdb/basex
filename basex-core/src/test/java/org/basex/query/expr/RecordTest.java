@@ -73,11 +73,11 @@ public final class RecordTest extends SandboxTest {
     // the parsed-csv-structure built-in record (function-valued 'get' field)
     query("let $r as fn:parsed-csv-structure-record :="
         + "  { 'columns': ('a', 'b'), 'column-index': { 'a': 1 }, 'rows': [ 'p' ],\n"
-        + "  'get': fn($r as xs:positiveInteger, $c as (xs:positiveInteger | xs:string))"
+        + "  'get': fn($r as xs:integer, $c as (xs:integer | xs:string))"
         + " as xs:string { 'x' } } return $r instance of fn:parsed-csv-structure-record", true);
     query("{ 'columns': ('a', 'b', 'c'), 'column-index': { 'a': 1, 'b': 2, 'c': 3 },\n"
         + "  'rows': ([ 'p', 'q', 'r' ], [ 's', 't', 'u' ]),\n"
-        + "  'get': fn($row as xs:positiveInteger, $col as (xs:positiveInteger | xs:string))"
+        + "  'get': fn($row as xs:integer, $col as (xs:integer | xs:string))"
         + " as xs:anyAtomicType? { 'banana' } } instance of fn:parsed-csv-structure-record", false);
     query("{ 'number': 0.937e0, 'next': fn() { fn:random-number-generator() },\n"
         + "  'permute': fn($in) { reverse($in) } }"

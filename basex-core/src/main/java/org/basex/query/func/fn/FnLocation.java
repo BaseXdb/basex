@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -32,8 +31,7 @@ public final class FnLocation extends ContextFn {
     final byte[] uri = node.root().baseURI();
     return XQMap.get(Records.LOCATION.get(),
       uri.length == 0 ? Empty.VALUE : Uri.get(uri, false), Empty.VALUE,
-      Itr.get(line, BasicType.POSITIVE_INTEGER),
-      column <= 0 ? Empty.VALUE : Itr.get(column, BasicType.POSITIVE_INTEGER));
+      Itr.get(line), column <= 0 ? Empty.VALUE : Itr.get(column));
   }
 
   @Override

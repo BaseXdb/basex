@@ -146,19 +146,22 @@ public final class JobTest {
     }
   }
 
-  /** A job that fails after acquiring its locks must give them back. */
-  @Test public void registrationFailsWithLocks() {
+  /** A job registered after the pool has been closed runs without timeout. */
+  @Test public void registrationClosed() {
     final Context ctx = new Context();
+    final Job job = job();
     try {
-      // non-admin jobs schedule a timeout, which is rejected once the pool has been closed
+      // non-admin jobs schedule a timeout, which is skipped once the pool has been closed
       ctx.user(new User("tester"));
       ctx.soptions.set(StaticOptions.TIMEOUT, 5);
       ctx.jobs.close();
-      assertThrows(RejectedExecutionException.class, () -> job().register(ctx));
-      assertTrue(ctx.jobs.active.isEmpty(), "failed job should have left the pool");
-      assertNull(ctx.locking.held(), "failed job should have released its locks");
+      job.register(ctx);
+      assertEquals(JobState.RUNNING, job.state);
     } finally {
-      ctx.jobs.active.clear();
+      // a job left on the current thread would be the parent of all later jobs
+      job.unregister(ctx);
+      assertTrue(ctx.jobs.active.isEmpty(), "job should have left the pool");
+      assertNull(ctx.locking.held(), "job should have released its locks");
       ctx.close();
     }
   }

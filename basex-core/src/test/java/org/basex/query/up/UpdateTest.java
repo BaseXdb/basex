@@ -1184,7 +1184,7 @@ public final class UpdateTest extends SandboxTest {
         UPURIDUP_X);
   }
 
-  /** Writes back updates on documents retrieved via fn:doc, but not via fn:parse-xml. */
+  /** Writes back updates on documents retrieved via fn:doc or CHECK, but not via fn:parse-xml. */
   @Test public void writeback() {
     final String doc = sandbox() + "wb-doc.xml", parsed = sandbox() + "wb-parsed.xml";
     query(_FILE_WRITE_TEXT.args(doc, "<a/>"));
@@ -1194,6 +1194,21 @@ public final class UpdateTest extends SandboxTest {
         + "/a");
     query(_FILE_READ_TEXT.args(doc), "<a><b/></a>");
     query(_FILE_EXISTS.args(parsed), false);
+
+    // main-memory document opened in context
+    final String checked = sandbox() + "wb-check.xml";
+    query(_FILE_WRITE_TEXT.args(checked, "<a/>"));
+    set(MainOptions.MAINMEM, true);
+    set(MainOptions.WRITEBACK, true);
+    try {
+      execute(new Check(checked));
+      query("insert node <b/> into /a");
+    } finally {
+      execute(new Close());
+      set(MainOptions.WRITEBACK, false);
+      set(MainOptions.MAINMEM, false);
+    }
+    query(_FILE_READ_TEXT.args(checked), "<a><b/></a>");
   }
 
   /** Allows empty-sequence() as return type for updating functions. */

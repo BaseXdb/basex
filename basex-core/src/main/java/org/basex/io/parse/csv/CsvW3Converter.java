@@ -111,7 +111,7 @@ public final class CsvW3Converter extends CsvConverter {
     @Override
     public Value value(final QueryContext qc) throws QueryException {
       final long rowIndex = toLong(arg(0), qc);
-      if(rowIndex <= rows.size()) {
+      if(rowIndex >= 1 && rowIndex <= rows.size()) {
         final XQArray row = (XQArray) rows.itemAt(rowIndex - 1);
         if(row != null) {
           Item colIndex = toAtomItem(arg(1), qc);
@@ -143,9 +143,9 @@ public final class CsvW3Converter extends CsvConverter {
     private static FuncItem funcItem(final Value rows, final XQMap columnIndex,
         final QueryContext qc, final InputInfo ii) {
       final VarScope vs = new VarScope();
-      final SeqType rowType = POSITIVE_INTEGER_O;
+      final SeqType rowType = INTEGER_O;
       final SeqType colType = ChoiceItemType.get(BasicType.STRING,
-          BasicType.POSITIVE_INTEGER).seqType();
+          BasicType.INTEGER).seqType();
       final Var row = vs.addNew(new QNm("row"), rowType, qc, ii);
       final Var col = vs.addNew(new QNm("column"), colType, qc, ii);
       final Get get = new Get(ii, rows, columnIndex, new VarRef(ii, row), new VarRef(ii, col));

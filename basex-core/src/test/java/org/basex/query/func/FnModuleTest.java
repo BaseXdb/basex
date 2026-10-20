@@ -547,7 +547,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
 
-    error(func.args(0), INVTYPE_X);
+    error(func.args(0), CHARINV_X);
+    error(func.args(-1), CHARINV_X);
     error(func.args(" 0xD800"), CHARINV_X);
     error(func.args(" 0x110000"), CHARINV_X);
     error(func.args(11111111111111L), CHARINV_X);
@@ -3184,6 +3185,16 @@ return
     query(func.args("m", " { 'content': `module{ char(13) }namespace m='m'; "
         + "declare variable $m:v := 1;` }") + "?variables?#Q{m}v", 1);
 
+    // qtspecs#2990: coerce values of external variables
+    final String ext = " { 'content': 'module namespace m=\"m\"; "
+        + "declare variable $m:v as %s external;', 'variables': { QName(\"m\", \"v\"): %s } }";
+    query(func.args("m", String.format(ext, "xs:double", "1")) + "?variables?#Q{m}v "
+        + "instance of xs:double", true);
+    query(func.args("m", String.format(ext, "xs:integer", "xs:untypedAtomic(\"1\")"))
+        + "?variables?#Q{m}v instance of xs:integer", true);
+    error(func.args("m", String.format(ext, "xs:integer", "\"1\"")),
+        MODULE_PARAMETER_TYPE_X_X);
+
     // GH-2640
     error("<e xmlns:p='p'>{\n"
         + "  load-xquery-module(\"m\", {\n"
@@ -4190,6 +4201,15 @@ return
       + "\"13.99\"],[\"2023-07-20\",\"Alice\",\"Aachen\",\"15.00\",\"\",\"\"],[\"2023-07-20\","
       + "\"Charlie\",\"Celle\",\"15.00\",\"GBP\",\"11.99\"]),\"get\":\"(: function :)\"}\n"
       + "11.99");
+
+    // indexes outside the range of the input yield empty fields
+    final String input = " 'a,b,c' || char(10) || 'p,q,r'";
+    query(func.args(input, " { 'select-columns': (3, 0, -1) }") + "?rows",
+        "[\"c\",\"\",\"\"]\n[\"r\",\"\",\"\"]");
+    query(func.args(input) + "?get(0, 1)", "");
+    query(func.args(input) + "?get(-1, 1)", "");
+    query(func.args(input) + "?get(1, 0)", "");
+    query(func.args(input) + "?get(1, -1)", "");
   }
 
   /** Test method. */
@@ -4442,6 +4462,11 @@ return
     query("let $f := " + func.args(" dateTime#2", " {2: xs:time('00:00:00')}") + " return $f("
         + "xs:date('2025-03-01'))", "2025-03-01T00:00:00");
     error(func.args(" name#1", " {1: 42}"), INVTYPE_X);
+
+    // keys outside the arity range are ignored
+    query("let $f := " + func.args(" concat#2", " {0: 'x'}") + " return $f('a', 'b')", "ab");
+    query("let $f := " + func.args(" concat#2", " {-1: 'x'}") + " return $f('a', 'b')", "ab");
+    query("let $f := " + func.args(" concat#2", " {3: 'x'}") + " return $f('a', 'b')", "ab");
   }
 
   /** Test method. */
@@ -6486,6 +6511,7 @@ return
     query(func.args(), "1970-01-01T00:00:00Z");
     query(func.args(0), "1970-01-01T00:00:00Z");
     query(func.args(86400000), "1970-01-02T00:00:00Z");
+    query(func.args(-86400000), "1969-12-31T00:00:00Z");
   }
 
   /** Test method. */
@@ -6549,6 +6575,149 @@ return
     final Function func = UNPARSED_TEXT_LINES;
     query(func.args(" ()"), "");
     query("exists(" + func.args(DOC, " { 'encoding': () }") + ")", true);
+  }
+
+  /** Test method. */
+  @Test public void update() {
+    final Function func = UPDATE;
+    final String store = " { 'store': { 'books': [ { 'title': 'XQuery', 'price': 39.95 }, "
+        + "{ 'title': 'JSON', 'price': 24.50, 'draft': true() } ], 'open': true() } }";
+    final String xml = " <store open='true'><books>"
+        + "<book><title>XQuery</title><price cur='EUR'>39.95</price></book>"
+        + "<book draft='true'><title>JSON</title><price cur='EUR'>24.50</price></book>"
+        + "</books></store>";
+
+    // JSON nodes
+    query(func.args(store, " fn { .//draft }"), "{\"store\":{\"books\":["
+        + "{\"title\":\"XQuery\",\"price\":39.95},{\"title\":\"JSON\",\"price\":24.5}],"
+        + "\"open\":true()}}");
+    query(func.args(store, " fn { .//price }", " fn { . * 2 }"), "{\"store\":{\"books\":["
+        + "{\"title\":\"XQuery\",\"price\":79.9},"
+        + "{\"title\":\"JSON\",\"price\":49,\"draft\":true()}],\"open\":true()}}");
+    query(func.args(store, " fn { .//price }", " fn { ., { 'currency': 'EUR' } }"),
+        "{\"store\":{\"books\":["
+        + "{\"title\":\"XQuery\",\"price\":39.95,\"currency\":\"EUR\"},"
+        + "{\"title\":\"JSON\",\"price\":24.5,\"currency\":\"EUR\",\"draft\":true()}],"
+        + "\"open\":true()}}");
+    query(func.args(store, " fn($n) { $n//books }", " fn($n) { { 'items': jvalue($n) } }"),
+        "{\"store\":{\"items\":[{\"title\":\"XQuery\",\"price\":39.95},"
+        + "{\"title\":\"JSON\",\"price\":24.5,\"draft\":true()}],\"open\":true()}}");
+    query(func.args(store, " fn($n) { $n//(price | books | draft) }", " fn($n) { "
+        + "if($n/self::price) then ($n * 2, { 'currency': 'EUR' }) "
+        + "else if($n/self::books) then { 'items': jvalue($n) } else () }"),
+        "{\"store\":{\"items\":[{\"title\":\"XQuery\",\"price\":79.9,\"currency\":\"EUR\"},"
+        + "{\"title\":\"JSON\",\"price\":49,\"currency\":\"EUR\"}],\"open\":true()}}");
+    // a map or an array supplies the children of the containing structure
+    query(func.args(" { 'a': 1 }", " fn { .//a }", " fn { { 'b': 9, 'c': 8 } }"),
+        "{\"b\":9,\"c\":8}");
+    query(func.args(" { 'a': 'b' }", " fn { * }", " fn { { 'b': 'a' } }"), "{\"b\":\"a\"}");
+    query(func.args(" [ 'a' ]", " fn { * }", " fn { [ 'b' ] }"), "[\"b\"]");
+    query(func.args(" [ 1 ]", " fn { * }", " fn { [ 9, 10 ] }"), "[9,10]");
+    // a nested container supplies a value
+    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " fn { [ [ 3, 4 ] ] }"), "[[3,4],2]");
+    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " fn { [ { 'k': 9 } ] }"), "[{\"k\":9},2]");
+    query(func.args(" { 'a': 1 }", " fn { .//a }", " fn($n) { { jkey($n): { 'x': 2 } } }"),
+        "{\"a\":{\"x\":2}}");
+    query("array:get(" + func.args(" [ 1 ]", " fn { * }", " fn { [ (1, 2) ] }") + ", 1)",
+        "1\n2");
+    // a map within an array, or an array within a map, supplies a value
+    query(func.args(" [ 1 ]", " fn { * }", " fn { { 'k': 9 } }"), "[{\"k\":9}]");
+    query(func.args(" { 'a': 1 }", " fn { * }", " fn { [ 9 ] }"), "{\"a\":[9]}");
+    query(func.args(" [ 1, 2 ]", " fn { * }", " {}"), "[{},{}]");
+    query(func.args(" [ { 'p': 2 }, { 'p': 5 } ]", " fn { * }",
+        " fn { map:merge((jvalue(), { 't': jvalue()?p * 2 })) }"),
+        "[{\"p\":2,\"t\":4},{\"p\":5,\"t\":10}]");
+    // a supplied map or array is returned as a value, a JNode as a JNode
+    query(func.args(" [ 1 ]", " fn {}") + " instance of array(*)", true);
+    query(func.args(" jtree([ 1 ])", " fn {}") + " instance of jnode(())", true);
+    query(func.args(" jtree(1)", " fn {}") + " => jvalue()", 1);
+    // the items of a sequence node
+    query(func.args(" jtree((44, 55, 66))", " fn { * }", " fn { 9 }") + " => jvalue()", "9\n9\n9");
+    query(func.args(" jtree((44, 55, 66))", " fn { *[jkey() = 2] }") + " => jvalue()", "44\n66");
+    query("count(" + func.args(" jtree((44, 55))", " fn { * }") + " => jvalue())", 0);
+    query(func.args(" { 'x': (44, 55) }", " fn { .//x/* }", " fn { . * 2 }"), "{\"x\":(88,110)}");
+    // an item can be replaced by several items, its key is dropped
+    query(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }", " fn { jtree((8, 9))/* }")
+        + " => jvalue()", "8\n9\n2");
+    query(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }", " fn { jtree({ 'a': 8 })/* }")
+        + " => jvalue()", "8\n2");
+    // the node passed to the callback retains its key
+    query(func.args(" jtree((44, 55))", " fn { * }", " fn($n) { $n }") + " => jvalue()", "44\n55");
+    query(func.args(" jtree((44, 55))", " fn { * }", " fn($n) { jkey($n) }") + " => jvalue()",
+        "1\n2");
+    query(func.args(" [ 44, 55 ]", " fn { * }", " fn($n) { jkey($n) }"), "[1,2]");
+
+    // XML nodes
+    query(func.args(xml, " fn($n) { $n//(price | books | @draft) }", " fn($n) { "
+        + "if($n/self::price) then ($n * 2, <currency>EUR</currency>) "
+        + "else if($n/self::books) then <items>{ $n/@*, $n/node() }</items> else () }"),
+        "<store open=\"true\"><items>"
+        + "<book><title>XQuery</title><price cur=\"EUR\">79.9</price>"
+        + "<currency>EUR</currency></book>"
+        + "<book><title>JSON</title><price cur=\"EUR\">49</price>"
+        + "<currency>EUR</currency></book></items></store>");
+    // an atomic item replaces the value, name and attributes are retained
+    query(func.args(" <a><b c='1'>x</b></a>", " fn { .//b }", " fn { 1 }"),
+        "<a><b c=\"1\">1</b></a>");
+    query(func.args(" <p><price cur='EUR'>39.95</price></p>", " fn { price }",
+        " fn { . * 2, <currency>EUR</currency> }"),
+        "<p><price cur=\"EUR\">79.9</price><currency>EUR</currency></p>");
+    // replacements are applied bottom-up
+    query(func.args(" <a><b><b/></b></a>", " fn { .//b }", " fn($n) { <c>{ $n/node() }</c> }"),
+        "<a><c><c/></c></a>");
+    query(func.args(" document { <a><b/></a> }", " fn { .//b }", " fn { <c/> }"), "<a><c/></a>");
+    query(func.args(" <a><!--c--><?pi v?></a>",
+        " fn { .//comment() | .//processing-instruction() }", " fn { 'X' }"),
+        "<a><!--X--><?pi X?></a>");
+    // namespaces are retained
+    query(func.args(" <p:a xmlns:p='u'><p:b/></p:a>", " fn { .//*:b }", " fn { 'x' }"),
+        "<p:a xmlns:p=\"u\"><p:b>x</p:b></p:a>");
+    // a node supplied as a replacement is copied, the input is not modified
+    query("let $x := <a><b/><c/></a> return (" + func.args(" $x", " fn { .//b }", " fn { $x/c }") +
+        ", $x/c/.. is $x)", "<a><c/><c/></a>\ntrue");
+    // in-scope namespaces of the updated node are retained
+    query("sort(in-scope-prefixes(" + func.args(" <a xmlns:p='u'><b/></a>/b", " fn {}") + "))",
+        "p\nxml");
+    query(func.args(" <a xmlns:p='u'><b><p:c/></b></a>/b", " fn { .//*:c }", " fn { 'x' }"),
+        "<b xmlns:p=\"u\"><p:c>x</p:c></b>");
+    // nodes of the result are in document order
+    query("let $r := " + func.args(" <a x='1'><c/><d/></a>", " fn { c }", " fn { <b/> }")
+        + " return ($r << $r/b, string-join(($r/d | $r/@x | $r/b | $r) ! name(), ' '))",
+        "true\na x b d");
+
+    error(func.args(" <e><a/></e>", " fn { <b/> }"), UPSELECT_X);
+    // the effective value cannot be replaced
+    error(func.args(" { 'a': 1 }", " fn { . }", " fn { . }"), UPSELECT_X);
+    error(func.args(" jtree(1)", " fn { . }", 2), UPSELECT_X);
+    error(func.args(" document { <a/> }", " fn { . }"), UPSELECT_X);
+    error(func.args(" <a><b/></a>", " fn { . | b }", " fn { <c/> }"), UPSELECT_X);
+    // namespace nodes and item nodes have a parent, but are no attributes or children
+    error(func.args(" <a/>", " fn { namespace p { 'u' } }"), UPSELECT_X);
+    error(func.args(" [ 1 ]", " fn { .//item::* }", " fn { 9 }"), UPSELECT_X);
+    error(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }", " fn { 8, 9 }"), UPREPLACEVALUE_X);
+    error(func.args(" <e a='1' b='2'/>", " fn { .//@a }", " fn { <x/> }"), UPREPLACE_X_X);
+    error(func.args(" <e><a/></e>", " fn { .//a }", " fn { { 'k': 1 } }"), UPREPLACE_X_X);
+    error(func.args(" <e><a/></e>", " fn { .//a }", " fn { namespace p { 'u' } }"),
+        UPREPLACE_X_X);
+    error(func.args(" { 'a': 1 }", " fn { .//a }", " fn { <x/> }"), UPREPLACE_X_X);
+    error(func.args(" [ 1 ]", " fn { * }", " fn { <a/> }"), UPREPLACE_X_X);
+    error(func.args(" <a><b/></a>", " fn { b }", " fn { jtree({ 'k': 1 }) }"), UPREPLACE_X_X);
+    error(func.args(" [ 1 ]", " fn { * }", " fn { 1, 2 }"), UPREPLACEVALUE_X);
+    query(func.args(" [ 1 ]", " fn { * }", " fn { [ 2 ], [ 3 ] }"), "[2,3]");
+    error(func.args(" { 'a': 1, 'b': 2 }", " fn { .//b }", " fn { { 'a': 3 } }"), UPREPLACEKEY_X);
+    error(func.args(" <e a='1'/>", " fn { .//@a }", " fn { 1, 2 }"), UPREPLACEVALUE_X);
+    error(func.args(" <a><b/></a>", " fn { .//b }", " fn { 1, <x/>, 2 }"), UPREPLACEVALUE_X);
+    error(func.args(" <e a='1' b='2'/>", " fn { .//@b }", " fn { attribute a { 9 } }"),
+        UPREPLACEATT_X);
+    error(func.args(" <e><a/></e>", " fn { .//a }", " fn { true#0 }"), UPREPLACE_X_X);
+    query(func.args(" [ 1 ]", " fn { .//jnode(1) }", " fn { true#0 }") +
+        " => array:get(1) instance of fn(*)", true);
+
+    // a root node contributes its children
+    query(func.args(" { 'a': 1 }", " fn { .//a }", " fn { jtree({ 'b': 2 }) }"), "{\"b\":2}");
+    // leading whitespace is removed from processing instructions
+    query(func.args(" <a><?pi v?></a>", " fn { .//processing-instruction() }", " '  y'") +
+        "//processing-instruction() ! string()", "y");
   }
 
   /** Test method. */
@@ -6682,7 +6851,7 @@ return
     query("exists(" + details + invalid + "?error-details?message)", true);
     query(details + invalid + "?error-details?location instance of fn:location-record+", true);
     query(details + invalid + "?error-details[1]?location?line-number"
-        + " instance of xs:positiveInteger", true);
+        + " instance of xs:integer", true);
     // the result of an invalid document is discarded while it is still being built
     query("exists(" + details + "(document { <distance>8.5km</distance> })?error-details)", true);
 

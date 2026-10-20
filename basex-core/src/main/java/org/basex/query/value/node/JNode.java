@@ -46,6 +46,15 @@ public final class JNode extends GNode {
   }
 
   /**
+   * Constructor for a node with a key and without parent.
+   * @param key key
+   * @param value value
+   */
+  public JNode(final Item key, final Value value) {
+    this(key, value, null, -1);
+  }
+
+  /**
    * Constructor.
    * @param parent parent node
    * @param index child index
