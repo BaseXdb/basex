@@ -373,7 +373,8 @@ public final class FtModuleTest extends SandboxTest {
 
     query(func.args(doc, "happy"), "lucky");
     query(func.args(doc, "happy", " { 'levels': 0 }"), "");
-    query(func.args(doc, "happy", " { 'levels': 5 }"), "lucky");
+    query(func.args(doc, "happy", " { 'levels': 1 to 5 }"), "lucky");
+    query(func.args(doc, "happy", " { 'levels': 5 }"), "");
     query(func.args(doc, "happy", " { 'relationship': 'RT' }"), "lucky");
     query(func.args(doc, "happy", " { 'relationship': 'XYZ' }"), "");
 
@@ -390,7 +391,11 @@ public final class FtModuleTest extends SandboxTest {
         + "</synonym></entry></thesaurus>";
     query(func.args(levels, "a"), "x\nc");
     query(func.args(levels, "a", " { 'levels': 1 }"), "x\nc");
-    query(func.args(levels, "a", " { 'levels': 2 }"), "x\nc\nd");
+    query(func.args(levels, "a", " { 'levels': 1 to 2 }"), "x\nc\nd");
+    query(func.args(levels, "a", " { 'levels': 2 }"), "d");
+    query(func.args(levels, "a", " { 'levels': 3 to 4 }"), "");
+    error(func.args(levels, "a", " { 'levels': (1, 3) }"), INVALIDOPTION_X);
+    error(func.args(levels, "a", " { 'levels': (2, 1) }"), INVALIDOPTION_X);
 
     // inverse relationships
     final String bt = " <thesaurus><entry><term>hardware</term><synonym><term>computers</term>"
@@ -422,7 +427,7 @@ public final class FtModuleTest extends SandboxTest {
     // synonyms are matched like the query term, independently of relationship and levels
     query(func.args(concepts, "blume", " { 'levels': 0 }"), "flower");
     query(func.args(concepts, "blume", " { 'relationship': 'NT' }"), "flower");
-    query(func.args(concepts, "blume", " { 'levels': 2 }"), "flower\nplant\nPflanze\ngarden");
+    query(func.args(concepts, "blume", " { 'levels': 1 to 2 }"), "flower\nplant\nPflanze\ngarden");
     query(func.args(concepts, "x"), "garden");
     query(func.args(concepts, "blume", " { 'relationship': 'BT' }"), "flower\nplant\nPflanze");
     query(func.args(concepts, "blume", " { 'relationship': 'broader' }"),
@@ -457,7 +462,7 @@ public final class FtModuleTest extends SandboxTest {
         + "<rdf:Description rdf:about='d'><skos:prefLabel>d</skos:prefLabel></rdf:Description>"
         + "<rdf:Description rdf:about='e'><skos:prefLabel>e</skos:prefLabel></rdf:Description>"
         + "</rdf:RDF>";
-    query(func.args(mappings, "a", " { 'relationship': 'BT', 'levels': 2 }"), "b");
+    query(func.args(mappings, "a", " { 'relationship': 'BT', 'levels': 1 to 2 }"), "b");
     query(func.args(mappings, "a", " { 'relationship': 'NT' }"), "c");
     query(func.args(mappings, "a", " { 'relationship': 'RT' }"), "d");
     query(func.args(mappings, "c", " { 'relationship': 'BT' }"), "a\ne");

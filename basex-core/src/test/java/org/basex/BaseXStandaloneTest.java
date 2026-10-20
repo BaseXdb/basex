@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.out.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -23,6 +25,19 @@ public final class BaseXStandaloneTest extends BaseXTest {
     INPUT.write("<a>X</a>");
     run("-i", INPUT.toString(), "-u", "-q", "delete node //text()");
     assertEquals("<a/>", string(INPUT.read()));
+  }
+
+  /**
+   * Terminates partial output with a newline if a query fails.
+   */
+  @Test public void partialOutput() {
+    try(ArrayOutput ao = new ArrayOutput()) {
+      System.setOut(new PrintStream(ao));
+      assertThrows(BaseXException.class, () -> new BaseX("-q1, error()"));
+      assertEquals("1" + Prop.NL, ao.toString());
+    } finally {
+      System.setOut(OUT);
+    }
   }
 
   @Override

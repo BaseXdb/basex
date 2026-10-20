@@ -174,7 +174,8 @@ public final class FnBuildDateTime extends DateTimeFn {
       throws QueryException {
     checkMonth(month, info);
     checkDayOnly(day, info);
-    if(day > ADate.maxDaysOfMonth((int) month)) throw INVALIDVALUE_X_X.get(info, DAY, day);
+    if(day > ADate.maxDaysOfMonth((int) month))
+      throw INVALIDVALUE_X_X.get(info, DAY, day + " in month " + month);
   }
 
   /**
@@ -189,7 +190,8 @@ public final class FnBuildDateTime extends DateTimeFn {
       final InputInfo info) throws QueryException {
     checkYear(year, info);
     checkMonthDay(month, day, info);
-    if(day > ADate.daysOfMonth(year, (int) month)) throw INVALIDVALUE_X_X.get(info, DAY, day);
+    if(day > ADate.daysOfMonth(year, (int) month))
+      throw INVALIDVALUE_X_X.get(info, DAY, day + " in month " + month + " of year " + year);
   }
 
   /**

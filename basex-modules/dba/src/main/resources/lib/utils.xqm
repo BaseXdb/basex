@@ -504,19 +504,6 @@ declare function utils:attachment(
 };
 
 (:~
- : Returns the URL of a DBA page.
- : @param  $page  name of the page
- : @return URL
- :)
-declare function utils:page(
-  $page  as xs:string
-) as xs:string {
-  (: the context path is not included: web:redirect resolves absolute locations against the
-     request URI, and thus adds it already :)
-  '/dba/' || $page
-};
-
-(:~
  : Returns the label of a store or a cache, whose default one is named by the empty string.
  : @param  $name  name
  : @return label
@@ -616,7 +603,7 @@ declare function utils:outcome(
 ) as element(rest:response) {
   (: every action ends in one of these, whether it is run by the dispatcher or by an endpoint
      of its own: the page it belongs to, with what it did or why it failed :)
-  web:redirect(utils:page($page), map:merge(($params, $message)))
+  web:redirect('/dba/' || $page, map:merge(($params, $message)))
 };
 
 (:~

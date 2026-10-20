@@ -353,7 +353,7 @@ function dba:logs-jump(
     where $log/@time = $time
     return ($pos - 1) idiv $config:ROWS + 1
   ) otherwise 1
-  return web:redirect(utils:page($dba:CAT), { 'name': $date, 'page': $page, 'time': $time }) update {
+  return web:redirect('/dba/' || $dba:CAT, { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)
   }
 };

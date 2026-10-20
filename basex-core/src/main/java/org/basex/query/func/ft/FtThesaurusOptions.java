@@ -13,5 +13,5 @@ public final class FtThesaurusOptions extends Options {
   /** Option: relationship. */
   public static final StringOption RELATIONSHIP = new StringOption("relationship", "");
   /** Option: levels. */
-  public static final NumberOption LEVELS = new NumberOption("levels", ThesAccessor.LEVELS);
+  public static final NumbersOption LEVELS = new NumbersOption("levels", ThesAccessor.LEVELS);
 }

@@ -78,7 +78,7 @@ public final class HtmlParser extends XMLParser {
     if(parser == null) {
       final TokenBuilder xml = new TokenBuilder().add(ELEM_O).add(HTML).add(ELEM_C).add(
           Serializer.value(io.read(), false, true, false)).add(ELEM_OS).add(HTML).add(ELEM_C);
-      return new IOContent(xml.finish(), io.name());
+      return new IOContent(xml.finish(), io.path());
     }
 
     try {
@@ -98,7 +98,7 @@ public final class HtmlParser extends XMLParser {
         if(enc != null) is.setEncoding(enc);
         reader.parse(is);
       }
-      return new IOContent(token(sw.toString()), io.name());
+      return new IOContent(token(sw.toString()), io.path());
     } catch(final SAXException ex) {
       throw INVHTML_X.getIO(ex.getLocalizedMessage());
     }

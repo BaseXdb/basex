@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
@@ -1007,6 +1008,18 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_WAIT;
     query(func.args(_JOB_EVAL.args("1", " ()", " { 'start': 'PT0.1S' }")));
     error(func.args(_JOB_CURRENT.args()), JOBS_SELF_X);
+  }
+
+  /** Schedules jobs after the job pool has been closed. */
+  @Test public void closed() {
+    final Context ctx = new Context(false);
+    ctx.close();
+    try(QueryProcessor qp = new QueryProcessor(_JOB_EVAL.args("1"), ctx)) {
+      qp.value();
+      fail("Error expected.");
+    } catch(final QueryException ex) {
+      assertEquals(JOBS_CLOSED, ex.error());
+    }
   }
 
   /**

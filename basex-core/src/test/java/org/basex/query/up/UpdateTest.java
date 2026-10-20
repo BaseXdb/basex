@@ -10,6 +10,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.func.Function;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.util.*;
@@ -1181,6 +1182,18 @@ public final class UpdateTest extends SandboxTest {
     error("declare base-uri \"" + sandbox() + "\"; let $node := <a/> return ("
         + PUT.args(" $node", "merge1.xml") + ',' + PUT.args(" $node", "merge1.xml") + ')',
         UPURIDUP_X);
+  }
+
+  /** Writes back updates on documents retrieved via fn:doc, but not via fn:parse-xml. */
+  @Test public void writeback() {
+    final String doc = sandbox() + "wb-doc.xml", parsed = sandbox() + "wb-parsed.xml";
+    query(_FILE_WRITE_TEXT.args(doc, "<a/>"));
+    query("declare option db:writeback 'true';"
+        + "insert node <b/> into " + Function.DOC.args(doc) + "/a,"
+        + "insert node <b/> into " + PARSE_XML.args("<a/>", " { 'base-uri': '" + parsed + "' }")
+        + "/a");
+    query(_FILE_READ_TEXT.args(doc), "<a><b/></a>");
+    query(_FILE_EXISTS.args(parsed), false);
   }
 
   /** Allows empty-sequence() as return type for updating functions. */

@@ -653,6 +653,11 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
       execute(new DropDB(NAME));
     }
 
+    // external variables without value
+    final String ext = "declare variable $x as xs:integer external; $x + 1";
+    query("exists(" + func.args(ext, " { 'compile': true() }") + "//StaticVarRef)", true);
+    query("exists(" + func.args(ext, " { 'optimize': true() }") + "//StaticVarRef)", true);
+
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);
 

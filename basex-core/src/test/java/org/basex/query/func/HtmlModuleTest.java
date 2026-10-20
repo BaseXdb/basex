@@ -24,6 +24,7 @@ public final class HtmlModuleTest extends SandboxTest {
     query(func.args(path, " { 'nons': false() }") + "//*:body ! name()", "body");
     query(func.args(path, " { 'method': 'nu' }") + "//Q{http://www.w3.org/1999/xhtml}body ! name()",
         "body");
+    query("ends-with(base-uri(" + func.args(path) + "), '/src/test/resources/input.html')", true);
   }
 
   /** Test method. */

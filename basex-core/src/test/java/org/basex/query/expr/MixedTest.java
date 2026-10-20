@@ -35,6 +35,8 @@ public final class MixedTest extends SandboxTest {
   @Test public void variableDecl() {
     query("declare variable $a external; 1", 1);
     error("declare variable $a external; $a", VAREMPTY_X);
+    error("declare %basex:lazy variable $a external; $a", VAREMPTY_X);
+    query("declare variable $a external; if(random:double() > 1) { $a }", "");
     query("declare variable $x as enum('a', 'b') := 'a'; $x", "a");
     query("declare variable $x as enum('a', 'b') := xs:anyURI('a'); $x", "a");
   }
