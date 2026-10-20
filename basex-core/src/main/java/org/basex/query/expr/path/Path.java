@@ -499,7 +499,11 @@ public abstract class Path extends ParseExpr {
     if(rt != null) {
       Expr prev = rt;
       for(final Expr step : steps) {
-        if(step instanceof final Step stp && stp.empty(prev.seqType())) return true;
+        if(step instanceof final Step stp) {
+          if(stp.empty(prev.seqType())) return true;
+          // later steps must not discard a failing selector
+          if(stp.selectorMayFail()) return false;
+        }
         prev = step;
       }
     }

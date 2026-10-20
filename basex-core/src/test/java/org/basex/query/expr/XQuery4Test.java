@@ -1114,6 +1114,7 @@ public final class XQuery4Test extends SandboxTest {
     error("{ 'a': <xml><w/></xml> }/a/jvalue()", SELECTORCTX_X);
     error("{ 'a': <xml><w/></xml> }/a/jvalue()//w", SELECTORCTX_X);
     error("{ 'a': 1 }/a/data()", SELECTORCTX_X);
+    error("{ 'a': [ <xml><w/></xml> ] }/a/ ?1 //w", SELECTORCTX_X);
     final String sel = "declare %basex:inline(0) function f($m, $s) { "
         + "$m/a/child::{ xs:integer($s) } }; ";
     error(sel + "f({ 'a': 1 }, 'x')", FUNCCAST_X_X);

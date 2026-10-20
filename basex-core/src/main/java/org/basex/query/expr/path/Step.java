@@ -489,7 +489,7 @@ public abstract class Step extends Preds {
    * Checks if the step has a selector that may raise an error.
    * @return result of check
    */
-  private boolean selectorMayFail() {
+  final boolean selectorMayFail() {
     return selector != null && !(selector instanceof Value);
   }
 
