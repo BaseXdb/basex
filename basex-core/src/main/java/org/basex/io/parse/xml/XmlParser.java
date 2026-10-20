@@ -73,13 +73,6 @@ public final class XmlParser {
         options.get(MainOptions.XSDVALIDATION));
     final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
     final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
-    // setting these options to false will ignore external entities, rather than rejecting them
-    f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-        dtd || dtdValidation);
-    f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
-    f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
-    f.setFeature("http://xml.org/sax/features/validation", dtdValidation);
-    f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
     f.setNamespaceAware(true);
     f.setValidating(dtdValidation);
     f.setXIncludeAware(xinclude);
@@ -90,6 +83,14 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
+    // features are assigned to the reader: each factory feature creates a temporary parser
+    // setting these options to false will ignore external entities, rather than rejecting them
+    xr.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
+        dtd || dtdValidation);
+    xr.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
+    xr.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
+    xr.setFeature("http://xml.org/sax/features/validation", dtdValidation);
+    xr.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
     english(xr::setProperty);
     if(options.allowExternal()) {
       for(final String limit : LIMITS) xr.setProperty(limit, "0");

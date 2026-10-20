@@ -100,6 +100,8 @@ public final class QT3TS extends Main {
   private final StringList setFiles = new StringList();
   /** Parsed test sets, shared by tests that bind the catalog (can be {@code null}). */
   private ArrayList<Data> setDatas;
+  /** Parsed source documents of the current test set, indexed by URI and path. */
+  private final Map<String, Data> sourceDatas = new HashMap<>();
 
   /**
    * Main method of the test class.
@@ -290,6 +292,7 @@ public final class QT3TS extends Main {
   private void testSet(final String name) throws Exception {
     // release test sets shared by the previous test set
     setDatas = null;
+    sourceDatas.clear();
     final XdmValue doc = new XQuery("doc(' " + file(false, name) + "')", ctx).value();
     final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
     final IO base = IO.get(doc.getBaseURI());
@@ -309,9 +312,10 @@ public final class QT3TS extends Main {
       if(report != null) report.addSet(asString("@name", set));
 
       // run all test cases
+      final Set<String> unsupported = unsupported(set);
       for(final XdmItem its : new XQuery("*:test-case", ctx).context(set)) {
         try {
-          testCase(its, envs);
+          testCase(its, envs, unsupported);
         } catch(final IOException ex) {
           Util.debug(ex);
         }
@@ -338,20 +342,16 @@ public final class QT3TS extends Main {
    * Runs a single test case.
    * @param test node
    * @param envs environments
+   * @param unsupported names of unsupported test cases
    * @throws Exception exception
    */
-  private void testCase(final XdmItem test, final ArrayList<QT3Env> envs) throws Exception {
+  private void testCase(final XdmItem test, final ArrayList<QT3Env> envs,
+      final Set<String> unsupported) throws Exception {
     if(total++ % 500 == 0) Util.print(".");
 
-    if(!supported(test)) {
-      if(ignoring) ignore.add(asString("@name", test)).add(NL);
-      ignored++;
-      return;
-    }
-
-    // skip queries that do not match filter
-    final String name = asString("@name", test);
-    if(!name.startsWith(single)) {
+    // skip unsupported queries and queries that do not match filter
+    final String name = attribute(test, "name");
+    if(unsupported.contains(name) || !name.startsWith(single)) {
       if(ignoring) ignore.add(name).add(NL);
       ignored++;
       return;
@@ -360,18 +360,20 @@ public final class QT3TS extends Main {
     tested++;
 
     // expected result
-    final XdmValue expected = new XQuery("*:result/*[1]", ctx).context(test).value();
+    final XdmItem result = child(test, "result");
+    final XdmItem first = result != null ? child(result, null) : null;
+    final XdmValue expected = first != null ? first : XdmEmpty.EMPTY;
 
     // check if environment is defined in test-case
     QT3Env env = null;
-    final XdmValue ienv = new XQuery("*:environment[*]", ctx).context(test).value();
-    if(ienv.size() != 0) env = new QT3Env(ctx, ienv);
+    final XdmItem ienv = child(test, "environment");
+    if(ienv != null && child(ienv, null) != null) env = new QT3Env(ctx, ienv);
 
     // parse local environment
     boolean base = true;
-    if(env == null) {
-      final String e = asString("*:environment[1]/@ref", test);
-      if(!e.isEmpty() && !e.equals("empty")) {
+    if(env == null && ienv != null) {
+      final String e = attribute(ienv, "ref");
+      if(e != null && !e.isEmpty() && !e.equals("empty")) {
         // check if environment is defined in test-set
         env = envs(envs, e);
         // check if environment is defined in catalog
@@ -391,7 +393,7 @@ public final class QT3TS extends Main {
     returned.env = env;
     final Map<String, XdmValue> mutable = new LinkedHashMap<>();
     final StringJoiner queries = new StringJoiner(NL);
-    for(final XdmItem step : new XQuery("*:test", ctx).context(test)) {
+    for(final XdmItem step : children(test, "test")) {
       queries.add(step(test, step, env, base, mutable, returned));
       if(returned.value == null) break;
     }
@@ -452,12 +454,12 @@ public final class QT3TS extends Main {
       throws Exception {
 
     // retrieve query to be run
-    final String qfile = asString("@file", step);
+    final String qfile = attribute(step, "file");
     String string;
     String qbase = baseURI;
-    if(qfile.isEmpty()) {
+    if(qfile == null || qfile.isEmpty()) {
       // get query string
-      string = asString("string()", step);
+      string = step.getString();
     } else {
       // get query from file: the file supplies the static base URI
       final IOFile io = new IOFile(baseDir, qfile);
@@ -489,27 +491,16 @@ public final class QT3TS extends Main {
     final XQuery query = new XQuery(string, ctx);
     if(base) query.baseURI(qbase);
 
-    // add modules
-    final String qm = "for $m in *:module where $m/@uri return ($m/@uri, $m/@file)";
-    final XQuery qmod = new XQuery(qm, ctx).context(test);
-    while(true) {
-      final XdmItem uri = qmod.next();
-      if(uri == null) break;
-      final XdmItem file = qmod.next();
-      if(file == null) break;
-      query.addModule(uri.getString(), new IOFile(baseDir, file.getString()).path());
-    }
-
-    // collect module locations (test cases modules-30, -31, -32, -33, -40, -41, -42, d1e78807j)
+    // add modules, collect module locations
+    // (test cases modules-30, -31, -32, -33, -40, -41, -42, d1e78807j)
     final Map<String, IO> locations = new HashMap<>();
-    final String ql = "for $m in *:module where $m/@location return ($m/@location, $m/@file)";
-    final XQuery qloc = new XQuery(ql, ctx).context(test);
-    while(true) {
-      final XdmItem location = qloc.next();
-      if(location == null) break;
-      final XdmItem file = qloc.next();
-      if(file == null) break;
-      locations.put(location.getString(), new IOFile(baseDir, file.getString()));
+    for(final XdmItem module : children(test, "module")) {
+      final String uri = attribute(module, "uri"), location = attribute(module, "location");
+      final String path = attribute(module, "file");
+      if(path == null) continue;
+      final IOFile file = new IOFile(baseDir, path);
+      if(uri != null) query.addModule(uri, file.path());
+      if(location != null) locations.put(location, file);
     }
 
     returned.value = null;
@@ -529,7 +520,13 @@ public final class QT3TS extends Main {
           if(new IOFile(path).eq(new IOFile(file(false, CATALOG)))) {
             query.qp().qc.resources.addDatabases(setDatas());
           }
-          query.addDocument(src.get(URI), path);
+          // share parsed documents with other tests of the test set, unless they were updated
+          final String key = src.get(URI) + '|' + path;
+          final Data data = sourceDatas.get(key);
+          if(data != null && data.modifications() == 0) {
+            query.qp().qc.resources.addDatabases(List.of(data));
+          }
+          else sourceDatas.put(key, query.addDocument(src.get(URI), path));
           if(role == null) continue;
 
           XdmValue doc = mutable.get(role);
@@ -597,7 +594,7 @@ public final class QT3TS extends Main {
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
       returned.error = ex;
-      Util.errln("Query: " + asString("@name", test));
+      Util.errln("Query: " + attribute(test, "name"));
       Util.stack(ex);
     }
     return string;
@@ -702,37 +699,89 @@ public final class QT3TS extends Main {
     "'removeType-valskip-ren-003a', " +
     "'')";
 
+  /** Query that generates a result if the context test set or test case is not supported. */
+  private static final String UNSUPPORTED = "(*:dependency[" +
+    // skip various features
+    "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
+    // skip supported features when test asks for non-support
+    "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
+    // skip revalidation modes other than skip, and tests that ask for non-support of skip
+    "@type = 'revalidation' and (@value = 'skip') = (@satisfied = 'false') or " +
+    // skip fully-normalized Unicode tests that ask for non-support
+    "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' and " +
+    "@satisfied = 'false' or " +
+    // skip tests locked to a historical Unicode version (JDK uses a much newer one)
+    "@type = 'unicode-version' and @value = ('5.2', '6.0', '6.2') or " +
+    // skip xml 1.1 tests and tests for other xsd versions than the one of the schema processor
+    "@type = 'xml-version' and @value = ('1.1', '1.0:4-') or " +
+    "@type = 'xsd-version' and @value != '" + ValidateXsd.version() + "' or " +
+    // skip default-language
+    "@type = 'default-language' and @value != 'en' or " +
+    // skip non-XQuery tests
+    "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
+    "]," +
+    // skip tests where BaseX implementation deviates from the spec
+    "@name[. = " + SKIP + "])";
+
   /**
-   * Checks if the current test case is supported.
-   * @param test test case
+   * Checks if the current test set is supported.
+   * @param set test set
    * @return result of check
    */
-  private boolean supported(final XdmValue test) {
-    // the following query generates a result if the specified test is not supported
-    if(all) return true;
-    final String query = "*:dependency[" +
-      // skip various features
-      "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
-      // skip supported features when test asks for non-support
-      "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
-      // skip revalidation modes other than skip, and tests that ask for non-support of skip
-      "@type = 'revalidation' and (@value = 'skip') = (@satisfied = 'false') or " +
-      // skip fully-normalized Unicode tests that ask for non-support
-      "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' and " +
-      "@satisfied = 'false' or " +
-      // skip tests locked to a historical Unicode version (JDK uses a much newer one)
-      "@type = 'unicode-version' and @value = ('5.2', '6.0', '6.2') or " +
-      // skip xml 1.1 tests and tests for other xsd versions than the one of the schema processor
-      "@type = 'xml-version' and @value = ('1.1', '1.0:4-') or " +
-      "@type = 'xsd-version' and @value != '" + ValidateXsd.version() + "' or " +
-      // skip default-language
-      "@type = 'default-language' and @value != 'en' or " +
-      // skip non-XQuery tests
-      "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-      "]," +
-      // skip tests where BaseX implementation deviates from the spec
-      "@name[. = " + SKIP + "]";
-    return new XQuery(query, ctx).context(test).value().size() == 0;
+  private boolean supported(final XdmValue set) {
+    return all || new XQuery(UNSUPPORTED, ctx).context(set).value().size() == 0;
+  }
+
+  /**
+   * Returns the names of the unsupported test cases of a test set.
+   * @param set test set
+   * @return names
+   */
+  private Set<String> unsupported(final XdmValue set) {
+    final Set<String> names = new HashSet<>();
+    if(all) return names;
+    final String query = "*:test-case[" + UNSUPPORTED + "]/string(@name)";
+    for(final XdmItem name : new XQuery(query, ctx).context(set)) names.add(name.getString());
+    return names;
+  }
+
+  /**
+   * Returns the value of an attribute.
+   * @param node node
+   * @param name attribute name
+   * @return value, or {@code null} if the attribute does not exist
+   */
+  private static String attribute(final XdmItem node, final String name) {
+    final byte[] value = ((XNode) node.internal()).attribute(new QNm(name));
+    return value != null ? string(value) : null;
+  }
+
+  /**
+   * Returns child elements.
+   * @param node node
+   * @param name local name (can be {@code null})
+   * @return child elements
+   */
+  private static ArrayList<XdmItem> children(final XdmItem node, final String name) {
+    final ArrayList<XdmItem> list = new ArrayList<>();
+    final byte[] local = name != null ? token(name) : null;
+    for(final GNode child : ((XNode) node.internal()).childIter()) {
+      if(child.kind() == Kind.ELEMENT && (local == null || eq(local(child.name()), local))) {
+        list.add(XdmItem.get(child));
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns the first child element.
+   * @param node node
+   * @param name local name (can be {@code null})
+   * @return child element, or {@code null} if it does not exist
+   */
+  private static XdmItem child(final XdmItem node, final String name) {
+    final ArrayList<XdmItem> list = children(node, name);
+    return list.isEmpty() ? null : list.getFirst();
   }
 
   /**

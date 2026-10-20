@@ -111,6 +111,8 @@ public abstract class Data {
   public Locations locations;
   /** Namespace URIs of the names (can be {@code null}). */
   private NSNames nsNames;
+  /** Number of modifications since the database instance was created. */
+  private volatile int modifications;
   /** Text index. */
   public ValueIndex textIndex;
   /** Attribute value index. */
@@ -633,6 +635,15 @@ public abstract class Data {
     locations = null;
     nsNames = null;
     nspaces.modified();
+    modifications++;
+  }
+
+  /**
+   * Returns the number of modifications since the database instance was created.
+   * @return number of modifications
+   */
+  public final int modifications() {
+    return modifications;
   }
 
   /**

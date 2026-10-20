@@ -7,6 +7,7 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -150,10 +151,11 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * Adds a document.
    * @param name name of the document (can be {@code null})
    * @param path document path
+   * @return data reference
    */
-  public void addDocument(final String name, final String path) {
+  public Data addDocument(final String name, final String path) {
     try {
-      qp.qc.resources.addDoc(name, path, qp.sc);
+      return qp.qc.resources.addDoc(name, path, qp.sc);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

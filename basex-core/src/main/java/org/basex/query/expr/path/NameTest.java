@@ -48,10 +48,8 @@ public final class NameTest extends Test {
   public byte[] name;
   /** Database name; assigned if the test matches a single name (can be {@code null}). */
   private byte[] dbName;
-  /** Database to which {@link #dbFilter} refers (can be {@code null}). */
-  private Data dbData;
-  /** Filter with the ID of the database name in {@link #dbData} (can be {@code null}). */
-  private DBFilter dbFilter;
+  /** Filter resolved for the last accessed database (can be {@code null}). */
+  private volatile Resolved resolved;
 
   /** JNode key; assigned if the test can select a single JNode key (can be {@code null}). */
   private final Item jkey;
@@ -107,17 +105,13 @@ public final class NameTest extends Test {
     }
 
     // skip optimizations if the database is unknown or incomplete, or if names are not indexed
-    final boolean elem = kind == Kind.ELEMENT;
-    if(data == null || !data.meta.complete || !elem && kind != Kind.ATTRIBUTE ||
-        !scope.oneOf(Scope.LOCAL, Scope.FLEXIBLE, Scope.FULL)) return this;
+    if(data == null || !indexed(data)) return this;
 
     // resolve the namespaces of all database names with the same local name
-    final Names names = elem ? data.elemNames : data.attrNames;
-    final TokenList all = names.lexical(qname.local(), !data.nspaces.isEmpty());
+    final TokenList all = names(data).lexical(qname.local(), !data.nspaces.isEmpty());
     final TokenList matches = matches(all, data);
     dbName = matches != null && matches.size() == 1 ? matches.get(0) : null;
-    dbData = dbName != null ? data : null;
-    dbFilter = dbName != null ? new DBFilter(filter.kind(), names.index(dbName), true) : null;
+    resolved = new Resolved(data, data.modifications(), filter(matches, data));
     if(matches == null) return this;
     // no matching name: no results
     if(matches.isEmpty()) return null;
@@ -141,8 +135,26 @@ public final class NameTest extends Test {
    * @return matching names, or {@code null} if the namespace of a name cannot be resolved
    */
   public TokenList dbNames(final Data data) {
-    final Names names = kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
-    return matches(names.lexical(qname.local(), !data.nspaces.isEmpty()), data);
+    return matches(names(data).lexical(qname.local(), !data.nspaces.isEmpty()), data);
+  }
+
+  /**
+   * Returns the name index of a database that is relevant for this test.
+   * @param data data reference
+   * @return names
+   */
+  private Names names(final Data data) {
+    return kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
+  }
+
+  /**
+   * Checks if the names of this test can be resolved via the name index of a database.
+   * @param data data reference
+   * @return result of check
+   */
+  private boolean indexed(final Data data) {
+    return data.meta.complete && kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE) &&
+      scope.oneOf(Scope.LOCAL, Scope.FLEXIBLE, Scope.FULL);
   }
 
   /**
@@ -172,8 +184,45 @@ public final class NameTest extends Test {
 
   @Override
   public DBFilter filter(final Data data) {
-    return data == dbData ? dbFilter : filter;
+    final DBFilter df = cached(data);
+    if(df != null) return df;
+    if(!indexed(data)) return filter;
+
+    final DBFilter rf = filter(dbNames(data), data);
+    resolved = new Resolved(data, data.modifications(), rf);
+    return rf;
   }
+
+  /**
+   * Returns the filter that has been resolved for a database.
+   * @param data data reference
+   * @return filter, or {@code null} if no filter has been resolved for the current database state
+   */
+  private DBFilter cached(final Data data) {
+    // updates may change names and namespaces: resolve the filter again after each modification
+    final Resolved rs = resolved;
+    return rs != null && rs.data == data && rs.modifications == data.modifications() ?
+      rs.filter : null;
+  }
+
+  /**
+   * Returns a filter for the database names matched by this test.
+   * @param matches matching names (can be {@code null})
+   * @param data data reference
+   * @return filter
+   */
+  private DBFilter filter(final TokenList matches, final Data data) {
+    return matches == null || matches.size() > 1 ? filter :
+      new DBFilter(filter.kind(), matches.isEmpty() ? -1 : names(data).index(matches.get(0)), true);
+  }
+
+  /**
+   * Filter resolved for a database.
+   * @param data data reference
+   * @param modifications number of database modifications when the filter was resolved
+   * @param filter filter
+   */
+  private record Resolved(Data data, int modifications, DBFilter filter) { }
 
   @Override
   public boolean matches(final GNode node) {
@@ -182,8 +231,11 @@ public final class NameTest extends Test {
       return false;
 
     // database node with a resolved name: compare name IDs
-    if(node instanceof final DBNode dbnode && dbnode.data() == dbData)
-      return dbData.nameId(dbnode.pre()) == dbFilter.nameId();
+    if(node instanceof final DBNode dbnode) {
+      final Data data = dbnode.data();
+      final DBFilter df = cached(data);
+      if(df != null && df.exact()) return data.nameId(dbnode.pre()) == df.nameId();
+    }
 
     if(node instanceof final JNode jnode) {
       // JNodes

@@ -377,13 +377,15 @@ public final class QueryResources {
    * @param name document identifier (can be {@code null})
    * @param path document path
    * @param sc static context
+   * @return data reference
    * @throws QueryException query exception
    */
-  public void addDoc(final String name, final String path, final StaticContext sc)
+  public Data addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
     final Data data = create(qi, DOC_OPTIONS, root, null, true, true);
     if(name != null) data.meta.original = name;
+    return data;
   }
 
   /**

@@ -8,7 +8,7 @@ import org.basex.data.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @param kind database kind of matching nodes ({@code -1}: all kinds)
- * @param nameId name ID of matching nodes ({@code 0}: all names)
+ * @param nameId name ID of matching nodes ({@code 0}: all names, {@code -1}: no names)
  * @param exact indicates if the filter decides the node test
  */
 public record DBFilter(int kind, int nameId, boolean exact) {
