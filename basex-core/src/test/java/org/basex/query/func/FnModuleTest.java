@@ -3185,6 +3185,16 @@ return
     query(func.args("m", " { 'content': `module{ char(13) }namespace m='m'; "
         + "declare variable $m:v := 1;` }") + "?variables?#Q{m}v", 1);
 
+    // qtspecs#2990: coerce values of external variables
+    final String ext = " { 'content': 'module namespace m=\"m\"; "
+        + "declare variable $m:v as %s external;', 'variables': { QName(\"m\", \"v\"): %s } }";
+    query(func.args("m", String.format(ext, "xs:double", "1")) + "?variables?#Q{m}v "
+        + "instance of xs:double", true);
+    query(func.args("m", String.format(ext, "xs:integer", "xs:untypedAtomic(\"1\")"))
+        + "?variables?#Q{m}v instance of xs:integer", true);
+    error(func.args("m", String.format(ext, "xs:integer", "\"1\"")),
+        MODULE_PARAMETER_TYPE_X_X);
+
     // GH-2640
     error("<e xmlns:p='p'>{\n"
         + "  load-xquery-module(\"m\", {\n"
