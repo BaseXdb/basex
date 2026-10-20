@@ -34,6 +34,8 @@ public final class DiskValuesBuilder extends IndexBuilder {
 
   /** Temporary value tree. */
   private IndexTree index;
+  /** Estimated number of distinct keys of a value tree. */
+  private int capacity;
 
   /**
    * Constructor.
@@ -42,7 +44,6 @@ public final class DiskValuesBuilder extends IndexBuilder {
    */
   public DiskValuesBuilder(final Data data, final IndexType type) {
     super(data, type);
-    index = new IndexTree(type);
   }
 
   @Override
@@ -71,6 +72,8 @@ public final class DiskValuesBuilder extends IndexBuilder {
    */
   void build(final int first, final int last, final SegmentWriter writer) throws IOException {
     try(writer) {
+      capacity = Math.min(last - first >>> 4, 1 << 20);
+      index = new IndexTree(type, capacity);
       final boolean updindex = data.meta.updindex;
       for(pre = first; pre < last; pre++) {
         if((pre & 0x0FFF) == 0) check();
@@ -93,7 +96,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
           ids.reset();
           poss.reset();
           decode(values, Num.size(values), type == IndexType.TOKEN, ids, poss);
-          writer.write(index.keys.get(n), ids, poss);
+          writer.write(index.key(n), ids, poss);
         }
       } else {
         // merge partial structures
@@ -142,7 +145,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
     // check if main memory is exhausted
     if(splitKeys > 0 ? index.size() >= splitKeys : splitRequired(index.memory())) {
       writeIndex();
-      index = new IndexTree(type);
+      index = new IndexTree(type, capacity);
     }
   }
 
@@ -166,7 +169,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
     // write texts
     try(DataOutput outT = new DataOutput(data.meta.dbFile(name + 't'))) {
       index.init();
-      while(index.more()) outT.writeToken(index.keys.get(index.next()));
+      while(index.more()) outT.writeToken(index.key(index.next()));
     }
     splits++;
   }

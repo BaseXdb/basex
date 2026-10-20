@@ -165,6 +165,16 @@ public final class SAXWrapper extends SingleParser {
       }
 
       @Override
+      public int read(final byte[] b, final int off, final int len) throws IOException {
+        final int n = buffer.read(b, off, len);
+        for(int i = off; i < off + n; i++) {
+          if(b[i] == '\n') ++lines;
+        }
+        if(n > 0) bytes += n;
+        return n;
+      }
+
+      @Override
       public void close() throws IOException {
         buffer.close();
       }

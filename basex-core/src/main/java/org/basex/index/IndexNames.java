@@ -84,8 +84,8 @@ public final class IndexNames {
    */
   public boolean unit(final int pre) {
     final int kind = kind(type, data.meta);
-    return data.kind(pre) == kind && (kind == Data.TEXT ?
-      containsName(data.parent(pre, Data.TEXT), Data.ELEM) : containsName(pre, kind));
+    return data.kind(pre) == kind && (isEmpty() || (kind == Data.TEXT ?
+      containsName(data.parent(pre, Data.TEXT), Data.ELEM) : containsName(pre, kind)));
   }
 
   /**

@@ -37,6 +37,8 @@ public final class PathNode {
    *  1: test flag;
    *  2: element can be empty. */
   private byte empty;
+  /** Offset of the last child returned by {@link #child(int, int)}. */
+  private int hint;
 
   /**
    * Empty constructor.
@@ -208,8 +210,15 @@ public final class PathNode {
    * @return child, or {@code null} if it does not exist
    */
   PathNode child(final int nm, final int knd) {
-    for(final PathNode child : children) {
-      if(child.kind == knd && child.name == nm) return child;
+    // start with the last match: siblings are usually indexed in the same order
+    final PathNode[] nodes = children;
+    final int nl = nodes.length;
+    for(int n = 0, i = hint; n < nl; n++, i = i + 1 == nl ? 0 : i + 1) {
+      final PathNode child = nodes[i];
+      if(child.kind == knd && child.name == nm) {
+        hint = i;
+        return child;
+      }
     }
     return null;
   }

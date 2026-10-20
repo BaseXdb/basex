@@ -218,7 +218,7 @@ public final class FTBuilder extends IndexBuilder {
       while(tree.more()) {
         final IndexTree t = tree.nextTree();
         final int n = t.next();
-        writer.write(t.keys.get(n), t.ids.get(n));
+        writer.write(t.key(n), t.ids.get(n));
       }
     }
 

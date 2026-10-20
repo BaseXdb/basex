@@ -42,44 +42,26 @@ public final class Compress {
     if(uc < 0) return text;
 
     // first bit: packer version (0), second bit: mapping type (upper/lower case)
-    final byte[] map;
+    final int[] codes;
     if(lc >= 0) {
       out = 2;
-      map = PACK1;
+      codes = CODES1;
     } else {
-      map = PACK2;
+      codes = CODES2;
     }
 
     // loop through and compress all characters
-    int in, off = 2;
+    int off = 2;
     for(final byte t : text) {
-      final int b = t >= 0 ? map[t] : t, s;
-      if(b >= 0x00 && b < 0x08) { // 1 xxx
-        in = 1 | b << 1;
-        s = 4;
-      } else if(b >= 0x08 && b < 0x10) { // 01 xxx
-        in = 2 | b << 2;
-        s = 5;
-      } else if(b >= 0x10 && b < 0x20) { // 001 xxxx
-        in = 4 | b << 3;
-        s = 7;
-      } else if(b >= 0x20 && b < 0x40) { // 0001 xxxxx
-        in = 8 | b << 4;
-        s = 9;
-      } else { // 0000 xxxxxxxx
-        in = b << 4;
-        s = 12;
-      }
-      for(int i = 0; i < s; i++) {
-        out |= (in & 1) << off;
-        in >>>= 1;
-        off = off + 1 & 7;
-        if(off == 0) {
-          // skip compression if packed array gets too large
-          if(size == tl) return text;
-          bytes[size++] = (byte) out;
-          out = 0;
-        }
+      final int code = codes[t & 0xFF];
+      out |= code >>> 4 << off;
+      off += code & 0x0F;
+      while(off >= 8) {
+        // skip compression if packed array gets too large
+        if(size == tl) return text;
+        bytes[size++] = (byte) out;
+        out >>>= 8;
+        off -= 8;
       }
     }
     if(off != 0) {
@@ -169,10 +151,10 @@ public final class Compress {
   };
   /** Second mapping for unpacking data (upper-case texts). */
   private static final byte[] UNPACK2 = new byte[UNPACK1.length];
-  /** First mapping for packing data (lower-case texts). */
-  private static final byte[] PACK1 = new byte[UNPACK1.length];
-  /** Second mapping for packing data (upper-case texts). */
-  private static final byte[] PACK2 = new byte[UNPACK1.length];
+  /** First mapping for packing bytes (lower-case texts): bit code, shifted by 4, and length. */
+  private static final int[] CODES1 = new int[256];
+  /** Second mapping for packing bytes (upper-case texts): bit code, shifted by 4, and length. */
+  private static final int[] CODES2 = new int[256];
 
   // initializes the character mappings
   static {
@@ -183,8 +165,25 @@ public final class Compress {
       final byte b2 = (byte) (b1 >= 'A' && b1 <= 'Z' ? b1 + 0x20 :
         b1 >= 'a' && b1 <= 'z' ? b1 - 0x20 : b1);
       UNPACK2[p] = b2;
-      PACK1[b1] = (byte) p;
-      PACK2[b2] = (byte) p;
+      CODES1[b1] = code(p);
+      CODES2[b2] = code(p);
     }
+    for(int b = 0x80; b < 0x100; b++) {
+      CODES1[b] = code(b);
+      CODES2[b] = code(b);
+    }
+  }
+
+  /**
+   * Returns the bit code for a mapped byte.
+   * @param b mapped byte
+   * @return bit code, shifted by 4, and its length
+   */
+  private static int code(final int b) {
+    return b < 0x08 ? (1 | b << 1) << 4 | 4 :       // 1 xxx
+           b < 0x10 ? (2 | (b & 0x07) << 2) << 4 | 5 : // 01 xxx
+           b < 0x20 ? (4 | (b & 0x0F) << 3) << 4 | 7 : // 001 xxxx
+           b < 0x40 ? (8 | (b & 0x1F) << 4) << 4 | 9 : // 0001 xxxxx
+           b << 8 | 12;                                // 0000 xxxxxxxx
   }
 }
