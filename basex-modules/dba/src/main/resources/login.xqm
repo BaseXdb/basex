@@ -8,44 +8,6 @@ module namespace dba = 'dba/login';
 import module namespace config = 'dba/lib/config' at 'lib/config.xqm';
 import module namespace form = 'dba/lib/form' at 'lib/form.xqm';
 import module namespace html = 'dba/lib/html' at 'lib/html.xqm';
-import module namespace utils = 'dba/lib/utils' at 'lib/utils.xqm';
-
-(:~
- : Permissions: checks the user credentials.
- : @param  $perm  permission data
- : @return redirection to login page if check was not successful
- :)
-declare
-  %perm:check('/dba', '{$perm}')
-function dba:check(
-  $perm  as map(*)
-) as element(rest:response)? {
-  (: redirects to the login page if a user is not logged in, or if the page is not public :)
-  let $path := $perm?path
-  let $allow := $perm?allow
-  return if ($allow = 'public') then (
-    (: public function, register id for better log entries :)
-    request:set-attribute('id', $allow)
-  ) else if (session:get($config:SESSION-KEY)) then (
-    (: everything fine, user is logged in :)
-  ) else (
-    (: last visited page to redirect to (if there was one) :)
-    let $page := replace($path, '^.*dba/?', '')[.]
-    return web:redirect(utils:page('login'), html:parameters({ 'page': $page }))
-  )
-};
-
-(:~
- : Permissions: checks the user credentials of a WebSocket handshake.
- :)
-declare
-  %perm:check('/ws/dba')
-function dba:ws-check() as empty-sequence() {
-  (: webSocket URLs have their own address space, so they are not covered by the check above :)
-  if (empty(session:get($config:SESSION-KEY))) {
-    web:error(403, 'Please log in.')
-  }
-};
 
 (:~
  : Login page.
@@ -135,7 +97,7 @@ function dba:logout(
   return (
     (: write log entry, redirect to login page :)
     admin:write-log('Logout: ' || $user, 'DBA'),
-    web:redirect(utils:page('login'), { '_name': $user })
+    web:redirect('/dba/login', { '_name': $user })
   ),
   (: closes the WebSockets of the session, deletes the session key :)
   ws:list-details()[@session = session:id()] ! ws:close(@id),

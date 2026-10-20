@@ -148,10 +148,15 @@ public final class JobPool {
    * Schedules a one-off task for delayed execution.
    * @param task task
    * @param delay delay (ms)
-   * @return cancellation handle
+   * @return cancellation handle ({@code null} if the application is closing)
    */
   public ScheduledFuture<?> schedule(final Runnable task, final long delay) {
-    return scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+    try {
+      return scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+    } catch(final RejectedExecutionException ex) {
+      Util.debug(ex);
+      return null;
+    }
   }
 
   /**
@@ -159,12 +164,7 @@ public final class JobPool {
    * @param job job
    */
   public void scheduleResult(final Job job) {
-    try {
-      schedule(() -> results.remove(job.jc().id()), timeout);
-    } catch(final RejectedExecutionException ex) {
-      // scheduler has been shut down (application is closing): the result is discarded anyway
-      Util.debug(ex);
-    }
+    schedule(() -> results.remove(job.jc().id()), timeout);
   }
 
   /**

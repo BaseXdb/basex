@@ -4342,6 +4342,12 @@ return
     query(func.args(_BIN_ENCODE_STRING.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x>", "ISO-8859-7")), "<x>\u20AC</x>");
 
+    // base URIs are kept
+    query("base-uri(" + func.args("<a/>", " { 'base-uri': 'file:///x' }") + ")", "file:///x");
+    query("base-uri(" + func.args("<a/>", " { 'base-uri': 'd://x/' }") + ")", "d://x/");
+    query("base-uri(" + func.args("<a/>", " { 'base-uri': 'http://x/y.xml' }") + ")",
+        "http://x/y.xml");
+
     final String path = "src/test/resources/parse-xml.entity";
     final String dtd = "<!DOCTYPE a ["
         + "<!ELEMENT a (#PCDATA | b)*>"

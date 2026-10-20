@@ -343,6 +343,8 @@ public enum QueryError {
   // Jobs Module
 
   /** Error code. */
+  JOBS_CLOSED(JOB, "closed", "Jobs cannot be scheduled while the application is closing."),
+  /** Error code. */
   JOBS_DEADLOCK_X(JOB, "deadlock", "Job may only read databases locked by caller (%)."),
   /** Error code. */
   JOBS_ID_EXISTS_X(JOB, "id", "Job id already exists: %."),
@@ -711,7 +713,7 @@ public enum QueryError {
   PICINVCOMP_X_X_X(FOFD, 1350, "[%] not applicable to %: %."),
 
   /** Error code. */
-  HASH_ALGORITHM_X(FOHA, 1, "Algorithm not supported: '%'."),
+  HASH_ALGORITHM_X(FOHA, 1, "Algorithm not supported: %."),
 
   /** Error code. */
   PARSE_JSON_X(FOJS, 1, "%"),

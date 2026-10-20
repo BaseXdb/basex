@@ -2865,6 +2865,8 @@ public class QueryParser extends InputParser {
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
     if(cp == '.' && !digit(next())) return contextValue();
+    // Elvis operator
+    if(cp == ':') throw error(KEYSPEC_X, QueryError.similar(found(), "otherwise"));
 
     final Expr expr = literal(false, false);
     return expr != null ? expr : Str.get(ncName(KEYSPEC_X, false));

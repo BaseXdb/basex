@@ -192,7 +192,13 @@ public class DBNode extends XNode {
       final String base = Token.string(data.text(pre, true)), name = data.meta.name;
       if(data.inMemory()) {
         final String path = data.meta.original;
-        if(!path.isEmpty()) return Token.token(IO.get(path).merge(base).url());
+        if(!path.isEmpty()) {
+          // file paths are converted to URIs, other absolute URIs (e.g. from fn:parse-xml) are kept
+          final IO io = IO.get(path);
+          final Uri uri = Uri.get(path);
+          return io instanceof IOFile && io.path().equals(path) || !uri.isAbsolute() ?
+            Token.token(io.merge(base).url()) : uri.resolve(Uri.get(base)).string();
+        }
         // documents without a database (e.g. created via fn:parse-xml) have no base URI
         if(name.isEmpty()) return Token.token(base);
       }

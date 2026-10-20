@@ -95,10 +95,13 @@ public abstract class CLI extends Main {
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
     final long size = out.size();
-    ss.execute(cmd);
-    // non-empty query result, no file output, no query info: attach newline
-    if(cmd instanceof AQuery && out.size() != size && !fileOutput && !info) out.print(Prop.NL);
-    out.flush();
+    try {
+      ss.execute(cmd);
+    } finally {
+      // non-empty query result, no file output, no query info: attach newline
+      if(cmd instanceof AQuery && out.size() != size && !fileOutput && !info) out.print(Prop.NL);
+      out.flush();
+    }
     if(info) Util.print(ss.info());
   }
 

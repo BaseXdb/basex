@@ -672,7 +672,8 @@ public class FTTest extends SandboxTest {
 
     // index and main memory yield the same results
     for(final String options : new String[] { " {}", " { 'levels': 0 }", " { 'levels': 1 }",
-        " { 'relationship': 'NT' }", " { 'relationship': 'RT' }" }) {
+        " { 'levels': 2 }", " { 'levels': 1 to 3 }", " { 'relationship': 'NT' }",
+        " { 'relationship': 'RT' }" }) {
       for(final String term : new String[] { "flower", "blume", "plant", "garden", "x" }) {
         query("deep-equal(" + _FT_THESAURUS.args(_DB_GET.args(db), term, options) + ", " +
             _FT_THESAURUS.args(" " + thes, term, options) + ")", true);

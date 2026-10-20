@@ -67,8 +67,13 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       final InputInfo info) throws QueryException {
 
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
-    if(get(sc, name, sf.min, sf.arity(), false) != null)
-      throw DUPLFUNC_X.get(info, name.prefixString());
+    final StaticFunc dupl = get(sc, name, sf.min, sf.arity(), false);
+    if(dupl != null) {
+      final boolean cnstr = sf.expr instanceof ShapeConstructor ||
+          dupl.expr instanceof ShapeConstructor;
+      final byte[] nm = name.prefixString();
+      throw DUPLFUNC_X.get(info, cnstr ? Token.concat(nm, " (record constructor)") : nm);
+    }
 
     funcsByModule.computeIfAbsent(moduleUri(sc, name.uri()), QNmMap::new).
       computeIfAbsent(name, ArrayList::new).add(sf);

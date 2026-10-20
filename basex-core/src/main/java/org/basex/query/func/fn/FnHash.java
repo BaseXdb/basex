@@ -15,6 +15,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.similarity.*;
 
 /**
  * Function implementation.
@@ -59,7 +60,10 @@ public final class FnHash extends StandardFunc {
     try {
       md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
-      throw HASH_ALGORITHM_X.get(info, algorithm).cause(ex);
+      final ArrayList<String> algs = new ArrayList<>(Security.getAlgorithms("MessageDigest"));
+      Collections.addAll(algs, "CRC-32", "BLAKE3");
+      final String similar = Levenshtein.similar(Token.token(alg), algs.toArray(String[]::new));
+      throw HASH_ALGORITHM_X.get(info, similar("'" + algorithm + "'", similar)).cause(ex);
     }
 
     if(value instanceof B64Lazy) {

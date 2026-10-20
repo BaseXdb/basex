@@ -49,8 +49,8 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    if(expr == null) throw VAREMPTY_X.get(info, name());
-    if(!compiled) {
+    // external variables without value: raise error at evaluation time
+    if(expr != null && !compiled) {
       compiled = true;
 
       final QueryFocus focus = cc.qc.focus;
@@ -84,7 +84,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public Value value(final QueryContext qc) throws QueryException {
-    if(!lazy && expr == null) throw VAREMPTY_X.get(info, name());
+    if(expr == null) throw VAREMPTY_X.get(info, name());
 
     final Value cached = value;
     return cached != null ? cached : qc.globals.value(this, qc);

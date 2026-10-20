@@ -70,12 +70,13 @@ public final class ThesAccessor {
    * Constructor.
    * @param node thesaurus root node
    * @param relation requested relation
+   * @param min requested minimum level
    * @param max requested maximum level
    * @param info input info (can be {@code null})
    */
-  public ThesAccessor(final XNode node, final byte[] relation, final long max,
+  public ThesAccessor(final XNode node, final byte[] relation, final long min, final long max,
       final InputInfo info) {
-    this(relation, 0, max, info);
+    this(relation, min, max, info);
     this.node = node;
   }
 
@@ -98,11 +99,12 @@ public final class ThesAccessor {
    * Checks if this accessor was created for the specified thesaurus node and options.
    * @param nd thesaurus root node
    * @param rel requested relation
+   * @param mn requested minimum level
    * @param mx requested maximum level
    * @return result of check
    */
-  public boolean matches(final XNode nd, final byte[] rel, final long mx) {
-    return node != null && node.is(nd) && eq(relation, rel) && max == mx;
+  public boolean matches(final XNode nd, final byte[] rel, final long mn, final long mx) {
+    return node != null && node.is(nd) && eq(relation, rel) && min == mn && max == mx;
   }
 
   /**

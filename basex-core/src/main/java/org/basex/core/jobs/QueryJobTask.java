@@ -73,12 +73,7 @@ public final class QueryJobTask implements Runnable {
       job.remove();
       cancel();
     } else {
-      try {
-        schedule();
-      } catch(final RejectedExecutionException ex) {
-        // scheduler has been shut down (application is closing): stop repeating
-        Util.debug(ex);
-      }
+      schedule();
     }
     job.startIfNotRunning();
   }
@@ -94,9 +89,11 @@ public final class QueryJobTask implements Runnable {
 
   /**
    * Schedules the next execution unless the task was canceled.
+   * @return success flag ({@code false} if the application is closing)
    */
-  synchronized void schedule() {
+  synchronized boolean schedule() {
     if(!canceled) future = jobs.schedule(this, Math.max(0, start - System.currentTimeMillis()));
+    return canceled || future != null;
   }
 
   /**
