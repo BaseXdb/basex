@@ -139,7 +139,7 @@ public final class Str extends AStr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E['x'] → E[true()]
       expr = Bln.get(value.length != 0);
     }

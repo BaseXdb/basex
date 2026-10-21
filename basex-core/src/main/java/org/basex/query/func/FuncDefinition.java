@@ -177,9 +177,8 @@ public final class FuncDefinition {
     Array.copy(params, Math.min(arity, nl), qnames);
     if(arity > nl) {
       final String nm = Token.string(params[nl - 1].local());
-      final int start = 1;
       for(int n = nl; n < arity; n++) {
-        qnames[n] = new QNm(nm + (start + n - nl), "");
+        qnames[n] = new QNm(nm + (n - nl + 1), "");
       }
     }
     return qnames;

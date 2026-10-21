@@ -103,7 +103,7 @@ public final class FnTail extends StandardFunc {
     // tail(1, 2, 3) → tail(2, 3)
     // tail(((1 to 4), 5)) → tail(1 to 4), 5
     if(input instanceof List) {
-      final Expr[] args = input.args();
+      final Expr[] args = input.args().clone();
       final Expr first = args[0];
       if(first.seqType().oneOrMore()) {
         args[0] = cc.function(TAIL, info, first);

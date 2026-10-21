@@ -18,7 +18,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -31,57 +30,16 @@ public final class FnDistinctValues extends FnDuplicateValues {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
+    final ItemSet set = ItemSet.get(collation, info);
     return new Iter() {
-      IntSet ints = new IntSet();
-      ItemSet set;
-
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
-          if(ints != null) {
-            // try to treat items as 32-bit integers
-            final int v = toInt(item);
-            if(v != Integer.MIN_VALUE) {
-              if(ints.add(v)) return item;
-              continue;
-            }
-            set = ItemSet.get(collation, info);
-            for(final int i : ints.keys()) set.add(Itr.get(i));
-            ints = null;
-          }
-          // fallback
           if(set.add(item)) return item;
         }
         return null;
       }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Iter values = arg(0).atomIter(qc, info);
-    final Collation collation = toCollation(arg(1), qc);
-
-    // try to treat items as 32-bit integers
-    final ValueBuilder vb = new ValueBuilder(qc);
-    IntSet ints = new IntSet();
-    Item item;
-    while((item = qc.next(values)) != null) {
-      final int v = toInt(item);
-      if(v == Integer.MIN_VALUE) break;
-      if(ints.add(v)) vb.add(v);
-    }
-    if(item == null) return vb.value(BasicType.INTEGER);
-
-    // fallback: continue with the values that have already been collected
-    final ItemSet set = ItemSet.get(collation, info);
-    for(final int i : ints.keys()) set.add(Itr.get(i));
-    // be nice to the garbage collector
-    ints = null;
-    do {
-      if(set.add(item)) vb.add(item);
-    } while((item = qc.next(values)) != null);
-    return vb.value(this);
   }
 
   @Override
@@ -134,7 +92,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // min(distinct-values($values)) → min($values), exists(distinct-values($v)) → exists($v)
     // arrays are excluded from the existence check: they may be atomized to an empty sequence
     final boolean drop = mode == Simplify.EXISTENCE && !arg(0).seqType().mayBeWrapped() ||
-        mode.oneOf(Simplify.DISTINCT, Simplify.SET) && !defined(1);
+        mode.deduplicating() && !defined(1);
     return cc.simplify(this, drop ? arg(0) : this, mode);
   }
 

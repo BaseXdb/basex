@@ -16,9 +16,8 @@ final class HtmlNoCaseCollation extends Collation {
   @Override
   public int compare(final byte[] string, final byte[] compare) {
     final int sl = string.length, cl = compare.length, l = Math.min(sl, cl);
-    for(int s = 0, c = 0; s < l || c < l; s += Token.cl(string, s), c += Token.cl(compare, c)) {
-      final int cp1 = Token.cp(string, s), cp2 = Token.cp(compare, s);
-      final int d = compare(lc(cp1), lc(cp2));
+    for(int i = 0; i < l; i++) {
+      final int d = compare(string[i] & 0xFF, compare[i] & 0xFF);
       if(d != 0) return d;
     }
     return Integer.signum(sl - cl);

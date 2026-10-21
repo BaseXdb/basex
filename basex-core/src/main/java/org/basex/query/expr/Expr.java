@@ -420,7 +420,7 @@ public abstract class Expr extends ExprInfo {
    */
   public final Expr simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // boolean(<a/>) → true()
       // E[()] → E[false()]
       final SeqType st = seqType();

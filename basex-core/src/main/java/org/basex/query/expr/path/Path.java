@@ -623,8 +623,7 @@ public abstract class Path extends ParseExpr {
     final Expr[] branches = switch(step) {
       case final If iff -> iff.exprs;
       case final Otherwise otherwise -> otherwise.exprs;
-      case final Switch swtch -> swtch.branches();
-      case final Typeswitch typeswitch -> typeswitch.branches();
+      case final ASwitch<?> swtch -> swtch.branches();
       default -> null;
     };
     if(branches == null || step.has(Flag.POS)) return null;

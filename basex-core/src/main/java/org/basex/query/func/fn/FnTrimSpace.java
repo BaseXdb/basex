@@ -64,7 +64,7 @@ public final class FnTrimSpace extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && arg(1) instanceof Value) {
+    if(mode.conditional() && arg(1) instanceof Value) {
       // $node[trim-space(.)] → $node[normalize-space(.)]
       expr = cc.function(Function.NORMALIZE_SPACE, info, arg(0));
     }

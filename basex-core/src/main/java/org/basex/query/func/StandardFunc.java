@@ -178,6 +178,24 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Optimizes a function that returns an empty sequence when one of two atomized arguments
+   * is empty.
+   * @param expr1 first argument
+   * @param expr2 second argument
+   * @param cc compilation context
+   * @return original or optimized expression
+   * @throws QueryException query exception
+   */
+  protected final Expr optPair(final Expr expr1, final Expr expr2, final CompileContext cc)
+      throws QueryException {
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.zero()) return cc.voidAndReturn(expr2, expr1, info);
+    if(st2.zero()) return cc.voidAndReturn(expr1, expr2, info);
+    if(st1.atomOcc().min >= 1 && st2.atomOcc().min >= 1) exprType.assign(Occ.EXACTLY_ONE);
+    return this;
+  }
+
+  /**
    * Serializes the data from the specified iterator.
    * @param iter data to serialize
    * @param sopts serialization parameters
@@ -212,36 +230,29 @@ public abstract class StandardFunc extends Arr {
   @Override
   public final boolean has(final Flag... flags) {
     for(final Flag flag : flags) {
-      switch(flag) {
-        case HOF -> {
-          if(hofOffsets() > 0) return true;
-          continue;
-        }
-        case UPD -> {
-          if(hasUPD()) return true;
-        }
-        case CTX -> {
-          if(hasCTX()) return true;
-        }
-        case CNS -> {
-          if(hasCNS()) return true;
-          continue;
-        }
-        case NDT -> {
-          if(hasNDT()) return true;
-          // check whether function arguments may contain non-deterministic code
-          final int hof = hofOffsets(), al = args().length;
-          for(int a = 0; a < al; a++) {
-            if((hof & 1 << a) != 0 && (!(arg(a) instanceof final Item item) ||
-                !(item instanceof final FuncItem fi) || fi.ndt())) return true;
-          }
-        }
-        default -> { }
-      }
-      if(definition.has(flag)) return true;
+      if(switch(flag) {
+        case HOF -> hofOffsets() > 0;
+        case UPD -> hasUPD();
+        case CTX -> hasCTX();
+        case CNS -> hasCNS();
+        case NDT -> hasNDT() || ndtArgs();
+        default -> definition.has(flag);
+      }) return true;
     }
     // check arguments (without function invocation; it only applies to the function itself)
     return super.has(Flag.remove(flags, Flag.HOF));
+  }
+
+  /**
+   * Checks whether function arguments may contain non-deterministic code.
+   * @return result of check
+   */
+  private boolean ndtArgs() {
+    final int hof = hofOffsets(), al = args().length;
+    for(int a = 0; a < al; a++) {
+      if((hof & 1 << a) != 0 && (!(arg(a) instanceof final FuncItem fi) || fi.ndt())) return true;
+    }
+    return false;
   }
 
   /**

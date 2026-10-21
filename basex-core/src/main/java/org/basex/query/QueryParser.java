@@ -1733,7 +1733,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private GroupSpec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
-    GroupSpec[] specs = null;
+    final ArrayList<GroupSpec> specs = new ArrayList<>();
     do {
       final Var var = newVar();
       final Expr by;
@@ -1744,46 +1744,23 @@ public class QueryParser extends InputParser {
       } else {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
-        boolean dec = false;
-        if(ref != null) {
-          // check preceding clauses
-          for(final Clause clause : cl) {
-            if(clause.declares(ref.var)) {
-              dec = true;
-              break;
-            }
-          }
-
-          // check other grouping variables
-          if(!dec && specs != null) {
-            for(final GroupSpec spec : specs) {
-              if(spec.var == ref.var) {
-                dec = true;
-                break;
-              }
-            }
-          }
-        }
-        if(!dec) throw error(GVARNOTDEFINED_X, var);
+        if(ref == null || !Checks.any(cl, c -> c.declares(ref.var)) &&
+            !Checks.any(specs, s -> s.var == ref.var)) throw error(GVARNOTDEFINED_X, var);
         by = ref;
       }
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(uriLiteral(),
           qc, info(), FLWORCOLL_X) : sc.collation;
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), by, coll);
-      if(specs == null) {
-        specs = new GroupSpec[] { spec };
-      } else {
-        for(int i = specs.length; --i >= 0;) {
-          if(specs[i].var.name.eq(spec.var.name)) {
-            specs[i].occluded = true;
-            break;
-          }
+      for(int i = specs.size(); --i >= 0;) {
+        if(specs.get(i).var.name.eq(spec.var.name)) {
+          specs.get(i).occluded = true;
+          break;
         }
-        specs = Array.add(specs, spec);
       }
+      specs.add(spec);
     } while(wsConsumeWs(","));
-    return specs;
+    return specs.toArray(GroupSpec[]::new);
   }
 
   /**
@@ -2655,24 +2632,16 @@ public class QueryParser extends InputParser {
     if(current('{')) return enclosedExpr();
 
     final ArrayList<Test> list = new ArrayList<>(1);
-    final QueryPredicate<Expr> add = e -> {
-      final boolean element = axis != Axis.ATTRIBUTE;
+    final boolean element = axis != Axis.ATTRIBUTE, paren = consume("(");
+    do {
+      if(paren) skipWs();
       final Test test = simpleNodeTest(element ? Kind.ELEMENT : Kind.ATTRIBUTE, true);
-      if(test == null) return false;
+      if(test == null) return null;
       checkTest(test, element);
       if(!list.contains(test)) list.add(test);
-      return true;
-    };
-    if(consume("(")) {
-      do {
-        skipWs();
-        if(!add.test(null)) return null;
-      } while(wsConsume("|"));
-      if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
-    } else {
-      if(!add.test(null)) return null;
-    }
-    return list.isEmpty() ? null : Test.get(list);
+    } while(paren && wsConsume("|"));
+    if(paren && !consume(')')) throw error(WRONGCHAR_X_X, ')', found());
+    return Test.get(list);
   }
 
   /**
@@ -3915,22 +3884,21 @@ public class QueryParser extends InputParser {
    */
   private Expr compConstructor() throws QueryException {
     final int p = pos;
-    for(int c = 0; c < COMPKINDS.length; c++) {
-      final String kind = COMPKINDS[c];
+    for(final String kind : COMPKINDS) {
       if(!wsConsumeWs(kind)) continue;
       final int k = pos;
-      final Expr expr = switch(c) {
-        case 0 -> compDoc();
-        case 1 -> compElement();
-        case 2 -> compAttribute();
-        case 3 -> compNamespace();
-        case 4 -> compText();
-        case 5 -> compComment();
+      final Expr expr = switch(kind) {
+        case DOCUMENT -> compDoc();
+        case ELEMENT -> compElement();
+        case ATTRIBUTE -> compAttribute();
+        case NAMESPACE -> compNamespace();
+        case TEXT -> compText();
+        case COMMENT -> compComment();
         default -> compPI();
       };
       if(expr != null) return expr;
       pos = k;
-      final boolean named = c == 1 || c == 2 || c == 3 || c == 6;
+      final boolean named = !Strings.eq(kind, DOCUMENT, TEXT, COMMENT);
       addHint(EXPECTAFTER_X_X, named ? "name and '{'" : "'{'", kind);
       break;
     }
@@ -5030,7 +4998,6 @@ public class QueryParser extends InputParser {
           } while(wsConsume(","));
           if(!wsConsume(")")) throw error(WRONGCHAR_X_X, ")", found());
         }
-        // skip if primary expression cannot be a function
         qc.updating();
         return new DynFuncCall(ii, true, false, func, argList.finish());
       }

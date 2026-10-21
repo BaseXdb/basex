@@ -69,10 +69,7 @@ public final class Functions {
    * @return result of check
    */
   public static boolean staticURI(final byte[] uri) {
-    for(final byte[] u : URIS) {
-      if(eq(uri, u)) return true;
-    }
-    return false;
+    return URIS.contains(uri);
   }
 
   /**

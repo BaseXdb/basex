@@ -125,7 +125,7 @@ public final class Union extends Set {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       for(final Expr ex : exprs) {
         // boolean(a union <a/>) → boolean(true())
         if(ex.seqType().instanceOf(Types.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;

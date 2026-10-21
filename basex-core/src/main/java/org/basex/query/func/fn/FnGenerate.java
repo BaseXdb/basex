@@ -57,7 +57,7 @@ public final class FnGenerate extends StandardFunc {
     final Expr init = arg(0), step = arg(1);
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
+    if(mode.deduplicating() ||
         mode == Simplify.PREDICATE && seqType().instanceOf(Types.XNODE_ZM)) {
       // 'x' = generate('y', fn { 'y' }) → 'x' = 'y'
       // distinct-values(generate(1, identity#1)) → distinct-values(1)

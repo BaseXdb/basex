@@ -411,10 +411,10 @@ public abstract class Filter extends Preds {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E[a[. = 'x']] → E[a = 'x']
       expr = flattenEbv(root, true, cc);
-    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) && !mayBePositional()) {
+    } else if(mode.deduplicating() && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
     } else if(mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && exprs.length == 1 &&

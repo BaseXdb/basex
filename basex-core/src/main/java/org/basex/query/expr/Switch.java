@@ -23,11 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Switch extends ParseExpr {
-  /** Condition. */
-  private Expr cond;
-  /** Case groups. */
-  private SwitchGroup[] groups;
+public final class Switch extends ASwitch<SwitchGroup> {
   /** Indexes of the groups of string cases (can be {@code null}). */
   private TokenIntMap strings;
 
@@ -38,25 +34,12 @@ public final class Switch extends ParseExpr {
    * @param groups case groups (last one is default case)
    */
   public Switch(final InputInfo info, final Expr cond, final SwitchGroup[] groups) {
-    super(info, Types.ITEM_ZM);
-    this.cond = cond;
-    this.groups = groups;
+    super(info, cond, groups);
   }
 
   @Override
-  public boolean navigational() {
-    return Checks.all(groups, group -> group.rtrn().navigational());
-  }
-
-  /**
-   * Returns the return expressions of all groups.
-   * @return expressions
-   */
-  public Expr[] branches() {
-    final int gl = groups.length;
-    final Expr[] branches = new Expr[gl];
-    for(int g = 0; g < gl; g++) branches[g] = groups[g].rtrn();
-    return branches;
+  Expr branch(final SwitchGroup group) {
+    return group.rtrn();
   }
 
   @Override
@@ -65,13 +48,6 @@ public final class Switch extends ParseExpr {
     for(final SwitchGroup group : groups) group.checkUp();
     // check if none or all return expressions are updating
     checkAllUp(branches());
-  }
-
-  @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    cond = cond.compile(cc);
-    for(final SwitchGroup group : groups) group.compile(cc);
-    return optimize(cc);
   }
 
   @Override
@@ -113,15 +89,6 @@ public final class Switch extends ParseExpr {
       for(int e = exprs.length - 1; e >= 1; e--) index.put(((Str) exprs[e]).string(), g);
     }
     return index;
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    boolean changed = false;
-    for(final SwitchGroup group : groups) {
-      changed |= group.simplifyFor(mode, cc) == null;
-    }
-    return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   /**
@@ -276,32 +243,6 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean vacuous() {
-    return Checks.all(groups, group -> group.rtrn().vacuous());
-  }
-
-  @Override
-  public boolean ddo() {
-    return Checks.all(groups, group -> group.rtrn().ddo());
-  }
-
-  @Override
-  public boolean has(final Flag... flags) {
-    for(final SwitchGroup group : groups) {
-      if(group.has(flags)) return true;
-    }
-    return cond.has(flags);
-  }
-
-  @Override
-  public boolean inlineable(final InlineContext ic) {
-    for(final SwitchGroup group : groups) {
-      if(!group.inlineable(ic)) return false;
-    }
-    return cond.inlineable(ic);
-  }
-
-  @Override
   public VarUsage count(final Var var) {
     VarUsage max = VarUsage.NEVER, uses = VarUsage.NEVER;
     for(final SwitchGroup cs : groups) {
@@ -312,58 +253,13 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = ic.inline(groups, true);
-    final Expr inlined = cond.inline(ic);
-    if(inlined != null) {
-      changed = true;
-      cond = inlined;
-    }
-    return changed ? optimize(ic.cc) : null;
-  }
-
-  @Override
-  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // (switch(C) case X return A default return B) coerce to T →
-    //   switch(C) case X return (A coerce to T) default return (B coerce to T)
-    boolean changed = false;
-    for(final SwitchGroup group : groups) {
-      changed |= group.inlineTypeCheck(tc, cc) != null;
-    }
-    return changed ? optimize(cc) : this;
-  }
-
-  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Switch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups)));
   }
 
   @Override
-  public void markTailCalls(final CompileContext cc) {
-    for(final SwitchGroup group : groups) group.markTailCalls(cc);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return cond.accept(visitor) && visitAll(visitor, groups);
-  }
-
-  @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr group : groups) size += group.exprSize();
-    return size + cond.exprSize();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Switch s && cond.equals(s.cond) &&
-        Arrays.equals(groups, s.groups);
-  }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), cond, groups);
+    return this == obj || obj instanceof Switch && super.equals(obj);
   }
 
   @Override

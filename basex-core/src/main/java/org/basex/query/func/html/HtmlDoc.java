@@ -12,10 +12,6 @@ import org.basex.query.value.*;
 public final class HtmlDoc extends HtmlParse {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    try {
-      return doc(qc);
-    } catch(final QueryException ex) {
-      throw error(ex);
-    }
+    return doc(qc);
   }
 }

@@ -36,12 +36,12 @@ public interface ItemSet extends Iterable<Item> {
   boolean contains(Item key) throws QueryException;
 
   /**
-   * Returns a hash item set.
+   * Returns an item set.
    * @param coll collation (can be {@code null})
    * @param info input info (can be {@code null})
    * @return item set
    */
   static ItemSet get(final Collation coll, final InputInfo info) {
-    return coll == null ? new HashItemSet(Mode.DEEP, info) : new CollationItemSet(coll, info);
+    return new IntItemSet(coll, info);
   }
 }

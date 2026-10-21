@@ -60,11 +60,11 @@ public final class FnString extends ContextFn {
     Expr expr = this;
     final Expr item = usesContext() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
-    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && st.type.isStringOrUntyped() &&
+    if(mode.stringifying() && st.type.isStringOrUntyped() &&
         st.one()) {
       // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
-    } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    } else if(mode.conditional()) {
       // boolean(string($number)) → true()
       if(st.instanceOf(Types.NUMERIC_O)) return Bln.TRUE;
       // boolean(string($node)) → boolean($node/descendant::text())

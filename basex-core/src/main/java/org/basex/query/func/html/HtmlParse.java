@@ -14,24 +14,11 @@ import org.basex.query.value.*;
 public class HtmlParse extends ParseHtml {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    try {
-      return parse(qc);
-    } catch(final QueryException ex) {
-      throw error(ex);
-    }
+    return parse(qc);
   }
 
   @Override
   protected final Parser parser() {
     return Parser.PARSER;
-  }
-
-  /**
-   * Adapts the error code.
-   * @param ex exception to be adapted
-   * @return new exception
-   */
-  final QueryException error(final QueryException ex) {
-    return ex;
   }
 }

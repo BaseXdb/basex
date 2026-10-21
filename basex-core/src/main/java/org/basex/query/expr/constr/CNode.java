@@ -104,7 +104,7 @@ public abstract class CNode extends Arr {
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
       final SeqType st1 = exprs[0].seqType();
       if(st1.one() && st1.instanceOf(Types.ANY_ATOMIC_TYPE_O) && !has(Flag.NDT)) {
-        if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
+        if(mode.stringifying()) {
           st = Types.STRING_O;
         } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
           st = this instanceof CComm || this instanceof CNSpace ? Types.STRING_O :

@@ -112,10 +112,10 @@ public final class SingletonSeq extends Seq {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     // distinct-values(replicate((1, 2), 3)) → distinct-values((1, 2)), E[replicate(1, 3)] → E[1]
-    if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
+    if(mode.deduplicating() ||
         mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
-    } else if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) &&
+    } else if(mode.stringifying() &&
         type.instanceOf(NodeType.XNODE)) {
       // string-join(replicate(<a>A</a>, 2)) → string-join(replicate('A', 2))
       expr = get((Value) value.simplifyFor(mode, cc), count());

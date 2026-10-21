@@ -40,6 +40,7 @@ public class DbOptionMap extends StandardFunc {
       case final Value val -> val;
       case final Boolean bln -> Bln.get(bln);
       case final Integer itr -> Itr.get(itr);
+      case final Long lng -> Itr.get(lng);
       case final int[] ints -> IntSeq.get(ints);
       case final Options options -> {
         final MapBuilder mb = new MapBuilder();

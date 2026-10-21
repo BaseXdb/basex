@@ -111,11 +111,8 @@ public final class PkgValidator {
   private static String availVersion(final PkgDep dep, final HashSet<String> versions) {
     if(versions.isEmpty()) return null;
     if(dep.versions != null) {
-      // get acceptable versions for secondary package/processor
-      final HashSet<String> versList = new HashSet<>();
-      Collections.addAll(versList, Strings.split(dep.versions, ' '));
-      // check if any acceptable version is already installed
-      for(final String v : versList) {
+      // check if any acceptable version of the secondary package/processor is already installed
+      for(final String v : Strings.split(dep.versions, ' ')) {
         if(versions.contains(v)) return v;
       }
     } else if(dep.semver != null) {

@@ -570,7 +570,7 @@ public class CmpG extends Cmp {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // E[node-name() = #a] → E[self::a]
-    final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
+    final Expr ex = mode.conditional() ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }
 

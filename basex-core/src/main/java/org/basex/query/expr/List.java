@@ -241,10 +241,10 @@ public final class List extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E[A, B] → E[A | B]
       expr = toUnion(cc);
-    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET)) {
+    } else if(mode.deduplicating()) {
       // (A, B) = 'X' → (A | B) = 'X'
       if(mode == Simplify.SET) expr = toUnion(cc);
       if(expr != this) return cc.simplify(this, expr, mode);

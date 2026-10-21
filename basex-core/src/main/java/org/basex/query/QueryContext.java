@@ -819,26 +819,24 @@ public final class QueryContext extends Job implements Closeable {
         final Iter iter = updating ? update().iter() : main.iter(this);
         Item item;
 
-        do {
-          // collect PRE values if a database is opened globally
-          if(defaultOutput && data != null) {
-            while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
-              pres.add(((DBNode) item).pre());
-            }
-            // skip if all results have been collected
-            if(item == null || pres.size() >= max) break;
-
-            // otherwise, add nodes to standard iterator
-            for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
-            items.add(item);
+        // collect PRE values if a database is opened globally
+        if(defaultOutput && data != null) {
+          while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
+            pres.add(((DBNode) item).pre());
           }
+          // skip if all results have been collected
+          if(item == null || pres.size() >= max) return null;
 
-          // use standard iterator
-          while((item = next(iter)) != null && items.size() < max) {
-            item.cache(false, null);
-            items.add(item);
-          }
-        } while(false);
+          // otherwise, add nodes to standard iterator
+          for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
+          items.add(item);
+        }
+
+        // use standard iterator
+        while((item = next(iter)) != null && items.size() < max) {
+          item.cache(false, null);
+          items.add(item);
+        }
         return null;
       });
     } catch(final QueryException | JobException ex) {

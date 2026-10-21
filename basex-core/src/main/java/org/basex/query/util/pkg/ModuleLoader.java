@@ -52,13 +52,11 @@ public final class ModuleLoader {
    */
   public void close() {
     for(final Object jm : javaModules) {
-      for(final Class<?> c : jm.getClass().getInterfaces()) {
-        if(c == QueryResource.class) {
-          try {
-            ((QueryResource) jm).close();
-          } catch(final RuntimeException ex) {
-            Util.debug(ex);
-          }
+      if(jm instanceof final QueryResource qr) {
+        try {
+          qr.close();
+        } catch(final RuntimeException ex) {
+          Util.debug(ex);
         }
       }
     }

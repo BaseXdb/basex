@@ -95,7 +95,7 @@ public final class Instance extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
+    final Expr ex = mode.conditional() ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }
 

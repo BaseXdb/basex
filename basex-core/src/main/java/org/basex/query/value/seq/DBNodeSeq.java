@@ -148,7 +148,7 @@ public class DBNodeSeq extends NativeSeq {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
+    if(mode.stringifying()) {
       // string-join((<a>A</a>, <b>B</b>)) → string-join(('A', 'B'))
       final TokenList list = new TokenList(size);
       for(final Item item : this) list.add(item.string(null));
