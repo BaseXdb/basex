@@ -7,6 +7,7 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -54,11 +55,11 @@ public final class FnTokenize extends RegExFn {
       };
     }
 
-    final Pattern p = pattern(pattern, flags, qc);
+    final RegExpr regExpr = regExpr(pattern, flags, qc);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = Token.string(value);
       final int len = string.length();
-      final Matcher matcher = p.matcher(string);
+      final Matcher matcher = regExpr.matcher(string, qc);
       int start;
 
       @Override
@@ -92,14 +93,14 @@ public final class FnTokenize extends RegExFn {
     if(literal != null) return vl == 0 ? Empty.VALUE :
       StrSeq.get(Token.split(value, literal, true));
 
-    final Pattern p = pattern(pattern, flags, qc);
+    final RegExpr regExpr = regExpr(pattern, flags, qc);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
     final String string = Token.string(value);
     final int len = string.length();
     int start = 0;
-    for(final Matcher matcher = p.matcher(string); matcher.find();) {
+    for(final Matcher matcher = regExpr.matcher(string, qc); matcher.find();) {
       final int ms = matcher.start(), me = matcher.end();
       if(ms != len && me != 0) {
         tl.add(string.substring(start, ms));

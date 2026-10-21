@@ -23,6 +23,16 @@ public final class Literal extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return 1;
+  }
+
+  @Override
+  int literal() {
+    return insensitive ? -1 : codepoint;
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     final int[] variants = insensitive ? CaseVariants.get(codepoint) : null;
     if(variants != null) {

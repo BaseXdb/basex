@@ -105,6 +105,11 @@ public final class Escape extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return 1;
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     sb.append(img);
   }

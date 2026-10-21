@@ -56,7 +56,7 @@ public final class FnReplace extends RegExFn {
     }
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final String input = string(value);
-    final Matcher matcher = regExpr.pattern.matcher(input);
+    final Matcher matcher = regExpr.matcher(input, qc);
 
     if(func) {
       // deprecated: groups are passed on as sequence
@@ -135,7 +135,13 @@ public final class FnReplace extends RegExFn {
         string = sb.toString();
       }
     }
-    return Str.get(matcher.replaceAll(string));
+    // no replaceAll: it would reset the matcher region
+    if(!matcher.find()) return Str.get(value);
+    final StringBuilder sb = new StringBuilder();
+    do {
+      matcher.appendReplacement(sb, string);
+    } while(matcher.find());
+    return Str.get(matcher.appendTail(sb).toString());
   }
 
   /**

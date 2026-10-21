@@ -33,6 +33,11 @@ public final class Wildcard extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return 1;
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     sb.append(nl ? "." : "[^\r\n]");
   }

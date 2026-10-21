@@ -15,6 +15,30 @@ public abstract class RegExp {
   }
 
   /**
+   * Returns the minimum number of code points matched by this expression.
+   * @return minimum length
+   */
+  int minLength() {
+    return 0;
+  }
+
+  /**
+   * Returns the pieces that are matched in sequence by this expression.
+   * @return pieces
+   */
+  RegExp[] pieces() {
+    return new RegExp[] { this };
+  }
+
+  /**
+   * Returns the code point that is matched case-sensitively by this expression.
+   * @return code point, or {@code -1}
+   */
+  int literal() {
+    return -1;
+  }
+
+  /**
    * Recursive {@link RegExp#toString()} helper.
    * @param sb string builder
    */

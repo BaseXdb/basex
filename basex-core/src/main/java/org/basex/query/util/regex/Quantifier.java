@@ -27,6 +27,14 @@ public final class Quantifier extends RegExp {
   }
 
   /**
+   * Returns the minimum number of occurrences.
+   * @return minimum
+   */
+  int min() {
+    return min;
+  }
+
+  /**
    * Indicates if this quantifier makes an atom optional ({@code ?}).
    * @return result of check
    */

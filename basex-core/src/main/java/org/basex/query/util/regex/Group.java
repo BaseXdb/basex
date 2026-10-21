@@ -88,6 +88,11 @@ public final class Group extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return encl.minLength();
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     toRegEx(sb, null);
   }

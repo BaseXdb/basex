@@ -3,7 +3,9 @@ package org.basex.query.util.regex;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.core.jobs.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Compiled regular expression (pattern and lazily computed group metadata).
@@ -13,21 +15,71 @@ import org.basex.util.*;
  */
 public class RegExpr {
   /** Pattern. */
-  public final Pattern pattern;
+  private final Pattern pattern;
   /** Java numbers of the capturing groups (can be {@code null} if they are identical). */
   private final int[] groups;
   /** Group info (can be {@code null}; lazily set once, read from concurrent child contexts). */
   private volatile GroupInfo groupInfo;
+  /** Minimum length of a match. */
+  private final int minLength;
+  /** Code points that must occur in a match. */
+  private final int[] literals;
+  /** Minimum string offsets of the code points. */
+  private final int[] offsets;
 
   /**
    * Constructor.
    * @param pattern pattern
    * @param groups Java numbers of the capturing groups (can be {@code null})
+   * @param regExp parsed regular expression (can be {@code null})
    */
-  public RegExpr(final Pattern pattern, final int[] groups) {
+  public RegExpr(final Pattern pattern, final int[] groups, final RegExp regExp) {
     this.pattern = pattern;
     this.groups = groups;
     groupInfo = null;
+
+    final IntList cps = new IntList(), offs = new IntList();
+    if(regExp != null) {
+      long offset = 0;
+      for(final RegExp piece : regExp.pieces()) {
+        final int cp = piece.literal();
+        if(cp != -1) {
+          cps.add(cp);
+          offs.add((int) offset);
+        }
+        offset = Math.min(Integer.MAX_VALUE, offset + piece.minLength());
+      }
+    }
+    minLength = regExp != null ? regExp.minLength() : 0;
+    literals = cps.finish();
+    offsets = offs.finish();
+  }
+
+  /**
+   * Returns a matcher for the specified input that can be stopped.
+   * @param input input
+   * @param job job to be checked
+   * @return matcher
+   */
+  public Matcher matcher(final String input, final Job job) {
+    final Matcher matcher = pattern.matcher(new StoppableString(input, job));
+    // empty region: skip the search if the input cannot match
+    if(!mayMatch(input)) matcher.region(input.length(), input.length());
+    return matcher;
+  }
+
+  /**
+   * Checks if the input satisfies the minimum length and contains all required code points.
+   * @param input input
+   * @return result of check
+   */
+  private boolean mayMatch(final String input) {
+    if(input.length() < minLength) return false;
+    final int ls = literals.length;
+    for(int l = 0; l < ls; l++) {
+      if(input.indexOf(literals[l], offsets[l]) == -1) return false;
+    }
+    return true;
   }
 
   /**

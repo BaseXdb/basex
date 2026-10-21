@@ -14,18 +14,35 @@ import org.basex.core.jobs.*;
 public final class StoppableString implements CharSequence {
   /** String. */
   private final String string;
+  /** Job to be checked (if {@code null}, the thread interruption status is checked). */
+  private final Job job;
+  /** Number of character accesses. */
+  private int count;
 
   /**
    * Constructor.
    * @param string string
    */
   public StoppableString(final String string) {
+    this(string, null);
+  }
+
+  /**
+   * Constructor.
+   * @param string string
+   * @param job job to be checked (can be {@code null})
+   */
+  public StoppableString(final String string, final Job job) {
     this.string = string;
+    this.job = job;
   }
 
   @Override
   public char charAt(final int index) {
-    checkStop();
+    if((++count & 0xFFF) == 0) {
+      if(job != null) job.checkStop();
+      else checkStop();
+    }
     return string.charAt(index);
   }
 
@@ -35,8 +52,8 @@ public final class StoppableString implements CharSequence {
   }
 
   @Override
-  public StoppableString subSequence(final int start, final int end) {
-    return new StoppableString(string.substring(start, end));
+  public String subSequence(final int start, final int end) {
+    return string.substring(start, end);
   }
 
   @Override

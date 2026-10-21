@@ -29,7 +29,7 @@ public final class FnMatches extends RegExFn {
 
     final byte[] literal = literal(pattern, flags);
     if(literal != null) return contains(value, literal);
-    return pattern(pattern, flags, qc).matcher(string(value)).find();
+    return regExpr(pattern, flags, qc).matcher(string(value), qc).find();
   }
 
   @Override

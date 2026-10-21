@@ -26,7 +26,7 @@ public final class FnMatchingSegments extends RegExFn {
 
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final String[] names = regExpr.getGroupNames();
-    final Matcher matcher = regExpr.pattern.matcher(value);
+    final Matcher matcher = regExpr.matcher(value, qc);
     final int gc = regExpr.groupCount(matcher);
     final IntUnaryOperator positions = positions(value);
     return new Iter() {

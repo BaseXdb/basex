@@ -23,6 +23,11 @@ public final class Piece extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return (int) Math.min(Integer.MAX_VALUE, (long) atom.minLength() * quant.min());
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     if(quant.optional() && atom instanceof final Group group && group.hasBackRef()) {
       group.toRegEx(sb, quant);

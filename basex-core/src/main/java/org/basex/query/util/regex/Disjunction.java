@@ -19,6 +19,13 @@ public final class Disjunction extends RegExp {
   }
 
   @Override
+  int minLength() {
+    int min = Integer.MAX_VALUE;
+    for(final RegExp branch : branches) min = Math.min(min, branch.minLength());
+    return min;
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     branches[0].toRegEx(sb);
     final int bl = branches.length;
