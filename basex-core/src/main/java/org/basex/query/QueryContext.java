@@ -676,7 +676,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public FNode toXml(final boolean full) {
     // only show root node if functions or variables exist
-    final QueryPlan plan = new QueryPlan(compiled, closed, full);
+    final QueryPlan plan = new QueryPlan(compiled, updating, full);
     if(main != null) {
       for(final StaticDecl ss : main.references()) ss.toXml(plan);
       main.toXml(plan);

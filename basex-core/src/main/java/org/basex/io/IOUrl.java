@@ -295,14 +295,32 @@ public final class IOUrl extends IO {
    * @return result of check
    */
   static boolean isValid(final String url) {
-    final int ul = url.length();
-    int u = url.indexOf(':');
-    if(u < 2 || u + 1 == ul || !isJarURL(url) && url.charAt(u + 1) != '/') return false;
-    while(--u >= 0) {
-      final char ch = url.charAt(u);
-      if(!(ch >= 'a' && ch <= 'z' || Strings.contains("+-._", ch))) return false;
+    final int u = scheme(url);
+    return u != -1 && (isJarURL(url) || url.charAt(u + 1) == '/');
+  }
+
+  /**
+   * Checks if the specified string is an opaque URI with a scheme and no path (e.g. {@code urn:x}).
+   * @param url url string
+   * @return result of check
+   */
+  static boolean isOpaque(final String url) {
+    return scheme(url) != -1 && !isValid(url);
+  }
+
+  /**
+   * Returns the position of the colon after a scheme with at least two characters.
+   * @param url url string
+   * @return position, or {@code -1} if there is no scheme or nothing follows it
+   */
+  private static int scheme(final String url) {
+    final int u = url.indexOf(':');
+    if(u < 2 || u + 1 == url.length()) return -1;
+    for(int c = 0; c < u; c++) {
+      final char ch = url.charAt(c);
+      if(!(ch >= 'a' && ch <= 'z' || Strings.contains("+-._", ch))) return -1;
     }
-    return true;
+    return u;
   }
 
   /**

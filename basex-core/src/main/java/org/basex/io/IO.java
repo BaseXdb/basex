@@ -150,6 +150,7 @@ public abstract class IO {
     return s.indexOf('<') == 0 ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOFile.toPath(s)) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
+           IOUrl.isOpaque(s)   ? new IOContent(s) :
            IOFile.isValid(s)   ? new IOFile(s) :
            new IOContent(s);
   }
