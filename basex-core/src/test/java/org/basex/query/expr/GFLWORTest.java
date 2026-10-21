@@ -753,4 +753,46 @@ public final class GFLWORTest extends SandboxTest {
     error("(for $k in (1 to 100) ! (if(. = 50) then 'a' else .) order by $k empty greatest "
         + "return $k)[position() <= 3]", INVTYPE_X);
   }
+
+  /** Sliding windows with a fixed size. */
+  @Test public void windowToSubsequence() {
+    final String window = "for sliding window $w in (2, 4, 6, 8, 10, 12) start at $s when true() ";
+    check(window + "end at $e when $e - $s eq 2 return sum($w)",
+        "12\n18\n24\n30\n22\n12", empty(Window.class), exists(SUBSEQUENCE));
+    check(window + "only end at $e when $e - $s eq 2 return sum($w)",
+        "12\n18\n24\n30", empty(Window.class), exists(SUBSEQUENCE));
+    check(window + "only end at $e when $e - $s + 1 eq 3 return sum($w)",
+        "12\n18\n24\n30", empty(Window.class));
+    check(window + "end at $e when $e = $s + 1 return $s * 100 + sum($w)",
+        "106\n210\n314\n418\n522\n612", empty(Window.class));
+    check(window + "only end at $e when 2 + $s = $e return count($w)",
+        "3\n3\n3\n3", empty(Window.class));
+    check(window + "only end at $e when $e - $s eq 0 return $w",
+        "2\n4\n6\n8\n10\n12", empty(Window.class));
+    check(window + "only end at $e when $e - $s eq 6 return $w",
+        "", empty(Window.class));
+    check("for $i in 1 to 2 let $in := (1 to $i + 2) ! (. * $i) "
+        + "for sliding window $w in $in start at $s when true() "
+        + "only end at $e when $e - $s eq 1 return sum($w) + count($in)",
+        "6\n8\n10\n14\n18", empty(Window.class));
+
+    // no rewrite: input is computed, end position is referenced, or no fixed distance
+    check("for $i in 1 to 2 for sliding window $w in 1 to $i + 2 start at $s when true() "
+        + "only end at $e when $e - $s eq 1 return sum($w)",
+        "3\n5\n3\n5\n7", exists(Window.class));
+    check("for sliding window $w in (1 to 6) ! (. * 2) start at $s when true() "
+        + "only end at $e when $e - $s eq 2 return sum($w)",
+        "12\n18\n24\n30", exists(Window.class));
+    check(window + "only end at $e when $e - $s eq 2 return $e",
+        "3\n4\n5\n6", exists(Window.class));
+    check(window + "only end at $e when $e - $s eq -1 return $e",
+        "", exists(Window.class));
+    check("for $i in 1 to 2 " + window + "only end at $e when $e - $s eq $i return count($w)",
+        "2\n2\n2\n2\n2\n3\n3\n3\n3", exists(Window.class));
+    check(window + "only end $x at $e when $e - $s eq 1 and $x > 4 return sum($w)",
+        "10\n14\n18\n22", exists(Window.class));
+    check("for tumbling window $w in 1 to 6 start at $s when true() "
+        + "only end at $e when $e - $s eq 2 return sum($w)",
+        "6\n15", exists(Window.class));
+  }
 }

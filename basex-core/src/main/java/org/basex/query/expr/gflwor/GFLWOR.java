@@ -208,7 +208,7 @@ public final class GFLWOR extends ParseExpr {
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
         forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
         cleanDeadVars() | optimizeCond(cc, true) | optimizeCond(cc, false) | posToPred(cc) |
-        optimizeOrderBy(cc));
+        optimizeOrderBy(cc) | windowToSubsequence(cc));
 
     mergeWheres(cc, true);
     mergeWheres(cc, false);
@@ -372,6 +372,26 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = clauses.get(i);
       if(clause instanceof final For fr && fr.asLet(clauses, i, cc)) {
         cc.info(QueryText.OPTFORTOLET_X, clause);
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Rewrites sliding windows with a fixed size to loops over subsequences.
+   * @param cc compilation context
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean windowToSubsequence(final CompileContext cc) throws QueryException {
+    boolean changed = false;
+    for(int c = 0; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
+      final int next = c + 1;
+      if(clause instanceof final Window window &&
+          window.toSubsequence(clauses, c, var -> count(var, next) == VarUsage.NEVER, cc)) {
+        cc.info(QueryText.OPTREWRITE_X_X, (Supplier<?>) window::description, window);
         changed = true;
       }
     }

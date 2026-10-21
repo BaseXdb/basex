@@ -108,6 +108,58 @@ public final class Condition extends Single {
   }
 
   /**
+   * Returns the position variable if it is the only variable of this condition.
+   * @return position variable or {@code null}
+   */
+  Var onlyPos() {
+    return item == null && prev == null && next == null ? pos : null;
+  }
+
+  /**
+   * Returns the fixed distance between the start and end position of a window.
+   * @param spos position variable of the start condition
+   * @return distance, or {@code -1} if this end condition specifies no fixed distance
+   */
+  long distance(final Var spos) {
+    final Var epos = onlyPos();
+    if(epos == null || !(expr instanceof final CmpG cmp) || cmp.cmpOp() != CmpOp.EQ) return -1;
+
+    // $e - $s = K, $e = $s + K, $s + K = $e, $e = $s
+    final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
+    final Expr dist;
+    if(op1 instanceof final Arith arith && arith.calc == Calc.SUBTRACT &&
+        ref(arith.arg(0), epos) && ref(arith.arg(1), spos)) {
+      dist = op2;
+    } else {
+      dist = ref(op1, epos) ? offset(op2, spos) : ref(op2, epos) ? offset(op1, spos) : null;
+    }
+    final long d = dist instanceof final Itr itr ? itr.itr() : -1;
+    return d >= 0 && d < Long.MAX_VALUE ? d : -1;
+  }
+
+  /**
+   * Returns the offset of an expression relative to the specified variable.
+   * @param ex expression
+   * @param var variable
+   * @return offset, or {@code null} if the expression is no such reference or addition
+   */
+  private static Expr offset(final Expr ex, final Var var) {
+    return ref(ex, var) ? Itr.ZERO :
+      ex instanceof final Arith arith && arith.calc == Calc.ADD && ref(arith.arg(0), var) ?
+      arith.arg(1) : null;
+  }
+
+  /**
+   * Checks if the expression is a reference to the specified variable.
+   * @param ex expression
+   * @param var variable
+   * @return result of check
+   */
+  private static boolean ref(final Expr ex, final Var var) {
+    return ex instanceof final VarRef vr && vr.var == var;
+  }
+
+  /**
    * Write all non-{@code null} variables in this condition to the given array.
    *
    * @param arr array to write to
