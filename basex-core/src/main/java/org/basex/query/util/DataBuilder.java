@@ -72,6 +72,15 @@ public final class DataBuilder {
    */
   public void build(final XNode node) throws QueryException {
     build(new GNodeList().add(node));
+    // parentless element copies keep the base URI of the original node (see DBNode#baseURI)
+    if(node.kind() == Kind.ELEMENT) {
+      try {
+        data.meta().original = string(node.contextBaseURI());
+      } catch(final QueryException ex) {
+        // invalid base URIs are not propagated
+        Util.debug(ex);
+      }
+    }
   }
 
   /**

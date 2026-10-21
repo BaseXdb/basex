@@ -1578,4 +1578,37 @@ public final class UpdateTest extends SandboxTest {
     query("/t/@* ! node-name() ! expanded-QName(.)", "Q{u}a");
     query("/t/@* ! name()", "ns0_1:a");
   }
+
+  /** Parentless copies keep the base URI of the original node. */
+  @Test public void copyBaseUri() {
+    final String uri = "http://x/y/doc.xml";
+    final String parsed = PARSE_XML.args("<a><b/></a>", " { 'base-uri': '" + uri + "' }");
+    query("base-uri(" + parsed + "/a update { })", uri);
+    query("base-uri(" + parsed + "/a/b update { })", uri);
+    query("base-uri((" + parsed + "/a update { })/b)", uri);
+    query("base-uri(" + parsed + "/a update { } update { })", uri);
+    query("base-uri(" + parsed + " update { })", uri);
+    query("copy $c := " + parsed + "/a modify () return base-uri($c)", uri);
+    query("declare copy-namespaces no-preserve, inherit; "
+        + "copy $c := " + parsed + "/a modify () return base-uri($c)", uri);
+    query("base-uri(<a xml:base='http://e/'/> update { })", "http://e/");
+
+    // relative xml:base attributes
+    final String rel = PARSE_XML.args("<a xml:base='sub/'><b/></a>",
+        " { 'base-uri': '" + uri + "' }");
+    query("base-uri(" + rel + "/a update { })", "http://x/y/sub/");
+    query("base-uri(" + rel + "/a update { } update { })", "http://x/y/sub/");
+    query("base-uri((" + rel + "/a update { })/b)", "http://x/y/sub/");
+    query("base-uri(" + rel + "/a/b update { })", "http://x/y/sub/");
+    query("base-uri(" + rel + "/a update { replace value of node @xml:base with 'c/' })",
+        "http://x/y/c/");
+    query("base-uri(" + rel + "/a update { delete node @xml:base })", uri);
+    query("base-uri(" + _XQUERY_EVAL.args("<a/>", " {}", " { 'base-uri': 'http://e/' }")
+        + " update { })", "http://e/");
+
+    final String file = sandbox() + "copy-base.xml";
+    query(_FILE_WRITE_TEXT.args(file, "<a/>"));
+    query("base-uri(" + Function.DOC.args(file) + "/a update { }) = base-uri("
+        + Function.DOC.args(file) + ")", true);
+  }
 }

@@ -237,7 +237,7 @@ public final class QueryResources {
     if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
       final Data data = globalData();
       if(data != null) {
-        final int pre = data.resources.doc(qi.original);
+        final int pre = doc(data, qi.original);
         if(pre != -1) {
           checkRead(data, qc, info);
           docOpts.checkDbAccess(info);
@@ -249,7 +249,7 @@ public final class QueryResources {
     // access open database or create new one
     final Data data = data(true, qi, docOpts, qc, info, allowExternal);
     // ensure that database contains a single document
-    final IntList docs = data.resources.docs(qi.dbPath);
+    final IntList docs = docs(data, qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
     throw (docs.isEmpty() ? BASEX_DBPATH1_X : BASEX_DBPATH2_X).get(info, qi.original);
   }
@@ -281,7 +281,7 @@ public final class QueryResources {
         final Data data = globalData();
         if(data != null) {
           checkRead(data, qc, info);
-          final IntList pres = data.resources.docs(qi.original);
+          final IntList pres = docs(data, qi.original);
           return DBNodeSeq.get(pres, data, true, qi.original.isEmpty());
         }
       }
@@ -296,8 +296,42 @@ public final class QueryResources {
 
     // access open database or create new one
     final Data data = data(false, qi, DOC_OPTIONS, qc, info, false);
-    final IntList docs = data.resources.docs(qi.dbPath);
+    final IntList docs = docs(data, qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
+  }
+
+  /**
+   * Returns the document of a database path, or of its percent-decoded variant if there is none.
+   * @param data data reference
+   * @param path database path
+   * @return PRE value of the document node, or {@code -1}
+   */
+  private static int doc(final Data data, final String path) {
+    final int pre = data.resources.doc(path);
+    return pre == -1 && decoded(path) instanceof final String dec ? data.resources.doc(dec) : pre;
+  }
+
+  /**
+   * Returns the documents of a database path, or of its percent-decoded variant if there are none.
+   * @param data data reference
+   * @param path database path
+   * @return PRE values of document nodes
+   */
+  private static IntList docs(final Data data, final String path) {
+    final IntList docs = data.resources.docs(path);
+    return docs.isEmpty() && decoded(path) instanceof final String dec ?
+      data.resources.docs(dec) : docs;
+  }
+
+  /**
+   * Returns the percent-decoded variant of a database path.
+   * @param path database path
+   * @return decoded path, or {@code null} if it is identical
+   */
+  private static String decoded(final String path) {
+    if(path.indexOf('%') == -1) return null;
+    final String decoded = XMLToken.decodeUri(path);
+    return decoded.equals(path) ? null : decoded;
   }
 
   /**

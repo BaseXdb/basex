@@ -205,7 +205,26 @@ public class DBNode extends XNode {
       return Token.concat('/', name, '/', base);
     }
     final byte[] base = attribute(XML_BASE);
+    if(copyRoot()) {
+      if(base == null) return Token.token(data.meta.original);
+      final Uri uri = Uri.get(base, false);
+      if(uri.isValid()) return Uri.get(data.meta.original).resolve(uri).string();
+    }
     return base != null ? base : Token.EMPTY;
+  }
+
+  @Override
+  public final byte[] contextBaseURI() throws QueryException {
+    return copyRoot() ? Token.token(data.meta.original) : super.contextBaseURI();
+  }
+
+  /**
+   * Indicates if this is a parentless element copy with the context base URI of the original node.
+   * @return result of check
+   */
+  private boolean copyRoot() {
+    return !data.meta.original.isEmpty() && kind() == Kind.ELEMENT && data.inMemory() &&
+        data.parent(pre, Data.ELEM) == -1;
   }
 
   @Override

@@ -36,8 +36,10 @@ public abstract class Docs extends DynamicFn {
    * @return query input, or {@code null} if the URI is invalid
    */
   QueryInput queryInput(final byte[] uri) {
-    return queryInput != null ? queryInput :
-      Uri.get(uri).isValid() ? new QueryInput(string(uri), sc()) : null;
+    if(queryInput != null) return queryInput;
+    // database paths are not checked for URI validity
+    final QueryInput qi = new QueryInput(string(uri), sc());
+    return qi.dbName != null || Uri.get(uri).isValid() ? qi : null;
   }
 
   /**

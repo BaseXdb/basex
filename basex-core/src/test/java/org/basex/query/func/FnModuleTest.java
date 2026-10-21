@@ -5072,11 +5072,19 @@ return
     query(func.args("a.html", " ()") + " => ends-with('/a.html')", true);
     query(func.args("g:h") + " instance of xs:anyURI", true);
 
+    // database paths as base URIs (GH-1172)
+    query(func.args("a.xml", "/db/path/b.xml"), "/db/path/a.xml");
+    query(func.args("../x", "/db/path/b.xml"), "/db/x");
+    query(func.args("../../../x", "/db/path/b.xml"), "/x");
+    query(func.args("#t", "/db/path/b.xml#s"), "/db/path/b.xml#t");
+    query(func.args("a.xml", "/db/[x]/b.xml"), "/db/[x]/a.xml");
+    query(func.args("http://x/", "/db/path/b.xml"), "http://x/");
+
     // invalid URI reference
     error(func.args(":", base), URIARG_X);
-    // relative base URI (includes database paths, see GH-1172)
+    // relative base URI
     error(func.args("a.html", "b.html"), URIARG_X);
-    error(func.args("a.xml", "/db/path/b.xml"), URIARG_X);
+    error(func.args("a.html", "//host/b.html"), URIARG_X);
     // non-hierarchical base URI
     error(func.args("a.html", "urn:doi:234567"), URIARG_X);
   }
