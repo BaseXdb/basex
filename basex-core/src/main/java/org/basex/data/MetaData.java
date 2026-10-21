@@ -92,6 +92,8 @@ public final class MetaData {
   public boolean diacritics;
   /** Full-text stopword file. */
   public String stopwords;
+  /** Full-text stopword file of the stored stopwords (can be {@code null}). */
+  public String swsource;
 
   /** Maximum number of categories. */
   public int maxcats;
@@ -193,6 +195,7 @@ public final class MetaData {
     casesens = meta.casesens;
     diacritics = meta.diacritics;
     stopwords = meta.stopwords;
+    swsource = meta.swsource;
     maxcats = meta.maxcats;
     maxlen = meta.maxlen;
     language = meta.language;
@@ -561,6 +564,7 @@ public final class MetaData {
         case IDBSTR -> istorage = v;
         case DBFNAME -> original = v;
         case DBFTSW -> stopwords = v;
+        case DBFTSWSRC -> swsource = v;
         case DBFTLN -> language(Language.get(v));
         case DBSIZE -> size = toInt(v);
         case DBNDOCS -> ndocs = toInt(v);
@@ -668,6 +672,7 @@ public final class MetaData {
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
     writeInfo(out, DBFTSW,     stopwords);
+    if(swsource != null) writeInfo(out, DBFTSWSRC, swsource);
     writeInfo(out, DBMAXLEN,   maxlen);
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);

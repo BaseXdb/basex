@@ -2,9 +2,12 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -78,6 +81,24 @@ public final class DBOptions {
    */
   public MainOptions assignTo(final MainOptions opts) {
     map.forEach(opts::put);
+    return opts;
+  }
+
+  /**
+   * Assigns runtime options to the specified main options and checks the indexing options.
+   * @param opts main options
+   * @param data existing database (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return main options
+   * @throws QueryException query exception
+   */
+  public MainOptions assignIndexing(final MainOptions opts, final Data data,
+      final InputInfo info) throws QueryException {
+    try {
+      IndexBuilder.check(assignTo(opts), data);
+    } catch(final IOException ex) {
+      throw BASEX_OPTIONS_X.get(info, ex);
+    }
     return opts;
   }
 }

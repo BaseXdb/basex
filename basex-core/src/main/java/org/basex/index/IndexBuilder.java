@@ -4,10 +4,13 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.data.*;
+import org.basex.index.ft.*;
 import org.basex.index.value.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * This class defines the functions which are needed for building
@@ -47,6 +50,31 @@ public abstract class IndexBuilder extends Job {
     this.type = type;
     size = data.nodes();
     includeNames = new IndexNames(type, data);
+  }
+
+  /**
+   * Checks if the index structures can be built with the specified options.
+   * @param options main options
+   * @param data existing database (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public static void check(final MainOptions options, final Data data) throws IOException {
+    if(options.get(MainOptions.TEXTINDEX)) {
+      IndexNames.check(IndexType.TEXT, options.get(MainOptions.TEXTINCLUDE));
+    }
+    if(options.get(MainOptions.ATTRINDEX)) {
+      IndexNames.check(IndexType.ATTRIBUTE, options.get(MainOptions.ATTRINCLUDE));
+    }
+    if(options.get(MainOptions.TOKENINDEX)) {
+      IndexNames.check(IndexType.TOKEN, options.get(MainOptions.TOKENINCLUDE));
+    }
+    if(options.get(MainOptions.FTINDEX)) {
+      final String ftinclude = options.get(MainOptions.FTINCLUDE);
+      IndexNames.check(IndexType.FULLTEXT, ftinclude);
+      FTBuilder.check(options.get(MainOptions.FTMIXED), ftinclude, Language.get(options),
+          options.get(MainOptions.STEMMING));
+      StopWords.check(data, options.get(MainOptions.STOPWORDS));
+    }
   }
 
   /**

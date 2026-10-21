@@ -118,17 +118,8 @@ public final class DBNew {
    * @param create create new database
    * @return database
    * @throws IOException I/O exception
-   * @throws QueryException query exception
    */
-  private Data build(final String name, final boolean create) throws IOException, QueryException {
-    // single node: create main-memory copy
-    final NewInput first = inputs.getFirst();
-    if(inputs.size() == 1 && first.node != null) {
-      final MemData mdata = (MemData) doc(first).copy(options.getFirst(), qc).data();
-      mdata.update(0, Data.DOC, token(first.path));
-      return mdata;
-    }
-
+  private Data build(final String name, final boolean create) throws IOException {
     // binary and value resources, and raw files of new databases, require an on-disk instance
     boolean disk = false;
     final List<Parser> parsers = new ArrayList<>();

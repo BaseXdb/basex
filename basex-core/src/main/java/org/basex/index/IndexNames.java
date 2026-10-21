@@ -23,7 +23,7 @@ public final class IndexNames {
   /** Index type. */
   private final IndexType type;
   /** First invalid entry (can be {@code null}). */
-  private String invalid;
+  private final String invalid;
 
   /**
    * Constructor.
@@ -33,11 +33,50 @@ public final class IndexNames {
   public IndexNames(final IndexType type, final Data data) {
     this.data = data;
     this.type = type;
-    for(final String entry : NamesOption.split(data.meta.names(type))) {
+    invalid = parse(data.meta.names(type), qnames);
+  }
+
+  /**
+   * Raises an error if an included name is invalid.
+   * @throws BaseXException database exception
+   */
+  public void check() throws BaseXException {
+    raise(type, invalid);
+  }
+
+  /**
+   * Raises an error if a name in the specified list is invalid.
+   * @param type index type
+   * @param names names to be included
+   * @throws BaseXException database exception
+   */
+  public static void check(final IndexType type, final String names) throws BaseXException {
+    raise(type, parse(names, new Atts()));
+  }
+
+  /**
+   * Raises an error if an invalid name was found.
+   * @param type index type
+   * @param invalid first invalid entry (can be {@code null})
+   * @throws BaseXException database exception
+   */
+  private static void raise(final IndexType type, final String invalid) throws BaseXException {
+    if(invalid != null) throw new BaseXException("Invalid name for % index: %.", type, invalid);
+  }
+
+  /**
+   * Parses a list of names and adds local names and namespace URIs.
+   * @param names names to be included
+   * @param qnames local names and namespace URIs (will be reset if a global wildcard is found)
+   * @return first invalid entry (can be {@code null})
+   */
+  private static String parse(final String names, final Atts qnames) {
+    String invalid = null;
+    for(final String entry : NamesOption.split(names)) {
       // global wildcard: ignore all assignments
       if(entry.equals("*") || entry.equals("*:*")) {
         qnames.reset();
-        return;
+        return null;
       }
 
       final byte[] name, uri;
@@ -57,14 +96,7 @@ public final class IndexNames {
       }
       qnames.add(name, uri);
     }
-  }
-
-  /**
-   * Raises an error if an included name is invalid.
-   * @throws BaseXException database exception
-   */
-  public void check() throws BaseXException {
-    if(invalid != null) throw new BaseXException("Invalid name for % index: %.", type, invalid);
+    return invalid;
   }
 
   /**
