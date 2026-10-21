@@ -53,7 +53,7 @@ public final class CmpIR extends CmpRange {
    * @return expression
    * @throws QueryException query exception
    */
-  static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final long min, final long max) throws QueryException {
     return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ?
       cc.function(Function.EXISTS, info, expr) :

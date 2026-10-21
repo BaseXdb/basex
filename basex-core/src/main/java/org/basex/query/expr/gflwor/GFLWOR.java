@@ -208,7 +208,7 @@ public final class GFLWOR extends ParseExpr {
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
         forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
         cleanDeadVars() | optimizeCond(cc, true) | optimizeCond(cc, false) | posToPred(cc) |
-        optimizeOrderBy(cc) | windowToSubsequence(cc));
+        optimizeOrderBy(cc) | windowToSubsequence(cc) | countToWhile(cc));
 
     mergeWheres(cc, true);
     mergeWheres(cc, false);
@@ -859,13 +859,9 @@ public final class GFLWOR extends ParseExpr {
         }
 
         final boolean where = fc instanceof Where;
-        Expr expr = fc.expr;
-        if(expr instanceof final CmpG cmp) expr = CmpIR.get(cc, cmp, true);
-        final boolean match = expr instanceof final CmpIR cmp &&
-            cmp.expr instanceof final VarRef vr && vr.var == pos.pos &&
-            (where || !outer && cmp.min <= 1);
+        final CmpIR cmp = range(fc.expr, pos.pos, cc);
         // skip non-matching where clauses, stop at non-matching while clauses
-        if(!match) {
+        if(cmp == null || !where && (outer || cmp.min > 1)) {
           // for $e at $p in E where P($e, $p) ... → for $e in E[P(., position())] ...
           if(where && d == c + 1 && count(pos.pos, d + 1) == VarUsage.NEVER &&
               pos.toPosPredicate(cc, fc.expr)) {
@@ -876,20 +872,79 @@ public final class GFLWOR extends ParseExpr {
           if(where) continue;
           break;
         }
-        final CmpIR cmp = (CmpIR) expr;
-
-        // remove clause and ensure that the positional variable is only used once
+        // for $e at $p in E where $p = P ... → for $e at $p in E[position() = P] ...
+        // for $e at $p in E while $p <= P ... → for $e at $p in E[position() <= P] ...
         clauses.remove(d);
-        if(count(pos.pos, c) == VarUsage.NEVER) {
-          // for $e at $p in E where $p = P ... → for $e in E[position() = P] ...
-          // for $e at $p in E while $p <= P ... → for $e in E[position() <= P] ...
-          pos.addPredicate(cc, IntPos.get(where ? cmp.min : 1, cmp.max, cmp.info()));
-          cc.info(QueryText.OPTPRED_X, expr);
-          changed = true;
+        final Expr pred = IntPos.get(cmp.min, cmp.max, cmp.info());
+        if(cmp.min <= 1 || count(pos.pos, c) == VarUsage.NEVER) {
+          pos.addPredicate(cc, pred);
         } else {
-          // re-add variable, give up
-          clauses.add(d, cl);
+          // positions are shifted: ... → for $e at $q in E[position() >= M] let $p := $q + M - 1
+          final InputInfo ii = pos.info();
+          final Var p = cc.vs().addNew(pos.pos.name, null, cc.qc, ii);
+          final For fr = new For(pos.var, p, pos.score, pos.expr, false);
+          fr.addPredicate(cc, pred);
+          final Expr add = new Arith(ii, new VarRef(ii, p).optimize(cc), Itr.get(cmp.min - 1),
+              Calc.ADD).optimize(cc);
+          clauses.set(c, fr.optimize(cc));
+          clauses.add(c + 1, new Let(pos.pos, add).optimize(cc));
         }
+        cc.info(QueryText.OPTPRED_X, cmp);
+        changed = true;
+        break;
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Returns an integer range comparison of the specified variable.
+   * @param expr expression
+   * @param var variable
+   * @param cc compilation context
+   * @return range comparison or {@code null}
+   * @throws QueryException query exception
+   */
+  private static CmpIR range(final Expr expr, final Var var, final CompileContext cc)
+      throws QueryException {
+    final Expr ex = expr instanceof final CmpG cmp ? CmpIR.get(cc, cmp, true) : expr;
+    return ex instanceof final CmpIR cmp && cmp.expr instanceof final VarRef vr &&
+        vr.var == var ? cmp : null;
+  }
+
+  /**
+   * Rewrites where clauses with upper bounds of count variables to while clauses.
+   * @param cc compilation context
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean countToWhile(final CompileContext cc) throws QueryException {
+    boolean changed = false;
+    for(int c = 0; c < clauses.size(); c++) {
+      if(!(clauses.get(c) instanceof final Count count)) continue;
+
+      // count variables increase monotonically unless tuples are reordered
+      for(int d = c + 1; d < clauses.size(); d++) {
+        final Clause cl = clauses.get(d);
+        if(!(cl instanceof For || cl instanceof Let || cl instanceof FilterClause ||
+            cl instanceof Count) || cl.has(Flag.NDT)) break;
+        if(!(cl instanceof final Where where)) continue;
+
+        final CmpIR cmp = range(where.expr, count.var, cc);
+        if(cmp == null || cmp.max == Long.MAX_VALUE) continue;
+
+        // count $c where $c <= N → count $c while $c <= N
+        // count $c where $c = M to N → count $c while $c <= N where $c >= M
+        final InputInfo ii = where.info();
+        final Expr le = CmpIR.get(cc, ii, cmp.expr, Long.MIN_VALUE, cmp.max);
+        clauses.set(d, new While(le, ii));
+        if(cmp.min > 1) {
+          final Expr ge = CmpIR.get(cc, ii, new VarRef(ii, count.var).optimize(cc),
+              cmp.min, Long.MAX_VALUE);
+          clauses.add(d + 1, new Where(ge, ii));
+        }
+        cc.info(QueryText.OPTREWRITE_X_X, (Supplier<?>) where::description, where);
+        changed = true;
         break;
       }
     }

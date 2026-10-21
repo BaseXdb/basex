@@ -600,7 +600,7 @@ public final class GFLWORTest extends SandboxTest {
         "1\n2\n1", empty(Where.class));
     check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
         + "for $j at $q in ($i to 2) where $q < 5 return $q",
-        "1\n2\n1", count(Where.class, 1));
+        "1\n2\n1", empty(Where.class));
     check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
         + "for $j at $q in ($i to 2) where $j > 1 where $p < 5 return $q",
         "2\n1", count(Where.class, 1));
@@ -752,6 +752,41 @@ public final class GFLWORTest extends SandboxTest {
     // incomparable keys
     error("(for $k in (1 to 100) ! (if(. = 50) then 'a' else .) order by $k empty greatest "
         + "return $k)[position() <= 3]", INVTYPE_X);
+  }
+
+  /** Positional variables that are referenced after the filter. */
+  @Test public void posToPredReferenced() {
+    final String flwor = "for $i at $p in (1 to 1000)[. mod 3 = 0] ";
+    final String rtrn = " return $p * 1000 + $i";
+    check(flwor + "where $p <= 2" + rtrn, "1003\n2006", empty(Where.class));
+    check(flwor + "while $p <= 2" + rtrn, "1003\n2006", empty(While.class));
+    check(flwor + "where $p = 3" + rtrn, "3009", empty(Where.class));
+    check(flwor + "where $p = 2 to 3" + rtrn, "2006\n3009", empty(Where.class));
+    check(flwor + "where $p >= 333" + rtrn, "333999", empty(Where.class));
+    check("for $n in 1 to 2 " + flwor + "where $p = $n + 1" + rtrn, "2006\n3009",
+        exists(Where.class));
+  }
+
+  /** Count clauses: early exit. */
+  @Test public void countToWhile() {
+    final String flwor = "for $i in 1 to 1000 for $j in 1 to $i count $c ";
+    final String rtrn = " return $c * 100 + $i * 10 + $j";
+    check(flwor + "where $c <= 3" + rtrn, "111\n221\n322",
+        exists(While.class), empty(Where.class));
+    check(flwor + "where $c = 2 to 3" + rtrn, "221\n322",
+        exists(While.class), exists(Where.class));
+    check(flwor + "where $j > 0 where $c <= 2" + rtrn, "111\n221",
+        exists(While.class));
+    check(flwor + "let $k := $j * 2 where $c <= 2 return $k + $i", "3\n4",
+        exists(While.class));
+    final String small = "for $i in 1 to 3 for $j in 1 to $i count $c ";
+    check(small + "order by $j descending where $c <= 2" + rtrn, "111\n221",
+        "//While << //OrderBy");
+
+    // no rewrite: no upper bound, tuples are affected by side effects
+    check(small + "where $c >= 5" + rtrn, "532\n633", empty(While.class));
+    check(small + "let $m := message($c) where $c <= 2" + rtrn, "111\n221",
+        empty(While.class));
   }
 
   /** Sliding windows with a fixed size. */
