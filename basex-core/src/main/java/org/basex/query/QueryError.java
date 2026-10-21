@@ -44,7 +44,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */
-  BASEX_CLASSPATH_X_X(BASEX, "function", "Function % requires missing class: %."),
+  BASEX_CLASSPATH_X_X(BASEX, "function", "Function % has unmet requirement: %."),
   /** Error code. */
   BASEX_ERROR_X(BASEX, "error", "%"),
   /** Error code. */

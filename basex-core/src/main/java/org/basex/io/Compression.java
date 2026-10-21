@@ -113,8 +113,8 @@ public enum Compression {
   }
 
   /**
-   * Returns the first required class that is not found in the classpath.
-   * @return class name, or {@code null} if the compression is available
+   * Returns the first missing requirement.
+   * @return missing requirement, or {@code null} if the compression is available
    */
   public String missing() {
     return lib == null || lib.available() ? null : lib.missing();
@@ -161,9 +161,11 @@ public enum Compression {
   private Object create(final String name, final Class<?>[] types, final Object... args)
       throws IOException {
     final String missing = missing();
-    final Class<?> clazz = missing == null ? Reflect.find(name) : null;
+    if(missing != null) throw new IOException(Util.info("% compression has unmet requirement: %",
+        this, missing));
+    final Class<?> clazz = Reflect.find(name);
     if(clazz == null) throw new IOException(Util.info("% compression requires missing class: %",
-        this, missing != null ? missing : name));
+        this, name));
     try {
       return clazz.getConstructor(types).newInstance(args);
     } catch(final InvocationTargetException ex) {
