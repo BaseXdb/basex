@@ -12,7 +12,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +30,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
-          cache: 'maven'
+
+      # Restore dependencies (saved below even on failure; setup-java caches only on success)
+      - name: Restore Maven repository
+        id: maven-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-${{ runner.os }}-
 
       # Build and test all modules listed in the root pom.xml (core, api, modules incl. geo/mail/sftp)
       - name: Build with Maven
@@ -41,6 +49,17 @@ jobs:
         run: |
           mvn -B -DskipTests package -f basex-examples/pom.xml
           mvn -B -DskipTests package -f basex-tests/pom.xml
+
+      # Save dependencies on a cache miss, without the artifacts built here
+      - name: Remove built artifacts from Maven repository
+        if: always() && steps.maven-cache.outputs.cache-hit != 'true'
+        run: rm -rf ~/.m2/repository/org/basex
+      - name: Save Maven repository
+        if: always() && steps.maven-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
 
       # Archive test reports and possible dumps in case of failure or timeout
       # (a timeout cancels the job, which failure() alone does not cover)
