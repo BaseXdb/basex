@@ -277,6 +277,7 @@ public final class MixedTest extends SandboxTest {
 
     query("element Q{ }x {}[namespace-uri() = (' ')]", "");
     query("element { 'Q{ }x' } {}[namespace-uri() = (' ')]", "");
+    query("parse-xml('<x xmlns=\" u \"/>')/*[namespace-uri() = ' u '] => count()", 1);
 
     query("attribute { ' a ' } {}", "a=\"\"");
 

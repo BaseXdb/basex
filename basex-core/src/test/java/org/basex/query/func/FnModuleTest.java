@@ -3752,6 +3752,8 @@ return
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
     query("<e xmlns:p='u'>{" + func.args(" xs:untypedAtomic(' p ')", " <e/>") + "}</e>/text()",
         "u");
+    query("let $a := parse-xml('<a xmlns:p=\" u \"><p:b/></a>')/a "
+        + "return " + func.args("p", " $a") + " eq namespace-uri($a/*)", true);
 
     error(func.args("p ", " <e/>"), INVTYPE_X);
     error(func.args("p:q", " <e/>"), INVTYPE_X);
@@ -4367,6 +4369,11 @@ return
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'd://x/' }") + ")", "d://x/");
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'http://x/y.xml' }") + ")",
         "http://x/y.xml");
+    // relative URIs are resolved against the static base URI
+    query("declare base-uri 'http://x/a/'; base-uri(" +
+        func.args("<a/>", " { 'base-uri': 'b.xml' }") + ")", "http://x/a/b.xml");
+    query("declare base-uri 'http://x/a/'; base-uri(" +
+        PARSE_XML_FRAGMENT.args("<a/>", " { 'base-uri': 'b.xml' }") + ")", "http://x/a/b.xml");
 
     final String path = "src/test/resources/parse-xml.entity";
     final String dtd = "<!DOCTYPE a ["

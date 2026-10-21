@@ -830,8 +830,17 @@ public abstract class StandardFunc extends Arr {
   protected final String toBaseUri(final String path, final Options options,
       final StringOption option) {
     final String base = options.get(option);
-    return base != null && !base.isEmpty() ? base :
+    return base != null && !base.isEmpty() ? resolveUri(base) :
       path != null && !path.isEmpty() ? path : string(sc().baseURI().string());
+  }
+
+  /**
+   * Resolves a URI against the static base URI.
+   * @param uri URI
+   * @return resolved URI
+   */
+  protected final String resolveUri(final String uri) {
+    return string(sc().baseURI().resolve(Uri.get(uri)).string());
   }
 
   /**

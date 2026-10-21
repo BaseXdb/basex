@@ -256,6 +256,11 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     query(func.args("static-base-uri()", " {}", " { 'base-uri': 'http://x.x/' }"),
         "http://x.x/");
+    // relative URIs are resolved against the static base URI of the caller
+    query("declare base-uri 'http://x.x/a/'; " +
+        func.args("static-base-uri()", " {}", " { 'base-uri': 'b.xq' }"), "http://x.x/a/b.xq");
+    query("declare base-uri 'http://x.x/a/'; " +
+        func.args("static-base-uri()", " {}", " { 'base-uri': 'urn:x' }"), "urn:x");
   }
 
   /** Test method. */
@@ -668,6 +673,9 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query("contains(try {" + func.args("1 +",
         " { 'base-uri': 'XXXX', 'pass': true() }") + "} catch * { $err:module }, 'XXXX')",
         true);
+    query("declare base-uri 'http://x.x/a/'; try {" + func.args("1 +",
+        " { 'base-uri': 'b.xq', 'pass': true() }") + "} catch * { $err:module }",
+        "http://x.x/a/b.xq");
 
     // queries
     query(func.args(" xs:anyURI('src/test/resources/input.xq')") + "/name()", "MainModule");

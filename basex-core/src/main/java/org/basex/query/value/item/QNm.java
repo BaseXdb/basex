@@ -147,7 +147,7 @@ public final class QNm extends Item {
    * @param u URI to be set (can be {@code null}, or an empty or non-empty string)
    */
   public void uri(final byte[] u) {
-    uri = u == null ? null : normalize(u);
+    uri = u;
   }
 
   /**
@@ -465,7 +465,7 @@ public final class QNm extends Item {
   public static byte[][] parseExpanded(final byte[] value, final boolean wc) {
     final Matcher matcher = EQNAME.matcher(Token.string(value));
     if(matcher.matches()) {
-      final byte[] uri = token(matcher.group(1)), name = token(matcher.group(2));
+      final byte[] uri = normalize(token(matcher.group(1))), name = token(matcher.group(2));
       if(wc && Token.eq(name, cpToken('*'))) return new byte[][] { null, uri };
       if(XMLToken.isQName(name)) return new byte[][] { name, uri };
     }

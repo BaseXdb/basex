@@ -76,8 +76,8 @@ public class FnParseXmlFragment extends Docs {
 
     check(options, fragment, qc);
 
-    final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ? uri :
-      string(sc().baseURI().string());
+    final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ?
+      resolveUri(uri) : string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 

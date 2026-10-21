@@ -123,6 +123,19 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalBaseUri() {
+    final Function func = _JOB_EVAL;
+    // relative URIs are resolved against the static base URI of the caller
+    for(final String[] test : new String[][] { { "b.xq", "http://x.x/a/b.xq" },
+        { "urn:x", "urn:x" } }) {
+      final String id = query("declare base-uri 'http://x.x/a/'; " + func.args("static-base-uri()",
+          " ()", " { 'cache': true(), 'base-uri': '" + test[0] + "' }"));
+      query(_JOB_WAIT.args(id));
+      query(_JOB_RESULT.args(id), test[1]);
+    }
+  }
+
+  /** Test method. */
   @Test public void evalTimeout() {
     final Function func = _JOB_EVAL;
     final String id = query(func.args(VERY_SLOW_QUERY, " ()",

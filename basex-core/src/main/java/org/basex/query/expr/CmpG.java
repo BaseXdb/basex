@@ -603,11 +603,10 @@ public class CmpG extends Cmp {
           }
         } else if(NAMESPACE_URI.is(fn)) {
           // namespace-uri() = ('URI1', 'URI2') → self::Q{URI1}* | self::Q{URI2}*
+          scope = Scope.URI;
           for(final Item item : value) {
-            final byte[] uri = item.string(info);
-            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
+            qnames.add(new QNm(Token.cpToken(':'), item.string(info)));
           }
-          if(qnames.size() == value.size()) scope = Scope.URI;
         } else if(NAME.is(fn)) {
           // (db-without-ns)[name() = 'city'] → (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
