@@ -688,6 +688,10 @@ public final class RecordTest extends SandboxTest {
         + "return ($p but with { 'x': $i })?x instance of xs:double", true);
     query(described.apply(p + "{ 'y': string($i) }"),
         "Field \"y\" of xyz: xs:integer expected, xs:string found: \"1\".");
+
+    // function values are stored, not invoked: constant records are pre-evaluated
+    check("{ 'x': 1, 'f': fn { . } }?x", 1, root(Itr.class));
+    check("{ 'x': 1, 'f': fn { . } }?f(2)", 2, empty(ShapeConstructor.class));
   }
 
   /** Tests for the compact record map implementation. */

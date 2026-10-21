@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
@@ -40,7 +41,7 @@ public class FnSubsequence extends StandardFunc {
     if(sr == EMPTY) return Empty.ITER;
 
     // return iterator if all results are returned, or if iterator yields no items
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = iter(arg(0), sr.end, qc);
     if(sr == ALL) return iter;
 
     // return empty iterator if no items remain
@@ -104,7 +105,7 @@ public class FnSubsequence extends StandardFunc {
     }
 
     // return empty iterator if no items remain
-    final Iter iter = input.iter(qc);
+    final Iter iter = iter(input, sr.end, qc);
     final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.VALUE;
 
@@ -127,6 +128,24 @@ public class FnSubsequence extends StandardFunc {
       if(c >= sr.start) vb.add(item);
     }
     return vb.value(this);
+  }
+
+  /**
+   * Returns an iterator for the input, which yields at least the specified number of items.
+   * @param input input
+   * @param limit number of required items
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  static Iter iter(final Expr input, final long limit, final QueryContext qc)
+      throws QueryException {
+    // sort(E), order by: only the smallest items are sorted
+    if(limit <= TopK.MAX) {
+      if(input instanceof final FnSortBy sort) return sort.iter((int) limit, qc);
+      if(input instanceof final GFLWOR gflwor) return gflwor.iter((int) limit, qc);
+    }
+    return input.iter(qc);
   }
 
   @Override

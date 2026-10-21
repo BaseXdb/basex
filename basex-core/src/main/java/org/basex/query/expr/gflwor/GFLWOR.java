@@ -111,12 +111,26 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Creates a new evaluator for this FLWOR expression.
+   * Creates a new evaluator for this FLWOR expression that yields at least the specified number
+   * of leading results.
+   * @param limit number of required results
    * @return evaluator
    */
-  private Eval newEval() {
+  private Eval newEval(final int limit) {
+    // last order by clause, followed by let clauses and a return expression with single items
+    OrderBy top = null;
+    if(limit <= TopK.MAX && rtrn.seqType().one()) {
+      Clause last = null;
+      for(final Clause clause : clauses) {
+        if(!(clause instanceof Let)) last = clause;
+      }
+      if(last instanceof final OrderBy ob) top = ob;
+    }
+
     Eval eval = new StartEval();
-    for(final Clause clause : clauses) eval = clause.eval(eval);
+    for(final Clause clause : clauses) {
+      eval = clause == top ? top.eval(eval, limit) : clause.eval(eval);
+    }
     return eval;
   }
 
@@ -127,8 +141,18 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext qc) {
+    return iter(Integer.MAX_VALUE, qc);
+  }
+
+  /**
+   * Returns an iterator that yields at least the specified number of leading results.
+   * @param limit number of required results
+   * @param qc query context
+   * @return iterator
+   */
+  public Iter iter(final int limit, final QueryContext qc) {
     return new Iter() {
-      private final Eval eval = newEval();
+      private final Eval eval = newEval(limit);
       private Iter iter = Empty.ITER;
 
       @Override
@@ -153,7 +177,7 @@ public final class GFLWOR extends ParseExpr {
       for(final Clause clause : clauses) ((Let) clause).bind(qc);
       return rtrn.value(qc);
     }
-    final Eval eval = newEval();
+    final Eval eval = newEval(Integer.MAX_VALUE);
     final ValueBuilder vb = new ValueBuilder(qc, size());
     while(eval.next(qc)) vb.add(rtrn.value(qc));
     return vb.value(this);
@@ -201,10 +225,10 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // when counting, order is irrelevant: drop order-by clauses, but keep nondeterministic keys
+    // if order is irrelevant: drop order-by clauses, but keep nondeterministic keys
     // count(for $x in E order by $x/@id return $x) → count(for $x in E return $x)
-    boolean changed = mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && clauses.removeIf(
-        clause -> clause instanceof OrderBy && !clause.has(Flag.NDT));
+    boolean changed = mode.unordered() &&
+        clauses.removeIf(clause -> clause instanceof OrderBy && !clause.has(Flag.NDT));
 
     // data(for $x in $s return <a>{ $x }</a>) → data(for $x in $s return xs:untypedAtomic($x))
     if(!mode.conditional()) {
@@ -863,6 +887,8 @@ public final class GFLWOR extends ParseExpr {
     For fr = null;
     while(fr == null && iter.hasNext()) {
       final Clause clause = iter.next();
+      // window clauses may yield multiple tuples
+      if(clause instanceof Window) return false;
       if(clause instanceof final For frr) fr = frr;
     }
     if(fr != null && fr.vars.length == 1 && iter.hasNext()) {

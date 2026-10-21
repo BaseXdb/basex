@@ -4,10 +4,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
@@ -25,12 +23,8 @@ public final class ArraySort extends ArraySortBy {
   }
 
   @Override
-  protected Integer[] index(final Value[] values, final QueryContext qc) throws QueryException {
-    // identical to {@link FnSort#index}
-    final FItem[] keys = { toFunctionOrNull(arg(2), 1, qc) };
-    final Collation[] collations = { toCollation(arg(1), qc) };
-    final boolean[] invert = { false };
-    return index(values, keys, collations, invert, qc);
+  protected Keys keys(final QueryContext qc) throws QueryException {
+    return sortKeys(qc);
   }
 
   @Override

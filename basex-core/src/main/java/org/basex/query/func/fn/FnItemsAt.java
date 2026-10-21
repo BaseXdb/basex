@@ -63,7 +63,7 @@ public final class FnItemsAt extends StandardFunc {
         if(value != null) return l < value.size() ? value.itemAt(l) : Empty.VALUE;
 
         // fast route if the result size is known
-        final Iter iter = input.iter(qc);
+        final Iter iter = FnSubsequence.iter(input, l + 1, qc);
         final long size = iter.size();
         if(size >= 0) {
           return l < size ? iter.get(l) : Empty.VALUE;

@@ -351,8 +351,7 @@ public abstract class StandardFunc extends Arr {
   protected final Expr simplifyOrder(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // count(reverse(A)) → count(A), $a = sort(B) → $a = B
-    return cc.simplify(this, mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE, Simplify.SET) &&
-        !has(Flag.NDT) ? arg(0) : this, mode);
+    return cc.simplify(this, mode.unordered() && !has(Flag.NDT) ? arg(0) : this, mode);
   }
 
   /**

@@ -2055,6 +2055,16 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" tokenize(" + wrap(1) + ")"), 1, exists(FOOT));
     check(func.args(" tokenize(" + wrap("1 2") + ")"), 2, exists(FOOT));
 
+    // rewrite sort to highest or lowest (unless keys are untyped)
+    final String ints = "let $i := (3, 1, 2) ! xs:integer(data(attribute _ { . })) return ";
+    check(ints + func.args(SORT.args(" $i")), 3, exists(HIGHEST), empty(SORT));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'order': 'descending' }")), 1,
+        exists(LOWEST), empty(SORT_BY));
+    check(func.args(SORT.args(" (<a x='1'/>, <b x='1'/>, <c x='0'/>)", " ()",
+        " fn($n) as xs:integer { $n/@x }")), "<b x=\"1\"/>", exists(HIGHEST), empty(SORT));
+    check("let $u := (9, 10) ! data(attribute _ { . }) return " + func.args(SORT.args(" $u")),
+        9, exists(SORT), empty(HIGHEST));
+
     check(func.args(" tail(tokenize(<a/>))"), "", exists(TAIL));
     check(func.args(" tail(1 ! <_>{.}</_>)"), "", empty());
     check(func.args(" tail((1 to 2) ! <_>{.}</_>)"), "<_>2</_>", empty(TAIL));
@@ -2293,6 +2303,23 @@ public final class FnModuleTest extends SandboxTest {
         "#local:x\n#local:y");
     query("let $n := " + _RANDOM_INTEGER.args(1) + " return (%local:x fn() { $n }, "
         + "%local:y fn() { $n }) ! map:keys(" + func.args(" .") + ")", "#local:x\n#local:y");
+
+    // the function is inspected, not invoked: pre-evaluation
+    check(COUNT.args(func.args(" %local:x fn() { 1 }")), 1, root(Itr.class));
+  }
+
+  /** Test method. */
+  @Test public void functionArity() {
+    final Function func = FUNCTION_ARITY;
+    check(func.args(" fn($a) { $a }"), 1, root(Itr.class));
+    check(func.args(" true#0"), 0, root(Itr.class));
+  }
+
+  /** Test method. */
+  @Test public void functionName() {
+    final Function func = FUNCTION_NAME;
+    check(func.args(" true#0"), "#fn:true", root(QNm.class));
+    check(func.args(" fn() { 1 }"), "", empty());
   }
 
   /** Test method. */
@@ -2485,6 +2512,24 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(TRUNK.args(" (<a/>, <b/>) ")), "<a/>", empty(TRUNK));
     check(func.args(TRUNK.args(" <a/>")), "", empty());
     check(func.args(TRUNK.args(" (1, 2)[. = 0]")), "", exists(TRUNK));
+
+    // rewrite sort to lowest or highest (unless keys are untyped)
+    final String ints = "let $i := (3, 1, 2) ! xs:integer(data(attribute _ { . })) return ";
+    check(ints + func.args(SORT.args(" $i")), 1, exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT.args(" $i", " ()", " fn($n) as xs:integer { -$n }")), 3,
+        exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT.args(" $i", " ()", " fn { -. }")), 3,
+        exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'key': fn { -. } }")), 3,
+        exists(LOWEST), empty(SORT_BY));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'key': fn { -. }, 'order': 'descending' }")),
+        1, exists(HIGHEST), empty(SORT_BY));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'order': 'descending' }")), 3,
+        exists(HIGHEST), empty(SORT_BY));
+    check(func.args(SORT.args(" (<a x='1'/>, <b x='0'/>, <c x='0'/>)", " ()",
+        " fn($n) as xs:integer { $n/@x }")), "<b x=\"0\"/>", exists(LOWEST), empty(SORT));
+    check("let $u := (9, 10) ! data(attribute _ { . }) return " + func.args(SORT.args(" $u")),
+        10, exists(SORT), empty(LOWEST));
 
     check(func.args(" tail((<a/>, <b/>, <c/>[. = '']))"), "<b/>", root(CElem.class));
     check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", root(CElem.class));
@@ -5452,6 +5497,11 @@ return
     query(in + func.args(-1, +2, -3), "b");
     query(in + func.args(-1, -2, +3), "");
     query(in + func.args(-1, -2, -3), "b");
+    check(in + func.args(+1, +2), "a\nb", root(_UTIL_RANGE));
+    check(in + func.args(+2, +5), "b", root(_UTIL_RANGE));
+    check(in + func.args(+3, +4), "", root(_UTIL_RANGE));
+    check(in + func.args(+5, +2), "b", root(SLICE));
+    check(in + func.args(+1, +2, +2), "a", root(SLICE));
 
     in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'b'] =>";
     query(in + func.args(+0), "a");
@@ -5614,6 +5664,81 @@ return
     query(func.args(input, " { 'key': data#1 }"), "a\nb");
     query(func.args(input, " { 'key': data#1, 'order': 'descending' }"), "b\na");
     query(func.args(input, " { 'order': 'descending' }"), "b\na");
+
+    // single ascending key: rewrite to fn:sort
+    check(OPAQUE + func.args(" $o", " ()"), "1\n2\n3\n4\n5", empty(func), exists(SORT));
+    check(OPAQUE + func.args(" $o", " { 'key': data#1 }"), "1\n2\n3\n4\n5",
+        empty(func), exists(SORT));
+    check(OPAQUE + func.args(" $o", " { 'order': 'descending' }"), "5\n4\n3\n2\n1",
+        exists(func));
+    check(OPAQUE + func.args(" $o", " ({}, {})"), "1\n2\n3\n4\n5", exists(func));
+  }
+
+  /** Sorts values by keys of common types. */
+  @Test public void sortTypes() {
+    final String pairs = "string-join(" + SORT.args(" ([ 3, 'a' ], [ 1, 'b' ], [ 3, 'c' ], "
+        + "[ 2, 'd' ])", " ()", " fn($p) { $p?1 }") + "?2)";
+    query(pairs, "bdac");
+    query("string-join(" + SORT.args(" ([ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ])",
+        " ()", " fn($p) { $p?1 }") + "?2)", "bca");
+    // empty keys precede strings and untyped values
+    query("string-join(" + SORT.args(" ([ 'b', 'x' ], [ (), 'y' ], [ <a>a</a>/text(), 'z' ])",
+        " ()", " fn($p) { $p?1 }") + "?2)", "yzx");
+    // two levels
+    query("string-join(" + SORT_BY.args(" ([ 'b', 2, 'w' ], [ 'a', 2, 'x' ], [ 'b', 1, 'y' ], "
+        + "[ 'a', 3, 'z' ])", " ({ 'key': fn($p) { $p?1 } }, "
+        + "{ 'key': fn($p) { $p?2 }, 'order': 'descending' })") + "?3)", "zxwy");
+    // incomparable keys
+    error(SORT.args(" (1, 'a', 2)", " ()", " fn($k) { $k }"), CMPTYPES_X_X_X_X);
+  }
+
+  /** Returns the smallest items of a sort. */
+  @Test public void sortTopK() {
+    final String ints = " (1 to 100) ! (. * 37 mod 101)";
+    query(SORT.args(ints) + "[position() <= 5]", "1\n2\n3\n4\n5");
+    query(SUBSEQUENCE.args(SORT.args(ints), 3, 4), "3\n4\n5\n6");
+    query(SLICE.args(SORT.args(ints), 2, 4), "2\n3\n4");
+    query(ITEMS_AT.args(SORT.args(ints), " 2 to 4"), "2\n3\n4");
+    query("for $k in (1, 3, 200) return count(" + SORT.args(ints) + "[position() <= $k])",
+        "1\n3\n100");
+    query("string-join(" + SORT.args(ints) + "[position() <= 5])", "12345");
+    query(SORT.args(ints + " ! string()") + "[position() <= 3]", "1\n10\n100");
+    query(SORT.args(" (" + ints + " ! xs:double(.), xs:double('NaN'), -0e0, 0e0)")
+        + "[position() <= 4] ! string()", "NaN\n-0\n0\n1");
+
+    // stable order of equal keys
+    final String pairs = " (1 to 100) ! [ . mod 7, . ]";
+    query(SORT.args(pairs, " ()", " fn($p) { $p?1 }") + "[position() <= 5] ! ?2",
+        "7\n14\n21\n28\n35");
+    query(SORT_BY.args(pairs, " { 'key': fn($p) { $p?1 }, 'order': 'descending' }")
+        + "[position() <= 5] ! ?2", "6\n13\n20\n27\n34");
+    query(SORT.args(pairs, " ()", " fn($p) { if($p?2 mod 2) then xs:decimal($p?1) else $p?1 }")
+        + "[position() <= 5] ! ?2", "7\n14\n21\n28\n35");
+    query(SORT_BY.args(pairs, " ({ 'key': fn($p) { $p?1 } }, "
+        + "{ 'key': fn($p) { $p?2 }, 'order': 'descending' })") + "[position() <= 3] ! ?2",
+        "98\n91\n84");
+    // empty keys come first
+    query(SORT.args(" 1 to 100", " ()", " fn($i) { if($i mod 25) then $i else () }")
+        + "[position() <= 5]", "25\n50\n75\n100\n1");
+    // incomparable keys
+    error(SORT.args(" (1 to 100) ! (if(. = 50) then 'a' else .)") + "[position() <= 3]",
+        CMPTYPES_X_X_X_X);
+
+    // input of unknown size
+    final String filtered = " (" + ints + ")[. > 0]";
+    query(SORT.args(filtered) + "[position() <= 5]", "1\n2\n3\n4\n5");
+    query(SUBSEQUENCE.args(SORT.args(filtered), 99, 5), "99\n100");
+    query(COUNT.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 200)), 100);
+    query(SUM.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 1000000000)), 5050);
+    query(SUM.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 100000)), 5050);
+    // first item, single position: untyped keys are not rewritten to fn:lowest
+    final String untyped = " (" + ints + ") ! data(attribute _ { . })";
+    check(HEAD.args(SORT.args(untyped)), 1, exists(SORT), root(HEAD));
+    check(ITEMS_AT.args(SORT.args(untyped), 3), 100, exists(SORT), root(ITEMS_AT));
+    query(SUBSEQUENCE.args(SORT.args(filtered), 3, 0), "");
+    query(SORT.args(" ('b', 'A', 'a', 'B')[. != 'x']",
+        " 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'")
+        + "[position() <= 2]", "A\na");
   }
 
   /** Test method. */

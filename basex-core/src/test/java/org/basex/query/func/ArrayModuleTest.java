@@ -529,6 +529,19 @@ public final class ArrayModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void sortBy() {
+    final Function func = _ARRAY_SORT_BY;
+    final String array = " array { tokenize(" + wrap("b a") + ") }";
+
+    // single ascending key: rewrite to array:sort
+    check(func.args(array, " ()"), "[\"a\",\"b\"]", empty(func), exists(_ARRAY_SORT));
+    check(func.args(array, " { 'key': string#1 }"), "[\"a\",\"b\"]",
+        empty(func), exists(_ARRAY_SORT));
+    check(func.args(array, " { 'order': 'descending' }"), "[\"b\",\"a\"]", exists(func));
+    check(func.args(array, " ({}, {})"), "[\"a\",\"b\"]", exists(func));
+  }
+
+  /** Test method. */
   @Test public void subquery() {
     final Function func = _ARRAY_SUBARRAY;
     query(func.args(" [ ]", 1), "[]");

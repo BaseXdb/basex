@@ -86,4 +86,10 @@ public final class InspectStaticContext extends StandardFunc {
         throw INSPECT_UNKNOWN_X.get(info, key);
     };
   }
+
+  @Override
+  public int hofOffsets() {
+    // the function is inspected, not invoked
+    return 0;
+  }
 }

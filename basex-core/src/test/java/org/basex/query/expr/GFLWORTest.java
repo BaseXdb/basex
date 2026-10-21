@@ -523,6 +523,30 @@ public final class GFLWORTest extends SandboxTest {
         exists(SORT), empty(OrderBy.class));
     check("for $x in " + seq + " stable order by $x descending return name($x)", "c\na\nb\nd",
         exists(SORT_BY), empty(REVERSE), empty(OrderBy.class));
+
+    // keys that only depend on the for variable
+    final String nodes = "(<a id='2'/>, <b id='3'/>, <c id='1'/>)";
+    check("for $x in " + nodes + " order by $x/@id return name($x)", "c\na\nb",
+        exists(SORT), empty(OrderBy.class));
+    check("for $x in " + nodes + " order by $x/@id descending return name($x)", "b\na\nc",
+        exists(SORT_BY), empty(OrderBy.class));
+    check("for $x in " + nodes + " order by $x/@id return $x/@id ! string()", "1\n2\n3",
+        exists(SORT), empty(OrderBy.class));
+    error("for $x in (<a><i/><i/></a>, <b/>) order by $x/i return $x", INVTYPE_X);
+    check("head(for $x in " + nodes + " order by xs:integer($x/@id) descending return $x)",
+        "<b id=\"3\"/>", exists(HIGHEST), empty(OrderBy.class));
+
+    // no merge: context-dependent key, coerced for variable
+    check("<_/> ! (for $x in (2, 1) order by name() return $x)", "2\n1", exists(OrderBy.class));
+    check("for $i as xs:integer in (<a>10</a>, <a>9</a>) ! data() order by $i return $i",
+        "9\n10", exists(OrderBy.class));
+
+    // no merge: window clause yields multiple tuples
+    final String window = "for tumbling window $w in (1, 2) start when true() ";
+    check(window + "for $i in (3 - $w, 5 - $w) order by $i return $i", "1\n2\n3\n4",
+        exists(OrderBy.class), empty(SORT));
+    check(window + "for $i at $p in (3 - $w, 5 - $w) order by $i return $i", "1\n2\n3\n4",
+        exists(OrderBy.class), empty(SORT));
   }
 
   /** Merge for/let clauses. */
@@ -666,5 +690,67 @@ public final class GFLWORTest extends SandboxTest {
     query(keys + "descending empty greatest return $k)", "E21N");
     query(keys + "empty least return $k)", "EN12");
     query(keys + "descending empty least return $k)", "21NE");
+  }
+
+  /** Order by: keys of common types. */
+  @Test public void orderByTypes() {
+    final String pairs = "string-join(for $p in (";
+    // integers, doubles (with NaN), stable order of equal keys
+    query(pairs + "[ 3, 'a' ], [ 1, 'b' ], [ 3, 'c' ], [ 2, 'd' ]) "
+        + "order by $p?1 return $p?2)", "bdac");
+    query(pairs + "[ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ]) "
+        + "order by $p?1 return $p?2)", "bca");
+    query(pairs + "[ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ]) "
+        + "order by $p?1 descending return $p?2)", "acb");
+    // strings and untyped values, empty keys
+    final String strings = pairs + "[ 'b', 'x' ], [ (), 'y' ], [ <a>a</a>/text(), 'z' ]) ";
+    query(strings + "order by $p?1 empty least return $p?2)", "yzx");
+    query(strings + "order by $p?1 empty greatest return $p?2)", "zxy");
+    query(strings + "order by $p?1 descending empty least return $p?2)", "xzy");
+    // multiple keys of different types
+    query(pairs + "[ 'b', 2, 'w' ], [ 'a', 2, 'x' ], [ 'b', 1, 'y' ], [ 'a', 3, 'z' ]) "
+        + "order by $p?1, $p?2 descending return $p?3)", "zxwy");
+    // incomparable keys
+    error("for $k in (1, 'a', 2) order by ($k, 'x')[1] return $k", CMPTYPES_X_X_X_X);
+  }
+
+  /** Order by: smallest tuples. */
+  @Test public void orderByTopK() {
+    final String flwor = "(for $i in 1 to 100 ";
+    // multiple keys, stable order of equal keys
+    check(flwor + "order by $i mod 7, $i descending return $i)[position() <= 3]",
+        "98\n91\n84", exists(OrderBy.class), root(_UTIL_RANGE));
+    query(flwor + "order by $i mod 7 empty greatest return $i)[position() <= 3]", "7\n14\n21");
+    query(SUBSEQUENCE.args(" " + flwor + "order by $i mod 7 empty greatest return $i)", 99, 5),
+        "90\n97");
+    query(SUBSEQUENCE.args(" " + flwor + "order by $i mod 7 empty greatest return $i)", 3, 0), "");
+    query(SUM.args(SUBSEQUENCE.args(" " + flwor + "order by $i empty greatest return $i)", 1,
+        1000000000)), 5050);
+    query(SUM.args(SUBSEQUENCE.args(" " + flwor + "order by $i empty greatest return $i)", 1,
+        100000)), 5050);
+    // first item, single position
+    check(HEAD.args(" " + flwor + "order by $i mod 7, $i descending return $i)"), 98,
+        exists(OrderBy.class), root(HEAD));
+    check(ITEMS_AT.args(" " + flwor + "order by $i mod 7, $i descending return $i)", 3), 84,
+        exists(OrderBy.class), root(ITEMS_AT));
+    // empty keys
+    final String keys = flwor + "let $k := if($i mod 25) then $i else () ";
+    query(keys + "order by $k empty greatest return $i)[position() <= 3]", "1\n2\n3");
+    query(keys + "order by $k descending empty greatest return $i)[position() <= 3]",
+        "25\n50\n75");
+    // collation
+    query("(for $s in ('b', 'A', 'a', 'B') order by $s collation "
+        + "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive' "
+        + "return $s)[position() <= 2]", "A\na");
+    // clauses after order by
+    query(flwor + "order by $i mod 7 empty greatest let $j := $i * 2 return $j)"
+        + "[position() <= 3]", "14\n28\n42");
+    query(flwor + "order by $i mod 7 empty greatest where $i > 7 return $i)[position() <= 2]",
+        "14\n21");
+    query(flwor + "order by $i mod 7 empty greatest return ($i, -$i))[position() <= 3]",
+        "7\n-7\n14");
+    // incomparable keys
+    error("(for $k in (1 to 100) ! (if(. = 50) then 'a' else .) order by $k empty greatest "
+        + "return $k)[position() <= 3]", INVTYPE_X);
   }
 }

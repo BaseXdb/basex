@@ -85,6 +85,12 @@ public final class ShapeConstructor extends StandardFunc {
   }
 
   @Override
+  public int hofOffsets() {
+    // function values are stored, not invoked
+    return 0;
+  }
+
+  @Override
   protected Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc)
       throws QueryException {
     // { 'y': Y, 'x': X } coerce to local:point → local:point(X, Y, ())

@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.list.*;
 
@@ -208,6 +209,18 @@ public final class Array {
   public static int[] createOrder(final long[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
+    return il.finish();
+  }
+
+  /**
+   * Stably sorts the offsets of a number of values and returns them.
+   * @param size number of values
+   * @param comparator comparator for two offsets
+   * @return array containing the order
+   */
+  public static int[] createOrder(final int size, final IntBinaryOperator comparator) {
+    final IntList il = number(size);
+    il.sort(comparator);
     return il.finish();
   }
 

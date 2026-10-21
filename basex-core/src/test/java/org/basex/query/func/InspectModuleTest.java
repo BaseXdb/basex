@@ -195,6 +195,8 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" ()", "construction"), "preserve");
     query(func.args(" ()", "default-order-empty"), "least");
     query("declare boundary-space preserve;" + func.args(" ()", "boundary-space"), "preserve");
+    // the function is inspected, not invoked: pre-evaluation
+    check(func.args(" fn() { 1 }", "boundary-space"), "strip", root(Str.class));
     query(func.args(" ()", "copy-namespaces"), "preserve\ninherit");
     query(func.args(" ()", "decimal-formats") + "('')('percent')", "%");
 

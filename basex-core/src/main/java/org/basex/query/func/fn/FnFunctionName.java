@@ -20,4 +20,10 @@ public final class FnFunctionName extends StandardFunc {
     final QNm name = function.funcName();
     return name == null ? Empty.VALUE : name;
   }
+
+  @Override
+  public int hofOffsets() {
+    // the function is inspected, not invoked
+    return 0;
+  }
 }

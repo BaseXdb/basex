@@ -1512,6 +1512,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(1 to 2)[. = 1] => sort() => count()", 1, empty(SORT));
     check("(1 to 2)[. = 1] => reverse() => count()", 1, empty(REVERSE));
     check("(for $i in (1 to 2)[. = 1] order by $i return $i ) => count()", 1, empty(OrderBy.class));
+    check("4 = (for $a in (1 to 2)[. >= 0] for $b in (3 to 4)[. >= 0] "
+        + "order by $b - $a return $a * $b)", true, empty(OrderBy.class));
   }
 
   /** Rewrite order by to fn:sort. */
@@ -1544,7 +1546,9 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1 to 2)[. >= 0] order by $i, 1 return $i", "1\n2",
         exists(OrderBy.class));
     check("for $i in (1 to 2)[. >= 0] order by -$i return $i", "2\n1",
-        exists(OrderBy.class));
+        empty(OrderBy.class), root(SORT));
+    check("let $_ :=" + wrap(1) + "for $i in (1 to 2)[. >= 0] order by $i - $_ return $i",
+        "1\n2", exists(OrderBy.class));
   }
 
   /** distinct-values: simplify arguments. */

@@ -58,6 +58,11 @@ public final class FnFoot extends StandardFunc {
     // foot(reverse(E)) → head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());
+    // foot(sort(E)) → foot(highest(E))
+    if(input instanceof final FnSortBy sort) {
+      final Expr extreme = sort.extreme(false, cc);
+      if(extreme != null) return cc.function(FOOT, info, extreme);
+    }
     // foot(replicate(E, count)) → foot(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1

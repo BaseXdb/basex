@@ -28,4 +28,10 @@ public final class FnFunctionAnnotations extends StandardFunc {
     }
     return vb.value();
   }
+
+  @Override
+  public int hofOffsets() {
+    // the function is inspected, not invoked
+    return 0;
+  }
 }
