@@ -232,7 +232,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" abs#1", " [ 1 ]"), 1, type(func, "xs:integer"));
     check(func.args(" reverse#1", " [ () ]"), "", type(func, "empty-sequence()"));
     check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
-        type(func, "item()*"));
+        type(func, "xs:boolean"));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);

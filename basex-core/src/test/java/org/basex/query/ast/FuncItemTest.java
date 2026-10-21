@@ -204,7 +204,7 @@ public final class FuncItemTest extends SandboxTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := local:Y(function($x) { $x() }) return exists($f ! .)",
         true,
-        exists(FuncItem.class)
+        root(Bln.class)
     );
   }
 
@@ -234,7 +234,7 @@ public final class FuncItemTest extends SandboxTest {
         "let $b := local:bar($a) " +
         "return exists($b ! .)",
         true,
-        exists(FuncItem.class)
+        root(Bln.class)
     );
   }
 
