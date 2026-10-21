@@ -14,8 +14,6 @@
 
   <properties>
     <geotools.version>35.2</geotools.version>
-    <hsqldb.version>2.7.4</hsqldb.version>
-    <gt-epsg-hsql.version>34.5-C321</gt-epsg-hsql.version>
   </properties>
 
   <repositories>
@@ -23,11 +21,6 @@
       <id>osgeo</id>
       <name>Open Source Geospatial Foundation Repository</name>
       <url>https://repo.osgeo.org/repository/release</url>
-    </repository>
-    <repository>
-      <id>geosolutions</id>
-      <name>GeoSolutions Repository</name>
-      <url>https://maven.geo-solutions.it/</url>
     </repository>
   </repositories>
 
@@ -45,15 +38,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>${hsqldb.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
-      <version>${gt-epsg-hsql.version}</version>
+      <version>${geotools.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.media</groupId>
