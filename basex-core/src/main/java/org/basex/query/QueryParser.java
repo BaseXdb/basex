@@ -4689,10 +4689,8 @@ public class QueryParser extends InputParser {
   private Expr ftAdditive(final boolean i) throws QueryException {
     if(!i) return additive();
     skipWs();
-    token.reset();
-    while(digit(current())) token.add(consume());
-    if(token.isEmpty()) throw error(INTEXP);
-    return Itr.get(toLong(token.toArray()));
+    if(!digit(current())) throw error(INTEXP);
+    return numericLiteral(Long.MAX_VALUE, false, false);
   }
 
   /**
