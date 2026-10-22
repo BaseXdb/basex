@@ -79,7 +79,16 @@ public final class FTIndexQueryTest extends SandboxTest {
         { "//w[text() contains text 'glad' using wildcards" + thes, "l.cky" },
         { "//w[text() contains text 'happy glad' any word" + thes, "lucky\nl.cky" },
         { "//w[text() contains text { 'stil.*' } using wildcards ftor { 'happy' }" + thes,
-          "lucky\na still life\nstill\nstillleben" }
+          "lucky\na still life\nstill\nstillleben" },
+        // GH-2785: underscores in integer literals
+        { "//w[text() contains text 'happy' using thesaurus at '" + db
+          + "' from 0_1 to 1_0 levels]", "lucky" },
+        { "//w[text() contains text 'happy' using thesaurus at '" + db
+            + "' exactly 0_1 levels]", "lucky" },
+        { "//w[text() contains text 'happy' using thesaurus at '" + db
+              + "' at least 0_1 levels]", "lucky" },
+        { "//w[text() contains text 'happy' using thesaurus at '" + db
+                + "' at most 1_0 levels]", "lucky" }
       };
       for(final String[] query : queries) {
         final String qu = query[0] + " ! string()";
