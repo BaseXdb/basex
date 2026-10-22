@@ -103,7 +103,7 @@ final class DialogJsonParser extends DialogParser {
     merge = new BaseXCheckBox(dialog, MERGE_TYPES, JsonOptions.MERGE, jopts);
     strings = new BaseXCheckBox(dialog, INCLUDE_STRINGS, JsonOptions.STRINGS, jopts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, JsonOptions.LAX, jopts);
-    example = new TextPanel(dialog, false);
+    example = new TextPanel(dialog);
 
     final BaseXBack pp = new BaseXBack(new RowLayout(8));
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 4));

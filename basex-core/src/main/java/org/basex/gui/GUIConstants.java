@@ -139,9 +139,7 @@ public final class GUIConstants {
 
   /** Context menu entries. */
   public static final GUIMenuCmd[] POPUP = {
-    C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null,
-    C_COPY_NODES, C_PASTE_NODES, C_DELETE_NODES, C_NEW_NODES, C_EDIT_NODES, null,
-    C_COPY_PATH
+    C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null, C_COPY_PATH
   };
 
   // CURSORS ======================================================================================

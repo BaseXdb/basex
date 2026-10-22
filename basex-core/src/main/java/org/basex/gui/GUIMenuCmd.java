@@ -15,10 +15,7 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.query.func.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -403,131 +400,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     boolean available(final GUI gui) {
-      // disallow copy of empty node set or root node
-      return updatable(gui.context.marked);
-    }
-  },
-
-  /** Copies the currently marked nodes. */
-  C_COPY_NODES(COPY, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final Context ctx = gui.context;
-      final DBNodes n = ctx.marked;
-      ctx.copied = new DBNodes(n.data(), n.pres());
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      // disallow copy of empty node set or root node
-      return updatable(gui.context.marked);
-    }
-  },
-
-  /** Pastes the copied nodes. */
-  C_PASTE_NODES(PASTE, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final StringBuilder sb = new StringBuilder();
-      final DBNodes n = gui.context.copied;
-      final long ns = n.size();
-      for(int i = 0; i < ns; i++) {
-        if(i > 0) sb.append(',');
-        sb.append(openPre(n, i));
-      }
-      gui.context.copied = null;
-      gui.execute(new XQuery("insert nodes (" + sb + ") into " +
-        openPre(gui.context.marked, 0)));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      final Context ctx = gui.context;
-      // disallow copy of empty node set or root node
-      return updatable(ctx.marked, Data.DOC) && ctx.copied != null;
-    }
-  },
-
-  /** Deletes the currently marked nodes. */
-  C_DELETE_NODES(DELETE + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
-      final StringBuilder sb = new StringBuilder();
-      final DBNodes n = gui.context.marked;
-      final long ns = n.size();
-      for(int i = 0; i < ns; i++) {
-        if(i > 0) sb.append(',');
-        sb.append(openPre(n, i));
-      }
-      gui.context.marked = new DBNodes(n.data());
-      gui.context.copied = null;
-      gui.context.focused = -1;
-      gui.execute(new XQuery("delete nodes (" + sb + ')'));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.DOC);
-    }
-  },
-
-  /** Inserts new nodes. */
-  C_NEW_NODES(NEW + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final DBNodes n = gui.context.marked;
-      final DialogInsert insert = new DialogInsert(gui);
-      if(!insert.ok()) return;
-
-      final StringList sl = insert.result;
-      final Kind kind = XNode.type(insert.kind).kind();
-      final TokenBuilder item = new TokenBuilder();
-      item.add(kind.description()).add(" { ").add(quote(sl.get(0))).add(" }");
-
-      if(kind.oneOf(Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION)) {
-        item.add(" { ").add(quote(sl.get(1))).add(" }");
-      } else if(kind == Kind.ELEMENT) {
-        item.add(" { () }");
-      }
-
-      gui.context.copied = null;
-      gui.execute(new XQuery("insert node " + item.add(" into ").add(openPre(n, 0)).toString()));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.ATTR, Data.PI, Data.COMM, Data.TEXT);
-    }
-  },
-
-  /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT_NODES(EDIT + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final DBNodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.pre(0));
-      if(!edit.ok()) return;
-
-      String rename = null;
-      String replace = null;
-      final int k = edit.kind;
-      if(k == Data.ELEM || k == Data.PI || k == Data.ATTR) {
-        rename = edit.result.get(0);
-        if(k != Data.ELEM) replace = edit.result.get(1);
-      } else {
-        replace = edit.result.get(0);
-      }
-
-      if(rename != null) gui.execute(new XQuery("rename node " +
-        openPre(n, 0) + " as " + quote(rename)));
-      if(replace != null) gui.execute(new XQuery("replace value of node " +
-        openPre(n, 0) + " with " + quote(replace)));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.DOC);
+      return marked(gui.context.marked);
     }
   },
 
@@ -547,7 +420,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     boolean available(final GUI gui) {
-      return updatable(gui.context.marked);
+      return marked(gui.context.marked);
     }
   },
 
@@ -908,37 +781,12 @@ public enum GUIMenuCmd implements GUICommand {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Checks if data can be updated.
-   * @param node node instance (can be {@code null})
-   * @param kinds disallowed node kinds
+   * Checks if nodes are marked.
+   * @param nodes marked nodes (can be {@code null})
    * @return result of check
    */
-  private static boolean updatable(final DBNodes node, final int... kinds) {
-    if(node == null || (kinds.length == 0 ? node.isEmpty() : node.size() != 1)) return false;
-    final int k = node.data().kind(node.pre(0));
-    for(final int kind : kinds) {
-      if(k == kind) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns a quoted string.
-   * @param string string to encode
-   * @return quoted string
-   */
-  private static String quote(final String string) {
-    return '"' + string.replace("\"", "&quot;") + '"';
-  }
-
-  /**
-   * Returns a database function for the specified node in a node set.
-   * @param nodes node set
-   * @param index node index
-   * @return function string
-   */
-  private static String openPre(final DBNodes nodes, final int index) {
-    return Function._DB_GET_PRE.args(nodes.data().meta.name, nodes.pre(index)).trim();
+  private static boolean marked(final DBNodes nodes) {
+    return nodes != null && !nodes.isEmpty();
   }
 
   /** Requirements for enabling a command. */

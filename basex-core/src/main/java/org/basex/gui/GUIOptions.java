@@ -174,8 +174,6 @@ public final class GUIOptions extends Options {
 
   /** Name of new database. */
   public static final StringOption DBNAME = new StringOption("DBNAME", "");
-  /** Last insertion type. */
-  public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
 
   /** Show attributes in treemap. */
   public static final BooleanOption MAPATTS = new BooleanOption("MAPATTS", false);

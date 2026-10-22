@@ -73,8 +73,6 @@ public final class Context {
 
   /** Marked nodes. {@code null} if database is closed. */
   public DBNodes marked;
-  /** Copied nodes. {@code null} if database is closed. */
-  public DBNodes copied;
   /** Focused node. */
   public int focused = -1;
 
@@ -247,7 +245,6 @@ public final class Context {
    */
   public void openDB(final Data dt) {
     data = dt;
-    copied = null;
     set(null, new DBNodes(dt));
   }
 
@@ -256,7 +253,6 @@ public final class Context {
    */
   public void closeDB() {
     data = null;
-    copied = null;
     set(null, null);
   }
 

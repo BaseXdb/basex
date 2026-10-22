@@ -27,7 +27,7 @@ public final class DialogRevert extends BaseXDialog {
 
     final BaseXBack back = new BaseXBack(new RowLayout(8));
     final TextPanel header = new TextPanel(this,
-        Util.info(Text.REVERT_FILES_X + ' ' + Text.ARE_YOU_SURE, BaseXLayout.format(files)), false);
+        Util.info(Text.REVERT_FILES_X + ' ' + Text.ARE_YOU_SURE, BaseXLayout.format(files)));
     header.setFont(back.getFont());
     back.add(header);
     set(back, BorderLayout.CENTER);

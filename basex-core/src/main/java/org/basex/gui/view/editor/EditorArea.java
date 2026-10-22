@@ -50,7 +50,7 @@ public final class EditorArea extends TextPanel {
    * @param file file reference
    */
   EditorArea(final EditorView view, final IOFile file) {
-    super(view.gui, true);
+    super(view.gui, "", true);
     this.view = view;
     this.file = file;
     label = new BaseXLabel(file.name());

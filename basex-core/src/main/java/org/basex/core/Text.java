@@ -1348,18 +1348,8 @@ public interface Text {
 
   /** Comment. */
   String COMMENT = lang("comment");
-  /** Dialog title for inserting new data. */
-  String INSERT_NEW_DATA = lang("insert_new_data");
-  /** Dialog title for updating document data. */
-  String EDIT_DATA = lang("edit_data");
   /** Insert value. */
   String VALUE = lang("value");
-  /** Dialog title for updating text. */
-  String EDIT_X = lang("edit_%");
-  /** Dialog title for updating text. */
-  String[] NODE_KINDS = { lang("document"), lang("element"), lang("text"),
-      lang("attribute"), COMMENT, lang("pi")
-  };
 
   /** Color schema information. */
   String RED = lang("red");

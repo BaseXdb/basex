@@ -92,12 +92,20 @@ public class TextPanel extends BaseXPanel {
   private int lastX = -1;
 
   /**
-   * Default constructor.
+   * Constructor for a read-only panel.
    * @param win parent window
-   * @param editable editable flag
    */
-  public TextPanel(final BaseXWindow win, final boolean editable) {
-    this(win, "", editable);
+  public TextPanel(final BaseXWindow win) {
+    this(win, "");
+  }
+
+  /**
+   * Constructor for a read-only panel.
+   * @param win parent window
+   * @param text initial text
+   */
+  public TextPanel(final BaseXWindow win, final String text) {
+    this(win, text, false);
   }
 
   /**
@@ -106,7 +114,7 @@ public class TextPanel extends BaseXPanel {
    * @param text initial text
    * @param editable editable flag
    */
-  public TextPanel(final BaseXWindow win, final String text, final boolean editable) {
+  protected TextPanel(final BaseXWindow win, final String text, final boolean editable) {
     super(win);
     this.editable = editable;
     final EditorOptions opts = new EditorOptions(gui.gopts);

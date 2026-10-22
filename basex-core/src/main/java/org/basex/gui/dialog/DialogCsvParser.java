@@ -76,7 +76,7 @@ final class DialogCsvParser extends DialogParser {
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
     backslashes = new BaseXCheckBox(dialog, BACKSLASHES, CsvOptions.BACKSLASHES, copts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);
-    example = new TextPanel(dialog, false);
+    example = new TextPanel(dialog);
 
     final BaseXBack pp = new BaseXBack(new RowLayout(8));
     BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));

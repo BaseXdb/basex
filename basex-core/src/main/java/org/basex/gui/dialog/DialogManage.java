@@ -75,7 +75,7 @@ public final class DialogManage extends BaseXDialog {
 
     doc1 = new BaseXLabel(" ").large();
 
-    detail = new TextPanel(this, false);
+    detail = new TextPanel(this);
     detail.setFont(panel.getFont());
     detail.setPreferredSize(new Dimension(600, 1));
 

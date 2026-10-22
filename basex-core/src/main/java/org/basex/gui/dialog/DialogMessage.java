@@ -37,7 +37,7 @@ public final class DialogMessage extends BaseXDialog {
     back.add(label);
 
     // break longer texts
-    final TextPanel tp = new TextPanel(this, txt.replaceAll("(.{1,160})", "$1").trim(), false);
+    final TextPanel tp = new TextPanel(this, txt.replaceAll("(.{1,160})", "$1").trim());
     tp.setFont(label.getFont());
     back.add(tp);
 

@@ -39,12 +39,12 @@ public final class DialogReplace extends BaseXDialog {
     final BaseXBack back = new BaseXBack(new RowLayout(8));
     final TextPanel header = new TextPanel(this,
         Util.info(Text.REPLACE_FILES_X_X + ' ' + Text.ARE_YOU_SURE, BaseXLayout.format(strings),
-            BaseXLayout.format(files)), false);
+            BaseXLayout.format(files)));
     header.setFont(back.getFont());
     back.add(header);
 
     backup = new BaseXCheckBox(this, Text.CREATE_BACKUP, GUIOptions.PROJBACKUP, gui.gopts);
-    path = new TextPanel(this, false);
+    path = new TextPanel(this);
     path.setFont(back.getFont());
     final BaseXBack row = new BaseXBack(new RowLayout());
     row.add(backup);

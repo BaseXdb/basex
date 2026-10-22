@@ -36,7 +36,7 @@ public final class DialogMem extends BaseXDialog {
     super(gui, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new TextPanel(this, info(), false);
+    text = new TextPanel(this, info());
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 
