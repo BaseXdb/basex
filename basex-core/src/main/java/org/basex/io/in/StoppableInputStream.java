@@ -2,6 +2,7 @@ package org.basex.io.in;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.*;
 import java.time.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -80,7 +81,8 @@ public final class StoppableInputStream extends FilterInputStream {
       io.initCause(ex);
       throw io;
     } catch(final IOException ex) {
-      if(!timedOut) throw ex;
+      // the HTTP client may close the stream first if its request timeout passes
+      if(!timedOut && !(ex.getCause() instanceof HttpTimeoutException)) throw ex;
       final SocketTimeoutException ste = new SocketTimeoutException("Read timed out");
       ste.initCause(ex);
       throw ste;
