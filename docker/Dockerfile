@@ -32,7 +32,7 @@ USER basex
 # 8080: HTTP server (REST, RESTXQ, DBA)
 EXPOSE 8080
 
-# / is served by webapp/restxq.xqm without authentification; /rest/ would require credentials.
+# / is served by webapp/restxq.xqm without authentication; /rest/ would require credentials.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
     CMD wget -q -O /dev/null http://localhost:8080/
 

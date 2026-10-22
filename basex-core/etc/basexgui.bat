@@ -1,5 +1,5 @@
 @echo off
-setLocal EnableDelayedExpansion
+setLocal
 
 REM Path to core and library classes
 set MAIN=%~dp0\..
