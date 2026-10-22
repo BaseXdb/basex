@@ -3846,7 +3846,7 @@ public class QueryParser extends InputParser {
     final byte[] name = ncName(NONCNAME_X, false);
     if(eq(lc(name), XML)) throw error(PIXML_X, name);
 
-    final boolean space = skipWs();
+    final boolean space = consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
       final int cp = consume();
