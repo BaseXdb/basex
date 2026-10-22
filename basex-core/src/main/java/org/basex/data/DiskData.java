@@ -293,10 +293,17 @@ public final class DiskData extends Data {
 
   @Override
   public void startUpdate(final MainOptions opts) throws BaseXException {
-    if(!table.lock(true)) throw new BaseXException(DB_PINNED_X, meta.name);
+    // on failure, restore the shared lock
+    if(!table.lock(true)) {
+      table.lock(false);
+      throw new BaseXException(DB_PINNED_X, meta.name);
+    }
     if(opts.get(MainOptions.AUTOFLUSH)) {
       final IOFile upd = meta.updateFile();
-      if(upd.exists()) throw new BaseXException(DB_UPDATED_X, meta.name);
+      if(upd.exists()) {
+        table.lock(false);
+        throw new BaseXException(DB_UPDATED_X, meta.name);
+      }
       if(!upd.touch()) throw Util.notExpected("%: could not create lock file.", meta.name);
     }
   }

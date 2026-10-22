@@ -88,10 +88,15 @@ public abstract class ACreate extends Command {
   final boolean update(final Data data, final Code update) {
     context.invalidate();
 
+    // prepare update, set locks
+    try {
+      if(lock) data.startUpdate(options);
+    } catch(final IOException ex) {
+      return error(ex);
+    }
+
     IOException exc = null;
     try {
-      // prepare update, set locks
-      if(lock) data.startUpdate(options);
       // perform update, return success flag
       return update.run();
     } catch(final IOException ex) {
