@@ -21,6 +21,7 @@ import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Renders and provides edit capabilities for text.
@@ -88,6 +89,8 @@ public class TextPanel extends BaseXPanel {
   private boolean completed;
   /** Last number of mouse clicks. */
   private int clicks;
+  /** Start point of a column selection (can be {@code null}). */
+  private Point column;
   /** Last horizontal position. */
   private int lastX = -1;
 
@@ -280,6 +283,7 @@ public class TextPanel extends BaseXPanel {
    * @param pos caret position
    */
   public final void setCaret(final int pos) {
+    editor.singleCaret();
     editor.pos(pos);
     update(Align.CENTER);
     caret(true);
@@ -347,8 +351,7 @@ public class TextPanel extends BaseXPanel {
    * Adds or removes a comment.
    */
   public final void comment() {
-    final int caret = editor.pos();
-    finish(caret, editor.comment(rend.syntax()));
+    edit(true, () -> editor.comment(rend.syntax()));
   }
 
   /**
@@ -356,8 +359,20 @@ public class TextPanel extends BaseXPanel {
    * @param cs case type
    */
   public final void toCase(final Case cs) {
+    edit(false, () -> editor.toCase(cs));
+  }
+
+  /**
+   * Runs an edit command for each caret and finishes it.
+   * @param lines line command (one caret per line)
+   * @param op edit command
+   */
+  private void edit(final boolean lines, final Runnable op) {
     final int caret = editor.pos();
-    finish(caret, editor.toCase(cs));
+    final byte[] text = editor.text();
+    if(lines) editor.forEachLine(op);
+    else editor.forEach(op);
+    finish(caret, text != editor.text());
   }
 
   /**
@@ -413,6 +428,7 @@ public class TextPanel extends BaseXPanel {
    * Selects the whole text.
    */
   private void selectAll() {
+    editor.singleCaret();
     editor.selectAll();
     rend.repaint();
   }
@@ -509,6 +525,7 @@ public class TextPanel extends BaseXPanel {
    */
   protected final void jump(final SearchDir dir, final boolean select) {
     SwingUtilities.invokeLater(() -> {
+      editor.singleCaret();
       scroll(rend.jump(dir, select), Align.CENTER);
       if(search != null) search.refreshCount();
     });
@@ -539,7 +556,8 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void mouseDragged(final MouseEvent e) {
     if(SwingUtilities.isLeftMouseButton(e) && clicks == 1) {
-      select(e.getPoint(), false);
+      if(column != null) selectColumns(e.getPoint());
+      else select(e.getPoint(), false);
       final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
       if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
       final int x = Math.max(20, Math.min(e.getX(), getWidth() - 20));
@@ -575,9 +593,17 @@ public class TextPanel extends BaseXPanel {
     if(SwingUtilities.isLeftMouseButton(e)) {
       clicks = e.getClickCount();
       if(clicks == 1) {
-        // selection mode
-        if(shift) editor.startSelection(true);
-        select(e.getPoint(), !shift);
+        if(e.isAltDown() && !shift && hist.active()) {
+          editor.addCaret(rend.jump(e.getPoint()).pos());
+          column = e.getPoint();
+          rend.repaint();
+        } else {
+          // selection mode
+          column = null;
+          editor.singleCaret();
+          if(shift) editor.startSelection(true);
+          select(e.getPoint(), !shift);
+        }
       } else if(clicks == 2) {
         editor.selectWord();
       } else {
@@ -601,7 +627,55 @@ public class TextPanel extends BaseXPanel {
     rend.repaint();
   }
 
+  /**
+   * Selects the text in the rectangle between the start of the column selection and the
+   * specified position.
+   * @param point mouse position
+   */
+  private void selectColumns(final Point point) {
+    final IntList starts = new IntList(), ends = new IntList();
+    final int fh = rend.fontHeight(), step = point.y < column.y ? -fh : fh;
+    // one selection per rendered row; the row of the mouse position is added last
+    for(int y = column.y;; y += step) {
+      final boolean last = step > 0 ? y >= point.y : y <= point.y;
+      final int yy = last ? point.y : y;
+      starts.add(rend.jump(new Point(column.x, yy)).pos());
+      ends.add(rend.jump(new Point(point.x, yy)).pos());
+      if(last) break;
+    }
+    // a slight move after an Alt click keeps the existing carets
+    if(starts.size() == 1 && starts.get(0) == ends.get(0)) return;
+    editor.columns(starts, ends);
+    rend.repaint();
+  }
+
   // KEY INTERACTIONS ===========================================================================
+
+  /**
+   * Adds or removes carets.
+   * @param e key event
+   * @return {@code true} if the key was processed
+   */
+  private boolean caretKey(final KeyEvent e) {
+    if(NEXTOCCUR.is(e)) {
+      editor.nextOccurrence();
+    } else if(PREVOCCUR.is(e)) {
+      editor.prevOccurrence();
+    } else if(ALLOCCUR.is(e)) {
+      editor.allOccurrences();
+    } else if(CARETUP.is(e) || CARETDOWN.is(e)) {
+      // the column of the first caret is kept
+      final int[] caret = rend.caretRows(CARETUP.is(e) ? -1 : 1, lastX);
+      if(caret != null) {
+        editor.cloneCaret(caret[0]);
+        editor.atRowEnd(rend.rowEnd());
+        lastX = caret[1];
+      }
+    } else {
+      return false;
+    }
+    return true;
+  }
 
   /**
    * Invokes special keys.
@@ -615,6 +689,11 @@ public class TextPanel extends BaseXPanel {
       gui.editor.tab(true);
     } else if(CLOSETAB.is(e)) {
       gui.editor.close(null);
+    } else if(ESCAPE.is(e) && editor.multiple()) {
+      // return to a single caret
+      editor.singleCaret();
+      rend.repaint();
+      return true;
     } else if(search != null && ESCAPE.is(e)) {
       search.deactivate(true);
     } else {
@@ -654,6 +733,17 @@ public class TextPanel extends BaseXPanel {
       return;
     }
 
+    // add or remove carets
+    if(hist.active() && caretKey(e)) {
+      hidePopups();
+      update(Align.BOTTOM);
+      e.consume();
+      return;
+    }
+    // multiple carets are only kept by horizontal moves and deletions
+    if(TEXTSTART.is(e) || TEXTEND.is(e) || PREVPAGE.is(e) || NEXTPAGE.is(e) || PREVLINE.is(e) ||
+        NEXTLINE.is(e) || MOVEUP.is(e) || MOVEDOWN.is(e) || COMPLETE.is(e)) editor.singleCaret();
+
     // set cursor position
     final boolean selected = editor.isSelected();
     final int pos = editor.pos();
@@ -665,9 +755,9 @@ public class TextPanel extends BaseXPanel {
     int lc = Integer.MIN_VALUE;
     final byte[] txt = editor.text();
     if(NEXTWORD.is(e)) {
-      editor.nextWord(shift);
+      editor.forEach(() -> editor.nextWord(shift));
     } else if(PREVWORD.is(e)) {
-      editor.prevWord(shift);
+      editor.forEach(() -> editor.prevWord(shift));
       down = false;
     } else if(TEXTSTART.is(e)) {
       editor.moveTo(0, shift);
@@ -675,10 +765,10 @@ public class TextPanel extends BaseXPanel {
     } else if(TEXTEND.is(e)) {
       editor.moveTo(editor.size(), shift);
     } else if(LINESTART.is(e)) {
-      moveRow(false, shift);
+      editor.forEach(() -> moveRow(false, shift));
       down = false;
     } else if(LINEEND.is(e)) {
-      moveRow(true, shift);
+      editor.forEach(() -> moveRow(true, shift));
     } else if(PREVPAGE_RO.is(e) && !hist.active()) {
       lc = moveCaret(-(getHeight() / fh), false);
       down = false;
@@ -695,9 +785,9 @@ public class TextPanel extends BaseXPanel {
       lc = moveCaret(-1, shift);
       down = false;
     } else if(NEXTCHAR.is(e)) {
-      editor.nextChar(shift);
+      editor.forEach(() -> editor.nextChar(shift));
     } else if(PREVCHAR.is(e)) {
-      editor.prevChar(shift);
+      editor.forEach(() -> editor.prevChar(shift));
       down = false;
     } else {
       moved = false;
@@ -718,23 +808,23 @@ public class TextPanel extends BaseXPanel {
       } else if(MOVEUP.is(e)) {
         editor.move(false);
       } else if(DUPLLINES.is(e)) {
-        editor.duplLines();
+        editor.forEachLine(editor::duplLines);
       } else if(DELLINES.is(e)) {
-        editor.deleteLines();
+        editor.forEachLine(editor::deleteLines);
       } else if(DELNEXTWORD.is(e)) {
-        editor.delete(true, true);
+        editor.forEach(() -> editor.delete(true, true));
       } else if(DELLINEEND.is(e)) {
-        editor.delete(false, true);
+        editor.forEach(() -> editor.delete(false, true));
       } else if(DELNEXT.is(e)) {
-        editor.delete();
+        editor.forEach(editor::delete);
       } else if(DELPREVWORD.is(e)) {
-        editor.delete(true, false);
+        editor.forEach(() -> editor.delete(true, false));
         down = false;
       } else if(DELLINESTART.is(e)) {
-        editor.delete(false, false);
+        editor.forEach(() -> editor.delete(false, false));
         down = false;
       } else if(DELPREV.is(e)) {
-        editor.deletePrev();
+        editor.forEach(editor::deletePrev);
         down = false;
       } else {
         edited = false;
@@ -747,15 +837,15 @@ public class TextPanel extends BaseXPanel {
     // text has changed: add old text to history
     if(changed) hist.store(tmp, pos, editor.pos());
     // text, cursor position or selection state has changed
-    if(changed || pos != editor.pos() || selected != editor.isSelected()) {
+    if(changed || pos != editor.pos() || selected != editor.isSelected() || editor.multiple()) {
       update(down ? Align.BOTTOM : Align.TOP);
     }
     // refresh visible completions; cursor moves discard a scheduled popup
-    if(hist.active() && (moved || edited)) {
+    if(hist.active() && (moved || edited) && !editor.multiple()) {
       if(moved && !completion.visible()) completion.hide();
       refreshCompletion(false);
       signatureCode.invokeLater(false);
-    } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+    } else if(editor.multiple() || control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
       // close the popups: the key press will be processed as a shortcut
       hidePopups();
     }
@@ -878,31 +968,34 @@ public class TextPanel extends BaseXPanel {
       return;
 
     final int caret = editor.pos();
+    final char ch = e.getKeyChar();
+    final boolean tab = TAB.is(e), enter = ENTER.is(e), shift = e.isShiftDown();
+    editor.forEach(() -> {
+      final int pos = editor.pos();
+      // remember if marked text is to be deleted
+      final StringBuilder sb = new StringBuilder(1).append(ch);
+      final boolean indent = tab && editor.indent(sb, shift);
 
-    // remember if marked text is to be deleted
-    final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
-    final boolean indent = TAB.is(e) && editor.indent(sb, e.isShiftDown());
+      // surround or delete marked text
+      final int move;
+      if(editor.surround(ch)) {
+        move = 0;
+      } else {
+        final boolean selected = editor.isSelected() && !indent;
+        if(selected) editor.delete();
+        move = enter ? editor.enter(sb) : editor.add(sb, selected);
+      }
+      // adjust cursor position
+      if(move != 0) editor.pos(Math.min(editor.size(), pos + move));
+    });
 
-    // surround or delete marked text
-    final int move;
-    if(editor.surround(e.getKeyChar())) {
-      move = 0;
-    } else {
-      final boolean selected = editor.isSelected() && !indent;
-      if(selected) editor.delete();
-      move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
-    }
-
-    // refresh history and adjust cursor position
+    // refresh history, adjust text height
     hist.store(editor.text(), caret, editor.pos());
-    if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
-
-    // adjust text height
     update(Align.BOTTOM);
     e.consume();
+    if(editor.multiple()) return;
 
     // refresh completions, or show them after a delay if a completion was started
-    final char ch = e.getKeyChar();
     refreshCompletion(Character.isLetter(ch) || rend.syntax().completeStart(ch));
     // a signature is proposed if an argument list is opened or continued
     signatureCode.invokeLater(ch == '(' || ch == ',');
@@ -926,8 +1019,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void paste(final String string) {
     final int pos = editor.pos();
-    if(editor.isSelected()) editor.delete();
-    editor.insert(string);
+    editor.paste(string);
     finish(pos, true);
   }
 
@@ -936,7 +1028,7 @@ public class TextPanel extends BaseXPanel {
    * @return true if text was copied
    */
   private boolean copy() {
-    final String txt = editor.selected();
+    final String txt = editor.selectedAll();
     final boolean copy = !txt.isEmpty();
     if(copy) BaseXLayout.toClipboard(txt);
     return copy;
@@ -1031,7 +1123,9 @@ public class TextPanel extends BaseXPanel {
     public void execute() {
       final int pos = editor.pos();
       if(!copy()) return;
-      editor.delete();
+      editor.forEach(() -> {
+        if(editor.isSelected()) editor.delete();
+      });
       finish(pos, true);
     }
     @Override

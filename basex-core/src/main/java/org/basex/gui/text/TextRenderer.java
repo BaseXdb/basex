@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import java.awt.*;
+import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -151,7 +152,12 @@ final class TextRenderer extends BaseXBack {
 
     layout.stringWidth = 0;
     final int s = iter.pos();
-    if(caret && s == iter.caret()) drawCaret(g, layout.x, layout.lineY);
+    if(caret) {
+      if(s == iter.caret()) drawCaret(g, layout.x, layout.lineY, true);
+      for(final TextEditor.Caret c : iter.carets()) {
+        if(c.pos() == s) drawCaret(g, layout.x, layout.lineY, false);
+      }
+    }
     if(s == iter.errorPos()) drawError(layout, g);
 
     clipAll(g);
@@ -753,6 +759,12 @@ final class TextRenderer extends BaseXBack {
         for(final int[] oc : iter.occurrences()) mark(oc, layout, g, GUIConstants.color3A);
       }
       mark(iter.selection(), layout, g, GUIConstants.color2A);
+      final ArrayList<TextEditor.Caret> carets = iter.carets();
+      for(final TextEditor.Caret c : carets) {
+        if(c.start() != c.end()) {
+          mark(new int[] { c.min(), c.max() }, layout, g, GUIConstants.color2A);
+        }
+      }
       for(final int[] sr : iter.searchResults()) mark(sr, layout, g, GUIConstants.color2A);
 
       // mark erroneous text
@@ -789,9 +801,17 @@ final class TextRenderer extends BaseXBack {
       // underline linked text
       if(layout.link) g.drawLine(x, y + 1, x + sw, y + 1);
       // show cursor: a wrapped token shares its first position with the end of the previous row
-      if(caret && iter.edited()) {
-        if(atRowEnd(layout)) drawCaret(g, layout.rowX, layout.rowLineY);
-        else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY);
+      if(caret) {
+        if(iter.edited()) {
+          if(atRowEnd(layout)) drawCaret(g, layout.rowX, layout.rowLineY, true);
+          else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY, true);
+        }
+        for(final TextEditor.Caret c : carets) {
+          final int p = c.pos();
+          if(p >= pos && p < iter.posEnd()) {
+            drawCaret(g, x + font.stringWidth(iter.text(), pos, p), lineY, false);
+          }
+        }
       }
     }
 
@@ -846,12 +866,15 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    * @param xx x position
    * @param yy y position
+   * @param primary primary caret
    */
-  private void drawCaret(final Graphics g, final int xx, final int yy) {
+  private void drawCaret(final Graphics g, final int xx, final int yy, final boolean primary) {
     g.setColor(GUIConstants.darkGray);
     g.fillRect(xx, yy, 2, fontHeight);
-    cursor[0] = xx;
-    cursor[1] = yy + fontHeight;
+    if(primary) {
+      cursor[0] = xx;
+      cursor[1] = yy + fontHeight;
+    }
   }
 
   /**

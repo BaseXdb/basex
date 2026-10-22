@@ -37,6 +37,12 @@ final class TextIterator {
   private final byte[] name;
   /** Occurrences of the name in the current token. */
   private final ArrayList<int[]> occurrences = new ArrayList<>();
+  /** Text editor. */
+  private final TextEditor editor;
+  /** Secondary carets, sorted by their position (requested on demand). */
+  private TextEditor.Caret[] carets;
+  /** Secondary carets of the current token. */
+  private final ArrayList<TextEditor.Caret> tokenCarets = new ArrayList<>();
 
   /** Current start position. */
   private int pos;
@@ -44,6 +50,8 @@ final class TextIterator {
   private int posEnd;
   /** Current search index. */
   private int searchIndex;
+  /** Index of the first secondary caret that may be placed in the current token. */
+  private int caretIndex;
   /** Position up to which occurrences have been located. */
   private int occurrencePos;
   /** Occurrence that was located last (can be {@code null}). */
@@ -65,6 +73,7 @@ final class TextIterator {
     errPos = et.error();
     searchResults = et.searchResults();
     name = et.occurrence();
+    editor = et;
   }
 
   /**
@@ -195,6 +204,21 @@ final class TextIterator {
       if(pos >= s && pos < e || s >= pos && s < posEnd) return new int[] { s, e };
     }
     return null;
+  }
+
+  /**
+   * Returns the secondary carets whose positions or selections are placed in the current token.
+   * @return carets
+   */
+  ArrayList<TextEditor.Caret> carets() {
+    if(carets == null) carets = editor.carets();
+    final int cl = carets.length;
+    tokenCarets.clear();
+    while(caretIndex < cl && carets[caretIndex].max() < pos) caretIndex++;
+    for(int c = caretIndex; c < cl && carets[c].min() <= posEnd; c++) {
+      tokenCarets.add(carets[c]);
+    }
+    return tokenCarets;
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.gui.text;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -443,6 +444,136 @@ public final class TextEditorTest {
     editor.select(start, end);
     editor.surround(ch);
     return Token.string(editor.text());
+  }
+
+  /** Typing and deleting at multiple carets. */
+  @Test public void multipleCarets() {
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(1);
+    editor.addCaret(4);
+    editor.addCaret(7);
+    assertTrue(editor.multiple());
+    editor.forEach(() -> editor.insert("x"));
+    assertEquals("axb\ncxd\nexf", Token.string(editor.text()));
+    assertEquals(10, editor.pos());
+    editor.forEach(editor::deletePrev);
+    editor.forEach(editor::deletePrev);
+    assertEquals("b\nd\nf", Token.string(editor.text()));
+    editor.forEach(() -> editor.lineEnd(false));
+    editor.forEach(() -> editor.insert(";"));
+    assertEquals("b;\nd;\nf;", Token.string(editor.text()));
+    // carets that meet are merged
+    editor.forEach(() -> editor.moveTo(0, false));
+    assertFalse(editor.multiple());
+  }
+
+  /** Adding carets for the occurrences of the selected text. */
+  @Test public void occurrences() {
+    final TextEditor editor = editor("$a + $ab + $a");
+    editor.pos(1);
+    // select word, add the next occurrences, which wrap around
+    editor.nextOccurrence();
+    assertEquals("a", editor.selected());
+    editor.nextOccurrence();
+    editor.nextOccurrence();
+    editor.nextOccurrence();
+    assertEquals(2, editor.carets().length);
+    editor.forEach(() -> {
+      editor.delete();
+      editor.insert("x");
+    });
+    assertEquals("$x + $xb + $x", Token.string(editor.text()));
+
+    // remove the caret that was added last
+    editor.select(1, 2);
+    editor.allOccurrences();
+    assertEquals(2, editor.carets().length);
+    editor.prevOccurrence();
+    assertEquals(1, editor.carets().length);
+    editor.singleCaret();
+    assertFalse(editor.multiple());
+
+    // a text change from outside discards secondary carets
+    editor.allOccurrences();
+    editor.text(Token.token("x"));
+    assertFalse(editor.multiple());
+  }
+
+  /** Adding and removing carets in adjacent rows. */
+  @Test public void cloneCaret() {
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(1);
+    editor.cloneCaret(4);
+    editor.cloneCaret(7);
+    assertEquals(2, editor.carets().length);
+    assertEquals(7, editor.pos());
+    // moving back removes the primary caret
+    editor.cloneCaret(4);
+    assertEquals(1, editor.carets().length);
+    assertEquals(4, editor.pos());
+    // first or last row: no caret is added
+    editor.cloneCaret(4);
+    assertEquals(1, editor.carets().length);
+  }
+
+  /** Copying and pasting at multiple carets. */
+  @Test public void copyPaste() {
+    // selections are joined in text order
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(0);
+    editor.cloneCaret(3);
+    editor.forEach(editor::selectWord);
+    assertEquals("ab\ncd", editor.selectedAll());
+
+    // lines are distributed if their number matches the number of carets
+    editor.paste("1\n2");
+    assertEquals("1\n2\nef", Token.string(editor.text()));
+    editor.paste("x");
+    assertEquals("1x\n2x\nef", Token.string(editor.text()));
+  }
+
+  /** Line commands at multiple carets. */
+  @Test public void lineCommands() {
+    // one caret per line is kept
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(0);
+    editor.addCaret(1);
+    editor.addCaret(3);
+    editor.caretPerLine();
+    assertEquals(1, editor.carets().length);
+    editor.forEach(editor::duplLines);
+    assertEquals("ab\nab\ncd\ncd\nef", Token.string(editor.text()));
+
+    final TextEditor comment = editor("a\nb");
+    comment.pos(0);
+    comment.addCaret(2);
+    comment.forEach(() -> comment.comment(new SyntaxXQuery()));
+    assertEquals("(: a :)\n(: b :)", Token.string(comment.text()));
+  }
+
+  /** Edits at a caret that remove the positions of other carets. */
+  @Test public void overlappingEdits() {
+    final TextEditor editor = editor("abcdef");
+    editor.pos(2);
+    editor.addCaret(4);
+    editor.forEach(() -> editor.delete(false, false));
+    assertEquals("ef", Token.string(editor.text()));
+
+    final TextEditor words = editor("ab cd");
+    words.pos(4);
+    words.addCaret(5);
+    words.forEach(() -> words.delete(true, false));
+    assertTrue(words.pos() <= words.size());
+  }
+
+  /** Column selections. */
+  @Test public void columns() {
+    final TextEditor editor = editor("abc\ndef\ng");
+    editor.columns(new IntList(new int[] { 1, 5, 9 }), new IntList(new int[] { 2, 6, 9 }));
+    assertEquals(2, editor.carets().length);
+    assertEquals(9, editor.pos());
+    editor.forEach(() -> editor.toCase(TextEditor.Case.UPPER));
+    assertEquals("aBc\ndEf\ng", Token.string(editor.text()));
   }
 
   /**

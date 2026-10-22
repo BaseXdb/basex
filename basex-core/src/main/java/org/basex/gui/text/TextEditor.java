@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.text.*;
 import java.util.*;
+import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -66,6 +67,74 @@ public final class TextEditor {
   private int pos;
   /** Caret position at the end of a rendered row ({@code -1} if the caret is elsewhere). */
   private int rowEndPos = -1;
+  /** Empty caret array. */
+  private static final Caret[] NO_CARETS = {};
+  /** Secondary carets, in the order in which they were added. */
+  private final ArrayList<Caret> carets = new ArrayList<>();
+
+  /**
+   * Caret with an optional text selection.
+   * @param pos caret position
+   * @param start start position of a text selection ({@code -1} if no text is selected)
+   * @param end end position of a text selection ({@code -1} if no text is selected)
+   */
+  record Caret(int pos, int start, int end) {
+    /**
+     * Constructor; an empty selection is stored as no selection.
+     * @param pos caret position
+     * @param start start position of a text selection
+     * @param end end position of a text selection
+     */
+    Caret {
+      if(start == end) {
+        start = -1;
+        end = -1;
+      }
+    }
+
+    /**
+     * Returns the first offset of the caret or its selection.
+     * @return offset
+     */
+    int min() {
+      return start != end ? Math.min(start, end) : pos;
+    }
+
+    /**
+     * Returns the last offset of the caret or its selection.
+     * @return offset
+     */
+    int max() {
+      return start != end ? Math.max(start, end) : pos;
+    }
+
+    /**
+     * Checks if this caret overlaps with another one.
+     * @param c other caret
+     * @return result of check
+     */
+    boolean overlaps(final Caret c) {
+      return pos == c.pos || min() < c.max() && c.min() < max();
+    }
+
+    /**
+     * Returns a caret that is moved by the specified distance.
+     * @param d distance
+     * @return new caret
+     */
+    Caret shift(final int d) {
+      return new Caret(Math.max(0, pos + d), Math.max(0, start + d), Math.max(0, end + d));
+    }
+
+    /**
+     * Returns a caret whose positions do not exceed the specified limit.
+     * @param p limit
+     * @return new caret
+     */
+    Caret limit(final int p) {
+      return new Caret(Math.min(pos, p), Math.min(start, p), Math.min(end, p));
+    }
+  }
 
   /**
    * Constructor.
@@ -90,6 +159,7 @@ public final class TextEditor {
     text = txt;
     lines = -1;
     resetSelection();
+    carets.clear();
     // repeat the last requested search, but not before the changes have come to a rest
     if(searchRequest != null) searchTimer.restart();
     if(pos > tl) pos = tl;
@@ -1597,11 +1667,19 @@ public final class TextEditor {
    * @return string
    */
   String selected() {
-    final int e = selMax();
-    int s = selMin();
+    return selected(selMin(), selMax());
+  }
+
+  /**
+   * Returns the string in the specified range without invalid characters.
+   * @param s start position
+   * @param e end position
+   * @return string
+   */
+  private String selected(final int s, final int e) {
     final TokenBuilder tb = new TokenBuilder(e - s);
-    for(; s < e; s += cl(text, s)) {
-      final int cp = cp(text, s);
+    for(int p = s; p < e; p += cl(text, p)) {
+      final int cp = cp(text, p);
       if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
@@ -1664,6 +1742,280 @@ public final class TextEditor {
   private void anchorSelection() {
     start = pos;
     end = pos;
+  }
+
+  // MULTIPLE CARETS ==============================================================================
+
+  /**
+   * Indicates if secondary carets exist.
+   * @return result of check
+   */
+  boolean multiple() {
+    return !carets.isEmpty();
+  }
+
+  /**
+   * Returns the secondary carets, sorted by their position.
+   * @return carets
+   */
+  Caret[] carets() {
+    if(carets.isEmpty()) return NO_CARETS;
+    final Caret[] array = carets.toArray(Caret[]::new);
+    Arrays.sort(array, Comparator.comparingInt(Caret::min));
+    return array;
+  }
+
+  /**
+   * Removes all secondary carets.
+   */
+  void singleCaret() {
+    carets.clear();
+  }
+
+  /**
+   * Adds a caret at the specified position, or removes a secondary caret placed there.
+   * @param p position
+   */
+  void addCaret(final int p) {
+    if(carets.removeIf(c -> c.pos() == p)) return;
+    carets.add(caret());
+    selectFrom(p);
+    normalize();
+  }
+
+  /**
+   * Adds a caret in the row above or below, or removes the primary caret if a caret exists there.
+   * @param p position in the adjacent row
+   */
+  void cloneCaret(final int p) {
+    if(p == pos) return;
+    final Caret c = new Caret(p, -1, -1);
+    if(carets.remove(c)) {
+      caret(c);
+    } else {
+      carets.add(caret());
+      pos(p);
+      normalize();
+    }
+  }
+
+  /**
+   * Returns the selected text of all carets, separated by newlines.
+   * @return string
+   */
+  String selectedAll() {
+    if(carets.isEmpty()) return selected();
+    final ArrayList<Caret> list = new ArrayList<>(carets);
+    list.add(caret());
+    list.sort(Comparator.comparingInt(Caret::min));
+    final StringList strings = new StringList();
+    for(final Caret c : list) {
+      if(c.start() != -1) strings.add(selected(c.min(), c.max()));
+    }
+    return String.join("\n", strings);
+  }
+
+  /**
+   * Inserts a string at all carets, or one line per caret if the numbers match.
+   * @param string string
+   */
+  void paste(final String string) {
+    final String[] strings = multiple() ? string.split("\n", -1) : new String[0];
+    final int[] s = { strings.length };
+    final boolean spread = s[0] == carets.size() + 1;
+    forEach(() -> {
+      if(isSelected()) delete();
+      insert(spread ? strings[--s[0]] : string);
+    });
+  }
+
+  /**
+   * Selects the word at the caret, or adds a caret for the next occurrence of the selected text.
+   */
+  void nextOccurrence() {
+    if(!isSelected()) {
+      selectWord();
+      return;
+    }
+    final int s = selMin(), e = selMax(), sl = e - s;
+    final byte[] sel = substring(text, s, e);
+    boolean wrapped = false;
+    for(int p = e;;) {
+      int f = indexOf(text, sel, p);
+      if(f == -1 && !wrapped) {
+        wrapped = true;
+        f = indexOf(text, sel, 0);
+      }
+      // stop if all occurrences have been visited
+      if(f == -1 || wrapped && f >= s) return;
+      final Caret c = new Caret(f + sl, f, f + sl);
+      if(!c.overlaps(caret()) && carets.stream().noneMatch(c::overlaps)) {
+        carets.add(caret());
+        caret(c);
+        return;
+      }
+      p = f + 1;
+    }
+  }
+
+  /**
+   * Removes the caret that was added last.
+   */
+  void prevOccurrence() {
+    if(!carets.isEmpty()) caret(carets.removeLast());
+  }
+
+  /**
+   * Adds carets for all occurrences of the selected text or the word at the caret.
+   */
+  void allOccurrences() {
+    if(!isSelected()) selectWord();
+    if(!isSelected()) return;
+
+    final int s = selMin(), e = selMax(), sl = e - s;
+    final byte[] sel = substring(text, s, e);
+    carets.clear();
+    for(int f = indexOf(text, sel, 0); f != -1; f = indexOf(text, sel, f + sl)) {
+      if(f != s) carets.add(new Caret(f + sl, f, f + sl));
+    }
+    normalize();
+  }
+
+  /**
+   * Runs an operation for each caret, starting with the last one in the text.
+   * @param op operation
+   */
+  void forEach(final Runnable op) {
+    if(carets.isEmpty()) {
+      op.run();
+      return;
+    }
+    // the primary caret is the last entry
+    final ArrayList<Caret> list = new ArrayList<>(carets);
+    list.add(caret());
+    carets.clear();
+
+    final int cs = list.size();
+    final int[] order = Array.createOrder(cs,
+        (c1, c2) -> list.get(c2).min() - list.get(c1).min()), shifts = new int[cs];
+    boolean rowEnd = false;
+    for(int o = 0; o < cs; o++) {
+      final int c = order[o];
+      caret(list.get(c));
+      final byte[] old = text;
+      op.run();
+      list.set(c, caret());
+      if(c == cs - 1) rowEnd = atRowEnd();
+      if(text == old) continue;
+
+      // carets inside the edited text are moved to its start
+      final int m = Arrays.mismatch(old, text);
+      final int p = m == -1 ? text.length : m;
+      for(int i = o + 1; i < cs && list.get(order[i]).max() > p; i++) {
+        list.set(order[i], list.get(order[i]).limit(p));
+      }
+      shifts[o] = text.length - old.length;
+    }
+    // carets after edited text are shifted
+    for(int o = cs - 1, d = 0; o >= 0; d += shifts[o--]) {
+      if(d != 0) list.set(order[o], list.get(order[o]).shift(d));
+    }
+    caret(list.removeLast());
+    atRowEnd(rowEnd);
+    carets.addAll(list);
+    normalize();
+  }
+
+  /**
+   * Returns the primary caret.
+   * @return caret
+   */
+  private Caret caret() {
+    return new Caret(pos, start, end);
+  }
+
+  /**
+   * Assigns the primary caret.
+   * @param c caret
+   */
+  private void caret(final Caret c) {
+    pos = c.pos();
+    start = c.start();
+    end = c.end();
+  }
+
+  /**
+   * Replaces all carets with a column selection; the last caret becomes the primary one.
+   * @param starts start positions of the selections
+   * @param ends end positions of the selections
+   */
+  void columns(final IntList starts, final IntList ends) {
+    carets.clear();
+    final int cs = starts.size();
+    for(int c = 0; c < cs; c++) carets.add(new Caret(ends.get(c), starts.get(c), ends.get(c)));
+    caret(carets.removeLast());
+    normalize();
+  }
+
+  /**
+   * Removes secondary carets whose lines are touched by the primary caret or by later ones.
+   */
+  void caretPerLine() {
+    normalize((c1, c2) -> bol(c1.min()) <= eol(c2.max()) && bol(c2.min()) <= eol(c1.max()));
+  }
+
+  /**
+   * Runs a line operation for each caret, keeping one caret per line.
+   * @param op operation
+   */
+  void forEachLine(final Runnable op) {
+    caretPerLine();
+    forEach(op);
+  }
+
+  /**
+   * Returns the start of the line that contains the specified position.
+   * @param p position
+   * @return line start
+   */
+  private int bol(final int p) {
+    int s = p;
+    while(s > 0 && text[s - 1] != '\n') s--;
+    return s;
+  }
+
+  /**
+   * Returns the end of the line that contains the specified position.
+   * @param p position
+   * @return line end
+   */
+  private int eol(final int p) {
+    int e = p;
+    while(e < text.length && text[e] != '\n') e++;
+    return e;
+  }
+
+  /**
+   * Removes secondary carets that overlap with the primary caret or with later ones.
+   */
+  private void normalize() {
+    normalize(Caret::overlaps);
+  }
+
+  /**
+   * Removes secondary carets that collide with the primary caret or with later ones.
+   * @param collides collision check
+   */
+  private void normalize(final BiPredicate<Caret, Caret> collides) {
+    final Caret primary = caret();
+    for(int c = carets.size() - 1; c >= 0; c--) {
+      final Caret caret = carets.get(c);
+      boolean coll = collides.test(caret, primary);
+      for(int d = c + 1; !coll && d < carets.size(); d++) {
+        coll = collides.test(caret, carets.get(d));
+      }
+      if(coll) carets.remove(c);
+    }
   }
 
   // ERROR HIGHLIGHTING ===========================================================================
