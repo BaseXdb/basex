@@ -2,6 +2,9 @@ package org.basex.build;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
+import java.util.zip.*;
+
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -51,6 +54,25 @@ public final class AddBinaryOptionTest extends SandboxTest {
   @Test public void testAdd() {
     execute(new Add("", DIR));
     assertAllFilesExist();
+  }
+
+  /**
+   * Test if archive entries with relative paths are rejected.
+   * @throws IOException I/O exception
+   */
+  @Test public void archiveSlip() throws IOException {
+    final IOFile zip = new IOFile(sandbox(), "slip.zip");
+    try(ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zip.file()))) {
+      for(final String entry : new String[] { "../../slip.txt", "a\\..\\..\\slip.txt", "ok.txt" }) {
+        out.putNextEntry(new ZipEntry(entry));
+        out.write(Token.token("X"));
+        out.closeEntry();
+      }
+    }
+    execute(new CreateDB(NAME, zip.path()));
+    assertEquals("ok.txt", query(Function._DB_LIST.args(NAME)));
+    assertFalse(context.soptions.dbPath("slip.txt").exists());
+    assertFalse(new IOFile(context.soptions.dbPath(NAME), "slip.txt").exists());
   }
 
   /**

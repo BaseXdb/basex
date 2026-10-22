@@ -261,8 +261,15 @@ public final class Payload {
 
     if(mode == BodyMode.PARSE) {
       // raw bytes: text is decoded by the media type of the part, binary data is kept
-      final byte[] contents = bl.finish();
-      part.value = parse(new IOContent(base64 ? Base64.decode(contents) : contents), part.type);
+      byte[] contents = bl.finish();
+      if(base64) {
+        try {
+          contents = Base64.decode(contents);
+        } catch(final IllegalArgumentException ex) {
+          throw HC_PARSE_X.get(info, ex);
+        }
+      }
+      part.value = parse(new IOContent(contents), part.type);
     }
     return true;
   }

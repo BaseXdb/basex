@@ -117,7 +117,7 @@ abstract class DbNew extends DbAccessFn {
 
     final String string = string(input.string(info));
     final IO io = IO.get(string);
-    if(io.isExternal()) checkPerm(qc, Perm.CREATE);
+    if(io.isExternal()) checkPerm(qc, Perm.ADMIN);
     if(!io.exists()) throw WHICHRES_X.get(info, string);
 
     // add slash to the target if the addressed file is an archive or directory

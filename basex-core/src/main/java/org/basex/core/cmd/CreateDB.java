@@ -45,6 +45,8 @@ public final class CreateDB extends ACreate {
   protected boolean run() {
     final String name = args[0];
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
+    // check local permissions
+    if(!create(name)) return error(PERM_REQUIRED_X, Perm.CREATE);
 
     // choose parser and input
     IO source;

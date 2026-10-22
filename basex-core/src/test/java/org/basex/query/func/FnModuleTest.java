@@ -2366,10 +2366,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void generate() {
     final Function func = GENERATE;
-    query(func.args(" ()", " fn {}"), "");
     query(func.args(" 1", " fn {}"), 1);
-    query(func.args(" ()", " fn { if(.) { . -1 } }"), "");
     query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
+    error(func.args(" ()", " fn {}"), INVTYPE_X);
+    error(func.args(" ()", " fn { if(.) { . -1 } }"), INVTYPE_X);
 
     final String init = "x";
     String step = " fn { . || 'x' }";
@@ -3280,14 +3280,14 @@ return
     } finally {
       set(MainOptions.TRUSTEXTERNAL, false);
     }
-    // permissions: content requires none, external locations require create
+    // permissions: content requires none, external locations require admin
     query("xquery:eval(``[" + func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare variable $m:v := 1;' }") + "?variables?*]``, (), { 'permission': 'none' })", 1);
     final IOFile pmod = new IOFile(sandbox(), "perm.xqm");
     write(pmod, "module namespace p = 'p'; declare variable $p:v := 2;");
     final String load = func.args("p", " { 'location-hints': '" + pmod.path() + "' }");
-    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'read' })", XQUERY_PERM_X);
-    query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'create' })", 2);
+    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'create' })", XQUERY_PERM_X);
+    query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'admin' })", 2);
     error(func.args("m", String.format(doc, ", 'trusted': false()")) + call, EXTERNALRESOURCE_X);
     // trust: documents opened by trusted code are not accessible to untrusted code
     error("doc('src/test/resources/input.xml'), " + func.args("m", String.format(doc, "")) + call,

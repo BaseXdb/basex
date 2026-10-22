@@ -50,7 +50,7 @@ public final class Databases {
    * @return databases and backups
    */
   public StringList all() {
-    return list(null, null, true);
+    return list(null, null, null, true);
   }
 
   /**
@@ -58,27 +58,30 @@ public final class Databases {
    * @return databases
    */
   public StringList list() {
-    return list(null, null, false);
+    return list(null, null, null, false);
   }
 
   /**
-   * Returns the sorted names of all databases.
+   * Returns the sorted names of all databases for which the user has the specified permission.
    * @param user accessing user
+   * @param perm required permission
    * @param pattern database pattern (can be {@code null})
    * @return databases
    */
-  public StringList list(final User user, final String pattern) {
-    return list(user, pattern, false);
+  public StringList list(final User user, final Perm perm, final String pattern) {
+    return list(user, perm, pattern, false);
   }
 
   /**
    * Returns the sorted names of all databases and, optionally, backups.
    * @param user accessing user (can be {@code null})
+   * @param perm required permission (ignored if no user is specified)
    * @param pattern database pattern (can be {@code null})
    * @param all include names of backed up databases
    * @return databases and, optionally, backups
    */
-  private StringList list(final User user, final String pattern, final boolean all) {
+  private StringList list(final User user, final Perm perm, final String pattern,
+      final boolean all) {
     final Pattern pt = pattern == null ? null : regex(pattern);
     final StringList list = new StringList();
     final HashSet<String> map = new HashSet<>();
@@ -92,7 +95,7 @@ public final class Databases {
       }
       // add entry if it has not already been added, matches the pattern, and is accessible
       if(entry != null && map.add(entry) && (pt == null || pt.matcher(entry).matches()) &&
-          (user == null || user.has(Perm.READ, entry))) {
+          (user == null || user.has(perm, entry))) {
         list.add(entry);
       }
     });

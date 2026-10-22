@@ -94,7 +94,7 @@ public abstract class ParseJson extends ParseFn {
         qc, info);
     final String root = mopts.get(JsonMappingOptions.ROOT);
     final MapToElement converter = new MapToElement(mopts, PlanFn.uris(qc, sc()), qc.shared,
-        qc.context.options, info);
+        mainOptions(qc), info);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
       final NodeHandler handler = new NodeHandler("", false);

@@ -68,11 +68,11 @@ public final class TraceTest extends SandboxTest {
     assertEquals(List.of("1"), TRACES);
 
     TRACES.clear();
-    query(_XQUERY_EVAL.args(" 'trace(1)'", " ()", " { 'permission': 'create' }"), 1);
+    query(_XQUERY_EVAL.args(" 'trace(1)'", " ()", " { 'permission': 'admin' }"), 1);
     assertEquals(List.of("1"), TRACES);
 
     TRACES.clear();
-    query(_XQUERY_EVAL.args(" 'trace(1)'", " ()", " { 'permission': 'write' }"), 1);
+    query(_XQUERY_EVAL.args(" 'trace(1)'", " ()", " { 'permission': 'create' }"), 1);
     assertTrue(TRACES.isEmpty(), TRACES::toString);
   }
 }

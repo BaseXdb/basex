@@ -92,12 +92,11 @@ public final class FnXsdValidator extends StandardFunc {
   @Override
   public FuncItem value(final QueryContext qc) throws QueryException {
     final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
-    final boolean trusted = trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
+    final boolean trusted = trustExternal(options, qc);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
     if(xsi && !trusted) throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
     // as in fn:doc, external resources are only retrieved with additional permissions
-    if(xsi || !options.get(XsdValidatorOptions.SCHEMA_LOCATION).isEmpty())
-      checkPerm(qc, Perm.CREATE);
+    if(!options.get(XsdValidatorOptions.SCHEMA_LOCATION).isEmpty()) checkPerm(qc, Perm.ADMIN);
     checkSupported(options);
 
     final Var var = new VarScope().addNew(new QNm("target"), TARGET_TYPE, qc, info);
@@ -149,7 +148,7 @@ public final class FnXsdValidator extends StandardFunc {
         sources.add(new StreamSource(io.inputStream(), io.url()));
       }
 
-      final SchemaFactory sf = ValidateXsd.factory(qc.context.options);
+      final SchemaFactory sf = ValidateXsd.factory(mainOptions(qc));
       // indirectly referenced schema documents are only retrieved in trusted mode
       if(!trusted) ValidateXsd.restrict(sf);
       return sources.isEmpty() ? sf.newSchema() : sf.newSchema(sources.toArray(Source[]::new));

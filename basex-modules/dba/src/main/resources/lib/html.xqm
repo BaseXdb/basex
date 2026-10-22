@@ -68,8 +68,9 @@ declare function html:wrap(
   (: what the last action reported. A page relays it from its address without ever looking at
      it, so the template fetches it instead of every page declaring, accepting and passing it
      on; a page that reports something of its own supplies it :)
-  let $info := request:parameter('info')[.]
-  let $error := ($options?error otherwise request:parameter('error'))[.]
+  let $query := request:query-map()
+  let $info := $query?info[.]
+  let $error := ($options?error otherwise $query?error)[.]
   (: only panels get a grid track; a page may supply scripts as well :)
   let $tracks := $panels[tokenize(@class) = 'panel']
   let $columns := string-join($options?columns otherwise ($tracks ! '1fr'), ' ')

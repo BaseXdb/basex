@@ -8,7 +8,6 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -109,16 +108,10 @@ public abstract class Docs extends DynamicFn {
    * Handles both common and main options.
    * @param options options
    * @param fragment parse fragment
-   * @param qc query context
    * @throws QueryException query exception
    */
-  void check(final Options options, final boolean fragment, final QueryContext qc)
-      throws QueryException {
-
+  void check(final Options options, final boolean fragment) throws QueryException {
     final Predicate<String> bool = name -> options.get(name) == Boolean.TRUE;
-    final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD.name());
-    final boolean xinclude = bool.test(CommonOptions.XINCLUDE) ||
-        bool.test(MainOptions.XINCLUDE.name());
     final boolean intparse = fragment || bool.test(CommonOptions.INTPARSE) ||
         bool.test(MainOptions.INTPARSE.name());
     final boolean dtdVal = bool.test(CommonOptions.DTD_VALIDATION) ||
@@ -127,14 +120,6 @@ public abstract class Docs extends DynamicFn {
     if(xsdVal == null) xsdVal = (String) options.get(CommonOptions.XSD_VALIDATION);
     final boolean skip = CommonOptions.SKIP.equals(xsdVal);
     final boolean strict = CommonOptions.STRICT.equals(xsdVal);
-    final boolean xsiLocation = !skip &&
-        (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) ||
-         bool.test(MainOptions.XSILOCATION.name()));
-    // external resources are only fetched in trusted mode, or if they are mapped by a catalog
-    final boolean trusted = trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
-    if(trusted && (dtd || xinclude || dtdVal || xsiLocation)) {
-      checkPerm(qc, Perm.CREATE);
-    }
 
     if(intparse && dtdVal) throw NODTDVALIDATION.get(info);
     if(!skip) {

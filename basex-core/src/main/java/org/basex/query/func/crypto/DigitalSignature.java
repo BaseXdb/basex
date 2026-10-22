@@ -279,11 +279,11 @@ final class DigitalSignature {
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-      // references to external resources require CREATE permission
+      // references to external resources require ADMIN permission
       for(final Reference ref : signature.getSignedInfo().getReferences()) {
         final String uri = ref.getURI();
         if(uri != null && !uri.isEmpty() && uri.charAt(0) != '#') {
-          qc.checkPerm(Perm.CREATE, null, uri, info);
+          qc.checkPerm(Perm.ADMIN, null, uri, info);
         }
       }
       return signature.validate(valContext);

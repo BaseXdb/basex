@@ -756,7 +756,7 @@ public class QueryParser extends InputParser {
     if(eq(uri, OUTPUT_URI)) {
       // output declaration
       if(sc.module != null) throw error(OUTPUTLIB_X, name);
-      if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) checkCreate(value, info());
+      if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) checkExternal(value, info());
       if(sparams.put(name, new Object[] { value, info() }) != null) throw error(OUTDUPL_X, name);
     } else if(eq(uri, DB_URI)) {
       // project-specific declaration
@@ -973,7 +973,7 @@ public class QueryParser extends InputParser {
     // parse supplied paths
     for(final byte[] pth : mi.paths) {
       // modules pre-declared by the caller require no permissions
-      if(!mi.declared) checkCreate(string(pth), mi.info);
+      if(!mi.declared) checkExternal(string(pth), mi.info);
       module(string(pth), string(uri), mi.info);
     }
   }
@@ -984,10 +984,10 @@ public class QueryParser extends InputParser {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private void checkCreate(final String location, final InputInfo info) throws QueryException {
-    if(!sc.maxPerm.has(Perm.CREATE)) throw error(EXTERNALRESOURCE_X, info, location);
-    if(!qc.parseResources && !qc.user.has(Perm.CREATE)) {
-      throw error(BASEX_PERMISSION_X_X, info, Perm.CREATE, location);
+  public void checkExternal(final String location, final InputInfo info) throws QueryException {
+    if(!sc.maxPerm.has(Perm.ADMIN)) throw error(EXTERNALRESOURCE_X, info, location);
+    if(!qc.parseResources && !qc.user.has(Perm.ADMIN)) {
+      throw error(BASEX_PERMISSION_X_X, info, Perm.ADMIN, location);
     }
   }
 
@@ -4806,7 +4806,7 @@ public class QueryParser extends InputParser {
     } else if(wsConsumeWs(AT)) {
       // optional: resolve URI reference
       final String location = string(stringLiteral());
-      checkCreate(location, info());
+      checkExternal(location, info());
       final IO fl = qc.resources.stopWords(location, sc);
       try {
         sw.read(fl, except);
@@ -4828,10 +4828,10 @@ public class QueryParser extends InputParser {
 
     // optional: resolve URI reference
     final String location = string(stringLiteral());
-    // favor database with the same name; files require CREATE permission
+    // favor database with the same name; files require ADMIN permission
     final String db = Databases.validName(location) &&
         qc.context.soptions.dbExists(location) ? location : null;
-    if(db == null) checkCreate(location, info());
+    if(db == null) checkExternal(location, info());
     final IO fl = qc.resources.thesaurus(location, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true, Itr.ZERO);

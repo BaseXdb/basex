@@ -94,7 +94,7 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
   /** User. */
   public User user;
-  /** Indicates if parsed code may access static resources without CREATE permission. */
+  /** Indicates if parsed code may access static resources without ADMIN permission. */
   public boolean parseResources;
   /** Maximum permission of the parsed code. */
   public Perm maxPerm;
@@ -568,7 +568,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return result of check
    */
   public boolean trusted(final InputInfo ii) {
-    return perm(ii).has(Perm.CREATE);
+    return perm(ii).has(Perm.ADMIN);
   }
 
   /**
@@ -596,7 +596,7 @@ public final class QueryContext extends Job implements Closeable {
     if(!user.has(perm, db)) throw BASEX_PERMISSION_X_X.get(ii, perm, subject);
     if(!perm(ii).has(perm)) {
       // untrusted code: no access to external resources
-      throw perm.has(Perm.CREATE) && !trusted(ii) ? EXTERNALRESOURCE_X.get(ii, subject) :
+      throw perm == Perm.ADMIN ? EXTERNALRESOURCE_X.get(ii, subject) :
         BASEX_PERMISSION_X_X.get(ii, perm, subject);
     }
   }
@@ -630,7 +630,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void trace(final String label, final Supplier<String> message) {
     // discard output of users with insufficient permissions
-    if(!user.has(Perm.CREATE)) return;
+    if(!user.has(Perm.ADMIN)) return;
     if(parent != null) {
       parent.trace(label, message);
     } else {

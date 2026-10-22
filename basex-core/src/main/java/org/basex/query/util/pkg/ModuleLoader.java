@@ -124,9 +124,12 @@ public final class ModuleLoader {
       if(java) throw WHICHMODCLASS_X.get(info, className).cause(ex);
       Util.debug(ex);
       return false;
-    } catch(final Throwable th) {
-      final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, className, t.getMessage(), Util.className(t)).cause(th);
+    } catch(final IOException | LinkageError ex) {
+      throw MODINIT_X_X_X.get(info, className, ex.getMessage(), Util.className(ex)).cause(ex);
+    }
+    // classes outside the repository must be query modules, or require admin permission
+    if(!QueryModule.class.isAssignableFrom(clz) && !repository(clz)) {
+      qp.checkExternal(className, info);
     }
 
     // instantiate class
@@ -139,7 +142,19 @@ public final class ModuleLoader {
   }
 
   /**
-   * Returns a reference to the specified class.
+   * Checks if the specified class was loaded from the repository.
+   * @param clz class
+   * @return result of check
+   */
+  private boolean repository(final Class<?> clz) {
+    for(final Loader loader : loaders) {
+      if(loader.defines(clz)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns a reference to the specified class without initializing it.
    * @param name fully qualified class name
    * @return found class
    * @throws ClassNotFoundException class not found exception
@@ -147,8 +162,12 @@ public final class ModuleLoader {
   public Class<?> findClass(final String name) throws ClassNotFoundException {
     Class<?> c = resolved.get(name);
     if(c != null) return c;
-    c = Reflect.find(name);
-    if(c != null) return c;
+    try {
+      return Reflect.forName(name, false);
+    } catch(final ClassNotFoundException | LinkageError ex) {
+      // class is not on the classpath, or the case of the name is wrong
+      Util.debug(ex);
+    }
     for(int i = loaders.size() - 1; i >= 0; --i) {
       c = loaders.get(i).find(name);
       if(c != null) {

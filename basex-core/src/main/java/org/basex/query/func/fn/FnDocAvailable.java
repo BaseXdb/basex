@@ -41,8 +41,8 @@ public class FnDocAvailable extends Docs {
    */
   final Item doc(final QueryContext qc) throws QueryException {
     final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
-    check(options, false, qc);
-    if(!trusted(options, CommonOptions.TRUST_EXTERNAL, qc)) {
+    check(options, false);
+    if(!trustExternal(options, qc)) {
       if(options.get(DocOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
       if(options.get(DocOptions.USE_XSI_SCHEMA_LOCATION) &&
           !CommonOptions.SKIP.equals(options.get(DocOptions.XSD_VALIDATION)))

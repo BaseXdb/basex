@@ -821,7 +821,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final String source, final QueryContext qc)
       throws QueryException {
-    checkPerm(qc, Perm.CREATE);
+    checkPerm(qc, Perm.ADMIN);
     final IO io = toIO(source, false);
     try {
       return new IOContent(io.readString(), io.url());
@@ -985,6 +985,28 @@ public abstract class StandardFunc extends Arr {
       staticOptions = toOptions(value, options.get(), cc.qc).seal();
       staticArg = arg;
     }
+  }
+
+  /**
+   * Returns the main options of the context, without access to external resources for
+   * users and code without admin permissions.
+   * @param qc query context
+   * @return main options
+   */
+  protected final MainOptions mainOptions(final QueryContext qc) {
+    final MainOptions mopts = qc.context.options;
+    return !qc.has(Perm.ADMIN, null, info) ? new MainOptions(mopts).trust(false) : mopts;
+  }
+
+  /**
+   * Indicates if the current user and code may retrieve external resources.
+   * @param options options
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean trustExternal(final Options options, final QueryContext qc) {
+    return qc.has(Perm.ADMIN, null, info) &&
+        trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
   }
 
   /**

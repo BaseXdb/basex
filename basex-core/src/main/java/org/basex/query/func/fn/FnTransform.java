@@ -11,7 +11,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -175,7 +174,7 @@ public final class FnTransform extends StandardFunc {
     final IO stylesheet = stylesheet(options);
     final Source source = source(options);
     final String uri = options.get(BASE_OUTPUT_URI);
-    final IOFile file = format == DeliveryFormat.FILE ? file(uri, qc) : null;
+    final IOFile file = format == DeliveryFormat.FILE ? file(uri) : null;
 
     // assemble stylesheet parameters and output properties
     final HashMap<String, Object> params = stylesheetParams(options);
@@ -398,12 +397,10 @@ public final class FnTransform extends StandardFunc {
   /**
    * Returns the file to which the result will be written.
    * @param uri base output URI (can be {@code null})
-   * @param qc query context
    * @return file
    * @throws QueryException query exception
    */
-  IOFile file(final String uri, final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.ADMIN);
+  IOFile file(final String uri) throws QueryException {
     if(uri == null) throw TRANSFORM_OPTIONS_X.get(info, "No base output URI supplied.");
     if(sc().resolve(uri) instanceof final IOFile file) return file;
     throw TRANSFORM_OPTIONS_X.get(info, "Base output URI is not writable: " + uri + '.');

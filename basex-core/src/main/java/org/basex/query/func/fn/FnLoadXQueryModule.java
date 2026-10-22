@@ -53,7 +53,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     // check for cached result (callers must not bypass the location check)
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
-    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.CREATE, null, info)) {
+    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.ADMIN, null, info)) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
       modCache = qcAnc.caches.moduleCache().get();
@@ -83,7 +83,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) {
         final IO src = info.sc().resolve(loc, info.path());
-        if(src.isExternal() && !provided) checkPerm(qc, Perm.CREATE);
+        if(src.isExternal() && !provided) checkPerm(qc, Perm.ADMIN);
         srcs.add(src);
       }
     }

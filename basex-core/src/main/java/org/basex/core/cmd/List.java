@@ -66,11 +66,11 @@ public final class List extends Command {
     table.description = DATABASES_X;
 
     final User user = context.user();
-    final boolean create = user.has(Perm.CREATE);
+    final boolean admin = user.has(Perm.ADMIN);
     table.header.add(NAME).add(RESOURCES).add(SIZE);
-    if(create) table.header.add(INPUT_PATH);
+    if(admin) table.header.add(INPUT_PATH);
 
-    for(final String name : context.databases.list(user, null)) {
+    for(final String name : context.databases.list(user, Perm.READ, null)) {
       String file;
       long dbsize = 0;
       int count = 0;
@@ -88,11 +88,11 @@ public final class List extends Command {
       }
 
       // create entry
-      final TokenList tl = new TokenList(create ? 4 : 3);
+      final TokenList tl = new TokenList(admin ? 4 : 3);
       tl.add(name);
       tl.add(count);
       tl.add(dbsize);
-      if(create) tl.add(file);
+      if(admin) tl.add(file);
       table.contents.add(tl);
     }
     out.println(table.sort().finish());

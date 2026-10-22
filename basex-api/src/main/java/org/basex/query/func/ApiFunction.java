@@ -56,6 +56,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_FORM_MAP(RequestFormMap::new, "form-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name, default?)",
       params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
@@ -88,6 +91,9 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_QUERY(RequestQuery::new, "query()",
       params(), STRING_ZO, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_QUERY_MAP(RequestQueryMap::new, "query-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress::new, "remote-address()",
       params(), STRING_O, REQUEST_URI),

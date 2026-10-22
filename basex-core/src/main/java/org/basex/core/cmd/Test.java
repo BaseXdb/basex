@@ -28,8 +28,7 @@ public final class Test extends Command {
   @Override
   protected boolean run() {
     final IOFile root = new IOFile(args[0]);
-    if(!root.exists())
-      return error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? root : args[0]);
+    if(!root.exists()) return error(RES_NOT_FOUND_X, root);
 
     try {
       final Suite suite = new Suite();

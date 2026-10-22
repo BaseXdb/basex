@@ -163,7 +163,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   CSV_DOC(FnCsvDoc::new, "csv-doc(source, options?)",
       params(STRING_ZO, MAP_ZO), Records.PARSED_CSV_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE),
-      flag(NDT), FN_URI, Perm.CREATE),
+      flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value, options?)",
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_CSV_ZO, flag(CNS)),
@@ -371,7 +371,7 @@ public enum Function implements AFunction {
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
   HTML_DOC(FnHtmlDoc::new, "html-doc(source, options?)",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_HTML_ZO, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_HTML_ZO, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   ID(FnId::new, "id(values, node?)",
       params(STRING_ZM, XNODE_ZO), ELEMENT_ZM),
@@ -425,7 +425,7 @@ public enum Function implements AFunction {
       params(JNODE_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(source, options?)",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value, options?)",
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_ZO, flag(CNS)),
@@ -743,7 +743,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRANSFORM(FnTransform::new, "transform(options)",
-      params(MAP_O), MAP_O, flag(NDT), FN_URI, Perm.CREATE),
+      params(MAP_O), MAP_O, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   TRANSITIVE_CLOSURE(FnTransitiveClosure::new, "transitive-closure(node, step)",
       params(NODE_ZO, FUNCTION_O), NODE_ZM),
@@ -770,16 +770,16 @@ public enum Function implements AFunction {
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   UNPARSED_BINARY(FnUnparsedBinary::new, "unparsed-binary(source)",
-      params(STRING_ZO), BASE64_BINARY_ZO, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO), BASE64_BINARY_ZO, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(source, options?)",
-      params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(source, options?)",
-      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(source, options?)",
-      params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   UPDATE(FnUpdate::new, "update(value, select, replacement?)",
       params(NODE_OR_MAP_OR_ARRAY_O, FuncType.get(NODE_ZM, NODE_O).seqType(), ITEM_ZM),
@@ -1047,27 +1047,27 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, MAP_ZO), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_CREATE_FROM(ArchiveCreateFrom::new, "create-from(path, options?, entries?)",
-      params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive, entries)",
-      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries::new, "entries(archive)",
-      params(ANY_ATOMIC_TYPE_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary::new, "extract-binary(archive, entries?)",
-      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, STRING_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive, entries?, encoding?)",
       params(ANY_ATOMIC_TYPE_O, STRING_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI,
-      Perm.CREATE),
+      Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path, archive, entries?)",
       params(STRING_O, ANY_ATOMIC_TYPE_O, STRING_ZM),
       EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      params(ANY_ATOMIC_TYPE_O), MAP_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O), MAP_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_REFRESH(ArchiveRefresh::new, "refresh(path, entries, contents)",
       params(STRING_O, ITEM_ZM, ITEM_ZM),
@@ -1075,7 +1075,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive, entries, contents)",
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM, ITEM_ZM),
-      BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_WRITE(ArchiveWrite::new, "write(path, entries, contents, options?)",
       params(STRING_O, ITEM_ZM, ITEM_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI,
@@ -1225,20 +1225,20 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CLIENT_CLOSE(ClientClose::new, "close(id)",
-      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), CLIENT_URI, Perm.CREATE),
+      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), CLIENT_URI, Perm.ADMIN),
   /** XQuery function. */
   _CLIENT_CONNECT(ClientConnect::new, "connect(host, port, username, password)",
       params(STRING_O, INTEGER_O, STRING_O, STRING_O),
-      ANY_URI_O, flag(NDT), CLIENT_URI, Perm.CREATE),
+      ANY_URI_O, flag(NDT), CLIENT_URI, Perm.ADMIN),
   /** XQuery function. */
   _CLIENT_EXECUTE(ClientExecute::new, "execute(id, command)",
-      params(ANY_URI_O, STRING_O), STRING_O, flag(NDT), CLIENT_URI, Perm.CREATE),
+      params(ANY_URI_O, STRING_O), STRING_O, flag(NDT), CLIENT_URI, Perm.ADMIN),
   /** XQuery function. */
   _CLIENT_INFO(ClientInfo::new, "info(id)",
-      params(ANY_URI_O), STRING_O, flag(NDT), CLIENT_URI, Perm.CREATE),
+      params(ANY_URI_O), STRING_O, flag(NDT), CLIENT_URI, Perm.ADMIN),
   /** XQuery function. */
   _CLIENT_QUERY(ClientQuery::new, "query(id, query, bindings?)",
-      params(ANY_URI_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), CLIENT_URI, Perm.CREATE),
+      params(ANY_URI_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), CLIENT_URI, Perm.ADMIN),
 
   // Conversion Module
 
@@ -1302,7 +1302,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CSV_DOC(CsvDoc::new, "doc(source, options?)",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI, Perm.ADMIN),
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(value, options?)",
       params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, flag(CNS), CSV_URI),
@@ -1457,19 +1457,19 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary::new, "binary(source)",
-      params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI, Perm.CREATE),
+      params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI, Perm.ADMIN),
   /** XQuery function. */
   _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(source, options?)",
       params(BINARY_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(source)",
-      params(STRING_O), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
+      params(STRING_O), STRING_O, flag(NDT), FETCH_URI, Perm.ADMIN),
   /** XQuery function. */
   _FETCH_DOC(FetchDoc::new, "doc(source, options?)",
-      params(STRING_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI, Perm.ADMIN),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(source, encoding?, fallback?)",
-      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI, Perm.ADMIN),
 
   // File Module
 
@@ -1487,10 +1487,10 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_BASE_DIR(FileBaseDir::new, "base-dir()",
-      params(), STRING_ZO, flag(), FILE_URI, Perm.CREATE),
+      params(), STRING_ZO, flag(), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_CHILDREN(FileChildren::new, "children(dir)",
-      params(STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_COPY(FileCopy::new, "copy(source, target)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1505,40 +1505,40 @@ public enum Function implements AFunction {
       params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_CURRENT_DIR(FileCurrentDir::new, "current-dir()",
-      params(), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_DELETE(FileDelete::new, "delete(path, recursive?)",
       params(STRING_O, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_DESCENDANTS(FileDescendants::new, "descendants(dir, options?)",
-      params(STRING_O, MAP_ZO), STRING_ZM, flag(NDT, HOF), FILE_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO), STRING_ZM, flag(NDT, HOF), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_DIR_SEPARATOR(FileDirSeparator::new, "dir-separator()",
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_EXISTS(FileExists::new, "exists(path)",
-      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_IS_ABSOLUTE(FileIsAbsolute::new, "is-absolute(path)",
       params(STRING_O), BOOLEAN_O, FILE_URI),
   /** XQuery function. */
   _FILE_IS_DIR(FileIsDir::new, "is-dir(path)",
-      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_IS_FILE(FileIsFile::new, "is-file(path)",
-      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LAST_MODIFIED(FileLastModified::new, "last-modified(path)",
-      params(STRING_O), DATE_TIME_STAMP_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), DATE_TIME_STAMP_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LINE_SEPARATOR(FileLineSeparator::new, "line-separator()",
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_LIST(FileList::new, "list(dir, recursive?, pattern?)",
-      params(STRING_O, BOOLEAN_ZO, STRING_ZO), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, BOOLEAN_ZO, STRING_ZO), STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LIST_ROOTS(FileListRoots::new, "list-roots()",
-      params(), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+      params(), STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_MOVE(FileMove::new, "move(source, target)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1547,36 +1547,36 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_PARENT(FileParent::new, "parent(path)",
-      params(STRING_O), STRING_ZO, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), STRING_ZO, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_PATH_SEPARATOR(FilePathSeparator::new, "path-separator()",
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_PATH_TO_NATIVE(FilePathToNative::new, "path-to-native(path)",
-      params(STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_PATH_TO_URI(FilePathToUri::new, "path-to-uri(path)",
-      params(STRING_O), ANY_URI_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O), ANY_URI_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_READ_BINARY(FileReadBinary::new, "read-binary(file, offset?, length?)",
-      params(STRING_O, INTEGER_ZO, INTEGER_ZO), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, INTEGER_ZO, INTEGER_ZO), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_READ_TEXT(FileReadText::new, "read-text(file, options?, ~fallback?)",
-      params(STRING_O, ITEM_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, ITEM_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_READ_TEXT_LINES(FileReadTextLines::new,
       "read-text-lines(file, options?, ~fallback?, ~offset?, ~length?)",
       params(STRING_O, ITEM_ZO, BOOLEAN_ZO, INTEGER_ZO, INTEGER_ZO),
-      STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+      STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_RESOLVE_PATH(FileResolvePath::new, "resolve-path(path, base?)",
-      params(STRING_O, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_SIZE(FileSize::new, "size(path, recursive?)",
-      params(STRING_O, BOOLEAN_ZO), INTEGER_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, BOOLEAN_ZO), INTEGER_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_TEMP_DIR(FileTempDir::new, "temp-dir()",
-      params(), STRING_O, flag(), FILE_URI, Perm.CREATE),
+      params(), STRING_O, flag(), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE(FileWrite::new, "write(file, input, options?)",
       params(STRING_O, ITEM_ZM, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1630,7 +1630,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _HTML_DOC(HtmlDoc::new, "doc(source, options?)",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_ZO, flag(NDT), HTML_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_ZO, flag(NDT), HTML_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value, options?)",
       params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, flag(CNS), HTML_URI),
@@ -1643,42 +1643,42 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _HTTP_DELETE(HttpDelete::new, "delete(href, options?)",
       params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
-      Perm.CREATE),
+      Perm.ADMIN),
   /** XQuery function. */
   _HTTP_GET(HttpGet::new, "get(href, options?)",
       params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
-      Perm.CREATE),
+      Perm.ADMIN),
   /** XQuery function. */
   _HTTP_HEAD(HttpHead::new, "head(href, options?)",
       params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
-      Perm.CREATE),
+      Perm.ADMIN),
   /** XQuery function. */
   _HTTP_OPTIONS(HttpOptions::new, "options(href, options?)",
       params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
-      Perm.CREATE),
+      Perm.ADMIN),
   /** XQuery function. */
   _HTTP_PATCH(HttpPatch::new, "patch(href, body?, options?)",
       params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
-      HTTP_URI, Perm.CREATE),
+      HTTP_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTTP_POST(HttpPost::new, "post(href, body?, options?)",
       params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
-      HTTP_URI, Perm.CREATE),
+      HTTP_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTTP_PUT(HttpPut::new, "put(href, body?, options?)",
       params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
-      HTTP_URI, Perm.CREATE),
+      HTTP_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTTP_QUERY(HttpQuery::new, "query(href, body?, options?)",
       params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
-      HTTP_URI, Perm.CREATE),
+      HTTP_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTTP_SEND(HttpSend::new, "send(href, method, body?, options?)",
       params(STRING_O, STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(),
-      flag(NDT), HTTP_URI, Perm.CREATE),
+      flag(NDT), HTTP_URI, Perm.ADMIN),
   /** XQuery function. */
   _HTTP_SEND_REQUEST(HttpSendRequest::new, "send-request(request, href?, bodies?)",
-      params(XNODE_ZO, STRING_ZO, ITEM_ZM), ITEM_OM, flag(NDT), HTTP_URI, Perm.CREATE),
+      params(XNODE_ZO, STRING_ZO, ITEM_ZM), ITEM_OM, flag(NDT), HTTP_URI, Perm.ADMIN),
 
   // Index Module
 
@@ -1705,7 +1705,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _INSPECT_CONTEXT(InspectContext::new, "context()",
-      params(), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
+      params(), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(FUNCTION_O), ELEMENT_O, flag(NDT), INSPECT_URI),
@@ -1714,7 +1714,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule::new, "module(source)",
-      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
+      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext::new, "static-context(function, key)",
       params(FUNCTION_ZO, STRING_O), ITEM_ZM, INSPECT_URI),
@@ -1723,7 +1723,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, MAP_ZO), STRING_O, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc::new, "xqdoc(source)",
-      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
+      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.ADMIN),
 
   // Jobs Module
 
@@ -1771,7 +1771,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _JSON_DOC(JsonDoc::new, "doc(source, options?)",
-      params(STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), JSON_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), JSON_URI, Perm.ADMIN),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value, options?)",
       params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZM, flag(CNS), JSON_URI),
@@ -1802,13 +1802,13 @@ public enum Function implements AFunction {
       EMPTY_SEQUENCE_Z, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_PROPERTY(ProcProperty::new, "property(name)",
-      params(STRING_O), STRING_ZO, flag(NDT), PROC_URI, Perm.CREATE),
+      params(STRING_O), STRING_ZO, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_PROPERTY_MAP(ProcPropertyMap::new, "property-map()",
-      params(), MAP_O, flag(NDT), PROC_URI, Perm.CREATE),
+      params(), MAP_O, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_PROPERTY_NAMES(ProcPropertyNames::new, "property-names()",
-      params(), STRING_ZM, flag(NDT), PROC_URI, Perm.CREATE),
+      params(), STRING_ZM, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_SYSTEM(ProcSystem::new, "system(command, arguments?, options?)",
       params(STRING_O, STRING_ZM, MAP_ZO), STRING_OR_BASE64_BINARY_O, flag(NDT), PROC_URI,
@@ -1893,31 +1893,31 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _SQL_CLOSE(SqlClose::new, "close(id)",
-      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_COMMIT(SqlCommit::new, "commit(id)",
-      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_CONNECT(SqlConnect::new, "connect(url, username?, password?, options?)",
-      params(STRING_O, STRING_ZO, STRING_ZO, MAP_ZO), ANY_URI_O, flag(NDT), SQL_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO, STRING_ZO, MAP_ZO), ANY_URI_O, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_EXECUTE(SqlExecute::new, "execute(id, statement, options?)",
-      params(ANY_URI_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_EXECUTE_BATCH(SqlExecuteBatch::new, "execute-batch(id, params?, options?)",
-      params(ANY_URI_O, ITEM_ZM, MAP_ZO), INTEGER_ZM, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O, ITEM_ZM, MAP_ZO), INTEGER_ZM, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_EXECUTE_PREPARED(SqlExecutePrepared::new, "execute-prepared(id, params?, options?)",
-      params(ANY_URI_O, ITEM_ZO, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O, ITEM_ZO, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_INIT(SqlInit::new, "init(class)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_PREPARE(SqlPrepare::new, "prepare(id, statement, options?)",
-      params(ANY_URI_O, STRING_O, MAP_ZO), ANY_URI_O, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O, STRING_O, MAP_ZO), ANY_URI_O, flag(NDT), SQL_URI, Perm.ADMIN),
   /** XQuery function. */
   _SQL_ROLLBACK(SqlRollback::new, "rollback(id)",
-      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
+      params(ANY_URI_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.ADMIN),
 
   // Store Module
 
@@ -2103,37 +2103,37 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _VALIDATE_DTD(ValidateDtd::new, "dtd(input, dtd?)",
-      params(ITEM_O, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo::new, "dtd-info(input, dtd?)",
-      params(ITEM_O, ITEM_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_DTD_REPORT(ValidateDtdReport::new, "dtd-report(input, dtd?)",
-      params(ITEM_O, ITEM_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_RNG(ValidateRng::new, "rng(input, schema, compact?)",
-      params(ITEM_O, ITEM_O, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_RNG_INFO(ValidateRngInfo::new, "rng-info(input, schema, compact?)",
-      params(ITEM_O, ITEM_O, BOOLEAN_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, BOOLEAN_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_RNG_REPORT(ValidateRngReport::new, "rng-report(input, schema, compact?)",
-      params(ITEM_O, ITEM_O, BOOLEAN_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, BOOLEAN_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_XSD(ValidateXsd::new, "xsd(input, schema?, options?)",
-      params(ITEM_O, ITEM_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_XSD_INFO(ValidateXsdInfo::new, "xsd-info(input, schema?, options?)",
-      params(ITEM_O, ITEM_ZO, MAP_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO, MAP_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_XSD_INIT(ValidateXsdInit::new, "xsd-init()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor::new, "xsd-processor()",
       params(), STRING_O, VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_XSD_REPORT(ValidateXsdReport::new, "xsd-report(input, schema?, options?)",
-      params(ITEM_O, ITEM_ZO, MAP_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_ZO, MAP_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.ADMIN),
   /** XQuery function. */
   _VALIDATE_XSD_VERSION(ValidateXsdVersion::new, "xsd-version()",
       params(), STRING_O, VALIDATE_URI),
@@ -2182,7 +2182,7 @@ public enum Function implements AFunction {
       params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(), XQUERY_URI, Perm.ADMIN),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse::new, "parse(query, options?)",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO), ELEMENT_O, flag(NDT), XQUERY_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, MAP_ZO), ELEMENT_O, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_REDUCE(XQueryReduce::new, "reduce(input, init, action, combine, options?)",
       params(ITEM_ZM, ITEM_ZM, FUNCTION_O, FUNCTION_O, MAP_ZO), ITEM_ZM,
@@ -2192,21 +2192,21 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _XSLT_INIT(XsltInit::new, "init()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), XSLT_URI, Perm.ADMIN),
   /** XQuery function. */
   _XSLT_PROCESSOR(XsltProcessor::new, "processor()",
       params(), STRING_O, XSLT_URI),
   /** XQuery function. */
   _XSLT_TRANSFORM(XsltTransform::new, "transform(input, stylesheet, arguments?, options?)",
-      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), DOCUMENT_O, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), DOCUMENT_O, flag(NDT), XSLT_URI, Perm.ADMIN),
   /** XQuery function. */
   _XSLT_TRANSFORM_REPORT(XsltTransformReport::new,
       "transform-report(input, stylesheet, arguments?, options?)",
-      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), MAP_O, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), MAP_O, flag(NDT), XSLT_URI, Perm.ADMIN),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText::new,
       "transform-text(input, stylesheet, arguments?, options?)",
-      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), XSLT_URI, Perm.ADMIN),
   /** XQuery function. */
   _XSLT_VERSION(XsltVersion::new, "version()",
       params(), STRING_O, XSLT_URI);

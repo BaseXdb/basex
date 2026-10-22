@@ -243,12 +243,16 @@ public final class MainOptions extends Options {
     }
   }
 
+  /** Resolver without catalog. */
+  private static final XMLResolver NO_RESOLVER = new XMLResolver("");
   /** Resolver instance (can be {@code null}; lazy instantiation). */
   private XMLResolver resolver;
   /** Options version of the resolver. */
   private int resolverVersion;
   /** Whether external resources may be accessed. */
   private boolean allowExternal = true;
+  /** Whether resources mapped by a catalog may be accessed. */
+  private boolean allowCatalog = true;
 
   /**
    * Default constructor.
@@ -273,6 +277,7 @@ public final class MainOptions extends Options {
     super(options);
     resolver = options.resolver;
     allowExternal = options.allowExternal;
+    allowCatalog = options.allowCatalog;
   }
 
   /**
@@ -285,6 +290,7 @@ public final class MainOptions extends Options {
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
     resolver = options.resolver;
     allowExternal = options.allowExternal;
+    allowCatalog = options.allowCatalog;
   }
 
   /**
@@ -309,6 +315,7 @@ public final class MainOptions extends Options {
     } else {
       setResolver(parent);
       allowExternal = t != null ? t : parent.allowExternal && parent.get(TRUSTEXTERNAL);
+      allowCatalog = parent.allowCatalog;
     }
   }
 
@@ -337,6 +344,7 @@ public final class MainOptions extends Options {
    * @return XML resolver
    */
   public XMLResolver resolver() {
+    if(!allowCatalog) return NO_RESOLVER;
     final int v = version();
     if(resolver == null || resolverVersion != v) {
       final String catalog = get(CATALOG);
@@ -363,6 +371,17 @@ public final class MainOptions extends Options {
    */
   public MainOptions allowExternal(final boolean allow) {
     allowExternal = allow;
+    return this;
+  }
+
+  /**
+   * Specifies whether external resources may be accessed, including resources mapped by catalogs.
+   * @param trust trust flag
+   * @return self reference
+   */
+  public MainOptions trust(final boolean trust) {
+    allowExternal = trust;
+    allowCatalog = trust;
     return this;
   }
 }

@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
  */
 public abstract class Iter {
   /**
-   * Returns the next item.
+   * Returns the next item, and must not be called again after {@code null} has been returned.
    * @return resulting item, or {@code null} if all items have been returned
    * @throws QueryException query exception
    */

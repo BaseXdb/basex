@@ -9,6 +9,7 @@ import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -45,6 +46,8 @@ public final class Restore extends ABackup {
     if(backups.isEmpty()) return error(BACKUP_NOT_FOUND_X, name);
 
     final String backup = backups.get(0), db = Databases.name(backup);
+    // check local permissions
+    if(!create(db)) return error(PERM_REQUIRED_X, Perm.CREATE);
     if(!db.isEmpty()) {
       // close database if it's currently opened and not opened by others
       if(!closed) closed = close(context, db);

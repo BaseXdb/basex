@@ -414,8 +414,9 @@ public final class BaseXHTTP extends CLI {
             final boolean stp;
             try {
               // honor same-host shutdown requests only
-              stp = BaseXServer.STOP.equals(BufferInput.get(s.getInputStream()).readString()) &&
-                  Util.localHost(s.getInetAddress());
+              final String name = BufferInput.get(s.getInputStream()).readString(
+                  BaseXServer.STOP.length());
+              stp = BaseXServer.STOP.equals(name) && Util.localHost(s.getInetAddress());
               if(!stp) {
                 po.write(1);
                 po.flush();

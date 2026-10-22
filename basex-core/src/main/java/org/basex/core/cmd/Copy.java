@@ -39,6 +39,8 @@ public final class Copy extends Command {
     // check if names are valid
     if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
+    // check local permissions
+    if(!create(src, trg)) return error(PERM_REQUIRED_X, Perm.CREATE);
 
     // source database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);

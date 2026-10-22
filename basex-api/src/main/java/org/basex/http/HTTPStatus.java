@@ -37,6 +37,8 @@ public enum HTTPStatus {
   METHOD_NOT_ALLOWED_X_X(SC_METHOD_NOT_ALLOWED, "Method not allowed: %. Supported: %."),
   /** Error: 406, "No acceptable media type". */
   NOT_ACCEPTABLE_X(SC_NOT_ACCEPTABLE, "No acceptable media type. Supported: %."),
+  /** Error: 413, "Form exceeds maximum size". */
+  FORM_TOO_LARGE_X(SC_REQUEST_ENTITY_TOO_LARGE, "Form exceeds maximum size of % bytes."),
   /** Error: 415, "Unsupported content type". */
   UNSUPPORTED_TYPE_X_X(SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported content type: %. Supported: %."),
   /** Error: 415, "Missing content type". */

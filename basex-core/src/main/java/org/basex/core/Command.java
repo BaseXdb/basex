@@ -204,6 +204,8 @@ public abstract class Command extends Job {
     // check permissions
     if(!ctx.user().has(perm, data != null && !data.inMemory() ? data.meta.name : null))
       return error(PERM_REQUIRED_X, perm);
+    // external entities, XIncludes and catalogs require ADMIN permission
+    ctx.options.trust(ctx.user().has(Perm.ADMIN));
 
     init(ctx, os);
     try {
@@ -304,6 +306,18 @@ public abstract class Command extends Job {
   protected final boolean error(final Exception ex) {
     exception = ex;
     return error(Util.message(ex));
+  }
+
+  /**
+   * Checks if the current user has CREATE permission for all specified databases.
+   * @param dbs names of databases
+   * @return result of check
+   */
+  protected final boolean create(final String... dbs) {
+    for(final String db : dbs) {
+      if(!context.user().has(Perm.CREATE, db)) return false;
+    }
+    return true;
   }
 
   /**

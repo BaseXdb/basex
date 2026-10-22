@@ -74,7 +74,7 @@ public class FnParseXmlFragment extends Docs {
     final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 
-    check(options, fragment, qc);
+    check(options, fragment);
 
     final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ?
       resolveUri(uri) : string(sc().baseURI().string());
@@ -82,10 +82,10 @@ public class FnParseXmlFragment extends Docs {
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options, qc.context.options).
-        allowExternal(trusted(options, CommonOptions.TRUST_EXTERNAL, qc));
-    // untrusted calls may only access catalog-mapped resources with create permissions
-    if(!mopts.allowExternal() && !qc.has(Perm.CREATE, null, info)) {
-      mopts.put(MainOptions.CATALOG, "");
+        allowExternal(trustExternal(options, qc));
+    // untrusted calls may only access catalog-mapped resources with admin permissions
+    if(!mopts.allowExternal() && !qc.has(Perm.ADMIN, null, info)) {
+      mopts.trust(false);
     }
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);

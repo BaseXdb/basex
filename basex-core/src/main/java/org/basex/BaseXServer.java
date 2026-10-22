@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -26,11 +27,17 @@ import org.basex.util.log.*;
 public final class BaseXServer extends CLI implements Runnable {
   /** Maximum number of queued incoming connections (absorbs connection bursts). */
   private static final int BACKLOG = 1 << 10;
+  /** Maximum number of pending logins per client address. */
+  private static final int PENDING = 32;
+  /** Maximum time for completing a login, in milliseconds. */
+  private static final long LOGIN_TIMEOUT = 30_000;
   /** Reserved identifier for requesting a server shutdown during the login handshake. */
   public static final String STOP = "stop:";
 
-  /** New sessions. */
-  private final HashSet<ClientListener> authorizing = new HashSet<>();
+  /** New sessions and their login timeouts. */
+  private final HashMap<ClientListener, ScheduledFuture<?>> authorizing = new HashMap<>();
+  /** Number of new sessions, indexed by client address. */
+  private final HashMap<InetAddress, Integer> pending = new HashMap<>();
   /** Indicates if server is running. */
   private volatile boolean running;
   /** Indicates if server is to be stopped. */
@@ -139,39 +146,63 @@ public final class BaseXServer extends CLI implements Runnable {
   public void run() {
     running = true;
     while(running) {
+      final Socket s;
       try {
-        final Socket s = socket.accept();
-        s.setTcpNoDelay(true);
-        // drop inactive connections
-        final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
-        if(ka > 0) {
-          final long ms = System.currentTimeMillis();
-          for(final ClientListener cl : context.sessions) {
-            if(ms - cl.last > ka) cl.close();
-          }
-        }
-        // create client listener, stop authentication after timeout
-        final ClientListener cl = new ClientListener(s, context, this);
-        if(ka > 0) {
-          cl.timeout.schedule(new TimerTask() {
-            @Override
-            public void run() {
-              cl.close();
-            }
-          }, ka);
-          authorizing.add(cl);
-        }
-        cl.start();
-      } catch(final SocketException ex) {
-        Util.debug(ex);
-        break;
-      } catch(final Throwable ex) {
-        // socket may have been unexpectedly closed
+        s = socket.accept();
+      } catch(final IOException ex) {
+        // stop if the server socket was closed, otherwise retry (e.g. for exhausted file handles)
+        if(socket.isClosed()) break;
         Util.errln(ex);
         context.log.writeServer(LogType.ERROR, Util.message(ex));
-        break;
+        Performance.sleep(100);
+        continue;
+      }
+      try {
+        accept(s);
+      } catch(final IOException ex) {
+        // client may have closed the connection
+        Util.debug(ex);
+        try {
+          s.close();
+        } catch(final IOException e) {
+          Util.debug(e);
+        }
       }
     }
+  }
+
+  /**
+   * Starts a client listener for an accepted connection.
+   * @param s client socket
+   * @throws IOException I/O exception
+   */
+  private void accept(final Socket s) throws IOException {
+    // reject clients with too many pending logins
+    final InetAddress address = s.getInetAddress();
+    synchronized(authorizing) {
+      if(pending.getOrDefault(address, 0) >= PENDING) {
+        context.log.writeServer(LogType.ERROR,
+            "Too many pending logins: " + address.getHostAddress());
+        s.close();
+        return;
+      }
+    }
+    s.setTcpNoDelay(true);
+    // drop inactive connections
+    final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
+    if(ka > 0) {
+      final long ms = System.currentTimeMillis();
+      for(final ClientListener cl : context.sessions) {
+        if(ms - cl.last > ka) cl.close();
+      }
+    }
+    // create client listener, stop authentication after timeout
+    final ClientListener cl = new ClientListener(s, context, this);
+    synchronized(authorizing) {
+      authorizing.put(cl, context.jobs.schedule(cl::close, LOGIN_TIMEOUT));
+      pending.merge(address, 1, Integer::sum);
+    }
+    cl.start();
   }
 
   /**
@@ -192,7 +223,11 @@ public final class BaseXServer extends CLI implements Runnable {
   public synchronized void close() {
     if(!running) return;
 
-    for(final ClientListener cl : authorizing) {
+    final ArrayList<ClientListener> listeners;
+    synchronized(authorizing) {
+      listeners = new ArrayList<>(authorizing.keySet());
+    }
+    for(final ClientListener cl : listeners) {
       remove(cl);
       cl.close();
     }
@@ -337,8 +372,12 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public void remove(final ClientListener client) {
     synchronized(authorizing) {
-      client.timeout.cancel();
-      authorizing.remove(client);
+      if(!authorizing.containsKey(client)) return;
+      // the timeout is null if the application is closing
+      final ScheduledFuture<?> timeout = authorizing.remove(client);
+      if(timeout != null) timeout.cancel(false);
+      pending.computeIfPresent(client.inetAddress(), (address, count) ->
+        count > 1 ? count - 1 : null);
     }
   }
 }

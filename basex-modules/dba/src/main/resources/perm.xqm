@@ -24,18 +24,19 @@ function dba:check(
   return if ($allow = 'public') then (
     (: public function, register id for better log entries :)
     request:set-attribute('id', $allow)
-  ) else if (session:get($config:SESSION-KEY)) then (
-    (: everything fine, user is logged in :)
+  ) else if (dba:admin()) then (
+    (: everything fine, user is logged in and still an administrator :)
   ) else (
     (: last visited page to redirect to (if there was one), current query parameters :)
     let $page := replace($path, '^.*dba/?', '')[.]
     let $params := {
-      for key $key value $value in request:parameter-map()
+      for key $key value $value in $perm?parameters
       where not(starts-with($key, '_'))
       return { $key: $value },
       { '_page': $page }
     }
-    return web:redirect('/dba/login', $params)
+    (: discard a stale login, if any :)
+    return (session:delete($config:SESSION-KEY), web:redirect('/dba/login', $params))
   )
 };
 
@@ -46,7 +47,16 @@ declare
   %perm:check('/ws/dba')
 function dba:ws-check() as empty-sequence() {
   (: webSocket URLs have their own address space, so they are not covered by the check above :)
-  if (empty(session:get($config:SESSION-KEY))) {
+  if (not(dba:admin())) {
     web:error(403, 'Please log in.')
   }
+};
+
+(:~
+ : Checks if the user of the current session is still an administrator.
+ : @return result of check
+ :)
+declare %private function dba:admin() as xs:boolean {
+  some $name in session:get($config:SESSION-KEY)[user:exists(.)]
+  satisfies user:list-details($name)/@permission = 'admin'
 };

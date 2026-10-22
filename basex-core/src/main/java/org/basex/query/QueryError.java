@@ -429,7 +429,7 @@ public enum QueryError {
   /** Error code. */
   REQUEST_BODY(REQUEST, "body", "Request body cannot be read."),
   /** Error code. */
-  REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded."),
+  REQUEST_PARAMETER_X(REQUEST, "parameter", "Form parameters cannot be read: %"),
 
   // Session Module
 

@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdAlter;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -37,6 +38,8 @@ public final class AlterDB extends ACreate {
     // check if names are valid
     if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
+    // check local permissions
+    if(!create(src, trg)) return error(PERM_REQUIRED_X, Perm.CREATE);
 
     // database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);

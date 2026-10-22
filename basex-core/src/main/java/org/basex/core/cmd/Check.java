@@ -38,7 +38,7 @@ public final class Check extends Command {
     final IO io = IO.get(input);
     final String dbName = io.dbName();
 
-    // choose OPEN if user has no create permissions, or if database exists
+    // choose OPEN if user has no admin permissions, or if database exists
     final Command cmd = open(io, dbName) ? new Open(dbName) :
       new CreateDB(dbName, io.exists() ? input : null);
 
@@ -59,8 +59,8 @@ public final class Check extends Command {
    * @return result of check
    */
   private boolean open(final IO input, final String dbName) {
-    // minimum permissions: create
-    if(!context.user().has(Perm.CREATE)) return true;
+    // minimum permissions: admin
+    if(!context.user().has(Perm.ADMIN)) return true;
     // database with given name does not exist
     if(!soptions.dbPath(dbName).exists()) return false;
     // open database if addressed file does not exist

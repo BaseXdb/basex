@@ -136,6 +136,25 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
+  @Test public void queryMap() throws Exception {
+    final ApiFunction func = _REQUEST_QUERY_MAP;
+    get("b", "", "query", func.args() + "?a", "a", "b");
+    get("b,c", "", "query", "string-join(" + func.args() + "?a, ',')", "a", "b", "a", "c");
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void formMap() throws Exception {
+    final ApiFunction func = _REQUEST_FORM_MAP;
+    get("0", "", "query", "map:size(" + func.args() + ")", "a", "b");
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
   @Test public void parameterNames() throws Exception {
     final ApiFunction func = _REQUEST_PARAMETER_NAMES;
     final String query = "count(" + func.args() + ")";

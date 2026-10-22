@@ -67,16 +67,23 @@ public abstract class ACreate extends Command {
       }
     }
 
-    // local and remote resources require CREATE permission
-    if(io != null && io.isExternal() && !context.user().has(Perm.CREATE)) {
-      throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
-    }
+    // local and remote resources require ADMIN permission
+    if(io != null && denied(io)) throw new BaseXException(PERM_REQUIRED_X, Perm.ADMIN);
     // assign (intermediate) name to input reference
     if(io instanceof IOContent || io instanceof IOStream) {
       if(Strings.endsWith(name, '/')) throw new BaseXException(NAME_INVALID_X, name);
       io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;
+  }
+
+  /**
+   * Checks if the current user lacks the permission to access the specified input.
+   * @param io input
+   * @return result of check
+   */
+  final boolean denied(final IO io) {
+    return io.isExternal() && !context.user().has(Perm.ADMIN);
   }
 
   /**

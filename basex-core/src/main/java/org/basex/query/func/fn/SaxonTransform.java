@@ -547,7 +547,7 @@ public final class SaxonTransform {
           output = new ArrayOutput();
           dest = serializer(Saxon.PROC.newSerializer(output), main);
         }
-        case FILE -> dest = serializer(Saxon.PROC.newSerializer(func.file(uri, qc).file()), main);
+        case FILE -> dest = serializer(Saxon.PROC.newSerializer(func.file(uri).file()), main);
         default -> dest = new RawDestination();
       }
     }

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -416,40 +417,30 @@ public final class HTTPConnection implements ClientInfo {
     if(authMethod != AuthMethod.CUSTOM && authMethod != StaticOptions.AUTHMETHOD.get(am[0]))
       throw new LoginException(HTTPText.WRONGAUTH_X, authMethod);
 
-    try {
-      final User user;
-      if(authMethod == AuthMethod.CUSTOM) {
-        // custom authentication
-        user = user(UserText.ADMIN);
-      } else {
-        final String details = am.length > 1 ? am[1] : "";
-        final String[] creds = Strings.split(Base64.decode(details), ':', 2);
-        user = user(creds[0]);
-        final Algorithm[] algorithms = context.soptions.authAlgorithms();
-        if(creds.length < 2 || !user.matches(creds[1], algorithms))
-          throw new LoginException(user.name());
-        context.users.rehash(user, creds[1], algorithms);
-      }
-
-      // accept and return user
-      context.blocker.remove(token(remoteAddress), user.name());
-      return user;
-    } catch(final LoginException ex) {
-      // delay users with wrong passwords
-      context.blocker.delay(token(remoteAddress), ex.name());
-      throw ex;
+    // custom authentication
+    if(authMethod == AuthMethod.CUSTOM) {
+      final User admin = context.users.get(UserText.ADMIN);
+      if(admin == null || !admin.enabled()) throw new LoginException(UserText.ADMIN);
+      return admin;
     }
-  }
 
-  /**
-   * Returns a user for the specified string, or an error.
-   * @param name username (can be {@code null})
-   * @return user reference
-   * @throws LoginException login exception
-   */
-  private User user(final String name) throws LoginException {
+    String details = am.length > 1 ? am[1] : "";
+    try {
+      details = Base64.decode(details);
+    } catch(final IllegalArgumentException ex) {
+      // malformed credentials are rejected and delayed like wrong ones
+      Util.debug(ex);
+      details = "";
+    }
+    final String[] creds = Strings.split(details, ':', 2);
+    final String name = creds[0];
     final User user = context.users.get(name);
-    if(user == null || !user.enabled()) throw new LoginException(name);
+    final Algorithm[] algorithms = context.soptions.authAlgorithms();
+    // delay users with wrong passwords (parsing the literal address normalizes IPv6 notations)
+    if(!context.blocker.login(InetAddress.getByName(remoteAddress), name, () -> user != null &&
+        user.enabled() && creds.length == 2 && user.matches(creds[1], algorithms)))
+      throw new LoginException(name);
+    context.users.rehash(user, creds[1], algorithms);
     return user;
   }
 

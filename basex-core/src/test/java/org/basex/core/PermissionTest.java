@@ -207,9 +207,9 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery("'a' contains text 'a' using thesaurus at '" + NAME + "'"), testSession);
     no(new Run(sandbox() + "doc.xml"), testSession);
 
-    // fn:parse-xml: external resources require CREATE permission
+    // fn:parse-xml: the trust-external option is ignored for users without ADMIN permission
     ok(new XQuery("parse-xml('<x/>')"), testSession);
-    no(new XQuery("parse-xml('<x/>', { 'trust-external': true() })"), testSession);
+    ok(new XQuery("parse-xml('<x/>', { 'trust-external': true() })"), testSession);
     ok(new XQuery("parse-xml('<x/>', { 'intparse': true() })"), testSession);
     no(new XQuery(CATALOG_QUERY), testSession);
   }
@@ -449,12 +449,12 @@ public final class PermissionTest extends SandboxTest {
     ok(new Grant("create", NAME), adminSession);
 
     ok(new CreateDB(NAME2, "<xml/>"), testSession);
-    ok(new Add("file.xml", sandbox() + "doc.xml"), testSession);
-    ok(new Put("file.xml", sandbox() + "doc.xml"), testSession);
-    ok(new BinaryPut("file.bin", sandbox() + "file"), testSession);
+    no(new Add("file.xml", sandbox() + "doc.xml"), testSession);
+    no(new Put("file.xml", sandbox() + "doc.xml"), testSession);
+    no(new BinaryPut("file.bin", sandbox() + "file"), testSession);
     ok(new XQuery("parse-xml('<x/>', { 'intparse': true(), 'trust-external': true() })"),
         testSession);
-    ok(new XQuery(CATALOG_QUERY), testSession);
+    no(new XQuery(CATALOG_QUERY), testSession);
     ok(new InfoIndex(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new DropIndex(cmd), testSession);
@@ -462,7 +462,7 @@ public final class PermissionTest extends SandboxTest {
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
     }
-    ok(new Export(sandbox() + "-export"), testSession);
+    no(new Export(sandbox() + "-export"), testSession);
     ok(new Close(), testSession);
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     no(new RepoList(), testSession);
@@ -515,10 +515,10 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery(_DB_DELETE.args(NAME, "b.xml")), testSession);
     ok(new XQuery(_DB_CREATE.args(NAME)), testSession);
     ok(new XQuery(_DB_OPTIMIZE.args(NAME)), testSession);
-    // db:add, db:put, db:put-binary: file paths
-    ok(new XQuery(_DB_ADD.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
-    ok(new XQuery(_DB_PUT.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, sandbox() + "file", "file")), testSession);
+    // db:add, db:put, db:put-binary: file paths require ADMIN permission
+    no(new XQuery(_DB_ADD.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    no(new XQuery(_DB_PUT.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    no(new XQuery(_DB_PUT_BINARY.args(NAME, sandbox() + "file", "file")), testSession);
     ok(new XQuery(_DB_CREATE_BACKUP.args(NAME)), testSession);
     no(new XQuery(_DB_EXPORT.args(NAME, sandbox() + "-export")), testSession);
     ok(new XQuery(_DB_BACKUPS.args()), testSession);
@@ -533,26 +533,27 @@ public final class PermissionTest extends SandboxTest {
 
     ok(new XQuery(_FILE_PATH_SEPARATOR.args()), testSession);
     ok(new XQuery(_FILE_NAME.args("name")), testSession);
-    ok(new XQuery(_FILE_PATH_TO_NATIVE.args(".")), testSession);
-    ok(new XQuery(_FILE_BASE_DIR.args()), testSession);
-    ok(new XQuery(_FILE_LIST.args(sandbox())), testSession);
-    ok(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
+    no(new XQuery(_FILE_PATH_TO_NATIVE.args(".")), testSession);
+    no(new XQuery(_FILE_BASE_DIR.args()), testSession);
+    no(new XQuery(_FILE_LIST.args(sandbox())), testSession);
+    no(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     no(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     no(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
 
-    // fn:doc, fn:doc-available: external resources accessible with CREATE permission
-    ok(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
-    ok(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+    // fn:doc, fn:doc-available: external resources require ADMIN permission
+    no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
 
     // files referenced in the query prolog or body, and query files
-    for(final String query : externalQueries()) ok(new XQuery(query), testSession);
-    ok(new Run(sandbox() + "doc.xml"), testSession);
-    // crypto:validate-signature: no permission error for external references
-    error(new XQuery(signature()), testSession, "CX0025");
+    for(final String query : externalQueries()) no(new XQuery(query), testSession);
+    no(new Run(sandbox() + "doc.xml"), testSession);
+    // crypto:validate-signature: external references require ADMIN permission
+    error(new XQuery(signature()), testSession, "basex:permission");
 
-    // xquery:parse and xquery:eval: load from URI now permitted with CREATE
-    ok(new XQuery(_XQUERY_PARSE.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
-    ok(new XQuery(_XQUERY_EVAL.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
+    // xquery:parse and xquery:eval: loading from URI requires ADMIN permission
+    ok(new XQuery(_XQUERY_PARSE.args("1")), testSession);
+    no(new XQuery(_XQUERY_PARSE.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
+    no(new XQuery(_XQUERY_EVAL.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -666,7 +667,7 @@ public final class PermissionTest extends SandboxTest {
     error(new XQuery(_XQUERY_EVAL.args(
         "xquery:eval(`unparsed-text('x.xq')`)",
         " ()", " { 'permission': 'read' }")),
-        testSession, "[xquery:permission]", "create");
+        testSession, "[xquery:permission]", "admin");
   }
 
   /** Tests permissions of dynamically loaded code. */
@@ -678,7 +679,7 @@ public final class PermissionTest extends SandboxTest {
         testSession);
     final String load = LOAD_XQUERY_MODULE.args("m",
         " { 'location-hints': '" + sandbox() + "module.xqm' }");
-    error(new XQuery(load), testSession, "[basex:permission]", "create");
+    error(new XQuery(load), testSession, "[basex:permission]", "admin");
     // modules installed in the repository require no permissions
     ok(new XQuery(LOAD_XQUERY_MODULE.args("urn:isbn:12345") + "?variables?* = '123' or error()"),
         testSession);
@@ -687,9 +688,24 @@ public final class PermissionTest extends SandboxTest {
         + "return function-lookup(xs:QName($n), 1)";
     ok(new XQuery("empty(" + lookup + ") or error()"), testSession);
 
-    ok(new Grant("create", NAME), adminSession);
+    ok(new Grant("admin", NAME), adminSession);
     ok(new XQuery(load + "?functions?*?*()"), testSession);
     ok(new XQuery("exists(" + lookup + ") or error()"), testSession);
+  }
+
+  /** Tests permissions of imported Java classes. */
+  @Test public void javaImport() {
+    final String timer = "import module namespace t = 'java:java.util.Timer'; 1";
+    final String module = "import module namespace qm = "
+        + "'java:org.basex.query.func.QueryModuleTest'; qm:convenient(1)";
+    ok(new Grant("read", NAME), adminSession);
+    error(new XQuery(timer), testSession, "[basex:permission]", "admin");
+    ok(new XQuery(module), testSession);
+    error(new XQuery(_XQUERY_EVAL.args(timer, " ()", " { 'permission': 'create' }")),
+        adminSession, "[FODC0016]");
+
+    ok(new Grant("admin", NAME), adminSession);
+    ok(new XQuery(timer), testSession);
   }
 
   /** Tests the permission error raised when accessing external resources. */
@@ -701,14 +717,124 @@ public final class PermissionTest extends SandboxTest {
     // interpreted as the database name).
     final String url = sandbox().url() + "doc.xml";
 
-    // READ user: missing CREATE for an external file
+    // READ user: missing ADMIN for an external file
     ok(new Grant("read", NAME), adminSession);
     error(new XQuery(COLLECTION.args(url)), testSession,
-        "[basex:permission]", "create");
-    // NONE user: same code; CREATE is still the missing permission for files
+        "[basex:permission]", "admin");
+    // NONE user: same code; ADMIN is still the missing permission for files
     ok(new Grant("none", NAME), adminSession);
     error(new XQuery(COLLECTION.args(url)), testSession,
-        "[basex:permission]", "create");
+        "[basex:permission]", "admin");
+  }
+
+  /** Tests that external entities and XIncludes in input strings require ADMIN permission. */
+  @Test public void externalEntities() {
+    final String url = new IOFile(sandbox() + "file").url();
+    final String xxe = "<!DOCTYPE x [<!ENTITY e SYSTEM '" + url + "'>]><x>&e;</x>";
+    final String xi = "<x xmlns:xi='http://www.w3.org/2001/XInclude'>"
+        + "<xi:include href='" + url + "' parse='text'/></x>";
+    final String string = '"' + xxe.replace("&", "&amp;") + '"';
+    final String add = "db:add('" + NAME2 + "', " + string + ", 'x.xml', { 'dtd': true() })";
+    final String fetch = "fetch:binary-doc(bin:encode-string(" + string + "), { 'dtd': true() })";
+
+    ok(new Grant("write", NAME), adminSession);
+    ok(new Set(MainOptions.DTD, true), testSession);
+    ok(new Open(NAME2), testSession);
+    error(new Add("x.xml", xxe), testSession, "trust-external");
+    error(new Put("x.xml", xxe), testSession, "trust-external");
+    error(new XQuery(add), testSession, "trust-external");
+    error(new XQuery(fetch), testSession, "trust-external");
+    ok(new Set(MainOptions.DTD, false), testSession);
+    ok(new Set(MainOptions.XINCLUDE, true), testSession);
+    error(new Add("x.xml", xi), testSession, "xinclude");
+    // trust-external is ignored: entity expansion remains limited
+    final StringBuilder dtd = new StringBuilder("<!ENTITY e0 'xxxxxxxxxx'>");
+    for(int e = 1; e <= 6; e++) {
+      dtd.append("<!ENTITY e").append(e).append(" '").append(("&e" + (e - 1) + ';').repeat(10));
+      dtd.append("'>");
+    }
+    final String laughs = "<!DOCTYPE x [" + dtd + "]><x>&e6;</x>";
+    error(new XQuery("parse-xml(\"" + laughs.replace("&", "&amp;") + "\", "
+        + "{ 'trust-external': true(), 'dtd': false() })"), testSession, "JAXP00010001");
+
+    ok(new Grant("admin", NAME), adminSession);
+    ok(new Add("x.xml", xi), testSession);
+    ok(new Set(MainOptions.DTD, true), testSession);
+    ok(new Add("x.xml", xxe), testSession);
+    ok(new XQuery(add), testSession);
+    ok(new XQuery(fetch), testSession);
+  }
+
+  /** Tests that external entities in serialized XML of map-to-element require ADMIN permission. */
+  @Test public void mapToElementEntities() {
+    final String url = new IOFile(sandbox() + "file").url();
+    final String query = "declare option db:trustexternal 'true'; map-to-element({ 'a': "
+        + "\"<!DOCTYPE x [<!ENTITY e SYSTEM '" + url + "'>]><x>&amp;e;</x>\" }, "
+        + "{ 'plan': { 'a': { 'layout': 'xml' } } })";
+    ok(new Grant("write", NAME), adminSession);
+    // the client query API bypasses the command layer
+    try {
+      final String result = testSession.query(query).execute();
+      fail("Query was supposed to fail: " + result);
+    } catch(final IOException ex) {
+      assertTrue(ex.getMessage().contains("trust-external"), ex.getMessage());
+    }
+  }
+
+  /** Tests that resources mapped by catalogs require ADMIN permission. */
+  @Test public void catalogs() {
+    final String catalog = FOLDER + "catalog/catalog.xml";
+    final String xml = "<!DOCTYPE doc SYSTEM 'http://dtd.dtd'><doc>&x;</doc>";
+    final String add = "db:add('" + NAME2 + "', \"" + xml.replace("&", "&amp;") + "\", 'c.xml', "
+        + "{ 'catalog': '" + catalog + "', 'dtd': true() })";
+    final String xsd = "declare option db:catalog '" + catalog + "'; xsd-validator({ 'schema': "
+        + "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:include schemaLocation='http://import.xsd'/></xs:schema> })(<a/>)?is-valid";
+
+    ok(new Grant("write", NAME), adminSession);
+    no(new XQuery(add), testSession);
+    ok(new Set(MainOptions.CATALOG, catalog), testSession);
+    ok(new Set(MainOptions.DTD, true), testSession);
+    ok(new Open(NAME2), testSession);
+    no(new Add("c.xml", xml), testSession);
+    // the client query API bypasses the command layer
+    try {
+      final String result = testSession.query(xsd).execute();
+      fail("Query was supposed to fail: " + result);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+
+    ok(new Grant("admin", NAME), adminSession);
+    ok(new Add("c.xml", xml), testSession);
+    ok(new XQuery(add), testSession);
+  }
+
+  /** Tests that copying, renaming and restoring databases respects local permissions. */
+  @Test public void localPermissions() {
+    ok(new Grant("create", NAME), adminSession);
+    ok(new CreateBackup(NAME2), adminSession);
+    ok(new Grant("read", NAME, NAME2), adminSession);
+    final String mine = NAME + "mine";
+    ok(new CreateDB(mine), testSession);
+
+    no(new Copy(NAME2, mine), testSession);
+    no(new Copy(mine, NAME2), testSession);
+    no(new AlterDB(NAME2, mine), testSession);
+    no(new AlterDB(mine, NAME2), testSession);
+    no(new Restore(NAME2), testSession);
+    no(new AlterBackup(NAME2, mine), testSession);
+    no(new CreateDB(NAME2), testSession);
+    no(new CreateBackup(NAME2), testSession);
+    ok(new DropDB(NAME2), testSession);
+    no(new XQuery(_DB_COPY.args(NAME2, mine)), testSession);
+    no(new XQuery(_DB_COPY.args(mine, NAME2)), testSession);
+    no(new XQuery(_DB_ALTER.args(mine, NAME2)), testSession);
+    no(new XQuery(_DB_ALTER_BACKUP.args(NAME2, mine)), testSession);
+    ok(new XQuery(_DB_EXISTS.args(NAME2) + " or error()"), adminSession);
+
+    ok(new DropDB(mine), testSession);
+    ok(new DropBackup(NAME2), adminSession);
   }
 
   /** Drops users. */

@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.AbstractMap.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -42,7 +43,9 @@ final class RESTPost {
     // perform queries
     final DBNode doc;
     try(NewlineInput ni = new NewlineInput(conn.request.getInputStream(), encoding)) {
-      doc = new DBNode(new IOContent(ni.content()));
+      // remote input: parse as untrusted
+      doc = new DBNode(Parser.xmlParser(new IOContent(ni.content()),
+          new MainOptions().allowExternal(false)));
     } catch(final IOException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }

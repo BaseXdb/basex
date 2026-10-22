@@ -27,6 +27,8 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class DBATest extends WebappTest {
+  /** Content type of URL-encoded forms. */
+  private static final String FORM = "application/x-www-form-urlencoded";
   /** Messages pushed by the server. */
   private static final BlockingQueue<String> MESSAGES = new LinkedBlockingQueue<>();
 
@@ -168,6 +170,62 @@ public final class DBATest extends WebappTest {
       for(final String page : new String[] { "database", "user", "jobs", "sessions", "editor",
           "files" }) {
         send(404, "GET", page, null, null);
+      }
+    }
+
+    /**
+     * Redirects to relative pages only after a login.
+     * @throws IOException I/O exception
+     */
+    @Test public void loginRedirect() throws IOException {
+      final String login = "_name=admin&_pass=" + NAME + "&_page=";
+      assertTrue(send(200, "POST", "login", login + "settings", FORM).uri().getPath().
+          endsWith("/dba/settings"));
+      final String authority = java.net.URI.create(HTTP_ROOT).getAuthority();
+      for(final String page : new String[] { "http://example.org/x", "//example.org/x" }) {
+        final java.net.URI uri = send("POST", "login", login + enc(page), FORM, Map.of()).uri();
+        assertEquals(authority, uri.getAuthority(), page);
+        assertTrue(uri.getPath().startsWith("/dba/"), page);
+      }
+    }
+
+    /**
+     * Rejects form bodies that exceed the maximum form size.
+     * @throws IOException I/O exception
+     */
+    @Test public void largeForm() throws IOException {
+      send(413, "POST", "login", "_name=admin&x=" + "x".repeat(300_000), FORM);
+    }
+
+    /**
+     * Forwards query parameters, but no form parameters, to the login page.
+     * @throws IOException I/O exception
+     */
+    @Test public void anonymousRedirect() throws IOException {
+      post("logout", Map.of());
+      try {
+        final String page = post("settings?query=1", Map.of("form", "2"));
+        assertTrue(page.contains("name=\"query\""), page);
+        assertFalse(page.contains("name=\"form\""), page);
+      } finally {
+        post("login", Map.of("_name", "admin", "_pass", NAME));
+      }
+    }
+
+    /**
+     * Ends the session of a user that is no longer an administrator.
+     * @throws Exception exception
+     */
+    @Test public void demotedUser() throws Exception {
+      final String user = NAME + "dba";
+      execute("user:create('" + user + "', 'pw', 'admin')");
+      try {
+        assertFalse(post("login", Map.of("_name", user, "_pass", "pw")).contains("_pass"));
+        execute("user:grant('" + user + "', 'create')");
+        assertTrue(get("settings").contains("_pass"), "session was not ended");
+      } finally {
+        execute("user:drop('" + user + "')");
+        post("login", Map.of("_name", "admin", "_pass", NAME));
       }
     }
 

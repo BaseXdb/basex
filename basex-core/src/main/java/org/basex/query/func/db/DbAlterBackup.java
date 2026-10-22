@@ -23,6 +23,7 @@ public final class DbAlterBackup extends DbAccessFn {
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name);
 
     checkCreate(name, qc);
+    checkCreate(newname, qc);
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 

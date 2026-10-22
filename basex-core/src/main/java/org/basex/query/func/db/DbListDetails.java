@@ -38,7 +38,7 @@ public final class DbListDetails extends DbList {
           database.attr(Q_RESOURCES, meta.ndocs + stats.binaries() + stats.values());
           database.attr(Q_MODIFIED_DATE, DateTime.format(meta.dbTime()));
           database.attr(Q_SIZE, stats.size());
-          if(qc.has(Perm.CREATE, name, info)) database.attr(Q_PATH, meta.original);
+          if(qc.has(Perm.ADMIN, name, info)) database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);

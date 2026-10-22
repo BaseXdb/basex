@@ -2,11 +2,14 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
 import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 
 /**
  * Request function.
@@ -25,6 +28,30 @@ public abstract class ApiFunc extends StandardFunc {
     final RequestContext rc = (RequestContext) qc.context.getExternal(RequestContext.class);
     if(rc == null) throw BASEX_HTTP.get(info);
     return rc;
+  }
+
+  /**
+   * Returns the query parameters of the current request.
+   * @param qc query context
+   * @return query parameters
+   * @throws QueryException query exception
+   */
+  public final XQMap queryValues(final QueryContext qc) throws QueryException {
+    return requestContext(qc).queryValues();
+  }
+
+  /**
+   * Returns the form parameters of the current request.
+   * @param qc query context
+   * @return form parameters
+   * @throws QueryException query exception
+   */
+  public final XQMap formValues(final QueryContext qc) throws QueryException {
+    try {
+      return requestContext(qc).formValues(qc.context.options);
+    } catch(final IOException ex) {
+      throw REQUEST_PARAMETER_X.get(info, ex).cause(ex);
+    }
   }
 
   /**

@@ -380,8 +380,8 @@ public abstract class JavaCall extends Arr {
           clazz = modules.findClass(className);
         } catch(final ClassNotFoundException ignore) {
           // class not found
-        } catch(final Throwable th) {
-          throw JAVAINIT_X_X.get(info, Util.className(th), th);
+        } catch(final LinkageError ex) {
+          throw JAVAINIT_X_X.get(info, Util.className(ex), ex);
         }
 
         if(clazz == null) {

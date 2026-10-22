@@ -91,37 +91,44 @@ public class ClientSession extends Session {
     super(output);
     socket = new Socket();
     socket.setTcpNoDelay(true);
+    boolean connected = false;
     try {
       // limit timeout to five seconds
       socket.connect(new InetSocketAddress(host, port), 5000);
+      sin = new StoppableInputStream(socket.getInputStream());
+
+      // receive challenge: {REALM}:{NONCE} (an empty string indicates a closed connection)
+      final BufferInput bi = BufferInput.get(sin);
+      final String[] challenge = Strings.split(bi.readString(), ':');
+      if(challenge.length < 2) throw new BaseXException(Text.CONNECTION_ERROR_X, port);
+      final String nonce = challenge[1];
+
+      // request the salt of the user: send the username and an empty hash
+      sout = PrintOutput.get(socket.getOutputStream());
+      send(username);
+      send("");
+      sout.flush();
+
+      // receive password parameters: {ALGORITHM}:{SALT} (servers < 13.0 send \1)
+      final int b = bi.read();
+      if(b == -1) throw new BaseXException(Text.CONNECTION_ERROR_X, port);
+      final String[] params = b > 1 ? Strings.split((char) b + bi.readString(), ':') :
+        new String[0];
+      if(params.length < 2) throw new LoginException(
+          "Server does not support salted authentication (BaseX < %).", "13.0");
+
+      // send hashed password
+      send(Strings.sha256(Strings.sha256(params[1] + password) + nonce));
+      sout.flush();
+
+      // receive success flag
+      if(!ok(bi)) throw new LoginException(username);
+      connected = true;
     } catch(final IllegalArgumentException ex) {
       throw new BaseXException(ex);
+    } finally {
+      if(!connected) socket.close();
     }
-    sin = new StoppableInputStream(socket.getInputStream());
-
-    // receive challenge: {REALM}:{NONCE}
-    final BufferInput bi = BufferInput.get(sin);
-    final String nonce = Strings.split(bi.readString(), ':')[1];
-
-    // request the salt of the user: send the username and an empty hash
-    sout = PrintOutput.get(socket.getOutputStream());
-    send(username);
-    send("");
-    sout.flush();
-
-    // receive password parameters: {ALGORITHM}:{SALT} (servers < 13.0 send \1)
-    final int b = bi.read();
-    final String[] params = b > 1 ? Strings.split((char) b + bi.readString(), ':') :
-      new String[0];
-    if(params.length < 2) throw new LoginException(
-        "Server does not support salted authentication (BaseX < %).", "13.0");
-
-    // send hashed password
-    send(Strings.sha256(Strings.sha256(params[1] + password) + nonce));
-    sout.flush();
-
-    // receive success flag
-    if(!ok(bi)) throw new LoginException(username);
   }
 
   @Override

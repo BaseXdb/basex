@@ -9,6 +9,7 @@ import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -106,10 +107,7 @@ public final class DirParser extends Parser {
           // process TAR files
           try(TarInputStream is = new TarInputStream(cin)) {
             for(TarEntry te; (te = is.getNextEntry()) != null;) {
-              if(te.isDirectory()) continue;
-              source = newStream(is, te.getName(), input);
-              source.length(te.getSize());
-              parseResource(builder);
+              if(!te.isDirectory()) parseEntry(builder, is, te.getName(), te.getSize(), input);
             }
           }
         } else if(compr != null) {
@@ -118,16 +116,14 @@ public final class DirParser extends Parser {
           // drop archive suffix, add .xml if no suffix remains
           name = input.name().replaceAll("\\.[^.]+$", "");
           if(!Strings.contains(name, '.')) name += IO.XMLSUFFIX;
-          source = newStream(cin, name, input);
-          parseResource(builder);
+          parseEntry(builder, cin, name, -1, input);
         } else {
           // process ZIP archive
           try(ZipInputStream is = new ZipInputStream(cin, Strings.CP437)) {
             for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
-              if(ze.isDirectory()) continue;
-              source = newStream(is, Strings.canonical(ze.getName()), input);
-              source.length(ze.getSize());
-              parseResource(builder);
+              if(!ze.isDirectory()) {
+                parseEntry(builder, is, Strings.canonical(ze.getName()), ze.getSize(), input);
+              }
             }
           }
         }
@@ -140,19 +136,29 @@ public final class DirParser extends Parser {
   }
 
   /**
-   * Creates a new stream.
+   * Parses an archive entry, or skips it if its path is invalid.
+   * @param builder builder instance
    * @param is input stream
    * @param path path inside archive
+   * @param size size of the entry ({@code -1} if unknown)
    * @param input input
-   * @return stream
+   * @throws IOException I/O exception
    */
-  private IOStream newStream(final InputStream is, final String path, final IO input) {
+  private void parseEntry(final Builder builder, final InputStream is, final String path,
+      final long size, final IO input) throws IOException {
+    final String norm = MetaData.normPath(path);
+    if(norm == null || norm.isEmpty()) {
+      skipped.add(input.path() + '/' + path);
+      return;
+    }
     // parsers must not close the archive stream
     final InputStream in = new FilterInputStream(is) {
       @Override
       public void close() { }
     };
-    return new IOStream(in, archiveName ? input.path() + '/' + path : path);
+    source = new IOStream(in, archiveName ? input.path() + '/' + norm : norm);
+    source.length(size);
+    parseResource(builder);
   }
 
   /**

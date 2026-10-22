@@ -619,7 +619,7 @@ public final class QueryResources {
     // check user permissions
     final IO io = input.io;
     checkTrusted(io, input.original, qc, info);
-    final Perm perm = io.isExternal() ? Perm.CREATE : Perm.READ;
+    final Perm perm = io.isExternal() ? Perm.ADMIN : Perm.READ;
     qc.checkPerm(perm, null, input.original, info);
 
     // check if input points to a single file

@@ -39,7 +39,7 @@ public abstract class Sandbox {
   private static final boolean OUTPUT = false;
 
   /** Database port. */
-  protected static final int DB_PORT = 9863;
+  protected static final int DB_PORT = Integer.getInteger("org.basex.test.port", 9863);
   /** HTTP stop port. */
   protected static final int STOP_PORT = 9864;
   /** HTTP port. */

@@ -54,7 +54,7 @@ public final class FTMildNot extends FTExpr {
           }
         }
         final FTNode item = item1;
-        item1 = iter1.next();
+        if(item != null) item1 = iter1.next();
         return item;
       }
     };

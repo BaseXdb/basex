@@ -18,6 +18,7 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 
+import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 /**
@@ -27,6 +28,11 @@ import jakarta.servlet.http.*;
  * @author Christian Gruen
  */
 public final class RequestContext implements RequestScope {
+  /** Name of the attribute or parameter for the maximum form size (adopted from Jetty). */
+  private static final String MAX_FORM = "org.eclipse.jetty.server.Request.maxFormContentSize";
+  /** Default maximum form size (adopted from Jetty). */
+  private static final long MAX_FORM_DEFAULT = 200_000;
+
   /** HTTP servlet request (can be {@code null} if the request is not accessible). */
   public final HttpServletRequest request;
   /** Request state. */
@@ -39,6 +45,8 @@ public final class RequestContext implements RequestScope {
   private XQMap headers;
   /** Content body (can be {@code null}). */
   private IO body;
+  /** Error raised while reading the body (can be {@code null}). */
+  private IOException failure;
   /** Temporary files of the spilled body and form parameters. */
   private final TempFiles temp = new TempFiles();
 
@@ -164,16 +172,58 @@ public final class RequestContext implements RequestScope {
    * @throws IOException I/O exception
    */
   public IO body() throws IOException {
+    if(failure != null) throw failure;
     if(body == null) {
       // no live request (WebSocket connection, detached job): empty body
       if(request == null) return new IOContent(Token.EMPTY);
       final InputStream is = request.getInputStream();
       // binary and multipart bodies are consumed as streams: spill large ones to disk
       final MediaType mt = state.mediaType();
-      body = Payload.binary(mt) || mt.isMultipart() ? SpillOutput.read(is, temp) :
-        new IOContent(BufferInput.get(is).content());
+      try {
+        if(Payload.binary(mt) || mt.isMultipart()) {
+          body = SpillOutput.read(is, temp);
+        } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
+          body = new IOContent(readForm(is));
+        } else {
+          body = new IOContent(BufferInput.get(is).content());
+        }
+      } catch(final IOException ex) {
+        // remember the error: the stream may have been partially consumed
+        failure = ex;
+        throw ex;
+      }
     }
     return body;
+  }
+
+  /**
+   * Reads a URL-encoded form body, rejecting bodies that exceed the maximum form size.
+   * @param is input stream
+   * @return body
+   * @throws IOException I/O exception
+   */
+  private byte[] readForm(final InputStream is) throws IOException {
+    final long max = maxForm();
+    if(request.getContentLengthLong() <= max) {
+      final byte[] bytes = is.readNBytes((int) Math.min(max, Array.MAX_SIZE - 1) + 1);
+      if(bytes.length <= max) return bytes;
+    }
+    throw HTTPStatus.FORM_TOO_LARGE_X.get(max);
+  }
+
+  /**
+   * Returns the maximum size of form bodies, as configured for the servlet container.
+   * @return maximum size
+   */
+  private long maxForm() {
+    final ServletContext sc = request.getServletContext();
+    Object value = sc.getAttribute(MAX_FORM);
+    if(value == null) value = sc.getInitParameter(MAX_FORM);
+    if(value == null) return MAX_FORM_DEFAULT;
+    final long max = Strings.toLong(value.toString());
+    if(max == Long.MIN_VALUE) return MAX_FORM_DEFAULT;
+    // negative values disable the limit, as in Jetty
+    return max < 0 ? Long.MAX_VALUE : max;
   }
 
   /**
