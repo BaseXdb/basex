@@ -24,18 +24,20 @@ public final class SearchEditor extends BaseXBack {
    * @param editor editor
    */
   public SearchEditor(final GUI gui, final TextPanel editor) {
-    this(gui, editor, editor);
+    this(gui, editor, editor, false);
   }
 
   /**
    * Constructor.
-   * @param gui gui reference
-   * @param center centered component
-   * @param editor editor (can be {@code null})
+   * @param gui      gui reference
+   * @param center   centered component
+   * @param editor   editor (can be {@code null})
+   * @param remember remember the search modes in the options
    */
-  public SearchEditor(final GUI gui, final JComponent center, final TextPanel editor) {
+  public SearchEditor(final GUI gui, final JComponent center, final TextPanel editor,
+      final boolean remember) {
     super(false);
-    search = new SearchBar(gui);
+    search = new SearchBar(gui, remember);
     layout(new BorderLayout(0, 2));
     add(center, BorderLayout.CENTER);
     add(search, BorderLayout.SOUTH);

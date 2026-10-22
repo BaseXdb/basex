@@ -52,6 +52,7 @@ public final class BaseXTabs extends JTabbedPane {
     addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseDragged(final MouseEvent e) {
+        if(!SwingUtilities.isLeftMouseButton(e)) return;
         if(draggedTab == -1) {
           final int t = getUI().tabForCoordinate(BaseXTabs.this, e.getX(), e.getY());
           if(t != -1 && getTabCount() > 1) {
@@ -71,7 +72,7 @@ public final class BaseXTabs extends JTabbedPane {
         if(draggedTab < 0) return;
         drop(e);
         draggedTab = -1;
-        setCursor(GUIConstants.CURSORARROW);
+        setCursor(null);
         refreshTabs();
       }
     });

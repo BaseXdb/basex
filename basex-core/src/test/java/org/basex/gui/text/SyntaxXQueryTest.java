@@ -223,6 +223,8 @@ public final class SyntaxXQueryTest {
     declarations("declare %private function f() {};", "f 1");
     declarations("declare %rest:GET %rest:query-param('p', '{$p}', 1) function f($p) {};", "f 1");
     declarations("declare updating function f() {};", "f 1");
+    declarations("declare record x();", "x 1");
+    declarations("declare %private record r(a, %static b as xs:integer := 1);", "r 1");
     // other prolog declarations are skipped
     declarations("declare namespace a = 'b'; declare option db:chop 'true';");
     declarations("declare default function namespace 'a';");
@@ -232,6 +234,82 @@ public final class SyntaxXQueryTest {
     declarations("(: declare function f() :)");
     // the line of each declaration is returned
     declarations("declare function a() {};\ndeclare\n  variable $b := 1;", "a 1", "$b 3");
+  }
+
+  /** Definitions of functions and variables. */
+  @Test public void definition() {
+    // declared functions and variables
+    String q = "declare function local:f($a) { $a }; local:f(1)";
+    definition(q, q.lastIndexOf("local:f") + 2, q.indexOf("local:f"));
+    definition(q, q.lastIndexOf("$a") + 1, q.indexOf("$a") + 1);
+    q = "declare record x(); x()";
+    definition(q, q.length() - 2, q.indexOf("x"));
+    q = "declare variable $v := 1; $v";
+    definition(q, q.length(), q.indexOf("$v") + 1);
+    // the closest preceding binding of a local variable
+    q = "let $x := 1 let $x := 2 return $x";
+    definition(q, q.length() - 1, q.lastIndexOf("$x :=") + 1);
+    q = "for $i at $p in 1 to 3 return $p";
+    definition(q, q.length() - 1, q.indexOf("$p") + 1);
+    // whitespace between dollar sign and name
+    q = "let $x := 1 return $ x";
+    definition(q, q.length(), q.indexOf("$x") + 1);
+    q = "fn($y) { $y }";
+    definition(q, q.lastIndexOf("$y") + 1, q.indexOf("$y") + 1);
+    // function calls are no bindings
+    q = "declare variable $z := 1; f($z, $z)";
+    definition(q, q.lastIndexOf("$z") + 1, q.indexOf("$z") + 1);
+    // declarations and bindings themselves have no definition
+    q = "declare function local:f($a) { $a }; declare variable $v := let $w := 1 return $w;";
+    definition(q, q.indexOf("local:f") + 2, -1);
+    definition(q, q.indexOf("$a") + 1, -1);
+    definition(q, q.indexOf("$v") + 1, -1);
+    definition(q, q.indexOf("$w") + 1, -1);
+    // names in strings and unknown names
+    definition("'local:f()'", 3, -1);
+    definition("local:g()", 3, -1);
+
+    // functions and variables of imported modules
+    q = "import module namespace m = 'u' at 'm.xqm'; m:f(1), $m:v";
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+    // names without definition are returned with their range
+    assertEquals(new Definition(null, "local:g", -1, 0, 7), syntax.definition(Token.token(
+        "local:g()"), 3));
+    assertFalse(syntax.definition(Token.token("local:g()"), 3).found());
+    assertNull(syntax.definition(Token.token("'local:g()'"), 3));
+    final int f = q.indexOf("m:f"), v = q.indexOf("m:v");
+    assertEquals(new Definition("m.xqm", "f", -1, f, f + 3), syntax.definition(Token.token(q),
+        f + 1));
+    assertEquals(new Definition("m.xqm", "$v", -1, v, v + 3), syntax.definition(Token.token(q),
+        q.length()));
+  }
+
+  /** Declarations with a local name. */
+  @Test public void declarationLocal() {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+    final String q = "declare function m:f() {}; declare variable $m:v := 1; " +
+      "declare variable $w := 2;";
+    final byte[] text = Token.token(q);
+    assertEquals(q.indexOf("m:f"), syntax.declaration(text, "f", true).pos());
+    assertEquals(q.indexOf("m:v"), syntax.declaration(text, "$v", true).pos());
+    assertEquals(q.indexOf("w :="), syntax.declaration(text, "$w", true).pos());
+    assertNull(syntax.declaration(text, "v", true));
+    assertNull(syntax.declaration(text, "f", false));
+  }
+
+  /**
+   * Checks the definition of the name at the specified position.
+   * @param query query string
+   * @param pos position of the name
+   * @param expected expected position of the definition ({@code -1}: none)
+   */
+  private static void definition(final String query, final int pos, final int expected) {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+    final Definition definition = syntax.definition(Token.token(query), pos);
+    assertEquals(expected, definition == null ? -1 : definition.pos(), query);
   }
 
   /** Code completion snippets. */

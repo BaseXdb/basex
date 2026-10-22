@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.function.*;
 
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
@@ -31,19 +32,24 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
   private final BaseXBack panel;
   /** Serialization string. */
   private final BaseXLabel info;
+  /** Consumer for changed serialization parameters (can be {@code null}). */
+  private final Consumer<SerializerOptions> change;
 
   /**
    * Constructor.
    * @param dialog dialog window
    * @param sopts serialization parameters
+   * @param change consumer for changed serialization parameters (can be {@code null})
    */
-  public BaseXSerial(final BaseXDialog dialog, final SerializerOptions sopts) {
+  public BaseXSerial(final BaseXDialog dialog, final SerializerOptions sopts,
+      final Consumer<SerializerOptions> change) {
     super(new RowLayout());
 
     add(new BaseXLabel(SERIALIZATION + COL, true, true));
 
     panel = new BaseXBack(new ColumnLayout(8));
     this.dialog = dialog;
+    this.change = change;
 
     params = new BaseXCombo(dialog, sopts.names());
     panel.add(params);
@@ -159,5 +165,6 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    */
   private void update() {
     info.setText(sopts.toString());
+    if(change != null) change.accept(sopts);
   }
 }

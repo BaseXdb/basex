@@ -144,6 +144,10 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
   /** Mark occurrences of the name at the caret. */
   public static final BooleanOption MARKOCCURRENCES = new BooleanOption("MARKOCCURRENCES", true);
+  /** Show indentation guides. */
+  public static final BooleanOption SHOWGUIDES = new BooleanOption("SHOWGUIDES", true);
+  /** Pin the lines that enclose the topmost visible line. */
+  public static final BooleanOption STICKYSCROLL = new BooleanOption("STICKYSCROLL", true);
   /** Save before executing file. */
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
   /** Parse project files. */

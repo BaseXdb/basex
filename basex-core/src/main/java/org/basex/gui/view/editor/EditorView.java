@@ -51,6 +51,8 @@ public final class EditorView extends View {
   private static final int WAIT_DELAY = 250;
   /** Delay for highlighting an error. */
   private static final int SEARCH_DELAY = 100;
+  /** Maximum number of visited positions. */
+  private static final int MAX_VISITS = 100;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), (\\d+)/(\\d+)");
   /** Scheduler for delayed parsing; serializes the parse runs of all editors. */
@@ -64,7 +66,7 @@ public final class EditorView extends View {
   /** Project files. */
   final ProjectView project;
   /** Test button. */
-  final AbstractButton test;
+  private final AbstractButton test;
   /** Declaration button. */
   private final AbstractButton declaration;
 
@@ -97,6 +99,11 @@ public final class EditorView extends View {
   /** Current input info (can be {@code null}). */
   private InputInfo inputInfo;
 
+  /** Visited editor positions. */
+  private final ArrayList<Visit> visits = new ArrayList<>();
+  /** Index of the current position in the visited positions. */
+  private int visit;
+
   /**
    * Default constructor.
    * @param notifier view notifier
@@ -117,7 +124,7 @@ public final class EditorView extends View {
           tabs.getComponentAt(i) instanceof final EditorArea edit) close(edit);
     });
 
-    final SearchEditor center = new SearchEditor(gui, tabs, null);
+    final SearchEditor center = new SearchEditor(gui, tabs, null, true);
     search = center.bar();
 
     final AbstractButton newB = BaseXButton.command(GUIMenuCmd.C_EDIT_NEW, gui);
@@ -133,8 +140,7 @@ public final class EditorView extends View {
         BaseXKeys.HISTORY.toString()), false, gui);
     stop = BaseXButton.command(GUIMenuCmd.C_STOP, gui);
     stop.setEnabled(false);
-    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
-        BaseXKeys.TESTS.toString()), false, gui);
+    test = BaseXButton.command(GUIMenuCmd.C_TEST, gui);
 
     final BaseXToolBar buttons = new BaseXToolBar();
     buttons.add(newB);
@@ -215,8 +221,9 @@ public final class EditorView extends View {
     history.addActionListener(e -> historyPopup(0));
     refreshHistory(null);
 
-    info.addMouseListener((MouseClickedListener) e -> markError(true));
-    test.addActionListener(e -> run(getEditor(), Action.TEST));
+    info.addMouseListener((MouseClickedListener) e -> {
+      if(SwingUtilities.isLeftMouseButton(e)) markError(true);
+    });
     declaration.addActionListener(e -> getEditor().gotoDeclaration());
     tabs.addChangeListener(e -> {
       // ignore index changes caused by dragged tabs: the selected editor stays the same
@@ -238,7 +245,7 @@ public final class EditorView extends View {
   @Override
   public void refreshMark() {
     final EditorArea edit = getEditor();
-    test.setEnabled(edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified());
+    test.setEnabled(GUIMenuCmd.C_TEST.enabled(gui));
     declaration.setEnabled(edit.hasDeclarations());
   }
 
@@ -511,14 +518,15 @@ public final class EditorView extends View {
   }
 
   /**
-   * Deletes a file.
-   * @param file file to be deleted
-   * @return success flag
+   * Closes the editors of a file or of the files in a directory without saving the options.
+   * @param file file or directory
+   * @return {@code false} if closing was canceled
    */
-  public boolean delete(final IOFile file) {
-    final EditorArea edit = find(file);
-    if(edit != null) close(edit);
-    return file.delete();
+  public boolean closeEditors(final IOFile file) {
+    for(final EditorArea edit : editors()) {
+      if(edit.opened() && file.contains(edit.file()) && !closeEditor(edit)) return false;
+    }
+    return true;
   }
 
   /**
@@ -573,6 +581,22 @@ public final class EditorView extends View {
    */
   public void run() {
     run(getEditor(), Action.EXECUTE);
+  }
+
+  /**
+   * Runs the tests of the currently opened file.
+   */
+  public void test() {
+    run(getEditor(), Action.TEST);
+  }
+
+  /**
+   * Indicates if the currently opened file can be tested.
+   * @return result of check
+   */
+  public boolean testable() {
+    final EditorArea edit = getEditor();
+    return edit != null && edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified();
   }
 
   /**
@@ -649,7 +673,7 @@ public final class EditorView extends View {
       info(null);
     } else {
       // no particular file format, no particular action: reset status info
-      info.setText(OK, Msg.SUCCESS);
+      status(OK);
     }
   }
 
@@ -708,14 +732,15 @@ public final class EditorView extends View {
 
   /**
    * Refreshes the list of recent query files and updates the query path.
-   * @param file new file (can be {@code null})
+   * @param edit editor with the new file (can be {@code null})
    */
-  void refreshHistory(final IOFile file) {
+  void refreshHistory(final EditorArea edit) {
     final StringList paths = new StringList();
-    if(file != null) {
-      gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
+    if(edit != null) {
+      final IOFile file = edit.file();
+      if(edit == getEditor()) gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
       paths.add(file.path());
-      tabs.setToolTipTextAt(tabs.getSelectedIndex(), BaseXLayout.info(file, true));
+      tabs.setToolTipTextAt(tabs.indexOfComponent(edit), BaseXLayout.info(file, true));
     }
     for(final String old : gui.gopts.get(GUIOptions.EDITOR)) {
       if(paths.size() < BaseXHistory.MAX) paths.addUnique(old);
@@ -730,7 +755,9 @@ public final class EditorView extends View {
    * Closes all editors.
    */
   public void closeAll() {
-    for(final EditorArea ea : editors()) closeEditor(ea);
+    for(final EditorArea ea : editors()) {
+      if(!closeEditor(ea)) break;
+    }
     gui.saveOptions();
   }
 
@@ -746,14 +773,20 @@ public final class EditorView extends View {
   /**
    * Closes an editor.
    * @param edit editor to be closed (if {@code null}, the currently opened editor will be closed)
+   * @return {@code false} if closing was canceled
    */
-  private void closeEditor(final EditorArea edit) {
+  private boolean closeEditor(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
-    if(ea.modified() && !confirm(ea)) return;
+    if(ea.modified() && !confirm(ea)) return false;
 
     // remove reference to last executed file
     if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
+    for(int v = visits.size() - 1; v >= 0; v--) {
+      if(visits.get(v).edit() != ea) continue;
+      visits.remove(v);
+      if(v < visit) visit--;
+    }
     // no panels left: open default tab
     if(tabs.getTabCount() == 0) {
       addTab();
@@ -761,6 +794,7 @@ public final class EditorView extends View {
     } else {
       focusEditor();
     }
+    return true;
   }
 
   /**
@@ -770,7 +804,7 @@ public final class EditorView extends View {
   public void pleaseWait(final int id) {
     final Timer timer = new Timer(WAIT_DELAY, e -> {
       if(gui.running(id)) {
-        info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
+        status(PLEASE_WAIT_D);
         stop.setEnabled(true);
       }
     });
@@ -828,10 +862,7 @@ public final class EditorView extends View {
     }
 
     if(stopped || th == null) {
-      info.setCursor(CURSORARROW);
-      info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS);
-      info.setToolTipText(null);
-      inputInfo = null;
+      status(stopped ? INTERRUPTED : OK);
     } else {
       info.setCursor(CURSORHAND);
       final String msg = Util.message(th), local = th.getLocalizedMessage();
@@ -849,6 +880,17 @@ public final class EditorView extends View {
       };
       markError(false);
     }
+  }
+
+  /**
+   * Shows a status message without error position.
+   * @param text message
+   */
+  private void status(final String text) {
+    info.setCursor(CURSORARROW);
+    info.setText(text, Msg.SUCCESS);
+    info.setToolTipText(null);
+    inputInfo = null;
   }
 
   /**
@@ -887,6 +929,7 @@ public final class EditorView extends View {
     final IOFile file = new IOFile(path);
     final EditorArea found = find(file), opened;
     if(jump) {
+      getEditor().visit();
       opened = open(file, error, true);
       // update error information if file was not already opened
       if(found == null && error) ii = inputInfo;
@@ -973,12 +1016,11 @@ public final class EditorView extends View {
         if(dir) {
           // change path to files in a renamed directory
           if(editPath.startsWith(oldPath)) {
-            ea.file(new IOFile(renamed, editPath.substring(oldPath.length())), true);
+            ea.rename(new IOFile(renamed, editPath.substring(oldPath.length())));
           }
         } else if(oldPath.equals(editPath)) {
           // update file reference and label of editor tab
-          ea.file(renamed, true);
-          ea.label.setText(renamed.name());
+          ea.rename(renamed);
           break;
         }
       }
@@ -1019,6 +1061,40 @@ public final class EditorView extends View {
       pos.setText(cp[0] + "\u2009:\u2009" + cp[1]);
     }
   };
+
+  /**
+   * Remembers the caret position of an editor before a jump.
+   * @param edit editor
+   */
+  void visit(final EditorArea edit) {
+    visits.subList(visit, visits.size()).clear();
+    final Visit position = new Visit(edit);
+    if(!visits.isEmpty() && visits.getLast().equals(position)) return;
+    visits.add(position);
+    if(visits.size() > MAX_VISITS) visits.remove(0);
+    visit = visits.size();
+  }
+
+  /**
+   * Returns to the previous or next visited position.
+   * @param next next/previous flag
+   */
+  public void visit(final boolean next) {
+    if(next ? visit >= visits.size() - 1 : visit == 0) return;
+    // the current position is remembered for returning to it
+    final EditorArea current = getEditor();
+    final Visit position = new Visit(current);
+    if(visit == visits.size()) visits.add(position);
+    else visits.set(visit, position);
+    visit += next ? 1 : -1;
+
+    final Visit target = visits.get(visit);
+    final EditorArea edit = target.edit();
+    tabs.setSelectedComponent(edit);
+    edit.setCaret(Math.min(target.pos(), edit.getText().length));
+    posCode.invokeLater();
+    focusEditor();
+  }
 
   /**
    * Returns the editor that has the specified file open.
@@ -1150,5 +1226,20 @@ public final class EditorView extends View {
       if(tabs.getComponentAt(t) instanceof final EditorArea edit) edits.add(edit);
     }
     return edits.toArray(EditorArea[]::new);
+  }
+
+  /**
+   * Visited editor position.
+   * @param edit editor
+   * @param pos caret position
+   */
+  private record Visit(EditorArea edit, int pos) {
+    /**
+     * Constructor for the current caret position of an editor.
+     * @param edit editor
+     */
+    Visit(final EditorArea edit) {
+      this(edit, edit.getCaret());
+    }
   }
 }

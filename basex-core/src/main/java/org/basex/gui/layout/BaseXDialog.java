@@ -100,8 +100,17 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
    * @param buttons button list
    */
   protected final void setButtons(final BaseXBack buttons) {
+    setButtons(buttons, 0);
+  }
+
+  /**
+   * Adds a button list at the bottom of the dialog and focuses the specified button.
+   * @param buttons button list
+   * @param focus index of the button to be focused
+   */
+  protected final void setButtons(final BaseXBack buttons, final int focus) {
     set(buttons, BorderLayout.SOUTH);
-    SwingUtilities.invokeLater(((Container) buttons.getComponent(0)).getComponent(0)::
+    SwingUtilities.invokeLater(((Container) buttons.getComponent(0)).getComponent(focus)::
       requestFocusInWindow);
   }
 
@@ -232,6 +241,16 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
    */
   public static boolean confirm(final GUI gui, final String text) {
     return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());
+  }
+
+  /**
+   * Static yes/no dialog for a destructive action, which focuses the No button.
+   * @param gui parent reference
+   * @param text text
+   * @return {@code true} if dialog was confirmed
+   */
+  public static boolean confirmDestructive(final GUI gui, final String text) {
+    return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION, true).action());
   }
 
   /**

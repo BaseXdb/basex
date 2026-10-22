@@ -91,9 +91,11 @@ final class DialogJsonParser extends DialogParser {
     browse = new BaseXButton(dialog, BROWSE_D);
     browse.addActionListener(e -> {
       final GUIOptions gopts = dialog.gui().gopts;
-      final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR,
-          gopts.get(GUIOptions.INPUTPATH)).filter(JSON_DOCUMENTS, true, IO.JSONSUFFIX);
-      final IO file = fc.select(Mode.FDOPEN);
+      final String current = mapping.getText();
+      final BaseXFileChooser fc = new BaseXFileChooser(dialog, OPEN,
+          current.isEmpty() ? gopts.get(GUIOptions.INPUTPATH) : current).
+          filter(JSON_DOCUMENTS, true, IO.JSONSUFFIX);
+      final IO file = fc.select(Mode.FOPEN);
       if(file != null) mapping.setText(file.path());
     });
 
@@ -125,7 +127,7 @@ final class DialogJsonParser extends DialogParser {
 
     // mapping file, spanning the full width below the options and the example
     final BaseXBack mp = new BaseXBack(new BorderLayout(8, 4)).border(8, 0, 0, 0);
-    mp.add(new BaseXLabel("Mapping" + COL, true, true), BorderLayout.NORTH);
+    mp.add(new BaseXLabel(MAPPING + COL, true, true), BorderLayout.NORTH);
     mp.add(mapping, BorderLayout.CENTER);
     mp.add(browse, BorderLayout.EAST);
     add(mp, BorderLayout.SOUTH);

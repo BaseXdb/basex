@@ -59,6 +59,7 @@ final class ViewMover extends BaseXPanel {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
+    if(!SwingUtilities.isLeftMouseButton(e)) return;
     final ViewContainer container = container();
     container.dragPanel((ViewPanel) getParent(), SwingUtilities.convertPoint(this, e.getPoint(),
         container));
@@ -67,6 +68,7 @@ final class ViewMover extends BaseXPanel {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    if(!SwingUtilities.isLeftMouseButton(e)) return;
     move = true;
     repaint();
   }

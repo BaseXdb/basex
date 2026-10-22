@@ -107,6 +107,7 @@ final class TableData {
    */
   void init(final Data dt, final int rt) {
     cols = new TableCol[0];
+    rootRows = null;
     root = rt;
     sortCol = -1;
     last = "";
@@ -134,7 +135,7 @@ final class TableData {
     final boolean rt = ctx.root();
     if(!create && rt && rootRows != null) {
       rows = rootRows;
-      sortCol = -1;
+      sort();
     } else {
       createRows();
       if(rt) rootRows = rows;

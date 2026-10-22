@@ -78,13 +78,14 @@ public enum GUIMenuCmd implements GUICommand {
         final IntList docs = data.resources.docs();
         final int ds = docs.size();
         for(int d = 0; d < ds; d++) {
-          file = root.resolve(Token.string(data.text(docs.get(d), true)));
-          if(file.exists()) {
+          final IOFile target = root.resolve(Token.string(data.text(docs.get(d), true)));
+          if(target.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
               file = null;
               break;
             }
+            file = target;
             overwrite = true;
           }
         }
@@ -92,7 +93,7 @@ public enum GUIMenuCmd implements GUICommand {
           // show message for overwriting files or directories
           final String msg = file == null ? FILES_REPLACE_X : FILE_EXISTS_X;
           if(file == null) file = root;
-          if(!BaseXDialog.confirm(gui, Util.info(msg, file))) return;
+          if(!BaseXDialog.confirmDestructive(gui, Util.info(msg, file))) return;
         }
       }
       DialogProgress.execute(gui, new Export(root.path()));
@@ -191,11 +192,29 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Runs the tests of the currently opened file. */
+  C_TEST(RUN_TESTS, "% shift ENTER", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.test();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.editor.testable();
+    }
+  },
+
   /** Stops the currently opened query. */
   C_STOP(STOP, "shift ESCAPE", Requires.NOTHING) {
     @Override
     public void execute(final GUI gui) {
       gui.stop();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.stoppable();
     }
   },
 
@@ -213,6 +232,7 @@ public enum GUIMenuCmd implements GUICommand {
     void toggled(final GUI gui, final boolean on) {
       final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
       sopts.put(SerializerOptions.INDENT, on ? YesNo.YES : YesNo.NO);
+      DialogPrefs.refresh();
       gui.layoutViews();
     }
   },
@@ -286,6 +306,93 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().bracket();
+    }
+  },
+
+  /** Joins lines. */
+  C_JOIN_LINES(JOIN_LINES, null, Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().joinLines();
+    }
+  },
+
+  /** Splits lines that exceed the line margin. */
+  C_SPLIT_LINES(SPLIT_LINES, null, Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().splitLines();
+    }
+  },
+
+  /** Expands the selection. */
+  C_EXPAND_SELECTION(EXPAND_SELECTION, Prop.MAC ? "ctrl shift % RIGHT" : "alt shift RIGHT",
+      Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().expandSelection();
+    }
+  },
+
+  /** Shrinks the selection. */
+  C_SHRINK_SELECTION(SHRINK_SELECTION, Prop.MAC ? "ctrl shift % LEFT" : "alt shift LEFT",
+      Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().shrinkSelection();
+    }
+  },
+
+  /** Jumps to the definition of a function or variable. */
+  C_GO_TO_DEFINITION(GO_TO_DEFINITION, "% shift J", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().gotoDefinition();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.editor.getEditor().hasDeclarations();
+    }
+  },
+
+  /** Returns to the previously visited position. */
+  C_VISIT_BACK(GO_BACK, Prop.MAC ? "ctrl % LEFT" : "alt LEFT", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.visit(false);
+    }
+  },
+
+  /** Returns to the next visited position. */
+  C_VISIT_FORWARD(GO_FORWARD, Prop.MAC ? "ctrl % RIGHT" : "alt RIGHT", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.visit(true);
+    }
+  },
+
+  /** Adds or removes a bookmark. */
+  C_TOGGLE_BOOKMARK(TOGGLE_BOOKMARK, "% F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toggleBookmark();
+    }
+  },
+
+  /** Jumps to the next bookmark. */
+  C_NEXT_BOOKMARK(NEXT_BOOKMARK, "F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().bookmark(true);
+    }
+  },
+
+  /** Jumps to the previous bookmark. */
+  C_PREVIOUS_BOOKMARK(PREVIOUS_BOOKMARK, "shift F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().bookmark(false);
     }
   },
 
@@ -391,7 +498,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copies the current database path to the clipboard. */
-  C_COPY_PATH(COPY_PATH, "% shift C", Requires.DATA) {
+  C_COPY_PATH(COPY_PATH, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pre(0);
@@ -573,7 +680,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens the update web page. */
-  C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES, null, Requires.NOTHING) {
+  C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES + ELLIPSIS, null, Requires.NOTHING) {
     @Override
     public void execute(final GUI gui) {
       gui.checkVersion(true);
@@ -591,7 +698,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  C_GO_BACK(GO_BACK, Prop.MAC ? null : "alt LEFT", Requires.DATA) {
+  C_GO_BACK(GO_BACK, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
@@ -604,7 +711,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one step forward. */
-  C_GO_FORWARD(GO_FORWARD, Prop.MAC ? null : "alt RIGHT", Requires.DATA) {
+  C_GO_FORWARD(GO_FORWARD, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);

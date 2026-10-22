@@ -123,11 +123,11 @@ final class TableHeader extends BaseXPanel {
       BaseXLayout.chopString(g, text, (int) x + 4 + o, 2 + o, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
-        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + o, (int) ce - 3 + o,
-            (int) ce - 6 + o },
-            new int[] { 4 + o, 4 + o, 8 + o }, 3);
-        else g.fillPolygon(new int[] { (int) ce - 9 + o, (int) ce - 3 + o,
-            (int) ce - 6 + o }, new int[] { 8 + o, 8 + o, 4 + o }, 3);
+        // sort arrow, scaled with the font size
+        final int s = Math.max(2, fsz / 6), xe = (int) ce - 3 + o, xs = xe - 3 * s;
+        final int top = 2 * s + o, bottom = 4 * s + o;
+        g.fillPolygon(new int[] { xs, xe, (xs + xe) / 2 },
+            tdata.asc ? new int[] { top, top, bottom } : new int[] { bottom, bottom, top }, 3);
       }
 
       // draw filter texts
@@ -210,15 +210,24 @@ final class TableHeader extends BaseXPanel {
       final int wl = ww.length;
       for(int w = 0; w < wl; w++) ww[w] = tdata.cols[w].width;
 
+      // hidden columns (width 0) are excluded from resizing
       if(e.isShiftDown()) {
-        ww[moveC - 1] += p;
-        ww[moveC] -= p;
+        int l = moveC - 1, r = moveC;
+        while(l > 0 && ww[l] == 0) l--;
+        while(r < wl - 1 && ww[r] == 0) r++;
+        if(ww[l] == 0 || ww[r] == 0) return;
+        ww[l] += p;
+        ww[r] -= p;
       } else {
-        for(int i = 0; i < moveC; i++) ww[i] += p / moveC;
-        for(int i = moveC; i < wl; i++) ww[i] -= p / (wl - moveC);
+        int vl = 0, vr = 0;
+        for(int i = 0; i < moveC; i++) if(ww[i] != 0) vl++;
+        for(int i = moveC; i < wl; i++) if(ww[i] != 0) vr++;
+        if(vl == 0 || vr == 0) return;
+        for(int i = 0; i < moveC; i++) if(ww[i] != 0) ww[i] += p / vl;
+        for(int i = moveC; i < wl; i++) if(ww[i] != 0) ww[i] -= p / vr;
       }
-      for(final double w : ww) {
-        if(w < 0.0001) return;
+      for(int w = 0; w < wl; w++) {
+        if(tdata.cols[w].width != 0 && ww[w] < 0.0001) return;
       }
       mouseX = x;
 
@@ -273,7 +282,7 @@ final class TableHeader extends BaseXPanel {
       } else {
         filter(clickCol);
       }
-    } else {
+    } else if(SwingUtilities.isRightMouseButton(e)) {
       chooseCols(e);
     }
     clickCol = -1;
@@ -318,8 +327,9 @@ final class TableHeader extends BaseXPanel {
         for(final TableCol c : tdata.cols) vis |= c != col && c.width != 0;
 
         if(vis) {
-          col.hwidth = sel ? 0 : col.width;
+          final double w = col.width;
           col.width = sel ? col.hwidth : 0;
+          col.hwidth = sel ? 0 : w;
         } else {
           mi.setSelected(true);
         }

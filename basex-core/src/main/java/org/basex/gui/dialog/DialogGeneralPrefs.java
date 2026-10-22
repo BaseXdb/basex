@@ -7,6 +7,7 @@ import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.listener.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -42,6 +43,8 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     final StaticOptions opts = gui.context.soptions;
     dbPath = new BaseXTextField(dialog, opts.get(StaticOptions.DBPATH));
+    // assign the path once editing is finished: a changed path closes the opened database
+    dbPath.addFocusListener((FocusLostListener) e -> assignDbPath());
     repoPath = new BaseXTextField(dialog, opts.get(StaticOptions.REPOPATH));
     xmlSuffixes = new BaseXTextField(dialog, GUIOptions.XMLSUFFIXES, gui.gopts);
     xmlSuffixes.hint(GUIOptions.XMLSUFFIXES.value());
@@ -83,19 +86,25 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @param source source
    */
   void action(final Object source) {
-    // new database path: close opened database
-    final StaticOptions opts = gui.context.soptions;
-    if(source == dbPath || source == dbButton) {
-      final String dbpath = dbPath.getText();
-      if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
-        Close.close(gui.context);
-        gui.notify.init();
-      }
-      opts.set(StaticOptions.DBPATH, dbpath);
+    if(source == dbButton) {
+      assignDbPath();
     } else if(source == repoPath || source == repoButton) {
       gui.context.repo.reset();
-      opts.set(StaticOptions.REPOPATH, repoPath.getText());
+      gui.context.soptions.set(StaticOptions.REPOPATH, repoPath.getText());
     }
     xmlSuffixes.assign();
+  }
+
+  /**
+   * Assigns the database path and closes an opened database if the path has changed.
+   */
+  private void assignDbPath() {
+    final StaticOptions opts = gui.context.soptions;
+    final String dbpath = dbPath.getText();
+    if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
+      Close.close(gui.context);
+      gui.notify.init();
+    }
+    opts.set(StaticOptions.DBPATH, dbpath);
   }
 }

@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import org.basex.core.Text;
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
 import org.basex.util.*;
@@ -104,7 +105,7 @@ public class BaseXCombo extends JComboBox<Object> {
     this.win = win;
 
     setEditable(editable);
-    setEditor(new BaseXEditor(win.gui(), this));
+    setEditor(new BaseXEditor(win, this));
 
     BaseXLayout.addInteraction(this, win);
 
@@ -182,7 +183,7 @@ public class BaseXCombo extends JComboBox<Object> {
   public BaseXCombo hint(final String label) {
     final BaseXTextField tf = textField();
     if(tf != null) tf.hint(label);
-    setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
+    setToolTipText(label.replaceAll(Text.ELLIPSIS + '$', ""));
     return this;
   }
 
@@ -201,6 +202,17 @@ public class BaseXCombo extends JComboBox<Object> {
     if(history != null) {
       history.add(getText());
       SwingUtilities.invokeLater(() -> setItems(history.values()));
+    }
+  }
+
+  /**
+   * Removes a value from the history and refreshes the selectable items.
+   * @param value value to remove
+   */
+  public void removeHistory(final String value) {
+    if(history != null) {
+      history.remove(value);
+      setItems(history.values());
     }
   }
 
@@ -338,11 +350,11 @@ public class BaseXCombo extends JComboBox<Object> {
 
     /**
      * Constructor.
-     * @param gui gui
+     * @param win parent window
      * @param combo combo box
      */
-    private BaseXEditor(final GUI gui, final BaseXCombo combo) {
-      tf = new BaseXTextField(gui);
+    private BaseXEditor(final BaseXWindow win, final BaseXCombo combo) {
+      tf = new BaseXTextField(win, null, false);
       // adopt border of original editor
       final Component comp = combo.getEditor().getEditorComponent();
       if(comp instanceof final JTextField text) tf.setBorder(text.getBorder());

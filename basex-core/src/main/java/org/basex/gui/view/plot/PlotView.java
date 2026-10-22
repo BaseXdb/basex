@@ -271,7 +271,7 @@ public final class PlotView extends View {
       final int itmID = data.elemNames.index(plotData.item);
       int k = data.kind(focused);
       int name = data.nameId(focused);
-      while(focused > 0 && itmID != name) {
+      while(focused > 0 && (k != Data.ELEM || itmID != name)) {
         focused = data.parent(focused, k);
         if(focused > -1) {
           k = data.kind(focused);
@@ -869,7 +869,7 @@ public final class PlotView extends View {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || e.isShiftDown()) return;
+    if(gui.updating || e.isShiftDown() || !SwingUtilities.isLeftMouseButton(e)) return;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -924,6 +924,7 @@ public final class PlotView extends View {
   @Override
   public void mousePressed(final MouseEvent e) {
     if(gui.updating || gui.painting) return;
+    super.mousePressed(e);
     markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
@@ -932,7 +933,17 @@ public final class PlotView extends View {
     // determine if a following context filter operation is possibly triggered
     // by popup menu
     final boolean r = !SwingUtilities.isLeftMouseButton(e);
-    if(r) { rightClick = true; return; }
+    if(r) {
+      rightClick = true;
+      // mark an unmarked node before the popup menu is shown
+      final int focused = gui.context.focused;
+      if(focused != -1 && !gui.context.marked.contains(focused)) {
+        gui.notify.mark(new DBNodes(gui.context.data(),
+            overlappingNodes(plotData.findPre(focused))), this);
+        nextContext = gui.context.marked;
+      }
+      return;
+    }
     // no item is focused. no nodes marked after mouse click
     if(gui.context.focused == -1) {
       gui.notify.mark(new DBNodes(gui.context.data()), this);
@@ -943,10 +954,11 @@ public final class PlotView extends View {
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(gui.context.focused);
     final int[] il = overlappingNodes(pre);
-    // right mouse or shift down
-    if(e.isShiftDown()) {
+    // shift down: add nodes, shortcut key down: toggle nodes
+    if(e.isShiftDown() || BaseXKeys.sc(e)) {
       final DBNodes marked = gui.context.marked;
-      marked.union(il);
+      if(e.isShiftDown()) marked.union(il);
+      else for(final int p : il) marked.toggle(p);
       gui.notify.mark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {

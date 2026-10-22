@@ -241,7 +241,7 @@ final class PlotAxis {
    */
   byte[] getValue(final int pre) {
     final Data data = plotData.context.data();
-    final int limit = pre + data.size(pre, Data.ELEM);
+    final int limit = pre + data.size(pre, data.kind(pre));
     for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);
       if((elem ? kind == Data.ELEM : kind == Data.ATTR) && attrID == data.nameId(p))

@@ -61,10 +61,14 @@ final class DialogCsvParser extends DialogParser {
     encoding = encoding(dialog, copts.get(CsvParserOptions.ENCODING));
 
     final StringList csv = new StringList();
-    for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
+    final int sep = copts.separator();
+    String selected = null;
+    for(final CsvSep cs : CsvSep.values()) {
+      csv.add(cs.toString());
+      if(cs.sep == sep) selected = cs.toString();
+    }
     separator = new BaseXCombo(dialog, csv.finish());
-    final CsvSep cs = Enums.get(CsvSep.class, copts.get(CsvOptions.SEPARATOR));
-    if(cs != null) separator.setSelectedItem(cs.toString());
+    if(selected != null) separator.setSelectedItem(selected);
 
     final String[] formats = Arrays.stream(new CsvFormat[] {
         CsvFormat.DIRECT, CsvFormat.ATTRIBUTES, CsvFormat.W3_XML

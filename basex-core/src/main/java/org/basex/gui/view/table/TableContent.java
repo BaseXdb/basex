@@ -1,7 +1,6 @@
 package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.awt.*;
 
@@ -9,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -25,8 +25,6 @@ final class TableContent extends BaseXBack {
   private final TableData tdata;
   /** GUI reference. */
   private final GUI gui;
-  /** Currently focused string. */
-  String focusedString;
 
   /**
    * Default constructor.
@@ -69,20 +67,19 @@ final class TableContent extends BaseXBack {
     final TokenBuilder[] tb = new TokenBuilder[nCols];
     for(int i = 0; i < nCols; i++) tb[i] = new TokenBuilder();
 
-    focusedString = null;
     final DBNodes marked = context.marked;
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 
-    int mpos = 0;
     while(++l < nRows && marked != null) {
       // skip when all visible rows have been painted or if data has changed
       if(posY > h || l >= tdata.rows.size()) break;
       posY += rowH;
 
+      // rows may be sorted by column: find first marked node at or after the row
       final int pre = tdata.rows.get(l);
-      final long ms = marked.size();
-      while(mpos < ms && marked.pre(mpos) < pre) ++mpos;
+      final int[] mpres = marked.sorted();
+      final int f = marked.find(pre), mpos = f < 0 ? -f - 1 : f;
 
       // draw line
       g.setColor(GUIConstants.color2);
@@ -90,15 +87,19 @@ final class TableContent extends BaseXBack {
       g.setColor(GUIConstants.backColor);
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
-      // verify if current node is marked or focused
-      final boolean rm = mpos < marked.size() && marked.pre(mpos) == pre;
+      // verify if current node is focused, and if it or one of its descendants is marked
+      final boolean rm = f >= 0;
+      final boolean dm = mpos < mpres.length && mpres[mpos] < pre + ViewData.size(data, pre);
       final boolean rf = pre == rfocus;
-      final int col = rm ? rf ? 5 : 4 : 3;
-      if(rm || rf) {
-        g.setColor(GUIConstants.color(col));
+      if(rf) {
+        g.setColor(GUIConstants.color(3));
         g.fillRect(0, posY - 1, w, rowH);
-        g.setColor(GUIConstants.color(col + 4));
+        g.setColor(GUIConstants.color(7));
         g.drawLine(0, posY - 1, w, posY - 1);
+      }
+      if(dm) {
+        g.setColor(rm ? GUIConstants.colormark1A : GUIConstants.colormark2A);
+        g.fillRect(0, posY - 1, w, rowH);
       }
       g.setColor(GUIConstants.textColor);
 
@@ -152,15 +153,10 @@ final class TableContent extends BaseXBack {
       if((rf || fcol != -1)  && focusStr != null) {
         final int sw = BaseXLayout.width(g, focusStr) + 8;
         if(fx > w - sw - 2) fx = w - sw - 2;
-        g.setColor(GUIConstants.color(col + 2));
+        g.setColor(GUIConstants.color(5));
         g.fillRect(fx - 2, posY, sw, rowH - 1);
         g.setColor(GUIConstants.textColor);
         BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
-
-        // cache focused string
-        focusedString = string(focusStr);
-        final int i = focusedString.indexOf("; ");
-        if(i != -1) focusedString = focusedString.substring(0, i);
       }
     }
     gui.painting = false;

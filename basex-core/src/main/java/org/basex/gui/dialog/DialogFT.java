@@ -122,8 +122,9 @@ final class DialogFT extends DialogIndex {
    */
   private void chooseStop() {
     final GUIOptions gopts = dialog.gui().gopts;
-    final BaseXFileChooser fc = new BaseXFileChooser(dialog,
-        FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH));
+    final String path = swpath.getText();
+    final BaseXFileChooser fc = new BaseXFileChooser(dialog, OPEN,
+        path.isEmpty() ? gopts.get(GUIOptions.DATAPATH) : path);
     final IOFile file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());

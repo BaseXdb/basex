@@ -48,6 +48,8 @@ public final class ProjectView extends BaseXPanel {
   private Component last;
   /** Indicates if the current project files have been parsed. */
   private boolean parsed;
+  /** Indicates if the root path combo box is being reset. */
+  private boolean resetting;
 
   /** Remembers the last focused component. */
   final FocusGainedListener lastfocus = e -> last = e.getComponent();
@@ -130,7 +132,7 @@ public final class ProjectView extends BaseXPanel {
       @Override
       public void componentResized(final ComponentEvent e) {
         // trigger parsing of project files; the filter must not be refreshed
-        parse(false);
+        parse(false, false);
       }
     });
 
@@ -161,7 +163,7 @@ public final class ProjectView extends BaseXPanel {
         if(xquery) ProjectFiles.parse(file.path(), gui.context, files.errors());
         refreshTree(io);
       }
-      refresh(rename, enforce);
+      refresh(rename, enforce, false);
     });
   }
 
@@ -205,25 +207,27 @@ public final class ProjectView extends BaseXPanel {
    * Refreshes the project view.
    */
   void refresh() {
-    refresh(true, true);
+    refresh(true, true, true);
   }
 
   /**
    * Refreshes the project view.
-   * @param reset invalidate the file cache
+   * @param reset   invalidate the file cache
    * @param enforce enforce parsing of XQuery files
+   * @param report  report the parsing time in the status bar
    */
-  private void refresh(final boolean reset, final boolean enforce) {
+  private void refresh(final boolean reset, final boolean enforce, final boolean report) {
     if(reset) files.reset();
     filter.refresh(true);
-    parse(enforce);
+    parse(enforce, report);
   }
 
   /**
    * Parses the project files in the background.
    * @param enforce enforce parsing of XQuery files
+   * @param report  report the parsing time in the status bar
    */
-  private void parse(final boolean enforce) {
+  private void parse(final boolean enforce, final boolean report) {
     // do not parse if project view is not visible, or if it has already been parsed
     if(!gui.gopts.get(GUIOptions.PARSEPROJ) || getWidth() == 0 || parsed && !enforce) return;
 
@@ -234,7 +238,8 @@ public final class ProjectView extends BaseXPanel {
         final Performance perf = new Performance();
         files.parse(root.file, gui.context);
         parsed = true;
-        gui.status.setText(PARSING_CC + perf.formatRuntime(), true);
+        // background parsing must not replace the status of the last query
+        if(report) gui.status.setText(PARSING_CC + perf.formatRuntime(), true);
         return true;
       }
 
@@ -317,20 +322,27 @@ public final class ProjectView extends BaseXPanel {
    * @return new file reference or {@code null} if operation failed
    */
   IOFile rename(final ProjectNode node, final String name) {
+    final IOFile old = node.file;
+    if(name.equals(old.name())) return null;
     // check if chosen file name is valid
-    if(IOFile.isValidName(name)) {
-      final IOFile old = node.file;
-      final IOFile updated = new IOFile(old.file().getParent(), name);
-      // rename file or show error dialog
-      try {
-        old.moveTo(updated, false);
-        // update tab references if file or directory could be renamed
-        gui.editor.rename(old, updated);
-        return updated;
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
-      }
+    if(!IOFile.isValidName(name)) {
+      BaseXDialog.error(gui, Util.info(NAME_INVALID_X, name));
+      return null;
+    }
+    // directory paths end with a slash
+    final IOFile updated = new IOFile(old.file().getParent(),
+        node instanceof ProjectDir ? name + '/' : name);
+    // rename file or show error dialog
+    try {
+      old.moveTo(updated, false);
+      // update tab references if file or directory could be renamed
+      gui.editor.rename(old, updated);
+      // invalidate file cache, filter list and errors
+      refresh();
+      return updated;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
     }
     return null;
   }
@@ -343,7 +355,7 @@ public final class ProjectView extends BaseXPanel {
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
     if(ea != null && !search.isEmpty()) {
-      final SearchFlags flags = filter.flags();
+      final SearchFlags flags = filter.listFlags();
       SwingUtilities.invokeLater(() -> ea.jump(search, flags));
     }
   }
@@ -364,8 +376,21 @@ public final class ProjectView extends BaseXPanel {
    * Changes the root directory. Called when another directory is chosen in the root path combo box.
    */
   private void changeRoot() {
-    final IOFile path = new IOFile(rootPath.getText());
-    if(root.file.eq(path)) return;
+    final String text = rootPath.getText();
+    final IOFile path = new IOFile(text);
+    if(resetting || root.file.eq(path)) return;
+
+    if(!path.isDir()) {
+      // directory does not exist anymore: report it, drop it from the history, restore the root
+      BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, path));
+      SwingUtilities.invokeLater(() -> {
+        resetting = true;
+        rootPath.removeHistory(text);
+        rootPath.select(root.file.path());
+        resetting = false;
+      });
+      return;
+    }
 
     // the pending replacement backup mirrors the old root; invalidate it
     filter.discardBackups();

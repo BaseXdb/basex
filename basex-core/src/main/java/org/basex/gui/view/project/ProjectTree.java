@@ -58,25 +58,42 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
       new GUIPopupCmd(DELETE + ELLIPSIS, BaseXKeys.DELNEXT) {
         @Override
         public void execute() {
-          final ProjectNode node = selectedNode();
+          // skip nodes in selected directories
+          final List<ProjectNode> nodes = selectedNodes();
+          nodes.removeIf(node -> Checks.any(nodes, n -> n != node && n.file.contains(node.file)));
+
           final GUI gui = view.gui;
-          if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
+          final String msg = nodes.size() == 1 ? Util.info(DELETE_FILE_X, nodes.getFirst().file) :
+            Util.info(DELETE_FILES_X, BaseXLayout.format(nodes.size()));
+          if(!BaseXDialog.confirmDestructive(gui, msg)) return;
+
+          // refreshing a directory detaches its child nodes: collect parents before deleting files
+          final ArrayList<ProjectNode> parents = new ArrayList<>();
+          for(final ProjectNode node : nodes) {
             final ProjectNode parent = (ProjectNode) node.getParent();
+            if(!parents.contains(parent)) parents.add(parent);
+          }
+          for(final ProjectNode node : nodes) {
+            if(!gui.editor.closeEditors(node.file)) break;
             // delete file or show error dialog
-            if(gui.editor.delete(node.file)) {
-              parent.refresh();
-              setSelectionPath(parent.path());
-              view.refresh();
-            } else {
+            if(!node.file.delete()) {
               BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
+              break;
             }
           }
+          // remember the closed editors
+          gui.saveOptions();
+          // refresh deepest directories first, select the topmost one
+          parents.sort((p1, p2) -> p2.getLevel() - p1.getLevel());
+          for(final ProjectNode parent : parents) parent.refresh();
+          setSelectionPath(parents.getLast().path());
+          view.refresh();
         }
 
         @Override
         public boolean enabled(final GUI main) {
-          final ProjectNode node = selectedNode();
-          return node != null && !node.root();
+          final List<ProjectNode> nodes = selectedNodes();
+          return !nodes.isEmpty() && !Checks.any(nodes, ProjectNode::root);
         }
       },
 
@@ -84,7 +101,6 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
         @Override
         public void execute() {
           startEditingAtPath(selectedNode().path());
-          view.refresh();
         }
 
         @Override
@@ -222,13 +238,23 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
   @Override
   public List<IOFile> selectedFiles() {
     final ArrayList<IOFile> files = new ArrayList<>();
+    for(final ProjectNode node : selectedNodes()) files.add(node.file);
+    return files;
+  }
+
+  /**
+   * Returns all selected nodes.
+   * @return selected nodes
+   */
+  private List<ProjectNode> selectedNodes() {
+    final ArrayList<ProjectNode> nodes = new ArrayList<>();
     final TreePath[] paths = getSelectionPaths();
     if(paths != null) {
       for(final TreePath tp : paths) {
-        if(tp.getLastPathComponent() instanceof final ProjectNode node) files.add(node.file);
+        if(tp.getLastPathComponent() instanceof final ProjectNode node) nodes.add(node);
       }
     }
-    return files;
+    return nodes;
   }
 
   // PRIVATE METHODS ===============================================================================

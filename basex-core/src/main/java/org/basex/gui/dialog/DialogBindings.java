@@ -27,6 +27,8 @@ public final class DialogBindings extends BaseXDialog {
   private final BaseXTextField[] values = new BaseXTextField[MAX];
   /** Context value. */
   private final BaseXTextField ctxValue;
+  /** Bindings that exceed the number of rows. */
+  private final HashMap<String, String> hidden = new HashMap<>();
 
   /**
    * Default constructor.
@@ -50,7 +52,7 @@ public final class DialogBindings extends BaseXDialog {
         values[c] = new BaseXTextField(this);
         row.add(values[c]);
       } else {
-        row.add(new BaseXLabel("Context value" + COLS));
+        row.add(new BaseXLabel(CONTEXT_VALUE + COL));
         final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
         ctx.add(ctxValue, BorderLayout.CENTER);
         final BaseXButton browse = new BaseXButton(this, BROWSE_D);
@@ -85,6 +87,8 @@ public final class DialogBindings extends BaseXDialog {
         names[c].setText('$' + name.replaceAll("^\\$", ""));
         values[c].setText(value);
         c++;
+      } else {
+        hidden.put(name, value);
       }
     }
     for(; c < MAX; c++) {
@@ -109,7 +113,7 @@ public final class DialogBindings extends BaseXDialog {
 
   @Override
   public void close() {
-    final HashMap<String, String> map = new HashMap<>();
+    final HashMap<String, String> map = new HashMap<>(hidden);
     for(int c = 0; c < MAX; c++) {
       final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");
       if(!name.isEmpty()) map.put(name, values[c].getText());

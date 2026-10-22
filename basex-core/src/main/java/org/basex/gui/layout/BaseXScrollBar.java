@@ -3,6 +3,8 @@ package org.basex.gui.layout;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import org.basex.gui.*;
 import org.basex.util.list.*;
 
@@ -78,6 +80,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     setOpaque(false);
+    setCursor(GUIConstants.CURSORARROW);
     refreshLayout();
   }
 
@@ -210,7 +213,7 @@ public final class BaseXScrollBar extends BaseXPanel {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(extent <= track) return;
+    if(extent <= track || !SwingUtilities.isLeftMouseButton(e)) return;
 
     // jump to the clicked position if the slider was not hit
     final int c = coord(e);

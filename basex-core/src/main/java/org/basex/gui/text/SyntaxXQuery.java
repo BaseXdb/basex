@@ -52,6 +52,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final ArrayList<Completion> DECLARATIONS = new ArrayList<>();
   /** Signatures of the built-in functions, with and without namespace prefix. */
   private static final HashMap<String, Signature> SIGNATURES = new HashMap<>();
+  /** Keywords that precede the name of a bound variable. */
+  private static final Set<String> BINDERS = Set.of(AT, CASE, COPY, COUNT, END, EVERY, FOR, KEY,
+    LET, MEMBER, NEXT, PREVIOUS, SCORE, SOME, START, "value", VARIABLE);
+  /** Pattern for the location of an imported module. */
+  private static final Pattern MODULE_IMPORT = Pattern.compile("import\\s+module\\s+namespace\\s+" +
+    "([^\\s=]+)\\s*=\\s*(?:\"[^\"]*\"|'[^']*')\\s*at\\s*(?:\"([^\"]*)\"|'([^']*)')");
   /** Code completions (documentation tags of a comment). */
   private static final ArrayList<Completion> TAGS = new ArrayList<>();
   /** Placeholder in a snippet for the namespace prefix of a library module. */
@@ -120,8 +126,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final int INITIAL = 4;
   /** Declaration scan: after the {@code default} keyword of a declaration. */
   private static final int DEFAULTED = 5;
-  /** Declaration scan: in the parameter list of a function. */
+  /** Declaration scan: in the parameter list of a function or the field list of a record. */
   private static final int FUNCTION_PARAMS = 6;
+  /** Declaration scan: after the {@code record} keyword. */
+  private static final int RECORD_NAME = 7;
 
   /** Module scan: before the module declaration. */
   private static final int MODULE_KEYWORD = 0;
@@ -516,6 +524,114 @@ final class SyntaxXQuery extends SyntaxMarkup {
     return SIGNATURES.get(name);
   }
 
+  @Override
+  Definition definition(final byte[] text, final int pos) {
+    // name in code at the specified position, or ending at this position
+    reset();
+    if(!(pos < text.length && name(text, pos)) && !(pos > 0 && name(text, pos - 1))) return null;
+    final int s = nameStart, e = nameEnd;
+    // names in strings, comments and element content are ignored
+    scan(text, s + 1);
+    if(!code()) return null;
+
+    final String word = string(text, s, e - s);
+    // a variable name may be separated from its '$' by whitespace, as in the highlighter
+    final boolean variable = cp(text, skipWsBack(text, s)) == '$';
+    if(!variable && !call(text, e)) return new Definition(null, word, -1, s, e);
+
+    // the closest preceding binding of a local variable (none for the binding itself)
+    final String name = variable ? '$' + word : word;
+    if(variable) {
+      final int binding = binding(text, s, word);
+      if(binding != -1) return new Definition(null, name, binding == s ? -1 : binding, s, e);
+    }
+    // declarations of the module
+    final Declaration declaration = declaration(text, name, false);
+    if(declaration != null) {
+      final int dp = declaration.pos();
+      return new Definition(null, name, dp == s ? -1 : dp, s, e);
+    }
+    // declarations of an imported module
+    final int colon = word.indexOf(':');
+    if(colon != -1) {
+      final Matcher m = MODULE_IMPORT.matcher(string(text));
+      final String prefix = word.substring(0, colon), local = word.substring(colon + 1);
+      while(m.find()) {
+        if(m.group(1).equals(prefix)) {
+          final String location = m.group(2) != null ? m.group(2) : m.group(3);
+          return new Definition(location, variable ? '$' + local : local, -1, s, e);
+        }
+      }
+    }
+    return new Definition(null, name, -1, s, e);
+  }
+
+  /**
+   * Checks if a name is followed by an argument list or a function reference.
+   * @param text text
+   * @param end end of the name
+   * @return result of check
+   */
+  private static boolean call(final byte[] text, final int end) {
+    final int ch = cp(text, skipWs(text, end));
+    return ch == '(' || ch == '#';
+  }
+
+  /**
+   * Returns the closest binding of a variable that precedes or contains the specified position.
+   * @param text text
+   * @param pos position of the variable name
+   * @param name variable name
+   * @return position of the bound name, or {@code -1} if none is found
+   */
+  private int binding(final byte[] text, final int pos, final String name) {
+    final byte[] token = token(name);
+    final int nl = token.length;
+    int binding = -1;
+    reset();
+    for(int p = 0; p <= pos; p += cl(text, p)) {
+      color(text, p, p + cl(text, p));
+      if(text[p] != '$' || !code()) continue;
+      final int s = skipWs(text, p + 1), e = s + nl;
+      if(e <= text.length && Arrays.equals(text, s, e, token, 0, nl) && end(text, e) == e &&
+          bound(text, p, e)) binding = s;
+    }
+    return binding;
+  }
+
+  /**
+   * Checks if a variable reference binds the variable.
+   * @param text text
+   * @param dollar position of the dollar sign
+   * @param end end of the variable name
+   * @return result of check
+   */
+  private boolean bound(final byte[] text, final int dollar, final int end) {
+    // assignment ('let $x := ...'), keyword ('for $x in', 'at $p')
+    if(startsWith(text, skipWs(text, end), ":=") || BINDERS.contains(endName(text, dollar)))
+      return true;
+    // parameter of a declared or inline function
+    final int before = skipWsBack(text, dollar);
+    if(before < 0 || text[before] != '(' && text[before] != ',') return false;
+    int depth = 0, p = before;
+    for(; p >= 0; p--) {
+      final int ch = text[p];
+      if(ch == ')' || ch == ']' || ch == '}') {
+        depth++;
+      } else if(ch == '(' || ch == '[' || ch == '{') {
+        if(depth == 0) break;
+        depth--;
+      }
+    }
+    if(p < 0 || text[p] != '(') return false;
+    final String fn = endName(text, p);
+    if(Strings.eq(fn, FUNCTION, FN)) return true;
+    // the name of a declared function may have a prefix
+    int q = nameStart(text, skipWsBack(text, p) + 1);
+    if(q > 0 && text[q - 1] == ':') q = nameStart(text, q - 1);
+    return !fn.isEmpty() && FUNCTION.equals(endName(text, q));
+  }
+
   /**
    * Adds the snippets that continue a declaration, without the keywords that introduce it.
    * @param list list to be filled
@@ -623,7 +739,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // parameter names of the current function, their optionality, and flag for the next parameter
     final StringList params = new StringList();
     final BoolList optional = new BoolList();
-    boolean parameter = false;
+    boolean parameter = false, record = false;
 
     final int tl = text.length;
     for(int p = 0; p < tl;) {
@@ -654,7 +770,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
             if(prev == '$') {
               if(begin < pos) context.variables.add(token('$' + word));
               // the first variable of a parameter is its name; the others occur in default values
-              if(scan == FUNCTION_PARAMS && parameter) {
+              if(scan == FUNCTION_PARAMS && parameter && !record) {
                 params.add(word);
                 optional.add(false);
                 parameter = false;
@@ -708,6 +824,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
                 scan = FUNCTION_NAME;
               } else if(VARIABLE.equals(word)) {
                 scan = VARIABLE_NAME;
+              } else if(RECORD.equals(word)) {
+                scan = RECORD_NAME;
               } else if(DEFAULT.equals(word)) {
                 scan = DEFAULTED;
               } else if(!UPDATING.equals(word)) {
@@ -717,11 +835,18 @@ final class SyntaxXQuery extends SyntaxMarkup {
             case DEFAULTED -> scan = OUTSIDE;
             case FUNCTION_PARAMS -> {
               // the words of a parameter list are names, types and keywords
+              if(record && parameter && depth == 1 && text[begin - 1] != '%') {
+                // the first word of a field declaration is its name, unless it is an annotation
+                params.add(word);
+                optional.add(false);
+                parameter = false;
+              }
             }
             default -> {
-              if(scan == FUNCTION_NAME) {
+              if(scan == FUNCTION_NAME || scan == RECORD_NAME) {
                 // the parameter names are collected until the list is closed
                 declarations.add(new Declaration(word, "()", begin, beginLine));
+                record = scan == RECORD_NAME;
                 scan = FUNCTION_PARAMS;
                 params.reset();
                 optional.reset();

@@ -56,7 +56,8 @@ final class DialogResultPrefs extends BaseXBack {
     textMax.addActionListener(e -> action());
     textLabel = new BaseXLabel(" ");
 
-    serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
+    serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER),
+        so -> gui.set(MainOptions.SERIALIZER, so));
 
     BaseXBack p, pp;
     p = new BaseXBack(new RowLayout());
@@ -94,12 +95,5 @@ final class DialogResultPrefs extends BaseXBack {
    */
   void init() {
     serial.init(gui.context.options.get(MainOptions.SERIALIZER));
-  }
-
-  /**
-   * Closes the panel.
-   */
-  void cancel() {
-    gui.set(MainOptions.SERIALIZER, serial.options());
   }
 }

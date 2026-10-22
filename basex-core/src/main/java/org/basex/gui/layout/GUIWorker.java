@@ -26,6 +26,14 @@ public abstract class GUIWorker<T> {
   protected abstract void done(T t);
 
   /**
+   * Error handling task.
+   * @param ex exception
+   */
+  protected void failed(final Exception ex) {
+    Util.stack(ex);
+  }
+
+  /**
    * Executes this worker.
    */
   public final void execute() {
@@ -41,7 +49,7 @@ public abstract class GUIWorker<T> {
           GUIWorker.this.done(get());
         } catch(final Exception ex) {
           if(ex.getCause() instanceof InterruptedException) Util.debug(ex);
-          else Util.stack(ex);
+          else failed(ex);
         }
       }
     }.execute();

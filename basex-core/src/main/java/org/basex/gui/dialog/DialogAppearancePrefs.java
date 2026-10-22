@@ -129,7 +129,7 @@ final class DialogAppearancePrefs extends BaseXBack {
     size.setValue(Integer.toString(gopts.get(GUIOptions.FONTSIZE)));
     antiAlias = new BaseXCombo(dialog, "System", "GASP", "On", "Off");
     antiAlias.setSelectedItem(gopts.get(GUIOptions.ANTIALIAS));
-    onlyMono = new BaseXCheckBox(dialog, "Monospace", GUIOptions.LISTMONO, gopts);
+    onlyMono = new BaseXCheckBox(dialog, MONOSPACE, GUIOptions.LISTMONO, gopts);
 
     BaseXBack p = new BaseXBack(new RowLayout()), pp;
     p.add(new BaseXLabel(FONTS + COL, true, true));
@@ -138,7 +138,7 @@ final class DialogAppearancePrefs extends BaseXBack {
     pp.add(font2);
     pp.add(size);
     final BaseXBack ppp = new BaseXBack(new ColumnLayout(8));
-    ppp.add(new BaseXLabel("Antialiasing"));
+    ppp.add(new BaseXLabel(ANTIALIASING + COL));
     ppp.add(antiAlias);
     pp.add(ppp);
     pp.add(onlyMono);

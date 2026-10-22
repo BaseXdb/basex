@@ -159,7 +159,7 @@ public final class TreeView extends View {
       for(int i = 0; !showAtts && i < rl; i++) {
         if(roots[i] >= data.nodes()) break;
         if(data.kind(roots[i]) == Data.ATTR) {
-          drawMessage(g, "Enable attributes in Tree Options.");
+          drawMessage(g, H_TREE_ATTS);
           return;
         }
       }
@@ -616,7 +616,7 @@ public final class TreeView extends View {
     if(px > -1 && levelDistance >= MIN_NODE_DIST_CONN) drawParentConnection(g, lv, r, px, rc);
 
     // if there are ancestors draw them
-    if(!root) {
+    if(!root && lv > 0) {
       final int par = d.parent(pre, k), lvp = lv - 1;
       final TreeRect parRect = tr.searchRect(sub, rn, lvp, par);
       if(parRect == null) return;
@@ -893,16 +893,13 @@ public final class TreeView extends View {
    */
   private void setLevelDistance() {
     final int h = height - BOTTOM_MARGIN, lvs = sub.maxSubtreeHeight();
-    int nh = (int) (fontSize * 1.4);
-    final int dist = nh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
-    while(true) {
-      final double ld = (h - lvs * nh) / (lvs - 1.0d);
-      if(ld >= dist || nh < MIN_NODE_HEIGHT) {
-        levelDistance = Math.clamp((int) ld, MIN_LEVEL_DISTANCE, MAX_LEVEL_DISTANCE);
-        break;
-      }
-      nh--;
-    }
+    final int bnh = (int) (fontSize * 1.4);
+    final int dist = bnh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
+    // limited space: shrink node height and level distance proportionally
+    final double f = Math.min(1, h / (lvs * bnh + (lvs - 1.0d) * dist));
+    final int nh = Math.max(MIN_NODE_HEIGHT, (int) (bnh * f));
+    final double ld = (h - lvs * nh) / (lvs - 1.0d);
+    levelDistance = Math.clamp((int) ld, MIN_LEVEL_DISTANCE, MAX_LEVEL_DISTANCE);
     nodeHeight = nh;
     topMargin = Math.max(TOP_MARGIN, (h - (levelDistance * (lvs - 1) + lvs * nh)) / 2);
   }
@@ -947,11 +944,12 @@ public final class TreeView extends View {
    * @param rn root
    * @param lv level
    * @param r rectangle
+   * @param ix index of the first node
    * @return size
    */
-  private int getHitBigRectNodesNum(final int rn, final int lv, final TreeRect r) {
+  private int getHitBigRectNodesNum(final int rn, final int lv, final TreeRect r, final int ix) {
     final int w = r.w(), ls = sub.levelSize(rn, lv);
-    return Math.max(ls / Math.max(w, 1), 1);
+    return Math.min(Math.max(ls / Math.max(w, 1), 1), ls - ix);
   }
 
   /**
@@ -965,8 +963,9 @@ public final class TreeView extends View {
    */
   private int getMostSizedNode(final Data d, final int rn, final int lv, final TreeRect r,
       final int p) {
-    final int size = getHitBigRectNodesNum(rn, lv, r), idx = sub.preIndex(rn, lv, p);
+    final int idx = sub.preIndex(rn, lv, p);
     if(idx < 0) return -1;
+    final int size = getHitBigRectNodesNum(rn, lv, r, idx);
     int dpre = -1, si = 0;
     for(int i = 0; i < size; i++) {
       final int pre = sub.prePerIndex(rn, lv, i + idx), k = d.kind(pre), s = d.size(pre, k);
@@ -990,25 +989,26 @@ public final class TreeView extends View {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(!inFocus || frect == null) return;
+    super.mousePressed(e);
+    if(!inFocus || frect == null) {
+      if(!gui.updating) unmark(e);
+      return;
+    }
 
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(flv >= sub.subtreeHeight(frn)) return;
 
       if(tr.bigRect(sub, frn, flv)) {
         final DBNodes ns = new DBNodes(gui.context.data());
-        int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.preIndex(frn, flv, fpre);
+        if(fix < 0) return;
+        int sum = getHitBigRectNodesNum(frn, flv, frect, fix);
         if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
         final int[] m = new int[sum];
-        for(int i = 0; i < sum; i++) {
-          final int pre = sub.prePerIndex(frn, flv, i + fix);
-          if(pre == -1) break;
-          m[i] = pre;
-        }
+        for(int i = 0; i < sum; i++) m[i] = sub.prePerIndex(frn, flv, i + fix);
         ns.union(m);
         gui.notify.mark(ns, null);
-      } else {
+      } else if(!markFocused(e)) {
         gui.notify.mark(0);
       }
       if(e.getClickCount() > 1) {
@@ -1021,8 +1021,51 @@ public final class TreeView extends View {
   }
 
   @Override
+  public void keyPressed(final KeyEvent e) {
+    super.keyPressed(e);
+    final int pre = gui.context.focused;
+    if(gui.updating || sub == null || pre == -1) return;
+
+    // arrow keys: move to the parent, the first child, or the previous or next node of the level
+    final boolean up = BaseXKeys.PREVLINE.is(e), down = BaseXKeys.NEXTLINE.is(e);
+    final boolean left = BaseXKeys.PREVCHAR.is(e), right = BaseXKeys.NEXTCHAR.is(e);
+    if(!(up || down || left || right)) return;
+
+    final Data data = gui.context.data();
+    final int rl = roots.length;
+    for(int rn = 0; rn < rl; rn++) {
+      final int h = sub.subtreeHeight(rn);
+      for(int lv = 0; lv < h; lv++) {
+        final int ix = sub.preIndex(rn, lv, pre);
+        if(ix < 0) continue;
+
+        int np = -1;
+        if(up) {
+          if(lv > 0) np = ViewData.parent(data, pre);
+        } else if(down) {
+          if(lv + 1 < h) {
+            final int end = pre + ViewData.size(data, pre);
+            for(int c = pre + 1; c < end && np == -1; c++) {
+              if(sub.preIndex(rn, lv + 1, c) >= 0) np = c;
+            }
+          }
+        } else {
+          final int nx = ix + (right ? 1 : -1);
+          if(nx >= 0 && nx < sub.levelSize(rn, lv)) np = sub.prePerIndex(rn, lv, nx);
+        }
+        if(np != -1) {
+          gui.notify.focus(np, this);
+          refreshFocus();
+        }
+        return;
+      }
+    }
+  }
+
+  @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(gui.updating || gui.context.focused == -1) return;
+    // shortcut key: zoom into the focused node or back
+    if(gui.updating || gui.context.focused == -1 || !BaseXKeys.sc(e)) return;
     if(e.getWheelRotation() <= 0) gui.notify.context(new DBNodes(
         gui.context.data(), gui.context.focused), false, null);
     else gui.notify.hist(false);
@@ -1030,7 +1073,7 @@ public final class TreeView extends View {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || e.isShiftDown()) return;
+    if(gui.updating || e.isShiftDown() || !SwingUtilities.isLeftMouseButton(e)) return;
 
     final int x = e.getX(), y = e.getY();
     if(selection) {

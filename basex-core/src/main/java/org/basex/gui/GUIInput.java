@@ -61,8 +61,9 @@ public final class GUIInput extends BaseXCombo {
           }
         }
 
+        // Shift+Up/Down: history of the input bar
         final int count = completions.getItemCount();
-        if(count == 0) return;
+        if(count == 0 || e.isShiftDown()) return;
 
         int bi = completions.getSelectedIndex();
         if(NEXTLINE.is(e)) {

@@ -114,6 +114,13 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    if(PREVTAB.is(e) || NEXTTAB.is(e) || CLOSETAB.is(e)) {
+      hidePopups();
+      if(CLOSETAB.is(e)) view.close(this);
+      else view.tab(NEXTTAB.is(e));
+      e.consume();
+      return;
+    }
     final byte[] text = editor.text();
     super.keyPressed(e);
     if(text != editor.text()) resetError();
@@ -129,9 +136,9 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(TESTS.is(e)) {
-      if(gui.editor.test.isEnabled()) view.run(this, Action.TEST);
-    } else if(HISTORY.is(e)) {
+    // tests are run via the menu shortcut
+    if(TESTS.is(e)) return;
+    if(HISTORY.is(e)) {
       gui.editor.historyPopup(0);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       view.run(this, Action.CHECK);
@@ -150,7 +157,7 @@ public final class EditorArea extends TextPanel {
 
     // do not discard modifications without confirmation (skipped if file was deleted)
     if(file.exists() && modified() &&
-        !BaseXDialog.confirm(gui, Util.info(REVERT_FILE_X, file.name()))) return;
+        !BaseXDialog.confirmDestructive(gui, Util.info(REVERT_FILE_X, file.name()))) return;
 
     if(!load(true)) {
       // file was deleted or cannot be accessed: flag editor contents as modified
@@ -189,7 +196,8 @@ public final class EditorArea extends TextPanel {
     file(file, false);
     timeStamp = ts;
     checked = ts;
-    view.run(this, Action.PARSE);
+    // background editors are parsed when they are selected
+    if(view.getEditor() == this) view.run(this, Action.PARSE);
     return true;
   }
 
@@ -211,7 +219,9 @@ public final class EditorArea extends TextPanel {
     // file was changed on disk: confirm overwrite, or adopt changes before tidying the contents
     final long ts = file.timeStamp();
     if(!rename && opened && ts != 0 && ts != timeStamp && (modified() ?
-        !BaseXDialog.confirm(gui, Util.info(FILE_CHANGED_X, file)) : !load(true))) return false;
+        !BaseXDialog.confirmDestructive(gui, Util.info(FILE_CHANGED_X, file)) : !load(true))) {
+      return false;
+    }
 
     final GUIOptions gopts = gui.gopts;
     final boolean trim = gopts.get(GUIOptions.TRIMLINES), nl = gopts.get(GUIOptions.FINALNL);
@@ -264,12 +274,43 @@ public final class EditorArea extends TextPanel {
     search.find(string, flags, SearchDir.CURRENT);
   }
 
+  @Override
+  protected void visit() {
+    view.visit(this);
+  }
+
+  @Override
+  protected void definition(final String location, final String name) {
+    // the module is resolved against the directory of the edited file
+    if(!(file.merge(location) instanceof final IOFile module) || !module.exists()) return;
+    final EditorArea edit = view.open(module);
+    if(edit != null) edit.gotoDeclaration(name);
+  }
+
   /**
    * Updates the file reference, timestamp and history.
    * @param io file
    * @param save save option files
    */
   void file(final IOFile io, final boolean save) {
+    hist.save();
+    assign(io, save);
+  }
+
+  /**
+   * Updates the reference to a renamed file, preserving the modification state.
+   * @param io renamed file
+   */
+  void rename(final IOFile io) {
+    assign(io, true);
+  }
+
+  /**
+   * Updates the file reference, timestamp and list of recent files.
+   * @param io file
+   * @param save save option files
+   */
+  private void assign(final IOFile io, final boolean save) {
     if(io != file) {
       file = io;
       label.setIcon(BaseXImages.file(io));
@@ -279,8 +320,7 @@ public final class EditorArea extends TextPanel {
     opened = true;
     timeStamp = file.timeStamp();
     checked = timeStamp;
-    hist.save();
-    view.refreshHistory(file);
+    view.refreshHistory(this);
     view.refreshControls(this, true);
     if(save) gui.saveOptions();
   }

@@ -21,6 +21,8 @@ final class TextRenderer extends BaseXBack {
   private final EditorOptions opts;
   /** Offset. */
   private static final int OFFSET = 5;
+  /** Maximum number of pinned lines. */
+  private static final int MAXPINNED = 3;
 
   /** Text editor. */
   private final TextEditor text;
@@ -51,8 +53,18 @@ final class TextRenderer extends BaseXBack {
   private boolean showLines;
   /** Mark current line. */
   private boolean markline;
+  /** Show indentation guides. */
+  private boolean guides;
+  /** Pin the lines that enclose the topmost visible line. */
+  private boolean sticky;
+  /** Positions and vertical offsets of the pinned lines. */
+  private final IntList pinned = new IntList();
+  /** Start and end of an underlined reference (can be {@code null}). */
+  private int[] underline;
   /** Antialiasing type. */
   private String antiAlias;
+  /** Apply the antialiasing option. */
+  private final boolean custom;
   /** Area to be repainted. */
   private Rectangle clip = new Rectangle();
 
@@ -81,16 +93,18 @@ final class TextRenderer extends BaseXBack {
    * @param scroll vertical scrollbar reference
    * @param hscroll horizontal scrollbar reference
    * @param edit editable flag
+   * @param custom apply the antialiasing option
    * @param opts editor options
    */
   TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final BaseXScrollBar hscroll,
-      final boolean edit, final EditorOptions opts) {
+      final boolean edit, final boolean custom, final EditorOptions opts) {
 
     setOpaque(false);
     this.text = text;
     this.scroll = scroll;
     this.hscroll = hscroll;
     this.edit = edit;
+    this.custom = custom;
     this.opts = opts;
     setFont(GUIConstants.dmfont);
   }
@@ -113,6 +127,8 @@ final class TextRenderer extends BaseXBack {
     showNL = edit && opts.get(GUIOptions.SHOWNL);
     showLines = edit && opts.get(GUIOptions.SHOWLINES);
     markline = edit && opts.get(GUIOptions.MARKLINE);
+    guides = edit && opts.get(GUIOptions.SHOWGUIDES);
+    sticky = edit && opts.get(GUIOptions.STICKYSCROLL);
     antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
   }
@@ -129,7 +145,7 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    BaseXLayout.antiAlias(g, antiAlias);
+    if(custom) BaseXLayout.antiAlias(g, antiAlias);
     // rows outside the requested area are laid out, but not drawn
     final Rectangle bounds = g.getClipBounds();
     clip = bounds != null ? bounds : new Rectangle(getWidth(), getHeight());
@@ -142,13 +158,13 @@ final class TextRenderer extends BaseXBack {
     int oldL = layout.line - 1;
     while(more(layout) && layout.y < height) {
       if(layout.line != oldL && layout.y >= 0) {
-        drawLineNumber(layout, g);
+        drawGutter(layout, g);
         oldL = layout.line;
       }
       write(layout, g);
     }
     if(rowStart(layout)) markLine(layout, g);
-    if(layout.line != oldL) drawLineNumber(layout, g);
+    if(layout.line != oldL) drawGutter(layout, g);
 
     layout.stringWidth = 0;
     final int s = iter.pos();
@@ -160,8 +176,119 @@ final class TextRenderer extends BaseXBack {
     }
     if(s == iter.errorPos()) drawError(layout, g);
 
+    drawPinned(g);
     clipAll(g);
     drawLinesSep(g);
+  }
+
+  /**
+   * Renders the line number and the bookmark of the current line.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawGutter(final Layout layout, final Graphics g) {
+    drawLineNumber(layout, g);
+    drawBookmark(layout, g);
+  }
+
+  /**
+   * Marks the current line if it is bookmarked.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawBookmark(final Layout layout, final Graphics g) {
+    if(!edit || !rowVisible(layout) || !text.bookmarked(layout.iter.pos())) return;
+    final int w = Math.min(Math.max(3, fontHeight / 5), offset - 3);
+    g.setColor(GUIConstants.color4);
+    clipAll(g);
+    g.fillRect(1, layout.lineY + 1, w, fontHeight - 2);
+    clipText(g);
+  }
+
+  /**
+   * Draws the indentation guides of the current line.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawGuides(final Layout layout, final Graphics g) {
+    final int cw = font.charWidth(' '), step = cw * opts.indent();
+    final int guide = cw * text.guides(layout.iter.pos());
+    g.setColor(GUIConstants.paleGray);
+    for(int x = 0; x < guide; x += step) {
+      g.drawLine(layout.startX + x, layout.lineY, layout.startX + x, layout.lineY + fontHeight);
+    }
+  }
+
+  /**
+   * Draws the lines that enclose the topmost visible line at the top of the panel.
+   * @param g graphics reference
+   */
+  private void drawPinned(final Graphics g) {
+    // the pinned lines are kept if the repainted area does not reach them
+    if(clip.y > fontHeight * (MAXPINNED + 1)) return;
+    pinned.reset();
+    if(!sticky || scroll.pos() == 0 || !cache.valid(text.size(), cacheWidth())) return;
+
+    // the lines are pinned that enclose the first line below the pinned ones
+    IntList lines;
+    for(int rows = 0;;) {
+      final int top = cache.pos(cache.indexByY(scroll.pos() + (rows + 1) * fontHeight));
+      lines = text.enclosingLines(top, MAXPINNED);
+      if(lines.size() <= rows) break;
+      rows = lines.size();
+    }
+    final int ls = lines.size();
+    if(ls == 0) return;
+
+    final int bottom = fontHeight * ls + fontHeight / 5;
+    clipAll(g);
+    g.setColor(GUIConstants.backColor);
+    g.fillRect(0, 0, getWidth(), bottom);
+    for(int l = 0; l < ls; l++) {
+      final int pos = lines.get(l), idx = cache.indexByPos(pos);
+      final Layout layout = init(true, false);
+      position(layout, idx, fontHeight - 2 + l * fontHeight - cache.y(idx));
+      syntax.state(cache.state(idx));
+      pinned.add(pos).add(layout.lineY + fontHeight);
+      drawGutter(layout, g);
+      clipText(g);
+      for(final int y = layout.y; more(layout) && layout.y == y; next(layout)) {
+        final TextIterator iter = layout.iter;
+        final int cp = iter.curr();
+        if(cp == TokenBuilder.NLINE) break;
+        final Color color = syntax.getColor(iter);
+        if(cp > ' ') {
+          g.setColor(color);
+          font.draw(g, iter.text(), iter.pos(), iter.posEnd(), layout.x, layout.y);
+        }
+      }
+      clipAll(g);
+    }
+    g.setColor(GUIConstants.lightGray);
+    g.drawLine(0, bottom, getWidth(), bottom);
+  }
+
+  /**
+   * Assigns the range of an underlined reference.
+   * @param range start and end (can be {@code null})
+   */
+  void underline(final int[] range) {
+    if(Arrays.equals(range, underline)) return;
+    underline = range;
+    repaint();
+  }
+
+  /**
+   * Returns the start of the pinned line at the specified position.
+   * @param point position
+   * @return line start, or {@code -1} if no pinned line is found
+   */
+  int sticky(final Point point) {
+    final int ps = pinned.size();
+    for(int p = 0; p < ps; p += 2) {
+      if(point.y < pinned.get(p + 1)) return pinned.get(p);
+    }
+    return -1;
   }
 
   /**
@@ -719,7 +846,14 @@ final class TextRenderer extends BaseXBack {
    */
   private void write(final Layout layout, final Graphics g) {
     final TextIterator iter = layout.iter;
-    if(rowStart(layout)) markLine(layout, g);
+    if(rowStart(layout)) {
+      markLine(layout, g);
+      // guides are drawn in the first row of a line
+      final int p = iter.pos();
+      if(guides && rowVisible(layout) && (p == 0 || iter.text()[p - 1] == '\n')) {
+        drawGuides(layout, g);
+      }
+    }
 
     // advance the highlighter, and choose color for enabled text, depending on highlighting or link
     final Color syntaxColor = syntax.getColor(iter);
@@ -798,8 +932,16 @@ final class TextRenderer extends BaseXBack {
           font.draw(g, iter.text(), pos, iter.posEnd(), x, y);
         }
       }
-      // underline linked text
+      // underline linked text and references
       if(layout.link) g.drawLine(x, y + 1, x + sw, y + 1);
+      if(underline != null) {
+        final int us = Math.max(pos, underline[0]), ue = Math.min(iter.posEnd(), underline[1]);
+        if(us < ue) {
+          final int ux = x + font.stringWidth(iter.text(), pos, us);
+          g.setColor(color);
+          g.drawLine(ux, y + 1, ux + font.stringWidth(iter.text(), us, ue), y + 1);
+        }
+      }
       // show cursor: a wrapped token shares its first position with the end of the previous row
       if(caret) {
         if(iter.edited()) {

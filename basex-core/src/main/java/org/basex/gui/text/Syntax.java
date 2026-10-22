@@ -315,6 +315,31 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the declaration with the specified name.
+   * @param text text
+   * @param name name of the function or variable (variables are prefixed with a dollar sign)
+   * @param local compare local names
+   * @return declaration, or {@code null} if it is not found
+   */
+  final Declaration declaration(final byte[] text, final String name, final boolean local) {
+    for(final Declaration declaration : declarations(text)) {
+      if((local ? declaration.local() : declaration.name()).equals(name)) return declaration;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the definition of the function or variable referenced at the specified position.
+   * @param text text
+   * @param pos position
+   * @return definition (possibly not found), or {@code null} if no name is referenced
+   */
+  @SuppressWarnings("unused")
+  Definition definition(final byte[] text, final int pos) {
+    return null;
+  }
+
+  /**
    * Indicates if code completions can be proposed at the specified position.
    * @param text text
    * @param caret caret position

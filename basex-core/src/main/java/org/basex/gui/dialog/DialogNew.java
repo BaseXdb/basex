@@ -112,7 +112,8 @@ public final class DialogNew extends BaseXDialog {
   public void action(final Object comp) {
     if(general == null) return;
 
-    final boolean valid = general.action(comp, true) && options.action();
+    String error = general.action(comp, true);
+    if(!options.action() && error == null) error = Util.info(INVALID_X, OPTIONS);
     final boolean indexed = indexes[0].action(textindex.isSelected()) &
         indexes[1].action(attrindex.isSelected()) & indexes[2].action(tokenindex.isSelected()) &
         indexes[3].action(ftindex.isSelected());
@@ -121,9 +122,9 @@ public final class DialogNew extends BaseXDialog {
     if(comp == general.browse || comp == general.input) dbName.setText(general.dbName);
 
     final String nm = dbName.getText().trim();
-    ok = valid && !nm.isEmpty();
+    ok = error == null && !nm.isEmpty();
 
-    String inf = valid ? ok ? null : ENTER_DB_NAME : RES_NOT_FOUND;
+    String inf = error != null ? error : ok ? null : ENTER_DB_NAME;
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = Databases.validName(nm);

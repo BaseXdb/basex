@@ -53,7 +53,8 @@ final class DialogPut extends BaseXBack {
     add(tabs, BorderLayout.CENTER);
 
     // buttons
-    put = new BaseXButton(dialog, PUT + ELLIPSIS);
+    put = new BaseXButton(dialog, PUT);
+    BaseXLayout.defaultButton(this, put);
 
     add(dialog.newButtons(put), BorderLayout.SOUTH);
     action(general.parsers);
@@ -72,19 +73,13 @@ final class DialogPut extends BaseXBack {
       final Runnable run = () -> dialog.resources.refreshNewFolder(trg);
       DialogProgress.execute(dialog, run, new Put(trg, src));
     } else {
-      boolean ok = general.action(comp, false);
+      String inf = general.action(comp, false);
       if(comp == general.browse || comp == general.input) target.setText(general.dbName);
 
-      final String inf;
-      if(ok) {
-        // check if target path is valid
-        ok = MetaData.normPath(trg) != null;
-        inf = ok ? null : Util.info(INVALID_X, TARGET_PATH);
-      } else {
-        inf = RES_NOT_FOUND;
-      }
+      // check if target path is valid
+      if(inf == null && MetaData.normPath(trg) == null) inf = Util.info(INVALID_X, TARGET_PATH);
       general.info.setText(inf, Msg.ERROR);
-      put.setEnabled(ok);
+      put.setEnabled(inf == null);
     }
   }
 }

@@ -47,6 +47,8 @@ public final class BaseXLayout {
 
   /** Key listener for global shortcuts (can be {@code null}). */
   private static KeyListener keys;
+  /** Client property key for the default button of a component. */
+  private static final String DEFAULT_BUTTON = "defaultButton";
 
   /** Private constructor. */
   private BaseXLayout() { }
@@ -278,6 +280,30 @@ public final class BaseXLayout {
   }
 
   /**
+   * Assigns a button that is pressed if Enter is typed in the component or its descendants.
+   * @param comp component
+   * @param button default button
+   */
+  public static void defaultButton(final JComponent comp, final AbstractButton button) {
+    comp.putClientProperty(DEFAULT_BUTTON, button);
+  }
+
+  /**
+   * Returns the default button of the specified component or its closest ancestor.
+   * @param comp component
+   * @return button or {@code null}
+   */
+  private static AbstractButton defaultButton(final Component comp) {
+    for(Component c = comp; c != null; c = c.getParent()) {
+      if(c instanceof final JComponent jc &&
+          jc.getClientProperty(DEFAULT_BUTTON) instanceof final AbstractButton button) {
+        return button;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Adds default listeners to the specified component.
    * @param comp component
    * @param win parent window
@@ -298,7 +324,10 @@ public final class BaseXLayout {
 
         // do not close dialog if button or editor is focused
         if(ENTER.is(e) && !(comp instanceof BaseXButton || comp instanceof TextPanel)) {
-          dialog.close();
+          // press the default button of the enclosing panel, or close the dialog
+          final AbstractButton button = defaultButton(comp);
+          if(button == null) dialog.close();
+          else if(button.isEnabled()) button.doClick();
         } else if(ESCAPE.is(e)) {
           // do not cancel dialog if search bar is opened
           boolean close = true;

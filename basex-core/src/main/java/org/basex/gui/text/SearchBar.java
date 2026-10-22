@@ -52,6 +52,8 @@ public final class SearchBar extends BaseXBack {
 
   /** GUI reference. */
   final GUI gui;
+  /** Remember the search modes in the options. */
+  private final boolean remember;
   /** Search text. */
   private final BaseXCombo find;
   /** Replace text. */
@@ -74,10 +76,12 @@ public final class SearchBar extends BaseXBack {
 
   /**
    * Constructor.
-   * @param gui gui reference
+   * @param gui      gui reference
+   * @param remember remember the search modes in the options
    */
-  SearchBar(final GUI gui) {
+  SearchBar(final GUI gui, final boolean remember) {
     this.gui = gui;
+    this.remember = remember;
 
     layout(new BorderLayout(2, 0));
     setOpaque(false);
@@ -99,10 +103,12 @@ public final class SearchBar extends BaseXBack {
     dotall = button("f_dotall", BaseXLayout.addShortcut(Text.DOT_ALL, DOTALL.toString()), al);
 
     // restore the search modes of the last session
-    mcase.setSelected(gui.gopts.get(GUIOptions.MATCHCASE));
-    word.setSelected(gui.gopts.get(GUIOptions.WHOLEWORD));
-    regex.setSelected(gui.gopts.get(GUIOptions.REGEX));
-    dotall.setSelected(gui.gopts.get(GUIOptions.DOTALL));
+    if(remember) {
+      mcase.setSelected(gui.gopts.get(GUIOptions.MATCHCASE));
+      word.setSelected(gui.gopts.get(GUIOptions.WHOLEWORD));
+      regex.setSelected(gui.gopts.get(GUIOptions.REGEX));
+      dotall.setSelected(gui.gopts.get(GUIOptions.DOTALL));
+    }
     modes();
 
     prev = BaseXButton.get("f_prev",
@@ -112,14 +118,14 @@ public final class SearchBar extends BaseXBack {
     rplcNext = BaseXButton.get("f_replace", Text.REPLACE_NEXT, false, gui);
     rplc = BaseXButton.get("f_replaceall",
         BaseXLayout.addShortcut(Text.REPLACE_ALL, META_ENTER.toString()), false, gui);
-    cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
+    cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.LEAVE_CLOSE, ESCAPE.toString()),
         false, gui);
 
     // add interaction to search field
     find.addKeyListener((KeyPressedListener) e -> {
-      if(ENTER.is(e) || FINDNEXT.is(e)) {
+      if(ENTER.is(e)) {
         editor.jump(SearchDir.FORWARD, true);
-      } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
+      } else if(SHIFT_ENTER.is(e)) {
         editor.jump(SearchDir.BACKWARD, true);
       } else if(META_ENTER.is(e)) {
         replaceAll();
@@ -155,13 +161,23 @@ public final class SearchBar extends BaseXBack {
       e.consume();
     });
 
-    // add default shortcuts to all interaction components
+    // add default shortcuts to all interaction components (search keys apply to this bar)
     final KeyListener keys = (KeyPressedListener) e -> {
       if(ESCAPE.is(e)) deactivate(false);
       else if(MATCHCASE.is(e)) toggle(mcase);
       else if(WHOLEWORD.is(e)) toggle(word);
       else if(REGEX.is(e)) toggle(regex);
       else if(DOTALL.is(e)) toggle(dotall);
+      else if(FIND.is(e)) {
+        find.requestFocusInWindow();
+        e.consume();
+      } else if(FINDNEXT.is(e)) {
+        editor.jump(SearchDir.FORWARD, true);
+        e.consume();
+      } else if(FINDPREV.is(e)) {
+        editor.jump(SearchDir.BACKWARD, true);
+        e.consume();
+      }
     };
     for(final Component comp : new Component[] {
       mcase, word, regex, dotall, find, replace, prev, next, rplc, rplcNext, cls
@@ -178,6 +194,14 @@ public final class SearchBar extends BaseXBack {
     if(searched.length > 0) setSearch(searched[0]);
     final String[] replaced = gui.gopts.get(GUIOptions.REPLACED);
     if(replaced.length > 0) replace.setText(replaced[0]);
+  }
+
+  @Override
+  public Dimension getPreferredSize() {
+    // the bar adopts the width of the enclosing layout: its contents vary
+    final Dimension dim = super.getPreferredSize();
+    dim.width = 0;
+    return dim;
   }
 
   /**
@@ -432,6 +456,7 @@ public final class SearchBar extends BaseXBack {
   private void modes() {
     final boolean rgx = regex.isSelected();
     dotall.setEnabled(rgx);
+    if(!remember) return;
     gui.gopts.set(GUIOptions.MATCHCASE, mcase.isSelected());
     gui.gopts.set(GUIOptions.WHOLEWORD, word.isSelected());
     gui.gopts.set(GUIOptions.REGEX, rgx);

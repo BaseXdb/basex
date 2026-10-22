@@ -86,6 +86,10 @@ final class ProjectFilter extends BaseXBack {
   private String lastContents = "";
   /** ID of the most recent hit count (invalidates older ones). */
   private volatile int countId;
+  /** Search flags of the listed files. */
+  private SearchFlags listFlags;
+  /** Files filter of the listed files. */
+  private String listFiles = "";
 
   /**
    * Constructor.
@@ -250,9 +254,17 @@ final class ProjectFilter extends BaseXBack {
    * Returns the current content search flags.
    * @return search flags
    */
-  SearchFlags flags() {
+  private SearchFlags flags() {
     return new SearchFlags(mcase.isSelected(), word.isSelected(),
         regex.isSelected(), dotall.isSelected());
+  }
+
+  /**
+   * Returns the search flags of the listed files.
+   * @return search flags ({@code null} if no files have been listed yet)
+   */
+  SearchFlags listFlags() {
+    return listFlags;
   }
 
   /**
@@ -281,8 +293,9 @@ final class ProjectFilter extends BaseXBack {
   private void replace() {
     if(!replaceButton.isEnabled()) return;
 
+    // adopt the search of the listed files
     final String contents = view.list.search();
-    final SearchFlags flags = flags();
+    final SearchFlags flags = listFlags;
     final Pattern pattern;
     try {
       pattern = SearchContext.pattern(contents, flags);
@@ -308,7 +321,7 @@ final class ProjectFilter extends BaseXBack {
       strings = hits;
     } else {
       final FilterJob filterJob = known != null ? new FilterJob(known, pattern) :
-        new FilterJob(view.files, filesQuery(filesFilter.getText()),
+        new FilterJob(view.files, filesQuery(listFiles),
           view.files.contentFilter(contents, flags), view.root.file, pattern);
       DialogProgress.execute(view.gui, filterJob);
       targets = filterJob.result();
@@ -351,7 +364,8 @@ final class ProjectFilter extends BaseXBack {
    */
   private void undoReplace() {
     final StringList backups = backupDir.descendants();
-    if(!new DialogRevert(view.gui, backups.size()).ok()) return;
+    if(!BaseXDialog.confirmDestructive(view.gui,
+        Util.info(Text.REVERT_FILES_X, BaseXLayout.format(backups.size())))) return;
 
     final IOFile root = view.root.file;
     int reverted = 0, skipped = 0;
@@ -457,11 +471,10 @@ final class ProjectFilter extends BaseXBack {
    * @param contents contents search string
    */
   private void filter(final String files, final String contents) {
-    filesFilter.setCursor(CURSORWAIT);
-    contentsFilter.setCursor(CURSORWAIT);
-    view.list.setCursor(CURSORWAIT);
+    busy(true);
 
-    final ProjectFiles.ContentFilter content = view.files.contentFilter(contents, flags());
+    final SearchFlags flags = flags();
+    final ProjectFiles.ContentFilter content = view.files.contentFilter(contents, flags);
     new GUIWorker<String[]>() {
       @Override
       protected String[] doInBackground() throws Exception {
@@ -472,7 +485,9 @@ final class ProjectFilter extends BaseXBack {
       protected void done(final String[] list) {
         final int max = view.gui.gopts.get(GUIOptions.MAXHITS);
         view.list.setElements(list, contents, list.length < max);
-        countHits(list, contents);
+        listFlags = flags;
+        listFiles = files;
+        countHits(list, contents, flags);
         final String error = content.error();
         contentsFilter.highlight(error != null ? lightRed : backColor);
         contentsFilter.setToolTipText(error);
@@ -483,26 +498,41 @@ final class ProjectFilter extends BaseXBack {
         final boolean contentSearch = !contents.isEmpty();
         replaceButton.setEnabled(contentSearch && list.length > 0);
         showReplace(contentSearch);
-        filesFilter.setCursor(CURSORTEXT);
-        contentsFilter.setCursor(CURSORTEXT);
-        view.list.setCursor(CURSORARROW);
+        busy(false);
+      }
+
+      @Override
+      protected void failed(final Exception ex) {
+        busy(false);
+        super.failed(ex);
       }
     }.execute();
+  }
+
+  /**
+   * Shows or hides the wait cursor.
+   * @param busy busy flag
+   */
+  private void busy(final boolean busy) {
+    filesFilter.setCursor(busy ? CURSORWAIT : CURSORTEXT);
+    contentsFilter.setCursor(busy ? CURSORWAIT : CURSORTEXT);
+    view.list.setCursor(busy ? CURSORWAIT : CURSORARROW);
   }
 
   /**
    * Counts the content hits of all listed files in the background and shows them in the list.
    * @param list listed file paths
    * @param contents contents search string
+   * @param flags search flags
    */
-  private void countHits(final String[] list, final String contents) {
+  private void countHits(final String[] list, final String contents, final SearchFlags flags) {
     // a new count invalidates the results of the previous one
     final int id = ++countId;
     if(contents.isEmpty() || list.length == 0) return;
 
     final Pattern pattern;
     try {
-      pattern = SearchContext.pattern(contents, flags());
+      pattern = SearchContext.pattern(contents, flags);
     } catch(final PatternSyntaxException ex) {
       Util.debug(ex);
       return;
@@ -554,8 +584,10 @@ final class ProjectFilter extends BaseXBack {
     combo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(combo.isPopupVisible()) return;
-        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+        // forward keys to the result list only if it is shown
+        if(combo.isPopupVisible() || !view.list.isShowing()) return;
+        // Shift+Up/Down: history of the filter field
+        if(!e.isShiftDown() && (BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e)) ||
             BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
           view.list.dispatchEvent(e);
         } else {
@@ -563,8 +595,10 @@ final class ProjectFilter extends BaseXBack {
             if(cmd == null) continue;
             for(final BaseXKeys sc : cmd.shortcuts()) {
               if(sc.is(e)) {
-                cmd.execute(view.gui);
-                e.consume();
+                if(cmd.enabled(view.gui)) {
+                  cmd.execute(view.gui);
+                  e.consume();
+                }
                 return;
               }
             }

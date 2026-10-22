@@ -438,7 +438,7 @@ public final class MapView extends View {
 
     // add or remove marked node
     final DBNodes marked = gui.context.marked;
-    if(e.getClickCount() == 2) {
+    if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(!markFocused(e) && !marked.contains(gui.context.focused)) {
       gui.notify.mark(0);
@@ -447,7 +447,8 @@ public final class MapView extends View {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list) return;
+    if(gui.updating || !SwingUtilities.isLeftMouseButton(e) || ++dragTol < 8 ||
+        mainRects.sorted != mainRects.list) return;
 
     // refresh mouse focus
     int mx = mouseX, my = mouseY, mw = e.getX() - mx, mh = e.getY() - my;
@@ -481,7 +482,8 @@ public final class MapView extends View {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(gui.updating || gui.context.focused == -1) return;
+    // shortcut key: zoom into the focused node or back
+    if(gui.updating || gui.context.focused == -1 || !sc(e)) return;
     if(e.getWheelRotation() <= 0) {
       final DBNodes m = new DBNodes(gui.context.data(), gui.context.focused);
       gui.context.marked = m;

@@ -157,15 +157,16 @@ public final class BaseXFileChooser {
           filter.suffixes.length != 0) suf = filter.suffixes[0];
       if(suf != null) {
         for(int f = 0; f < fl; f++) {
-          final String path = files[f].path();
-          if(!path.contains(".")) files[f] = new IOFile(path + suf);
+          if(!files[f].name().contains(".")) files[f] = new IOFile(files[f].path() + suf);
         }
       }
 
       // show replace dialog
       for(final IOFile io : files) {
-        if(io.exists() && !BaseXDialog.confirm(win.gui(), Util.info(FILE_EXISTS_X, io)))
+        if(io.exists() &&
+            !BaseXDialog.confirmDestructive(win.gui(), Util.info(FILE_EXISTS_X, io))) {
           return new IOFile[0];
+        }
       }
     }
     return files;

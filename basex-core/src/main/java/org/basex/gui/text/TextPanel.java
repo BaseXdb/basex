@@ -93,6 +93,30 @@ public class TextPanel extends BaseXPanel {
   private Point column;
   /** Last horizontal position. */
   private int lastX = -1;
+  /** Last mouse position in the panel (can be {@code null}). */
+  private Point mouse;
+  /** Last checked mouse pointer (can be {@code null}). */
+  private Pointer pointed;
+
+  /**
+   * Text, checked range and mode of a mouse pointer check.
+   * @param text text
+   * @param start start of the checked range (position of the pointer, or start of a name)
+   * @param end end of the checked range
+   * @param definition check for a definition
+   */
+  private record Pointer(byte[] text, int start, int end, boolean definition) {
+    /**
+     * Checks if the specified pointer position has already been checked.
+     * @param txt text (compared by identity)
+     * @param pos position of the pointer
+     * @param def check for a definition
+     * @return result of check
+     */
+    boolean covers(final byte[] txt, final int pos, final boolean def) {
+      return text == txt && definition == def && pos >= start && pos <= end;
+    }
+  }
 
   /**
    * Constructor for a read-only panel.
@@ -156,6 +180,17 @@ public class TextPanel extends BaseXPanel {
 
     scroll = new BaseXScrollBar(this);
     hscroll = new BaseXScrollBar(this, true);
+    // popups are positioned relative to the text: hide them when the scrollbars are used
+    final MouseAdapter hide = new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e) { hidePopups(); }
+      @Override
+      public void mouseWheelMoved(final MouseWheelEvent e) { hidePopups(); }
+    };
+    scroll.addMouseListener(hide);
+    hscroll.addMouseListener(hide);
+    // the vertical scrollbar forwards wheel events to this panel
+    hscroll.addMouseWheelListener(hide);
 
     // the filler keeps the horizontal scrollbar clear of the vertical one
     final BaseXBack filler = new BaseXBack();
@@ -164,7 +199,8 @@ public class TextPanel extends BaseXPanel {
     hpanel.add(hscroll, BorderLayout.CENTER);
     hpanel.add(filler, BorderLayout.EAST);
 
-    rend = new TextRenderer(editor, scroll, hscroll, editable, opts);
+    // the antialiasing option applies to the texts of the main window
+    rend = new TextRenderer(editor, scroll, hscroll, editable, win.dialog() == null, opts);
     hpanel.setVisible(!rend.wrap());
 
     add(rend, BorderLayout.CENTER);
@@ -191,6 +227,14 @@ public class TextPanel extends BaseXPanel {
     new BaseXPopup(this, cmds.toArray(GUICommand[]::new));
 
     caretTimer = new Timer(500, e -> rend.blink());
+    // names with a definition are indicated while the shortcut key is pressed
+    final int key = Prop.MAC ? KeyEvent.VK_META : KeyEvent.VK_CONTROL;
+    addKeyListener((KeyPressedListener) e -> {
+      if(e.getKeyCode() == key) pointer(true);
+    });
+    addKeyListener((KeyReleasedListener) e -> {
+      if(e.getKeyCode() == key) pointer(false);
+    });
   }
 
   @Override
@@ -290,6 +334,29 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Jumps to the specified position and remembers the previous one.
+   * @param pos caret position
+   */
+  private void jumpTo(final int pos) {
+    visit();
+    setCaret(pos);
+    gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Returns the caret position.
+   * @return caret position
+   */
+  public final int getCaret() {
+    return editor.pos();
+  }
+
+  /**
+   * Remembers the caret position before a jump.
+   */
+  protected void visit() { }
+
+  /**
    * Returns the output text.
    * @return output text
    */
@@ -380,6 +447,53 @@ public class TextPanel extends BaseXPanel {
    */
   public final void bracket() {
     setCaret(editor.bracket(rend.syntax()));
+  }
+
+  /**
+   * Joins the selected lines, or the line with the caret and the next one.
+   */
+  public final void joinLines() {
+    edit(true, editor::joinLines);
+  }
+
+  /**
+   * Splits the selected lines, or the line with the caret, if they exceed the line margin.
+   */
+  public final void splitLines() {
+    edit(true, () -> editor.splitLines(rend.syntax()));
+  }
+
+  /**
+   * Expands the selection to the enclosing name or bracket.
+   */
+  public final void expandSelection() {
+    editor.expandSelection(rend.syntax());
+    rend.repaint();
+  }
+
+  /**
+   * Restores the selection that was replaced by the last expansion.
+   */
+  public final void shrinkSelection() {
+    editor.shrinkSelection();
+    rend.repaint();
+  }
+
+  /**
+   * Adds or removes the bookmark of the line with the caret.
+   */
+  public final void toggleBookmark() {
+    editor.toggleBookmark();
+    rend.repaint();
+  }
+
+  /**
+   * Jumps to the next or previous bookmarked line.
+   * @param next next/previous flag
+   */
+  public final void bookmark(final boolean next) {
+    final int pos = editor.bookmark(next);
+    if(pos != -1) jumpTo(pos);
   }
 
   /**
@@ -535,9 +649,53 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseMoved(final MouseEvent e) {
-    if(linkListener == null) return;
-    final TextIterator iter = rend.jump(e.getPoint());
-    setCursor(iter.link() != null ? CURSORHAND : CURSORARROW);
+    mouse = e.getPoint();
+    pointer(sc(e));
+  }
+
+  @Override
+  public final void mouseExited(final MouseEvent e) {
+    mouse = null;
+    pointer(false);
+  }
+
+  /**
+   * Shows a hand cursor if the mouse points to a link, or to a name with a definition.
+   * @param definition check for a definition
+   */
+  private void pointer(final boolean definition) {
+    final boolean link = linkListener != null, def = definition && hist.active();
+    boolean hand = false;
+    int[] reference = null;
+    if(mouse != null && rend.sticky(mouse) != -1) {
+      // pinned lines can be clicked
+      hand = true;
+      pointed = null;
+    } else if(mouse != null && (link || def)) {
+      final TextIterator iter = rend.jump(mouse);
+      final byte[] text = editor.text();
+      final int pos = iter.pos();
+      // the text is only checked again if the pointer leaves the checked position or name
+      if(pointed != null && pointed.covers(text, pos, def)) return;
+      pointed = new Pointer(text, pos, pos, def);
+      if(link && iter.link() != null) {
+        hand = true;
+      } else if(def) {
+        // the name of the reference is underlined
+        // a checked name is not checked again
+        final Definition dfn = rend.syntax().definition(text, pos);
+        if(dfn != null) pointed = new Pointer(text, dfn.start(), dfn.end(), true);
+        if(dfn != null && dfn.found()) {
+          reference = new int[] { dfn.start(), dfn.end() };
+          hand = true;
+        }
+      }
+    } else {
+      pointed = null;
+    }
+    rend.underline(reference);
+    final Cursor cursor = hand ? CURSORHAND : CURSORTEXT;
+    if(mouse != null && getCursor() != cursor) setCursor(cursor);
   }
 
   @Override
@@ -571,8 +729,8 @@ public class TextPanel extends BaseXPanel {
     // copy and paste text with middle mouse button (Unix only)
     if(SwingUtilities.isMiddleMouseButton(e)) {
       if(!Prop.WIN && !Prop.MAC) {
-        if(editor.isSelected()) {
-          copy();
+        if(copy()) {
+          editor.singleCaret();
           editor.resetSelection();
           rend.repaint();
         } else if(editable && isEnabled()) {
@@ -592,8 +750,19 @@ public class TextPanel extends BaseXPanel {
     final boolean shift = e.isShiftDown(), selected = editor.isSelected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       clicks = e.getClickCount();
+      // a click on a pinned line jumps to that line
+      final int sticky = rend.sticky(e.getPoint());
+      if(sticky != -1) {
+        jumpTo(sticky);
+        return;
+      }
       if(clicks == 1) {
-        if(e.isAltDown() && !shift && hist.active()) {
+        if(sc(e) && !shift && hist.active()) {
+          // a click with the shortcut key jumps to the definition of the clicked name
+          editor.singleCaret();
+          select(e.getPoint(), true);
+          gotoDefinition();
+        } else if(e.isAltDown() && !shift && hist.active()) {
           editor.addCaret(rend.jump(e.getPoint()).pos());
           column = e.getPoint();
           rend.repaint();
@@ -609,7 +778,8 @@ public class TextPanel extends BaseXPanel {
       } else {
         editor.selectLine();
       }
-    } else if(!selected) {
+    } else if(!selected && !editor.multiple()) {
+      // multiple carets are kept for the popup commands
       select(e.getPoint(), true);
     }
   }
@@ -683,23 +853,17 @@ public class TextPanel extends BaseXPanel {
    * @return {@code true} if special key was processed
    */
   private boolean specialKey(final KeyEvent e) {
-    if(PREVTAB.is(e)) {
-      gui.editor.tab(false);
-    } else if(NEXTTAB.is(e)) {
-      gui.editor.tab(true);
-    } else if(CLOSETAB.is(e)) {
-      gui.editor.close(null);
-    } else if(ESCAPE.is(e) && editor.multiple()) {
+    if(!ESCAPE.is(e)) return false;
+    if(editor.multiple()) {
       // return to a single caret
       editor.singleCaret();
       rend.repaint();
-      return true;
-    } else if(search != null && ESCAPE.is(e)) {
+    } else if(search != null) {
       search.deactivate(true);
+      hidePopups();
     } else {
       return false;
     }
-    hidePopups();
     return true;
   }
 
@@ -709,6 +873,13 @@ public class TextPanel extends BaseXPanel {
     completed = false;
     if(completion.visible() && completion.key(e)) {
       completed = true;
+      e.consume();
+      return;
+    }
+
+    // hide the signature popup
+    if(ESCAPE.is(e) && signature.visible()) {
+      signature.hide();
       e.consume();
       return;
     }
@@ -724,12 +895,9 @@ public class TextPanel extends BaseXPanel {
 
     // operations without cursor movement...
     final int fh = rend.fontHeight();
-    if(SCROLLDOWN.is(e)) {
-      scroll.pos(scroll.pos() + fh);
-      return;
-    }
-    if(SCROLLUP.is(e)) {
-      scroll.pos(scroll.pos() - fh);
+    if(SCROLLDOWN.is(e) || SCROLLUP.is(e)) {
+      hidePopups();
+      scroll.pos(scroll.pos() + (SCROLLDOWN.is(e) ? fh : -fh));
       return;
     }
 
@@ -970,24 +1138,22 @@ public class TextPanel extends BaseXPanel {
     final int caret = editor.pos();
     final char ch = e.getKeyChar();
     final boolean tab = TAB.is(e), enter = ENTER.is(e), shift = e.isShiftDown();
-    editor.forEach(() -> {
-      final int pos = editor.pos();
+    final Runnable op = () -> {
       // remember if marked text is to be deleted
       final StringBuilder sb = new StringBuilder(1).append(ch);
       final boolean indent = tab && editor.indent(sb, shift);
 
       // surround or delete marked text
-      final int move;
-      if(editor.surround(ch)) {
-        move = 0;
-      } else {
+      if(!editor.surround(ch)) {
         final boolean selected = editor.isSelected() && !indent;
         if(selected) editor.delete();
-        move = enter ? editor.enter(sb) : editor.add(sb, selected);
+        if(enter) editor.enter(sb);
+        else editor.add(sb, selected);
       }
-      // adjust cursor position
-      if(move != 0) editor.pos(Math.min(editor.size(), pos + move));
-    });
+    };
+    // lines are indented or unindented once
+    if(tab && (shift || editor.anySelected())) editor.forEachLine(op);
+    else editor.forEach(op);
 
     // refresh history, adjust text height
     hist.store(editor.text(), caret, editor.pos());
@@ -1028,10 +1194,20 @@ public class TextPanel extends BaseXPanel {
    * @return true if text was copied
    */
   private boolean copy() {
-    final String txt = editor.selectedAll();
-    final boolean copy = !txt.isEmpty();
-    if(copy) BaseXLayout.toClipboard(txt);
+    final boolean copy = editor.anySelected();
+    if(copy) BaseXLayout.toClipboard(editor.selectedAll());
     return copy;
+  }
+
+  /**
+   * Deletes the selected text of all carets.
+   */
+  private void deleteSelected() {
+    final int pos = editor.pos();
+    editor.forEach(() -> {
+      if(editor.isSelected()) editor.delete();
+    });
+    finish(pos, true);
   }
 
   /**
@@ -1065,6 +1241,7 @@ public class TextPanel extends BaseXPanel {
     if(e.isShiftDown()) rend.moveX(units);
     else scroll.pos(scroll.pos() + units);
     rend.repaint();
+    mouseMoved(e);
   }
 
   @Override
@@ -1121,15 +1298,10 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int pos = editor.pos();
-      if(!copy()) return;
-      editor.forEach(() -> {
-        if(editor.isSelected()) editor.delete();
-      });
-      finish(pos, true);
+      if(copy()) deleteSelected();
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.anySelected(); }
   }
 
   /** Copy command. */
@@ -1140,7 +1312,7 @@ public class TextPanel extends BaseXPanel {
     @Override
     public void execute() { copy(); }
     @Override
-    public boolean enabled(final GUI main) { return editor.isSelected(); }
+    public boolean enabled(final GUI main) { return editor.anySelected(); }
   }
 
   /** Paste command. */
@@ -1166,12 +1338,10 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int pos = editor.pos();
-      editor.delete();
-      finish(pos, true);
+      deleteSelected();
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.anySelected(); }
   }
 
   /** Select all command. */
@@ -1256,7 +1426,9 @@ public class TextPanel extends BaseXPanel {
       return search != null && button.apply(search).isEnabled();
     }
     @Override
-    public boolean selected(final GUI main) { return button.apply(search).isSelected(); }
+    public boolean selected(final GUI main) {
+      return search != null && button.apply(search).isSelected();
+    }
   }
 
   /**
@@ -1284,8 +1456,7 @@ public class TextPanel extends BaseXPanel {
       pos = t + 1;
       ++line;
     }
-    setCaret(pos);
-    gui.editor.posCode.invokeLater();
+    jumpTo(pos);
   }
 
   /**
@@ -1312,7 +1483,41 @@ public class TextPanel extends BaseXPanel {
     if(!hasDeclarations()) return;
 
     // the caret follows the selection and stays where the dialog leaves it
+    visit();
     DialogDeclaration.show(gui, declarations(), editor.pos(), this::setCaret);
+    gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Jumps to the definition of the function or variable at the caret.
+   */
+  public final void gotoDefinition() {
+    final Definition definition = rend.syntax().definition(editor.text(), editor.pos());
+    if(definition == null || !definition.found()) return;
+    if(definition.location() != null) {
+      visit();
+      definition(definition.location(), definition.name());
+    } else {
+      jumpTo(definition.pos());
+    }
+  }
+
+  /**
+   * Jumps to the definition of a function or variable in an imported module.
+   * @param location location of the module
+   * @param name local name of the function or variable (variables are prefixed with a dollar sign)
+   */
+  @SuppressWarnings("unused")
+  protected void definition(final String location, final String name) { }
+
+  /**
+   * Jumps to the declaration with the specified local name.
+   * @param name local name of the function or variable (variables are prefixed with a dollar sign)
+   */
+  public final void gotoDeclaration(final String name) {
+    final Declaration declaration = rend.syntax().declaration(editor.text(), name, true);
+    if(declaration == null) return;
+    setCaret(declaration.pos());
     gui.editor.posCode.invokeLater();
   }
 
@@ -1389,7 +1594,7 @@ public class TextPanel extends BaseXPanel {
   /**
    * Hides the completion and signature popups.
    */
-  private void hidePopups() {
+  protected final void hidePopups() {
     completion.hide();
     signature.hide();
   }
@@ -1437,10 +1642,8 @@ public class TextPanel extends BaseXPanel {
     final Signature sig = rend.syntax().signature(name);
     if(sig != null) return sig;
     // declared functions are looked up in the text
-    for(final Declaration declaration : declarations()) {
-      if(declaration.name().equals(name)) return Signature.get(declaration.args());
-    }
-    return null;
+    final Declaration declaration = rend.syntax().declaration(editor.text(), name, false);
+    return declaration != null ? Signature.get(declaration.args()) : null;
   }
 
   /**

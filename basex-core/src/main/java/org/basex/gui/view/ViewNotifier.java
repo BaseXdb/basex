@@ -129,17 +129,25 @@ public final class ViewNotifier {
    * @param mode mark mode
    */
   public void mark(final int mode) {
-    final int f = gui.context.focused;
-    if(f == -1) return;
+    mark(mode, gui.context.focused);
+  }
+
+  /**
+   * Marks, adds or toggles the specified node and notifies all views.
+   * @param mode mark mode (0: mark node, 1: add node, 2: toggle node)
+   * @param pre PRE value of the node (ignored if {@code -1})
+   */
+  public void mark(final int mode, final int pre) {
+    if(pre == -1) return;
 
     final Context ctx = gui.context;
     DBNodes nodes = ctx.marked;
     if(mode == 0) {
-      nodes = new DBNodes(ctx.data(), f);
+      nodes = new DBNodes(ctx.data(), pre);
     } else if(mode == 1) {
-      nodes.union(new int[] { f });
+      nodes.union(new int[] { pre });
     } else {
-      nodes.toggle(f);
+      nodes.toggle(pre);
     }
     mark(nodes, null);
   }
@@ -180,8 +188,7 @@ public final class ViewNotifier {
     // add new entry if current node set has not been cached yet
     final DBNodes newn = nodes.discardDocs();
     final DBNodes empty = new DBNodes(ctx.data()).ftpos(ctx.marked.ftpos());
-    final DBNodes curr = quick ? ctx.current() : null;
-    final DBNodes cmp = quick ? curr : ctx.marked;
+    final DBNodes cmp = quick ? ctx.current() : newn;
     if(!Objects.equals(cont[hist], cmp)) {
       checkHist();
       if(quick) {
@@ -189,7 +196,7 @@ public final class ViewNotifier {
         queries[hist] = "";
         marked[hist] = new DBNodes(ctx.data());
         // add current entry
-        cont[++hist] = curr;
+        cont[++hist] = cmp;
       } else {
         // store history entry
         final String in = gui.input.getText();

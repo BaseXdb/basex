@@ -142,10 +142,10 @@ final class DialogImport extends BaseXBack {
    * Updates the dialog window.
    * @param comp component
    * @param empty allow empty input
-   * @return success flag, or {@code false} if specified input is not found
+   * @return error message, or {@code null} if the input is valid
    */
-  boolean action(final Object comp, final boolean empty) {
-    boolean ok = parsing.action();
+  String action(final Object comp, final boolean empty) {
+    final boolean parsed = parsing.action();
 
     final String in = input.getText().trim();
     final IO io = IO.get(in);
@@ -167,11 +167,11 @@ final class DialogImport extends BaseXBack {
         "*" + IO.JSONSUFFIX + ",*" + IO.JSONLSUFFIX : "*." + parser);
     }
 
-    ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
-    if(ok && comp == input) setType(in);
+    final boolean found = empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
+    if(parsed && found && comp == input) setType(in);
 
     info.setText(null, null);
-    return ok;
+    return !found ? RES_NOT_FOUND : !parsed ? Util.info(INVALID_X, PARSING) : null;
   }
 
   /**
