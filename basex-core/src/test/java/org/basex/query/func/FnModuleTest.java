@@ -1392,6 +1392,9 @@ public final class FnModuleTest extends SandboxTest {
     error("xquery:eval(``[exists(" + func.args(xincDoc,
         " { 'xinclude': true(), 'trust-external': true() }")
         + "/root/root)" + "]``, (), {'permission': 'none'})", EXTERNALRESOURCE_X);
+    // first path segment is no database: no database permission check
+    error("xquery:eval(``[" + func.args("/unknown-db/doc.xml") + "]``, (), {'permission': 'none'})",
+        EXTERNALRESOURCE_X);
 
     // unstable documents are parsed anew for each evaluation
     query("count(distinct-values(for $i in 1 to 2 return " +

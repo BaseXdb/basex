@@ -590,11 +590,17 @@ public final class QueryResources {
 
     // try to open existing database
     if(withdb && name != null) {
-      qc.checkPerm(Perm.READ, name, name, info);
       try {
         final Data data = Open.open(name, context, context.options, false, false);
         if(data != null) {
-          docOpts.checkDbAccess(info);
+          // check permissions only if the database exists: otherwise, the input is a file path
+          try {
+            qc.checkPerm(Perm.READ, name, name, info);
+            docOpts.checkDbAccess(info);
+          } catch(final QueryException ex) {
+            Close.close(data, context);
+            throw ex;
+          }
           return addData(data);
         }
       } catch(final IOException ex) {
