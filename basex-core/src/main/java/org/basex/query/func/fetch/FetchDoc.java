@@ -37,7 +37,7 @@ public class FetchDoc extends StandardFunc {
     final DBOptions dbopts = new DBOptions(toEmptyMap(arg(1), qc), MainOptions.PARSING, qc, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions());
     // external entities, XIncludes and catalogs require ADMIN permission
-    if(!qc.has(Perm.ADMIN, null, info)) mopts.trust(false);
+    if(!qc.has(Perm.ADMIN, null, info)) mopts.allowExternal(false);
     try {
       return new DBNode(Parser.singleParser(source, mopts, ""));
     } catch(final IOException ex) {

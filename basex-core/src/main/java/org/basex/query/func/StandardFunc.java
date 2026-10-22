@@ -995,7 +995,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final MainOptions mainOptions(final QueryContext qc) {
     final MainOptions mopts = qc.context.options;
-    return !qc.has(Perm.ADMIN, null, info) ? new MainOptions(mopts).trust(false) : mopts;
+    return !qc.has(Perm.ADMIN, null, info) ? new MainOptions(mopts).allowExternal(false) : mopts;
   }
 
   /**

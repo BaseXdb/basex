@@ -11,6 +11,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 
+import jakarta.servlet.http.*;
+import jakarta.websocket.CloseReason.*;
+
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.
  *
@@ -55,6 +58,16 @@ public final class WsPool {
    */
   static void remove(final String id) {
     CLIENTS.remove(id);
+  }
+
+  /**
+   * Closes all WebSockets of the specified HTTP session.
+   * @param session HTTP session
+   */
+  public static void close(final HttpSession session) {
+    for(final WebSocket socket : CLIENTS.values()) {
+      if(socket.session == session) socket.close(CloseCodes.NORMAL_CLOSURE.getCode(), null);
+    }
   }
 
   /**

@@ -39,19 +39,11 @@ public final class Grant extends AUser {
   protected boolean run() {
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
-    final boolean local = args[2].isEmpty();
-    if(cmd == CmdPerm.NONE) {
-      prm = Perm.NONE;
-    } else if(cmd == CmdPerm.READ) {
-      prm = Perm.READ;
-    } else if(cmd == CmdPerm.WRITE) {
-      prm = Perm.WRITE;
-    } else if(cmd == CmdPerm.CREATE && local) {
-      prm = Perm.CREATE;
-    } else if(cmd == CmdPerm.ADMIN && local) {
-      prm = Perm.ADMIN;
+    // admin permissions can only be assigned globally
+    if(cmd == null || cmd == CmdPerm.ADMIN && !args[2].isEmpty()) {
+      return error(PERM_UNKNOWN_X, args[0]);
     }
-    if(prm == null) return error(PERM_UNKNOWN_X, args[0]);
+    prm = Perm.valueOf(cmd.name());
 
     return run(1, false);
   }

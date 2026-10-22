@@ -55,7 +55,7 @@ public final class CreateBackup extends ABackup {
 
     // retrieve all databases
     final StringList names = pattern.isEmpty() ? new StringList("") :
-      context.databases.list(context.user(), Perm.CREATE, pattern);
+      context.databases.list(context.user(), Perm.ADMIN, pattern);
     if(names.isEmpty()) return error(DB_NOT_FOUND_X, pattern);
 
     // loop through all databases

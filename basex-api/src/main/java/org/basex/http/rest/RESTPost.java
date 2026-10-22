@@ -78,6 +78,7 @@ final class RESTPost {
         for(final Item item : qp.value()) {
           final String name = value("@name", item, ctx).toUpperCase(Locale.ENGLISH);
           final String value = value("@value", item, ctx);
+          RESTCmd.check(ctx.options.option(name), ctx.user());
           ctx.options.assign(name, value);
         }
       }

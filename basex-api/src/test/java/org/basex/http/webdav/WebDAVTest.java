@@ -106,7 +106,7 @@ public final class WebDAVTest extends WebappTest {
     try {
       // a read user may browse the root collection
       assertEquals(207, dav("PROPFIND", "webdav", "reader", "readerpw"));
-      // a read user may not create a database (create permission is required): 403, not 500
+      // a read user may not create a database (admin permission is required): 403, not 500
       assertEquals(403, dav("MKCOL", "webdav/" + DB, "reader", "readerpw"));
     } finally {
       new DropUser("reader").execute(ctx);
@@ -497,7 +497,7 @@ public final class WebDAVTest extends WebappTest {
     new CreateUser("writer", "writerpw").execute(ctx);
     new Grant("write", "writer").execute(ctx);
     try {
-      // creating and deleting a database requires create permissions
+      // creating and deleting a database requires admin permissions
       assertEquals(403, dav("MKCOL", "webdav/" + DB, "writer", "writerpw"));
       send(201, "MKCOL", DB, null, null);
       assertEquals(403, dav("DELETE", "webdav/" + DB, "writer", "writerpw"));

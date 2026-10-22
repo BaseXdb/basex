@@ -47,6 +47,8 @@ public final class QueryResources {
   private final ArrayList<Value> colls = new ArrayList<>(1);
   /** Names of collections. */
   private final ArrayList<String> collNames = new ArrayList<>(1);
+  /** URIs of listed directories. */
+  private final Map<String, Value> dirs = new HashMap<>();
   /** Indicates if the first database in the context is globally opened. */
   private boolean globalData;
 
@@ -247,7 +249,8 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(true, qi, docOpts, qc, info, allowExternal);
+    Data data = open(qi, docOpts, qc, info);
+    if(data == null) data = create(qi, docOpts, qc, info, true, allowExternal);
     // ensure that database contains a single document
     final IntList docs = docs(data, qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -265,17 +268,77 @@ public final class QueryResources {
    */
   public synchronized Value collection(final QueryInput qi, final QueryContext qc,
       final InputInfo info) throws QueryException {
+    return collection(qi, false, qc, info);
+  }
 
-    final boolean withdb = context.options.get(MainOptions.WITHDB);
+  /**
+   * Evaluates {@code fn:uri-collection()}: returns the URIs of the files of a directory that has
+   * not been opened yet, or the documents of an opened or new collection.
+   * @param qi query input (set to {@code null} if default collection is requested)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return URIs or documents
+   * @throws QueryException query exception
+   */
+  public synchronized Value uriCollection(final QueryInput qi, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    return collection(qi, true, qc, info);
+  }
+
+  /**
+   * Returns a collection, or the URIs of the files of a directory.
+   * @param qi query input (set to {@code null} if default collection is requested)
+   * @param uris return URIs of unopened directories
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return documents or URIs
+   * @throws QueryException query exception
+   */
+  private Value collection(final QueryInput qi, final boolean uris, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     // return default collection
     if(qi == null) {
-      if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(info);
+      if(!context.options.get(MainOptions.WITHDB) || colls.isEmpty()) throw NODEFCOLL.get(info);
       return colls.getFirst();
     }
 
+    final Value value = openCollection(qi, qc, info);
+    if(value != null) return value;
+
+    // list files of a directory without parsing them
+    if(uris && qi.io instanceof final IOFile dir && dir.isDir()) {
+      checkAccess(dir, qi.original, qc, info);
+      final String path = dir.path();
+      final Value cached = dirs.get(path);
+      if(cached != null) return cached;
+      final ArrayList<IOFile> files = new DirParser(dir, options(DOC_OPTIONS, false)).files();
+      if(files != null) {
+        final TokenList list = new TokenList(files.size());
+        for(final IOFile file : files) list.add(file.url());
+        final Value urls = StrSeq.get(list, BasicType.ANY_URI);
+        dirs.put(path, urls);
+        return urls;
+      }
+    }
+
+    final Data data = create(qi, DOC_OPTIONS, qc, info, false, false);
+    return DBNodeSeq.get(docs(data, ""), data, true, true);
+  }
+
+  /**
+   * Returns a collection from the default database, an opened collection or an opened database.
+   * @param qi query input
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return collection, or {@code null} if it must be created
+   * @throws QueryException query exception
+   */
+  private Value openCollection(final QueryInput qi, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+
     final MainOptions options = context.options;
-    if(withdb) {
+    if(options.get(MainOptions.WITHDB)) {
       // favor default database
       if(options.get(MainOptions.DEFAULTDB)) {
         final Data data = globalData();
@@ -294,10 +357,10 @@ public final class QueryResources {
       }
     }
 
-    // access open database or create new one
-    final Data data = data(false, qi, DOC_OPTIONS, qc, info, false);
-    final IntList docs = docs(data, qi.dbPath);
-    return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
+    // access open database
+    final Data data = open(qi, DOC_OPTIONS, qc, info);
+    return data != null ? DBNodeSeq.get(docs(data, qi.dbPath), data, true, qi.dbPath.isEmpty()) :
+      null;
   }
 
   /**
@@ -489,19 +552,16 @@ public final class QueryResources {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Returns an already open database for the specified input or creates a new one.
-   * @param single single document
+   * Returns an opened database instance, or opens an existing database.
    * @param qi query input
    * @param docOpts options used by fn:doc or fn:collection
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @param allowExternal allow access to external resources
-   * @return data reference
+   * @return data reference, or {@code null} if a new instance must be created
    * @throws QueryException query exception
    */
-  private Data data(final boolean single, final QueryInput qi, final DocOptions docOpts,
-      final QueryContext qc, final InputInfo info, final boolean allowExternal)
-      throws QueryException {
+  private Data open(final QueryInput qi, final DocOptions docOpts, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final boolean withdb = context.options.get(MainOptions.WITHDB);
     final String name = qi.dbName;
@@ -541,12 +601,7 @@ public final class QueryResources {
         throw IOERR_X.get(info, ex);
       }
     }
-
-    // otherwise, create new instance
-    final Data data = create(qi, docOpts, qc, info, single, allowExternal);
-    // reset database path: indicates that all documents were parsed
-    qi.dbPath = "";
-    return data;
+    return null;
   }
 
   /**
@@ -602,6 +657,20 @@ public final class QueryResources {
   }
 
   /**
+   * Checks if the current user and the accessing code may create an instance from a resource.
+   * @param io resource
+   * @param input original input (for error messages)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private static void checkAccess(final IO io, final String input, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    checkTrusted(io, input, qc, info);
+    qc.checkPerm(io.isExternal() ? Perm.ADMIN : Perm.READ, null, input, info);
+  }
+
+  /**
    * Creates a new database instance.
    * @param input query input
    * @param docOpts options used by fn:doc or fn:collection
@@ -616,30 +685,20 @@ public final class QueryResources {
       final InputInfo info, final boolean single, final boolean allowExternal)
       throws QueryException {
 
-    // check user permissions
     final IO io = input.io;
-    checkTrusted(io, input.original, qc, info);
-    final Perm perm = io.isExternal() ? Perm.ADMIN : Perm.READ;
-    qc.checkPerm(perm, null, input.original, info);
+    checkAccess(io, input.original, qc, info);
 
     // check if input points to a single file
     if(!io.exists()) throw WHICHRES_X.get(info, io.path());
     if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 
-    // create parsing options with custom values
-    final MainOptions mopts = context.options, options;
-    if(!allowExternal && docOpts == DOC_OPTIONS && mopts.resolver().standard()
-      && !mopts.get(MainOptions.TRUSTEXTERNAL)) {
-      options = MAIN_OPTIONS;
-    } else {
-      options = new MainOptions(docOpts, mopts);
-      if(allowExternal) options.allowExternal(true);
-    }
-
+    final MainOptions options = options(docOpts, allowExternal);
     try {
       final DirParser parser = new DirParser(io, options);
       final Data data = CreateDB.create(io.dbName(), parser, context, options, true);
       data.meta.docOpts = docOpts.toString();
+      // reset database path: indicates that all documents were parsed
+      input.dbPath = "";
       if(!docOpts.get(DocOptions.STABLE)) return data;
       return addData(data);
     } catch(final IOException ex) {
@@ -650,6 +709,22 @@ public final class QueryResources {
         options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
           XSDVALIDATIONERR_X.get(info, ex);
     }
+  }
+
+  /**
+   * Returns the parsing options for a new database instance.
+   * @param docOpts options used by fn:doc or fn:collection
+   * @param allowExternal allow access to external resources
+   * @return options
+   */
+  private MainOptions options(final DocOptions docOpts, final boolean allowExternal) {
+    final MainOptions mopts = context.options;
+    if(!allowExternal && docOpts == DOC_OPTIONS && mopts.resolver().standard()
+      && !mopts.get(MainOptions.TRUSTEXTERNAL)) return MAIN_OPTIONS;
+
+    final MainOptions options = new MainOptions(docOpts, mopts);
+    if(allowExternal) options.allowExternal(true);
+    return options;
   }
 
   /**

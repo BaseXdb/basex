@@ -54,7 +54,7 @@ public final class DBNew {
     this.qc = qc;
     this.info = info;
     // external entities, XIncludes and catalogs require ADMIN permission
-    if(!qc.has(Perm.ADMIN, null, info)) opts.trust(false);
+    if(!qc.has(Perm.ADMIN, null, info)) opts.allowExternal(false);
 
     final int il = inputs.length;
     this.inputs = new ArrayList<>(il);

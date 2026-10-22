@@ -156,6 +156,17 @@ public final class Databases {
   }
 
   /**
+   * Checks if a user has the specified permission for a database or backup.
+   * @param user user
+   * @param perm permission
+   * @param name name of the database or backup (empty string for general data)
+   * @return result of check
+   */
+  public static boolean permitted(final User user, final Perm perm, final String name) {
+    return user.has(perm, name(name));
+  }
+
+  /**
    * Extracts the date of a database from the name of a backup.
    * @param backup name of the backup, including the date
    * @return date string

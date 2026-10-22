@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
 public class FnCollection extends Docs {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return collection(qc);
+    return qc.resources.collection(collectionInput(qc), qc, info);
   }
 
   @Override
@@ -38,13 +38,12 @@ public class FnCollection extends Docs {
   }
 
   /**
-   * Returns a collection.
+   * Returns the query input of the specified collection.
    * @param qc query context
-   * @return collection
+   * @return query input, or {@code null} for the default collection
    * @throws QueryException query exception
    */
-  final Value collection(final QueryContext qc) throws QueryException {
-    // return default collection or parse specified collection
+  final QueryInput collectionInput(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
       final Expr source = arg(0);
@@ -54,6 +53,6 @@ public class FnCollection extends Docs {
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
     }
-    return qc.resources.collection(qi, qc, info);
+    return qi;
   }
 }

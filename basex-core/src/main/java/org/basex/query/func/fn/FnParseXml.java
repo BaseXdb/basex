@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -39,13 +37,6 @@ public final class FnParseXml extends FnParseXmlFragment {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
-    if(!trustExternal(options, qc)) {
-      if(options.get(ParseXmlOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
-      if(options.get(ParseXmlOptions.USE_XSI_SCHEMA_LOCATION) &&
-          !CommonOptions.SKIP.equals(options.get(ParseXmlOptions.XSD_VALIDATION)))
-          throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
-    }
-    return parse(qc, false, options);
+    return parse(qc, false, toOptions(arg(1), new ParseXmlOptions(), qc));
   }
 }

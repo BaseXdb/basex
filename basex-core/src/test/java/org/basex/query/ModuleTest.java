@@ -216,7 +216,7 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
-   * Tests imports of pre-declared modules without create permissions.
+   * Tests imports of pre-declared modules without admin permissions.
    * @throws Exception exception
    */
   @Test public void declaredImportPermissions() throws Exception {

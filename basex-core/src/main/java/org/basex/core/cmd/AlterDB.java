@@ -39,7 +39,7 @@ public final class AlterDB extends ACreate {
     if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
     // check local permissions
-    if(!create(src, trg)) return error(PERM_REQUIRED_X, Perm.CREATE);
+    if(!create(src, trg)) return error(PERM_REQUIRED_X, Perm.ADMIN);
 
     // database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);

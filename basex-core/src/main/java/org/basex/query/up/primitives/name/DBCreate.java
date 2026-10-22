@@ -62,7 +62,7 @@ public final class DBCreate extends NameUpdate {
 
       if(clip != null && !clip.data.inMemory()) {
         // temporary database on disk: build index structures before the existing one is replaced
-        qc.checkPerm(Perm.CREATE, name, name, info);
+        qc.checkPerm(Perm.ADMIN, name, name, info);
         final Data tmp = clip.data;
         tmp.startUpdate(options);
         try {

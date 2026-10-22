@@ -8,6 +8,7 @@ import java.util.zip.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -28,6 +29,7 @@ public final class ShowBackups extends ABackup {
     table.header.add(COMMENT);
 
     for(final String backup : context.databases.backups()) {
+      if(!Databases.permitted(context.user(), Perm.READ, backup)) continue;
       final TokenList tl = new TokenList();
       tl.add(backup);
       final IOFile zip = soptions.dbPath(backup + IO.ZIPSUFFIX);

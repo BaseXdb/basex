@@ -213,27 +213,45 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * Ends the session of a user that is no longer an administrator.
+     * Closes the session of a dropped user.
      * @throws Exception exception
      */
-    @Test public void demotedUser() throws Exception {
+    @Test public void droppedUser() throws Exception {
       final String user = NAME + "dba";
       execute("user:create('" + user + "', 'pw', 'admin')");
       try {
         assertFalse(post("login", Map.of("_name", user, "_pass", "pw")).contains("_pass"));
-        execute("user:grant('" + user + "', 'create')");
-        assertTrue(get("settings").contains("_pass"), "session was not ended");
+        post("users/drop", Map.of("name", user));
+        assertTrue(get("settings").contains("_pass"), "session was not closed");
       } finally {
-        execute("user:drop('" + user + "')");
+        execute("if(user:exists('" + user + "')) { user:drop('" + user + "') }");
         post("login", Map.of("_name", "admin", "_pass", NAME));
       }
     }
 
     /**
      * Closes the WebSocket connections of a session on logout.
-     * @throws Exception exception
+     * @throws Throwable exception
      */
-    @Test public void logoutClosesSockets() throws Exception {
+    @Test public void logoutClosesSockets() throws Throwable {
+      socketClosed(() -> post("logout", Map.of()));
+    }
+
+    /**
+     * Closes the WebSocket connections of a session when the session is closed.
+     * @throws Throwable exception
+     */
+    @Test public void sessionClosesSockets() throws Throwable {
+      socketClosed(() -> execute("sessions:ids() ! sessions:close(.)"));
+    }
+
+    /**
+     * Checks if a WebSocket connection is closed by the specified action.
+     * @param action action
+     * @throws Throwable exception
+     */
+    private void socketClosed(final org.junit.jupiter.api.function.Executable action)
+        throws Throwable {
       final CompletableFuture<Integer> closed = new CompletableFuture<>();
       final java.net.http.WebSocket socket = socket("/dba/logs",
           new java.net.http.WebSocket.Listener() {
@@ -245,7 +263,7 @@ public final class DBATest extends WebappTest {
         }
       });
       try {
-        post("logout", Map.of());
+        action.execute();
         assertNotNull(closed.get(10, TimeUnit.SECONDS));
       } finally {
         socket.abort();

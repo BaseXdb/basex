@@ -107,8 +107,10 @@ public final class CatalogTest extends SandboxTest {
     set(MainOptions.CATALOG, CATALOG);
     query(func.args("http://doc.xml", " { 'dtd': true(), 'trust-external': true() }"),
         "<doc>X</doc>");
-    query(func.args("http://doc.xml", " { 'dtd': false() }"), "<doc>\uFFFD</doc>");
-    query(func.args("http://doc.xml"), "<doc>X</doc>");
+    query(func.args("http://doc.xml", " { 'dtd': false(), 'trust-external': true() }"),
+        "<doc>\uFFFD</doc>");
+    // untrusted calls ignore the catalog
+    error(func.args("http://doc.xml"), EXTERNALRESOURCE_X);
   }
 
   /** Test method.*/
@@ -121,16 +123,14 @@ public final class CatalogTest extends SandboxTest {
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
         " { 'dtd': false() }"), "<doc>\uFFFD</doc>");
 
-    // untrusted calls may access resources that are mapped by a catalog
-    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>"), "<doc>X</doc>");
-    error(func.args("<!DOCTYPE xml SYSTEM 'http://unknown.dtd'><doc/>"), EXTERNALRESOURCE_X);
+    // untrusted calls ignore the catalog
+    error(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>"),
+        EXTERNALRESOURCE_X);
     error(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc/>", " { 'intparse': true() }"),
         EXTERNALRESOURCE_X);
-    error("xquery:eval(``[" + func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc/>")
-        + "]``, (), { 'permission': 'read' })", EXTERNALRESOURCE_X);
 
     set(MainOptions.CATALOG, "");
-    query(OPTION + func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>"),
-        "<doc>X</doc>");
+    query(OPTION + func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
+        " { 'trust-external': true() }"), "<doc>X</doc>");
   }
 }

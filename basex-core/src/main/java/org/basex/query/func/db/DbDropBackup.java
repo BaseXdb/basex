@@ -20,7 +20,7 @@ public final class DbDropBackup extends BackupFn {
   public Value value(final QueryContext qc) throws QueryException {
     final String name = toBackup(arg(0), qc);
 
-    checkCreate(name, qc);
+    checkBackup(name, qc);
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 

@@ -251,8 +251,6 @@ public final class MainOptions extends Options {
   private int resolverVersion;
   /** Whether external resources may be accessed. */
   private boolean allowExternal = true;
-  /** Whether resources mapped by a catalog may be accessed. */
-  private boolean allowCatalog = true;
 
   /**
    * Default constructor.
@@ -277,7 +275,6 @@ public final class MainOptions extends Options {
     super(options);
     resolver = options.resolver;
     allowExternal = options.allowExternal;
-    allowCatalog = options.allowCatalog;
   }
 
   /**
@@ -290,7 +287,6 @@ public final class MainOptions extends Options {
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
     resolver = options.resolver;
     allowExternal = options.allowExternal;
-    allowCatalog = options.allowCatalog;
   }
 
   /**
@@ -315,7 +311,6 @@ public final class MainOptions extends Options {
     } else {
       setResolver(parent);
       allowExternal = t != null ? t : parent.allowExternal && parent.get(TRUSTEXTERNAL);
-      allowCatalog = parent.allowCatalog;
     }
   }
 
@@ -344,7 +339,7 @@ public final class MainOptions extends Options {
    * @return XML resolver
    */
   public XMLResolver resolver() {
-    if(!allowCatalog) return NO_RESOLVER;
+    if(!allowExternal) return NO_RESOLVER;
     final int v = version();
     if(resolver == null || resolverVersion != v) {
       final String catalog = get(CATALOG);
@@ -375,13 +370,11 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Specifies whether external resources may be accessed, including resources mapped by catalogs.
-   * @param trust trust flag
-   * @return self reference
+   * Checks if the specified option accesses files and can only be assigned by admins.
+   * @param option option (can be {@code null})
+   * @return result of check
    */
-  public MainOptions trust(final boolean trust) {
-    allowExternal = trust;
-    allowCatalog = trust;
-    return this;
+  public static boolean admin(final Option<?> option) {
+    return option == STOPWORDS || option == WRITEBACK;
   }
 }

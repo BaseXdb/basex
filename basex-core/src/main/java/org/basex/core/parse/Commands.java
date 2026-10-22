@@ -172,7 +172,7 @@ public interface Commands {
   /** Binary commands. */
   enum CmdBinary { GET, PUT }
   /** Permission commands. */
-  enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
+  enum CmdPerm { NONE, READ, WRITE, ADMIN }
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, TOKEN, FULLTEXT }
   /** Index types. */

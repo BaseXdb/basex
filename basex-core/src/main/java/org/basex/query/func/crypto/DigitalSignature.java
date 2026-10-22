@@ -157,7 +157,8 @@ final class DigitalSignature {
           }
         }
 
-        // initialize the keystore
+        // initialize the keystore (local files require ADMIN permission)
+        qc.checkPerm(Perm.ADMIN, null, ksURI, info);
         final KeyStore ks;
         try {
           ks = KeyStore.getInstance(ksTY);

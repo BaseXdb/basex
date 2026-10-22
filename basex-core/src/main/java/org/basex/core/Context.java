@@ -178,6 +178,8 @@ public final class Context {
    */
   public void user(final User us) {
     user = us;
+    // external resources require ADMIN permission
+    options.allowExternal(us.has(Perm.ADMIN));
   }
 
   /**

@@ -69,7 +69,7 @@ declare function panels:users(
   form:dialog('create', 'New User', 'users/create', false(), (
     form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
     form:field('Password:', <input type='password' name='pw' autocomplete='new-password'/>),
-    form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5], 'none'))
+    form:field('Permission:', form:select('perm', $config:PERMISSIONS, 'none'))
   ))
 };
 
@@ -113,7 +113,7 @@ declare function panels:user(
         }</div>,
         if (not($admin)) {
           <div>{
-            form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5],
+            form:field('Permission:', form:select('perm', $config:PERMISSIONS,
               $perm otherwise $user/@permission)),
             panels:local-permissions($user)
           }</div>

@@ -168,7 +168,6 @@ public final class UserModuleTest extends SandboxTest {
 
     // admin permission can only be set globally
     error(func.args(NAME, Perm.ADMIN, NAME), USER_LOCAL);
-    error(func.args(NAME, Perm.CREATE, NAME), USER_LOCAL);
     // admin cannot be modified
     error(func.args(UserText.ADMIN, Perm.ADMIN), USER_ADMIN);
     error(func.args(UserText.ADMIN, Perm.ADMIN, NAME), USER_ADMIN);

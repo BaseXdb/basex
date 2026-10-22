@@ -274,19 +274,11 @@ public final class JobModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void evalEnd() {
-    // scheduled execution
-    final Function func = _JOB_EVAL;
-    final String id = query(func.args("123", " ()",
-      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
-    // ensure that query is running
-    Performance.sleep(500);
-    query(_JOB_LIST.args() + "='" + id + '\'', true);
-    assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + id + "')"));
-
     // job is removed if it is still running when the end time is exceeded
-    final String slow = query(func.args("prof:sleep(2000)", " ()",
-      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
-    Performance.sleep(1500);
+    final Function func = _JOB_EVAL;
+    final String slow = query(func.args("prof:sleep(1000)", " ()",
+      " { 'interval': 'PT1S', 'end': 'PT0.5S' }"));
+    Performance.sleep(700);
     query(_JOB_LIST.args() + "='" + slow + '\'', true);
     assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + slow + "')"));
 

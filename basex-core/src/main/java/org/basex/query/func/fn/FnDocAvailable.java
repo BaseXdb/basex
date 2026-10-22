@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -42,12 +41,6 @@ public class FnDocAvailable extends Docs {
   final Item doc(final QueryContext qc) throws QueryException {
     final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
     check(options, false);
-    if(!trustExternal(options, qc)) {
-      if(options.get(DocOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
-      if(options.get(DocOptions.USE_XSI_SCHEMA_LOCATION) &&
-          !CommonOptions.SKIP.equals(options.get(DocOptions.XSD_VALIDATION)))
-          throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
-    }
 
     QueryInput qi = queryInput;
     if(qi == null) {

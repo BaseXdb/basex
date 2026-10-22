@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.util.options.*;
 
 /**
@@ -44,6 +45,7 @@ final class QueryOptions {
     final MainOptions options = qc.context.options;
     final Option<?> option = options.option(key);
     if(option == null) throw BASEX_OPTIONS_X.get(parser.info(), options.similar(name));
+    if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, key, parser.info());
 
     // try to assign option to dummy options
     if(dummyOptions == null) dummyOptions = new MainOptions(false);

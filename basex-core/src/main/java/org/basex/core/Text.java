@@ -466,7 +466,7 @@ public interface Text {
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
-    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [pattern]) " + S_TO +
+    CmdPerm.ADMIN + "] (" + ON + " [pattern]) " + S_TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")

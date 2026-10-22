@@ -38,7 +38,7 @@ public final class AlterBackup extends ABackup {
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
     if(!Databases.validName(newname)) return error(NAME_INVALID_X, newname);
     // check local permissions
-    if(!create(name, newname)) return error(PERM_REQUIRED_X, Perm.CREATE);
+    if(!create(Databases.name(name), newname)) return error(PERM_REQUIRED_X, Perm.ADMIN);
 
     // rename all backups
     final StringList backups = context.databases.backups(name);

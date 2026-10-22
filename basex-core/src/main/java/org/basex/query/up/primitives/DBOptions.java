@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
@@ -45,6 +46,7 @@ public final class DBOptions {
       final String name = Options.name(key, info);
       final Option<?> option = options.get(name);
       if(option == null) throw BASEX_OPTIONS_X.get(info, Options.similar(name, options));
+      if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, name, info);
 
       // nested maps and functions cannot be serialized as strings and are assigned with types
       Value value = qopts.get(key);

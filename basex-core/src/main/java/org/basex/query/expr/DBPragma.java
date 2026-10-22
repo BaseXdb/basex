@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -33,6 +34,7 @@ public final class DBPragma extends Pragma {
 
   @Override
   Object init(final QueryContext qc, final InputInfo info) throws QueryException {
+    if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, option.name(), info);
     final Object old = qc.context.options.get(option);
     try {
       qc.context.options.assign(option.name(), string(value));

@@ -20,7 +20,7 @@ abstract class AInfo extends Command {
    * @param args arguments
    */
   AInfo(final boolean openDB, final String... args) {
-    super(Perm.READ, openDB, args);
+    super(openDB ? Perm.READ : Perm.NONE, openDB, args);
   }
 
   /**

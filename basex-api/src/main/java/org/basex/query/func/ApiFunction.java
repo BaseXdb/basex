@@ -138,13 +138,13 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZO, SESSION_URI),
   /** XQuery function. */
   _SESSION_CLOSE(SessionClose::new, "close()",
-      params(), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSION_CREATED(SessionCreated::new, "created()",
       params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_DELETE(SessionDelete::new, "delete(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSION_GET(SessionGet::new, "get(key, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, SESSION_URI),
@@ -156,7 +156,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_SET(SessionSet::new, "set(key, value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
 
   // Sessions Module
 

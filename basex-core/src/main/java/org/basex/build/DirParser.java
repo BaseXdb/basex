@@ -80,6 +80,34 @@ public final class DirParser extends Parser {
       Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
   }
 
+  /**
+   * Returns the files of a directory that are parsed as XML documents.
+   * @return files, or {@code null} if they can only be determined by parsing the input
+   */
+  public ArrayList<IOFile> files() {
+    if(!(source instanceof final IOFile file && file.isDir()) || skipCorrupt) return null;
+    final ArrayList<IOFile> files = new ArrayList<>();
+    // the binary parser stores all files as binaries
+    if(binaryParser) return files;
+    for(final String path : file.descendants()) {
+      final IOFile input = new IOFile(file, path);
+      // archive entries are only known after parsing
+      if(archives && input.isArchive()) return null;
+      if(include(input.name())) files.add(input);
+    }
+    return files;
+  }
+
+  /**
+   * Checks if a file passes the name filter pattern.
+   * @param name file name
+   * @return result of check
+   */
+  private boolean include(final String name) {
+    return filter == null ||
+        filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
+  }
+
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.inputsize = 0;
@@ -182,8 +210,7 @@ public final class DirParser extends Parser {
     }
 
     // check if file passes the name filter pattern
-    final boolean include = filter == null ||
-        filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
+    final boolean include = include(name);
 
     if(include ? binaryParser : addBinary) {
       // store input in binary format if binary parser was chosen, or if file was included otherwise

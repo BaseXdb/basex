@@ -88,7 +88,9 @@ public final class User {
     name = string(attribute(user, Q_NAME, "Root"));
     passwords = new EnumMap<>(Algorithm.class);
     patterns = new LinkedHashMap<>();
-    permission = attribute(name, user, Q_PERMISSION, Perm.values());
+    // the former create permission was merged into the admin permission
+    permission = eq(user.attribute(Q_PERMISSION), token("create")) ? Perm.ADMIN :
+      attribute(name, user, Q_PERMISSION, Perm.values());
 
     for(final GNode gchild : children(user)) {
       final XNode child = (XNode) gchild;
@@ -216,11 +218,11 @@ public final class User {
 
   /**
    * Returns the global permission, or the permission for the specified database.
-   * @param db database pattern (can be {@code null})
+   * @param db database pattern (can be {@code null} or empty for the global permission)
    * @return permission
    */
   public synchronized Perm permission(final String db) {
-    if(db != null) {
+    if(db != null && !db.isEmpty()) {
       final Entry<String, Perm> entry = find(db);
       if(entry != null) return entry.getValue();
     }

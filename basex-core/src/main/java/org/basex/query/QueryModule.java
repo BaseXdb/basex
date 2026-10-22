@@ -54,8 +54,6 @@ public abstract class QueryModule {
     READ,
     /** Write permissions. */
     WRITE,
-    /** Create permissions. */
-    CREATE,
     /** Admin permissions. */
     ADMIN
   }

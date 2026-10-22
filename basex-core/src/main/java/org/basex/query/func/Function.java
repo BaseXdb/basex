@@ -1044,7 +1044,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _ARCHIVE_CREATE(ArchiveCreate::new, "create(entries, contents, options?)",
-      params(ITEM_ZM, ITEM_ZM, MAP_ZO), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
+      params(ITEM_ZM, ITEM_ZM, MAP_ZO), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_CREATE_FROM(ArchiveCreateFrom::new, "create-from(path, options?, entries?)",
       params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
@@ -1188,38 +1188,38 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CACHE_CLEAR(CacheClear::new, "clear()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_DELETE(CacheDelete::new, "delete(name?)",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_GET(CacheGet::new, "get(key, name?)",
-      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key, put, name?)",
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
-      ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+      ITEM_ZM, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_INFO(CacheInfo::new, "info(name?)",
-      params(STRING_ZO), MAP_O, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_ZO), MAP_O, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_INIT(CacheInit::new, "init(options?, name?)",
-      params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_KEYS(CacheKeys::new, "keys(name?)",
-      params(STRING_ZO), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_ZO), STRING_ZM, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_LIST(CacheList::new, "list()",
-      params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_PUT(CachePut::new, "put(key, value, name?)",
-      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_REMOVE(CacheRemove::new, "remove(key, name?)",
-      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_SIZE(CacheSize::new, "size(name?)",
-      params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
+      params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.ADMIN),
 
   // Client Module
 
@@ -1329,7 +1329,7 @@ public enum Function implements AFunction {
       params(STRING_O, ITEM_O, ITEM_O, STRING_ZO), ATTRIBUTE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_BACKUPS(DbBackups::new, "backups(database?)",
-      params(STRING_ZO), ELEMENT_ZM, flag(NDT), DB_URI, Perm.CREATE),
+      params(STRING_ZO), ELEMENT_ZM, flag(NDT), DB_URI, Perm.ADMIN),
   /** XQuery function. */
   _DB_CONTENT_TYPE(DbContentType::new, "content-type(database, path)",
       params(STRING_O, STRING_O), STRING_O, flag(NDT), DB_URI),
@@ -1923,40 +1923,40 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _STORE_CLEAR(StoreClear::new, "clear()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_CLOSE(StoreClose::new, "close(name?)",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_DELETE(StoreDelete::new, "delete(name?)",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_GET(StoreGet::new, "get(key, name?)",
-      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_GET_OR_PUT(StoreGetOrPut::new, "get-or-put(key, put, name?)",
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
-      ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+      ITEM_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_INFO(StoreInfo::new, "info(name?)",
-      params(STRING_ZO), MAP_O, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), MAP_O, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_KEYS(StoreKeys::new, "keys(name?)",
-      params(STRING_ZO), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), STRING_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _STORE_LIST(StoreList::new, "list()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  _STORE_LIST(StoreList::new, "list()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_PUT(StorePut::new, "put(key, value, name?)",
-      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_READ(StoreRead::new, "read(name?)",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_REMOVE(StoreRemove::new, "remove(key, name?)",
-      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write(name?)",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.ADMIN),
 
   // Strings Module
 
@@ -2052,7 +2052,7 @@ public enum Function implements AFunction {
       params(), STRING_O, USER_URI),
   /** XQuery function. */
   _USER_DROP(UserDrop::new, "drop(name, patterns?)",
-      params(STRING_O, STRING_ZM), EMPTY_SEQUENCE_Z, flag(UPD), USER_URI),
+      params(STRING_O, STRING_ZM), EMPTY_SEQUENCE_Z, flag(UPD), USER_URI, Perm.ADMIN),
   /** XQuery function. */
   _USER_EXISTS(UserExists::new, "exists(name)",
       params(STRING_O), BOOLEAN_O, flag(NDT), USER_URI, Perm.ADMIN),

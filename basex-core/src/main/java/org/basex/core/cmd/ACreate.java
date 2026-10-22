@@ -28,7 +28,7 @@ public abstract class ACreate extends Command {
    * @param args arguments
    */
   ACreate(final String... args) {
-    this(Perm.CREATE, false, args);
+    this(Perm.ADMIN, false, args);
     newData = true;
   }
 
@@ -120,6 +120,11 @@ public abstract class ACreate extends Command {
       }
     }
     return error(exc);
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return newData || super.updating(ctx);
   }
 
   @Override

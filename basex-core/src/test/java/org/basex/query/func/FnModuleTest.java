@@ -3286,7 +3286,7 @@ return
     final IOFile pmod = new IOFile(sandbox(), "perm.xqm");
     write(pmod, "module namespace p = 'p'; declare variable $p:v := 2;");
     final String load = func.args("p", " { 'location-hints': '" + pmod.path() + "' }");
-    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'create' })", XQUERY_PERM_X);
+    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'write' })", XQUERY_PERM_X);
     query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'admin' })", 2);
     error(func.args("m", String.format(doc, ", 'trusted': false()")) + call, EXTERNALRESOURCE_X);
     // trust: documents opened by trusted code are not accessible to untrusted code
@@ -6858,6 +6858,21 @@ return
     // leading whitespace is removed from processing instructions
     query(func.args(" <a><?pi v?></a>", " fn { .//processing-instruction() }", " '  y'") +
         "//processing-instruction() ! string()", "y");
+  }
+
+  /** Test method. */
+  @Test public void uriCollection() {
+    final Function func = URI_COLLECTION;
+    final IOFile dir = new IOFile(sandbox(), "uris/");
+    dir.md();
+    write(new IOFile(dir, "a.xml"), "<a/>");
+    write(new IOFile(dir, "dtd.xml"), "<!DOCTYPE x SYSTEM 'x.dtd'><x/>");
+    write(new IOFile(dir, "b.txt"), "b");
+
+    // files are listed without being parsed
+    query("string-join(sort(" + func.args(dir.path()) + ") ! substring-after(., '/uris/'), ',')",
+        "a.xml,dtd.xml");
+    error(COLLECTION.args(dir.path()), EXTERNALRESOURCE_X);
   }
 
   /** Test method. */

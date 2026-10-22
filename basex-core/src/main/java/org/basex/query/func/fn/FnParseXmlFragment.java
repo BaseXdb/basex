@@ -10,7 +10,6 @@ import org.basex.build.xml.*;
 import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.CommonOptions.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -83,10 +82,6 @@ public class FnParseXmlFragment extends Docs {
 
     final MainOptions mopts = new MainOptions(options, qc.context.options).
         allowExternal(trustExternal(options, qc));
-    // untrusted calls may only access catalog-mapped resources with admin permissions
-    if(!mopts.allowExternal() && !qc.has(Perm.ADMIN, null, info)) {
-      mopts.trust(false);
-    }
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

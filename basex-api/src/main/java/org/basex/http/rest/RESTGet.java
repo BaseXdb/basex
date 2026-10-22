@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.AbstractMap.*;
 import java.util.Map.*;
 
+import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -70,6 +71,7 @@ final class RESTGet {
     String op = null, input = null;
     final HTTPConnection conn = session.conn;
     final Options sopts = conn.sopts(), mopts = conn.context.options;
+    final User user = conn.context.user();
     for(final Entry<String, String[]> param : conn.requestCtx.queryStrings().entrySet()) {
       final String key = param.getKey();
       final String[] values = param.getValue();
@@ -82,7 +84,8 @@ final class RESTGet {
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         bindings.put(null, new SimpleEntry<>(values, NodeType.DOCUMENT.toString()));
-      } else if(!RESTCmd.assign(sopts, param, false) && !RESTCmd.assign(mopts, param, false)) {
+      } else if(!RESTCmd.assign(sopts, param, false, user) &&
+          !RESTCmd.assign(mopts, param, false, user)) {
         // assign database option, serialization parameter or external variable
         bindings.put(key, new SimpleEntry<>(values, null));
       }

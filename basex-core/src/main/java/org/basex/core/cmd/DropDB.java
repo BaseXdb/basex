@@ -38,7 +38,7 @@ public final class DropDB extends ACreate {
     }
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.databases.list(context.user(), Perm.CREATE, pattern);
+    final StringList dbs = context.databases.list(context.user(), Perm.ADMIN, pattern);
     if(dbs.isEmpty()) return info(NO_DB_DROPPED);
 
     // loop through all databases

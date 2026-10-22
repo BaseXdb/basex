@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/users';
 
+import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/user-panels' at 'panels.xqm';
 import module namespace user-info = 'dba/lib/user-info' at 'user-info.xqm';
@@ -100,7 +101,16 @@ declare
 function dba:drop() {
   utils:dispatch($dba:CAT, fn($args) { {
     'info': utils:info($args?name, 'user', 'dropped'),
-    'run' : %updating fn() { $args?name ! user:drop(.) }
+    'run' : %updating fn() {
+      $args?name ! user:drop(.),
+      (: dropped users are logged out :)
+      void(
+        for $id in sessions:ids()
+        where (try { sessions:get($id, $config:SESSION-KEY) } catch sessions:not-found { })
+          = $args?name
+        return sessions:close($id)
+      )
+    }
   } })
 };
 

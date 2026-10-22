@@ -33,14 +33,14 @@ public final class DropBackup extends ABackup {
     // loop through all databases and collect databases to be dropped
     final Databases db = context.databases;
     final User user = context.user();
-    final StringList names = general ? new StringList("") : db.list(user, Perm.CREATE, pattern);
-    // if the given argument is not a database name, it could be the name of a backup file
-    if(names.isEmpty() && user.has(Perm.CREATE, pattern)) names.add(pattern);
+    final StringList names = general ? new StringList("") : db.list(user, Perm.ADMIN, pattern);
+    // no database found: the pattern may address backups of a dropped database or a single backup
+    if(names.isEmpty()) names.add(pattern);
 
-    // drop all backups
+    // drop all permitted backups
     for(final String name : names) {
       for(final String backup : db.backups(name)) {
-        drop(backup, soptions);
+        if(Databases.permitted(user, Perm.ADMIN, backup)) drop(backup, soptions);
       }
     }
     return info(BACKUP_DROPPED_X, pattern);
