@@ -25,6 +25,7 @@ declare record table:options(
   presort  as xs:string?,
   select   as xs:string?,
   page     as xs:integer?,
+  focus    as xs:string?,
   count    as xs:integer?,
   filters  as element(tr)?,
   all      as xs:boolean?,
@@ -124,6 +125,7 @@ declare function table:properties(
  :     the first column shows
  :   * 'presort': key of pre-sorted column; if identical to sort, entries will not be resorted
  :   * 'page': number of pages that are shown; a link below the table shows one more
+ :   * 'focus': id of an entry that the shown pages start around
  :   * 'count': total number of entries, if only a slice of them is supplied
  :   * 'filters': table row with filter fields, displayed below the header row
  :   * 'all': list all entries, ignoring the maximum number of table entries
@@ -191,8 +193,14 @@ declare function table:create(
   let $count-option := $options?count[$presorted]
   let $page := max(($options?page, 1))
   let $entries := $count-option otherwise count($sorted-entries)
+  (: the focused entry is shown amid its neighbors, and not after all entries before it :)
+  let $offset := max((
+    $options?focus ! index-of($sorted-entries?id, .)[1] - 1 - $max-option idiv 2, 0
+  ))
   (: the entries of the shown pages, but not more than a table is meant to hold :)
-  let $last := min(($page * $max-option, $entries, $config:MAX-SHOWN[not($options?all)]))
+  let $last := min((
+    $entries, $offset + min(($page * $max-option, $config:MAX-SHOWN[not($options?all)]))
+  ))
 
   let $noun := $options?noun otherwise 'entry'
   (: everything above the table :)
@@ -211,7 +219,9 @@ declare function table:create(
       $entries,
       utils:capitalize(utils:plural($entries, $noun)),
 
-      <span class='range'>{ $last } shown</span>[$last < $entries]
+      <span class='range'>{ `{ $offset + 1 }–`[$offset > 0] }{ $last } shown</span>[
+        $offset > 0 or $last < $entries
+      ]
     }
   )
   return (
@@ -230,7 +240,7 @@ declare function table:create(
     },
 
     (: list of results :)
-    let $shown-entries := $sorted-entries[position() <= $last]
+    let $shown-entries := $sorted-entries[position() > $offset and position() <= $last]
     where exists($shown-entries) or exists($options?filters)
     let $fixed := some $header in $headers satisfies $header?width
     (: columns without a width keep some room when the fixed ones exceed a narrow screen :)
@@ -309,10 +319,14 @@ declare function table:create(
     }
     return (
       (: horizontal scroll on narrow screens :)
-      element div { attribute class { 'scroll' }, $table },
+      element div {
+        attribute class { 'scroll' },
+        attribute data-offset { $offset }[$offset > 0],
+        $table
+      },
       (: entries that follow are shown by asking for the next page, up to the limit :)
       if ($last < $entries) {
-        if ($last < $config:MAX-SHOWN) then (
+        if ($last - $offset < $config:MAX-SHOWN) then (
           (: a block that asks for the next page as soon as it is scrolled to, or via its button
              if the panels are stacked; see js.js :)
           <div class='more' data-more='{ $page + 1 }'>

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/logs';
 
-import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
@@ -34,7 +33,7 @@ declare variable $dba:COLUMNS := (
  : @param  $name   name (date) of log file
  : @param  $sort   table sort key
  : @param  $page   number of shown pages
- : @param  $time   timestamp to highlight
+ : @param  $entry  entry to highlight
  : @return page
  :)
 declare
@@ -44,14 +43,14 @@ declare
   %rest:query-param('name',  '{$name}')
   %rest:query-param('sort',  '{$sort}', '')
   %rest:query-param('page',  '{$page}', '1')
-  %rest:query-param('time',  '{$time}')
+  %rest:query-param('entry', '{$entry}')
   %output:method('html')
 function dba:logs(
   $input  as xs:string?,
   $name   as xs:string?,
   $sort   as xs:string,
   $page   as xs:string,
-  $time   as xs:string?
+  $entry  as xs:string?
 ) as element(html) {
   let $files := admin:logs()
   let $date := $name otherwise string(head($files))
@@ -70,6 +69,9 @@ function dba:logs(
           <label title='Reload the entries at the interval chosen in the settings'>{
             <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
           }</label>,
+          (: shown while the entries do not start with the first page; see showLogEntries :)
+          <button type='button' id='top' hidden='' onclick='showTop();'
+                  title='Show the first page of entries'>Top</button>,
           <span class='ignore'>{
             <input type='text' id='ignore' class='smallinput' autocomplete='off'
                    placeholder='Ignore, e.g. /dba'
@@ -88,7 +90,7 @@ function dba:logs(
         <input type='hidden' id='date' value='{ $date }'/>
         <input type='hidden' id='sort' value='{ $sort }'/>
         <input type='hidden' id='page' value='{ $page }'/>
-        <input type='hidden' id='time' value='{ $time }'/>
+        <input type='hidden' id='entry' value='{ $entry }'/>
         <div id='list'>{
           (: the filter is a control of the list, and shares the row of its buttons :)
           let $buttons := (
@@ -105,13 +107,13 @@ function dba:logs(
             { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
           )
           let $entries :=
-            for $entry in $files
+            for $file in $files
             return {
               (: the reference is a deep link naming the file; following it in place asks for
                  its entries over the connection the view already opened :)
-              'name': html:select($entry, $dba:CAT, { 'sort': $sort, 'name': $entry },
-                $date = $entry, 'name', 'selectLog'),
-              'size': $entry/@size
+              'name': html:select($file, $dba:CAT, { 'sort': $sort, 'name': $file },
+                $date = $file, 'name', 'selectLog'),
+              'size': $file/@size
             }
           (: the head is pinned, so the actions stay in reach while the files scroll.
              The files of a server are few, and the filter looks through all of them :)
@@ -157,7 +159,7 @@ function dba:ws-message(
       $json?dates?*,
       $json?sort[.] otherwise 'time',
       xs:integer($json?page),
-      $json?time,
+      $json?entry,
       $json?ignore,
       $filters
     ], { 'cache': true(), 'id': utils:job-id('logs') })
@@ -224,20 +226,20 @@ declare %private function dba:searched(
  : @param  $dates    names of the log files to be searched
  : @param  $sort     table sort key
  : @param  $page     number of shown pages
- : @param  $time     timestamp to highlight
+ : @param  $entry    entry to highlight
  : @param  $ignore   regular expression of entries to hide
  : @param  $filters  column filters
- : @return html elements
+ : @return html element
  :)
 declare function dba:entries(
   $input    as xs:string?,
   $dates    as xs:string+,
   $sort     as xs:string,
   $page     as xs:integer,
-  $time     as xs:string?,
+  $entry    as xs:string?,
   $ignore   as xs:string?,
   $filters  as map(*)
-) as element()+ {
+) as element(div) {
   (: the files are searched newest first, so that the first page is the most recent data :)
   let $files := reverse(sort(distinct-values($dates), '?lang=en'))
   (: a single file is what the view was opened on: its date is stated by the panel, and every
@@ -250,7 +252,9 @@ declare function dba:entries(
     let $joined-terms := if ($regex-string) then $input else string-join($terms, '|')
 
     for $date in $files
-    for $log in reverse(admin:logs($date, true()))
+    let $logs := admin:logs($date, true())
+    for $n in reverse(1 to count($logs))
+    let $log := $logs[$n]
     let $text := string($log)
     where not($ignore and matches($text, $ignore, 'i'))
     (: AND-combine column filters; an address is found by what is shown and by what is logged :)
@@ -269,11 +273,13 @@ declare function dba:entries(
       return if ($input) then dba:searched($map, $terms, $joined-terms) else $map
     )
 
-    let $id := string($log/@time)
+    let $time := string($log/@time)
+    (: entries can share a time: their position in the file tells them apart :)
+    let $key := `{ $time }-{ $n }`
     let $address := string($log/@address)
     (: two files hold the same times of day: what names an entry, and what is shown for it,
        is prefixed by the file it belongs to :)
-    let $label := ($date || ' ')[$several] || $id
+    let $prefix := ($date || ' ')[$several]
     (: a failed request is told apart by its type: an error, an HTTP client or server error, or
        a WebSocket close code other than 1000, 1001 (closed in order) and 1005 (no code) :)
     let $type := $map-results?type
@@ -284,13 +290,14 @@ declare function dba:entries(
         'type': if ($failed) then fn() {
           <span class='log-failed'>{ if ($type instance of fn(*)) then $type() else $type }</span>
         } else $type,
-        'id': translate($label, ' ', 'T'),
+        'id': ($date || 'T')[$several] || $key,
         'address': fn() { html:address($address) },
         'ms': xs:decimal($log/@ms),
         'time': fn() {
-          let $link := html:link($label, $dba:CAT || '-jump',
-            ({ 'date': $date, 'time': $id }, { 'ignore': $ignore }[$ignore]))
-          return if (not($input) and $id = $time) then element b { $link } else $link
+          let $link := <a href='{
+            web:create-url($dba:CAT, { 'name': $date, 'entry': $key }, $key)
+          }'>{ $prefix || $time }</a>
+          return if (not($input) and $key = $entry) then element b { $link } else $link
         }
       }
     }
@@ -312,50 +319,22 @@ declare function dba:entries(
     }
   }
   let $options := {
-    'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row,
+    'sort': $sort, 'presort': 'time', 'page': $page, 'focus': $entry[not($input)],
+    'filters': $filter-row,
     (: the number of entries stays in view below the search line :)
     'pinned': true(),
     'empty': if ($input or $ignore or map:size($filters) > 0) then 'No entries match the search.'
       else 'The log is empty.'
   }
-  return (
+  (: the number of shown pages is stated for the client; see shownPages :)
+  return <div data-page='{ $page }'>{
     (: a search that stopped at the limit reports as much: what it did not reach is not
        missing from the log, it was not looked at :)
     <div class='note warn'>{
       `The search was stopped after { $max - 1 } entries. Choose fewer files, or narrow the search.`
     }</div>[$several and count($shown) = $max],
     table:create($dba:COLUMNS, $shown, (), $params, $options)
-  )
-};
-
-(:~
- : Redirects to the URL that returns logs for the specified timestamp.
- : @param  $date    date
- : @param  $time    time
- : @param  $ignore  regular expression of entries to hide
- : @return redirection
- :)
-declare
-  %rest:GET
-  %rest:path('/dba/logs-jump')
-  %rest:query-param('date',   '{$date}')
-  %rest:query-param('time',   '{$time}')
-  %rest:query-param('ignore', '{$ignore}')
-function dba:logs-jump(
-  $date    as xs:string,
-  $time    as xs:string,
-  $ignore  as xs:string?
-) as element(rest:response) {
-  let $page := head(
-    for $log at $pos in reverse(
-      admin:logs($date, true())[not($ignore and matches(., $ignore, 'i'))]
-    )
-    where $log/@time = $time
-    return ($pos - 1) idiv $config:ROWS + 1
-  ) otherwise 1
-  return web:redirect('/dba/' || $dba:CAT, { 'name': $date, 'page': $page, 'time': $time }) update {
-    .//*:header/@value ! (replace value of node . with . || '#' || $time)
-  }
+  }</div>
 };
 
 (:~

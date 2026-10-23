@@ -6,6 +6,9 @@ let _logInput;
 /** Number of log files that the search covers. */
 let _logFiles = 1;
 
+/** Indicates whether the entry named in the address still has to be scrolled to. */
+let _logJump = window.location.hash !== "";
+
 /**
  * Queries the entries of the log files that are searched: the checked ones, or the file that
  * is opened.
@@ -56,7 +59,7 @@ function logEntries(key) {
     sort: document.getElementById("sort").value,
     // a new search or filter keeps the number of entries that are shown
     page: Number(document.getElementById("page").value) || 1,
-    time: document.getElementById("time").value,
+    entry: document.getElementById("entry").value,
     // the fields are named after the columns they filter, with a prefix of their own
     filters: Object.fromEntries(typed.map(([ name, value ]) => [ name.replace(/^f-/, ""), value ]))
   };
@@ -72,7 +75,7 @@ function logEntries(key) {
   // the number of shown pages is not kept: a reload starts with the first one, unless an entry
   // that was jumped to has to be shown again
   window.history.replaceState(null, "", replaceParams(window.location.href,
-    { input: input, page: message.time ? message.page : "", sort: message.sort }));
+    { input: input, page: message.entry ? message.page : "", sort: message.sort }));
 }
 
 /**
@@ -88,10 +91,17 @@ function showLogEntries(text) {
     output.innerHTML = text;
     if(_toTop.delete("output")) output.closest(".pane")?.scrollTo(0, 0);
     markTruncated(output);
+    // a table that is more than the first page can be returned to
+    document.getElementById("top").hidden = shownPages("output") === 1 &&
+      !output.querySelector("[data-offset]");
     // a range of files is not reloaded: the live refresh follows a single file
     scheduleLive(() => logEntries(), liveOn() && _logFiles === 1);
-    const e = document.getElementById(window.location.hash.replace(/^#/, ""));
-    if(e) e.scrollIntoView();
+    // the entry that was jumped to is scrolled to once; a live refresh leaves the position alone
+    if(_logJump) {
+      _logJump = false;
+      document.getElementById(decodeURIComponent(window.location.hash.slice(1)))?.
+        scrollIntoView({ block: "center" });
+    }
   }, "input.filter");
 }
 
@@ -108,6 +118,11 @@ function filterLogs(key) {
  * Restores the stored text fields, then loads the log entries.
  */
 function initLogs() {
+  // an entry that is jumped to is shown in the whole log, apart from the ignored entries
+  if(document.getElementById("entry").value) {
+    store(fieldKey("input"), null);
+    store(fieldKey("filters"), null);
+  }
   // a search of the address wins over the stored one
   restoreField("input");
   restoreField("ignore");
@@ -119,6 +134,28 @@ function initLogs() {
     if(event.target.matches("input[type=checkbox]")) logEntries("select");
   });
   logEntries();
+}
+
+/**
+ * Shows the first page of entries, without an entry that was jumped to.
+ * @param {object} params further query parameters of the address
+ */
+function showFirstPage(params) {
+  document.getElementById("page").value = 1;
+  document.getElementById("entry").value = "";
+  // a reload shows what the page shows; the fragment named the entry
+  const url = new URL(replaceParams(window.location.href, { ...params, page: "", entry: "" }));
+  url.hash = "";
+  window.history.replaceState(null, "", url);
+  logEntries();
+}
+
+/**
+ * Shows the first page of entries instead of the ones that were jumped to or loaded below it.
+ */
+function showTop() {
+  _toTop.add("output");
+  showFirstPage({});
 }
 
 /**
@@ -158,15 +195,8 @@ function selectLog(date) {
   const file = document.getElementById("date");
   if(date === file.value) return;
   file.value = date;
-  document.getElementById("page").value = 1;
-  document.getElementById("time").value = "";
   mark("list", date);
-  // the file is part of the address, so a reload shows what the page shows; the fragment
-  // named an entry of the previous file
-  const url = new URL(replaceParam(window.location.href, "name", date));
-  url.hash = "";
-  window.history.replaceState(null, "", url);
-  logEntries();
+  showFirstPage({ name: date });
 }
 
 /** The sort and page links of the entry table are followed in place: they name what the table
