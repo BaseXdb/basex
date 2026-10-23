@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -84,7 +85,9 @@ public final class Functions {
       throws QueryException {
 
     // partial function call?
-    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc), fb, true);
+    if(fb.placeholders > 0) {
+      return dynamic(item(qnm, fb.arity, fb, false, fb.info, qc), fb, true);
+    }
 
     final QNm name = funcName(qnm, fb.arity, fb.info, qc);
 
@@ -102,7 +105,7 @@ public final class Functions {
     }
 
     // user-defined function
-    return staticCall(name, fb, qc);
+    return staticCall(name, fb.args(), fb, qc);
   }
 
   /**
@@ -159,6 +162,22 @@ public final class Functions {
    */
   public static Expr item(final QNm qnm, final int arity, final boolean runtime,
       final InputInfo info, final QueryContext qc) throws QueryException {
+    return item(qnm, arity, null, runtime, info, qc);
+  }
+
+  /**
+   * Creates a function item expression for the parameters supplied by a function call.
+   * @param qnm function name
+   * @param arity number of arguments
+   * @param call function call with placeholders (can be {@code null})
+   * @param runtime {@code true} if this method is called at runtime
+   * @param info input info
+   * @param qc query context
+   * @return literal if found, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  private static Expr item(final QNm qnm, final int arity, final FuncBuilder call,
+      final boolean runtime, final InputInfo info, final QueryContext qc) throws QueryException {
 
     final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
     final QNm name = funcName(qnm, arity, info, qc);
@@ -177,10 +196,11 @@ public final class Functions {
       final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1], fd.visible);
       if(arts != null) throw wrongArity(fd, arity, arts, true, info);
 
-      final FuncType ft = fd.type(arity, fb.anns);
-      final QNm[] names = fd.paramNames(arity);
-      for(int a = 0; a < arity; a++) fb.add(names[a], ft.argTypes[a], qc);
-      final StandardFunc sf = fd.get(info, fb.args());
+      final QNm[] names = fd.paramNames(Math.max(arity, fd.params.length));
+      final SeqType[] types = fd.type(names.length, fb.anns).argTypes;
+      final Expr[] args = params(fb, call, names, types, fd.minMax[0], fd, qc);
+      final FuncType ft = FuncType.get(fb.anns, fd.seqType, fb.params);
+      final StandardFunc sf = fd.get(info, args);
       // function items created at runtime are not compiled: check permissions here
       if(runtime) sf.checkPerm(qc);
       final boolean updating = sf.hasUPD();
@@ -194,7 +214,7 @@ public final class Functions {
     // user-defined function
     final StaticFunc sf = qc.functions.get(info.sc(), name, arity, runtime);
     if(sf != null) {
-      final Expr func = item(sf, fb, qc);
+      final Expr func = item(sf, call, fb, qc);
       if(sf.updating) qc.updating();
       return func;
     }
@@ -297,17 +317,18 @@ public final class Functions {
   /**
    * Creates a cached function call.
    * @param name function name
+   * @param args positional arguments
    * @param fb function arguments
    * @param qc query context
    * @return function call
    * @throws QueryException query exception
    */
-  private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
-      final QueryContext qc) throws QueryException {
+  private static StaticFuncCall staticCall(final QNm name, final Expr[] args,
+      final FuncBuilder fb, final QueryContext qc) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
 
-    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info);
+    final StaticFuncCall call = new StaticFuncCall(name, args, fb.keywords, fb.info);
     qc.functions.setFunc(call, fb.runtime, qc);
     return call;
   }
@@ -322,16 +343,63 @@ public final class Functions {
    */
   public static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc)
       throws QueryException {
+    return item(sf, null, fb, qc);
+  }
+
+  /**
+   * Creates a function item expression for the parameters of a user-defined function.
+   * @param sf static function
+   * @param call function call with placeholders (can be {@code null})
+   * @param fb function arguments
+   * @param qc query context
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private static Expr item(final StaticFunc sf, final FuncBuilder call, final FuncBuilder fb,
+      final QueryContext qc) throws QueryException {
 
     final FuncType sft = sf.funcType();
-    final int arity = fb.params.length;
-    for(int a = 0; a < arity; a++) fb.add(sf.paramName(a), sft.argTypes[a], qc);
-    final FuncType ft = FuncType.get(fb.anns, sft.declType, Arrays.copyOf(sft.argTypes, arity));
+    final Expr[] args = params(fb, call, sf.paramNames(), sft.argTypes, sf.minArity(),
+        (Supplier<String>) sf::paramString, qc);
+    final FuncType ft = FuncType.get(fb.anns, sft.declType, fb.params);
 
-    final StaticFuncCall call = staticCall(sf.name, fb, qc);
-    if(call.func != null) fb.anns = call.func.anns;
+    final StaticFuncCall sfc = staticCall(sf.name, args, fb, qc);
+    if(sfc.func != null) fb.anns = sfc.func.anns;
     // default values are evaluated with the focus of the function reference
-    return item(call, fb, ft, sf.name, sf.updating, call.has(Flag.CTX));
+    return item(sfc, fb, ft, sf.name, sf.updating, sfc.has(Flag.CTX));
+  }
+
+  /**
+   * Adds the supplied parameters and returns the arguments for the function body.
+   * @param fb function arguments
+   * @param call function call with placeholders (can be {@code null})
+   * @param names parameter names
+   * @param types parameter types
+   * @param min minimum number of arguments
+   * @param function function (for error messages)
+   * @param qc query context
+   * @return arguments ({@link Empty#UNDEFINED} for parameters with default values)
+   * @throws QueryException query exception
+   */
+  private static Expr[] params(final FuncBuilder fb, final FuncBuilder call, final QNm[] names,
+      final SeqType[] types, final int min, final Object function, final QueryContext qc)
+      throws QueryException {
+
+    // parameters skipped by keyword arguments are assigned their default values
+    final Expr[] supplied = call != null && call.keywords != null ?
+      prepareArgs(call, names, names.length, function) : null;
+    final int al = supplied != null ? supplied.length : fb.params.length;
+    final Expr[] args = new Expr[al];
+    for(int a = 0; a < al; a++) {
+      if(supplied == null || supplied[a] != null) {
+        args[a] = fb.add(names[a], types[a], qc);
+      } else if(a < min) {
+        throw PARAMMISSING_X_X.get(fb.info, function, names[a].prefixString());
+      } else {
+        args[a] = Empty.UNDEFINED;
+      }
+    }
+    return args;
   }
 
   /**

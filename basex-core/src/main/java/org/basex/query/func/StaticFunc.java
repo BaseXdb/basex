@@ -283,6 +283,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     return params[pos].name;
   }
 
+  /**
+   * Returns the names of all parameters.
+   * @return parameter names
+   */
+  public QNm[] paramNames() {
+    final int pl = params.length;
+    final QNm[] names = new QNm[pl];
+    for(int p = 0; p < pl; p++) names[p] = params[p].name;
+    return names;
+  }
+
   @Override
   public String paramString() {
     return XQFunctionExpr.paramString(this, min);

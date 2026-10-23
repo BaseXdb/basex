@@ -105,11 +105,14 @@ public final class FuncBuilder {
    * @param name parameter name
    * @param st parameter type
    * @param qc query context
+   * @return reference to the parameter
    */
-  public void add(final QNm name, final SeqType st, final QueryContext qc) {
+  public VarRef add(final QNm name, final SeqType st, final QueryContext qc) {
     final Var var = vs.addNew(name, st, qc, info);
     params[arity] = var;
-    add(new VarRef(info, var), null);
+    final VarRef ref = new VarRef(info, var);
+    add(ref, null);
+    return ref;
   }
 
   /**

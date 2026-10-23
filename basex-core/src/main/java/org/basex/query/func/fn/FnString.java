@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,8 +19,17 @@ import org.basex.query.value.type.*;
 public final class FnString extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = contextArg(qc).unwrappedItem(qc, info);
+    return string(contextArg(qc).unwrappedItem(qc, info), info);
+  }
 
+  /**
+   * Returns the string value of an item.
+   * @param value item
+   * @param info input info (can be {@code null})
+   * @return string item
+   * @throws QueryException query exception
+   */
+  static Item string(final Item value, final InputInfo info) throws QueryException {
     if(value.isEmpty()) return Str.EMPTY;
     if(value.type == BasicType.STRING) return value;
     if(!(value instanceof FItem) || value instanceof XQJava) return Str.get(value.string(info));

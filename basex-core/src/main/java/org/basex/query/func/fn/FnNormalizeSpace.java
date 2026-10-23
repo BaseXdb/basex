@@ -17,13 +17,19 @@ import org.basex.util.*;
 public final class FnNormalizeSpace extends ContextFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item item = contextArg(qc).atomItem(qc, info);
+    final Item item = atomArg(qc);
     return item.isEmpty() ? Str.EMPTY : Str.get(Token.normalize(item.string(info)));
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    return !Token.ws(toZeroToken(contextArg(qc), qc));
+    final Item item = atomArg(qc);
+    return !item.isEmpty() && !Token.ws(item.string(info));
+  }
+
+  @Override
+  protected boolean stringContext() {
+    return true;
   }
 
   @Override

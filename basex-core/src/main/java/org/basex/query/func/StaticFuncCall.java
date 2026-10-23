@@ -148,10 +148,8 @@ public final class StaticFuncCall extends FuncCall {
     // assign keyword arguments
     final int arity = sf.arity();
     if(keywords != null) {
-      final QNm[] names = new QNm[arity];
-      for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), names, arity,
-          (Supplier<String>) sf::paramString);
+      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), sf.paramNames(),
+          arity, (Supplier<String>) sf::paramString);
       keywords = null;
     }
     // mark arguments that will be replaced with default expressions

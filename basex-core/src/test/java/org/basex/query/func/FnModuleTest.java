@@ -3893,6 +3893,11 @@ return
     query("boolean(" + func.args(" <?_ x?>") + ')', true);
     query("boolean(" + func.args(" <?_  x ?>") + ')', true);
     query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
+
+    // context value defaults to fn:string(.)
+    query(func.args(" [ ' a ' ]"), "a");
+    error("[ ' a ' ] ! " + func.args(), FISTRING_X);
+    error("[ ' a ' ] ! boolean(" + func.args() + ')', FISTRING_X);
   }
 
   /** Test method. */
@@ -5874,6 +5879,11 @@ return
     query(func.args(111), 3);
     query(func.args(" ([ (), 'a' ])"), 1);
 
+    // context value defaults to fn:string(.)
+    error("[ 'a' ] ! " + func.args(), FISTRING_X);
+    error("{ 'a': 1 } ! " + func.args(), FISTRING_X);
+    error("for $a in ([ 'a' ], 'bc') return $a ! " + func.args(), FISTRING_X);
+
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query("<_>A</_>[" + func.args(" .") + ']', "<_>A</_>");
 
@@ -5908,7 +5918,7 @@ return
     check("<a/>[" + func.args() + " gt 1]", "", exists(func));
     check("<a/>[" + func.args() + " = <a>1</a>]", "", exists(func));
 
-    error("true#0[" + func.args() + ']', FIATOMIZE_X);
+    error("true#0[" + func.args() + ']', FISTRING_X);
   }
 
   /** Test method. */
@@ -6562,6 +6572,12 @@ return
         empty(func), exists(NORMALIZE_SPACE));
 
     error(func.args("a", " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
+
+    // context value defaults to fn:string(.)
+    query(func.args(" [ ' a ' ]"), "a");
+    error("[ 'a' ] ! " + func.args(), FISTRING_X);
+    error("[ 'a', 'b' ] ! " + func.args(), FISTRING_X);
+    error("[ 'a' ] -> " + func.args(" options := { 'side': 'end' }"), FISTRING_X);
   }
 
   /** Test method. */

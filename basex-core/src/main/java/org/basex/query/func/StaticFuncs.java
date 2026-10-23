@@ -108,7 +108,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
       call.setFunc(func);
       // default values can only be assigned once all function calls have been resolved
-      if(arity < func.arity()) {
+      if(Checks.any(call.exprs, expr -> expr == Empty.UNDEFINED)) {
         if(dynamic) call.assignDefaults();
         else unassignedCalls.add(call);
       }
