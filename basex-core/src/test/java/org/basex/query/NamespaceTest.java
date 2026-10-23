@@ -157,8 +157,13 @@ public final class NamespaceTest extends SandboxTest {
         DUPLNSCONS_X);
     error("<_ xmlns='a'>{ namespace { '' } { 'B' } }</_>",
         DUPLNSCONS_X);
-    error("<_ xmlns='A'>{ element E { namespace { '' } { 'B' } } }</_>",
-        DUPLNSCONS_X);
+    // inherited namespaces are overridden by namespace nodes
+    query("<_ xmlns='A'>{ element E { namespace { '' } { 'B' } } }</_>",
+        "<_ xmlns=\"A\"><_1:E xmlns=\"B\" xmlns:_1=\"A\"/></_>");
+    query("<x xmlns='a'>{ element { QName('v', 'e') } { namespace { '' } { 'u' } } }</x>",
+        "<x xmlns=\"a\"><_1:e xmlns=\"u\" xmlns:_1=\"v\"/></x>");
+    query("declare default element namespace 'a'; element e { namespace { '' } { 'u' } }",
+        "<_1:e xmlns=\"u\" xmlns:_1=\"a\"/>");
 
     error("element e { namespace { '' } { 'u' } }",
         EMPTYNSCONS);
@@ -182,6 +187,8 @@ public final class NamespaceTest extends SandboxTest {
     // prefixes of node names are changed instead
     query("element { QName('v', 'p:e') } { namespace p { 'u' } }",
         "<p_1:e xmlns:p=\"u\" xmlns:p_1=\"v\"/>");
+    query("element { QName('v', 'e') } { namespace { '' } { 'u' } }",
+        "<_1:e xmlns=\"u\" xmlns:_1=\"v\"/>");
   }
 
   /**
