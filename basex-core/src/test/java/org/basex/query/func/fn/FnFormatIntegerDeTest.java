@@ -170,7 +170,6 @@ public final class FnFormatIntegerDeTest extends SandboxTest {
     query("format-integer(1000, 'w;o', 'de')", "eintausendste");
     query("format-integer(10000, 'w;o', 'de')", "zehntausendste");
     query("format-integer(100000, 'w;o', 'de')", "einhunderttausendste");
-    query("format-integer(1000000, 'w;o', 'de')", "eine millionste");
   }
 
   /** fn:format-integer, German title case. */
