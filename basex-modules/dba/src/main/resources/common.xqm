@@ -27,7 +27,6 @@ function dba:redirect(
  :)
 declare
   %rest:path('/dba/.static/{$file=.+}')
-  %output:method('basex')
   %perm:allow('public')
 function dba:file(
   $file  as xs:string
@@ -73,7 +72,6 @@ declare
   %rest:path('/dba/{$path=.*}')
   %rest:error-param('code', '{$code}')
   %rest:error-param('description', '{$description}')
-  %output:method('text')
 function dba:error(
   $path         as xs:string,
   $code         as xs:QName?,

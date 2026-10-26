@@ -175,10 +175,7 @@ function dba:backup-download(
 ) as item()+ {
   let $path := utils:safe-path(db:option('dbpath') || '/', $backup)
   return (
-    web:response-header(
-      { 'media-type': 'application/octet-stream' },
-      { 'Content-Length': file:size($path) }
-    ),
+    web:response-header((), { 'Content-Length': file:size($path) }),
     file:read-binary($path)
   )
 };
@@ -198,7 +195,6 @@ declare
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')
   %rest:query-param('indent',   '{$indent}')
-  %output:method('text')
 function dba:db-save(
   $name      as xs:string,
   $resource  as xs:string,

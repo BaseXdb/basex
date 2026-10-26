@@ -90,7 +90,7 @@ declare function panels:jobs(
       let $entries := (
         for $details in $jobs except $hidden
         let $id := $details/@id
-        let $sec := (xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S'))
+        let $sec := duration-to-seconds(xs:dayTimeDuration($details/@duration))
           otherwise 0
         let $time := data($details/@time)
         order by $time descending

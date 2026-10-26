@@ -351,8 +351,8 @@ declare %private function panels:label(
   $root    as item()*,
   $prefix  as item()*
 ) as xs:string {
-  let $parent := panels:resolve($root, subsequence($prefix, 1, count($prefix) - 1))
-  return string(panels:key($parent, $prefix[last()]))
+  let $parent := panels:resolve($root, trunk($prefix))
+  return string(panels:key($parent, foot($prefix)))
 };
 
 (:~

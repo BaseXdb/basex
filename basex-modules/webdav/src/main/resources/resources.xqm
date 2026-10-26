@@ -81,7 +81,7 @@ declare function res:join(
 declare function res:name(
   $path  as xs:string
 ) as xs:string {
-  tokenize($path, '/')[last()]
+  foot(tokenize($path, '/'))
 };
 
 (:~
@@ -92,7 +92,7 @@ declare function res:name(
 declare function res:parent(
   $path  as xs:string
 ) as xs:string {
-  string-join(tokenize($path, '/')[position() < last()], '/')
+  substring-before-last($path, '/')
 };
 
 (:~

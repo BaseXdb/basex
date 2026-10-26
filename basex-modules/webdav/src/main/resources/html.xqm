@@ -23,7 +23,6 @@ import module namespace resp = 'webdav/responses' at 'responses.xqm';
  :)
 declare
   %rest:path('/webdav/.static/{$file=.+}')
-  %output:method('basex')
 function html:file(
   $file  as xs:string
 ) as item()+ {

@@ -74,7 +74,6 @@ declare
   %rest:path('/dba/store-save')
   %rest:query-param('name', '{$name}')
   %rest:query-param('path', '{$path}')
-  %output:method('text')
 function dba:store-save(
   $name   as xs:string?,
   $path   as xs:string,

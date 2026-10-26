@@ -17,7 +17,6 @@ declare
   %rest:path('/dba/editor-open')
   %rest:query-param('name', '{$name}')
   %rest:query-param('dir',  '{$dir}')
-  %output:method('text')
 function dba:editor-open(
   $name  as xs:string,
   $dir   as xs:string?
@@ -37,7 +36,6 @@ declare
   %rest:path('/dba/editor-save')
   %rest:query-param('name', '{$name}')
   %rest:query-param('dir',  '{$dir}')
-  %output:method('text')
 function dba:editor-save(
   $name     as xs:string,
   $dir      as xs:string?,

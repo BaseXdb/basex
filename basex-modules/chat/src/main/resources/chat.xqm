@@ -88,7 +88,6 @@ function chat:logout() as element(rest:response) {
  :)
 declare
   %rest:path('/chat/.static/{$file=.+}')
-  %output:method('basex')
 function chat:file(
   $file  as xs:string
 ) as item()+ {

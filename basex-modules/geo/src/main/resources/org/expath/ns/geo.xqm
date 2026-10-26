@@ -1,5 +1,3 @@
-(: --- DELTA 6: module header — add GML version preservation + supported inputs summary --- :)
-
 (:~
  : BaseX Geo Module
  :
@@ -23,8 +21,8 @@
  :
  : @author BaseX Team, BSD License
  :)
- 
- module namespace geo = "http://expath.org/ns/geo";
+
+module namespace geo = "http://expath.org/ns/geo";
 
 (: Import Java class :)
 import module namespace java = "java:org.expath.ns.Geo";

@@ -65,9 +65,13 @@ declare %basex:lazy %private variable $config:OPTIONS := (
       return {
         for key $key value $value in $config:DEFAULTS
         let $option := $options/*[name() = $key]
-        return { $key: if (not($option)) then $value
-          else if ($value instance of xs:numeric) then xs:integer($option)
-          else string($option) }
+        return { $key: switch () {
+          case not($option) return $value
+          case $value instance of xs:numeric return xs:integer($option)
+          (: the former create permission was merged into the admin permission :)
+          case $key = $config:PERMISSION and $option = 'create' return 'admin'
+          default return string($option)
+        } }
       }
     } catch * {
       (: use defaults if an error occurs while parsing the options :)

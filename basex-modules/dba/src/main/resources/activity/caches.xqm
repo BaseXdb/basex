@@ -78,7 +78,6 @@ declare
   %rest:path('/dba/cache-remove')
   %rest:query-param('name', '{$name}', '')
   %rest:query-param('key',  '{$keys}')
-  %output:method('text')
 function dba:remove(
   $name  as xs:string,
   $keys  as xs:string*

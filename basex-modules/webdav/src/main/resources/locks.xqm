@@ -245,5 +245,5 @@ declare %private function lock:descendants(
 declare %private function lock:expires(
   $timeout  as xs:integer
 ) as xs:dateTime {
-  current-dateTime() + xs:dayTimeDuration('PT' || $timeout || 'S')
+  current-dateTime() + seconds($timeout)
 };
