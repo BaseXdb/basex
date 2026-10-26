@@ -166,7 +166,7 @@ public final class QueryPlan {
     addAttribute(elem, TYPE, seqType);
     // field names of the top-level shape, declared or inferred
     if(seqType.type instanceof final ShapeType sh && !sh.any()) {
-      addAttribute(elem, SHAPE, sh.fieldNames());
+      addAttribute(elem, SHAPE, sh.fieldNames(false));
     }
     if(size != -1) addAttribute(elem, SIZE, size);
     if(structSize != -1) addAttribute(elem, STRUCT_SIZE, structSize);

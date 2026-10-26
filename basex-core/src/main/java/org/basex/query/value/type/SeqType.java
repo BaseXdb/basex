@@ -227,6 +227,8 @@ public final class SeqType {
           if(it instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
         } else if(dt instanceof final RecordType rt) {
           if(it instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+        } else if(dt instanceof final ShapeType sh) {
+          if(it instanceof final XQMap map) cast = map.castTo(sh, error, qc, info);
         } else if(dt instanceof final MapType mt) {
           if(it instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
         }
@@ -447,6 +449,7 @@ public final class SeqType {
         if(dt instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
       } else if(fitem instanceof final XQMap map) {
         if(dt instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
+        if(dt instanceof final ShapeType sh) return map.coerceTo(sh, qc, info, cc);
         if(dt instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
       if(dt instanceof final FuncType ft) return fitem.coerceTo(ft, qc, cc, info);
@@ -712,7 +715,7 @@ public final class SeqType {
   private static Type matched(final Type type) {
     final Type tp = TypeRef.deref(type);
     // matching records may have another record type: no record type can be assigned
-    if(tp instanceof final ShapeType sh) return sh.declared() ? Types.RECORD : type;
+    if(tp instanceof final ShapeType sh) return sh.labeled() ? Types.RECORD : type;
     if(tp instanceof final ArrayType at) {
       final SeqType vt = at.valueType(), mvt = vt.matched();
       return mvt == vt ? type : ArrayType.get(mvt);

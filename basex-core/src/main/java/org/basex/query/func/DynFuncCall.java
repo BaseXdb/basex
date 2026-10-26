@@ -120,7 +120,7 @@ public final class DynFuncCall extends FuncCall {
         // $array(POSITION) → array:get($array, POSITION)
         if(ftype instanceof ArrayType) return cc.function(Function._ARRAY_GET, info, func, arg(0));
         // $map(KEY) → map:get($map, KEY)  (unless a strict record may lack the key)
-        if(ftype instanceof final MapType mt && !Lookup.mayLackField(mt, arg(0), info)) {
+        if(ftype instanceof final MapType mt && !Lookup.mayLackField(mt, arg(0))) {
           return cc.function(Function._MAP_GET, info, func, arg(0));
         }
       }

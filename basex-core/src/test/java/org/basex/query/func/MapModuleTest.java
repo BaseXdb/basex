@@ -507,27 +507,27 @@ public final class MapModuleTest extends SandboxTest {
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x as xs:integer, y as xs:integer)"));
 
     record = "declare record local:x(x as xs:integer?);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer?)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer?)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer?)"));
+        type(func, "record(x as xs:integer?, y as xs:integer)"));
 
     record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x as xs:integer, y as xs:integer)"));
   }
 
   /** Test method. */

@@ -43,14 +43,12 @@ public final class Lookup extends Arr {
    * Checks if a map of the specified type may be a strict record that lacks the requested key.
    * @param mt map type
    * @param key key expression
-   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean mayLackField(final MapType mt, final Expr key, final InputInfo ii)
-      throws QueryException {
+  public static boolean mayLackField(final MapType mt, final Expr key) throws QueryException {
     return mt instanceof final ShapeType sh ?
-      sh.strict() && !(key instanceof final AStr str && sh.fields().contains(str.string(ii))) :
+      sh.strict() && !(key instanceof final Item item && sh.index(item) != 0) :
       mt.keyType().intersect(BasicType.STRING) != null;
   }
 
@@ -112,7 +110,7 @@ public final class Lookup extends Arr {
     if(ks == 0) return keys;
 
     // keep the lookup if a runtime value could be a strict record that lacks a requested key
-    if(keys != Str.WILDCARD && type instanceof final MapType mt && mayLackField(mt, keys, info)) {
+    if(keys != Str.WILDCARD && type instanceof final MapType mt && mayLackField(mt, keys)) {
       return this;
     }
 

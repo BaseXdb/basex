@@ -41,8 +41,8 @@ public final class ButWith extends Arr {
       exprs = new Expr[] { bw.exprs[0], update };
       cc.info(OPTMERGE_X, this);
     }
-    // the result carries the record type of the left operand; an inferred shape is no record, but
-    // a record may still turn up at runtime, so the check is left to the evaluation step
+    // the result carries the label of the left operand; if no label is known statically, a record
+    // may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof final RecordType rt) {
       // RECORD but with { } → RECORD
@@ -136,7 +136,7 @@ public final class ButWith extends Arr {
       values[f] = sameOrder ? record.valueAt(f) : record.getOrNull(rt.key(f + 1));
     }
     update.forEach((key, value) -> {
-      final int i = key.type.isStringOrUntyped() ? fields.index(key.string(null)) : 0;
+      final int i = rt.index(key);
       // static fields cannot be updated
       if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
       values[i - 1] = rt.coerce(i, value, qc, info, null);

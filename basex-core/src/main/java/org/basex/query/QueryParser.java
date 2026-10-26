@@ -582,7 +582,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          nominativeRecordTypeDecl(anns.check(false, true));
+          labeledRecordTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -1191,11 +1191,11 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NominativeRecordTypeDecl" rule.
+   * Parses the "LabeledRecordTypeDecl" rule.
    * @param anns annotations
    * @throws QueryException query exception
    */
-  private void nominativeRecordTypeDecl(final AnnList anns) throws QueryException {
+  private void labeledRecordTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNS, TYPENAME_X);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
@@ -1209,9 +1209,7 @@ public class QueryParser extends InputParser {
         if(statik && !wsConsumeWs("static")) throw error(WRONGCHAR_X_X, "static", found());
         final InputInfo fi = info();
         skipWs();
-        // explicitly requested constructor functions require NCName field names
-        final byte[] name = quote(current()) && !anns.contains(Annotation.CONSTRUCTOR) ?
-          stringLiteral() : ncName(NONCNAME_X, false);
+        final byte[] name = ncName(NONCNAME_X, false);
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
         Expr init = null;
@@ -1289,12 +1287,7 @@ public class QueryParser extends InputParser {
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
 
-    // the constructor annotation is not assigned to the function
-    AnnList anns = AnnList.EMPTY;
-    for(final Ann ann : rt.anns()) {
-      if(ann.definition != Annotation.CONSTRUCTOR) anns = anns.attach(ann);
-    }
-    final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, anns, doc, vs,
+    final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, rt.anns(), doc, vs,
         info());
     funcs.add(func);
   }
@@ -4220,8 +4213,8 @@ public class QueryParser extends InputParser {
         wsCheck(")");
         return type;
       }
-      // record(): empty record (distinct from the abstract record(*))
-      if(wsConsume(")")) return qc.shared.shape(new RecordType(new TokenObjectMap<>(0)));
+      // record(): empty map (distinct from the abstract record(*))
+      if(wsConsume(")")) return qc.shared.shape(new ShapeType(new TokenObjectMap<>(0)));
     } else if(wsConsume("*")) {
       // wildcard
       wsCheck(")");
@@ -4241,7 +4234,7 @@ public class QueryParser extends InputParser {
         } while(wsConsume(","));
         check(')');
       }
-      return qc.shared.shape(new RecordType(fields));
+      return qc.shared.shape(new ShapeType(fields));
     }
     // map
     if(type instanceof MapType) {

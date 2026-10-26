@@ -8,11 +8,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Record type: a shape that is declared in a query and assigned to its records as type annotation.
+ * Labeled record type: a shape that is assigned to its records as type annotation (label).
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -31,7 +32,7 @@ public final class RecordType extends ShapeType {
   private volatile Expr[] inits;
 
   /**
-   * Constructor for a structural record type.
+   * Constructor for an unnamed record type.
    * @param fields field declarations
    */
   public RecordType(final TokenObjectMap<ShapeField> fields) {
@@ -39,7 +40,7 @@ public final class RecordType extends ShapeType {
   }
 
   /**
-   * Constructor for a nominative record type.
+   * Constructor for a labeled record type.
    * @param fields field declarations
    * @param name record name (can be {@code null})
    * @param anns annotations
@@ -51,8 +52,14 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  boolean declared() {
+  boolean labeled() {
     return true;
+  }
+
+  @Override
+  public boolean matches(final XQMap map, final boolean coerce) {
+    // the map must be a record with a matching label
+    return map.type instanceof final RecordType rt && SeqType.kept(rt, this, coerce);
   }
 
   @Override
@@ -195,8 +202,6 @@ public final class RecordType extends ShapeType {
 
   @Override
   public String toString() {
-    if(name != null) return Token.string(name.prefixString());
-    return new QueryString().token(RECORD).token('(').
-        token(any() ? "*" : fieldNames()).token(')').toString();
+    return name != null ? Token.string(name.prefixString()) : super.toString();
   }
 }

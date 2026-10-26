@@ -198,7 +198,7 @@ public final class ErrorMessageTest extends SandboxTest {
         JAVANOINSTANCE_X_X, "ArrayList found");
     errorMessage("Q{String}toString(123)", JAVANOINSTANCE_X_X, "xs:integer found");
     errorMessage("let $m := { 'a': 1 } return Q{java:java.lang.Integer}new($m)",
-        JAVANONE_X_X_X, "(map(xs:string, xs:integer))");
+        JAVANONE_X_X_X, "(record(a as xs:integer))");
   }
 
   /**

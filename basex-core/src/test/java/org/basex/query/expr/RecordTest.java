@@ -23,25 +23,38 @@ import org.junit.jupiter.api.*;
 public final class RecordTest extends SandboxTest {
   /** Record type matching. */
   @Test public void instanceOf() {
-    // a plain map never matches a record type, however well it fits structurally
+    // a plain map never matches a labeled record type, however well it fits structurally
     query("declare record x(x); { 'x': () } instance of x", false);
-
-    query("{} instance of record()", false);
-    query("{ 'x': () } instance of record()", false);
     query("declare record local:empty(); {} instance of local:empty", false);
     query("declare record local:empty(); { 'x': () } instance of local:empty", false);
 
-    query("{ 'x': () } instance of record(x)", false);
+    // simple record types are matched structurally
+    query("{} instance of record()", true);
+    query("{ 'x': () } instance of record()", false);
+
+    query("{ 'x': () } instance of record(x)", true);
     query("{} instance of record(x)", false);
     query("{} instance of record(x as xs:integer)", false);
 
-    query("{ 'x': (), 'y': () } instance of record(x, y)", false);
+    query("{ 'x': (), 'y': () } instance of record(x, y)", true);
+    query("{ 'y': (), 'x': () } instance of record(x, y)", true);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
     query("{ 'x': (), 0: () } instance of record(x, y)", false);
     query("{ 'x': (), 0: () } instance of record(x)", false);
+    query("map:build(('x', 'y')) instance of record(x, y)", true);
+    query("map:build(('x', 'y'), value := string#1) instance of record(x as xs:integer, y)",
+        false);
 
-    query("map:entries({ 'a': 1 }) instance of record(a)", false);
+    query("map:entries({ 'a': 1 }) instance of record(a)", true);
     query("map:entries({ 'x': 1 }) instance of record(a)", false);
+
+    // a labeled record matches simple record types with the same fields
+    query("declare record local:r(a); local:r(1) instance of record(a)", true);
+    query("declare record local:r(a); local:r(1) instance of record(a as xs:string)", false);
+    // record(*) only matches labeled records
+    query("declare record local:r(a); local:r(1) instance of record(*)", true);
+    query("{ 'a': 1 } instance of record(*)", false);
+    query("let $r as record(a) := { 'a': 1 } return $r instance of record(*)", false);
 
     // coercion attaches the record annotation: the coerced value matches
     query("declare record x(x); let $r as x := { 'x': () } return $r instance of x", true);
@@ -67,7 +80,7 @@ public final class RecordTest extends SandboxTest {
         + "return $r instance of record(a, b)", true);
     query("let $r as record(a as xs:integer, b as element(x)) := { 'a': 1, 'b': <x/> } "
         + "return $r instance of record(a as xs:integer, b as element(x))", true);
-    query("{ 'a': 1, 'b': <x/> } instance of record(a, b)", false);
+    query("{ 'a': 1, 'b': <x/> } instance of record(a, b)", true);
     query("{ 'a': 1, 'b': <x/>, 'c': 2 } instance of record(a, b)", false);
     query("{ 'a': <x/>, 'b': 2 } instance of record(a as xs:integer, b)", false);
     // the parsed-csv-structure built-in record (function-valued 'get' field)
@@ -103,13 +116,40 @@ public final class RecordTest extends SandboxTest {
         + ")", true);
   }
 
+  /** Simple record types: coercion and casting create maps without label. */
+  @Test public void simple() {
+    // matching maps are kept, entries keep their order
+    query("({ 'b': 2, 'a': 1 } coerce to record(a, b)) => map:keys()", "b\na");
+    // values are coerced, missing optional fields are appended
+    query("({ 'b': 2, 'a': 1 } coerce to record(a as xs:double, b as xs:double))?a "
+        + "=> type-of()", "xs:double");
+    query("({ 'b': 2, 'a': 1 } coerce to record(a as xs:double, b as xs:double)) => map:keys()",
+        "b\na");
+    query("({ 'b': 2 } coerce to record(a as xs:integer?, b)) => map:keys()", "b\na");
+    query("{ 'b': 2 } coerce to record(a as xs:integer?, b) instance of record(*)", false);
+    error("{ 'b': 2 } coerce to record(a, b, c as xs:integer)", INVTYPE_X);
+    error("{ 'b': 2, 'x': 3 } coerce to record(a as xs:integer?, b)", INVTYPE_X);
+
+    // casting discards undeclared entries and appends missing fields
+    query("({ 'c': 3, 'b': 2 } cast as record(a, b)) => map:keys()", "b\na");
+    query("({ 'b': '2' } cast as record(a, b as xs:integer))?b => type-of()", "xs:integer");
+    query("{ 'b': 2 } cast as record(a, b) instance of record(*)", false);
+
+    // labeled record types: field names are NCNames, %constructor is no longer recognized
+    error("declare record local:r('a'); 1", NONCNAME_X);
+    error("declare %constructor record local:r(a); 1", ANNRESERVED_X);
+  }
+
   /** Strict field access on records. */
   @Test public void lookup() {
-    // record: lookup or call of an undeclared field is a type error
-    error("let $r as record(a) := { 'a': 1 } return $r?b", RECORDFIELD_X_X);
-    error("let $r as record(a) := { 'a': 1 } return $r('b')", RECORDFIELD_X_X);
-    error("let $r as record(a) := { 'a': 1 } return $r(('b')[. != ''])", RECORDFIELD_X_X);
+    // labeled record: lookup or call of an undeclared field is a type error
     error("declare record local:c(x, y); local:c(1, 2)?z", RECORDFIELD_X_X);
+    error("declare record local:c(x, y); local:c(1, 2)('z')", RECORDFIELD_X_X);
+    error("declare record local:c(x, y); local:c(1, 2)(('z')[. != ''])", RECORDFIELD_X_X);
+    // simple record type: lookup or call of an undeclared field returns ()
+    query("let $r as record(a) := { 'a': 1 } return $r?b", "");
+    query("let $r as record(a) := { 'a': 1 } return $r('b')", "");
+    query("let $r as record(a) := { 'a': 1 } return $r(('b')[. != ''])", "");
     // declared fields are accessible
     query("let $r as record(a) := { 'a': 1 } return $r?a", 1);
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?b", 2);
@@ -130,9 +170,10 @@ public final class RecordTest extends SandboxTest {
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
         + "local:reset(local:coord(1, 2))?z", RECORDFIELD_X_X);
-    // multiple keys: every key must be a declared field
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'b')", "1\n2");
-    error("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'c')", RECORDFIELD_X_X);
+    // multiple keys: on labeled records, every key must be a declared field
+    query("declare record local:ab(a, b); local:ab(1, 2)?('a', 'b')", "1\n2");
+    error("declare record local:ab(a, b); local:ab(1, 2)?('a', 'c')", RECORDFIELD_X_X);
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'c')", 1);
     // wildcard returns all field values and never errors
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?*", "1\n2");
     // nested record lookup
@@ -151,44 +192,44 @@ public final class RecordTest extends SandboxTest {
 
   /** The {@code but with} operator. */
   @Test public void butWith() {
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'b': 9 }",
-        "{\"a\":1,\"b\":9}");
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'a': 7, 'b': 8 }",
-        "{\"a\":7,\"b\":8}");
+    final String ab = "declare record local:ab(a, b); ", a = "declare record local:a(a); ";
+    query(ab + "local:ab(1, 2) but with { 'b': 9 }", "{\"a\":1,\"b\":9}");
+    query(ab + "local:ab(1, 2) but with { 'a': 7, 'b': 8 }", "{\"a\":7,\"b\":8}");
     // left-associative chaining
-    query("let $r as record(a) := { 'a': 1 } return ($r but with { 'a': 2 }) but with { 'a': 3 }",
-        "{\"a\":3}");
+    query(a + "(local:a(1) but with { 'a': 2 }) but with { 'a': 3 }", "{\"a\":3}");
     // coercion applies: an integer is promoted to the required type
-    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r but with { 'a': 2 })?a", 2);
+    query("declare record local:d(a as xs:double); (local:d(1) but with { 'a': 2 })?a", 2);
     // the result is still a record: looking up an undeclared field errors
-    error("let $r as record(a) := { 'a': 1 } return ($r but with { 'a': 2 })?b", RECORDFIELD_X_X);
+    error(a + "(local:a(1) but with { 'a': 2 })?b", RECORDFIELD_X_X);
     // an undeclared field in the right operand is a type error
-    error("let $r as record(a) := { 'a': 1 } return $r but with { 'c': 9 }", INVTYPE_X);
+    error(a + "local:a(1) but with { 'c': 9 }", INVTYPE_X);
     // a value that does not conform to the field type is a type error
-    error("let $r as record(a as xs:integer) := { 'a': 1 } "
-        + "return $r but with { 'a': 'x' }", INVTYPE_X);
+    error("declare record local:i(a as xs:integer); local:i(1) but with { 'a': 'x' }", INVTYPE_X);
     // the left operand must be a record (a map with non-string keys is not)
     error("{ 1: 'a' } but with { 1: 'b' }", INVTYPE_X);
-    // a plain map is no record, even if its field set is statically known
+    // a map is no record, even if its field set is statically known or matches a record type
     error("{ 'a': 1 } but with { 'a': 2 }", INVTYPE_X);
     error("{ 'a': 1 } but with { 'b': 2 }", INVTYPE_X);
     error("let $m := { 'a': 1 } return $m but with { 'a': 2 }", INVTYPE_X);
-    // a record passed through a shape-typed variable is still a record
+    error("let $r as record(a) := { 'a': 1 } return $r but with { 'a': 2 }", INVTYPE_X);
+    // a record passed through a map-typed variable is still a record
     query("declare record local:p(x); let $m as map(*) := local:p(1) "
         + "return ($m but with { 'x': 9 })?x", 9);
     // updates a record built by a named constructor; unmentioned fields are preserved
     query("declare record local:p(x, y); local:p(1, 2) but with { 'y': 9 }", "{\"x\":1,\"y\":9}");
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return ($r but with { 'a': 9 })?b", 2);
+    query(ab + "(local:ab(1, 2) but with { 'a': 9 })?b", 2);
     // an empty right operand leaves the record unchanged (annotation included)
-    query("let $r as record(a) := { 'a': 1 } return $r but with {}", "{\"a\":1}");
-    error("let $r as record(a) := { 'a': 1 } return ($r but with {})?b", RECORDFIELD_X_X);
+    query(a + "local:a(1) but with {}", "{\"a\":1}");
+    error(a + "(local:a(1) but with {})?b", RECORDFIELD_X_X);
   }
 
   /** Width-invariant subtyping and {@code record(*)}. */
   @Test public void subtyping() {
-    // record(*) matches any record, but no plain map
-    query("let $r as record() := {} return $r instance of record(*)", true);
-    query("let $r as record(x) := { 'x': 1 } return $r instance of record(*)", true);
+    // record(*) matches any labeled record, but no plain map
+    query("declare record local:e(); local:e() instance of record(*)", true);
+    query("declare record local:x(x); local:x(1) instance of record(*)", true);
+    query("let $r as record() := {} return $r instance of record(*)", false);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(*)", false);
     query("{} instance of record(*)", false);
     query("{ 'x': 1 } instance of record(*)", false);
     query("{ 1: 2 } instance of record(*)", false);
@@ -490,13 +531,13 @@ public final class RecordTest extends SandboxTest {
         root(func));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
-        type(func, "map(xs:string, item()*)"), shape(func, "y"));
+        type(func, "record(y)"), shape(func, "y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>x</_>)", "{\"y\":()}",
-        type(func, "map(xs:string, item()*)"), shape(func, "y"));
+        type(func, "record(y)"), shape(func, "y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "map(xs:string, item()*)"), shape(func, "x"));
+        type(func, "record(x)"), shape(func, "x"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "map(xs:string, item()*)"), shape(func, "x"));
+        type(func, "record(x)"), shape(func, "x"));
     // the removed field is no longer looked up
     check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('x')", "",
         empty());
@@ -512,14 +553,11 @@ public final class RecordTest extends SandboxTest {
   @Test public void typePut() {
     final Function func = _MAP_PUT;
     check("declare record local:x(x); local:x(1) => map:put('x', 2)",
-        "{\"x\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
-        shape(ShapeSet.class, "x"));
+        "{\"x\":2}", type(ShapeSet.class, "record(x)"), shape(ShapeSet.class, "x"));
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
-        shape(ShapeSet.class, "x"));
+        "{\"x\":2}", type(ShapeSet.class, "record(x)"), shape(ShapeSet.class, "x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(func, "map(xs:string, item()*)"),
-        shape(func, "x, y"));
+        "{\"x\":1,\"y\":2}", type(func, "record(x, y as xs:integer)"), shape(func, "x, y"));
     // the new field is appended, and the record annotation is dropped
     query("declare record local:x(x); local:x(1) => map:put('y', 2) instance of local:x", false);
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)",
@@ -529,29 +567,30 @@ public final class RecordTest extends SandboxTest {
 
     // a mismatching value widens the field type, the field set is preserved
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)",
-        "{\"x\":<x/>}", type(ShapeSet.class, "map(xs:string, element(x))"),
+        "{\"x\":<x/>}", type(ShapeSet.class, "record(x as element(x))"),
         shape(ShapeSet.class, "x"));
     check("declare record local:x(x, y); local:x(1, 2) => map:put('x', <x/>) => map:get('z')", "",
         empty());
 
     check("declare record local:x(x, y := ()); local:x(1) => map:put('x', 2)",
-        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "record(x, y)"),
         shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "record(x, y)"),
         shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "record(x, y)"),
         shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>y</_>, 2)",
-        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "record(x, y)"),
         shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(0, 0)",
         "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
 
     // inferred shapes are extended as well
     check("{ 'a': 1, 'b': 2 } => map:put('c', <c/>)", "{\"a\":1,\"b\":2,\"c\":<c/>}",
-        type(func, "map(xs:string, item())"), shape(func, "a, b, c"));
+        type(func, "record(a as xs:integer, b as xs:integer, c as element(c))"),
+        shape(func, "a, b, c"));
     check("{ 'a': 1, 'b': 2 } => map:put('c', <c/>) => map:size()", 3, root(Itr.class));
     // fields are only added if the maximum shape size is not exceeded
     final StringBuilder sb = new StringBuilder("{");
@@ -565,19 +604,24 @@ public final class RecordTest extends SandboxTest {
   /** A field update coerced back to its record type is fused into the {@code but with} operator. */
   @Test public void typePutCoerce() {
     // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R but with map:entry(FIELD, VALUE)
-    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
-        + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
+    final String ab = "declare record local:ab(a, b); ";
+    check(ab + "let $r as local:ab := local:ab(<a/>, 2) "
+        + "let $s as local:ab := map:put($r, 'a', 0) return $s",
         "{\"a\":0,\"b\":2}", root(ButWith.class), empty(ShapeSet.class));
     // the fused result is a record again: strict field access applies
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
         + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X_X);
     // no fusion when the coercion target is not the record's own (strict) type
-    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } return map:put($r, 'a', 0)",
+    check(ab + "let $r as local:ab := local:ab(<a/>, 2) return map:put($r, 'a', 0)",
+        "{\"a\":0,\"b\":2}", empty(ButWith.class));
+    // no fusion for simple record types: a matching map is not rebuilt
+    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
+        + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
         "{\"a\":0,\"b\":2}", empty(ButWith.class));
     // a chain of updates unrolls into but with operations, which merge and cover all fields
-    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
-        + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
+    check(ab + "let $r as local:ab := local:ab(<a/>, 2) "
+        + "let $s as local:ab := $r => map:put('a', 0) => map:put('b', 9) return $s",
         "{\"a\":0,\"b\":9}", empty(ButWith.class), empty(ShapeSet.class));
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
@@ -620,10 +664,11 @@ public final class RecordTest extends SandboxTest {
         + "local:c(1, 2, 3) but with local:d(<x>4</x>) but with { 'y': <y/> }",
         "{\"x\":4,\"y\":<y/>,\"z\":3}", count(ButWith.class, 2));
     // constant operands are pre-evaluated
-    check("let $r as record(x, y, z) := { 'x': 1, 'y': 2, 'z': 3 } return $r but with { 'z': 0 }",
+    check("declare record local:c(x, y, z); let $r as local:c := { 'x': 1, 'y': 2, 'z': 3 } "
+        + "return $r but with { 'z': 0 }",
         "{\"x\":1,\"y\":2,\"z\":0}", empty(ButWith.class), root(XQShapeValueMap.class));
-    error("let $r as record(x, y, z) := { 'x': 1, 'y': 2, 'z': 3 } return $r but with { 'q': 0 }",
-        INVTYPE_X);
+    error("declare record local:c(x, y, z); let $r as local:c := { 'x': 1, 'y': 2, 'z': 3 } "
+        + "return $r but with { 'q': 0 }", INVTYPE_X);
     // empty updates are dropped
     check("declare record local:c(x, y); local:c(<x/>, 1) but with { }",
         "{\"x\":<x/>,\"y\":1}", empty(ButWith.class));
@@ -638,14 +683,14 @@ public final class RecordTest extends SandboxTest {
   /** An update that supplies every field overwrites the record and drops the merge operator. */
   @Test public void butWithCovered() {
     // a covering constant update makes the left operand dead: the operator folds away entirely
-    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'a': 7, 'b': 8 }",
+    final String ab = "declare record local:ab(a, b); ", a = "declare record local:a(a); ";
+    check(ab + "local:ab(1, 2) but with { 'a': 7, 'b': 8 }",
         "{\"a\":7,\"b\":8}", empty(ButWith.class));
     // record(...) but with record(...): every field is overwritten by the right operand
     query("declare record local:rec(a, b); local:rec(1, 2) but with local:rec(4, 5)",
         "{\"a\":4,\"b\":5}");
     // a non-constant covering update also drops the operator; only the update construction remains
-    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } "
-        + "return $r but with { 'a': <c/>, 'b': <d/> }",
+    check(ab + "local:ab(1, 2) but with { 'a': <c/>, 'b': <d/> }",
         "{\"a\":<c/>,\"b\":<d/>}", empty(ButWith.class), count(ShapeConstructor.class, 1));
     // a covering constructor update builds the record type directly: no intermediate + coercion,
     // so the plan carries no TypeCheck (field types differ: integer arguments, double fields)
@@ -654,9 +699,9 @@ public final class RecordTest extends SandboxTest {
         + "f(pt(0, 0), 3)",
         "{\"x\":3,\"y\":3}", empty(ButWith.class), empty(TypeCheck.class));
     // coercion still applies on the collapsed path: the integer is promoted to the field type
-    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r but with { 'a': 2 })?a", 2);
+    query("declare record local:d(a as xs:double); (local:d(1) but with { 'a': 2 })?a", 2);
     // the collapsed result stays a record: an undeclared field in the update still errors
-    error("let $r as record(a) := { 'a': 1 } return $r but with { 'a': 2, 'c': 3 }", INVTYPE_X);
+    error(a + "local:a(1) but with { 'a': 2, 'c': 3 }", INVTYPE_X);
     // a partial update does NOT trigger the rewrite: the merge is kept, unmentioned fields survive
     check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) but with { 'x': 0 }",
         "{\"x\":0,\"y\":<y>2</y>}", root(ButWith.class));
@@ -794,13 +839,13 @@ public final class RecordTest extends SandboxTest {
     // missing field (untyped, so item()*) becomes the empty sequence
     query("let $m as record(a) := {} return $m", "{\"a\":()}");
     query("let $m as record(a, b) := { 'a': 1 } return $m", "{\"a\":1,\"b\":()}");
-    query("let $m as record(b, a) := { 'a': 1 } return $m", "{\"b\":(),\"a\":1}");
+    query("let $m as record(b, a) := { 'a': 1 } return $m", "{\"a\":1,\"b\":()}");
 
-    // entry order follows the record type definition
+    // entries keep their order
     query("let $m as record(a, b) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
-    query("let $m as record(a, b) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a, b) := { 'b': 2, 'a': 1 } return $m", "{\"b\":2,\"a\":1}");
     query("let $m as record(b, a) := { xs:untypedAtomic('a'): 1, 'b': 2 } return $m",
-        "{\"b\":2,\"a\":1}");
+        "{\"a\":1,\"b\":2}");
 
     // extra field is rejected even when reordering occurs
     error("let $m as record(b, a) := { 'a': 1, 'x': 9, 'b': 2 } return $m", INVTYPE_X);
@@ -872,17 +917,17 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "[ local:item() ] instance of array(local:BA)", true);
     query(prolog + "local:N(local:item()) instance of local:M", true);
 
-    // coercion creates a record with the field order of the required type
+    // the record matches the simple record type: coercion keeps it unchanged
     for(final String input : new String[] { "local:ab()", "local:item()" }) {
       query(prolog + "declare function local:f($r as local:BA) { $r?a }; "
           + "local:f(" + input + ")", 1);
       query(prolog + "declare %basex:inline(0) function local:f($r as local:BA) { $r?a }; "
           + "local:f(" + input + ")", 1);
       query(prolog + "declare %basex:inline(0) function local:f($r as local:BA) { map:keys($r) }; "
-          + "local:f(" + input + ")", "b\na");
+          + "local:f(" + input + ")", "a\nb");
       query(prolog + "declare %basex:inline(0) function local:f() as local:BA { " + input + " }; "
-          + "map:keys(local:f())", "b\na");
-      query(prolog + "let $r as local:BA := " + input + " return ($r?a, map:keys($r))", "1\nb\na");
+          + "map:keys(local:f())", "a\nb");
+      query(prolog + "let $r as local:BA := " + input + " return ($r?a, map:keys($r))", "1\na\nb");
       query(prolog + "let $a as array(local:BA) := [ " + input + " ] return $a(1)?a", 1);
       query(prolog + "let $m as map(*) := { 'x': " + input + " } "
           + "let $c as map(xs:string, local:BA) := $m return $c?x?a", 1);
@@ -941,7 +986,7 @@ public final class RecordTest extends SandboxTest {
         + "fn() as local:AB { local:ab() } }; ";
     query(prolog + result + "local:g() instance of fn() as local:BA", true);
     query(prolog + result + "let $g as fn() as local:BA := local:g() "
-        + "return ($g()?a, map:keys($g()))", "1\nb\na");
+        + "return ($g()?a, map:keys($g()))", "1\na\nb");
     query(prolog + "for $i in 1 to 2 "
         + "return (if($i = 1) then local:ab() else "
         + "({ 'b': 2, 'a': 1 } coerce to local:BA))?a", "1\n1");
@@ -953,35 +998,35 @@ public final class RecordTest extends SandboxTest {
     query(prolog + d + "declare %basex:inline(0) function local:f($r as local:BA*) { "
         + "$r ! string-join(map:keys(.)) }; "
         + "let $s := (local:d(), local:ab()) "
-        + "return ($s instance of local:BA+, local:f($s))", "true\nba\nba");
+        + "return ($s instance of local:BA+, local:f($s))", "true\nab\nab");
     query(prolog + d + "declare %basex:inline(0) function local:f($a as array(local:BA)) { "
         + "string-join(map:keys($a(2))) }; "
         + "let $a := [ local:d(), local:ab() ] "
-        + "return ($a instance of array(local:BA), local:f($a))", "true\nba");
+        + "return ($a instance of array(local:BA), local:f($a))", "true\nab");
     query(prolog + d + "declare %basex:inline(0) "
         + "function local:f($m as map(xs:string, local:BA)) { "
         + "string-join(map:keys($m?y)) }; "
         + "let $m := { 'x': local:d(), 'y': local:ab() } "
-        + "return ($m instance of map(xs:string, local:BA), local:f($m))", "true\nba");
+        + "return ($m instance of map(xs:string, local:BA), local:f($m))", "true\nab");
     // union of record types with different field orders
     final String any = "declare %basex:inline(0) function local:any($x) { $x }; ";
     query(prolog + "let $r as local:BA* := (local:AB(1, 2), "
         + "({ 'b': 2, 'a': 1 } coerce to local:BA)) "
-        + "return $r ! string-join(map:keys(.))", "ba\nba");
+        + "return $r ! string-join(map:keys(.))", "ab\nba");
     query(prolog + any
         + "let $r as local:BA* := local:any((({ 'b': 2, 'a': 1 } coerce to local:BA), "
-        + "local:ab())) return $r ! string-join(map:keys(.))", "ba\nba");
+        + "local:ab())) return $r ! string-join(map:keys(.))", "ba\nab");
     query(prolog + any
         + "declare %basex:inline(0) function local:f($a as array(local:BA)*) { "
         + "$a ! string-join(map:keys(.(1))) }; "
         + "local:f(local:any(([ { 'b': 2, 'a': 1 } coerce to local:BA ], [ local:ab() ])))",
-        "ba\nba");
+        "ba\nab");
     query(prolog + any
         + "declare %basex:inline(0) function local:f($m as map(xs:string, local:BA)*) { "
         + "$m ! string-join(map:keys(?x)) }; "
         + "local:f(local:any((map:build(1, fn { 'x' }, fn { { 'b': 2, 'a': 1 } "
         + "coerce to local:BA }), "
-        + "map:build(1, fn { 'x' }, fn { local:ab() }))))", "ba\nba");
+        + "map:build(1, fn { 'x' }, fn { local:ab() }))))", "ba\nab");
   }
 
   /** Coercion to choice types: first matching alternative. */
@@ -990,7 +1035,7 @@ public final class RecordTest extends SandboxTest {
         + "declare type local:BA as record(b as xs:integer, a as xs:integer); "
         + "declare %basex:inline(0) function local:any($x) { $x }; ";
     query(prolog + "let $r as (local:BA | xs:string)* := local:any((local:AB(1, 2), "
-        + "local:AB(3, 4))) return $r ! string-join(map:keys(.))", "ba\nba");
+        + "local:AB(3, 4))) return $r ! string-join(map:keys(.))", "ab\nab");
     query(prolog + "let $r as (map(*) | local:BA)* := local:any((local:AB(1, 2), "
         + "local:AB(3, 4))) return $r ! string-join(map:keys(.))", "ab\nab");
     query(prolog + "let $f as (fn(xs:integer) as item()* | xs:string)* := "
@@ -1089,7 +1134,7 @@ public final class RecordTest extends SandboxTest {
 
   /** Static fields, initializers in coercions, constructor annotation. */
   @Test public void staticFields() {
-    final String prolog = "declare %constructor record local:r(a as xs:integer, b := 1 + 2, "
+    final String prolog = "declare record local:r(a as xs:integer, b := 1 + 2, "
         + "%static c as fn(local:r) as xs:integer := fn($r) { $r?a * 10 }); ";
     query(prolog + "let $r := local:r(1, 2) return $r?c($r)", 10);
     query(prolog + "local:r#2 => function-arity()", 2);
@@ -1112,13 +1157,13 @@ public final class RecordTest extends SandboxTest {
     error(init + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | xs:string)", FUNERR1);
     error("declare function local:x() as item() { 'x' };"
         + "declare record local:t(a as xs:integer, b as xs:integer := local:x()); "
-        + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | record(o))", INVTYPE_X);
+        + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | record(o, p))", INVTYPE_X);
     query("<a>x</a> coerce to (xs:integer | xs:string)", "x");
 
     // syntax
     error("declare record local:s(%static a); 1", WRONGCHAR_X_X);
     error("declare record local:s(a := 1, b); 1", PARAMOPTIONAL_X);
-    query("declare record local:s('a'); 1", "1");
+    error("declare record local:s('a'); 1", NONCNAME_X);
     error("declare record local:s(1); 1", NONCNAME_X);
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
   }

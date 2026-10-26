@@ -3265,7 +3265,7 @@ return
     // value type
     check(func.args(" array { (1 to 2) }"), "[1,2]", type(func, "jnode((), array(xs:integer))"));
     check(func.args(" { 'a': 1 }"), "{\"a\":1}",
-        type(func, "jnode((), map(xs:string, xs:integer))"));
+        type(func, "jnode((), record(a as xs:integer))"));
     check("for $i in (1, 'a') return " + func.args(" $i"), "1\na",
         type(func, "jnode((), xs:anyAtomicType)"));
 

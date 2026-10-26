@@ -129,8 +129,9 @@ public final class CastTest extends SandboxTest {
   @Test public void wildcards() {
     query("[ 1, 'a' ] cast as array(*)", "[1,\"a\"]");
     query("{ 'a': 1 } cast as map(*)", "{\"a\":1}");
-    // record(*) is abstract: only a record can be cast to it
-    query("let $r as record(a) := { 'a': 1 } return $r cast as record(*)", "{\"a\":1}");
+    // record(*) is abstract: only a labeled record can be cast to it
+    query("declare record local:a(a); local:a(1) cast as record(*)", "{\"a\":1}");
+    error("let $r as record(a) := { 'a': 1 } return $r cast as record(*)", INVTYPE_X);
     error("{ 'a': 1 } cast as record(*)", INVTYPE_X);
 
     query("([ 1 ] cast as array(*)) instance of array(*)", true);
@@ -265,9 +266,10 @@ public final class CastTest extends SandboxTest {
   @Test public void recordEdges() {
     // entries with non-string keys are discarded, like any other undeclared entry
     query("{ 1: 'a', 'b': 2 } cast as record(b as xs:integer)", "{\"b\":2}");
-    // the field order of the result follows the record type, not the input map
+    // entries keep their order, missing fields are appended
     query("{ 'b': 2, 'a': 1 } "
-        + "cast as record(a as xs:integer, b as xs:integer)", "{\"a\":1,\"b\":2}");
+        + "cast as record(a as xs:integer, b as xs:integer)", "{\"b\":2,\"a\":1}");
+    query("{ 'b': 2 } cast as record(a, b as xs:integer)", "{\"b\":2,\"a\":()}");
     // the empty record type discards all entries
     query("{ 'a': 1, 'b': 2 } cast as record()", "{}");
 

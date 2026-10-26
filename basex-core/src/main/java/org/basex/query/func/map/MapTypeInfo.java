@@ -47,9 +47,8 @@ public final class MapTypeInfo {
    */
   public MapTypeInfo key(final Expr expr) throws QueryException {
     if(shape != null && expr instanceof final Item item) {
-      final Type kt = item.type;
-      if(kt.isStringOrUntyped()) index = shape.fields().index(item.string(null));
-      if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
+      index = shape.index(item);
+      if(item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
     }
     final SeqType st = expr.seqType();
     if(mapType != null && st.atomOcc() == Occ.EXACTLY_ONE) {
