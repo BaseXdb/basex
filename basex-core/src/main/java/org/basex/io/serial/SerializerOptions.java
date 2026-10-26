@@ -316,8 +316,7 @@ public final class SerializerOptions extends Options {
       return MediaType.APPLICATION_XML;
     if(sm.oneOf(SerialMethod.XHTML, SerialMethod.HTML)) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) {
-      return get(JSON_LINES) == YesNo.YES ? MediaType.APPLICATION_JSONL :
-        MediaType.APPLICATION_JSON;
+      return yes(JSON_LINES) ? MediaType.APPLICATION_JSONL : MediaType.APPLICATION_JSON;
     }
     if(sm == SerialMethod.CSV) return MediaType.TEXT_CSV;
     return MediaType.TEXT_PLAIN;
@@ -365,7 +364,7 @@ public final class SerializerOptions extends Options {
    * @return character map or {@code null} if map is invalid
    * @throws QueryException query exception
    */
-  public static String characterMap(final GNode elem, final InputInfo info) throws QueryException {
+  private static String characterMap(final GNode elem, final InputInfo info) throws QueryException {
     final Supplier<QueryException> error = () -> SERDOC_X.get(info,
         Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
     if(elem.attributeIter().next() != null) throw error.get();

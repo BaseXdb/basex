@@ -46,8 +46,6 @@ public final class CsvW3XmlConverter extends CsvXmlConverter {
 
   /** Rows element is open. */
   private boolean rows;
-  /** Row element is open. */
-  private boolean open;
 
   /**
    * Constructor.
@@ -63,7 +61,6 @@ public final class CsvW3XmlConverter extends CsvXmlConverter {
     super.init(uri);
     handler.openElem(E_CSV, atts, FN_NSP);
     rows = false;
-    open = false;
   }
 
   @Override
@@ -73,12 +70,8 @@ public final class CsvW3XmlConverter extends CsvXmlConverter {
 
   @Override
   protected void record() throws IOException {
-    line++;
     if(!rows) openRows();
-    closeRow();
-    handler.openElem(E_ROW, atts, NO_NSP);
-    open = true;
-    col = -1;
+    openRecord(E_ROW);
   }
 
   @Override
@@ -95,7 +88,7 @@ public final class CsvW3XmlConverter extends CsvXmlConverter {
   @Override
   protected Value finish(final InputInfo ii, final QueryContext qc) throws IOException {
     if(!rows) openRows();
-    closeRow();
+    closeRecord();
     handler.closeElem();
     handler.closeElem();
     return super.finish(ii, qc);
@@ -120,16 +113,5 @@ public final class CsvW3XmlConverter extends CsvXmlConverter {
     }
     handler.openElem(E_ROWS, atts, NO_NSP);
     rows = true;
-  }
-
-  /**
-   * Closes an open row element.
-   * @throws IOException I/O exception
-   */
-  private void closeRow() throws IOException {
-    if(open) {
-      handler.closeElem();
-      open = false;
-    }
   }
 }

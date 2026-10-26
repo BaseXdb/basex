@@ -29,7 +29,6 @@ public abstract class CsvConverter extends Job {
   /** Rows. */
   public static final Str ROWS = Str.get("rows");
 
-
   /** CSV options. */
   protected final CsvParserOptions copts;
   /** Shared data references. */
@@ -43,8 +42,6 @@ public abstract class CsvConverter extends Job {
 
   /** Input stream. */
   protected TextInput ti;
-  /** Current column. */
-  protected int col = -1;
 
   /**
    * Returns a CSV converter for the given configuration.

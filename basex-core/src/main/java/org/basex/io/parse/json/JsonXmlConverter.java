@@ -71,7 +71,10 @@ abstract class JsonXmlConverter extends JsonConverter {
         if(cache.type == null) {
           // different types: add type attributes to all elements
           final int es = cache.elems.size();
-          for(int e = 0; e < es; e++) addType(cache.elems.get(e), cache.types.get(e));
+          for(int e = 0; e < es; e++) {
+            final byte[] type = cache.types.get(e);
+            if(strings || type != STRING) cache.elems.get(e).attr(shared.qName(TYPE), type);
+          }
         } else if(strings || cache.type != STRING) {
           // identical types: add key to the root attribute of the type
           int t = 0;
@@ -136,14 +139,7 @@ abstract class JsonXmlConverter extends JsonConverter {
     if(merge) {
       final FBuilder elem = ((NodeHandler) handler).current();
       if(root == null) root = elem;
-      if(cache) {
-        TypeCache tc = names.get(key);
-        if(tc == null) {
-          tc = new TypeCache(key, type);
-          names.put(key, tc);
-        }
-        tc.add(elem, type);
-      }
+      if(cache) names.computeIfAbsent(key, () -> new TypeCache(key, type)).add(elem, type);
     }
   }
 
@@ -160,15 +156,6 @@ abstract class JsonXmlConverter extends JsonConverter {
     openElem(name, key, type, NO_NSP);
     if(value != null) handler.text(value);
     handler.closeElem();
-  }
-
-  /**
-   * Adds a type attribute to the specified element.
-   * @param elem element
-   * @param type type
-   */
-  private void addType(final FBuilder elem, final byte[] type) {
-    if(strings || type != STRING) elem.attr(shared.qName(TYPE), type);
   }
 
   /**

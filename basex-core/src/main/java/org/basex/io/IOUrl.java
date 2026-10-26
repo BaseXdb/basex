@@ -285,8 +285,7 @@ public final class IOUrl extends IO {
    * @return reason or empty string
    */
   public static String reason(final int status) {
-    final String reason = REASONS.get(status);
-    return reason != null ? reason : "";
+    return REASONS.getOrDefault(status, "");
   }
 
   /**

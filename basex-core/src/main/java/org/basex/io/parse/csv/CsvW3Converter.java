@@ -113,16 +113,14 @@ public final class CsvW3Converter extends CsvConverter {
       final long rowIndex = toLong(arg(0), qc);
       if(rowIndex >= 1 && rowIndex <= rows.size()) {
         final XQArray row = (XQArray) rows.itemAt(rowIndex - 1);
-        if(row != null) {
-          Item colIndex = toAtomItem(arg(1), qc);
-          if(colIndex.type.instanceOf(BasicType.STRING)) {
-            final Item it = (Item) columnIndex.get(colIndex);
-            if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
-            colIndex = it;
-          }
-          final long index = colIndex.itr(info) - 1;
-          if(index >= 0 && index < row.structSize()) return row.valueAt(index);
+        Item colIndex = toAtomItem(arg(1), qc);
+        if(colIndex.type.instanceOf(BasicType.STRING)) {
+          final Item it = (Item) columnIndex.get(colIndex);
+          if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
+          colIndex = it;
         }
+        final long index = colIndex.itr(info) - 1;
+        if(index >= 0 && index < row.structSize()) return row.valueAt(index);
       }
       return Str.EMPTY;
     }

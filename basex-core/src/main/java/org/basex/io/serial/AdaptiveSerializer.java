@@ -55,7 +55,6 @@ public class AdaptiveSerializer extends OutputSerializer {
     this.os = os;
 
     if(omit) sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
-    indent = sopts.yes(INDENT);
     expression = sopts.yes(EXPRESSION);
     if(itemsep == null) itemsep = Token.token(expression ? ", " : "\n");
   }

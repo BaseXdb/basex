@@ -124,7 +124,7 @@ public abstract class TableAccess {
   public final void replace(final int pre, final byte[] entries, final int count) {
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int diff = count - nsize;
-    final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
+    final int last = pre + Math.min(count, nsize);
     copy(entries, pre, last);
     final int off = last - pre << IO.NODEPOWER;
 

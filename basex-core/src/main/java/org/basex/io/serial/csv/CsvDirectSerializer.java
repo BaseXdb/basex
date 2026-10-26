@@ -102,8 +102,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
       final int size = headers.size();
       // print header
       if(header) {
-        for(int i = 0; i < size; i++) tl.add(headers.get(i));
-        record(tl);
+        record(headers, false);
         header = false;
       }
       // print data, sorted by headers

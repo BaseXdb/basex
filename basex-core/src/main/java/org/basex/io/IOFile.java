@@ -776,15 +776,7 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final String path = Strings.startsWith(pth, '/') ? pth.substring(1) : pth;
-    final StringBuilder sb = new StringBuilder(FILEPREF).append("//");
-    final int pl = path.length();
-    for(int p = 0; p < pl; p++) {
-      // replace spaces with %20
-      final char ch = path.charAt(p);
-      if(ch == ' ') sb.append("%20");
-      else sb.append(ch);
-    }
-    return sb.toString();
+    return FILEPREF + "//" + path.replace(" ", "%20");
   }
 
   /**
@@ -919,7 +911,7 @@ public final class IOFile extends IO {
         } else if(ch == '.') {
           suffix = true;
           // last character is dot: disallow file suffix
-          if(g + 1 == glb.length()) break;
+          if(g + 1 == gl) break;
           sb.append('\\');
         } else if(!Character.isLetterOrDigit(ch)) {
           sb.append('\\');

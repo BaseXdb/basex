@@ -98,8 +98,7 @@ public abstract class JsonConverter extends JsonHandler {
    * @throws IOException I/O exception
    */
   public final Value convert(final IO input) throws QueryException, IOException {
-    final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    try(NewlineInput ni = new NewlineInput(input, encoding)) {
+    try(NewlineInput ni = new NewlineInput(input, jopts.get(JsonParserOptions.ENCODING))) {
       return convert(ni, input.url(), null, this);
     }
   }

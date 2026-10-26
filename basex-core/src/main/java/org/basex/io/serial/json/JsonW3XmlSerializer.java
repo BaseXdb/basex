@@ -65,7 +65,7 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
           throw error("Element '%' has invalid attribute: %.", local, an);
         }
         if(eq(an, KEY)) {
-          key = attr.string();
+          key = av;
         } else if(eq(an, ESCAPED_KEY) && printKey) {
           final Boolean b = Bln.parse(av);
           if(b == null) throw error("Value of '%' attribute is invalid: '%'.", an, av);
@@ -130,7 +130,7 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
    * @param number number string
    * @return result of check
    */
-  public static boolean isNumber(final String number) {
+  private static boolean isNumber(final String number) {
     final InputParser ip = new InputParser(number);
     int cp = ip.consume();
     if(cp == '-') cp = ip.consume();

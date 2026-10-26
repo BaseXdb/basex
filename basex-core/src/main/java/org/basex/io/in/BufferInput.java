@@ -61,9 +61,8 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    */
   public BufferInput(final IO input) throws IOException {
-    this(input.inputStream());
+    this(input.inputStream(), input.length());
     this.input = input;
-    length = input.length();
   }
 
   /**

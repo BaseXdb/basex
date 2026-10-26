@@ -286,7 +286,7 @@ public abstract class IO {
         Util.stack(ex);
       }
     }
-    return get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
+    return get(dir() + path);
   }
 
   /**
@@ -379,12 +379,7 @@ public abstract class IO {
    */
   public static boolean checkSuffix(final String path, final String... suffixes) {
     final int i = path.lastIndexOf('.');
-    if(i == -1) return false;
-    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-    for(final String suffix : suffixes) {
-      if(suf.equals(suffix)) return true;
-    }
-    return false;
+    return i != -1 && Strings.eq(path.substring(i).toLowerCase(Locale.ENGLISH), suffixes);
   }
 
   /**

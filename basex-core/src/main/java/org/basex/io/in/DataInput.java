@@ -69,16 +69,7 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public int[] readNums() throws IOException {
-    return readNums(readNum());
-  }
-
-  /**
-   * Reads compressed integer values of the specified size.
-   * @param s array size
-   * @return integer array
-   * @throws IOException I/O exception
-   */
-  private int[] readNums(final int s) throws IOException {
+    final int s = readNum();
     final int[] tmp = new int[s];
     for(int a = 0; a < s; a++) tmp[a] = readNum();
     return tmp;

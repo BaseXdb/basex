@@ -25,11 +25,15 @@ abstract class CsvXmlConverter extends CsvConverter {
   final Atts atts = new Atts();
   /** Target of the XML events. */
   XmlHandler handler;
-  /** Current line. */
-  int line;
+  /** Current column. */
+  int col = -1;
 
   /** External handler (can be {@code null}). */
   private final XmlHandler external;
+  /** Current line. */
+  private int line;
+  /** Record element is open. */
+  private boolean open;
 
   /**
    * Constructor.
@@ -44,6 +48,31 @@ abstract class CsvXmlConverter extends CsvConverter {
   @Override
   protected void init(final String uri) throws IOException {
     handler = external != null ? external : new NodeHandler(uri, false);
+    open = false;
+  }
+
+  /**
+   * Closes an open record element and opens a new one.
+   * @param name element name
+   * @throws IOException I/O exception
+   */
+  final void openRecord(final byte[] name) throws IOException {
+    line++;
+    closeRecord();
+    handler.openElem(name, atts, NO_NSP);
+    open = true;
+    col = -1;
+  }
+
+  /**
+   * Closes an open record element.
+   * @throws IOException I/O exception
+   */
+  final void closeRecord() throws IOException {
+    if(open) {
+      handler.closeElem();
+      open = false;
+    }
   }
 
   @Override

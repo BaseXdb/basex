@@ -309,21 +309,6 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Writes a 5-byte value to the specified position.
-   * @param pos position in the file
-   * @param value value to be written
-   */
-  public void write5(final long pos, final long value) {
-    final Reader writer = writer();
-    writer.cursor(pos);
-    writer.write((byte) (value >>> 32));
-    writer.write((byte) (value >>> 24));
-    writer.write((byte) (value >>> 16));
-    writer.write((byte) (value >>> 8));
-    writer.write((byte) value);
-  }
-
-  /**
    * Writes an integer value to the specified position.
    * @param pos write position
    * @param value value to be written
@@ -348,16 +333,6 @@ public final class DataAccess implements Closeable {
    */
   public void writeNum(final int value) {
     writer().writeNum(value);
-  }
-
-  /**
-   * Writes a byte array to the file.
-   * @param data data containing the bytes to be written
-   * @param offset offset of first byte
-   * @param len number of bytes to be written
-   */
-  public void writeBytes(final byte[] data, final int offset, final int len) {
-    writer().writeBytes(data, offset, len);
   }
 
   /**
@@ -639,8 +614,7 @@ public final class DataAccess implements Closeable {
      * @return text as byte array
      */
     private byte[] readToken() {
-      final int l = readNum();
-      return readBytes(l);
+      return readBytes(readNum());
     }
 
     /**

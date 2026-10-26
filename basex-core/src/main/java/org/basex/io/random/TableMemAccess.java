@@ -45,26 +45,22 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public int read1(final int pre, final int offset) {
-    final TableMemBlock block = block(pre);
-    return (int) (block.value(pre, offset) >> ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
+    return (int) (block(pre).value(pre, offset) >> ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
   }
 
   @Override
   public int read2(final int pre, final int offset) {
-    final TableMemBlock block = block(pre);
-    return (int) (block.value(pre, offset) >> ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
+    return (int) (block(pre).value(pre, offset) >> ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
   }
 
   @Override
   public int read4(final int pre, final int offset) {
-    final TableMemBlock block = block(pre);
-    return (int) (block.value(pre, offset) >> ((offset < 8 ? 4 : 12) - offset << 3));
+    return (int) (block(pre).value(pre, offset) >> ((offset < 8 ? 4 : 12) - offset << 3));
   }
 
   @Override
   public long read5(final int pre, final int offset) {
-    final TableMemBlock block = block(pre);
-    return block.value(pre, offset) >> ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
+    return block(pre).value(pre, offset) >> ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override
@@ -135,11 +131,10 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void insert(final int pre, final byte[] entries) {
     final int count = entries.length >>> IO.NODEPOWER;
-    int size = nodes;
-    if(pre == size) {
+    if(pre == nodes) {
       // append entries. if no space is left, append new blocks
       final int bs = blocks.size();
-      final int remaining = bs == 0 ? 0 : blocks.get(bs - 1).remaining(size);
+      final int remaining = bs == 0 ? 0 : blocks.get(bs - 1).remaining(nodes);
       if(remaining < count) {
         blocks.addAll(bs, TableMemBlock.get(count - remaining, pre + remaining));
       }
@@ -156,8 +151,7 @@ public final class TableMemAccess extends TableAccess {
       dense = false;
     }
     // increase table size, populate table with actual entries
-    size += count;
-    nodes = size;
+    nodes += count;
     copy(entries, pre, pre + count);
   }
 
