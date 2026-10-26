@@ -193,13 +193,9 @@ public final class BaseXGUI extends Main {
     final MainParser arg = new MainParser(this);
     while(arg.more()) {
       if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'd') {
-          // activate debug mode
-          Prop.debug = true;
-        } else {
-          throw arg.usage();
-        }
+        // activate debug mode
+        if(arg.next() != 'd') throw arg.usage();
+        Prop.debug = true;
       } else {
         files.add(arg.string());
       }

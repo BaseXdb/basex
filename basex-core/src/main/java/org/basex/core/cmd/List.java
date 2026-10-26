@@ -106,24 +106,27 @@ public final class List extends Command {
 
     try {
       final Data data = Open.open(db, context, options, true, true);
-      final Resources resources = data.resources;
+      try {
+        final Resources resources = data.resources;
 
-      // list XML documents
-      final IntList docs = resources.docs(root);
-      final int ds = docs.size();
-      for(int d = 0; d < ds; d++) {
-        final int pre = docs.get(d);
-        final String string = Token.string(data.text(pre, true));
-        add(table, string, data.size(pre, Data.DOC), ResourceType.XML);
-      }
-      // list file resources
-      for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.dir(type);
-        for(final String path : resources.paths(root, type)) {
-          add(table, path, type.filePath(bin, path).length(), type);
+        // list XML documents
+        final IntList docs = resources.docs(root);
+        final int ds = docs.size();
+        for(int d = 0; d < ds; d++) {
+          final int pre = docs.get(d);
+          final String string = Token.string(data.text(pre, true));
+          add(table, string, data.size(pre, Data.DOC), ResourceType.XML);
         }
+        // list file resources
+        for(final ResourceType type : Resources.BINARIES) {
+          final IOFile bin = data.meta.dir(type);
+          for(final String path : resources.paths(root, type)) {
+            add(table, path, type.filePath(bin, path).length(), type);
+          }
+        }
+      } finally {
+        Close.close(data, context);
       }
-      Close.close(data, context);
     } catch(final IOException ex) {
       return error(ex);
     }

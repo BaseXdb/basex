@@ -131,7 +131,6 @@ final class StringParser extends CommandParser {
       };
       case GRANT -> {
         final CmdPerm perm = consume(CmdPerm.class, cmd);
-        if(perm == null) throw help(null, cmd);
         final String db = key(ON, null) ? glob(cmd) : null;
         key(S_TO, cmd);
         yield new Grant(perm, glob(cmd), db);
@@ -141,7 +140,6 @@ final class StringParser extends CommandParser {
         case DELETE -> new RepoDelete(string(cmd), parser.info());
         case LIST -> new RepoList();
       };
-      default -> throw Util.notExpected("Command specified, but not implemented yet");
     };
   }
 
@@ -365,16 +363,9 @@ final class StringParser extends CommandParser {
    * @return completions
    */
   private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en, final String prefix) {
-    Enum<?>[] list = { };
     final String t = prefix == null ? "" : prefix.toUpperCase(Locale.ENGLISH);
-    for(final Enum<?> e : en.getEnumConstants()) {
-      if(e.name().startsWith(t)) {
-        final int s = list.length;
-        list = Array.copy(list, new Enum<?>[s + 1]);
-        list[s] = e;
-      }
-    }
-    return list;
+    return Arrays.stream(en.getEnumConstants()).filter(e -> e.name().startsWith(t)).
+      toArray(Enum<?>[]::new);
   }
 
   /**

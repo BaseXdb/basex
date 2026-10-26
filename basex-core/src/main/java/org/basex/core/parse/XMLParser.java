@@ -298,7 +298,7 @@ final class XMLParser extends CommandParser {
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = root.qname().string();
-    syntax.reset().add('<').add(nm);
+    syntax.add('<').add(nm);
     for(final byte[] m : mand) syntax.add(' ').add(m).add("=\"...\"");
     for(final byte[] o : opt) syntax.add(" (").add(o).add("=\"...\")");
     if(t != null) {

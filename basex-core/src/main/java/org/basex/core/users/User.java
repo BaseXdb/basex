@@ -108,7 +108,7 @@ public final class User {
         for(final GNode code : children(child)) {
           final Code cd = value(name, code.qname().unique(), algorithm.codeTypes);
           if(ec.containsKey(cd)) throw new BaseXException(
-              "%, %: Code % supplied more than once.", name, algorithm, code);
+              "%, %: Code % supplied more than once.", name, algorithm, cd);
           ec.put(cd, string(code.string()));
         }
         for(final Code code : algorithm.codeTypes) {

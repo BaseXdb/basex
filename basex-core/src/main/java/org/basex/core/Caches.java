@@ -132,10 +132,10 @@ public final class Caches {
    */
   public synchronized TokenList keys(final String name) {
     final Cache cache = caches.get(name);
-    if(cache != null) cache.cleanup();
-    final Set<String> keys = cache != null ? cache.keySet() : Set.of();
-    final TokenList list = new TokenList(keys.size());
-    for(final String key : keys) list.add(key);
+    if(cache == null) return new TokenList(0);
+    cache.cleanup();
+    final TokenList list = new TokenList(cache.size());
+    for(final String key : cache.keySet()) list.add(key);
     return list;
   }
 
@@ -347,8 +347,8 @@ public final class Caches {
 
   /**
    * Cache entry.
-     * @param value value
-     * @param expires expiration time in milliseconds
+   * @param value value
+   * @param expires expiration time in milliseconds
    */
   private record CacheEntry(Value value, long expires) { }
 }

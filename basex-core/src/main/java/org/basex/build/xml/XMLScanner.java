@@ -117,12 +117,9 @@ final class XMLScanner extends Job {
             if(!s) throw error(WSERROR);
             s = s();
           }
-          if(sddecl() != null && !s) throw error(WSERROR);
+          if(sddecl() && !s) throw error(WSERROR);
           s();
-          int ch = nextChar();
-          if(ch != '?') throw error(WRONGCHAR, '?', (char) ch);
-          ch = nextChar();
-          if(ch != '>') throw error(WRONGCHAR, '>', (char) ch);
+          check(PI_C);
         } else {
           prev(5);
         }
@@ -662,11 +659,10 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private void nmtoken() throws IOException {
-    final TokenBuilder name = new TokenBuilder();
-    int c;
-    while(isChar(c = nextChar())) name.add(c);
+    int n = 0;
+    while(isChar(nextChar())) n++;
     prev(1);
-    if(name.isEmpty()) throw error(INVNAME);
+    if(n == 0) throw error(INVNAME);
   }
 
   /**
@@ -747,11 +743,8 @@ final class XMLScanner extends Job {
       if(version()) checkS();
       s();
       if(encoding() == null) throw error(TEXTENC);
-      int ch = nextChar();
-      if(s(ch)) ch = nextChar();
-      if(ch != '?') throw error(WRONGCHAR, '?', ch);
-      ch = nextChar();
-      if(ch != '>') throw error(WRONGCHAR, '>', ch);
+      s();
+      check(PI_C);
       content = Arrays.copyOfRange(content, (int) input.pos(), content.length);
     }
     input = tin;
@@ -1107,21 +1100,17 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a standalone flag.
-   * @return flag or {@code null}
+   * @return true if a standalone flag was found
    * @throws IOException I/O exception
    */
-  private byte[] sddecl() throws IOException {
-    if(!consume(STANDALONE)) return null;
+  private boolean sddecl() throws IOException {
+    if(!consume(STANDALONE)) return false;
     s(); check('='); s();
     final int d = qu();
-    byte[] sd = token(NO);
-    if(!consume(sd)) {
-      sd = token(YES);
-      if(!consume(sd)) sd = null;
-    }
+    final boolean sd = consume(token(NO)) || consume(token(YES));
     check((char) d);
-    if(sd == null || fragment) throw error(DECLSTANDALONE);
-    return sd;
+    if(!sd || fragment) throw error(DECLSTANDALONE);
+    return true;
   }
 
   /**
@@ -1138,7 +1127,7 @@ final class XMLScanner extends Job {
   public String detailedInfo() {
     final String path = input.io().path();
     return path.isEmpty() ? Util.info(LINE_X, input.line()) :
-        Util.info(SCANPOS_X_X, input.io().path(), input.line());
+        Util.info(SCANPOS_X_X, path, input.line());
   }
 
   @Override

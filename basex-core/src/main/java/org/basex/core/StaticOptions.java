@@ -191,10 +191,8 @@ public final class StaticOptions extends Options {
    * @return name of random database
    */
   public synchronized String createTempDb(final String name) {
-    String db;
-    int c = 0;
-    while(true) {
-      db = name + '.' + c++;
+    for(int c = 0;; c++) {
+      final String db = name + '.' + c;
       final IOFile io = dbPath(db);
       if(!io.exists()) {
         io.md();

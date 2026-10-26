@@ -237,7 +237,6 @@ no_data              = Geen gegevens beschikbaar.
 no_db_dropped        = Geen database verwijderd.
 no_db_found          = Geen database gevonden.
 no_db_opened         = Geen database geopend.
-no_help              = Sorry, geen help beschikbaar.
 no_mainmem           = Commando is niet beschikbaar in main memory mode.
 no_pixels            = Niet genoeg ruimte.
 no_stemmer_%         = Geen 'stemmer' beschikbaar voor taal "%".

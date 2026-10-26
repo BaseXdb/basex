@@ -561,7 +561,7 @@ final class NSEntries {
       final ArrayList<NSNode> stack = new ArrayList<>();
       stack.add(root);
       while(!stack.isEmpty()) {
-        final NSNode node = stack.remove(stack.size() - 1);
+        final NSNode node = stack.removeLast();
         final int setId = node.setId();
         counts.set(setId, counts.get(setId) + 1);
         final int cs = node.children();
@@ -587,7 +587,7 @@ final class NSEntries {
       final ArrayList<NSNode> stack = new ArrayList<>();
       stack.add(root);
       while(!stack.isEmpty()) {
-        final NSNode node = stack.remove(stack.size() - 1);
+        final NSNode node = stack.removeLast();
 
         // encode the leaf entries, and remember the PRE value and offset of every further block
         final int pre = node.pre(), cs = node.children();

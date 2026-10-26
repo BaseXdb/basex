@@ -99,5 +99,6 @@ public final class AlterBackup extends ABackup {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.ALTER + " " + CmdDrop.BACKUP).args();
-  }}
+    cb.init(Cmd.ALTER + " " + CmdAlter.BACKUP).args();
+  }
+}

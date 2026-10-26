@@ -146,7 +146,7 @@ public class XMLParser extends SingleParser {
 
     // get element name
     final byte[] raw = consumeToken(Type.ELEMNAME);
-    byte[] en = stripNS ? local(raw) : raw;
+    final byte[] en = stripNS ? local(raw) : raw;
     skipSpace();
 
     // parse optional attributes

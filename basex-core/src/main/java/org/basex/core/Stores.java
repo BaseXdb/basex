@@ -286,7 +286,7 @@ public final class Stores implements Closeable {
         mb.put(in.readToken(), read(in, qc));
       }
     } catch(final IOException ex) {
-      throw QueryError.STORE_IO_X.get(info, ex);
+      throw STORE_IO_X.get(info, ex);
     }
     stores.put(name, new Store(mb.map()));
   }
@@ -331,7 +331,7 @@ public final class Stores implements Closeable {
    * Returns the names of all stores from disk.
    * @return keys
    */
-  private synchronized TreeSet<String> listStores() {
+  private TreeSet<String> listStores() {
     final TreeSet<String> names = new TreeSet<>();
     for(final IOFile file : context.soptions.dbPath().children()) {
       final String name = file.name();
@@ -349,17 +349,8 @@ public final class Stores implements Closeable {
    */
   private IOFile storeFile(final String name) {
     final TokenBuilder tb = new TokenBuilder().add(NAME);
-    if(!standardStore(name)) tb.add('-').add(name);
+    if(!name.isEmpty()) tb.add('-').add(name);
     return context.soptions.dbPath(tb.add(IO.BASEXSUFFIX).toString());
-  }
-
-  /**
-   * Checks if the supplied store refers to the standard store.
-   * @param name name of store
-   * @return result of check
-   */
-  private static boolean standardStore(final String name) {
-    return name.isEmpty();
   }
 
   // STATIC FUNCTIONS =============================================================================

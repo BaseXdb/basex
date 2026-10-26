@@ -20,8 +20,6 @@ import org.basex.util.*;
 public abstract class ACreate extends Command {
   /** Flag for closing a data instance before executing the command. */
   private boolean newData;
-  /** Indicates if database should be locked. */
-  protected boolean lock = true;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -97,7 +95,7 @@ public abstract class ACreate extends Command {
 
     // prepare update, set locks
     try {
-      if(lock) data.startUpdate(options);
+      data.startUpdate(options);
     } catch(final IOException ex) {
       return error(ex);
     }
@@ -112,7 +110,7 @@ public abstract class ACreate extends Command {
       try {
         // finish update, remove locks
         Optimize.finish(data);
-        if(lock) data.finishUpdate(options);
+        data.finishUpdate(options);
       } catch(final IOException ex) {
         // do not overwrite existing error if something goes wrong
         if(exc == null) exc = ex;

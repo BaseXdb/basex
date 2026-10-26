@@ -77,6 +77,8 @@ public abstract class Builder extends Job implements XmlHandler {
     this.parser = parser;
   }
 
+  // PUBLIC METHODS ===============================================================================
+
   /**
    * Assigns the source location of the nodes that will be added next.
    * @param line line number
@@ -86,8 +88,6 @@ public abstract class Builder extends Job implements XmlHandler {
     nodeLine = line;
     nodeColumn = column;
   }
-
-  // PUBLIC METHODS ===============================================================================
 
   /**
    * Parses the given input source and builds the database.

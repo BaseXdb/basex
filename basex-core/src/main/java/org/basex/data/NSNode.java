@@ -26,7 +26,7 @@ final class NSNode {
   private NSNode parent;
   /** ID of the set with the prefix/namespace URI pairs. */
   private int setId;
-  /** Pre value. */
+  /** PRE value. */
   private int pre;
 
   /**
@@ -139,18 +139,21 @@ final class NSNode {
    * @return node
    */
   NSNode find(final int p, final Data data) {
-    // return this node if the PRE values of all children are greater than the searched value
-    final int s = find(p);
-    if(s == -1) return this;
+    NSNode node = this;
+    while(true) {
+      // return this node if the PRE values of all children are greater than the searched value
+      final int s = node.find(p);
+      if(s == -1) return node;
 
-    final NSNode ch = nodes[s];
-    final int cp = ch.pre;
-    // return exact hit
-    if(cp == p) return ch;
-    // found node is preceding sibling
-    if(cp + data.size(cp, Data.ELEM) <= p) return this;
-    // continue recursive search
-    return nodes[s].find(p, data);
+      final NSNode ch = node.nodes[s];
+      final int cp = ch.pre;
+      // return exact hit
+      if(cp == p) return ch;
+      // found node is preceding sibling
+      if(cp + data.size(cp, Data.ELEM) <= p) return node;
+      // continue with the child
+      node = ch;
+    }
   }
 
   /**
@@ -179,8 +182,7 @@ final class NSNode {
   /**
    * Deletes nodes in the specified range (p .. p + s - 1) and updates the following PRE values.
    * @param p PRE value
-   * @param s number of nodes to be deleted, or actually the size of the pre
-   * value which is to be deleted
+   * @param s size of the deleted node
    */
   void delete(final int p, final int s) {
     final int sz = size;

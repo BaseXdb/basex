@@ -198,9 +198,9 @@ public interface Commands {
 
     /**
      * Default constructor.
-     * @param help help texts or {@code null} if command is hidden
+     * @param help help texts
      */
-    Cmd(final String... help) {
+    Cmd(final String[] help) {
       this.help = help;
     }
 
@@ -209,15 +209,9 @@ public interface Commands {
      * @param detail show details
      * @return string
      */
-    public final String help(final boolean detail) {
-      final StringBuilder sb = new StringBuilder();
-      if(help == null) {
-        if(detail) sb.append(NOHELP);
-      } else {
-        sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
-        if(detail) sb.append(NL + help[2]);
-      }
-      return sb.toString();
+    public String help(final boolean detail) {
+      final String string = this + " " + help[0] + NL + "  " + help[1] + NL;
+      return detail ? string + NL + help[2] : string;
     }
   }
 }

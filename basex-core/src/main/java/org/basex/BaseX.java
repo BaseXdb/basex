@@ -66,14 +66,16 @@ public class BaseX extends CLI {
       final int os = ops.size();
       for(int o = 0; o < os; o++) {
         final int c = ops.get(o);
-        String value = vals.get(o);
+        final String value = vals.get(o);
 
         switch(c) {
-          case 'b' -> {
+          case 'b', 'I' -> {
             if(!bind.isEmpty()) bind.append(',');
+            // the context value is bound to an empty name
+            if(c == 'I') bind.append('=');
             // commas are escaped by a second comma
-            value = bind.append(value.replace(",", ",,")).toString();
-            execute(new Set(MainOptions.BINDINGS, value), false);
+            bind.append(value.replace(",", ",,"));
+            execute(new Set(MainOptions.BINDINGS, bind.toString()), false);
           }
           case 'c' -> {
             console = false;
@@ -87,12 +89,6 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.MAINMEM, true), false);
             execute(new Check(value), verbose);
             execute(new Set(MainOptions.MAINMEM, false), false);
-          }
-          case 'I' -> {
-            if(!bind.isEmpty()) bind.append(',');
-            // commas are escaped by a second comma
-            value = bind.append('=').append(value.replace(",", ",,")).toString();
-            execute(new Set(MainOptions.BINDINGS, value), false);
           }
           case 'o' -> {
             quit();

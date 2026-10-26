@@ -237,7 +237,6 @@ no_data              = 找不到数据
 no_db_dropped        = 没有删除任何数据库
 no_db_found          = 没找到数据库
 no_db_opened         = 没打开数据库
-no_help              = 对不起，没有帮助文档
 no_mainmem           = 在主内存模式中该命令不可用
 no_pixels            = 像素不够
 no_stemmer_%         = 该语言没有stemmer "%"

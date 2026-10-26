@@ -96,8 +96,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     try {
       while(authenticated) {
         command(null);
-        String cmd;
-        final ServerCmd sc;
+        String cmd = null;
         try {
           final int b = in.read();
           if(b == -1) {
@@ -108,21 +107,15 @@ public final class ClientListener extends Thread implements ClientInfo {
 
           last = System.currentTimeMillis();
           perf.nanoRuntime();
-          sc = ServerCmd.get(b);
-          cmd = null;
-          if(sc == ServerCmd.CREATE) {
-            create();
-          } else if(sc == ServerCmd.ADD) {
-            add();
-          } else if(sc == ServerCmd.PUT) {
-            put();
-          } else if(sc == ServerCmd.PUTBINARY) {
-            putBinary();
-          } else if(sc != ServerCmd.EXECUTE) {
-            query(sc);
-          } else {
+          final ServerCmd sc = ServerCmd.get(b);
+          switch(sc) {
+            case CREATE -> execute(new CreateDB(in.readString()));
+            case ADD -> execute(new Add(in.readString()));
+            case PUT -> execute(new Put(in.readString()));
+            case PUTBINARY -> execute(new BinaryPut(in.readString()));
             // database command
-            cmd = new ByteList().add(b).add(in.readBytes()).toString();
+            case EXECUTE -> cmd = new ByteList().add(b).add(in.readBytes()).toString();
+            default -> query(sc);
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
@@ -130,24 +123,17 @@ public final class ClientListener extends Thread implements ClientInfo {
           close();
           break;
         }
-        if(sc != ServerCmd.EXECUTE) continue;
+        if(cmd == null) continue;
 
         // parse input and create command instance
         try {
           command(CommandParser.get(cmd, context).parseSingle());
           log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
-          // log invalid command
-          final String msg = ex.getMessage();
+          // log invalid command, send 0 to mark end of potential result, send error info
           log(LogType.REQUEST, cmd);
-          log(LogType.ERROR, msg);
-          // send 0 to mark end of potential result
           out.write(0);
-          // send {INFO}0
-          out.print(msg);
-          out.write(0);
-          // send 1 to mark error
-          send(false);
+          info(ex.getMessage(), false);
           continue;
         }
 
@@ -356,24 +342,6 @@ public final class ClientListener extends Thread implements ClientInfo {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Returns error feedback.
-   * @param info error string
-   * @throws IOException I/O exception
-   */
-  private void error(final String info) throws IOException {
-    info(info, false);
-  }
-
-  /**
-   * Returns user feedback.
-   * @param info information string
-   * @throws IOException I/O exception
-   */
-  private void success(final String info) throws IOException {
-    info(info, true);
-  }
-
-  /**
    * Returns user feedback.
    * @param info information string
    * @param ok success/error flag
@@ -389,39 +357,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Creates a database.
-   * @throws IOException I/O exception
-   */
-  private void create() throws IOException {
-    execute(new CreateDB(in.readString()));
-  }
-
-  /**
-   * Adds a document to a database.
-   * @throws IOException I/O exception
-   */
-  private void add() throws IOException {
-    execute(new Add(in.readString()));
-  }
-
-  /**
-   * Puts (adds or replaces) a document in the opened database.
-   * @throws IOException I/O exception
-   */
-  private void put() throws IOException {
-    execute(new Put(in.readString()));
-  }
-
-  /**
-   * Puts (adds or replaces) a binary resource in the opened database.
-   * @throws IOException I/O exception
-   */
-  private void putBinary() throws IOException {
-    execute(new BinaryPut(in.readString()));
-  }
-
-  /**
-   * Executes the specified command.
+   * Executes a command with streamed input.
    * @param cmd command to be executed
    * @throws IOException I/O exception
    */
@@ -431,10 +367,10 @@ public final class ClientListener extends Thread implements ClientInfo {
     try {
       cmd.setInput(si);
       cmd.execute(context);
-      success(cmd.info());
+      info(cmd.info(), true);
     } catch(final BaseXException ex) {
       si.drain();
-      error(ex.getMessage());
+      info(ex.getMessage(), false);
     }
   }
 
@@ -446,21 +382,17 @@ public final class ClientListener extends Thread implements ClientInfo {
   private void query(final ServerCmd sc) throws IOException {
     // iterator argument (query or identifier)
     String arg = in.readString();
-
-    String error = null;
     try {
       final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
       if(sc == ServerCmd.QUERY) {
-        final String query = arg;
-        qp = new ServerQuery(query, context);
+        qp = new ServerQuery(arg, context);
+        info.append(arg);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
         out.print(arg);
         out.write(0);
-        // write log file
-        info.append(query);
       } else {
         // find query process
         qp = queries.get(arg);
@@ -505,12 +437,10 @@ public final class ClientListener extends Thread implements ClientInfo {
     } catch(final Throwable ex) {
       // log exception (static or runtime)
       Util.debug(ex);
-      error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
+      final String error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
       log(LogType.REQUEST, sc + "[" + arg + ']');
       log(LogType.ERROR, error);
       queries.remove(arg);
-    }
-    if(error != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);

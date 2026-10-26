@@ -396,7 +396,7 @@ public final class Inspection {
         final int pre = iter.pre();
         size++;
         if(pre <= last || pre >= nodes || !names.unit(pre) || (tokenize ?
-          !Arrays.stream(distinctTokens(data.text(pre, false))).anyMatch(t -> eq(t, key)) :
+          Arrays.stream(distinctTokens(data.text(pre, false))).noneMatch(t -> eq(t, key)) :
           !eq(data.text(pre, text), key))) {
           add(check, pre);
         } else {

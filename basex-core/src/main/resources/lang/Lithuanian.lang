@@ -237,7 +237,6 @@ no_data              = Nėra duomenų.
 no_db_dropped        = Nepašalinta jokia duomenų bazė.
 no_db_found          = Nerasta jokia duomenų bazė.
 no_db_opened         = Neatverta jokia duomenų bazė.
-no_help              = Atsiprašome, žinyno nėra.
 no_mainmem           = Komanda neprieinama pagrindinės atminties režime.
 no_pixels            = Per mažai pikselių.
 no_stemmer_%         = Nėra kamiengrąžos „%“ kalbai.

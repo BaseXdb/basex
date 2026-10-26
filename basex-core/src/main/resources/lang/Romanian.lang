@@ -237,7 +237,6 @@ no_data              = Nu există date disponibile.
 no_db_dropped        = Nici o baza de date nu a fost stearsa
 no_db_found          = Nici o baza de date nu a fost gasita
 no_db_opened         = Nici o baza de date deschisa.
-no_help              = Ne pare rău, nici un ajutor disponibil.
 no_mainmem           = Comandă nu este disponibilă în modul de memorie principală.
 no_pixels            = Nu este suficient spaţiu.
 no_stemmer_%         = Nu este disponibil stemmer pentru limba '%'.

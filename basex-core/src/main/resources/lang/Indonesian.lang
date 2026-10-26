@@ -237,7 +237,6 @@ no_data              = Tidak ada data yang tersedia.
 no_db_dropped        = Tidak ada basisdata yang dihancurkan.
 no_db_found          = Tidak ada basisdata yang ditemukan.
 no_db_opened         = Tidak ada basisdata yang dibuka.
-no_help              = Maaf, tidak ada bantuan yang tersedia.
 no_mainmem           = Perintah tidak tersedia di cara memori utama.
 no_pixels            = Tidak cukup ruang.
 no_stemmer_%         = Tidak ada pemotong yang tersedia untuk bahasa "%".

@@ -116,12 +116,12 @@ public final class BaseXServer extends CLI implements Runnable {
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port), BACKLOG);
     } catch(final BindException ex) {
-      context.log.writeServer(LogType.ERROR, Util.message(ex));
+      error(ex);
       throw new BaseXException(SRV_RUNNING_X, port, ex);
     } catch(final IOException ex) {
       throw ex;
     } catch(final Exception ex) {
-      context.log.writeServer(LogType.ERROR, Util.message(ex));
+      error(ex);
       throw new BaseXException(ex.getLocalizedMessage(), ex);
     }
 
@@ -153,7 +153,7 @@ public final class BaseXServer extends CLI implements Runnable {
         // stop if the server socket was closed, otherwise retry (e.g. for exhausted file handles)
         if(socket.isClosed()) break;
         Util.errln(ex);
-        context.log.writeServer(LogType.ERROR, Util.message(ex));
+        error(ex);
         Performance.sleep(100);
         continue;
       }
@@ -206,6 +206,29 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
+   * Removes a client listener that is waiting for authentication.
+   * @param client client to be removed
+   */
+  public void remove(final ClientListener client) {
+    synchronized(authorizing) {
+      if(!authorizing.containsKey(client)) return;
+      // the timeout is null if the application is closing
+      final ScheduledFuture<?> timeout = authorizing.remove(client);
+      if(timeout != null) timeout.cancel(false);
+      pending.computeIfPresent(client.inetAddress(), (address, count) ->
+        count > 1 ? count - 1 : null);
+    }
+  }
+
+  /**
+   * Logs an error.
+   * @param ex exception
+   */
+  private void error(final Exception ex) {
+    context.log.writeServer(LogType.ERROR, Util.message(ex));
+  }
+
+  /**
    * Stops the server.
    * @throws IOException I/O exception
    */
@@ -240,7 +263,7 @@ public final class BaseXServer extends CLI implements Runnable {
       if(acceptor != null && acceptor != Thread.currentThread()) acceptor.join();
     } catch(final IOException ex) {
       Util.errln(ex);
-      context.log.writeServer(LogType.ERROR, Util.message(ex));
+      error(ex);
     } catch(final InterruptedException ex) {
       Util.debug(ex);
       Thread.currentThread().interrupt();
@@ -363,21 +386,6 @@ public final class BaseXServer extends CLI implements Runnable {
       if(in.read() != 0) throw new BaseXException(CONNECTION_ERROR_X, port);
     } catch(final IOException ex) {
       throw new BaseXException(CONNECTION_ERROR_X, port, ex);
-    }
-  }
-
-  /**
-   * Removes a client listener that is waiting for authentication.
-   * @param client client to be removed
-   */
-  public void remove(final ClientListener client) {
-    synchronized(authorizing) {
-      if(!authorizing.containsKey(client)) return;
-      // the timeout is null if the application is closing
-      final ScheduledFuture<?> timeout = authorizing.remove(client);
-      if(timeout != null) timeout.cancel(false);
-      pending.computeIfPresent(client.inetAddress(), (address, count) ->
-        count > 1 ? count - 1 : null);
     }
   }
 }

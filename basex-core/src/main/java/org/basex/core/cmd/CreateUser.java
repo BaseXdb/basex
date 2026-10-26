@@ -33,7 +33,7 @@ public final class CreateUser extends AUser {
     final Users users = context.users;
     users.add(new User(name, password, context.soptions.authAlgorithms()));
     users.write();
-    return info(USER_CREATED_X, args[0]);
+    return info(USER_CREATED_X, name);
   }
 
   @Override

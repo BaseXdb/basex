@@ -385,43 +385,12 @@ public final class Namespaces {
   }
 
   /**
-   * Finds the nearest namespace node on the ancestor axis of the insert location and sets it as new
-   * root. Possible candidates for this node are collected and the match with the highest PRE value
-   * between ancestors and candidates is determined.
+   * Sets the nearest namespace node on the ancestor-or-self axis of the insert location as cursor.
    * @param pre PRE value
    * @param data data reference
    */
   void root(final int pre, final Data data) {
-    // collect possible candidates for namespace root
-    final List<NSNode> cand = new LinkedList<>();
-    NSNode nd = tree();
-    cand.add(nd);
-    for(int p; (p = nd.find(pre)) > -1;) {
-      // add candidate to stack
-      nd = nd.child(p);
-      cand.addFirst(nd);
-    }
-
-    nd = root;
-    if(cand.size() > 1) {
-      // compare candidates to ancestors of PRE value
-      int ancPre = pre;
-      // take first candidate from stack
-      NSNode curr = cand.removeFirst();
-      while(ancPre > -1 && nd == root) {
-        // if the current candidate's PRE value is lower than the current ancestor of par or par
-        // itself, we have to look for a potential match for this candidate. therefore we iterate
-        // through ancestors until we find one with a lower than or the same PRE value as the
-        // current candidate.
-        while(ancPre > curr.pre()) ancPre = data.parent(ancPre, data.kind(ancPre));
-        // this is the new root
-        if(ancPre == curr.pre()) nd = curr;
-        // no potential for infinite loop, because dummy root is always a match,
-        // in this case ancPre ends iteration
-        if(!cand.isEmpty()) curr = cand.removeFirst();
-      }
-    }
-
+    final NSNode nd = tree().find(pre, data);
     final int uriId = uriIdForPrefix(Token.EMPTY, pre, data);
     defaults.set(level, uriId);
     // remember URI before insert of first node n to connect siblings of n to according namespace
@@ -670,7 +639,7 @@ public final class Namespaces {
       final TokenList values = map.get(key).sort();
       final int ks = values.size();
       if(ks > 1 || values.get(0).length != 0) {
-        if(values.size() != 1) tb.add("(");
+        if(ks != 1) tb.add("(");
         for(int k = 0; k < ks; k++) {
           if(k != 0) tb.add(", ");
           tb.add(values.get(k));

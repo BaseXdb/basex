@@ -306,9 +306,6 @@ public interface Text {
   /** Goodbye information. */
   String[] BYE = { lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4") };
 
-  /** No help available. */
-  String NOHELP = lang("no_help");
-
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.BACKUP + '|' + CmdCreate.DATABASE + '|' +

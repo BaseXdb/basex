@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.server.*;
 
 /**
@@ -27,7 +26,7 @@ public final class Kill extends AUser {
   @Override
   protected boolean run() {
     if(!run(0, false) || count == 0) {
-      error(Locking.CONTEXT);
+      error("");
 
       // kill all sessions with the specified IP (and optional port)
       final Sessions ss = context.sessions;

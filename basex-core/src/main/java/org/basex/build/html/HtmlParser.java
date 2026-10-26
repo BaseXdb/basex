@@ -288,20 +288,12 @@ public final class HtmlParser extends XMLParser {
       public boolean available(final HtmlOptions options) {
         if(!super.available(options)) return false;
         if(!options.contains(HEURISTICS)) return true;
-        switch(options.get(HEURISTICS)) {
-          case ALL -> {
-            if(!ExternalLib.ICU.available()) return false;
-            if(!ExternalLib.CHARDET.available()) return false;
-          }
-          case ICU -> {
-            if(!ExternalLib.ICU.available()) return false;
-          }
-          case CHARDET -> {
-            if(!ExternalLib.CHARDET.available()) return false;
-          }
-          default -> { }
-        }
-        return true;
+        return switch(options.get(HEURISTICS)) {
+          case ALL -> ExternalLib.ICU.available() && ExternalLib.CHARDET.available();
+          case ICU -> ExternalLib.ICU.available();
+          case CHARDET -> ExternalLib.CHARDET.available();
+          default -> true;
+        };
       }
     };
 

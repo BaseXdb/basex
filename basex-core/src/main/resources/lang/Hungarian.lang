@@ -237,7 +237,6 @@ no_data              = Nincs elérhető adat.
 no_db_dropped        = Egy adatbázis sem lett eldobva.
 no_db_found          = Egy adatbázis sincs.
 no_db_opened         = Nincs nyitva adatbázis.
-no_help              = Sajnáljuk, nincs elérhető súgó.
 no_mainmem           = Parancs nem érhető el főmemória módban.
 no_pixels            = Nem elegendő pixel.
 no_stemmer_%         = "%" nyelvhez nincs elérhető csupaszító (stemmer).

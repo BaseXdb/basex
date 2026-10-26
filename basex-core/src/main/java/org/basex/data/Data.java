@@ -368,7 +368,7 @@ public abstract class Data {
 
     // find PRE value in the table; start with specified ID
     final int size = nodes();
-    for(int p = Math.max(0, id); p < nodes(); p++) {
+    for(int p = Math.max(0, id); p < size; p++) {
       if(id == id(p)) return p;
     }
     final int ps = Math.min(size, id);
@@ -889,9 +889,8 @@ public abstract class Data {
     // delete textual values
     if(kind != DOC && kind != ELEM) delete(pre, kind != ATTR);
 
-    // reduce size of ancestors
+    // attributes: reduce attribute size and size of the parent element
     int par = pre;
-    // check if we are an attribute (different size counters)
     if(kind == ATTR) {
       par = parent(par, ATTR);
       attSize(par, ELEM, attSize(par, ELEM) - 1);
@@ -909,7 +908,7 @@ public abstract class Data {
       size(par, kind, size(par, kind) - size);
     }
 
-    // preserve empty root node
+    // decrease document counter
     if(kind(pre) == DOC) --meta.ndocs;
 
     // delete node from table structure and reduce document size
@@ -961,7 +960,6 @@ public abstract class Data {
     // organize namespaces to avoid duplicate declarations
     final NSScope nsScope = new NSScope(pre, sCount, this);
 
-    // indicates if database only contains a dummy node
     final Data sData = source.data;
     // indicates if namespaces need to be considered
     final boolean ns = !nspaces.isEmpty() || !sData.nspaces.isEmpty();

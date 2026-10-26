@@ -45,7 +45,7 @@ public final class QueryJob extends Job implements Runnable {
   /** Remove flag. */
   private volatile boolean remove;
   /** Running flag. */
-  private final AtomicBoolean running = new AtomicBoolean(false);
+  private final AtomicBoolean running = new AtomicBoolean();
 
   /**
    * Constructor, which creates and registers the specified job.
@@ -198,7 +198,7 @@ public final class QueryJob extends Job implements Runnable {
    * @return milliseconds to wait
    * @throws QueryException query exception
    */
-  public static long toDelay(final Item start, final long min, final InputInfo info)
+  private static long toDelay(final Item start, final long min, final InputInfo info)
       throws QueryException {
 
     final QueryDateTime qdt = new QueryDateTime();
@@ -288,10 +288,10 @@ public final class QueryJob extends Job implements Runnable {
         result.time = perf.nanoRuntime();
 
         // fail if the job needs locks that are not read-locked by the callers waiting for it
-        if(jc().locks.inherited()) {
+        if(jc.locks.inherited()) {
           qp.addLocks();
           final Locks required = qp.jc().locks.finish(ctx);
-          if(jc().locks.deadlocks(required)) throw JOBS_DEADLOCK_X.get(info, required);
+          if(jc.locks.deadlocks(required)) throw JOBS_DEADLOCK_X.get(info, required);
         }
 
         // register job

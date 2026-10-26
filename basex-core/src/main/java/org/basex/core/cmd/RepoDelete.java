@@ -22,11 +22,11 @@ public final class RepoDelete extends ARepo {
 
   /**
    * Constructor.
-   * @param perm package
+   * @param pkg package
    * @param info input info (can be {@code null})
    */
-  public RepoDelete(final String perm, final InputInfo info) {
-    super(Perm.ADMIN, perm);
+  public RepoDelete(final String pkg, final InputInfo info) {
+    super(Perm.ADMIN, pkg);
     this.info = info;
   }
 

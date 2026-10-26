@@ -11,11 +11,11 @@ import static org.basex.util.Token.*;
 public interface DataText {
   // META DATA ====================================================================================
 
-  /** Database version; older version cannot open these instances. */
+  /** Database version; older versions cannot open these instances. */
   String STORAGE = "13.0";
   /** Database version that is written if no compressed namespaces are stored. */
   String OLDSTORAGE = "9.0.1";
-  /** Index version; older version cannot open indexes of these instances. */
+  /** Index version; older versions cannot open indexes of these instances. */
   String ISTORAGE = "8.6";
 
   /** Database version. */
@@ -161,19 +161,19 @@ public interface DataText {
 
   // TABLE SERIALIZATION ==========================================================================
 
-  /** First table Header. */
+  /** ID header. */
   byte[] TABLEID = token("ID");
-  /** First table Header. */
+  /** PRE header. */
   byte[] TABLEPRE = token("PRE");
-  /** Second table Header. */
+  /** Distance header. */
   byte[] TABLEDIST = token("DIS");
-  /** Third table Header. */
+  /** Size header. */
   byte[] TABLESIZE = token("SIZ");
-  /** Fourth table Header. */
+  /** Attribute size header. */
   byte[] TABLEATS = token("ATS");
-  /** Fifth table Header. */
+  /** Kind header. */
   byte[] TABLEKND = token("KIND");
-  /** Sixth table Header. */
+  /** Content header. */
   byte[] TABLECON = token("CONTENT");
 
   /** Namespace header. */

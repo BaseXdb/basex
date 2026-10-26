@@ -237,7 +237,6 @@ no_data              = Brak dostępnych danych.
 no_db_dropped        = Nie usunięto żadnej bazy danych.
 no_db_found          = Nie znaleziono bazy danych.
 no_db_opened         = Nie otwarto żadnej bazy danych.
-no_help              = Przepraszamy, brak dostępnej pomocy.
 no_mainmem           = Polecenie nie jest dostępne w trybie pamięci głównej.
 no_pixels            = Za mało pikseli.
 no_stemmer_%         = Brak stemmera dla języka "%".

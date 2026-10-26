@@ -315,7 +315,6 @@ public final class MainOptions extends Options {
     });
     final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
-      resolver = null;
       allowExternal = t == Boolean.TRUE;
     } else {
       setResolver(parent);

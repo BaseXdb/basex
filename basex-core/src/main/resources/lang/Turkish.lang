@@ -237,7 +237,6 @@ no_data              = Veri yok
 no_db_dropped        = Hiçbir veritabanı silinmedi
 no_db_found          = Veritabanı bulunamadı
 no_db_opened         = Açık veritabanı yok
-no_help              = Üzgünüz, yardım mevcut değil
 no_mainmem           = Komut ana bellek modunda kullanılamaz
 no_pixels            = Yeterli piksel yok
 no_stemmer_%         = "%" dili için kök bulucu (stemmer) yok

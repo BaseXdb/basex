@@ -27,10 +27,10 @@ public final class Databases {
 
   /** Date pattern. */
   private static final String DATE = "\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
-  /** Regex representation of allowed database characters. */
-  private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern ZIPPATTERN = Pattern.compile('-' + DATE + '\\' + IO.ZIPSUFFIX + '$');
+  /** Pattern to extract the database name from a backup name. */
+  private static final Pattern DATEPATTERN = Pattern.compile('-' + DATE + '$');
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
@@ -151,7 +151,7 @@ public final class Databases {
    * @return name of the database (empty string for general data)
    */
   public static String name(final String backup) {
-    final String[] strings = Pattern.compile('-' + DATE + '$').split(backup);
+    final String[] strings = DATEPATTERN.split(backup);
     return strings.length > 0 ? strings[0] : "";
   }
 
@@ -212,7 +212,7 @@ public final class Databases {
   private static Pattern regex(final String pattern, final String suffix) {
     if(pattern == null) return null;
     final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
-      pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;
+      Pattern.quote(pattern) + suffix;
     return Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
   }
 

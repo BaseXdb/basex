@@ -237,7 +237,6 @@ no_data              = Neniuj datumoj disponeblaj.
 no_db_dropped        = Neniu datumbazo estis forigita.
 no_db_found          = Neniu datumbazo trovita.
 no_db_opened         = Neniu datumbazo malfermita.
-no_help              = Bedaŭrinde, neniu helpo disponebla.
 no_mainmem           = La komando ne disponeblas en ĉefmemora reĝimo.
 no_pixels            = Ne sufiĉe da bilderoj.
 no_stemmer_%         = Neniu radikigilo disponebla por lingvo "%".

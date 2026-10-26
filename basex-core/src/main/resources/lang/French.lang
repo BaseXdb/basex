@@ -237,7 +237,6 @@ no_data              = Aucune donnée disponible.
 no_db_dropped        = Aucune base de données n’a été supprimée.
 no_db_found          = Aucune base de données trouvée.
 no_db_opened         = Aucune base de données ouverte.
-no_help              = Pas d’aide disponible.
 no_mainmem           = Cette commande n’est pas disponible en mode mémoire principale.
 no_pixels            = Espace insuffisant.
 no_stemmer_%         = Aucun stemmer disponible pour la langue "%".

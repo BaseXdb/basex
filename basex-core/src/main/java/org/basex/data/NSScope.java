@@ -53,7 +53,7 @@ final class NSScope {
   }
 
   /**
-   * Parses the specified namespaces and returns all namespaces that are not declared yet.
+   * Opens a new level and adds the specified namespaces that are not declared yet.
    * @param pre PRE value
    * @param nsp source namespaces
    * @return {@code true} if new namespaces were added

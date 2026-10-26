@@ -355,7 +355,7 @@ public abstract class Command extends Job {
       if(db.isEmpty() || db.matches(".*[?*,].*")) {
         list.addGlobal();
       } else {
-        list.add(args[index]);
+        list.add(db);
       }
     }
   }
