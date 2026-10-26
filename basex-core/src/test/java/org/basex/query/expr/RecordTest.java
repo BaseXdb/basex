@@ -328,6 +328,14 @@ public final class RecordTest extends SandboxTest {
         + "let $r as record(next as list1?, x as xs:untypedAtomic) := { 'x': <a>0</a> }\n"
         + "return $f($r)",
         "false");
+    // ShapeType.intersect: a pair compared in a sibling field is no cycle
+    query("declare type R2 as record(x as xs:integer*);\n"
+        + "declare type R3 as record(x as xs:decimal?);\n"
+        + "declare type R1 as record(a as R2, b as R2);\n"
+        + "declare type Q1 as record(a as R3, b as R3);\n"
+        + "declare function local:f($p as record(o as R1)) { $p instance of record(o as Q1) };\n"
+        + "local:f({ 'o': { 'a': { 'x': 1 }, 'b': { 'x': 1 } } })",
+        true);
 
     // recursive ShapeType.eq and ShapeType.instanceOf
     error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
@@ -1097,6 +1105,15 @@ public final class RecordTest extends SandboxTest {
         + "local:s()?a = local:s()?a", true);
     error("declare record local:s(a := .); 1 ! local:s()", NOCTX_X);
     error("declare record local:s(a := local:s()); local:s()", CIRCVAR_X);
+
+    // errors of initializers are not swallowed by the coercion to choice item types
+    final String init = "declare record local:t(a as xs:integer, b := error()); ";
+    error(init + "{ 'a': 1 } coerce to (local:t | xs:string)", FUNERR1);
+    error(init + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | xs:string)", FUNERR1);
+    error("declare function local:x() as item() { 'x' };"
+        + "declare record local:t(a as xs:integer, b as xs:integer := local:x()); "
+        + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | record(o))", INVTYPE_X);
+    query("<a>x</a> coerce to (xs:integer | xs:string)", "x");
 
     // syntax
     error("declare record local:s(%static a); 1", WRONGCHAR_X_X);

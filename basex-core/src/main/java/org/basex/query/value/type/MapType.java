@@ -70,13 +70,13 @@ public class MapType extends FType {
   }
 
   @Override
-  public boolean coercive() {
-    return valueType.type.coercive();
+  public Coercion coercion() {
+    return valueType.type.coercion();
   }
 
   @Override
-  public boolean wraps() {
-    return valueType.type.wraps();
+  public boolean assignable() {
+    return keyType.assignable() && valueType.type.assignable();
   }
 
   @Override

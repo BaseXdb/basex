@@ -345,7 +345,7 @@ public abstract class XQMap extends XQStruct {
         return type instanceof final RecordType rt && (coerce && sh.coercive() ?
           SeqType.kept(rt, sh, true) : rt.instanceOf(sh) || sh.matches(this));
       }
-      if(SeqType.instanceOf(type, tp, coerce)) return true;
+      if(SeqType.keptStatic(type, tp, coerce)) return true;
 
       final Type kt;
       final SeqType vt;
@@ -365,8 +365,9 @@ public abstract class XQMap extends XQStruct {
       if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
       // remember the more specific type to skip subsequent checks (records keep their type)
-      if(tp instanceof MapType && !(type instanceof ShapeType) && (coerce || !tp.coercive()) &&
-          (kt == null || kt.assignable()) && (vt == null || vt.type.assignable())) refineType(tp);
+      if(tp instanceof MapType && !(type instanceof ShapeType) && tp.assignable(coerce)) {
+        refineType(tp);
+      }
       return true;
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);

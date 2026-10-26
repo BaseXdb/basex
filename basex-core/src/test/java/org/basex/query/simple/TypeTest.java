@@ -147,6 +147,10 @@ public final class TypeTest extends SandboxTest {
         + "fn() as record(a as xs:integer?)", true);
     query("fn() as record(a as xs:integer?) { {} } instance of "
         + "fn() as record(a as xs:integer)", false);
+    // disjoint item types: the empty sequence is an instance of both
+    query("let $n := random:integer(1) + 5 return (1, 2)[. = $n] instance of xs:string*", true);
+    query("let $n := random:integer(1) + 5 "
+        + "return typeswitch((1, 2)[. = $n]) case xs:string* return 1 default return 2", 1);
     query("type-of(current-dateTime())", "xs:dateTimeStamp");
     query("type-of(current-dateTime() cast as xs:dateTime)", "xs:dateTime");
     query("42 instance of xs:error", false);

@@ -73,7 +73,12 @@ public final class ShapeField {
    * @throws QueryException query exception
    */
   public Value init(final QueryContext qc) throws QueryException {
-    return init != null ? init.value(qc) : Empty.VALUE;
+    if(init == null) return Empty.VALUE;
+    try {
+      return init.value(qc);
+    } catch(final QueryException ex) {
+      throw ex.initializer();
+    }
   }
 
   /**

@@ -48,13 +48,13 @@ public final class ArrayType extends FType {
   }
 
   @Override
-  public boolean coercive() {
-    return valueType.type.coercive();
+  public Coercion coercion() {
+    return valueType.type.coercion();
   }
 
   @Override
-  public boolean wraps() {
-    return valueType.type.wraps();
+  public boolean assignable() {
+    return valueType.type.assignable();
   }
 
   @Override

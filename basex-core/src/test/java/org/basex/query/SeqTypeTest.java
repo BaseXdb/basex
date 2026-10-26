@@ -772,6 +772,11 @@ public final class SeqTypeTest {
     combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_STAMP_O, op);
 
     combine(EMPTY_SEQUENCE_Z, ITEM_O, null, op);
+    combine(STRING_ZO, INTEGER_ZO, EMPTY_SEQUENCE_Z, op);
+    combine(STRING_ZM, INTEGER_ZM, EMPTY_SEQUENCE_Z, op);
+    combine(STRING_ZO, INTEGER_O, null, op);
+    combine(ArrayType.get(STRING_ZO).seqType(), ArrayType.get(INTEGER_ZO).seqType(),
+        ArrayType.get(EMPTY_SEQUENCE_Z).seqType(), op);
 
     combine(JNODE_O, NODE_O, JNODE_O, op);
     combine(XNODE_O, NODE_O, XNODE_O, op);

@@ -114,13 +114,8 @@ public final class TypeRef implements Type {
   }
 
   @Override
-  public boolean coercive() {
-    return deref().coercive();
-  }
-
-  @Override
-  public boolean wraps() {
-    return deref().wraps();
+  public Coercion coercion() {
+    return deref().coercion();
   }
 
   @Override

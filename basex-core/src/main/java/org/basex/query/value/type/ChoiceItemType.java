@@ -50,13 +50,10 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
-  public boolean coercive() {
-    return Checks.any(types, Type::coercive);
-  }
-
-  @Override
-  public boolean wraps() {
-    return Checks.any(types, Type::wraps);
+  public Coercion coercion() {
+    Coercion coercion = Coercion.KEEP;
+    for(final Type tp : types) coercion = coercion.max(tp.coercion());
+    return coercion;
   }
 
   @Override

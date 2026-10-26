@@ -56,14 +56,9 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public boolean coercive() {
-    return strict();
-  }
-
-  @Override
-  public boolean wraps() {
+  public Coercion coercion() {
     // the fields of records are coerced when the records are constructed
-    return false;
+    return strict() ? Coercion.REBUILD : Coercion.KEEP;
   }
 
   @Override

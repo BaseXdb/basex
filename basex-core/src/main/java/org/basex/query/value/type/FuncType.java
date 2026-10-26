@@ -229,13 +229,8 @@ public final class FuncType extends FType {
   }
 
   @Override
-  public boolean coercive() {
-    return typedArgs() || declType.type.coercive();
-  }
-
-  @Override
-  public boolean wraps() {
-    return typedArgs() || declType.type.wraps();
+  public Coercion coercion() {
+    return typedArgs() ? Coercion.WRAP : declType.type.coercion();
   }
 
   /**

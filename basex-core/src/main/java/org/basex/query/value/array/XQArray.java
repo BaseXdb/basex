@@ -308,7 +308,7 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(SeqType.instanceOf(type, tp, coerce)) return true;
+    if(SeqType.keptStatic(type, tp, coerce)) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
@@ -326,8 +326,7 @@ public abstract class XQArray extends XQStruct {
         if(!mt.instance(value, coerce)) return false;
       }
       // remember the more specific type to skip subsequent checks
-      if(tp instanceof ArrayType && (coerce || !tp.coercive()) &&
-          mt.type.assignable()) refineType(tp);
+      if(tp instanceof ArrayType && tp.assignable(coerce)) refineType(tp);
     }
     return true;
   }

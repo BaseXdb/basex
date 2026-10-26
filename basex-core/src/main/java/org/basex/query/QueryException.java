@@ -72,6 +72,8 @@ public class QueryException extends Exception {
   private int markedCol;
   /** Marks if this exception is catchable by a {@code try/catch} expression. */
   private boolean catchable = true;
+  /** Marks if this exception was raised by the initializing expression of a record field. */
+  private boolean initializer;
 
   // no public constructor with a single Throwable: ForkJoinTask would use it to wrap thrown errors
 
@@ -314,6 +316,23 @@ public class QueryException extends Exception {
    */
   public final QueryException notCatchable() {
     catchable = false;
+    return this;
+  }
+
+  /**
+   * Checks if this exception was raised by the initializing expression of a record field.
+   * @return result of check
+   */
+  public final boolean isInitializer() {
+    return initializer;
+  }
+
+  /**
+   * Marks this exception as raised by the initializing expression of a record field.
+   * @return self reference for convenience
+   */
+  public final QueryException initializer() {
+    if(this != ERROR) initializer = true;
     return this;
   }
 

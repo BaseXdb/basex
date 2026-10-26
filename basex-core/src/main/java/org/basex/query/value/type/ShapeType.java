@@ -206,7 +206,7 @@ public class ShapeType extends MapType {
     try {
       return fields.value(f).seqType().coerce(value, qc, ii, null, cc);
     } catch(final QueryException ex) {
-      if(ex.error() != INVTYPE_X) throw ex;
+      if(ex.error() != INVTYPE_X || ex.isInitializer()) throw ex;
       final String msg = ex.getLocalizedMessage();
       throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(
         fields.key(f), false)) + " of " + this + ": " +
@@ -273,13 +273,17 @@ public class ShapeType extends MapType {
   }
 
   @Override
-  public boolean coercive() {
-    return Checks.any(fields.values(), f -> f.seqType().type.coercive());
+  public Coercion coercion() {
+    Coercion coercion = Coercion.KEEP;
+    for(final ShapeField rf : fields.values()) {
+      coercion = coercion.max(rf.seqType().type.coercion());
+    }
+    return coercion;
   }
 
   @Override
-  public boolean wraps() {
-    return Checks.any(fields.values(), f -> f.seqType().type.wraps());
+  public boolean assignable() {
+    return true;
   }
 
   @Override
@@ -439,7 +443,9 @@ public class ShapeType extends MapType {
               !fst.zero() && !shfst.zero()) {
             final Pair pair = new Pair(sh1, sh2);
             if(pairs.contains(pair)) return Types.MAP;
-            union = SeqType.get(sh1.union(sh2, pair.addTo(pairs)), fst.occ.union(shfst.occ));
+            final Set<Pair> set = pair.addTo(pairs);
+            union = SeqType.get(sh1.union(sh2, set), fst.occ.union(shfst.occ));
+            set.remove(pair);
           } else {
             union = fst.union(shfst);
           }
@@ -557,8 +563,11 @@ public class ShapeType extends MapType {
     if(t1 instanceof final ShapeType sh1 && t2 instanceof final ShapeType sh2) {
       final Pair pair = new Pair(sh1, sh2);
       if(pairs.contains(pair)) return null;
-      final Type it = sh1.intersect(sh2, pair.addTo(pairs));
-      return it == null ? null : SeqType.get(it, st1.occ.intersect(st2.occ));
+      // pairs of sibling fields are no cycles: remove the pair after the check
+      final Set<Pair> set = pair.addTo(pairs);
+      final Type it = sh1.intersect(sh2, set);
+      set.remove(pair);
+      return st1.intersect(st2, it);
     }
     return st1.intersect(st2);
   }

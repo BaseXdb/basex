@@ -208,7 +208,7 @@ public abstract class Preds extends Arr {
       if(expr instanceof final Instance inst && inst.arg(0) instanceof ContextValue) {
         st = st.intersect(inst.seqType.matched().with(st.occ));
         // E[. instance of xs:integer][. instance of xs:string] → ()
-        if(st == null) return true;
+        if(st == null || st.zero()) return true;
       }
     }
     exprType.assign(max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO), exact ? max : -1);
