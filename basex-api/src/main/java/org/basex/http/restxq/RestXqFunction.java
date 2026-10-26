@@ -33,7 +33,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 import jakarta.servlet.http.*;
 
@@ -119,6 +118,14 @@ public final class RestXqFunction extends WebFunction {
     AnnList starts = AnnList.EMPTY;
     Ann pathAnn = null;
     final Set<String> templates = new HashSet<>();
+    if(mopts != null) {
+      // module options are applied first: function annotations override them
+      final QNmMap<String> options = module.options();
+      for(final QNm name : options) {
+        final Annotation def = Annotation.get(name);
+        if(def != null) input(def, mopts, options.get(name));
+      }
+    }
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -181,16 +188,7 @@ public final class RestXqFunction extends WebFunction {
         permission = new RestXqPerm(p, v);
         starts = starts.attach(ann);
       } else if(mopts != null) {
-        if(def == _INPUT_CSV) {
-          final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
-          mopts.set(MainOptions.CSVPARSER, parse(opts, ann));
-        } else if(def == _INPUT_JSON) {
-          final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
-          mopts.set(MainOptions.JSONPARSER, parse(opts, ann));
-        } else if(def == _INPUT_HTML) {
-          final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
-          mopts.set(MainOptions.HTMLPARSER, parse(opts, ann));
-        }
+        for(final Item arg : value) input(def, mopts, string(arg.string(ann.info)));
       }
     }
 
@@ -421,18 +419,27 @@ public final class RestXqFunction extends WebFunction {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Assigns annotation values as options.
-   * @param <O> option type
-   * @param options options instance
-   * @param ann annotation
-   * @return options instance
-   * @throws QueryException query exception
+   * Assigns input options.
+   * @param def annotation definition
+   * @param mopts main options
+   * @param string options string
    * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O options, final Ann ann)
-      throws QueryException, IOException {
-    for(final Item arg : ann.value()) options.assign(string(arg.string(ann.info)));
-    return options;
+  private static void input(final Annotation def, final MainOptions mopts, final String string)
+      throws IOException {
+    if(def == _INPUT_CSV) {
+      final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.CSVPARSER, opts);
+    } else if(def == _INPUT_JSON) {
+      final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.JSONPARSER, opts);
+    } else if(def == _INPUT_HTML) {
+      final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.HTMLPARSER, opts);
+    }
   }
 
   /**

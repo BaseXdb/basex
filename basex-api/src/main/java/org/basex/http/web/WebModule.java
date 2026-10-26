@@ -11,6 +11,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.hash.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
 
@@ -27,6 +28,8 @@ public final class WebModule {
   private volatile ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** Real paths of the module file and its imports (replaced whenever modules are checked). */
   private volatile Map<String, String> realPaths = new ConcurrentHashMap<>();
+  /** Option declarations of the module. */
+  private volatile QNmMap<String> options = new QNmMap<>();
   /** Timestamps of the module file and its imports, indexed by file path. */
   private final HashMap<String, Long> files = new HashMap<>();
   /** File reference. */
@@ -71,7 +74,8 @@ public final class WebModule {
       // new lists are assigned: requests may still iterate the old ones
       final ArrayList<RestXqFunction> funcs = new ArrayList<>();
       final ArrayList<WsFunction> wsFuncs = new ArrayList<>();
-      for(final StaticFunc sf : parse(qc).funcs) {
+      final AModule module = parse(qc);
+      for(final StaticFunc sf : module.funcs) {
         if(sf.expr != null) {
           final RestXqFunction rxf = new RestXqFunction(sf, this, qc, 0);
           if(rxf.parseAnnotations(null)) {
@@ -89,11 +93,13 @@ public final class WebModule {
       }
       functions = funcs;
       wsFunctions = wsFuncs;
+      options = module.options;
       error = null;
     } catch(final QueryException ex) {
       // skip modules that cannot be parsed; all other modules stay available
       functions = new ArrayList<>();
       wsFunctions = new ArrayList<>();
+      options = new QNmMap<>();
       error = ex;
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
     } finally {
@@ -139,6 +145,14 @@ public final class WebModule {
    */
   public ArrayList<WsFunction> wsFunctions() {
     return wsFunctions;
+  }
+
+  /**
+   * Returns the option declarations of the module.
+   * @return options
+   */
+  public QNmMap<String> options() {
+    return options;
   }
 
   /**
