@@ -238,26 +238,16 @@ public final class XMLToken {
   }
 
   /**
-   * Returns a valid token representation of the specified value.
-   * @param value object (can be {@code null}, will be converted to token otherwise)
-   * @param validate validate input
-   * @return token, or {@code null} if validation is enabled and if invalid characters are found
+   * Checks if the specified token contains only valid XML 1.1 characters.
+   * @param value value to be checked
+   * @return result of check
    */
-  public static byte[] check(final Object value, final boolean validate) {
-    if(value == null) return Token.EMPTY;
-
-    final TokenBuilder tb = new TokenBuilder();
-    final TokenParser tp = new TokenParser(Token.token(value));
-    while(tp.more()) {
-      final int cp = tp.next();
-      if(valid11(cp)) {
-        tb.add(cp);
-      } else {
-        if(validate) return null;
-        tb.add(Token.REPLACEMENT);
-      }
+  public static boolean isValid(final byte[] value) {
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      if(!valid11(cp(value, v))) return false;
     }
-    return tb.finish();
+    return true;
   }
 
   /**

@@ -144,6 +144,37 @@ public final class QueryInfoTest extends SandboxTest {
     }
   }
 
+  /** The query plan is generated at the requested stage. */
+  @Test public void planStage() {
+    final String query = "declare context value := 1; . + 2";
+    try {
+      set(MainOptions.XMLPLAN, "parsed");
+      assertTrue(plan(query).contains("<ContextValue"));
+      set(MainOptions.XMLPLAN, "compiled");
+      assertTrue(plan(query).contains("<ContextValue"));
+      set(MainOptions.XMLPLAN, "optimized");
+      assertFalse(plan(query).contains("<ContextValue"));
+      assertTrue(plan("1 + 2").contains(">3<"));
+      set(MainOptions.XMLPLAN, "parsed");
+      assertTrue(plan("1 + 2").contains("<Arith"));
+      set(MainOptions.XMLPLAN, "compiled");
+      assertTrue(plan("1 + 2").contains(">3<"));
+    } finally {
+      set(MainOptions.XMLPLAN, false);
+    }
+  }
+
+  /**
+   * Returns the query plan section of a query.
+   * @param query query
+   * @return plan
+   */
+  private static String plan(final String query) {
+    final XQuery xq = new XQuery(query);
+    execute(xq);
+    return value(xq.sections().sections(), "plan");
+  }
+
   /**
    * Returns the text of a section.
    * @param map sections

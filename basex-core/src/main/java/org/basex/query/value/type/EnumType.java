@@ -64,7 +64,7 @@ public final class EnumType implements Type {
   @Override
   public Value cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    return cast(Str.get(value, qc, info), qc, info);
+    return cast(Str.get(value, info), qc, info);
   }
 
   @Override

@@ -570,7 +570,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     final boolean inf = gopts.get(GUIOptions.SHOWINFO);
     context.options.set(MainOptions.QUERYINFO, inf);
-    context.options.set(MainOptions.XMLPLAN, inf);
+    context.options.set(MainOptions.XMLPLAN, String.valueOf(inf));
 
     final Data data = context.data();
     status.database(data);

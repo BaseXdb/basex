@@ -142,8 +142,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Default for the 'trust-external' option of XQuery functions. */
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
-  /** Validate string inputs. */
-  public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
   /** Runs the query, or only parses it. */
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
@@ -167,12 +165,10 @@ public final class MainOptions extends Options {
   public static final OptionsOption<SerializerOptions> EXPORTER =
       new OptionsOption<>("EXPORTER", new SerializerOptions());
 
-  /** Prints an XML plan. */
-  public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);
+  /** Stage at which an XML plan is printed. */
+  public static final StringOption XMLPLAN = new StringOption("XMLPLAN", "none");
   /** Creates comprehensive query plan information. */
   public static final BooleanOption FULLPLAN = new BooleanOption("FULLPLAN", false);
-  /** Creates the query plan before or after optimization. */
-  public static final BooleanOption OPTPLAN = new BooleanOption("OPTPLAN", true);
 
   /** Flushes the database after each update. */
   public static final BooleanOption AUTOFLUSH = new BooleanOption("AUTOFLUSH", true);
@@ -236,6 +232,19 @@ public final class MainOptions extends Options {
     /** VOID.     */ VOID,
     /** SOME.     */ SOME,
     /** NONE.     */ NONE;
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
+  }
+
+  /** Query plan stage. */
+  public enum PlanStage {
+    /** NONE.      */ NONE,
+    /** PARSED.    */ PARSED,
+    /** COMPILED.  */ COMPILED,
+    /** OPTIMIZED. */ OPTIMIZED;
 
     @Override
     public String toString() {
@@ -367,6 +376,25 @@ public final class MainOptions extends Options {
   public MainOptions allowExternal(final boolean allow) {
     allowExternal = allow;
     return this;
+  }
+
+  @Override
+  public synchronized void assign(final String name, final String value) throws BaseXException {
+    // no plan stage: toggle query plan
+    final boolean toggle = value.isEmpty() && name.equalsIgnoreCase(XMLPLAN.name());
+    super.assign(name, toggle ? String.valueOf(planStage() == PlanStage.NONE) : value);
+  }
+
+  /**
+   * Returns the stage at which the query plan is printed.
+   * @return stage
+   */
+  public PlanStage planStage() {
+    final String value = get(XMLPLAN).trim().toLowerCase(Locale.ENGLISH);
+    final Boolean enable = Strings.toBoolean(value);
+    if(enable != null) return enable ? PlanStage.OPTIMIZED : PlanStage.NONE;
+    final PlanStage stage = Enums.get(PlanStage.class, value);
+    return stage != null ? stage : PlanStage.NONE;
   }
 
   /**

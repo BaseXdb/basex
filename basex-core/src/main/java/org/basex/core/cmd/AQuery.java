@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
+import org.basex.core.MainOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
@@ -38,8 +39,8 @@ public abstract class AQuery extends Command {
   private QueryInfo.Sections sections;
   /** Error message (can be {@code null}). */
   private String message;
-  /** Query plan was serialized. */
-  private boolean plan;
+  /** Stage at which the query plan is serialized ({@code NONE} once it has been serialized). */
+  private PlanStage planStage = PlanStage.NONE;
   /** Maximum number of results (ignored if negative). */
   private int maxResults = -1;
   /** Indicates if the query has performed updates. */
@@ -67,7 +68,6 @@ public abstract class AQuery extends Command {
       try {
         final boolean runquery = options.get(MainOptions.RUNQUERY);
         final boolean serialize = options.get(MainOptions.SERIALIZE);
-        final boolean optplan = options.get(MainOptions.OPTPLAN);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; r++) {
           // reuse existing processor instance
@@ -77,9 +77,8 @@ public abstract class AQuery extends Command {
           }
           init(context);
 
-          queryPlan(!optplan);
           qp.optimize();
-          queryPlan(optplan);
+          queryPlan(PlanStage.OPTIMIZED);
           if(!runquery) continue;
 
           final PrintOutput po = r == 0 && serialize ? out : new NullOutput();
@@ -116,7 +115,7 @@ public abstract class AQuery extends Command {
       }
     }
     // add query plan, if not done yet, and info string
-    queryPlan(true);
+    queryPlan(planStage);
     info(info.toString(qp, out.size(), hits, jc().locks, error == null));
     // the info view is given the same information as data
     sections = info.toSections(qp, out.size(), hits, jc().locks);
@@ -221,8 +220,12 @@ public abstract class AQuery extends Command {
   private void init(final Context ctx) throws QueryException {
     if(qp != null) return;
 
-    if(info == null) info = new QueryInfo(ctx);
-    else info.reset();
+    if(info == null) {
+      info = new QueryInfo(ctx);
+      planStage = ctx.options.planStage();
+    } else {
+      info.reset();
+    }
 
     qp = pushJob(new QueryProcessor(query, uri, ctx, info));
 
@@ -231,19 +234,21 @@ public abstract class AQuery extends Command {
       qp.variable(entry.getKey(), value.getKey(), value.getValue());
     }
     qp.parse();
+    queryPlan(PlanStage.PARSED);
     qp.compile();
+    queryPlan(PlanStage.COMPILED);
   }
 
   /**
-   * Generates a query plan.
-   * @param create create plan
+   * Generates a query plan if the specified stage has been requested.
+   * @param stage reached stage
    */
-  private void queryPlan(final boolean create) {
-    if(create && !plan && options.get(MainOptions.XMLPLAN)) {
+  private void queryPlan(final PlanStage stage) {
+    if(planStage != PlanStage.NONE && stage == planStage) {
       final String xml = info.planInfo(qp);
       if(!xml.isEmpty()) {
         info(xml);
-        plan = true;
+        planStage = PlanStage.NONE;
       }
     }
   }

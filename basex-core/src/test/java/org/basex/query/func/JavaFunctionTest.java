@@ -190,6 +190,13 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void errors() {
     final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
     error(mod + "n:null-array()", JAVANULL);
+
+    final String decode = "Q{java.net.URLDecoder}decode('a%00b,c', 'UTF-8')";
+    final String wrapped = "(# db:wrapjava all #) { " + decode + " }";
+    error(decode, INVCODE_X);
+    error("Q{String}split(" + wrapped + ", ',')", INVCODE_X);
+    error("(# db:wrapjava none #) { Q{java.util.Optional}of(" + wrapped + ") }", INVCODE_X);
+    error("string(" + wrapped + ")", INVCODE_X);
   }
 
   /** Instance errors. */

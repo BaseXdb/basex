@@ -282,7 +282,7 @@ public abstract class JavaCall extends Arr {
         // string array
         if(object instanceof final String[] values) {
           final TokenList list = new TokenList(values.length);
-          for(final String string : values) list.add(string);
+          for(final String string : values) list.add(Str.token(string, info));
           return StrSeq.get(list);
         }
         // any other array (including nested ones)
@@ -309,7 +309,7 @@ public abstract class JavaCall extends Arr {
           }
           vb.add(mb.map());
         } else {
-          vb.add(Str.get(object.toString()));
+          vb.add(Str.get(object.toString(), info));
         }
         return vb.value();
       }

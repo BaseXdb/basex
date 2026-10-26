@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
+import org.basex.core.MainOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -30,6 +31,8 @@ public final class ServerQuery extends Job {
   private QueryProcessor qp;
   /** Parsing flag. */
   private boolean parsed;
+  /** Stage at which the query plan is serialized. */
+  private PlanStage planStage;
   /** Query info. */
   private final StringBuilder info = new StringBuilder();
 
@@ -122,6 +125,7 @@ public final class ServerQuery extends Job {
       final QueryInfo qi = qc.info;
 
       qp.optimize();
+      queryPlan(PlanStage.OPTIMIZED);
       final Iter iter = qp.iter();
 
       // iterate through results
@@ -165,10 +169,11 @@ public final class ServerQuery extends Job {
   }
 
   /**
-   * Generates a query plan.
+   * Generates a query plan if the specified stage has been requested.
+   * @param stage reached stage
    */
-  private void queryPlan() {
-    if(ctx.options.get(MainOptions.XMLPLAN)) info.append(qp.qc.info.planInfo(qp)).append(NL);
+  private void queryPlan(final PlanStage stage) {
+    if(stage == planStage) info.append(qp.qc.info.planInfo(qp)).append(NL);
   }
 
   /**
@@ -178,10 +183,12 @@ public final class ServerQuery extends Job {
   private void parse() throws IOException {
     if(parsed) return;
 
+    planStage = ctx.options.planStage();
     try {
       qp().parse();
+      queryPlan(PlanStage.PARSED);
       qp.compile();
-      queryPlan();
+      queryPlan(PlanStage.COMPILED);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }

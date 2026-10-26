@@ -44,7 +44,7 @@ public final class ArchiveRefresh extends ArchiveFn {
             if(content instanceof final Bin bin) {
               Files.copy(bin.input(info), path, StandardCopyOption.REPLACE_EXISTING);
             } else {
-              Files.write(path, encode(toBytes(content, qc), encoding(header), false, qc));
+              Files.write(path, encode(toBytes(content, qc), encoding(header), false));
             }
             final long time = timestamp(header, qc);
             final FileTime ft = FileTime.fromMillis(time < 0 ? System.currentTimeMillis() : time);

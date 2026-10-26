@@ -19,7 +19,7 @@ public final class ArchiveExtractText extends ArchiveExtractBinary {
     final String encoding = toEncodingOrNull(arg(2), ARCHIVE_ENCODE1_X, qc);
     final TokenList tl = new TokenList();
     for(final byte[] content : extract(qc)) {
-      tl.add(encode(content, encoding, true, qc));
+      tl.add(encode(content, encoding, true));
     }
     return StrSeq.get(tl);
   }

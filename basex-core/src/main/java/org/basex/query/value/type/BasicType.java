@@ -78,7 +78,7 @@ public enum BasicType implements Type {
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return Str.get(value, qc, info);
+      return Str.get(value, info);
     }
   },
 
@@ -610,7 +610,7 @@ public enum BasicType implements Type {
     public Bln cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return value instanceof final Boolean bln ? Bln.get(bln) :
-        cast(Str.get(value, qc, info), qc, info);
+        cast(Str.get(value, info), qc, info);
     }
     @Override
     public Bln read(final DataInput in, final QueryContext qc) throws IOException {
@@ -802,7 +802,7 @@ public enum BasicType implements Type {
     if(parent == null || oneOf(ANY_ATOMIC_TYPE, ERROR, BINARY)) {
       throw FUNCCAST_X_X.get(info, this, value);
     }
-    return cast(Str.get(value, qc, info), qc, info);
+    return cast(Str.get(value, info), qc, info);
   }
 
   @Override
