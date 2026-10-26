@@ -82,6 +82,8 @@ final class XMLScanner extends Job {
   private boolean prolog = true;
   /** Parameter entity parsing. */
   private boolean pe;
+  /** XML 1.1 document. */
+  private boolean xml11;
   /** Text mode. */
   private boolean text = true;
   /** Current quote character. */
@@ -110,7 +112,9 @@ final class XMLScanner extends Job {
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {
-          if(!version()) throw error(DECLSTART);
+          final byte[] version = version();
+          if(version == null) throw error(DECLSTART);
+          xml11 = version == VERS11;
           boolean s = s();
           encoding = encoding();
           if(encoding != null) {
@@ -513,7 +517,7 @@ final class XMLScanner extends Job {
         ent.add(ch = nextChar());
       } while(ch != ';');
 
-      if(!valid10(n)) throw error(INVCHARREF, ent);
+      if(!(xml11 ? valid11(n) : valid10(n))) throw error(INVCHARREF, ent);
       ent.reset();
       ent.add(n);
       return ent.finish();
@@ -740,7 +744,7 @@ final class XMLScanner extends Job {
     input = new XMLInput(new IOContent(content, io.path()));
     if(consume(XDECL)) {
       check(XML); s();
-      if(version()) checkS();
+      if(version() != null) checkS();
       s();
       if(encoding() == null) throw error(TEXTENC);
       s();
@@ -1058,16 +1062,17 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a document version.
-   * @return true if version was found
+   * @return version token, or {@code null} if no version was found
    * @throws IOException I/O exception
    */
-  private boolean version() throws IOException {
-    if(!consume(VERS)) return false;
+  private byte[] version() throws IOException {
+    if(!consume(VERS)) return null;
     s(); check('='); s();
     final int d = qu();
-    if(!consume(VERS10) && !consume(VERS11)) throw error(DECLVERSION);
+    final byte[] version = consume(VERS10) ? VERS10 : consume(VERS11) ? VERS11 : null;
+    if(version == null) throw error(DECLVERSION);
     check((char) d);
-    return true;
+    return version;
   }
 
   /**
