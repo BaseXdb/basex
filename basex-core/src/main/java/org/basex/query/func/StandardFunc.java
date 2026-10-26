@@ -756,10 +756,9 @@ public abstract class StandardFunc extends Arr {
 
     // copy database nodes of variable values
     for(final Entry<String, Value> binding : bindings.entrySet()) {
-      bindings.put(binding.getKey(),
-          binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
+      binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
-    return new QueryJobSpec(options, bindings, content, sc().resolver());
+    return new QueryJobSpec(options, bindings, content, qc.resolver);
   }
 
   /**
@@ -1138,7 +1137,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a function item.
+   * Checks the arity and the updating property of a function item.
    * @param function function
    * @param nargs maximum number of supplied arguments
    * @param updating updating flag
@@ -1280,8 +1279,7 @@ public abstract class StandardFunc extends Arr {
    * @return new exception
    */
   protected final QueryException error(final QueryException ex, final QueryError error) {
-    if(error == null) return ex;
-    return error.get(info, ex.getLocalizedMessage()).cause(ex);
+    return error == null ? ex : error.get(info, ex.getLocalizedMessage()).cause(ex);
   }
 
   @Override

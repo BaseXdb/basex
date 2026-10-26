@@ -505,11 +505,10 @@ public abstract class XNode extends GNode {
    */
   public final byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributeIter();
-    while(true) {
-      final GNode node = iter.next();
-      if(node == null) return null;
+    for(GNode node; (node = iter.next()) != null;) {
       if(node.qname().eq(name)) return node.string();
     }
+    return null;
   }
 
   /**

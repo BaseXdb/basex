@@ -58,9 +58,7 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final IndexType it = index.type();
-    final Data data = db.data(qc, it);
-
+    final Data data = db.data(qc, index.type());
     final IndexIterator iter = data.iter(index);
     final IntList list = new IntList();
     while(iter.more()) list.add(iter.pre());

@@ -52,9 +52,7 @@ public final class FnHash extends StandardFunc {
       return result;
     }
 
-    if(alg.equals("BLAKE3")) {
-      return new Blake3().digest(toBytes(value));
-    }
+    if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value));
 
     final MessageDigest md;
     try {

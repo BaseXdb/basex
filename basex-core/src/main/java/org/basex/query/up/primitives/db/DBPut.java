@@ -40,10 +40,6 @@ public final class DBPut extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     for(final byte[] path : paths) {
       final IOFile bin = data.meta.file(string(path), ResourceType.VALUE);

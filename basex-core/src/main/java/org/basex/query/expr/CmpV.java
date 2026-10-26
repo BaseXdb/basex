@@ -123,10 +123,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr invert() {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.atomOcc() == Occ.EXACTLY_ONE && st2.atomOcc() == Occ.EXACTLY_ONE ?
-      new CmpV(info, expr1, expr2, op.invert()) : null;
+    return invertible() ? new CmpV(info, exprs[0], exprs[1], op.invert()) : null;
   }
 
   @Override

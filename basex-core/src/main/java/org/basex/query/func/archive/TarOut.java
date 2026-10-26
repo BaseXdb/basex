@@ -37,11 +37,6 @@ final class TarOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ArchiveIn in) throws IOException {
-    write(in.entry(), in);
-  }
-
-  @Override
   public void write(final ZipEntry entry, final InputStream is) throws IOException {
     write(entry, is, entry.getSize());
   }

@@ -369,9 +369,7 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
-      return true;
-    }
+    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
         if(instanceOf(TypeRef.deref(tp), pairs)) return true;
@@ -379,9 +377,7 @@ public class ShapeType extends MapType {
       return false;
     }
     // record(*) is only matched by record types
-    if(type == Types.RECORD) {
-      return declared();
-    }
+    if(type == Types.RECORD) return declared();
     if(type instanceof final ShapeType sh) {
       // an inferred shape is not an instance of a record (the annotation is an extra guarantee)
       if(sh.declared() && !declared()) return false;
@@ -526,7 +522,7 @@ public class ShapeType extends MapType {
       // a record has the fields of its type, and a single nominative record type
       final QNm id = name(), shid = sh.name();
       if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;
-      final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
+      final ShapeType st = id != null || !sh.declared() || shid == null && declared() ?
         this : sh;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : st.fields) {

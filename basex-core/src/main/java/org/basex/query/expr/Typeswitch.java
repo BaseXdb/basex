@@ -75,12 +75,7 @@ public final class Typeswitch extends ASwitch<TypeswitchGroup> {
         // make sure that preceding groups do not branch on subtypes
         boolean branch = false;
         for(int h = 0; !branch && h < g; h++) {
-          for(final SeqType st : groups[h].seqTypes) {
-            if(Checks.any(matching, st::instanceOf)) {
-              branch = true;
-              break;
-            }
-          }
+          branch = Checks.any(groups[h].seqTypes, st -> Checks.any(matching, st::instanceOf));
         }
         // typeswitch($i) case xs:integer return A default return B → A
         if(!branch) tg = groups[g];

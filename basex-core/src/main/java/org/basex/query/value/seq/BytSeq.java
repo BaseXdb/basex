@@ -53,7 +53,7 @@ public final class BytSeq extends ItrSeq {
 
   @Override
   public Itr itemAt(final long index) {
-    return new Itr(values[(int) index], type);
+    return Itr.get(values[(int) index], type);
   }
 
   @Override

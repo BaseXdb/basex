@@ -30,15 +30,15 @@ final class UCACollation extends Collation {
   private final int variableTop;
 
   /**
-   * Private Constructor.
+   * Constructor.
    * @param collator collator
    */
   UCACollation(final RuleBasedCollator collator) {
     this.collator = collator;
-    strength = this.collator.getStrength();
+    strength = collator.getStrength();
     strengthMask = mask(strength);
-    isShifted = this.collator.isAlternateHandlingShifted();
-    variableTop = this.collator.getVariableTop();
+    isShifted = collator.isAlternateHandlingShifted();
+    variableTop = collator.getVariableTop();
   }
 
   /**

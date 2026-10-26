@@ -2966,4 +2966,23 @@ public final class RewritingsTest extends SandboxTest {
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a/>, 'a')", "<b/>");
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a><c/></a>, 'a')", "<b/>");
   }
+
+  /** Inverted positional checks: bounds must not be empty. */
+  @Test public void invertPositionEmpty() {
+    query("for $p in (1, 9) let $q := $p[. > 5] return [ (1, 2, 3)[not(position() <= $q)] ]",
+        "[(1,2,3)]\n[()]");
+    query("for $p in (1, 9) return (1, 2, 3)[not(position() <= $p)]", "2\n3");
+  }
+
+  /** Inverted comparisons: operands must not be NaN. */
+  @Test public void invertNaN() {
+    final String f = "declare %basex:inline(0) function local:f($d as xs:double, $e as xs:double) ";
+    final String args = "local:f(xs:double('NaN'), 1)";
+    query(f + "{ not($d < $e) }; " + args, true);
+    query(f + "{ not($d lt $e) }; " + args, true);
+    query(f + "{ $d < $e or not($d >= $e + 1) }; " + args, true);
+    query(f + "{ $d < $e and $d < $e + 1 }; " + args, false);
+    query(f + "{ count((1 to 5)[not(position() <= $d)]) }; " + args, 5);
+    query(f + "{ count((1 to 5)[not(position() >= $d)]) }; " + args, 5);
+  }
 }

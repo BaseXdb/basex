@@ -21,9 +21,7 @@ public final class MapGet extends MapFn {
     final Item key = toAtomItem(arg(1), qc);
 
     final Value value = map.getOrNull(key);
-    if(value != null) return value;
-    if(defined(2)) return arg(2).value(qc);
-    return Empty.VALUE;
+    return value != null ? value : defined(2) ? arg(2).value(qc) : Empty.VALUE;
   }
 
   @Override

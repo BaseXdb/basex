@@ -184,8 +184,8 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Returns the number of structural updates.
-   * @return number of structural updates
+   * Returns the number of updates.
+   * @return number of updates
    */
   public int updatesSize() {
     flush();
@@ -356,7 +356,7 @@ public final class AtomicUpdateCache {
    *
    * @param pre PRE value
    * @param beforeUpdates calculate PRE value before shifts/updates have been applied
-   * @return index of update, or -1
+   * @return PRE value
    */
   public int calculatePreValue(final int pre, final boolean beforeUpdates) {
     // find update that affects the given PRE value
@@ -480,10 +480,8 @@ public final class AtomicUpdateCache {
 
     final AtomicUpdateCache auc = new AtomicUpdateCache(data);
     for(final Delete delete : deletes) auc.considerAtomic(delete, true);
-    deletes.clear();
     auc.applyUpdates();
     auc.adjustDistances();
-    auc.clear();
   }
 
   /**
@@ -493,10 +491,9 @@ public final class AtomicUpdateCache {
    * @return list of text merging operations or {@code null}
    */
   private Delete mergeTextNodes(final int pre) {
-    final int s = data.nodes();
     final int b = pre + 1;
     // don't leave table
-    if(pre >= s || b >= s || pre < 0 || b < 0) return null;
+    if(pre < 0 || b >= data.nodes()) return null;
     // only merge texts and neighboring texts
     if(data.kind(pre) != Data.TEXT || data.kind(b) != Data.TEXT ||
        data.parent(pre, Data.TEXT) != data.parent(b, Data.TEXT)) return null;

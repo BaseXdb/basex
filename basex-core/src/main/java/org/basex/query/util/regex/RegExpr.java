@@ -36,7 +36,6 @@ public class RegExpr {
   public RegExpr(final Pattern pattern, final int[] groups, final RegExp regExp) {
     this.pattern = pattern;
     this.groups = groups;
-    groupInfo = null;
 
     final IntList cps = new IntList(), offs = new IntList();
     if(regExp != null) {
@@ -198,7 +197,6 @@ public class RegExpr {
     private GroupScanner(final String pattern) {
       this.pattern = pattern;
       len = pattern.length();
-      pos = 0;
     }
 
     /**
@@ -314,8 +312,7 @@ public class RegExpr {
         cp = pattern.codePointAt(pos);
         chrCount = Character.charCount(cp);
         pos += chrCount;
-      }
-      else {
+      } else {
         cp = -1;
         chrCount = 0;
       }

@@ -45,14 +45,16 @@ public abstract class NodeUpdate extends DataUpdate {
    * @param qc query context
    * @throws QueryException query exception
    */
-  public abstract void prepare(MemData memData, QueryContext qc) throws QueryException;
+  @SuppressWarnings("unused")
+  public void prepare(final MemData memData, final QueryContext qc) throws QueryException { }
 
   /**
    * Updates the name pool, which is used to find duplicate attributes
    * and namespace conflicts.
    * @param pool name pool
    */
-  public abstract void update(NamePool pool);
+  @SuppressWarnings("unused")
+  public void update(final NamePool pool) { }
 
   /**
    * Adds the atomic update operations for this update primitive to the given list.

@@ -42,7 +42,9 @@ public final class ArchiveRefresh extends ArchiveFn {
             if(Files.exists(path)) Files.delete(path);
           } else {
             if(content instanceof final Bin bin) {
-              Files.copy(bin.input(info), path, StandardCopyOption.REPLACE_EXISTING);
+              try(InputStream is = bin.input(info)) {
+                Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+              }
             } else {
               Files.write(path, encode(toBytes(content, qc), encoding(header), false));
             }

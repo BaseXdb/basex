@@ -84,9 +84,7 @@ public class FileList extends FileFn {
       });
     } catch(final IOException ex) {
       // skip entries that cannot be accessed; throw exception only on root level
-      if(top) {
-        throw ex;
-      }
+      if(top) throw ex;
       return;
     }
 

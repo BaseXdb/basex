@@ -19,7 +19,7 @@ public final class FnFilter extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-   final Iter input = arg(0).iter(qc);
+    final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, predicate);

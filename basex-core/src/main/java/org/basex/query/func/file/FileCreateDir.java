@@ -21,12 +21,11 @@ public final class FileCreateDir extends FileFn {
     final Path dir = absolute(toPath(arg(0), qc));
 
     // find the lowest existing path
-    for(Path p = dir; p != null;) {
+    for(Path p = dir; p != null; p = p.getParent()) {
       if(Files.exists(p)) {
         if(Files.isRegularFile(p)) throw FILE_EXISTS_X.get(info, p);
         break;
       }
-      p = p.getParent();
     }
 
     Files.createDirectories(dir);

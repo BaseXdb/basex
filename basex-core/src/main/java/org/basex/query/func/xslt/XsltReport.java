@@ -114,7 +114,6 @@ final class XsltReport {
    * @return item or empty sequence
    */
   private Value convert(final IOContent content, final boolean result) {
-    final FBuilder doc = result ? FDoc.build() : null;
     XNode node;
     try {
       node = new DBNode(content);
@@ -130,7 +129,7 @@ final class XsltReport {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final GNode child : node.childIter()) {
       vb.add(child.kind() == Kind.TEXT ? Atm.get(child.string()) :
-        result ? doc.node(child).finish() : child);
+        result ? FDoc.build().node(child).finish() : child);
     }
     return vb.value();
   }

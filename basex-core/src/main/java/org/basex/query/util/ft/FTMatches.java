@@ -23,7 +23,6 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
    * @param pos query position
    */
   public FTMatches(final int pos) {
-    this();
     this.pos = pos;
   }
 

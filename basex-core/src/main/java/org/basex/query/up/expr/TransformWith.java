@@ -118,7 +118,7 @@ public final class TransformWith extends Copy {
   public Expr inline(final InlineContext ic) throws QueryException {
     final Expr inlined = arg(target()).inline(ic);
     boolean changed = inlined != null;
-    if(changed) arg(1, arg -> inlined);
+    if(changed) arg(target(), arg -> inlined);
 
     // do not inline context reference in updating expressions
     changed |= ic.var != null && ic.cc.get(arg(target()), true, () -> {

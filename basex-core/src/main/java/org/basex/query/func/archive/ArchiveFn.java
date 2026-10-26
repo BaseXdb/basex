@@ -195,7 +195,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final int level(final Item header) throws QueryException {
     if(header instanceof final XNode node) {
-      final byte[] value  = node.attribute(Q_LEVEL);
+      final byte[] value = node.attribute(Q_LEVEL);
       if(value != null) {
         final int level = toInt(value);
         if(level < 0 || level > 9) throw ARCHIVE_LEVEL_X.get(info, value);
@@ -214,7 +214,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final long timestamp(final Item header, final QueryContext qc) throws QueryException {
     if(header instanceof final XNode node) {
-      final byte[] value  = node.attribute(Q_LAST_MODIFIED);
+      final byte[] value = node.attribute(Q_LAST_MODIFIED);
       try {
         if(value != null) return toMs(new Dtm(value, BasicType.DATE_TIME, info), qc);
       } catch(final QueryException ex) {
@@ -344,7 +344,7 @@ abstract class ArchiveFn extends StandardFunc {
           final SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class));
           try(ArchiveOut out = ArchiveOut.get(format, in.method(), info, so)) {
             while(in.more()) {
-              if(action.apply(in.entry(), out)) out.write(in);
+              if(action.apply(in.entry(), out)) out.write(in.entry(), in);
             }
             finish.apply(out);
           }

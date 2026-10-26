@@ -206,7 +206,6 @@ public final class DbCounts extends StandardFunc {
     }
   }
 
-
   /** Value counter. */
   private final class Counter {
     /** Distinct keys. */

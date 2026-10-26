@@ -107,12 +107,11 @@ public final class CmpSR extends CmpRange {
       newMni = cmp.mni;
       newMxi = cmp.mxi;
       coll = cmp.sc().collation;
-    } else if(ex instanceof final CmpG cmp) {
-      if(cmp.op == CmpOp.EQ && cmp.exprs[1] instanceof final Str str) {
-        newMin = str.string();
-        newMax = newMin;
-        coll = cmp.sc().collation;
-      }
+    } else if(ex instanceof final CmpG cmp && cmp.op == CmpOp.EQ &&
+        cmp.exprs[1] instanceof final Str str) {
+      newMin = str.string();
+      newMax = newMin;
+      coll = cmp.sc().collation;
     }
     if(newMin == null && newMax == null || coll != null || sc().collation != null) return null;
 

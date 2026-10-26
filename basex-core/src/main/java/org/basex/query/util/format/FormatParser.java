@@ -70,9 +70,9 @@ abstract class FormatParser extends FormatUtil {
     // check single character
     if(tp.more()) {
       // Word output (title case)
-      if(cp == 'W' && tp.consume('w')) return pic;
+      if(cp == 'W' && tp.consume('w') && !tp.more()) return pic;
       // Textual output (title case)
-      if(date && cp == 'N' && tp.consume('n')) return pic;
+      if(date && cp == 'N' && tp.consume('n') && !tp.more()) return pic;
     } else if(
       sequence(cp) != null || // Latin, Greek and other alphabets
       cp == 'i' || cp == 'I' || // Roman sequences (lower/upper case)
@@ -109,17 +109,28 @@ abstract class FormatParser extends FormatUtil {
         if(mds && !frac) throw OPTAFTER_X.get(info, pic);
         ods = true;
         gss = false;
-      } else if(!Character.isLetter(cp)) {
+      } else if(!alphanumeric(cp)) {
         // grouping-separator-sign
         if(gss) throw INVGROUP_X.get(info, pic);
         gss = true;
       } else {
-        // any other letter: return default primary token
+        // any other letter or number: invalid pattern
         throw INVDDPATTERN_X.get(info, pic);
       }
     }
     if(gss) throw INVGROUP_X.get(info, pic);
     return pic;
+  }
+
+  /**
+   * Checks if a character is a letter or number (Unicode categories L*, Nd, Nl, No).
+   * @param cp codepoint
+   * @return result of check
+   */
+  static boolean alphanumeric(final int cp) {
+    final int type = Character.getType(cp);
+    return Character.isLetter(cp) || type == Character.DECIMAL_DIGIT_NUMBER ||
+        type == Character.LETTER_NUMBER || type == Character.OTHER_NUMBER;
   }
 
   /**

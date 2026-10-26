@@ -40,9 +40,7 @@ public final class SmallSeq extends TreeSeq {
     // both arrays can be used as digits
     if(Math.min(tl, il) >= MIN_DIGIT) return new BigSeq(tmp, items, tp);
 
-    final Item[] out = new Item[n];
-    Array.copy(tmp, tl, out);
-    Array.copyFromStart(items, il, out, tl);
+    final Item[] out = concat(tmp, items);
     if(n <= MAX_SMALL) return new SmallSeq(out, tp);
 
     final int mid = n / 2;

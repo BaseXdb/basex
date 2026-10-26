@@ -119,7 +119,7 @@ final class DataFTBuilder {
     if(s < sl) marks.add(new DataFTMarker(subtoken(string, s, sl), false));
 
     // chop text
-    int ln = -len + string.length;
+    int ln = sl - len;
     if(ln > 0) {
       final int ms = marks.size();
       final DataFTMarker first = marks.getFirst();

@@ -185,12 +185,7 @@ public abstract class XQArray extends XQStruct {
    * @param job interruptible job
    * @return new array
    */
-  public XQArray reverseArray(final Job job) {
-    final long size = structSize();
-    final ArrayBuilder ab = new ArrayBuilder(job, size);
-    for(long i = size - 1; i >= 0; i--) ab.add(valueAt(i));
-    return ab.array(this);
-  }
+  public abstract XQArray reverseArray(Job job);
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {

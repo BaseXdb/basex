@@ -75,10 +75,6 @@ public final class DBOptimize extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     // check which options have changed
     final int maxlen = options.get(MainOptions.MAXLEN);

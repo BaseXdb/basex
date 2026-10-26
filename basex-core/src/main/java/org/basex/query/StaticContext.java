@@ -71,8 +71,8 @@ public final class StaticContext {
   public SeqType contextType;
   /** Global focus of a loaded module (can be {@code null}). */
   public QueryFocus global;
-  /** Sets a custom URI resolver (can be {@code null}). */
-  UriResolver resolver;
+  /** Custom URI resolver (can be {@code null}). */
+  private UriResolver resolver;
   /** Sets an XML catalog URI resolver. */
   private final URIResolver uriResolver;
 
@@ -93,6 +93,7 @@ public final class StaticContext {
     withdb = mopts.get(MainOptions.WITHDB);
     defaultdb = mopts.get(MainOptions.DEFAULTDB);
     maxPerm = qc.maxPerm;
+    resolver = qc.resolver;
     uriResolver = mopts.resolver().uriResolver();
   }
 
@@ -136,15 +137,14 @@ public final class StaticContext {
       // ignore empty URIs
       if(uri.isEmpty()) return;
       // working directory: adopt cached references
-      if(uri.equals("./") && resolver == null && baseURI == Uri.EMPTY) {
+      if(uri.equals("./") && baseURI == Uri.EMPTY) {
         baseURI = WORKDIR;
         baseIO = Prop.WORKDIR;
         return;
       }
       // adopt original URIs that do not adhere to a known IO schema
       final IO io = IO.get(uri);
-      string = io instanceof IOContent ? uri :
-        (resolver == null && baseIO() == null ? io : resolve(uri)).url();
+      string = io instanceof IOContent ? uri : resolveDefault(uri).url();
       // #1062: check if specified URI points to a directory. if yes, add trailing slash
       if(!Strings.endsWith(string, '/') &&
         (Strings.endsWith(uri, '.') || Strings.endsWith(uri, '/'))) string += '/';
@@ -165,19 +165,9 @@ public final class StaticContext {
   /**
    * Assigns a custom URI resolver.
    * @param custom URI resolver
-   * @return self reference
    */
-  public StaticContext resolver(final UriResolver custom) {
+  public void resolver(final UriResolver custom) {
     resolver = custom;
-    return this;
-  }
-
-  /**
-   * Returns the custom URI resolver.
-   * @return URI resolver (can be {@code null})
-   */
-  public UriResolver resolver() {
-    return resolver;
   }
 
   /**
@@ -201,11 +191,19 @@ public final class StaticContext {
       final IO io = resolver.resolve(path, uri, baseURI);
       if(io != null) return io;
     }
+    return resolveDefault(path);
+  }
 
+  /**
+   * Resolves the specified path against the base URI, ignoring the custom URI resolver.
+   * @param path file path
+   * @return io reference
+   */
+  private IO resolveDefault(final String path) {
     final IO base = baseIO();
     if(base == null) return IO.get(path);
 
-    // try to resolve the path against the registered URI resolver
+    // try to resolve the path against the XML catalog resolver
     if(uriResolver != null) {
       try {
         final Source s = uriResolver.resolve(path, base.path());

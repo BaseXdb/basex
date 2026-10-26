@@ -445,10 +445,7 @@ public final class MapToElement {
       }
       case TEXT -> handler.text(node.string());
       case COMMENT -> handler.comment(node.string());
-      case PROCESSING_INSTRUCTION -> {
-        final byte[] data = node.string();
-        pi(node.name(), data, handler);
-      }
+      case PROCESSING_INSTRUCTION -> pi(node.name(), node.string(), handler);
       default -> { }
     }
   }
@@ -588,17 +585,6 @@ public final class MapToElement {
   }
 
   /**
-   * Checks if a value matches an element name.
-   * @param name element name
-   * @param value element value
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean valid(final QNm name, final Value value) throws QueryException {
-    return select(name, value) != null;
-  }
-
-  /**
    * Checks if the value of an element matches a layout.
    * @param name element name
    * @param value value
@@ -697,7 +683,7 @@ public final class MapToElement {
    */
   private boolean validMembers(final QNm name, final XQArray array) throws QueryException {
     for(final Value member : array.members()) {
-      if(!valid(name, member)) return false;
+      if(select(name, member) == null) return false;
     }
     return true;
   }

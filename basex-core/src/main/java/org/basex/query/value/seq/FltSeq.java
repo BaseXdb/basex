@@ -48,7 +48,7 @@ public final class FltSeq extends NativeSeq {
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final double v : values) out.writeToken(Token.token(v));
+    for(final float v : values) out.writeToken(Token.token(v));
   }
 
   @Override

@@ -823,7 +823,7 @@ public abstract class ParseExpr extends Expr {
   protected GNode toContextNode(final Value value) throws QueryException {
     if(value instanceof final GNode gnode) return gnode;
     if(value instanceof XQStruct) return new JNode(value);
-    if(value == null) throw QueryError.NOCTX_X.get(info, this);
+    if(value == null) throw NOCTX_X.get(info, this);
     throw PATHNODE_X_X_X.get(info, this, value.seqType(), value);
   }
 

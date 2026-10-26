@@ -36,7 +36,11 @@ public final class WebArchiveTest extends HTTPTest {
       "  resolve-uri('data/text.txt', static-base-uri()) => unparsed-text() };",
     "lib/util.xqm",
       "module namespace u = 'http://basex.org/demo/util';" +
-      "declare function u:name() { 'hello' };",
+      "import module namespace n = 'http://basex.org/demo/name' at 'name.xqm';" +
+      "declare function u:name() { n:name() };",
+    "lib/name.xqm",
+      "module namespace n = 'http://basex.org/demo/name';" +
+      "declare function n:name() { 'hello' };",
     "data/text.txt", "from-the-archive"
   };
 

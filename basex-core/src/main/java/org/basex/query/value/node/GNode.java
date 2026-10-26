@@ -64,11 +64,8 @@ public abstract class GNode extends Item {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(type.instanceOf(tp)) return true;
-    if(tp instanceof final NodeType nt && nt.test != null) {
-      return nt.test.matches(this);
-    }
-    return false;
+    return type.instanceOf(tp) ||
+      tp instanceof final NodeType nt && nt.test != null && nt.test.matches(this);
   }
 
   @Override

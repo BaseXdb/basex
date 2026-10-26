@@ -113,11 +113,6 @@ public final class Uri extends AStr {
   }
 
   @Override
-  public int hashCode() {
-    return Token.hashCode(value);
-  }
-
-  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.conditional()) {
@@ -145,10 +140,5 @@ public final class Uri extends AStr {
     } catch(final URISyntaxException ex) {
       throw QueryError.BASEX_ERROR_X.get(null, ex);
     }
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Uri uri && Token.eq(value, uri.value);
   }
 }

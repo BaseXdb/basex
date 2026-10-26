@@ -352,15 +352,6 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns an array with values for this exception.
-   * @return values
-   * @throws QueryException query exception
-   */
-  public ValueList values() throws QueryException {
-    return values(true);
-  }
-
-  /**
    * Returns an array with values for this exception, optionally omitting the location values.
    * @param location include the values from index {@link #LOCATION} onward
    * @return values
@@ -394,7 +385,7 @@ public class QueryException extends Exception {
    * @throws QueryException query exception
    */
   public XQMap map() throws QueryException {
-    return (XQMap) values().peek();
+    return (XQMap) values(true).peek();
   }
 
   /**

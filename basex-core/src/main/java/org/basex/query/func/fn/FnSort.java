@@ -50,13 +50,9 @@ public final class FnSort extends FnSortBy {
   Value quickValue(final Value input) {
     if(exprs.length == 1) {
       // range values
-      if(input instanceof final RangeSeq rs) {
-        return rs.ascending() ? rs : rs.reverse(null);
-      }
-      // integers
-      if(input instanceof final NativeSeq ns && sc().collation == null) {
-        return ns.sort();
-      }
+      if(input instanceof final RangeSeq rs) return rs.ascending() ? rs : rs.reverse(null);
+      // native values
+      if(input instanceof final NativeSeq ns && sc().collation == null) return ns.sort();
       // sortable single or singleton values
       final SeqType st = input.seqType();
       if(st.type.isSortable() && (st.one() || input instanceof final SingletonSeq ss &&

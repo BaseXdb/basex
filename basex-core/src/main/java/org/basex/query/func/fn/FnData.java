@@ -40,9 +40,7 @@ public final class FnData extends ContextFn {
         return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
-      if(type != null) {
-        exprType.assign(type.seqType(st.atomOcc()), input.atomSize());
-      }
+      if(type != null) exprType.assign(type.seqType(st.atomOcc()), input.atomSize());
     }
     return this;
   }

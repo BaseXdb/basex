@@ -66,9 +66,7 @@ public final class Let extends ForLet {
       double s = 0;
       int c = 0;
       final Iter iter = expr.iter(qc);
-      for(Item item; (item = qc.next(iter)) != null; c++) {
-        s += item.score();
-      }
+      for(Item item; (item = qc.next(iter)) != null; c++) s += item.score();
       return Dbl.get(Scoring.avg(s, c));
     } finally {
       qc.scoring = scrng;
@@ -97,12 +95,10 @@ public final class Let extends ForLet {
   @Override
   public Let optimize(final CompileContext cc) throws QueryException {
     // skip redundant type check: let $x as xs:int := (E coerce to xs:int) → let $x as xs:int := E
-    if(!scoring && expr instanceof final TypeCheck tc) {
-      if(var.declType != null && var.declType.coercible(expr.seqType()) ||
-          var.adoptCheck(expr.seqType())) {
-        cc.info(OPTTYPE_X, this);
-        expr = tc.expr;
-      }
+    if(!scoring && expr instanceof final TypeCheck tc && (var.declType != null &&
+        var.declType.coercible(expr.seqType()) || var.adoptCheck(expr.seqType()))) {
+      cc.info(OPTTYPE_X, this);
+      expr = tc.expr;
     }
     // coerce at compile time
     if(expr instanceof final Value value) {

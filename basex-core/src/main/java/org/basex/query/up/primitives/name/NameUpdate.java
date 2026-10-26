@@ -38,7 +38,8 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * Prepares this operation.
    * @throws QueryException query exception
    */
-  public abstract void prepare() throws QueryException;
+  @SuppressWarnings("unused")
+  public void prepare() throws QueryException { }
 
   /**
    * Applies this operation.
@@ -80,7 +81,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
 
   @Override
   public final int compareTo(final NameUpdate o) {
-    return Integer.signum(type.ordinal() - o.type.ordinal());
+    return type.compareTo(o.type);
   }
 
   /**

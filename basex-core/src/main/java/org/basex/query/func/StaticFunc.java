@@ -40,7 +40,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Memoization flag. */
   private final boolean memo;
 
-  /** Indicates if the query focus is accessed or modified. */
+  /** Indicates if the function body neither accesses nor modifies the query focus. */
   private boolean simple;
   /** Indicates if the function body enforces the declared return type. */
   private boolean checked;

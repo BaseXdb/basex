@@ -174,13 +174,12 @@ public final class WebModule {
    * @throws QueryException query exception
    */
   private AModule parse(final QueryContext qc) throws QueryException {
-    final StaticContext sc = archive == null ? null :
-      new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
+    qc.resolver = archive;
     // modules of the web application may access external resources
     qc.parseResources = true;
     qc.realPaths = realPaths;
     try {
-      return qc.parse(content, file.path(), sc);
+      return qc.parse(content, file.path());
     } finally {
       qc.parseResources = false;
     }

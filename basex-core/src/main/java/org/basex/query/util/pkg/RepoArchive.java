@@ -105,11 +105,8 @@ public final class RepoArchive {
         final Path path = IOFile.resolve(target.file().toPath(), ze.getName());
         if(path == null) continue;
         final IOFile trg = new IOFile(path);
-        if(ze.isDirectory()) {
-          trg.md();
-        } else {
-          trg.write(in);
-        }
+        if(ze.isDirectory()) trg.md();
+        else trg.write(in);
       }
     }
   }

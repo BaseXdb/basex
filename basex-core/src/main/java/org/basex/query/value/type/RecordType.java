@@ -158,7 +158,7 @@ public final class RecordType extends ShapeType {
         case final MapType mt -> collect(mt.valueType().type);
         case final ArrayType at -> collect(at.valueType().type);
         case final FuncType ft -> {
-          if(ft.declType != null) collect(ft.declType.type);
+          collect(ft.declType.type);
           if(ft.argTypes != null) {
             for(final SeqType st : ft.argTypes) collect(st.type);
           }

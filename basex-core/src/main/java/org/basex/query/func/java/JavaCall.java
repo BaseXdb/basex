@@ -211,7 +211,7 @@ public abstract class JavaCall extends Arr {
   final QueryException executionError(final Throwable th, final Object... args) {
     final Throwable root = Util.rootException(th);
     return root instanceof final QueryException qe ? qe.info(info) :
-      JAVAEXEC_X_X_X.get(info, root, name(), JavaCall.argTypes(args));
+      JAVAEXEC_X_X_X.get(info, root, name(), argTypes(args));
   }
 
   // STATIC METHODS ===============================================================================

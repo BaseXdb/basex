@@ -70,8 +70,7 @@ public final class FnString extends ContextFn {
     Expr expr = this;
     final Expr item = usesContext() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
-    if(mode.stringifying() && st.type.isStringOrUntyped() &&
-        st.one()) {
+    if(mode.stringifying() && st.type.isStringOrUntyped() && st.one()) {
       // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
     } else if(mode.conditional()) {

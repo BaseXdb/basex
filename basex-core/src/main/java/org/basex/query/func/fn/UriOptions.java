@@ -3,7 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.util.options.*;
 
 /**
- * Function implementation.
+ * Options for fn:parse-uri and fn:build-uri.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

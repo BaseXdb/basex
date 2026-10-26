@@ -129,9 +129,9 @@ public final class UCAOptions extends CollationOptions {
 
     if(contains(CASEFIRST)) {
       switch(get(CASEFIRST)) {
-        case "upper": rbc.setUpperCaseFirst(true); break;
-        case "lower": rbc.setLowerCaseFirst(true); break;
-        default: if(!fallback) throw error(CASEFIRST);
+        case "upper" -> rbc.setUpperCaseFirst(true);
+        case "lower" -> rbc.setLowerCaseFirst(true);
+        default -> { if(!fallback) throw error(CASEFIRST); }
       }
     }
 

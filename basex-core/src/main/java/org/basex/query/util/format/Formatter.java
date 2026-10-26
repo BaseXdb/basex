@@ -290,7 +290,7 @@ public abstract class Formatter extends FormatUtil {
         case 'F' -> abbreviation(day((int) num - 1), fp.max);
         case 'P' -> ampm(num == 0);
         case 'C' -> calendar();
-        case 'E' -> era((int) num);
+        case 'E' -> era(num);
         default -> null;
       };
       if(name != null) {

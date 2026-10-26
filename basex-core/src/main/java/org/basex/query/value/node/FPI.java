@@ -20,8 +20,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
-  /** Opening characters. */
-  public static final byte[] OPEN = { '<', '?' };
   /** Closing characters. */
   public static final byte[] CLOSE = { '?', '>' };
 

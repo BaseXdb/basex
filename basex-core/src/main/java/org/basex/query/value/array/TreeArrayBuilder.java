@@ -61,14 +61,6 @@ final class TreeArrayBuilder extends ArrBuilder {
     return this;
   }
 
-  /**
-   * Creates an {@link XQArray} containing the members of this builder.
-   * @return resulting array
-   */
-  XQArray array() {
-    return array(Types.ARRAY);
-  }
-
   @Override
   public XQArray array(final ArrayType type) {
     // invalidate data structures
@@ -83,7 +75,7 @@ final class TreeArrayBuilder extends ArrBuilder {
     if(n == 1) return XQArray.get(values[start]);
 
     if(n <= TreeArray.MAX_SMALL) {
-      // small int array, fill directly
+      // small array, fill directly
       final Value[] small = new Value[n];
       for(int i = 0; i < n; i++) small[i] = values[(start + i) % CAP];
       return new SmallArray(small, type);

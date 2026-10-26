@@ -170,8 +170,7 @@ public final class IcuFormatter extends Formatter {
 
   @Override
   protected byte[][] day(final int n) {
-    if(internal != null) return internal.day(n);
-    return new byte[][] { days[n] };
+    return internal != null ? internal.day(n) : new byte[][] { days[n] };
   }
 
   @Override

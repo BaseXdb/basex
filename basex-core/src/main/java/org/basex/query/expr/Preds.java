@@ -124,10 +124,9 @@ public abstract class Preds extends Arr {
     }
 
     // paths: E[./...] → E[...], E[E/...] → E[...]
-    if(expr instanceof final Path path && rst.type instanceof NodeType) {
-      if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(cc, expr.info(info), null, path.steps);
-      }
+    if(expr instanceof final Path path && rst.type instanceof NodeType &&
+        first.test(path.root) && !path.steps[0].has(Flag.POS)) {
+      expr = Path.get(cc, expr.info(info), null, path.steps);
     }
 
     // inline root item (ignore nodes): 1[. = 1] → 1[1 = 1]
@@ -168,11 +167,9 @@ public abstract class Preds extends Arr {
 
     // <a/>/.[pos: 1] → <a/>/.[true()]
     // $child/..[pos: 2, 5] → $child/..[false()]
-    if(root instanceof final Step step) {
-      final Axis axis = step.axis;
-      if(axis.oneOf(Axis.SELF, Axis.PARENT) && expr instanceof final IntPos pos) {
-        expr = Bln.get(pos.min == 1);
-      }
+    if(root instanceof final Step step && step.axis.oneOf(Axis.SELF, Axis.PARENT) &&
+        expr instanceof final IntPos pos) {
+      expr = Bln.get(pos.min == 1);
     }
 
     // recursive optimization of AND expressions: E[A and [B and C]] → E[A][B][C]
@@ -354,8 +351,7 @@ public abstract class Preds extends Arr {
     // E[1], E[position() <= 2]
     if(last instanceof final IntPos pos) return pos.min == 1;
     // E[last()]
-    if(last instanceof final Pos pos) return Function.LAST.is(pos.expr);
-    return false;
+    return last instanceof final Pos pos && Function.LAST.is(pos.expr);
   }
 
   /**
@@ -363,10 +359,7 @@ public abstract class Preds extends Arr {
    * @return result of check
    */
   public final boolean mayBePositional() {
-    for(final Expr expr : exprs) {
-      if(mayBePositional(expr)) return true;
-    }
-    return false;
+    return Checks.any(exprs, Arr::mayBePositional);
   }
 
   @Override

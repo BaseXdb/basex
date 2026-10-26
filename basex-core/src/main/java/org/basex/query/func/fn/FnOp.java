@@ -26,7 +26,7 @@ public final class FnOp extends StandardFunc {
   public FuncItem value(final QueryContext qc) throws QueryException {
     final String operator = toString(arg(0), qc);
 
-    final int pl =  2;
+    final int pl = 2;
     final VarScope vs = new VarScope();
     final Var[] params = new Var[pl];
     final Expr[] args = new Expr[pl];

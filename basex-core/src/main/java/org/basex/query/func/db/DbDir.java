@@ -66,7 +66,7 @@ public final class DbDir extends DbList {
    * @param dir directory flag
    * @param path path
    * @param date modified date
-   * @param size file size (can be {@code null})
+   * @param size file size
    * @param type resource type
    * @return element node
    */

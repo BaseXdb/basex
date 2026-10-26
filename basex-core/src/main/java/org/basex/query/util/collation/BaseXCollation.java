@@ -20,7 +20,7 @@ final class BaseXCollation extends Collation {
   private final Comparator<Object> collator;
 
   /**
-   * Private Constructor.
+   * Constructor.
    * @param collator collator
    */
   BaseXCollation(final Comparator<Object> collator) {

@@ -136,9 +136,9 @@ public final class Switch extends ASwitch<SwitchGroup> {
     }
 
     // merge branches with identical return path
-    for(int g = 0; g < tmpGroups.size(); g++) {
-      final SwitchGroup group1 = g > 0 ? tmpGroups.get(g - 1) : null, group2 = tmpGroups.get(g);
-      if(g > 0 && group1.rtrn().equals(group2.rtrn())) {
+    for(int g = 1; g < tmpGroups.size(); g++) {
+      final SwitchGroup group1 = tmpGroups.get(g - 1), group2 = tmpGroups.get(g);
+      if(group1.rtrn().equals(group2.rtrn())) {
         if(g + 1 == tmpGroups.size() && !group1.has(Flag.NDT)) {
           // case 'a' return A default return A → default return A
           tmpGroups.set(g - 1, group2);

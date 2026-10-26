@@ -63,11 +63,9 @@ public final class FnFoot extends StandardFunc {
       final Expr extreme = sort.extreme(false, cc);
       if(extreme != null) return cc.function(FOOT, info, extreme);
     }
-    // foot(replicate(E, count)) → foot(E)
-    if(REPLICATE.is(input)) {
-      // static integer will always be greater than 1
-      if(input.arg(1) instanceof Itr) return cc.function(FOOT, info, input.arg(0));
-    }
+    // foot(replicate(E, count)) → foot(E) (static integer will always be greater than 1)
+    if(REPLICATE.is(input) && input.arg(1) instanceof Itr)
+      return cc.function(FOOT, info, input.arg(0));
 
     // foot((1, 2)) → 2
     // foot((1, (2 to 3))) → foot(2 to 3)
@@ -78,7 +76,7 @@ public final class FnFoot extends StandardFunc {
       if(stl.one()) return last;
       if(stl.oneOrMore()) return cc.function(FOOT, info, last);
     }
-    // foot(reverse(root)[test]) → head(root[test])
+    // foot(root[test]) → head(reverse(root)[test])
     if(input instanceof final IterFilter filter) {
       final Expr root = cc.function(REVERSE, filter.info(), filter.root);
       return cc.function(HEAD, info, Filter.get(cc, filter.info(), root, filter.exprs));

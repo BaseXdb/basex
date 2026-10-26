@@ -500,7 +500,6 @@ public final class SeqType {
         cast : null;
   }
 
-
   /**
    * Computes the union of two sequence types, i.e. the lowest common ancestor of both types.
    * @param st second type
@@ -830,7 +829,7 @@ public final class SeqType {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!one() && type instanceof FType && !(type instanceof MapType || type instanceof ArrayType)) {
+    if(!one() && type instanceof FuncType) {
       tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());

@@ -78,8 +78,6 @@ public interface PkgText {
   /** QName. */
   QNm Q_SEMVER_MAX = new QNm("semver-max");
 
-  /** Not expected initialization error. */
-  String MISSDESC = "Missing package descriptor for package '%'";
   /** Attribute missing. */
   String MISSATTR = "'%' attribute missing in '%' element";
   /** Invalid element. */

@@ -70,11 +70,9 @@ public final class FnHead extends StandardFunc {
     // head(distinct-values(E, C)) → head(data(E))
     if(DISTINCT_VALUES.is(input))
       return cc.function(HEAD, info, cc.function(DATA, info, input.arg(0)));
-    // head(replicate(E, count)) → head(E)
-    if(REPLICATE.is(input)) {
-      // static integer will always be greater than 1
-      if(input.arg(1) instanceof Itr) return cc.function(HEAD, info, input.arg(0));
-    }
+    // head(replicate(E, count)) → head(E) (static integer will always be greater than 1)
+    if(REPLICATE.is(input) && input.arg(1) instanceof Itr)
+      return cc.function(HEAD, info, input.arg(0));
     // head(file:read-text-lines(E)) → file:read-text-lines(E, 0, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
       return FileReadTextLines.merge(this, 0, 1, cc);

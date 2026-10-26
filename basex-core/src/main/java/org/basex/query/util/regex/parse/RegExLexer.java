@@ -244,8 +244,7 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
         for(int cp = next(skipCmt); cp != '}'; cp = next(skipCmt))
           if(cp == -1) throw error(tb.toString(), -1);
         final String in = tb.toString().substring(3, tb.size() - 1);
-        final Matcher m = CAT_REGEX.matcher(in);
-        if(!m.matches()) throw error("{", nxt);
+        if(!CAT_REGEX.matcher(in).matches()) throw error("{", nxt);
         payload = in;
         return CAT_ESC;
       default:

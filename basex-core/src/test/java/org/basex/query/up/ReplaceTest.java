@@ -105,6 +105,16 @@ public final class ReplaceTest extends SandboxTest {
   }
 
   /**
+   * Replaces processing instructions with names of different lengths, using lazy replace.
+   */
+  @Test public void lazyReplacePi() {
+    final String pi = "replace node (" + _DB_GET.args(NAME) + "//processing-instruction())";
+    lazyReplace("<x><?a cfoo?><?abc xy?></x>",
+        pi + "[1] with <?abc foo?>, " + pi + "[2] with <?a xyz?>",
+        "<x><?abc foo?><?a xyz?></x>", true);
+  }
+
+  /**
    * Runs an update on a single document and checks if the node IDs have been kept.
    * @param doc document
    * @param update update query

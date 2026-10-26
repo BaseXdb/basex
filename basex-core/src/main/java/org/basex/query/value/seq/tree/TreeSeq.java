@@ -39,7 +39,7 @@ public abstract class TreeSeq extends Seq {
   }
 
   /**
-   * Helper for {@link #insert(long, Value, Job)} that copies all items into a
+   * Helper for {@link #insertValue(long, Value, Job)} that copies all items into a
    * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param value value to insert
@@ -110,7 +110,7 @@ public abstract class TreeSeq extends Seq {
    * the given sequence. Its length is always {@code to - from}. If {@code from} is smaller than
    * zero, the first {@code -from} entries in the resulting sequence are {@code null}.
    * If {@code to > items.length} then the last {@code to - items.length} entries are
-   * {@code null}. If {@code from == 0 && to == items.length}, the original items are returned.
+   * {@code null}.
    * @param items input sequence
    * @param from first index, inclusive (can be negative)
    * @param to last index, exclusive (can be greater than {@code items.length})

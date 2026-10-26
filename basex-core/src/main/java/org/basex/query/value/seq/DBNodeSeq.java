@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -129,18 +128,9 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public final Value reverse(final Job job) {
-    final int sz = (int) size;
-    final int[] tmp = new int[sz];
-    for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];
-    return new DBNodeSeq(tmp, data, type, false);
-  }
-
-  @Override
   public Value sort() {
-    final int[] tmp = pres.clone();
-    Arrays.sort(tmp);
-    return get(tmp, data, type, all);
+    // nodes are sorted by their atomized values, not by document order
+    return null;
   }
 
   @Override
@@ -180,7 +170,7 @@ public class DBNodeSeq extends NativeSeq {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof final DBNodeSeq ds ?
-      data == ds.data && size == ds.size && Arrays.equals(pres, ds.pres) : super.equals(obj));
+      data == ds.data && Arrays.equals(pres, ds.pres) : super.equals(obj));
   }
 
   @Override

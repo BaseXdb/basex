@@ -154,7 +154,7 @@ public abstract class Item extends Value {
 
   /**
    * Checks if this item is instance of the specified type.
-   * Overridden by {@link XQMap} and {@link XQArray}.
+   * Overridden by {@link XQMap}, {@link XQArray}, {@link FuncItem} and {@link GNode}.
    * @param tp type
    * @param coerce item coercion
    * @return result of check
@@ -253,14 +253,14 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overridden by: {@link Lazy}, {@link XQMap}, {@link XQArray}.
+   * Overridden by: {@link Lazy}, {@link XQMap}, {@link XQArray}, {@link JNode}.
    */
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
   /**
    * {@inheritDoc}
-   * Overridden by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link XNode}.
+   * Overridden by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link JNode}, {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -341,10 +341,9 @@ public abstract class Item extends Value {
 
   /**
    * Returns a type ID.
-   * Overridden by {@link DBNode} and {@link FDoc}.
-   * @return type string
+   * @return type ID
    */
-  public ID typeId() {
+  public final ID typeId() {
     return type.id();
   }
 

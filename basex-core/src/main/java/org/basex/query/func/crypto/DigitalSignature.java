@@ -233,8 +233,6 @@ final class DigitalSignature {
         signContext = new DOMSignContext(pk, inputNode.getDocumentElement());
         xmlSig = fac.newXMLSignature(si, ki);
       } else {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
         final XMLStructure cont = new DOMStructure(inputNode.getDocumentElement());
         final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont), "", null, null);
         xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj), null, null);

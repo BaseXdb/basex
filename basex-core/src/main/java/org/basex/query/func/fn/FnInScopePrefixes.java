@@ -25,9 +25,7 @@ public final class FnInScopePrefixes extends StandardFunc {
     final TokenList tl = new TokenList();
     for(int a = 0; a < as; a++) {
       final byte[] key = atts.name(a);
-      if(key.length + atts.value(a).length != 0) {
-        tl.add(key);
-      }
+      if(key.length + atts.value(a).length != 0) tl.add(key);
     }
     return StrSeq.get(tl);
   }

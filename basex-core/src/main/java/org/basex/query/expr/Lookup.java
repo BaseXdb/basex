@@ -239,15 +239,9 @@ public final class Lookup extends Arr {
     qs.token(exprs[0]).token('?');
 
     final Expr keys = exprs[1];
-    byte[] key = null;
-    if(keys == Str.WILDCARD) {
-      key = Str.WILDCARD.string();
-    } else if(keys instanceof final Str str) {
-      if(XMLToken.isNCName(str.string())) key = str.string();
-    } else if(keys instanceof final Itr itr) {
-      final long l = itr.itr();
-      if(l >= 0) key = Token.token(l);
-    }
+    final byte[] key = keys == Str.WILDCARD ? Str.WILDCARD.string() :
+      keys instanceof final Str str && XMLToken.isNCName(str.string()) ? str.string() :
+      keys instanceof final Itr itr && itr.itr() >= 0 ? Token.token(itr.itr()) : null;
     if(key != null) qs.value(key);
     else qs.paren(keys);
   }

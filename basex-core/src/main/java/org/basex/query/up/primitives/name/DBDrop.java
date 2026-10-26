@@ -26,10 +26,6 @@ public final class DBDrop extends NameUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     close();
     // check if database files can be safely removed

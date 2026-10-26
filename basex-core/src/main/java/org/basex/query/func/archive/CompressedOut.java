@@ -34,11 +34,6 @@ final class CompressedOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ArchiveIn in) throws IOException {
-    in.transferTo(zos);
-  }
-
-  @Override
   public void write(final ZipEntry entry, final byte[] value) throws IOException {
     zos.write(value);
   }

@@ -110,9 +110,7 @@ public final class FnPath extends ContextFn {
           for(final GNode nd : node.precedingSiblingIter(false)) {
             qc.checkStop();
             final QNm qnm = nd.qname();
-            if(nd.kind() == kind && (qnm == null || nd.qname().eq(qname))) {
-              index++;
-            }
+            if(nd.kind() == kind && (qnm == null || qnm.eq(qname))) index++;
           }
           tb.add('[').addInt(index).add(']');
         }

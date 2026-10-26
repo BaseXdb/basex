@@ -1310,6 +1310,9 @@ public final class FnModuleTest extends SandboxTest {
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 54);
     query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 54);
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 54);
+
+    // integer range must not overflow
+    query(func.args(" (2147483647, -2147483648)"), "2147483647\n-2147483648");
   }
 
   /** Test method. */
@@ -2229,6 +2232,15 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(12345678, "16^#_xxxx"), "bc_614e");
     query(func.args(255, "2^xxxx xxxx"), "1111 1111");
     query(func.args(1023, "32^XXXX"), "00VV");
+    error(func.args(255, "16^xax"), INVDDPATTERN_X);
+    error(func.args(255, "16^x1x"), INVDDPATTERN_X);
+    error(func.args(255, "10^x1x"), INVDDPATTERN_X);
+    error(func.args(255, "016^xx"), INVDDPATTERN_X);
+    error(func.args(255, "+16^xx"), INVGROUP_X);
+    error(func.args(255, "16 ^xx"), INVGROUP_X);
+    error(func.args(255, "#²0"), INVDDPATTERN_X);
+    query(func.args(1, "Wwfoo"), 1);
+    error(func.args(1, "Ww1"), INVDDPATTERN_X);
 
     query(func.args(1, "Ww", "de"), "Eins");
     query(func.args(1, "Ww;o", "de"), "Erste");
@@ -5166,6 +5178,17 @@ return
 
     check(func.args(" (1 to 6, (7 to " + wrap(13) + ")[. > 12], (14 to " + wrap(20) + ")[. > 18])"),
         "20\n19\n13\n6\n5\n4\n3\n2\n1", count(REVERSE, 2));
+
+    // reversed database nodes are not in document order
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("b.xml", "<b/>"));
+    final String rev = "declare variable $r := " + func.args(_DB_GET.args(NAME)) + "; ";
+    query(rev + "$r ! name(*)", "b\na");
+    query(rev + "head($r union ()) ! name(*)", "a");
+    query(rev + "head($r/.) ! name(*)", "a");
+    query(rev + "head(" + DISTINCT_ORDERED_NODES.args(" $r") + ") ! name(*)", "a");
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -5669,6 +5692,17 @@ return
 
     query(func.args(" true#0"), "fn:true#0");
     error(func.args(" (1 to 2) ! true#0"), FIATOMIZE_X);
+
+    // database nodes are sorted by value, not by document order
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a>3</a>"));
+    execute(new Add("b.xml", "<a>1</a>"));
+    execute(new Add("c.xml", "<a>2</a>"));
+    query(func.args(_DB_GET.args(NAME)) + " ! string()", "1\n2\n3");
+    query(func.args(_DB_GET.args(NAME) + "/a") + " ! string()", "1\n2\n3");
+    query(_ARRAY_SORT.args(" array { " + _DB_GET.args(NAME) + " }") + "?* ! string()",
+        "1\n2\n3");
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -6099,6 +6133,10 @@ return
     query(func.args(" ('a', 'b', 'c')", 1, " xs:double('INF')"), "a\nb\nc");
     query("let $e := (1 to 3)[. > 0] return " +
         func.args(" $e", " -9223372036854775808", " count($e)"), "");
+
+    // skip leading list operands
+    check("let $s := tokenize(" + wrap("c d e f g") + ") return " +
+        func.args(" ('a', 'b', $s)", 4, 2), "d\ne", empty(List.class));
   }
 
   /** Test method. */

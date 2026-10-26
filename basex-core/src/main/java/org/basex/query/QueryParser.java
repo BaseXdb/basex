@@ -427,10 +427,7 @@ public class QueryParser extends InputParser {
     // check memoized functions
     qc.functions.checkMemo();
 
-    if(qc.contextValue != null) {
-      final Expr ctx = qc.contextValue.expr;
-      if(ctx.has(Flag.UPD)) throw error(UPCTX);
-    }
+    if(qc.contextValue != null && qc.contextValue.expr.has(Flag.UPD)) throw error(UPCTX);
 
     if(qc.updating) {
       // check updating semantics if updating expressions exist
@@ -1019,8 +1016,7 @@ public class QueryParser extends InputParser {
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
     if(pUri != null) {
       if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, pUri);
-    }
-    else {
+    } else {
       qc.modParsed.put(tPath, tUri);
 
       // read module
@@ -1033,7 +1029,6 @@ public class QueryParser extends InputParser {
 
       qc.modStack.push(tPath);
       final QueryParser qp = new QueryParser(query, io.path(), qc, null);
-      qp.sc.resolver = sc.resolver;
 
       // check if import and declaration URI match
       final LibraryModule lib = qp.parseLibrary(false);
@@ -1395,9 +1390,6 @@ public class QueryParser extends InputParser {
     }
 
     final TokenObjectMap<Var> curr = new TokenObjectMap<>();
-    for(final Clause clause : clauses)
-      for(final Var var : clause.vars()) curr.put(var.name.unique(), var);
-
     int size;
     do {
       do {
@@ -2239,14 +2231,10 @@ public class QueryParser extends InputParser {
    */
   private Expr pipeline() throws QueryException {
     final Expr expr = arrow();
-    if(expr != null) {
-      if(wsConsumeWs("->")) {
-        final ExprList el = new ExprList(expr);
-        do el.add(operand(arrow(), "->")); while(wsConsumeWs("->"));
-        return new Pipeline(info(), el.finish());
-      }
-    }
-    return expr;
+    if(expr == null || !wsConsumeWs("->")) return expr;
+    final ExprList el = new ExprList(expr);
+    do el.add(operand(arrow(), "->")); while(wsConsumeWs("->"));
+    return new Pipeline(info(), el.finish());
   }
 
   /**
@@ -2683,11 +2671,8 @@ public class QueryParser extends InputParser {
       p = pos;
       if(all && wsConsumeWs("(")) {
         final Kind kn = Kind.get(name);
-        if(kn == Kind.JNODE) {
-          return jnodeTest();
-        } else if(kn != null) {
-          return kindTest(kn);
-        }
+        if(kn == Kind.JNODE) return jnodeTest();
+        if(kn != null) return kindTest(kn);
       } else {
         NameTest.Scope scope = NameTest.Scope.FULL;
         if(!name.hasPrefix()) {
@@ -4193,11 +4178,7 @@ public class QueryParser extends InputParser {
     SeqType st = null;
     Item key = null;
     if(!wsConsume(")")) {
-      if(wsConsume("(") && wsConsume(")")) {
-        key = Empty.VALUE;
-      } else {
-        key = literal(true, false);
-      }
+      key = wsConsume("(") && wsConsume(")") ? Empty.VALUE : literal(true, false);
       if(key == null) {
         final byte[] ncname = ncName(null, false);
         if(ncname.length != 0) key = Str.get(ncname);
@@ -5126,8 +5107,7 @@ public class QueryParser extends InputParser {
           if(n < nn) ok = false;
           if(!m) n += 9;
         } while(!consume(';'));
-        if(!ok) entityError(p, INVCHARREF_X);
-        if(!XMLToken.valid11(n)) entityError(p, INVCHARREF_X);
+        if(!ok || !XMLToken.valid11(n)) entityError(p, INVCHARREF_X);
         tb.add(n);
       } else {
         if(consume("lt")) {

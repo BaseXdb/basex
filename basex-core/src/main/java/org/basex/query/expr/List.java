@@ -124,9 +124,8 @@ public final class List extends Arr {
       final Expr expr = e < el ? exprs[e] : null;
       long mn = Long.MIN_VALUE, mx = 0;
       if(expr instanceof final Itr itr && itr.type == BasicType.INTEGER) {
-        final long l = itr.itr();
-        mn = l;
-        mx = l;
+        mn = itr.itr();
+        mx = mn;
       } else if(expr instanceof final RangeSeq rs && rs.ascending()) {
         mn = rs.min();
         mx = rs.max();

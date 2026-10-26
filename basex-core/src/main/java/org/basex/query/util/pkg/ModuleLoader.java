@@ -84,21 +84,18 @@ public final class ModuleLoader {
       className = uri.substring(JAVA_PREFIX_COLON.length());
     } else {
       // no "java:" prefix: check EXPath repositories
-      final HashSet<String> pkgs = context.repo.nsDict().get(uri);
-      if(pkgs != null) {
-        Version ver = null;
-        String id = null;
-        for(final String pkg : pkgs) {
-          final Version v = new Version(Pkg.version(pkg));
-          if(ver == null || v.compareTo(ver) > 0) {
-            ver = v;
-            id = pkg;
-          }
+      Version ver = null;
+      String id = null;
+      for(final Pkg pkg : context.repo.pkgs(uri)) {
+        final Version v = new Version(pkg.version);
+        if(ver == null || v.compareTo(ver) > 0) {
+          ver = v;
+          id = pkg.id();
         }
-        if(id != null) {
-          addRepo(id, qp, info);
-          return true;
-        }
+      }
+      if(id != null) {
+        addRepo(id, qp, info);
+        return true;
       }
       // check XQuery modules
       final IOFile repo = context.soptions.repoPath();
@@ -254,15 +251,9 @@ public final class ModuleLoader {
       @Override
       protected Iterable<String> next(final String pkgId) throws QueryException {
         // find package in package dictionary
-        Pkg pkg = context.repo.pkgDict().get(pkgId);
+        final Pkg pkg = context.repo.pkgDict().get(pkgId);
         if(pkg == null) throw REPO_NOTFOUND_X.get(info, pkgId);
         final IOFile pkgPath = context.repo.path(pkg.path());
-
-        // parse package descriptor
-        final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
-        if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, pkgId);
-
-        pkg = new PkgParser(info).parse(pkgDesc);
         final IOFile modDir = pkg.modDir(pkgPath);
         try {
           addLoader(pkgUrls(pkgPath, modDir, info));

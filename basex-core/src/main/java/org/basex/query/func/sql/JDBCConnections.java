@@ -9,7 +9,6 @@ import org.basex.core.jobs.*;
 import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -101,13 +100,7 @@ public final class JDBCConnections implements QueryResource {
   @Override
   public synchronized void close() {
     binding.close();
-    for(final AutoCloseable ac : conns.values()) {
-      try {
-        if(ac != null) ac.close();
-      } catch(final Exception ex) {
-        Util.debug(ex);
-      }
-    }
+    for(final AutoCloseable ac : conns.values()) SqlFn.close(ac);
     genKeys.clear();
   }
 }

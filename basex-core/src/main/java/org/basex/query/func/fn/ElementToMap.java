@@ -379,7 +379,7 @@ public final class ElementToMap {
   /**
    * Returns a record item.
    * @param node node
-   * @return array
+   * @return map
    * @throws QueryException query exception
    */
   private XQMap record(final GNode node) throws QueryException {
@@ -438,7 +438,7 @@ public final class ElementToMap {
   /**
    * Returns an XML item.
    * @param node node
-   * @return array
+   * @return string
    * @throws QueryException query exception
    */
   private static Str xml(final GNode node) throws QueryException {

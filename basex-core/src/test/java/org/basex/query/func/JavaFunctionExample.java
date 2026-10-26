@@ -97,6 +97,24 @@ public final class JavaFunctionExample {
   }
 
   /**
+   * Returns the name of the parameter type and the node value.
+   * @param node argument
+   * @return parameter type and value
+   */
+  public String ambiguous3(final Node node) {
+    return "node " + node.getNodeValue();
+  }
+
+  /**
+   * Returns the name of the parameter type and the element name.
+   * @param element argument
+   * @return parameter type and name
+   */
+  public String ambiguous3(final Element element) {
+    return "element " + element.getTagName();
+  }
+
+  /**
    * Returns an array with a null value.
    * @return array
    */
@@ -228,5 +246,14 @@ public final class JavaFunctionExample {
    */
   public Node attribute() throws Exception {
     return doc().createAttribute("a");
+  }
+
+  /**
+   * Creates an attribute with a namespace.
+   * @return attribute
+   * @throws Exception exception
+   */
+  public Node nsAttribute() throws Exception {
+    return doc().createAttributeNS("u", "p:a");
   }
 }

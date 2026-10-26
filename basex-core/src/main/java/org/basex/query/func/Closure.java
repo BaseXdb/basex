@@ -433,9 +433,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
     final Flag[] flgs = Flag.remove(flags, Flag.UPD);
-    if(flgs.length == 0) return false;
-
-    return props.has(flgs);
+    return flgs.length != 0 && props.has(flgs);
   }
 
   @Override

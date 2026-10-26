@@ -44,7 +44,6 @@ public final class Group extends RegExp {
     this.encl = encl;
     this.capture = capture;
     this.name = name;
-    hasBackRef = false;
     this.atomPath = atomPath;
   }
 

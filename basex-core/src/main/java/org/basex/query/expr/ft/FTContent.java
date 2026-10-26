@@ -48,8 +48,7 @@ public final class FTContent extends FTFilter {
       for(final FTMatch combo : combine(match)) {
         final boolean[] bl = new boolean[s];
         for(final FTStringMatch sm : combo) {
-          if(sm.gaps) continue;
-          Arrays.fill(bl, sm.start, sm.end + 1, true);
+          if(!sm.gaps) Arrays.fill(bl, sm.start, sm.end + 1, true);
         }
         boolean entire = true;
         for(final boolean b : bl) {

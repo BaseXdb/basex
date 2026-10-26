@@ -105,6 +105,50 @@ public final class ModuleTest extends SandboxTest {
     }
   }
 
+  /**
+   * Passes a URI resolver on to dynamically evaluated queries.
+   * @throws Exception exception
+   */
+  @Test public void uriResolverEval() throws Exception {
+    final String module = "import module namespace m='uri' at 'x.xq'; m:f()";
+    for(final String query : new String[] {
+      "load-xquery-module('uri', { 'location-hints': 'x.xq' })?functions?(xs:QName('m:f'))?0()",
+      "xquery:eval(\"" + module + "\")"
+    }) {
+      try(QueryProcessor qp = new QueryProcessor(
+          "declare namespace m='uri'; " + query, context)) {
+        qp.uriResolver((path, uri, base) ->
+          new IOContent("module namespace m='uri'; declare function m:f() { 'OK' };"));
+        assertEquals("OK", qp.value().serialize().toString(), query);
+      }
+    }
+  }
+
+  /**
+   * Passes a URI resolver on to nested module imports.
+   * @throws Exception exception
+   */
+  @Test public void uriResolverNested() throws Exception {
+    final String n = "module namespace n='n'; declare function n:g() { 'OK' };";
+    final String m = "module namespace m='uri'; import module namespace n='n' at 'y.xq'; "
+        + "declare function m:f() { n:g() };";
+    final IOFile file = new IOFile(sandbox(), "m.xqm");
+    write(file, m);
+    for(final String query : new String[] {
+      "load-xquery-module('uri', { 'location-hints': 'x.xq', 'trusted': true() })"
+        + "?functions?(xs:QName('m:f'))?0()",
+      "xquery:parse(\"" + m + "\") ! 'OK'",
+      "count(inspect:functions('" + file.path() + "')) ! 'OK'",
+      "inspect:module('" + file.path() + "') ! 'OK'"
+    }) {
+      try(QueryProcessor qp = new QueryProcessor(
+          "declare namespace m='uri'; " + query, context)) {
+        qp.uriResolver((path, uri, base) -> new IOContent(path.endsWith("y.xq") ? n : m, path));
+        assertEquals("OK", qp.value().serialize().toString(), query);
+      }
+    }
+  }
+
   /** Tests type import. */
   @Test public void importedTypes() {
     final IOFile sandbox = sandbox();

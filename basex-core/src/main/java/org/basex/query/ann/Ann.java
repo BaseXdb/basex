@@ -77,7 +77,7 @@ public final class Ann {
    * @param qs query string builder
    */
   public void toString(final QueryString qs) {
-    qs.concat("%", (definition != null ? definition.name : name).prefixId(XQ_URI));
+    qs.concat("%", name().prefixId(XQ_URI));
     if(!value.isEmpty()) {
       final StringList list = new StringList(value.size());
       for(final Item item : value) list.add(item.toString());

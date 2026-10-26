@@ -1,12 +1,10 @@
 package org.basex.query.util.pkg;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.util.pkg.Pkg.*;
 import static org.basex.query.util.pkg.PkgText.*;
 
 import java.util.*;
 
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -75,8 +73,8 @@ public final class PkgValidator {
   String depPkg(final PkgDep dep) {
     // get installed versions of secondary package
     final HashSet<String> instVers = new HashSet<>();
-    for(final String nextPkg : repo.pkgDict().keySet()) {
-      if(nextPkg.startsWith(dep.name)) instVers.add(version(nextPkg));
+    for(final Pkg pkg : repo.pkgDict().values()) {
+      if(pkg.name.equals(dep.name)) instVers.add(pkg.version);
     }
     // check if an appropriate version is already installed
     final String version = availVersion(dep, instVers);
@@ -175,20 +173,13 @@ public final class PkgValidator {
    * @param comp component
    * @param name component's package
    * @return result
-   * @throws QueryException query exception
    */
-  private boolean isInstalled(final PkgComponent comp, final String name) throws QueryException {
+  private boolean isInstalled(final PkgComponent comp, final String name) {
     // get packages in which the module's namespace is found
-    final HashSet<String> ids = repo.nsDict().get(comp.uri);
-    if(ids == null) return false;
-
-    for(final String id : ids) {
-      if(id != null && !name(id).equals(name)) {
+    for(final Pkg installed : repo.pkgs(comp.uri)) {
+      if(!installed.name.equals(name)) {
         // installed package is a different one, not just a different version of the current one
-        final String pkgPath = repo.pkgDict().get(id).path();
-        final IO pkgDesc = new IOFile(repo.path(pkgPath), DESCRIPTOR);
-        final Pkg pkg = new PkgParser(info).parse(pkgDesc);
-        for(final PkgComponent nextComp : pkg.comps) {
+        for(final PkgComponent nextComp : installed.comps) {
           if(nextComp.name().equals(comp.name())) return true;
         }
       }

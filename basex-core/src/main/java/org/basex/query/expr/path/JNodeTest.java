@@ -3,7 +3,6 @@ package org.basex.query.expr.path;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -60,34 +59,11 @@ public final class JNodeTest extends Test {
     }
   }
 
-  /**
-   * Compares two values.
-   * @param v1 first value
-   * @param v2 second value
-   * @return result of check
-   */
-  public static boolean equals(final Value v1, final Value v2) {
-    // if values are compared, reference checks for non-atomic values are sufficient
-    if(v1 == v2) return true;
-
-    if(v1 instanceof final Item i1 && v2 instanceof final Item i2 &&
-        i1.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-      try {
-        return i1.atomicEqual(i2);
-      } catch(final QueryException ex) {
-        throw Util.notExpected(ex);
-      }
-    }
-    return false;
-  }
-
   @Override
   public boolean matches(final GNode node) {
-    if(node instanceof final JNode jnode) {
-      return (key == null || (key == Empty.VALUE ? jnode.isRoot() : equals(key, jnode.key))) &&
-          valueType.instance(jnode.value);
-    }
-    return false;
+    return node instanceof final JNode jnode &&
+        (key == null || (key == Empty.VALUE ? jnode.isRoot() : equals(key, jnode.key))) &&
+        valueType.instance(jnode.value);
   }
 
   /**

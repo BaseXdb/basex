@@ -44,9 +44,7 @@ public final class UserDrop extends UserFn {
 
     @Override
     public void apply() {
-      boolean global = false;
-      for(final String pattern : patterns) global |= pattern.isEmpty();
-      if(global) {
+      if(patterns.contains("")) {
         users.drop(user);
       } else {
         for(final String db : patterns) user.drop(db);

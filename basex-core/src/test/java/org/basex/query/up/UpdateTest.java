@@ -195,6 +195,17 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
+   * Tests if merged insertion sequences are not shared by other targets.
+   */
+  @Test public void insertSequenceSharing() {
+    query("<r><x/><y/></r> update { insert node <a/> into (x, y), insert node <b/> into x }",
+        "<r><x><a/><b/></x><y><a/></y></r>");
+    query("<r><x/><y/></r> update { insert node attribute a { } into (x, y), "
+        + "insert node attribute b { } into x }",
+        "<r><x a=\"\" b=\"\"/><y a=\"\"/></r>");
+  }
+
+  /**
    * Delete last node of a data instance. Checks if table limits are crossed.
    */
   @Test public void deleteLastNode() {

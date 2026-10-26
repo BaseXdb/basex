@@ -30,7 +30,7 @@ public final class Types {
   /** One or more items. */
   public static final SeqType ITEM_OM = ITEM.seqType(ONE_OR_MORE);
 
-  /** Zero or one xs:anyAtomicType. */
+  /** Single xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_O = ANY_ATOMIC_TYPE.seqType();
   /** Zero or one xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_ZO = ANY_ATOMIC_TYPE.seqType(ZERO_OR_ONE);
@@ -50,7 +50,7 @@ public final class Types {
   public static final SeqType DOUBLE_O = DOUBLE.seqType();
   /** Zero or one double. */
   public static final SeqType DOUBLE_ZO = DOUBLE.seqType(ZERO_OR_ONE);
-  /** Double number. */
+  /** Zero or more doubles. */
   public static final SeqType DOUBLE_ZM = DOUBLE.seqType(ZERO_OR_MORE);
   /** Float number. */
   public static final SeqType FLOAT_O = FLOAT.seqType();
@@ -66,10 +66,6 @@ public final class Types {
   public static final SeqType INTEGER_ZM = INTEGER.seqType(ZERO_OR_MORE);
   /** Positive integer. */
   public static final SeqType POSITIVE_INTEGER_O = POSITIVE_INTEGER.seqType();
-  /** Zero or one positive integer. */
-  public static final SeqType POSITIVE_INTEGER_ZO = POSITIVE_INTEGER.seqType(ZERO_OR_ONE);
-  /** Zero or more positive integers. */
-  public static final SeqType POSITIVE_INTEGER_ZM = POSITIVE_INTEGER.seqType(ZERO_OR_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYTE_ZM = BYTE.seqType(ZERO_OR_MORE);
 
@@ -215,7 +211,7 @@ public final class Types {
   public static final NodeType DOCUMENT_ELEMENT = NodeType.get(new DocTest(NodeTest.ELEMENT));
   /** Zero or one document with single element. */
   public static final SeqType DOCUMENT_ELEMENT_ZO = DOCUMENT_ELEMENT.seqType(ZERO_OR_ONE);
-  /** Zero or more documents or elements. */
+  /** Zero or one document or element. */
   public static final SeqType DOCUMENT_OR_ELEMENT_ZO =
       ChoiceItemType.get(DOCUMENT_ELEMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_ONE);
 
@@ -256,9 +252,9 @@ public final class Types {
   public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
   /** Single function. */
   public static final SeqType FUNCTION_O = FUNCTION.seqType();
-  /** Zero of single function. */
+  /** Zero or one function. */
   public static final SeqType FUNCTION_ZO = FUNCTION.seqType(ZERO_OR_ONE);
-  /** Zero of more functions. */
+  /** Zero or more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
 
   /** Job target: a query string or URI, or a function to be invoked. */
@@ -267,9 +263,9 @@ public final class Types {
   public static final SeqType QUERY_SPEC_O = QUERY_SPEC.seqType();
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
-  /** Predicate function. */
+  /** Predicate function for sequences. */
   public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_ZO, ITEM_ZM, INTEGER_O).seqType();
-  /** Predicate function. */
+  /** Binary predicate function. */
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();

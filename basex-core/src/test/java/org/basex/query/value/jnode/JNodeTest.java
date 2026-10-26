@@ -120,7 +120,7 @@ public final class JNodeTest extends SandboxTest {
     assertTrue(rootNode.instanceOf(NodeType.get(null, Types.ITEM_ZM), false));
     assertTrue(rootNode.instanceOf(NodeType.get(null, Types.ITEM_O), false));
     assertTrue(rootNode.instanceOf(NodeType.get(null, Types.MAP_O), false));
-    assertFalse(rootNode.instanceOf(NodeType.get(Str.KEY, Types.MAP_O), false));
+    assertFalse(rootNode.instanceOf(NodeType.get(Str.get("key"), Types.MAP_O), false));
 
     assertTrue(aNode.instanceOf(NodeType.get(null, Types.MAP_O), false));
     assertTrue(aNode.instanceOf(NodeType.get(Str.get("a"), Types.MAP_O), false));

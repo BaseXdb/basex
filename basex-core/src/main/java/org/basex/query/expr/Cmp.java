@@ -101,6 +101,40 @@ public abstract class Cmp extends Arr {
   public abstract Expr invert();
 
   /**
+   * Checks if the operands yield single items whose comparison can be inverted.
+   * @return result of check
+   */
+  final boolean invertible() {
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    return st1.atomOcc() == Occ.EXACTLY_ONE && st2.atomOcc() == Occ.EXACTLY_ONE &&
+      nanSafe(cmpOp(), exprs);
+  }
+
+  /**
+   * Checks if inverting a comparison with the specified operator and operands is NaN-safe.
+   * @param op operator
+   * @param exprs operands
+   * @return result of check
+   */
+  static boolean nanSafe(final CmpOp op, final Expr... exprs) {
+    return op.oneOf(CmpOp.EQ, CmpOp.NE) || !mayBeNaN(exprs);
+  }
+
+  /**
+   * Checks if the atomized items of one of the specified expressions may be NaN.
+   * @param exprs expressions
+   * @return result of check
+   */
+  static boolean mayBeNaN(final Expr... exprs) {
+    for(final Expr expr : exprs) {
+      final BasicType type = expr.seqType().type.atomic();
+      if(type == null || !type.instanceOf(BasicType.DECIMAL) &&
+          (type.isNumberOrUntyped() || type == BasicType.ANY_ATOMIC_TYPE)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the general comparator of the expression.
    * @return operator, or {@code null} for node comparisons
    */
@@ -254,9 +288,9 @@ public abstract class Cmp extends Arr {
               if(last instanceof final CmpG cmp) {
                 // (name ! (. = 'Ukraine')) = true() → name = 'Ukraine'
                 // (code ! (. = 1)) = false() → code != 1
-                final Expr op2 = ops[1];
+                final Expr op1 = args[al - 1], op2 = ops[1];
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().atomOcc() == Occ.EXACTLY_ONE &&
-                    !args[al - 1].seqType().mayBeWrapped())) {
+                    !op1.seqType().mayBeWrapped() && (t || nanSafe(cmp.op, op1, op2)))) {
                   CmpOp cmpOp = cmp.op;
                   if(!t) cmpOp = cmpOp.invert();
                   return new CmpG(info, map.remove(cc, al), op2, cmpOp).optimize(cc);

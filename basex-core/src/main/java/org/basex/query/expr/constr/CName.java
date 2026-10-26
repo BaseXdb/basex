@@ -78,9 +78,8 @@ abstract class CName extends CNode {
     final Item item = name.atomItem(qc, info);
     if(item == Empty.VALUE) {
       if(empty) return EMPTY;
-    } else {
-      final Type type = item.type;
-      if(type.isStringOrUntyped()) return trim(item.string(info));
+    } else if(item.type.isStringOrUntyped()) {
+      return trim(item.string(info));
     }
     throw STRNCN_X_X.get(info, item.seqType(), item);
   }

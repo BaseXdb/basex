@@ -65,7 +65,7 @@ public final class DeepEqual {
    * @param coll collation (can be {@code null})
    * @param qc query context (to interrupt process, can be {@code null})
    */
-  public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc) {
+  public DeepEqual(final InputInfo info, final Collation coll, final QueryContext qc) {
     this(info, coll, qc, null);
   }
 
@@ -76,7 +76,7 @@ public final class DeepEqual {
    * @param qc query context (can be {@code null})
    * @param options options (can be {@code null})
    */
-  public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc,
+  public DeepEqual(final InputInfo info, final Collation coll, final QueryContext qc,
       final DeepEqualOptions options) {
     this.info = info;
     this.coll = Collation.get(coll, info);

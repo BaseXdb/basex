@@ -35,9 +35,6 @@ public final class RenameNode extends NodeUpdate {
   }
 
   @Override
-  public void prepare(final MemData memData, final QueryContext qc) { }
-
-  @Override
   public void limits(final NameLimits limits) {
     final int kind = data.kind(pre);
     if(kind != Data.PI) limits.add(name, kind == Data.ELEM);

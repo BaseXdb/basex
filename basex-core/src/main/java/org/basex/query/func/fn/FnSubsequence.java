@@ -314,8 +314,8 @@ public class FnSubsequence extends StandardFunc {
           final boolean exact = a == sr.start, one = args[a].seqType().one();
           if(a > 0 && (exact || !one)) {
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-            final long start = sr.start - a + 1, end = sr.end - start;
-            return cc.function(SUBSEQUENCE, info, list, Itr.get(start), Itr.get(end));
+            return cc.function(SUBSEQUENCE, info, list, Itr.get(sr.start - a + 1),
+                Itr.get(sr.length));
           }
           if(!one) break;
         }

@@ -102,16 +102,8 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
    * @param indent indentation level
    */
   void toString(final StringBuilder sb, final int indent) {
-    sb.repeat("  ", indent).append(Util.className(this)).append('[').append('\n');
-    if(sub instanceof final InnerNode<?, ?> inner) {
-      inner.toString(sb, indent + 1);
-    } else if(sub instanceof final PartialInnerNode<?, ?> partial) {
-      partial.toString(sb, indent + 1);
-    } else {
-      for(final String line : sub.toString().split("\r\n?|\n")) {
-        sb.repeat("  ", indent + 1).append(line).append('\n');
-      }
-    }
-    sb.repeat("  ", indent).append(']');
+    sb.repeat("  ", indent).append(Util.className(this)).append("[\n");
+    FingerTree.toString(sub, sb, indent + 1);
+    sb.append('\n').repeat("  ", indent).append(']');
   }
 }

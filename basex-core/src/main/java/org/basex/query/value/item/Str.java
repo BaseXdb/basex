@@ -23,8 +23,6 @@ public final class Str extends AStr {
   public static final Str EMPTY = new Str(Token.EMPTY);
   /** Wildcard of lookup expressions. */
   public static final Str WILDCARD = new Str(Token.cpToken('*'));
-  /** Key string. */
-  public static final Str KEY = Str.get("key");
 
   /** Unicode character cache. */
   private static final IntObjectMap<Str> CACHE = new IntObjectMap<>();
@@ -137,11 +135,6 @@ public final class Str extends AStr {
    */
   public byte[] string() {
     return value;
-  }
-
-  @Override
-  public int hashCode() {
-    return Token.hashCode(value);
   }
 
   @Override

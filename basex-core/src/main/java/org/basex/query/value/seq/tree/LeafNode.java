@@ -197,10 +197,7 @@ final class LeafNode implements Node<Item, Item> {
     final int l = ls.length, r = rs.length, n = l + r;
     if(n <= TreeSeq.MAX_LEAF) {
       // merge into one node
-      final Item[] vals = new Item[n];
-      Array.copy(ls, l, vals);
-      Array.copyFromStart(rs, r, vals, l);
-      nodes[pos - 1] = new LeafNode(vals);
+      nodes[pos - 1] = new LeafNode(TreeSeq.concat(ls, rs));
       return pos;
     }
 

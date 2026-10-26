@@ -61,6 +61,7 @@ public final class XQueryParse extends StandardFunc {
       // compilation may evaluate code: adopt the permissions of the calling code
       qctx.user = qc.user;
       qctx.maxPerm = perm(qc);
+      qctx.resolver = qc.resolver;
       final AModule module = qctx.parse(query.readString(),
           toBaseUri(query.path(), options, XQueryOptions.BASE_URI));
       // library modules have no main expression to optimize

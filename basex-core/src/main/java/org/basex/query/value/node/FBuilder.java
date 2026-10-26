@@ -26,7 +26,7 @@ public final class FBuilder {
   public Atts namespaces;
   /** Namespaces inherited from enclosing constructors (can be {@code null}). */
   public Atts nsInherited;
- /** Attributes (can be {@code null}). */
+  /** Attributes (can be {@code null}). */
   public GNodeList attributes;
   /** Children (can be {@code null}). */
   public GNodeList children;

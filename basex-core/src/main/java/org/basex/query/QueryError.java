@@ -512,6 +512,8 @@ public enum QueryError {
   /** Error code. */
   USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
   /** Error code. */
+  USER_PATTERN2_X(USER, "pattern", "No permission specified for pattern '%'."),
+  /** Error code. */
   USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
   /** Error code. */
   USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),

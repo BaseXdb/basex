@@ -451,8 +451,7 @@ public final class DecFormatter extends FormatUtil {
           if(ch == percent) {
             pic.pc = true;
             pix.add(percentRendition);
-          }
-          else if(ch == permille) {
+          } else if(ch == permille) {
             pic.pm = true;
             pix.add(permilleRendition);
           } else {

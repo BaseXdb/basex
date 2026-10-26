@@ -36,10 +36,10 @@ public class DbCopy extends DbAccessFn {
       throw DB_CONFLICT4_X.get(info, name);
     }
 
-    // source database does not exist
     checkCreate(name, qc);
     checkCreate(newname, qc);
-    if(!qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);
+    // source database does not exist
+    if(!sopts.dbExists(name)) throw DB_GET1_X.get(info, name);
 
     qc.updates().add(keep ? new DBCopy(name, newname, qc, info) :
       new DBAlter(name, newname, qc, info), qc);

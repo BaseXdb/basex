@@ -113,7 +113,7 @@ public final class RangeSeq extends Seq {
   @Override
   public Object toJava() {
     final long[] obj = new long[(int) size];
-    for(int s = 0; s < size; s++) obj[s] = start + (ascending ? s : -s);
+    for(int s = 0; s < size; s++) obj[s] = get(s);
     return obj;
   }
 

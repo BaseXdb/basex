@@ -61,7 +61,6 @@ public final class DbListDetails extends DbList {
     return new BasicIter<FNode>(size) {
       @Override
       public FNode get(final long i) {
-        if(i >= size) return null;
         final ResourceType type;
         final String pt;
         final long mdate, sz;

@@ -20,6 +20,8 @@ import org.basex.util.*;
 abstract class NodeCopy extends NodeUpdate {
   /** Nodes to be inserted. */
   GNodeList nodes;
+  /** Indicates if the node list is owned by this primitive. */
+  private boolean owned;
   /** Insertion sequence data clip (can be {@code null}; populated by {@link #prepare}). */
   DataClip insseq;
 
@@ -52,6 +54,16 @@ abstract class NodeCopy extends NodeUpdate {
   @Override
   public final void limits(final NameLimits limits) {
     if(insseq != null) limits.add(insseq);
+  }
+
+  @Override
+  public void merge(final Update update) throws QueryException {
+    final GNodeList add = ((NodeCopy) update).nodes;
+    if(!owned) {
+      nodes = new GNodeList(nodes.size() + add.size()).add(nodes);
+      owned = true;
+    }
+    nodes.add(add);
   }
 
   /**
@@ -100,6 +112,6 @@ abstract class NodeCopy extends NodeUpdate {
 
   @Override
   public final String toString() {
-    return Util.className(this) + "[], " + (insseq != null ? size() : nodes.size()) + " ops]";
+    return Util.className(this) + '[' + (insseq != null ? size() : nodes.size()) + " ops]";
   }
 }

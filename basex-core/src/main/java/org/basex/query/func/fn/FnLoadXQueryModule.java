@@ -166,8 +166,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final MapBuilder functions = new MapBuilder();
     for(final QNm qnm : funcs) {
       final MapBuilder arities = new MapBuilder();
-      final Map<Integer, Expr> funcItems = funcs.get(qnm);
-      for(final Map.Entry<Integer, Expr> entry : funcItems.entrySet()) {
+      for(final Map.Entry<Integer, Expr> entry : funcs.get(qnm).entrySet()) {
         arities.put(Itr.get(entry.getKey()), entry.getValue().value(mqc));
       }
       functions.put(qnm, arities.map());

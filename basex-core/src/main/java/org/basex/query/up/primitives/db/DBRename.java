@@ -36,10 +36,6 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     for(final Entry<String, String> entry : map.entrySet()) {
       final IOFile src = new IOFile(entry.getKey()), trg = new IOFile(entry.getValue());

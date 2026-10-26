@@ -156,7 +156,7 @@ public final class DTDur extends Dur {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final QueryContext qc, final InputInfo ii) throws QueryException {
-    return item.type == type ? seconds.subtract(((Dur) item).seconds).signum() :
+    return item.type == type ? seconds.compareTo(((Dur) item).seconds) :
       super.compare(item, coll, transitive, qc, ii);
   }
 

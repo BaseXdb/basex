@@ -1048,12 +1048,10 @@ public abstract class Path extends ParseExpr {
    * @return axis or {@code null}
    */
   private static Axis mergedAxis(final Expr expr) {
-    if(expr instanceof final Step step) {
+    if(expr instanceof final Step step && !step.mayBePositional()) {
       final Axis axis = step.axis;
-      if(!step.mayBePositional()) {
-        if(axis.oneOf(CHILD, DESCENDANT)) return DESCENDANT;
-        if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
-      }
+      if(axis.oneOf(CHILD, DESCENDANT)) return DESCENDANT;
+      if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
     }
     return null;
   }

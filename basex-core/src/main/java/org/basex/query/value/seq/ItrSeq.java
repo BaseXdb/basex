@@ -96,8 +96,6 @@ public abstract class ItrSeq extends NativeSeq {
       if(minWidth(min, max) >= width) return this;
     }
     final int w = minWidth(min, max);
-    if(w >= width) return this;
-
     if(w == 1) {
       final byte[] tmp = new byte[sz];
       for(int i = 0; i < sz; i++) tmp[i] = (byte) itrAt(i);
@@ -138,7 +136,7 @@ public abstract class ItrSeq extends NativeSeq {
       final int tl = tmp.length;
       int t = 0;
       if(type == BasicType.INTEGER) {
-        while(++t < tl && tmp[0] + t == tmp[t]);
+        while(++t < tl && (long) tmp[0] + t == tmp[t]);
       }
       if(t == tl) expr = RangeSeq.get(tmp[0], tl, true);
       else if(tl != sz) expr = IntSeq.get(tmp, type);

@@ -261,11 +261,9 @@ public final class GFLWOR extends ParseExpr {
       return new If(info, where.expr, cs == 1 ? rtrn : this).optimize(cc);
     }
 
-    if(first instanceof final For fr) {
-      // replace allowing empty with empty sequence: for $_ allowing empty in () return $_ → ()
-      if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof final VarRef vr &&
-          vr.var == fr.var) return Empty.VALUE;
-    }
+    // replace allowing empty with empty sequence: for $_ allowing empty in () return $_ → ()
+    if(cs == 1 && first instanceof final For fr && fr.size() == 0 && !fr.has(Flag.NDT) &&
+        rtrn instanceof final VarRef vr && vr.var == fr.var) return Empty.VALUE;
 
     // rewrite group by to distinct-values
     //   for $e in E let $l := L where W group by $g := G ... return R
@@ -474,13 +472,11 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = clauses.size() - 1; c >= 0; c--) {
       final Clause clause = clauses.get(c);
-      if(clause instanceof final For fr) {
-        if(fr.expr.size() == 0 && !fr.empty) {
-          cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-          for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(c);
-          rtrn = fr.expr;
-          changed = true;
-        }
+      if(clause instanceof final For fr && fr.expr.size() == 0 && !fr.empty) {
+        cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+        clauses.subList(c, clauses.size()).clear();
+        rtrn = fr.expr;
+        changed = true;
       }
     }
     return changed;
@@ -632,37 +628,32 @@ public final class GFLWOR extends ParseExpr {
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause clause = iter.next();
-        if(clause instanceof final For fr) {
-          // for $x in (for $y in A (...) return B) → for $y in A (...) for $x in B
-          if(!fr.empty && fr.pos == null && fr.expr instanceof final GFLWOR fl && fl.isFLW()) {
-            cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
-            iter.remove();
-            for(final Clause cls : fl.clauses) iter.add(cls);
-            fr.expr = fl.rtrn;
-            iter.add(fr);
-            thisRound = changed = true;
-          }
+        // for $x in (for $y in A (...) return B) → for $y in A (...) for $x in B
+        if(clause instanceof final For fr && !fr.empty && fr.pos == null &&
+            fr.expr instanceof final GFLWOR fl && fl.isFLW()) {
+          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
+          iter.remove();
+          for(final Clause cls : fl.clauses) iter.add(cls);
+          fr.expr = fl.rtrn;
+          iter.add(fr);
+          thisRound = changed = true;
         }
 
-        if(!thisRound && clause instanceof final ForLet flt) {
-          // let $x := (let $y := E return F) → let $y := E let $x := F
-          if(flt.expr instanceof final GFLWOR fl) {
-            final LinkedList<Clause> cls = fl.clauses;
-            if(cls.getFirst() instanceof Let) {
-              // remove the binding from the outer clauses
-              iter.remove();
+        // let $x := (let $y := E return F) → let $y := E let $x := F
+        if(!thisRound && clause instanceof final ForLet flt &&
+            flt.expr instanceof final GFLWOR fl && fl.clauses.getFirst() instanceof Let) {
+          // remove the binding from the outer clauses
+          iter.remove();
 
-              // propagate all leading 'let' bindings into outer clauses
-              do iter.add(cls.removeFirst());
-              while(!cls.isEmpty() && cls.getFirst() instanceof Let);
+          // propagate all leading 'let' bindings into outer clauses
+          final LinkedList<Clause> cls = fl.clauses;
+          do iter.add(cls.removeFirst());
+          while(!cls.isEmpty() && cls.getFirst() instanceof Let);
 
-              // re-add the binding with new, reduced expression at the end
-              final Expr rest = fl.clauses.isEmpty() ? fl.rtrn : fl.optimize(cc);
-              flt.expr = rest;
-              iter.add(clause);
-              thisRound = changed = true;
-            }
-          }
+          // re-add the binding with new, reduced expression at the end
+          flt.expr = cls.isEmpty() ? fl.rtrn : fl.optimize(cc);
+          iter.add(clause);
+          thisRound = changed = true;
         }
       }
     } while(thisRound);

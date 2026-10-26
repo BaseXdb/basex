@@ -46,10 +46,7 @@ public final class DocTest extends Test {
       final Test isect = child.intersect(dt.child);
       return isect != null ? new DocTest(isect) : null;
     }
-    if(test instanceof NodeTest || test instanceof UnionTest) {
-      return test.intersect(this);
-    }
-    return null;
+    return test instanceof NodeTest || test instanceof UnionTest ? test.intersect(this) : null;
   }
 
   @Override

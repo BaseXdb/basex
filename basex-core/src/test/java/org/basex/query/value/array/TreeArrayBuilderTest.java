@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -20,7 +21,7 @@ public final class TreeArrayBuilderTest extends ArrayTest {
     for(int len = 0; len < 2_000; len++) {
       final TreeArrayBuilder ab = new TreeArrayBuilder();
       for(int i = 0; i < len; i++) ab.add(Itr.get(i));
-      final XQArray array = ab.array();
+      final XQArray array = ab.array(Types.ARRAY);
       assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {

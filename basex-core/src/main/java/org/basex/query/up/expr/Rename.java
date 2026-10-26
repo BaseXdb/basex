@@ -52,14 +52,9 @@ public final class Rename extends Update {
 
       QNm newName = names.get(kind);
       if(newName == null) {
-        final CNode cname;
-        if(element) {
-          cname = new CElem(info, false, name, new Atts(), new Atts());
-        } else if(attribute) {
-          cname = new CAttr(info, true, name, Empty.VALUE);
-        } else {
-          cname = new CPI(info, false, name, Empty.VALUE);
-        }
+        final CNode cname = element ? new CElem(info, false, name, new Atts(), new Atts()) :
+          attribute ? new CAttr(info, true, name, Empty.VALUE) :
+          new CPI(info, false, name, Empty.VALUE);
         newName = ((XNode) cname.item(qc, info)).qname();
         names.put(kind, newName);
       }

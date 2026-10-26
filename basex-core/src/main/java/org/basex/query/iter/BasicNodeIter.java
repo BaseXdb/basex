@@ -43,9 +43,8 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<GNode> 
 
       @Override
       public boolean hasNext() {
-        final GNode n = BasicNodeIter.this.next();
-        node = n;
-        return n != null;
+        node = BasicNodeIter.this.next();
+        return node != null;
       }
 
       @Override

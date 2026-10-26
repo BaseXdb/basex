@@ -368,7 +368,7 @@ public final class OrderBy extends Clause {
   boolean clean(final IntObjectMap<Var> decl, final BitSet used) {
     // delete unused variables
     final int len = refs.length;
-    for(int r = refs.length; --r >= 0;) {
+    for(int r = len; --r >= 0;) {
       if(!used.get(refs[r].var.id)) refs = Array.remove(refs, r);
     }
     if(refs.length == used.cardinality()) return refs.length != len;

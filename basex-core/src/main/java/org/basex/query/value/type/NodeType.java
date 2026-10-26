@@ -186,10 +186,7 @@ public final class NodeType implements Type {
       if(!kind.instanceOf(nt.kind)) return false;
       return nt.test == null || test != null && test.instanceOf(nt.test);
     }
-    if(type instanceof final ChoiceItemType cit) {
-      return cit.hasInstance(this);
-    }
-    return false;
+    return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
 
   @Override

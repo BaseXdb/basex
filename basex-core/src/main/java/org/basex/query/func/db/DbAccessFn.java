@@ -72,7 +72,7 @@ abstract class DbAccessFn extends StandardFunc {
    */
   final String toDbPathOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toDbPath(toString(expr, qc));
+    return item.isEmpty() ? null : toDbPath(toString(item, expr));
   }
 
   /**

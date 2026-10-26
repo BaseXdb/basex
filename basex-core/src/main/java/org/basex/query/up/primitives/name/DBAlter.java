@@ -34,10 +34,6 @@ public final class DBAlter extends NameUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     close();
     close(newname, qc, info);

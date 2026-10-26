@@ -132,8 +132,7 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString function(final FuncDefinition definition, final Object... args) {
-    token(definition.args(error, args).trim());
-    return this;
+    return token(definition.args(error, args).trim());
   }
 
   /**
@@ -337,11 +336,9 @@ public final class QueryString {
 
   /**
    * Adds a space if appropriate.
-   * @return self reference
    */
-  private QueryString space() {
+  private void space() {
     if(!Strings.contains(NO_SPACE, last())) tb.add(' ');
-    return this;
   }
 
   /**

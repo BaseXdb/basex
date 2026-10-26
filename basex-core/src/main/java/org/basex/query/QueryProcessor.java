@@ -221,7 +221,8 @@ public final class QueryProcessor extends Job implements Closeable {
    * @return self reference
    */
   public QueryProcessor uriResolver(final UriResolver resolver) {
-    sc.resolver = resolver;
+    qc.resolver = resolver;
+    sc.resolver(resolver);
     return this;
   }
 

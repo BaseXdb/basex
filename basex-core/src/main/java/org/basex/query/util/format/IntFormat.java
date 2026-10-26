@@ -35,8 +35,10 @@ public final class IntFormat extends FormatParser {
       if(xuc == -1 && xlc == -1) {
         rc = -1;
       } else {
-        radix = toInt(substring(picture, 0, rc));
-        if(radix < 2 || radix > 36) {
+        final byte[] prefix = substring(picture, 0, rc);
+        radix = toInt(prefix);
+        // reject leading zeros, signs and whitespace
+        if(radix < 2 || radix > 36 || !eq(token(radix), prefix)) {
           rc = -1;
           radix = 10;
         } else if(xuc != -1 && xlc != -1) {
@@ -48,6 +50,13 @@ public final class IntFormat extends FormatParser {
 
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY_X.get(info, picture);
+    if(hasExplicitRadix) {
+      for(final int cp : cps(pres)) {
+        if(cp != 'x' && cp != 'X' && alphanumeric(cp)) {
+          throw INVDDPATTERN_X.get(info, picture);
+        }
+      }
+    }
     finish(presentation(pres, cpToken('1'), false, false));
     if(sc == -1) return;
 
@@ -88,13 +97,9 @@ public final class IntFormat extends FormatParser {
    */
   @Override
   public int zeroes(final int ch) {
-    if(hasExplicitRadix && (ch == 'x' || ch == 'X')) return '0';
-    if(radix == 10) return super.zeroes(ch);
-    for(int r = 0; r < radix; r++) {
-      final int c = DIGITS[r];
-      if(ch == c || ch > '9' && ch == uc(c)) return '0';
-    }
-    return -1;
+    // '0': normalized zero digit, passed on by callers (rejected in the picture by the constructor)
+    if(hasExplicitRadix) return ch == 'x' || ch == 'X' || ch == '0' ? '0' : -1;
+    return super.zeroes(ch);
   }
 
   /**
@@ -105,10 +110,7 @@ public final class IntFormat extends FormatParser {
    */
   @Override
   public boolean digit(final int ch, final int zero) {
-    if(hasExplicitRadix && (ch == 'X' || ch == 'x')) return true;
-    if(radix == 10) return super.digit(ch, zero);
-    final int num = ch <= '9' ? ch : (ch & 0xDF) - 0x37;
-    return ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' &&
-        num < radix;
+    if(hasExplicitRadix) return ch == 'x' || ch == 'X';
+    return super.digit(ch, zero);
   }
 }

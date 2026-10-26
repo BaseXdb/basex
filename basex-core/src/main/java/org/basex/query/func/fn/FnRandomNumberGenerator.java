@@ -145,7 +145,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
         @Override
         public Item next() {
-          return c++ == count ? null : Dbl.get(random.nextDouble());
+          return c++ < count ? Dbl.get(random.nextDouble()) : null;
         }
       };
     }

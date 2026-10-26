@@ -27,10 +27,8 @@ public final class ArchiveWrite extends ArchiveFn {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
     final CreateOptions options = toOptions(arg(3), new CreateOptions(), qc);
 
-    try {
-      try(BufferOutput out = new BufferOutput(new IOFile(path))) {
-        create(files, options, out, qc);
-      }
+    try(BufferOutput out = new BufferOutput(new IOFile(path))) {
+      create(files, options, out, qc);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

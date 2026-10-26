@@ -43,7 +43,6 @@ public final class Catch extends Single {
     super(info, expr, Types.ITEM_ZM);
     this.tests = tests;
     this.vars = vars;
-    this.expr = expr;
     used.set(0, vars.length);
   }
 

@@ -391,7 +391,7 @@ public abstract class XQMap extends XQStruct {
       return new BasicIter<>(size) {
         @Override
         public Item get(final long i) {
-          return (Item) valueAt((int) i);
+          return (Item) valueAt(i);
         }
       };
     }
@@ -497,9 +497,7 @@ public abstract class XQMap extends XQStruct {
     final MapBuilder mb = new MapBuilder(structSize());
     return test((key, value) -> {
       qc.checkStop();
-      final Value ck = kt.convert(key, error, qc, info);
-      if(ck == null) return false;
-      final Item k = (Item) ck;
+      if(!(kt.convert(key, error, qc, info) instanceof final Item k)) return false;
       if(mb.contains(k)) {
         if(error) throw MAPDUPLKEY_X.get(info, k);
         return false;

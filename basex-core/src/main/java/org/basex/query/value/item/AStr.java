@@ -186,6 +186,11 @@ public abstract class AStr extends Item {
   }
 
   @Override
+  public int hashCode() {
+    return Token.hashCode(value);
+  }
+
+  @Override
   public void toString(final QueryString qs) {
     if(type == BasicType.STRING) qs.quoted(value);
     else qs.constructor(type, value);

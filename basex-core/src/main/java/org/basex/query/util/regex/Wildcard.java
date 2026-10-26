@@ -24,7 +24,7 @@ public final class Wildcard extends RegExp {
   }
 
   /**
-   * Getter for the lazily initialized wildcard instances.
+   * Returns the wildcard instance for the specified flag.
    * @param dotAll match-all flag
    * @return instance
    */

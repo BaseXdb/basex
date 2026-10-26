@@ -102,7 +102,7 @@ public final class Flt extends ANum {
 
   @Override
   public Flt round(final int prec, final RoundMode mode) {
-    if(value == 0 || Float.isNaN(value) || Float.isInfinite(value)) return this;
+    if(value == 0 || !Float.isFinite(value)) return this;
     final float f = Dec.round(BigDecimal.valueOf(value), prec, mode).floatValue();
     return f == 0 && Float.floatToRawIntBits(value) < 0 ? NEGATIVE_ZERO :
       f == value ? this : Flt.get(f);
