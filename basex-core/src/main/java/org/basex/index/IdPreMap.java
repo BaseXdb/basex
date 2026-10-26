@@ -95,8 +95,8 @@ public class IdPreMap {
     if(bytes.length < length) throw new IOException("ID/PRE log is incomplete: " + log);
     final IntList list = changes;
     changes = null;
+    final int[] args = new int[4];
     for(int p = 0; p < length;) {
-      final int[] args = new int[4];
       for(int a = 0; a < 4; a++) {
         args[a] = Num.get(bytes, p);
         p += Num.length(bytes, p);

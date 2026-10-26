@@ -156,7 +156,7 @@ public final class Names extends TokenSet implements Index {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Text.LI_STRUCTURE).add(Text.HASH).add(Text.NL);
     tb.add(Text.LI_ENTRIES).addInt(size - 1).add(Text.NL);
-    for(int i = 0; i < size - 1; i++) {
+    for(int i = 0; i < size; i++) {
       final int o = ordered[i];
       if(st == null || st[o] == null) continue;
       final byte[] key = keys[o];

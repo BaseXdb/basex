@@ -79,16 +79,16 @@ public final class IndexNames {
         return null;
       }
 
-      final byte[] name, uri;
-      final byte[][] parsed = QNm.parseExpanded(token(entry), true);
+      final byte[] token = token(entry), name, uri;
+      final byte[][] parsed = QNm.parseExpanded(token, true);
       if(parsed != null) { // Q{uri}name, Q{uri}*
         name = parsed[0];
         uri = parsed[1];
       } else if(entry.startsWith("*:")) { // *:name
-        name = token(entry.substring(2));
+        name = substring(token, 2);
         uri = null;
-      } else if(XMLToken.isNCName(token(entry))) { // name
-        name = token(entry);
+      } else if(XMLToken.isNCName(token)) { // name
+        name = token;
         uri = EMPTY;
       } else { // invalid
         if(invalid == null) invalid = entry;

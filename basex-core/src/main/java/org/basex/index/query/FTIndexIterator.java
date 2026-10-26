@@ -37,7 +37,7 @@ public abstract class FTIndexIterator implements IndexIterator {
   public abstract void pos(int p);
 
   /**
-   * Merges two index iterators for unions.
+   * Merges index iterators for unions.
    * @param iters index iterators to merge
    * @return new iterator
    */
@@ -140,7 +140,7 @@ public abstract class FTIndexIterator implements IndexIterator {
           if(d <= 0) iter1 = i1.more() ? i1 : null;
           if(d >= 0) iter2 = i2.more() ? i2 : null;
           if(iter1 == null || iter2 == null) return false;
-          d = iter1.pre() - iter2.pre();
+          d = Integer.compare(iter1.pre(), iter2.pre());
           if(d != 0) continue;
           all = iter1.matches();
           final FTMatches all2 = iter2.matches();
@@ -149,9 +149,8 @@ public abstract class FTIndexIterator implements IndexIterator {
               for(final FTMatch m2 : all2) m1.add(m2);
             }
             return true;
-          } else if(all.phrase(all2, dis)) {
-            return true;
           }
+          if(all.phrase(all2, dis)) return true;
         }
       }
 

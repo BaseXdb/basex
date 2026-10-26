@@ -28,14 +28,15 @@ import org.basex.util.list.*;
  *
  * <ul>
  * <li>File <b>x</b> contains an entry for each token length.
- * Structure: {@code [l, p] ...}.
- * {@code l} is the length of a token [byte].
+ * Structure: {@code n, [l, p] ...}.
+ * {@code n} is the number of entries [{@link Num}].
+ * {@code l} is the length of a token [{@link Num}].
  * {@code p} is the pointer of the first token with length {@code l} [int].
  * </li>
  * <li>File <b>y</b> contains the tokens and references.
  * Structure: {@code [t0, t1, ... tl, z, s]}
  * {@code t0, t1, ... tl-1} is the token [byte[l]]
- * {@code z} is the pointer on the data entries of the token [long]
+ * {@code z} is the pointer on the data entries of the token [5 bytes]
  * {@code s} is the number of references, saved in data [int]
  * </li>
  * <li>File <b>z</b> contains the {@code ID/POS} references.

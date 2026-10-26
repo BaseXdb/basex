@@ -91,7 +91,7 @@ final class FTSegment extends IndexSegment implements FTSource {
   @Override
   public void wildcards(final FTWildcard wc, final IntList pres, final IntList poss) {
     final byte[] pref = wc.prefix();
-    final int pl = positions.length, l = Math.min(pl - 1, wc.max());
+    final int pl = positions.length, l = Math.min(pl - 2, wc.max());
     for(int p = pref.length; p <= l; p++) {
       int start = positions[p];
       if(start == -1) continue;
@@ -108,7 +108,7 @@ final class FTSegment extends IndexSegment implements FTSource {
 
   @Override
   public void fuzzy(final FTFuzzy fuzzy, final IntList pres, final IntList poss) {
-    final int pl = positions.length, e = Math.min(pl - 1, fuzzy.maxLength());
+    final int pl = positions.length, e = Math.min(pl - 2, fuzzy.maxLength());
     for(int s = fuzzy.minLength(); s <= e; s++) {
       final int p = positions[s];
       if(p == -1) continue;
@@ -266,7 +266,7 @@ final class FTSegment extends IndexSegment implements FTSource {
    */
   private int find(final byte[] token, final int start, final int end, final int ti) {
     final int tl = ti + FTIndex.ENTRY;
-    int s = 0, e = (end - start) / tl;
+    int s = 0, e = (end - start) / tl - 1;
     while(s <= e) {
       final int m = s + e >>> 1, pos = start + m * tl, d = compare(cache(pos, ti), token);
       if(d == 0) return pos;
@@ -320,25 +320,18 @@ final class FTSegment extends IndexSegment implements FTSource {
    * @return int pointer or {@code -1} if token was not found
    */
   private int token(final byte[] token) {
-    final int tl = token.length;
-    // left limit
-    int s = positions[tl];
-    if(s == -1) return -1;
-
-    // find right limit
-    final int x = end(tl);
-    int e = x;
-
-    // binary search
+    final int tl = token.length, start = positions[tl];
+    if(start == -1) return -1;
+    // binary search without caching the probed tokens
     final int o = tl + FTIndex.ENTRY;
-    while(s < e) {
-      final int m = s + (e - s >> 1) / o * o, d = compare(dataY.readBytes(m, tl), token);
-      if(d == 0) return m;
-      if(d < 0) s = m + o;
-      else e = m - o;
+    int s = 0, e = (end(tl) - start) / o - 1;
+    while(s <= e) {
+      final int m = s + e >>> 1, pos = start + m * o, d = compare(dataY.readBytes(pos, tl), token);
+      if(d == 0) return pos;
+      if(d < 0) s = m + 1;
+      else e = m - 1;
     }
-    // accept entry if pointer is inside relevant tokens
-    return e != x && s == e && eq(dataY.readBytes(s, tl), token) ? s : -1;
+    return -1;
   }
 
   /**
