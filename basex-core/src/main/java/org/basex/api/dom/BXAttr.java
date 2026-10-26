@@ -21,11 +21,6 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
-  public String getNodeName() {
-    return Token.string(nd.name());
-  }
-
-  @Override
   public String getLocalName() {
     return Token.string(Token.local(nd.name()));
   }

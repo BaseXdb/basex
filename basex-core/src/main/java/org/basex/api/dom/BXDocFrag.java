@@ -19,7 +19,7 @@ public final class BXDocFrag extends BXNode implements DocumentFragment {
   }
 
   @Override
-  protected int kind() {
+  int kind() {
     return 7;
   }
 }
