@@ -37,6 +37,8 @@ function dba:users(
   $sort     as xs:string
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show :)
+  (: a user is always open: the first one if the address names none :)
+  let $name := $name[.] otherwise min(user:list())
   let $user := panels:user($name, $newname, $perm)
   return (
     html:panel(panels:users($sort, 1, $name), { 'id': 'users-panel', 'label': 'Users' }),
@@ -46,23 +48,12 @@ function dba:users(
       <form method='post' action='users/update' autocomplete='off' id='user-panel'
             class='pane column'>{ $user }</form>,
       { 'label': 'User', 'pane': false(), 'hidden': empty($user) }),
-    (: the panels follow the selection: what is attached to no user in particular steps back
-       once one of them is being looked at :)
-    html:panel(panels:information(),
-      { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user),
-        'description': 'custom data that belongs to no user in particular' }),
     (: outside the panels: the user panel is a form, and is replaced when another user is shown :)
-    panels:pattern-dialog()
+    panels:pattern-dialog(),
+    panels:info-dialog()
   ) => html:wrap({
     'header' : $dba:CAT,
-    'divided': true(),
-    (: the information panel is only open while no user is shown, where it is one of two
-       panels: its share is what the two of them then split :)
-    'columns': ('25fr', '50fr', '25fr'),
     'rows'   : '1fr',
-    (: a view of its own: what is folded away while a user is shown is not what is folded away
-       while the list is :)
-    'panels' : 'user'[$user],
     'scripts': ('cm6', 'editor', 'users'),
     'init'   : 'initUsers();'
   })

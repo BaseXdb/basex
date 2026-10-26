@@ -12,7 +12,7 @@ let _logJump = window.location.hash !== "";
 /**
  * Queries the entries of the log files that are searched: the checked ones, or the file that
  * is opened.
- * @param {string} key typed key, or the cause of the request ('select', 'filter'); omitted
+ * @param {string} key 'Enter', or the cause of the request ('input', 'select', 'filter'); omitted
  *   for a plain refresh
  */
 function logEntries(key) {
@@ -20,12 +20,10 @@ function logEntries(key) {
   const input = fieldValue("input");
   const ignore = fieldValue("ignore");
   const filters = document.querySelectorAll("input.filter");
-  // the checked files are the scope of a search; without a search term, and without a
-  // selection, the opened file is what is listed
+  // the checked files are what is listed and searched; without a selection, the opened file
   const checked = [ ...document.querySelectorAll("#list input[name=name]:checked") ].
     map(input => input.value);
-  const dates = input && checked.length ? checked :
-    [ document.getElementById("date").value ];
+  const dates = checked.length ? checked : [ document.getElementById("date").value ];
   // the filter fields belong to the rendered table, so they are missing until the first
   // result arrives; empty ones must not count, or the first key press after a search
   // would look like a new search. Before that, the stored ones
@@ -48,34 +46,30 @@ function logEntries(key) {
   const live = document.getElementById("live");
   if(live) live.disabled = _logFiles > 1;
   // what is searched is stated where the date of a single file is
-  const heading = document.querySelector(".logbar h2");
+  const heading = document.querySelector(".searchbar h2");
   if(heading) heading.textContent = _logFiles > 1 ? `Logs: ${_logFiles} files` : `Log: ${dates[0]}`;
 
   const message = {
     type: "entries",
-    input: input,
-    ignore: ignore,
-    dates: dates,
+    input,
+    ignore,
+    dates,
     sort: document.getElementById("sort").value,
     // a new search or filter keeps the number of entries that are shown
     page: Number(document.getElementById("page").value) || 1,
-    entry: document.getElementById("entry").value,
+    // the entry that was jumped to belongs to the opened file
+    entry: checked.length ? "" : document.getElementById("entry").value,
     // the fields are named after the columns they filter, with a prefix of their own
     filters: Object.fromEntries(typed.map(([ name, value ]) => [ name.replace(/^f-/, ""), value ]))
   };
-  // the server stops a search that is superseded by a newer one
-  message.run = startRequest();
-  sendMessage("/logs", message).then(sent => {
-    // a search that takes longer than a moment says so; the message is revoked by showMessage
-    // when the entries arrive
-    if(sent) awaitResult(message.run);
-  });
+  // the server stops a search that is superseded by a newer one; a search that takes longer
+  // than a moment says so, and the message is revoked by showMessage when the entries arrive
+  sendRequest("/logs", message);
 
   // refresh browser history, so that a reload shows what the page shows
   // the number of shown pages is not kept: a reload starts with the first one, unless an entry
   // that was jumped to has to be shown again
-  window.history.replaceState(null, "", replaceParams(window.location.href,
-    { input: input, page: message.entry ? message.page : "", sort: message.sort }));
+  setParams({ input, page: message.entry ? message.page : "", sort: message.sort });
 }
 
 /**
@@ -106,15 +100,6 @@ function showLogEntries(text) {
 }
 
 /**
- * Requests the entries that were typed for: the search, the ignore filter and the column
- * filters share one pending request, as a search reads all of them at once.
- * @param {string} key typed key
- */
-function filterLogs(key) {
-  filterKey(key, "logs", () => logEntries(key));
-}
-
-/**
  * Restores the stored text fields, then loads the log entries.
  */
 function initLogs() {
@@ -126,12 +111,14 @@ function initLogs() {
   // a search of the address wins over the stored one
   restoreField("input");
   restoreField("ignore");
-  if(restoreField("log-filter")) logFilter();
-  // the checked files are the scope of the search, so a new selection is a new search.
-  // Clicks, not changes: the checkbox of the table header ticks the rows by script, which
-  // raises no change event of its own
+  _panel_filled.list();
+  // the checked files are what is listed, so a new selection is a new request; the clicks of a
+  // row are collected first. Clicks, not changes: the checkbox of the table header ticks the
+  // rows by script, which raises no change event of its own
   document.getElementById("list").addEventListener("click", event => {
-    if(event.target.matches("input[type=checkbox]")) logEntries("select");
+    if(event.target.matches("input[type=checkbox]")) {
+      filterKey("select", "logEntries", () => logEntries("select"));
+    }
   });
   logEntries();
 }
@@ -165,23 +152,18 @@ function logFilter() {
   const value = document.getElementById("log-filter").value;
   storeField("log-filter");
   const list = document.getElementById("dates");
-  let count = 0, unchecked = false;
-  for(const input of list.querySelectorAll("input[name=name]")) {
+  let unchecked = false;
+  filterRows(list, list.querySelectorAll("tbody tr"), row => {
+    const input = row.querySelector("input[name=name]");
     const visible = !value || input.value.startsWith(value);
-    input.closest("tr").style.display = visible ? null : "none";
-    if(visible) {
-      count++;
-    } else if(input.checked) {
-      // a file that is filtered out is no longer searched
+    if(!visible && input.checked) {
+      // a file that is filtered out is no longer listed
       input.checked = false;
       unchecked = true;
     }
-  }
-  // the summary counts what is left; the words are the ones the table was rendered with, and
-  // the buttons are derived from the selection by buttons()
-  const summary = list.querySelector("h3");
-  if(summary) summary.textContent =
-    plural(count, summary.dataset.singular, summary.dataset.plural);
+    return visible;
+  });
+  // the buttons are derived from the selection
   buttons();
   if(unchecked) logEntries("filter");
 }
@@ -205,7 +187,21 @@ followPanelLinks({ output: (sort, page) => {
   if(sort !== undefined) document.getElementById("sort").value = sort;
   document.getElementById("page").value = page;
   logEntries();
-} });
+}, list: refreshFiles });
+
+/**
+ * Requests the list of log files.
+ * @param {string} sort sort key; if omitted, the shown order is kept
+ */
+function refreshFiles(sort) {
+  requestPanel("/logs", "list", { type: "files", date: document.getElementById("date").value,
+    entries: document.getElementById("sort").value }, sort);
+}
+
+/** The filter of the log files is part of the replaced list, and is applied again. */
+_panel_filled.list = () => {
+  if(restoreField("log-filter")) logFilter();
+};
 
 /** The log view receives its entries as a rendered table. */
 _handlers["/logs"] = json => {

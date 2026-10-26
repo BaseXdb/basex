@@ -93,7 +93,7 @@ declare function panel:files(
       'pinned': true(),
       'empty': 'The directory is empty.'
     }
-    return table:create($headers, $entries, $buttons, {}, $options)
+    return table:create($headers, $entries, $buttons, options := $options)
     }</form>,
 
     (: the file chooser is opened by the Upload button and submits what it collects :)

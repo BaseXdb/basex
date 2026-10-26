@@ -54,7 +54,7 @@ function dba:stores(
     })
   ) => html:wrap({
     'header' : $dba:CAT,
-    'columns': ('30fr', '35fr', '35fr'),
+    'columns': ('35fr', '35fr', '30fr'),
     'rows'   : '1fr',
     'scripts': ('cm6', 'editor', 'stores'),
     'init'   : `initStores({ $value?editable });`
@@ -127,7 +127,6 @@ function dba:remove() {
        store are removed from the store itself :)
     let $path := panels:steps($args?path)
     let $steps := $args?step ! panels:steps(.)
-    let $key := head($path)
     return {
       (: the entries that were removed are gone; the level they belonged to is not :)
       'params': dba:selection($args, ()),
@@ -136,6 +135,7 @@ function dba:remove() {
         if (empty($path)) then (
           $steps ! store:remove(string(.), $args?name)
         ) else (
+          let $key := head($path)
           let $value := store:get($key, $args?name)
           let $level := panels:remove(panels:resolve($value, tail($path)), $steps)
           return store:put($key, panels:replace($value, tail($path), $level), $args?name)

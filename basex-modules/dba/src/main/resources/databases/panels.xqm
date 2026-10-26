@@ -28,6 +28,8 @@ declare function panels:databases(
   $name  as xs:string?
 ) as element()+ {
   let $db-names := db:list()
+  let $presort := 'name'
+  let $sort := $sort[.] otherwise $presort
   return (
     (: the page is the list of databases: a heading would only repeat the navigation :)
     <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
@@ -36,7 +38,7 @@ declare function panels:databases(
           (: the values of a known format get the width they need; the name takes the rest :)
           { 'key': 'name', 'label': 'Name' },
           { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
-            'width': 'calc(7ch + 0.5rem)' },
+            'width': 'calc(8ch + 0.5rem)' },
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
             'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
@@ -53,15 +55,6 @@ declare function panels:databases(
           where $db
           return { $db: string(head($backup)/@date) }
         )
-        let $databases :=
-          for $db in utils:slice(db:list-details(), $page, $sort)
-          return {
-            'name': panels:select($db, $db = $name),
-            'resources': $db/@resources,
-            'size': $db/@size,
-            'date': $db/@modified-date,
-            'backup': $backups?(string($db))
-          }
         (: a dropped database stays listed as long as a backup of it exists, so that it can
            be selected and restored :)
         let $dropped := (
@@ -72,6 +65,17 @@ declare function panels:databases(
             'backup': $backup
           }
         )
+        (: dropped databases are appended; if there are any, the table sorts all entries :)
+        let $presorted := $presort[empty($dropped)]
+        let $databases :=
+          for $db in utils:slice(db:list-details(), $page, $sort, $presorted)
+          return {
+            'name': panels:select($db, $db = $name),
+            'resources': $db/@resources,
+            'size': $db/@size,
+            'date': $db/@modified-date,
+            'backup': $backups?(string($db))
+          }
         let $buttons := (
           <button type='button' onclick='showDialog("create")'
                   title='Create a new database'>New…</button>,
@@ -82,10 +86,15 @@ declare function panels:databases(
           form:button('databases/backups-create', 'Back up', 'CHECK',
             title := 'Write a zipped backup of each selected database'),
           form:button('databases/backups-restore', 'Restore', ('CHECK', 'CONFIRM'),
-            title := 'Restore each selected database from its latest backup')
+            title := 'Restore each selected database from its latest backup'),
+          <button type='button' onclick='openDialog("storage")'
+                  title='Show the backups of the users, services, and stores, and the stored data'>{
+            'Storage…'
+          }</button>
         )
         let $options := {
           'sort': $sort,
+          'presort': $presorted,
           'page': $page,
           'count': count($db-names) + count($dropped),
           (: the heading and the buttons stay in reach while the list scrolls :)
@@ -93,7 +102,7 @@ declare function panels:databases(
           'noun': 'database',
           'empty': 'There are no databases yet. Create one with New…'
         }
-        return table:create($headers, ($databases, $dropped), $buttons, {}, $options)
+        return table:create($headers, ($databases, $dropped), $buttons, options := $options)
       }
     </form>,
 
@@ -116,9 +125,11 @@ declare function panels:databases(
             title := 'Store the uploaded files as binary data, without parsing them')
         }</div>,
         <div>{ form:parsing-options(()) }</div>,
-        (: the defaults of the server: incremental indexing is enabled :)
-        form:index-fields(('textindex', 'attrindex', 'updindex'), { 'language': 'English' })
-      }</div>
+        (: the defaults of the server :)
+        form:index-fields(('textindex', 'attrindex'), { 'language': 'English' })
+      }</div>,
+      (: incremental indexing is enabled by default :)
+      form:update-fields('updindex')
     ))
   )
 };
@@ -146,12 +157,15 @@ declare function panels:database(
     (: nothing is selected: the panel is not shown, so it needs no placeholder :)
   ) else if (not(db:exists($name))) then (
     (: the name is only known from the backups of the dropped database :)
-    <h2>{ 'Database: ' || $name }</h2>,
-    <div class='note'>The database does not exist; one of its backups can be restored.</div>
+    <h2>Database: { $name }</h2>,
+    <div class='note'>The database does not exist; one of its backups can be restored.</div>,
+    <div class='buttons'>
+      <button type='button' onclick='openDialog("properties", "backups-panel")'
+              title='Show the backups of the database'>Backups…</button>
+    </div>
   ) else (
     panels:resource-list($name, $sort, $page, $resource, $dir, $filter),
     panels:add-dialog($name),
-    panels:optimize-dialog($name),
     (: the new name of the database is asked for; the chosen action decides what is done with it :)
     form:prompt('database-newname', 'newname', (),
       <input type='hidden' name='name' value='{ $name }'/>)
@@ -176,7 +190,9 @@ declare %private function panels:resource-list(
   $dir       as xs:string,
   $filter    as xs:string
 ) as element(form) {
-  <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
+  let $presort := 'name'
+  let $sort := $sort[.] otherwise $presort
+  return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <input type='hidden' name='name' value='{ $name }'/>
     {
       let $headers := (
@@ -202,7 +218,7 @@ declare %private function panels:resource-list(
         return $entry
       )
       let $entries :=
-        for $entry in utils:slice($level, $page, $sort)
+        for $entry in utils:slice($level, $page, $sort, $presort)
         let $label := string($entry)
         let $directory := boolean($entry/self::dir)
         (: a directory is entered, a resource is opened; the path of a directory ends with a
@@ -222,18 +238,16 @@ declare %private function panels:resource-list(
           'size': $entry/@size,
           'date': $entry/@modified-date
         }
-      (: what applies to the database comes first; the row wraps only if it has to :)
+      (: the resources are acted on here; the database as a whole in its properties dialog :)
       let $buttons := (
         <button type='button' onclick='enterDbDir("..")'
                 title='Go to the parent directory'>{
           attribute disabled { }[not($dir)], '..'
         }</button>,
-        <button type='button' onclick='renameDatabase()'
-                title='Rename the database'>Rename…</button>,
-        <button type='button' onclick='copyDatabase()'
-                title='Copy the database under a new name'>Copy…</button>,
-        <button type='button' onclick='showDialog("optimize")'
-                title='Change the index options and update the indexes'>Options…</button>,
+        <button type='button' onclick='openDialog("properties")'
+                title='Show the options, indexes, backups and information of the database'>{
+          'Properties…'
+        }</button>,
         <button type='button' onclick='showDialog("add")'
                 title='Add files, a directory, an archive or a URL'>Add…</button>,
         form:button('resources-download', 'Download', 'CHECK',
@@ -243,10 +257,11 @@ declare %private function panels:resource-list(
         (: the filter is a control of the list, and shares the row of its buttons :)
         <input type='text' id='resource-filter' class='smallinput' placeholder='Filter, e.g. .xml'
                title='Find resources of the database, wherever they are stored'
-               value='{ $filter }' onkeyup='filterResources(event.key);'/>
+               value='{ $filter }' data-filter='filterResources'/>
       )
       let $options := {
         'sort': $sort,
+        'presort': $presort,
         'page': $page,
         (: the entries of one level are known, so the total is what they are counted by :)
         'count': count($level),
@@ -277,11 +292,11 @@ declare %private function panels:database-heading(
 ) as element(h2) {
   <h2>{
     'Database: ',
-    (: below the root, or with a filter, the name returns to the root of the database and
-       clears the selected resource, and with it the document that is shown :)
+    (: below the root, or with a filter, the name returns to the root of the database; the
+       document stays open :)
     if ($dir or $filter) then (
       <a href='{ web:create-url($panels:CAT, { 'name': $name }) }'
-         onclick='enterDbDir(""); selectResource(""); return false;'>{ $name }</a>
+         onclick='enterDbDir(""); return false;'>{ $name }</a>
     ) else (
       text { $name }
     ),
@@ -328,53 +343,223 @@ declare %private function panels:add-dialog(
 };
 
 (:~
- : Creates the dialog that optimizes a database.
- : @param  $name  database
- : @return dialog
+ : Creates the tab bar of a dialog and the blocks that its tabs show.
+ : @param  $dialog  name of the dialog
+ : @param  $tabs    tabs: the id of the block each of them shows, its label, and its contents
+ : @return tab bar and blocks
  :)
-declare %private function panels:optimize-dialog(
-  $name  as xs:string
-) as element(dialog) {
-  (: the index configuration is not a report: it is what the next optimization applies :)
-  (: one read of the database properties supplies both the index flags and the text values :)
-  let $indexes := db:info($name)//indexes/*
-  return form:dialog('optimize', 'Database Options', 'databases/optimize-db', false(), (
-    <input type='hidden' name='name' value='{ $name }'/>,
-    form:checkbox('all', 'true', false(), 'Full optimization'),
-    <div class='field-columns'>{
-      form:index-fields($indexes[. = 'true']/name(), map:build($indexes, name#1, string#1))
-    }</div>
-  ))
+declare %private function panels:tabs(
+  $dialog  as xs:string,
+  $tabs    as map(*)+
+) as element(div)+ {
+  (: the selected tab is marked, and made the only one reached with Tab, by showTab :)
+  <div class='tabs' role='tablist' onkeydown='tabKey("{ $dialog }", event)'>{
+    for $tab in $tabs
+    return <button type='button' class='tab' role='tab'
+                   id='{ $tab?id }-tab' aria-controls='{ $tab?id }'
+                   onclick='showTab("{ $dialog }", "{ $tab?id }")'>{ $tab?label }</button>
+  }</div>,
+  for $tab in $tabs
+  return <div id='{ $tab?id }' role='tabpanel' aria-labelledby='{ $tab?id }-tab'>{
+    $tab?contents
+  }</div>
 };
 
 (:~
- : Creates the contents of the backups panel: the backups of the selected database, or the ones
- : of the general data if none is selected.
+ : Creates the properties dialog of the selected database.
+ : @param  $name  selected database
+ : @return dialog
+ :)
+declare function panels:properties-dialog(
+  $name  as xs:string?
+) as element(dialog) {
+  (: outside the panels, which are replaced; once another database is chosen, the contents are
+     requested when the dialog is opened; see openDialog :)
+  <dialog id='properties-dialog' class='tabbed'>{
+    panels:properties($name, 'element-name', '')
+  }</dialog>
+};
+
+(:~
+ : Creates the contents of the properties dialog: everything that concerns a database as a whole.
+ : @param  $name    selected database
+ : @param  $index   index that is listed
+ : @param  $prefix  prefix of the listed index entries
+ : @return contents; empty if no database is selected
+ :)
+declare function panels:properties(
+  $name    as xs:string?,
+  $index   as xs:string,
+  $prefix  as xs:string
+) as element()* {
+  (: a database that is only known from its backups offers nothing but them. A tab only shows
+     another block: what was entered in the options is kept :)
+  if ($name) {
+    let $exists := db:exists($name)
+    (: one read of the database properties supplies the options and the information :)
+    let $info := if ($exists) { db:info($name) }
+    return (
+      <h2>Properties: { $name }</h2>,
+      panels:tabs('properties', (
+        if ($exists) {
+          { 'id': 'options-panel', 'label': 'Options', 'contents': panels:options($name, $info) },
+          { 'id': 'index-panel', 'label': 'Indexes',
+            'contents': panels:index($name, $index, $prefix, '', 1) }
+        },
+        { 'id': 'backups-panel', 'label': 'Backups', 'contents': panels:backups($name) },
+        if ($exists) {
+          (: a report: what can be changed is offered by the options block :)
+          { 'id': 'information-panel', 'label': 'Information',
+            'contents': table:properties($info) }
+        }
+      )),
+      <form method='dialog' class='buttons'>{
+        (: what is done with the database as a whole; the options are applied from every tab :)
+        if ($exists) {
+          <button type='button' onclick='renameDatabase()'
+                  title='Rename the database'>Rename…</button>,
+          <button type='button' onclick='copyDatabase()'
+                  title='Copy the database under a new name'>Copy…</button>,
+          <button form='options-form'>Optimize</button>
+        },
+        <button>Close</button>
+      }</form>
+    )
+  }
+};
+
+(:~
+ : Creates the contents of the options block: the index configuration that the next
+ : optimization of the selected database applies.
+ : @param  $name  selected database
+ : @param  $info  properties of the database
+ : @return form
+ :)
+declare %private function panels:options(
+  $name  as xs:string,
+  $info  as element()
+) as element(form) {
+  (: the index flags and the text values of the properties :)
+  let $indexes := $info//indexes/*
+  return <form method='post' action='databases/optimize-db' autocomplete='off'
+               id='options-form'>{
+    <input type='hidden' name='name' value='{ $name }'/>,
+    let $opts := $indexes[. = 'true']/name()
+    return (
+      <div class='field-columns'>{
+        form:index-fields($opts, map:build($indexes, name#1, string#1))
+      }</div>,
+      (: a change of incremental indexing requires a full optimization :)
+      form:update-fields($opts, form:checkbox('all', 'true', false(), 'Full optimization'))
+    )
+  }</form>
+};
+
+(:~
+ : Creates the contents of the backups block: the backups of the selected database.
  : @param  $name  selected database
  : @param  $sort  sort key of the backup list
  : @param  $page  number of shown pages of the backup list
- : @return panel contents
+ : @return block contents; empty if no database is selected
  :)
 declare function panels:backups(
   $name  as xs:string?,
   $sort  as xs:string := '',
   $page  as xs:integer := 1
-) as element()+ {
-  (: both are recovery corners, so the panel opens on demand :)
-  (: a selected database supersedes the general backups: its own are what is asked for :)
-  if ($name) then (
-    <h2>{ 'Backups: ' || $name }</h2>,
+) as element()* {
+  (: the general backups have a dialog of their own :)
+  if ($name) {
     panels:backup-section($name, $sort, $page)
-  ) else (
-    <h2>General Backups</h2>,
-    <div class='note'>
-      The data that belongs to no database:
-      <a target='_blank' href='https://docs.basex.org/main/User_Management'>users</a>,
-      <a target='_blank'
-         href='https://docs.basex.org/main/Job_Functions#services'>services</a>, and
-      <a target='_blank' href='https://docs.basex.org/main/Store_Functions'>stores</a>.
-    </div>,
-    panels:backup-section('', $sort, $page)
+  }
+};
+
+(:~
+ : Creates the storage dialog.
+ : @return dialog
+ :)
+declare function panels:storage-dialog() as element(dialog) {
+  (: outside the panels. Its contents are rarely looked at: they are requested when the dialog is
+     opened; see openDialog :)
+  <dialog id='storage-dialog' class='tabbed'/>
+};
+
+(:~
+ : Creates the contents of the storage dialog: the backups of the data that belongs to no
+ : database, and what is stored.
+ : @return contents
+ :)
+declare function panels:storage() as element()+ {
+  (: what the server is configured with is listed in the settings :)
+  <h2>Storage</h2>,
+  panels:tabs('storage', (
+    { 'id': 'general-backups-panel', 'label': 'Backups',
+      'contents': panels:general-backups('', 1) },
+    { 'id': 'storage-information-panel', 'label': 'Information',
+      'contents': panels:storage-information() }
+  )),
+  <form method='dialog' class='buttons'><button>Close</button></form>
+};
+
+(:~
+ : Creates the contents of the general backups block.
+ : @param  $sort  sort key of the backup list
+ : @param  $page  number of shown pages of the backup list
+ : @return block contents
+ :)
+declare function panels:general-backups(
+  $sort  as xs:string,
+  $page  as xs:integer
+) as element()+ {
+  <div class='note'>
+    The data that belongs to no database:
+    <a target='_blank' href='https://docs.basex.org/main/User_Management'>users</a>,
+    <a target='_blank'
+       href='https://docs.basex.org/main/Job_Functions#services'>services</a>, and
+    <a target='_blank' href='https://docs.basex.org/main/Store_Functions'>stores</a>.
+  </div>,
+  panels:backup-section('', $sort, $page)
+};
+
+(:~
+ : Creates the contents of the storage information block: the totals of the stored data.
+ : @return block contents
+ :)
+declare %private function panels:storage-information() as element()+ {
+  let $databases := db:list-details()
+  let $backups := db:backups()
+  let $dbpath := db:option('dbpath')
+  let $file := Q{java.io.File}new($dbpath)
+  let $free := Q{java.io.File}getUsableSpace($file)
+  let $latest := max($backups/@date ! xs:dateTime(.))
+  return (
+    (: an optimization or backup of a database needs about as much space as the database :)
+    if ($free < max($databases/@size)) {
+      <div class='note warn'>
+        The free space is smaller than the largest database: a full optimization or backup
+        may fail.
+      </div>
+    },
+    table:properties(
+      <server>
+        <drive>
+          <dbpath>{ $dbpath }</dbpath>
+          <free>{ prof:human($free) }</free>
+          <total>{ prof:human(Q{java.io.File}getTotalSpace($file)) }</total>
+        </drive>
+        <databases>
+          <count>{ count($databases) }</count>
+          <resources>{ sum($databases/@resources) }</resources>
+          <size>{ prof:human(sum($databases/@size)) }</size>
+        </databases>
+        <backups>
+          <count>{ count($backups) }</count>
+          <general>{ count($backups[not(@database/string())]) }</general>
+          <size>{ prof:human(sum($backups/@size)) }</size>
+          <latest>{ ($latest ! html:exact(.)) otherwise '–' }</latest>
+          <without-backup>{ count($databases[not(. = $backups/@database)]) }</without-backup>
+        </backups>
+      </server>
+    )
   )
 };
 
@@ -413,14 +598,14 @@ declare function panels:index-type(
 };
 
 (:~
- : Creates the contents of the index panel: the entries of one index of the selected database,
+ : Creates the contents of the index block: the entries of one index of the selected database,
  : with the number of times each of them occurs.
  : @param  $name    selected database
  : @param  $index   index that is listed
  : @param  $prefix  prefix of the entries to be listed
  : @param  $sort    sort key of the entry list
  : @param  $page    number of shown pages of the entry list
- : @return panel contents; empty if no existing database is selected
+ : @return block contents; empty if no existing database is selected
  :)
 declare function panels:index(
   $name    as xs:string?,
@@ -429,9 +614,11 @@ declare function panels:index(
   $sort    as xs:string,
   $page    as xs:integer
 ) as element()* {
-  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
+  (: no existing database: the tab is not shown, so it needs no placeholder :)
   if ($name and db:exists($name)) {
-    <form autocomplete='off' action='javascript:void(0);' data-sort='{ $sort }'
+    let $presort := 'entry'
+    let $sort := $sort[.] otherwise $presort
+    return <form autocomplete='off' action='javascript:void(0);' data-sort='{ $sort }'
           data-page='{ $page }'>
       {
         (: which index is browsed, what is done with it, and where its entries are entered:
@@ -464,14 +651,15 @@ declare function panels:index(
           ),
           <input type='text' id='index-prefix' class='smallinput' placeholder='Prefix, e.g. abc'
                  title='Entries that start with the supplied string'
-                 value='{ $prefix }' onkeyup='filterIndex(event.key);'/>
+                 value='{ $prefix }' data-filter='filterIndex'/>
         )
         let $headers := (
-          { 'key': 'entry', 'label': 'Entry', 'width': '75%' },
-          { 'key': 'count', 'label': 'Count', 'type': 'number', 'order': 'desc' }
+          { 'key': 'entry', 'label': 'Entry' },
+          { 'key': 'count', 'label': 'Count', 'type': 'number', 'order': 'desc',
+            'width': 'calc(8ch + 0.5rem)' }
         )
-        (: what the panel is and what it offers; the same head is shown if the list cannot be :)
-        let $head := (<h2>Indexes</h2>, <div class='buttons'>{ $controls }</div>)
+        (: the same head is shown if the list cannot be :)
+        let $head := <div class='buttons'>{ $controls }</div>
         (: an index that a database does not have is reported, not raised :)
         return try {
           let $entries := $type?entries($name, $prefix)
@@ -485,8 +673,8 @@ declare function panels:index(
           return table:create($headers,
             subsequence($shown, 1, $max - 1) !
               { 'entry': panels:entry(.), 'count': @count },
-            (), {}, {
-              'sort': $sort, 'page': $page,
+            options := {
+              'sort': $sort, 'presort': $presort, 'page': $page,
               (: the head stays in view while the entries scroll. The controls are no actions
                  on the entries, so the list has nothing to check :)
               'sticky': $head,
@@ -524,79 +712,67 @@ declare %private function panels:entry(
 };
 
 (:~
- : Creates the contents of the information panel: the index configuration that the next
- : optimization of the selected database applies, and its properties.
- : @param  $name  selected database
- : @return panel contents; empty if no existing database is selected
- :)
-declare function panels:information(
-  $name  as xs:string?
-) as element()* {
-  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  if ($name and db:exists($name)) {
-    (: a report: what can be changed is asked for by the Optimize dialog :)
-    <h2>Information</h2>,
-    table:properties(db:info($name))
-  }
-};
-
-(:~
  : Creates the contents of the resource panel: the actions that apply to the shown document,
  : the reason why it cannot be edited, and the field for querying it.
  : @param  $name      selected database
  : @param  $resource  selected resource
  : @param  $document  document properties, as returned by panels:document
- : @return panel contents; empty if no resource is selected
+ : @return panel contents; empty if no database is selected
  :)
 declare function panels:resource(
   $name      as xs:string?,
   $resource  as xs:string?,
   $document  as utils:editor
 ) as element()* {
-  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  if ($document?exists) {
-    let $hidden := (
-      <input type='hidden' name='name' value='{ $name }'/>,
-      <input type='hidden' name='resource' value='{ $resource }'/>
-    )
-    return (
-      <h2>{ 'Resource: ' || $resource }</h2>,
-      <form method='post' autocomplete='off'>{
-        $hidden,
-        <div class='buttons'>{
-          (: enabled by the client once the document was edited :)
-          <button type='button' id='save-resource' onclick='saveResource()'
-                  disabled='' title='Save the edited resource'>Save</button>,
-          (: a query on a large document takes time, and can be given up on :)
-          <button type='button' onclick='renameResource()'
-                  title='Rename the resource'>Rename…</button>,
-          form:button('db-download', 'Download', title := 'Download the resource'),
-          <button type='button' onclick='chooseUpload("replace-file")'
-                  title='Replace the resource with an uploaded file'>Replace…</button>,
-          <label>{
-            <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
-          }</label>
-        }</div>
-      }</form>,
-      (: the line is reserved: the client writes to it as well :)
-      <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
-      (: the query runs while it is typed; a query on a large document takes time, and can be
-         given up on :)
-      if ($document?xml) {
-        <div class='query-row'>{
-          <input type='text' class='query' name='input' id='input'
-                 placeholder='XQuery on this document, e.g. //title'
-                 title='Runs while you type; the result is shown instead of the document'
-                 onkeyup='queryResource(false)'/>,
-          <button type='button' id='stop' onclick='stopQuery()' disabled=''
-                  title='Stop the running query'>Stop</button>
-        }</div>
-      },
+  switch () {
+    case $document?exists return (
+      let $hidden := (
+        <input type='hidden' name='name' value='{ $name }'/>,
+        <input type='hidden' name='resource' value='{ $resource }'/>
+      )
+      return (
+        <h2>Resource: { $resource }</h2>,
+        <form method='post' autocomplete='off'>{
+          $hidden,
+          <div class='buttons'>{
+            (: enabled by the client once the document was edited :)
+            <button type='button' id='save-resource' onclick='saveResource()'
+                    disabled='' title='Save the edited resource'>Save</button>,
+            <button type='button' onclick='renameResource()'
+                    title='Rename the resource'>Rename…</button>,
+            form:button('db-download', 'Download', title := 'Download the resource'),
+            <button type='button' onclick='chooseUpload("replace-file")'
+                    title='Replace the resource with an uploaded file'>Replace…</button>,
+            <label>{
+              <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
+            }</label>
+          }</div>
+        }</form>,
+        (: the line is reserved: the client writes to it as well :)
+        <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
+        (: the query runs while it is typed; a slow one can be stopped :)
+        if ($document?xml) {
+          <div class='query-row'>{
+            <input type='text' class='query' name='input' id='input'
+                   placeholder='XQuery on this document, e.g. //title'
+                   title='Runs while you type; the result is shown instead of the document'
+                   oninput='queryResource(false)'/>,
+            <button type='button' id='stop' onclick='stopQuery()' disabled=''
+                    title='Stop the running query'>Stop</button>
+          }</div>
+        },
 
-      (: the new path of the resource is asked for and submitted :)
-      form:prompt('rename-target', 'target', 'databases/resource-rename', $hidden),
-      form:upload('databases/replace', 'replace-file', false(), $hidden)
+        (: the new path of the resource is asked for and submitted :)
+        form:prompt('rename-target', 'target', 'databases/resource-rename', $hidden),
+        form:upload('databases/replace', 'replace-file', false(), $hidden)
+      )
     )
+    (: while a database is shown, the panel keeps its place, whatever is selected :)
+    case boolean($name) return (
+      <h2>Resource</h2>,
+      <div class='note'>Choose a resource of the database.</div>
+    )
+    default return ()
   }
 };
 
@@ -627,10 +803,10 @@ declare function panels:document(
     (: what speaks against editing; the note the client extends for query results is the one
        that utils:editable composes from it :)
     return utils:editable(
-      if ($truncated) then substring($text, 1, $max) else $text,
+      substring($text, 1, $max),
       (
-        'only XML documents can be edited'[not($xml)],
-        'the document is too large, download it to see all of it'[$truncated]
+        'no XML document'[not($xml)],
+        'truncated, download for full text'[$truncated]
       )
     ) but with { 'xml': $xml }
   )
@@ -699,21 +875,23 @@ declare %private function panels:backup-section(
   $sort  as xs:string,
   $page  as xs:integer
 ) as element()+ {
-  (: the two sections of the view never show the same backups, so one function serves both :)
-  (: one section is shown at a time, so its fields need no names of their own.
-     One form for the whole section, so that its actions share a single row of buttons.
-     Every button carries its own 'formaction' :)
+  (: the backups of a database and the general ones are tabs of two dialogs on the same page: the
+     backup prompt and the file chooser are named after what they belong to. One form for the
+     whole section, so that its actions share a single row of buttons. Every button carries its
+     own 'formaction' :)
+  let $id := if ($name) then 'backup' else 'general-backup'
   (: the backups are listed with the newest one first, which is the order of their names :)
   let $presort := 'backup'
   let $sort := $sort[.] otherwise $presort
-  return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
+  return (<form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <input type='hidden' name='name' value='{ $name }'/>
     {
         let $headers := (
           (: a backup is named after its timestamp and a size never grows beyond four digits
              and a unit: both are of a known length and take no more than they need. The
-             comment is free text, and is given whatever is left :)
-          { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': 'calc(19ch + 0.5rem)' },
+             comment is free text, and is given whatever is left. The name shares its column
+             with the checkbox :)
+          { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': 'calc(21ch + 0.5rem)' },
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
             'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'comment', 'label': 'Comment' }
@@ -732,13 +910,13 @@ declare %private function panels:backup-section(
         (: an empty name addresses the data that belongs to no database :)
         let $what := if ($name) then 'the database' else 'the users, services, and stores'
         let $buttons := (
-          <button type='button' onclick='showDialog("backup")'
-                  title='{ 'Create a backup of ' || $what }'>{
+          <button type='button' onclick='showDialog("{ $id }")'
+                  title='Create a backup of { $what }'>{
             (: there is nothing to back up if the name is only known from a backup :)
             attribute disabled { }[$name][not(db:exists($name))],
             'Back up…'
           }</button>,
-          <button type='button' onclick='chooseUpload("upload-backups")'
+          <button type='button' onclick='chooseUpload("upload-{ $id }s")'
                   title='Upload backup files'>Upload…</button>,
           form:button('databases/backup-restore', 'Restore', ('CHECK', 'CONFIRM'),
             title := 'Replace ' || $what || ' with the selected backup'),
@@ -747,11 +925,11 @@ declare %private function panels:backup-section(
         )
         return table:create($headers, $entries, $buttons, { 'name': $name },
           { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'backup',
-            'empty': 'There are no backups yet.' })
+            'empty': 'There are no backups yet. Create one with Back up…' })
       }
   </form>,
 
-  form:dialog('backup', 'Back Up', 'databases/backup-create', false(), (
+  form:dialog($id, 'Back Up', 'databases/backup-create', false(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     form:field('Comment:', <input type='text' name='comment' placeholder='optional' autofocus=''/>),
     form:checkbox('compress', 'true', true(), 'Compress',
@@ -760,6 +938,7 @@ declare %private function panels:backup-section(
 
   (: the file chooser is opened by the Upload button and submits what it collects. An upload
      lands in the database directory, so the server checks that it belongs where it is put :)
-  form:upload('databases/backup-upload', 'upload-backups', true(),
+  form:upload('databases/backup-upload', `upload-{ $id }s`, true(),
     <input type='hidden' name='name' value='{ $name }'/>)
+  )
 };

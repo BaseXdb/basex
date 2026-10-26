@@ -167,6 +167,17 @@ function storeField(id, scope) {
 }
 
 /**
+ * Empties a text field of the current page, and forgets what was typed into it.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to (can be empty)
+ */
+function clearField(id, scope) {
+  const field = document.getElementById(id);
+  if(field) field.value = "";
+  storeField(id, scope);
+}
+
+/**
  * Fills an empty text field of the current page with what was typed into it before.
  * @param {string} id id of the field
  * @param {string} scope what the field applies to (can be empty)
@@ -225,7 +236,7 @@ function stored(key, fallback = null) {
 function storedJson(key, fallback, valid) {
   try {
     const value = JSON.parse(stored(key));
-    if(value !== null && valid(value)) return value;
+    if(valid(value)) return value;
   } catch { /* malformed: an older or foreign value is given up */ }
   return fallback;
 }
@@ -236,7 +247,7 @@ function storedJson(key, fallback, valid) {
  * @returns {boolean} result of check
  */
 function isRecord(value) {
-  return typeof value === "object" && !Array.isArray(value);
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -546,18 +557,13 @@ function showMessage(path, data) {
 }
 
 /**
- * Registers a request whose outcome is awaited.
- * @returns {number} number of the run
+ * Sends a request whose outcome is awaited; one that takes longer is reported and can be stopped.
+ * @param {string} path path, relative to the WebSocket root
+ * @param {object} message message to be sent, without its run number
  */
-function startRequest() {
-  return _pending = ++_run;
-}
-
-/**
- * Reports a request that takes longer, and offers to stop it.
- * @param {number} run number of the run
- */
-function awaitResult(run) {
+async function sendRequest(path, message) {
+  const run = _pending = ++_run;
+  if(!await sendMessage(path, { ...message, run })) return;
   setTimeout(() => {
     if(_pending === run) {
       setText("Please wait…", "warning");
@@ -641,9 +647,10 @@ function fillPanel(id, html) {
       input.checked = values.includes(input.value);
     }
   }
-  // a panel with nothing to show is not shown at all, and gives up its grid track
+  // a panel with nothing to show is not shown at all, and gives up its grid track. A block of a
+  // dialog has none
   const panel = pane.closest(".panel"), empty = !html;
-  if(panel.classList.contains("hidden") !== empty) {
+  if(panel && panel.classList.contains("hidden") !== empty) {
     panel.classList.toggle("hidden", empty);
     applyColumns();
     remeasure();
@@ -789,10 +796,10 @@ new MutationObserver(mutations => {
 }).observe(document.documentElement, { childList: true, subtree: true });
 
 /**
- * Requests what was typed into a filter field. Every key would be a request of its own, so the
- * ones that are typed in a row are collected first; Enter asks at once.
- * @param {string} key typed key
- * @param {string} id id of the filter field, which its pending request is kept under
+ * Requests what was typed into a filter field. Every change would be a request of its own, so the
+ * ones that are made in a row are collected first; Enter asks at once.
+ * @param {string} key 'Enter', or the cause of the request ('input', 'select')
+ * @param {string} id name that the pending request is kept under
  * @param {Function} action requests what the field names
  */
 function filterKey(key, id, action) {
@@ -800,6 +807,21 @@ function filterKey(key, id, action) {
   if(key === "Enter") action();
   else _filters[id] = setTimeout(action, FILTER_DELAY);
 }
+
+/**
+ * Requests what was typed into a filter field: it names the function in 'data-filter', which is
+ * called with the cause. Fields that name the same function share one pending request.
+ * @param {Event} event input or key event
+ * @param {string} key 'Enter', or 'input' for a changed text
+ */
+function filterField(event, key) {
+  const call = event.target.dataset?.filter;
+  if(call) filterKey(key, call, () => window[call](key));
+}
+document.addEventListener("input", event => filterField(event, "input"));
+document.addEventListener("keyup", event => {
+  if(event.key === "Enter") filterField(event, "Enter");
+});
 
 /**
  * Stops the query that is currently evaluated. The server confirms the request with a 'stopped'
@@ -1450,24 +1472,13 @@ function showShortcuts() {
 }
 
 /**
- * Returns the key the folded panels of the current page are stored under. A page that shows
- * different panels in its subviews keeps a state for each of them: the subview is what the page
- * calls itself in 'data-panels'.
- * @returns {string} key
- */
-function panelsKey() {
-  const subview = document.querySelector(".content")?.dataset.panels;
-  return pageKey(PANELS_KEY) + (subview ? `/${subview}` : "");
-}
-
-/**
- * Returns the panels that were folded by hand in the current subview.
+ * Returns the panels that were folded by hand on the current page.
  * @returns {object} collapsed state, by panel label
  */
 function storedPanels() {
   // a panel is named by its label, not by its position: a panel that is added, removed or moved
   // in a later version leaves the state of the others alone
-  const state = storedJson(panelsKey(), {}, isRecord);
+  const state = storedJson(pageKey(PANELS_KEY), {}, isRecord);
   return Object.fromEntries(Object.entries(state).filter(([ label, collapse ]) =>
     typeof collapse === "boolean" && _panels.some(panel => panelLabel(panel) === label)));
 }
@@ -1534,7 +1545,7 @@ function togglePanel(panel) {
   // what is written back is the state of the panels that exist: older entries are dropped
   const state = storedPanels();
   state[panelLabel(panel)] = collapse;
-  store(panelsKey(), JSON.stringify(state));
+  store(pageKey(PANELS_KEY), JSON.stringify(state));
 
   remeasure();
   if(!collapse) _panel_opened?.(panel);
@@ -1566,36 +1577,6 @@ function showPanel(panel, collapse) {
   button.title = `${collapse ? "Expand" : "Collapse"} ${title}` +
     (description ? `: ${description}` : "");
   button.setAttribute("aria-expanded", !collapse);
-}
-
-/**
- * Returns a content panel by the name it is labelled with.
- * @param {string} label panel label
- * @returns {HTMLElement} panel
- */
-function contentPanel(label) {
-  return document.querySelector(`.content > .panel[data-label='${label}']`);
-}
-
-/**
- * Indicates whether a content panel has anything to show. A panel with nothing is hidden, which
- * is not the same as one that was folded away.
- * @param {string} label panel label
- * @returns {boolean} whether the panel is shown
- */
-function panelShown(label) {
-  return !contentPanel(label).classList.contains("hidden");
-}
-
-/**
- * Assigns the collapsed state that follows from what the view shows, and is therefore not
- * remembered: a view states it whenever its selection changes.
- * @param {Array} rules collapsed state per panel, as [ label, collapse ] pairs
- */
-function foldPanels(rules) {
-  for(const [ label, collapse ] of rules) showPanel(contentPanel(label), collapse);
-  applyColumns();
-  remeasure();
 }
 
 /**
@@ -1649,23 +1630,16 @@ function ready() {
  * @param {...string} names parameter names
  */
 function hideParams(...names) {
-  const url = new URL(window.location.href);
-  for(const name of names) url.searchParams.delete(name);
-  window.history.replaceState(null, "", url);
+  setParams(Object.fromEntries(names.map(name => [ name, "" ])));
 }
 
 /**
- * Replaces a query parameter; empty values remove the parameter.
- * @param {string} url URL
- * @param {string} name name
- * @param {string} value value
- * @returns {string} new url
+ * Writes query parameters to the address bar, replacing the current step. A parameter with an
+ * empty value is dropped.
+ * @param {object} params values, by parameter name
  */
-function replaceParam(url, name, value) {
-  const u = new URL(url);
-  if(`${value}`) u.searchParams.set(name, value);
-  else u.searchParams.delete(name);
-  return u.href;
+function setParams(params) {
+  window.history.replaceState(null, "", replaceParams(window.location.href, params));
 }
 
 /**
@@ -1675,8 +1649,12 @@ function replaceParam(url, name, value) {
  * @returns {string} new url
  */
 function replaceParams(url, params) {
-  for(const [ name, value ] of Object.entries(params)) url = replaceParam(url, name, value);
-  return url;
+  const u = new URL(url);
+  for(const [ name, value ] of Object.entries(params)) {
+    if(`${value}`) u.searchParams.set(name, value);
+    else u.searchParams.delete(name);
+  }
+  return u.href;
 }
 
 /**
@@ -1686,6 +1664,34 @@ function replaceParams(url, params) {
  */
 function pushParams(params) {
   window.history.pushState({}, "", replaceParams(window.location.href, params));
+}
+
+/**
+ * Shows the table rows that pass a test, and restates the summary in the words it was rendered with.
+ * @param {HTMLElement} container element that holds the table and its summary
+ * @param {Iterable<HTMLTableRowElement>} rows rows to be filtered
+ * @param {Function} visible tests whether a row is shown
+ */
+function filterRows(container, rows, visible) {
+  let count = 0;
+  for(const row of rows) {
+    const shown = visible(row);
+    row.style.display = shown ? null : "none";
+    if(shown) count++;
+  }
+  const summary = container.querySelector("h3[data-singular]");
+  if(summary) summary.textContent = plural(count, summary.dataset.singular, summary.dataset.plural);
+}
+
+/**
+ * Returns the entry that the server opened as the address named none, and adds it to the address.
+ * @param {string} id id of the panel that shows the entry
+ * @returns {string} name of the entry, or an empty string
+ */
+function adoptOpened(id) {
+  const name = document.querySelector(`#${id} input[name=name]`)?.value ?? "";
+  if(name) setParams({ name });
+  return name;
 }
 
 /**

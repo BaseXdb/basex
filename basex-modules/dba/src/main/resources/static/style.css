@@ -158,6 +158,10 @@ th {
   text-align: left;
   border-bottom-color: var(--rule);
 }
+/* the direction of the sorted column; its label reverses it */
+th .sorted {
+  color: var(--rule);
+}
 
 /* the row that is pointed at, and the rows that are selected */
 tr:has(> td):not(:has(input.filter)):hover {
@@ -308,7 +312,7 @@ button.tab:not(.active):hover {
   color: var(--accent-strong);
 }
 
-ul, dd {
+ul {
   padding-left: 1.2rem;
   margin-left: 0;
 }
@@ -327,8 +331,8 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration:underline;
+a:hover, button.link:hover {
+  text-decoration: underline;
 }
 
 /* a control that acts on the server but reads as a link */
@@ -339,10 +343,6 @@ button.link {
   font: inherit;
   color: var(--accent);
   cursor: pointer;
-}
-
-button.link:hover {
-  text-decoration: underline;
 }
 
 b {
@@ -414,13 +414,13 @@ select:not([multiple], [size]) {
 
 /* buttons, and the one of a file chooser, share the flat face of the code buttons on
    docs.basex.org; the link-like, the folding and the tab buttons bring their own */
-button:not(.link, .collapse, .dismiss, .tab), input[type=file]::file-selector-button {
+button:not(.link, .collapse, .tab), input[type=file]::file-selector-button {
   background-color: var(--shade);
   color: var(--fg);
   font: inherit;
   cursor: pointer;
 }
-button:not(.link, .collapse, .dismiss, .tab):hover:not(:disabled),
+button:not(.link, .collapse, .tab):hover:not(:disabled),
 input[type=file]::file-selector-button:hover {
   background-color: var(--shade-hover);
 }
@@ -483,6 +483,13 @@ hr {
 
 input.smallinput {
   width: 170px;
+}
+/* the filter shares its row with five buttons: it takes the room they leave, and only wraps if
+   that is less than its minimum */
+#resource-filter {
+  flex: 1 1 5rem;
+  min-width: 0;
+  max-width: 9rem;
 }
 
 input.filter {
@@ -627,13 +634,8 @@ header {
   color: var(--accent-strong);
 }
 
-/* a long message truncates instead of pushing the views out of the line */
-#info {
-  min-width: 0;
-}
-
 /* error message that can be clicked to jump to its line/column in the editor */
-#info.locatable, #run-info.locatable {
+.locatable {
   cursor: pointer;
 }
 
@@ -650,9 +652,9 @@ header {
 .scroll {
   overflow-x: auto;
 }
-/* a panel that scrolls on its own scrolls sideways as well; the wrapper would otherwise be the
-   box that the header of its table is pinned to */
-.content.fill .pane .scroll {
+/* a panel or a dialog that scrolls on its own scrolls sideways as well; the wrapper would
+   otherwise be the box that the header of its table is pinned to */
+.content.fill .pane .scroll, dialog .scroll {
   overflow: visible;
 }
 
@@ -756,7 +758,6 @@ header {
 }
 /* the outcome of the last run, at the right end of the query information tabs */
 #run-info {
-  min-width: 0;
   color: var(--muted);
 }
 #run-info.failed {
@@ -813,9 +814,8 @@ body .cm-editor.cm-focused {
   gap: inherit;
 }
 
-/* query field above a resource editor; named with its element, or the width of a text
-   field would be the more specific rule */
-/* a query field with the button that stops its query */
+/* a query field with the button that stops its query, above a resource editor; the field is
+   named with its element, or the width of a text field would be the more specific rule */
 .query-row {
   display: flex;
   gap: .4rem;
@@ -835,10 +835,10 @@ body .cm-editor.cm-focused {
   padding-bottom: var(--space);
 }
 /* the collapse chevron floats over the top right corner: only what shares its line stays clear
-   of it, the rows below use the full width. The search line of the logs is a single row.
+   of it, the rows below use the full width. A search line is a single row.
    A panel without a chevron keeps the full width */
-.panel:has(> button.collapse) :is(.sticky:not(.logbar) > :first-child, .logbar) {
-  padding-right: calc(var(--scrollbar) + 1rem + var(--beside, 0px));
+.panel:has(> button.collapse) :is(.sticky:not(.searchbar) > :first-child, .searchbar) {
+  padding-right: calc(var(--scrollbar) + 1rem);
 }
 /* the spacing below the head is the panel's, not the last block's inside it */
 .sticky > :last-child {
@@ -847,11 +847,6 @@ body .cm-editor.cm-focused {
 /* nor is a margin above it: it would leave the head, which then moves before it is pinned */
 .sticky > :first-child {
   margin-top: 0;
-}
-
-/* the heading names a database or a path; what can be done with it starts its own line */
-#database-panel h2, #resource-panel > h2 {
-  margin-bottom: var(--space);
 }
 
 /* the trailing non-breaking space keeps a clipped heading clear of the collapse chevron */
@@ -1030,13 +1025,13 @@ body:has(.content.fill) main {
 .job-columns h3:first-child {
   margin-top: 0;
 }
-/* the dialog is opened by the page, not by the keyboard: nothing in it is outlined as focused */
-#details-dialog :focus:not(:focus-visible), #details-dialog .job-facts:focus {
+/* a dialog focuses what scrolls in it, such as an editor or a tab: only controls are ringed */
+dialog :not(button, input, select, textarea, a):focus-visible {
   outline: none;
 }
 /* the entries sit below their heading; the bullets bring the only indentation */
 .query-info dd {
-  padding-left: 0;
+  margin-left: 0;
 }
 .query-info ul {
   margin: 0;
@@ -1154,10 +1149,40 @@ dialog .field-columns label:has(> input[type=checkbox]) {
   padding-left: 20px;
   text-indent: -20px;
 }
+/* the options that concern updates are set apart from the index columns they are placed below */
+dialog .update-fields {
+  margin-top: var(--space);
+}
 /* the names an index is restricted to: below its checkbox, in line with its label */
 dialog .field-columns input.include {
   width: calc(100% - 20px);
   margin: .1rem 0 .3rem 20px;
+}
+/* a dialog with tabs keeps its width and height when another tab is shown */
+dialog.tabbed[open] {
+  width: min(90vw, 48rem);
+  height: 85vh;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+}
+/* the blocks of the tabs scroll; the heading, the tabs and the buttons keep their place */
+dialog.tabbed > [role=tabpanel] {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+/* a margin, not a padding of the blocks: the rows that scroll must not pass above the pinned head */
+dialog.tabbed > .tabs {
+  flex: none;
+  margin-bottom: var(--space);
+  border-bottom: var(--line) solid var(--border);
+}
+/* the controls of a list belong to the list, not to the row that closes the dialog */
+dialog.tabbed > [role=tabpanel] .buttons {
+  justify-content: flex-start;
+  margin-top: 0;
+  margin-bottom: var(--space);
 }
 /* the shortcuts are described in a line each, and their keys can be long */
 #shortcuts {
@@ -1173,13 +1198,12 @@ dialog:has(textarea) {
 
 /* collapsible content panels: a chevron folds a panel to a labeled strip. It sits just inside
    the scrollbar of the list or editor below it: over the content, so it costs no width, but
-   never on the scrollbar itself. The offset is measured by measureScrollbar. A panel that shows
-   a selection is closed by a cross in the corner, which moves the chevron beside it */
-button:is(.collapse, .dismiss) {
+   never on the scrollbar itself. The offset is measured by measureScrollbar */
+button.collapse {
   position: absolute;
   top: 0;
   /* clear of the scrollbar, plus a little air */
-  right: calc(var(--scrollbar) + .5rem + var(--beside, 0px));
+  right: calc(var(--scrollbar) + .5rem);
   /* the pinned head of a list is raised, and would otherwise be painted over the button */
   z-index: 2;
   padding: 0 .2rem .1rem;
@@ -1192,22 +1216,16 @@ button:is(.collapse, .dismiss) {
   line-height: 1;
   cursor: pointer;
 }
-.panel:has(> button.dismiss) {
-  --beside: 1.6rem;
-  > button.dismiss {
-    --beside: 0px;
-  }
-}
 /* nothing scrolls behind it: the chevron takes the room the scrollbar would have needed */
-.panel.no-scrollbar > button:is(.collapse, .dismiss) {
-  right: calc(.5rem + var(--beside, 0px));
+.panel.no-scrollbar > button.collapse {
+  right: .5rem;
 }
 /* and moves on into the gutter where a divider follows: what the chevron keeps its distance to
    is whatever comes next, be that the scrollbar of its own panel or the line after it */
-.content.divided > .panel.no-scrollbar:has(+ .panel) > button:is(.collapse, .dismiss) {
-  right: calc(.5rem - var(--gap) + var(--beside, 0px));
+.content.divided > .panel.no-scrollbar:has(+ .panel) > button.collapse {
+  right: calc(.5rem - var(--gap));
 }
-button:is(.collapse, .dismiss):hover {
+button.collapse:hover {
   color: var(--accent);
   background-color: var(--shade-hover);
 }
@@ -1293,22 +1311,21 @@ button.collapse .label {
   }
   /* labels above their controls, so the fields keep the full width */
   .field,
-  :has(> .field) > .field {
+  :has(> .field) {
     grid-template-columns: 1fr;
   }
   /* one column of fields: a narrow screen has no room for two */
   .field-columns {
     grid-auto-flow: row;
   }
-  /* keep the logs search + ignore fields on one line, letting them shrink to fit */
-  .logbar h2 { white-space: nowrap; }
-  .logbar #input,
-  .logbar .ignore {
+  /* keep the search and ignore fields on one line, letting them shrink to fit */
+  .searchbar #input,
+  .searchbar .ignore {
     flex: 1;
     min-width: 0;
     margin-left: 0;
   }
-  .logbar #ignore {
+  .searchbar #ignore {
     width: 100%;
   }
   /* the entries that follow a list are asked for via a button */
@@ -1320,7 +1337,7 @@ button.collapse .label {
     display: inline-block;
   }
   /* logs: the text of an entry is what is read, the other columns are scrolled past */
-  .logbar + #output {
+  .searchbar + #output {
     --free-column: 20rem;
   }
   /* workspace: the result is read below the editor, and needs more lines than the editor */
@@ -1335,13 +1352,13 @@ button.collapse .label {
   white-space: nowrap;
 }
 
-/* logs: search line with a right-aligned "Ignore" filter */
-.logbar {
+/* logs, settings: search line; the logs add a right-aligned "Ignore" filter */
+.searchbar {
   display: flex;
   align-items: baseline;
   gap: .5rem;
 }
-.logbar .ignore {
+.searchbar .ignore {
   margin-left: auto;
   color: var(--muted);
 }

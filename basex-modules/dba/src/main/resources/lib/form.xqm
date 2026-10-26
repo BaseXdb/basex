@@ -14,7 +14,7 @@ import module namespace config = 'dba/lib/config' at 'config.xqm';
  : @param  $opts   checked options
  : @return checkbox
  :)
-declare function form:option(
+declare %private function form:option(
   $value  as xs:string,
   $label  as xs:string,
   $opts   as xs:string*
@@ -215,7 +215,7 @@ declare function form:prompt(
 
 (:~ Index options that can be assigned when a database is created and optimized. :)
 (: the full-text index heads the options that refine it; 'include' is the option with the names
-   an index is restricted to :)
+   an index is restricted to; 'update' marks the options that concern updates :)
 declare %private variable $form:INDEX-OPTIONS := (
   { 'name': 'textindex', 'label': 'Text Index', 'include': {
     'name': 'textinclude', 'kind': 'Elements', 'title': 'Elements whose texts are indexed' } },
@@ -225,8 +225,8 @@ declare %private variable $form:INDEX-OPTIONS := (
     'name': 'tokeninclude', 'kind': 'Attributes',
     'title': 'Attributes whose values are indexed as tokens' } },
   (: changing it requires a full optimization :)
-  { 'name': 'updindex', 'label': 'Incremental Indexing' },
-  { 'name': 'autooptimize', 'label': 'Automatic Optimization' },
+  { 'name': 'updindex', 'label': 'Incremental Indexing', 'update': true() },
+  { 'name': 'autooptimize', 'label': 'Automatic Optimization', 'update': true() },
   (: the names are what Mixed Content refers to: string values are indexed for these
      elements, so the option is rejected if no name is supplied :)
   { 'name': 'ftindex', 'label': 'Full-Text', 'heading': true(), 'fulltext': true(), 'include': {
@@ -253,7 +253,7 @@ declare function form:index-fields(
   for $fulltext in (false(), true())
   return <div>{
     if (not($fulltext)) { <h3>Indexes</h3> },
-    for $option in $form:INDEX-OPTIONS[$fulltext = exists(?fulltext)]
+    for $option in $form:INDEX-OPTIONS[$fulltext = exists(?fulltext)][not(?update)]
     let $checkbox := form:option($option?name, $option?label, $opts)
     return (
       if ($option?heading) then <h3>{ $checkbox }</h3> else $checkbox,
@@ -266,11 +266,28 @@ declare function form:index-fields(
 };
 
 (:~
+ : Creates the options of a database dialog that concern updates.
+ : @param  $opts    checked options
+ : @param  $fields  fields placed above them
+ : @return block, placed below the index columns
+ :)
+declare function form:update-fields(
+  $opts    as xs:string*,
+  $fields  as node()* := ()
+) as element(div) {
+  <div class='update-fields'>{
+    $fields,
+    for $option in $form:INDEX-OPTIONS[?update]
+    return form:option($option?name, $option?label, $opts)
+  }</div>
+};
+
+(:~
  : Creates the field that chooses the language of the full-text index.
  : @param  $lang  language
  : @return form field
  :)
-declare function form:language-field(
+declare %private function form:language-field(
   $lang  as xs:string?
 ) as element(div) {
   (: the field is labeled, so it belongs to the fields of a dialog, not to the flags of the
@@ -423,7 +440,7 @@ declare function form:directory(
         file:list-roots() ! [ 'Root', string(.) ],
         [ 'Current'   , $dir ]
       )
-      let $selected := head(index-where($options, fn($option) { $option?2 = $dir }))
+      let $selected := head(index-where($options, fn { ?2 = $dir }))
       for $option at $pos in $options
       let $[$name, $path] := $option
       where $path

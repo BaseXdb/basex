@@ -522,6 +522,8 @@ public final class DBATest extends WebappTest {
       try {
         final String dialog = dialog(get("databases?name=" + DB), "properties");
         assertFalse(dialog.contains("id=\"options-form\""), "options of a dropped database");
+        assertFalse(dialog.contains("Rename…"), "a dropped database can be renamed");
+        assertFalse(dialog.contains("aria-controls=\"index-panel\""), "indexes are offered");
         assertTrue(dialog.contains("<form method=\"dialog\" class=\"buttons\">"),
             "dialog cannot be closed");
       } finally {
@@ -530,17 +532,37 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * Creates a general backup, finds it in the dialog the page opens again, and drops it.
-     * @throws IOException I/O exception
+     * A database that is only known from its backups is sorted by name with the others.
+     * @throws Exception exception
      */
-    @Test public void generalBackups() throws IOException {
+    @Test public void droppedSorted() throws Exception {
+      execute("db:create('dba-b'), db:create('dba-a')");
+      execute("db:create-backup('dba-a')");
+      execute("db:drop('dba-a')");
+      try {
+        final String page = get("databases");
+        assertTrue(page.indexOf("dba-a") < page.indexOf("dba-b"), "dropped database not sorted");
+      } finally {
+        execute("db:drop-backup('dba-a'), db:drop('dba-b')");
+      }
+    }
+
+    /**
+     * Creates a general backup, finds it in the storage dialog, and drops it.
+     * @throws Exception exception
+     */
+    @Test public void generalBackups() throws Exception {
       final String page = post("databases/backup-create",
           Map.of("name", "", "comment", "junit-general"));
       assertTrue(page.contains("Users, services, and stores were backed up."),
           "backup not created");
-      final String dialog = dialog(page, "storage");
-      assertTrue(dialog.contains("<td>junit-general</td>"), "comment of the backup not listed");
-      final Matcher m = Pattern.compile("name=\"backup\" value=\"([^\"]+)\"").matcher(dialog);
+      // the dialog is filled when it is opened
+      connect("/databases");
+      sendMessage("{ \"type\": \"storage\" }");
+      final String dialog = pollMessage();
+      assertTrue(dialog.contains("<td>junit-general<\\/td>"), "comment of the backup not listed");
+      final Matcher m = Pattern.compile("name=\\\\\"backup\\\\\" value=\\\\\"([^\\\\\"]+)").
+          matcher(dialog);
       assertTrue(m.find(), "backup not listed");
 
       assertTrue(post("databases/backup-drop", Map.of("name", "", "backup", m.group(1))).
@@ -781,6 +803,29 @@ public final class DBATest extends WebappTest {
      */
     @AfterEach public void drop() throws Exception {
       discard("db:drop('" + DB + "')");
+    }
+
+    /**
+     * The contents of the properties dialog are pushed when they are requested.
+     * @throws Exception exception
+     */
+    @Test public void properties() throws Exception {
+      sendMessage("{ \"type\": \"properties\", \"name\": \"" + DB + "\" }");
+      final String message = pollMessage();
+      assertTrue(message.contains("\"id\":\"properties-dialog\""), "dialog not pushed: " + message);
+      assertTrue(message.contains("Properties: " + DB), "database not named: " + message);
+      assertTrue(message.contains("options-form"), "options missing: " + message);
+    }
+
+    /**
+     * The contents of the storage dialog are pushed when they are requested.
+     * @throws Exception exception
+     */
+    @Test public void storage() throws Exception {
+      sendMessage("{ \"type\": \"storage\" }");
+      final String message = pollMessage();
+      assertTrue(message.contains("\"id\":\"storage-dialog\""), "dialog not pushed: " + message);
+      assertTrue(message.contains("general-backups-panel"), "backups missing: " + message);
     }
 
     /**

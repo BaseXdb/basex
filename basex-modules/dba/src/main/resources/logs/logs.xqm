@@ -59,13 +59,13 @@ function dba:logs(
   return (
     html:panel(
       if ($date) {
-        <div class='sticky logbar'>{
-          <h2>{ 'Log: ' || $date }</h2>,
+        <div class='sticky searchbar'>{
+          <h2>Log: { $date }</h2>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
                  placeholder='Search, e.g. admin'
                  title='{ 'Words that the user, type or text of an entry must contain, ' ||
                    'or a regular expression' }'
-                 autofocus='' onkeyup='filterLogs(event.key);'/>,
+                 autofocus='' data-filter='logEntries'/>,
           <label title='Reload the entries at the interval chosen in the settings'>{
             <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
           }</label>,
@@ -76,7 +76,7 @@ function dba:logs(
             <input type='text' id='ignore' class='smallinput' autocomplete='off'
                    placeholder='Ignore, e.g. /dba'
                    title='Regular expression: entries whose text matches it are hidden'
-                   onkeyup='filterLogs(event.key);'/>
+                   data-filter='logEntries'/>
           }</span>
         }</div>,
         <div id='output'/>
@@ -91,36 +91,7 @@ function dba:logs(
         <input type='hidden' id='sort' value='{ $sort }'/>
         <input type='hidden' id='page' value='{ $page }'/>
         <input type='hidden' id='entry' value='{ $entry }'/>
-        <div id='list'>{
-          (: the filter is a control of the list, and shares the row of its buttons :)
-          let $buttons := (
-            form:button('logs-download', 'Download', 'CHECK',
-              title := 'Download the selected log files'),
-            form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM'),
-              title := 'Delete the selected log files'),
-            <input type='text' id='log-filter' maxlength='10'
-                   onkeyup='logFilter();' class='smallinput' placeholder='Date, e.g. 2026-09'
-                   title='Show the log files whose date starts with the input, e.g. 2026-09'/>
-          )
-          let $headers := (
-            { 'key': 'name', 'label': 'Name' },
-            { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
-          )
-          let $entries :=
-            for $file in $files
-            return {
-              (: the reference is a deep link naming the file; following it in place asks for
-                 its entries over the connection the view already opened :)
-              'name': html:select($file, $dba:CAT, { 'sort': $sort, 'name': $file },
-                $date = $file, 'name', 'selectLog'),
-              'size': $file/@size
-            }
-          (: the head is pinned, so the actions stay in reach while the files scroll.
-             The files of a server are few, and the filter looks through all of them :)
-          return table:create($headers, $entries, $buttons, {},
-            { 'sticky': <h2>Logs</h2>, 'all': true(), 'noun': 'file',
-              'empty': 'There are no log files yet.' })
-        }</div>
+        <div id='list'>{ dba:files($date, '', $sort) }</div>
       </form>,
       { 'label': 'Logs' }
     )
@@ -133,7 +104,53 @@ function dba:logs(
 };
 
 (:~
- : Sends a log entry table to the client.
+ : Creates the list of log files.
+ : @param  $date     name (date) of the opened log file
+ : @param  $sort     table sort key; empty string for the newest files first
+ : @param  $entries  sort key of the log entries, included in the links to the files
+ : @return list
+ :)
+declare function dba:files(
+  $date     as xs:string,
+  $sort     as xs:string,
+  $entries  as xs:string
+) as element(div) {
+  let $sort := $sort[.] otherwise 'name'
+  (: the filter is a control of the list, and shares the row of its buttons :)
+  let $buttons := (
+    form:button('logs-download', 'Download', 'CHECK',
+      title := 'Download the selected log files'),
+    form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM'),
+      title := 'Delete the selected log files'),
+    <input type='text' id='log-filter' maxlength='10'
+           data-filter='logFilter' class='smallinput' placeholder='Date, e.g. 2026-09'
+           title='Show the log files whose date starts with the input, e.g. 2026-09'/>
+  )
+  let $headers := (
+    { 'key': 'name', 'label': 'Name', 'order': 'desc' },
+    { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc' }
+  )
+  let $files :=
+    for $file in admin:logs()
+    return {
+      (: the reference is a deep link naming the file; following it in place asks for
+         its entries over the connection the view already opened :)
+      'name': html:select($file, $dba:CAT, { 'sort': $entries, 'name': $file },
+        $date = $file, 'name', 'selectLog'),
+      'size': $file/@size
+    }
+  (: the head is pinned, so the actions stay in reach while the files scroll.
+     The files of a server are few, and the filter looks through all of them :)
+  return <div data-sort='{ $sort }'>{
+    table:create($headers, $files, $buttons, options := {
+      'sort': $sort, 'presort': 'name', 'sticky': <h2>Log Files</h2>, 'all': true(), 'noun': 'file',
+      'empty': 'There are no log files yet.'
+    })
+  }</div>
+};
+
+(:~
+ : Sends a log entry table or the list of log files to the client.
  : @param  $message  message
  :)
 declare
@@ -142,6 +159,20 @@ function dba:ws-message(
   $message  as xs:string
 ) as empty-sequence() {
   let $json := parse-json($message)
+  return switch ($json?type) {
+    case 'files' return utils:ws-panel('list',
+      dba:files(string($json?date), string($json?sort), string($json?entries)))
+    default return dba:ws-entries($json)
+  }
+};
+
+(:~
+ : Searches log entries and sends them to the client.
+ : @param  $json  message
+ :)
+declare %private function dba:ws-entries(
+  $json  as map(*)
+) as empty-sequence() {
   let $run := xs:integer($json?run)
   let $filters := $json?filters otherwise {}
   (: an expression is incomplete while it is being typed: report it, do not raise it :)
@@ -162,8 +193,8 @@ function dba:ws-message(
       $json?entry,
       $json?ignore,
       $filters
-    ], { 'cache': true(), 'id': utils:job-id('logs') })
-    return utils:ws-start($id, $run, { 'method': 'html' })
+    ], { 'cache': true(), 'id': utils:job-id('logs'), 'serializer': { 'method': 'html' } })
+    return utils:ws-start($id, $run, false())
   )
 };
 
@@ -246,10 +277,13 @@ declare function dba:entries(
      entry of it is collected. A range of files can hold millions of entries, of which the ones
      that are not shown are not worth reading :)
   let $several := count($files) > 1
-  let $entries := (
+  (: one entry more than the limit: it is what tells that the search was cut short :)
+  let $max := $dba:MAX-ENTRIES + 1
+  (: a single reference: the files are only read until the limit is reached :)
+  let $shown := subsequence((
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
     let $terms := if ($regex-string) then $input else tokenize($input)
-    let $joined-terms := if ($regex-string) then $input else string-join($terms, '|')
+    let $joined-terms := string-join($terms, '|')
 
     for $date in $files
     let $logs := admin:logs($date, true())
@@ -301,10 +335,7 @@ declare function dba:entries(
         }
       }
     }
-  )
-  (: one entry more than the limit: it is what tells that the search was cut short :)
-  let $max := $dba:MAX-ENTRIES + 1
-  let $shown := if ($several) then subsequence($entries, 1, $max) else $entries
+  ), 1, $max[$several])
   let $params := { 'name': head($files), 'input': $input }
   (: filter fields, displayed below the table header :)
   let $filter-row := element tr {
@@ -315,7 +346,7 @@ declare function dba:entries(
       <input type='text' class='filter' name='{ $name }' value='{ $filters?($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
              title='Regular expression of the { lower-case($column?label) } values to show'
-             onkeyup='filterLogs(event.key);'/>
+             data-filter='logEntries'/>
     }
   }
   let $options := {

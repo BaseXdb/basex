@@ -6,8 +6,8 @@ const WORKSPACE_WS = "/workspace";
 /** Id of the job of the query that is currently evaluated in the editor panel. */
 let _job;
 
-/** File names that are treated as XQuery. The suffixes are the server's, which knows them
-    from IO.XQSUFFIXES; a list of its own here would go stale the day one is added. */
+/** File names that are treated as XQuery. The suffixes are the server's ($utils:XQUERY-REGEX);
+    a list of its own here would go stale the day one is added. */
 const XQUERY_SUFFIXES =
   new RegExp(document.documentElement.dataset.xquery ?? "^$", "i");
 
@@ -60,7 +60,7 @@ function tab() {
  * @returns {object} tab
  */
 function newTab(dir, name) {
-  return { dir: name ? dir : "", name: name, id: _nextId++, saved: "", edited: false,
+  return { dir: name ? dir : "", name, id: _nextId++, saved: "", edited: false,
     state: undefined };
 }
 
@@ -83,7 +83,7 @@ function newFile() {
  */
 function tabText(t) {
   if(t === tab()) return editorValue();
-  return typeof t.state === "string" ? t.state : t.state ? t.state.doc.toString() : "";
+  return typeof t.state === "string" ? t.state : t.state?.doc.toString() ?? "";
 }
 
 /**
@@ -132,8 +132,10 @@ function renderTabs() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "tab";
+    button.setAttribute("role", "tab");
     const edited = tabModified(t);
     button.classList.toggle("active", i === _tab);
+    button.setAttribute("aria-selected", i === _tab);
     button.title = t.name ? t.dir + t.name : "New file";
     // file names are user input: they are text, never markup
     const label = document.createElement("span");
@@ -141,6 +143,8 @@ function renderTabs() {
     const close = document.createElement("span");
     close.className = "close";
     close.textContent = "\u00d7";
+    // a pointer control: the keyboard closes a document with its shortcut
+    close.setAttribute("aria-hidden", "true");
     close.addEventListener("click", event => {
       event.stopPropagation();
       closeTab(i);
@@ -169,7 +173,7 @@ function renderTabs() {
  */
 function captureTab() {
   const t = tab();
-  if(t) t.state = _editor.view ? _editor.view.state : editorValue();
+  if(t) t.state = _editor.view?.state ?? editorValue();
 }
 
 /**
@@ -204,7 +208,7 @@ function showTab() {
  * Refreshes the strip, the buttons and the language of the editor for the active document.
  */
 function refreshTab() {
-  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
+  _editor.setLanguage?.(fileLanguage(tab()?.name, editorValue()));
   renderTabs();
   checkButtons();
 }
@@ -233,7 +237,8 @@ function selectTab(index) {
  */
 async function closeTab(index) {
   const t = _tabs[index];
-  if(!t) return;
+  // closing the only, empty unnamed document would just open another one
+  if(!t || _tabs.length === 1 && !t.name && !tabModified(t)) return;
   if(tabModified(t)) {
     // ask about the document the user is looking at
     if(index !== _tab) selectTab(index);
@@ -320,25 +325,22 @@ function refreshFiles(sort, dir) {
  * Evaluates a query in the editor panel. The query is sent to the server, which pushes back the
  * result or the error; see showMessage.
  */
-async function runQuery() {
+function runQuery() {
   if(document.getElementById("run").disabled) return;
-  if(_editor) _editor.focus();
+  _editor?.focus();
 
   setDisabled("stop", true);
   setText("", "");
   setRunInfo("");
 
-  const run = startRequest();
-  if(!await sendMessage(WORKSPACE_WS, {
+  sendRequest(WORKSPACE_WS, {
     type: "run",
-    run: run,
     query: editorValue(),
     indent: indentOn(),
     // relative paths in the query resolve against the opened file, or against the directory
     dir: tabDir(),
     file: tab()?.name ?? ""
-  })) return;
-  awaitResult(run);
+  });
 }
 
 /**
@@ -347,7 +349,7 @@ async function runQuery() {
  */
 function showResult(json) {
   setText("Query was successful.", "info");
-  if(_output.setLanguage) _output.setLanguage(contentLanguage(json.result, "text"));
+  _output.setLanguage?.(contentLanguage(json.result, "text"));
   _output.setValue(json.result);
   document.getElementById("output-hint").hidden = true;
   const items = json.items;
@@ -575,8 +577,8 @@ async function saveFile(saveAs) {
   // the document is renamed below: its draft is dropped under both keys
   const key = draftKey(t);
   try {
-    await request(`editor-save?${new URLSearchParams({ name: name, dir: dir })}`, text);
-    Object.assign(t, { dir: dir, name: name, saved: text, edited: false });
+    await request(`editor-save?${new URLSearchParams({ name, dir })}`, text);
+    Object.assign(t, { dir, name, saved: text, edited: false });
     store(key, null);
     store(draftKey(t), null);
     showTab();

@@ -8,8 +8,7 @@ const USERS_WS = "/users";
 let _user = "";
 
 /**
- * Shows another user. What is attached to no user in particular steps back while one of them
- * is being looked at.
+ * Shows another user.
  * @param {string} name user
  */
 function selectUser(name) {
@@ -52,13 +51,8 @@ function refreshUsers(sort, page) {
   requestPanel(USERS_WS, "users-panel", { type: "users", name: _user }, sort, page);
 }
 
-/** The data of a user is edited as XML, and the panel brings a new text area with it. The data
-    that belongs to no user in particular steps back to a strip while one is being looked at;
-    the panel decides, not the selection, as a user that does not exist opens nothing. */
-_panel_filled["user-panel"] = () => {
-  loadCodeMirror("xml", [ "editor" ]);
-  foldPanels([ [ "General User Data", panelShown("User") ] ]);
-};
+/** The data of a user is edited as XML, and the panel brings a new text area with it. */
+_panel_filled["user-panel"] = () => loadCodeMirror("xml", [ "editor" ]);
 
 /** The sort links of the user list are followed in place. */
 followPanelLinks({ "users-panel": refreshUsers });
@@ -72,4 +66,6 @@ function initUsers() {
   // selection, and is therefore the editor the page-wide helpers refer to
   loadCodeMirror("xml", [ "user-info", "editor" ]);
   initSelection(adoptSelection, showUser);
+  // the server opens the first user if the address names none: the address is completed
+  _user ||= adoptOpened("user-panel");
 }

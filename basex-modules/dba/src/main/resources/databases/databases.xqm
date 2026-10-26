@@ -34,55 +34,36 @@ function dba:databases(
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show; changing
      it refreshes the panels over the connection the view opens for its queries :)
-  (: the document is needed twice: its text fills the editor, its properties the panel :)
-  let $document := panels:document($name, $resource)
+  (: a database is always open: the first one if the address names none :)
+  let $name := $name[.] otherwise head(db:list())
   (: a link that names a resource alone opens the level that holds it; the client derives the
      directory in the same way :)
   let $dir := $dir[.] otherwise replace($resource, '[^/]+$', '')
+  (: the document is needed twice: its text fills the editor, its properties the panel :)
+  let $document := panels:document($name, $resource)
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
   let $database := panels:database($name, '', 1, $resource, $dir, '')
-  let $information := panels:information($name)
-  let $index := panels:index($name, 'element-name', '', '', 1)
-  (: the panels follow the selection: while a document is shown, what it was chosen from steps
-     back to a strip; without one, the lists are what there is to see. A panel that is folded by
-     hand keeps the state it was given :)
-  let $fold := $document?exists
   return (
-    html:panel(panels:databases('', 1, $name),
-      { 'id': 'databases-panel', 'label': 'Databases', 'collapsed': $fold }),
-    html:panel($database,
-      { 'id': 'database-panel', 'label': 'Database', 'close': 'selectDatabase("")' }),
+    html:panel(panels:databases('', 1, $name), { 'id': 'databases-panel', 'label': 'Databases' }),
+    html:panel($database, { 'id': 'database-panel', 'label': 'Database' }),
     (: the editor is created once and outlives the panel above it, which is redrawn :)
     html:panel(panels:resource($name, $resource, $document), {
       'id'   : 'resource-panel',
       'label': 'Resource',
-      'close': 'selectResource("")',
       'pane' : false(),
       'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
     }),
-    (: the last three sit at the right edge, so all fold that way; only the last one does so by
-       default. The backups are shown on the top level, and step back once a database is chosen :)
-    html:panel(panels:backups($name), {
-      'id': 'backups-panel', 'label': 'Backups', 'collapsed': boolean($name), 'fold': 'right',
-      'description': 'the backups of the database, or of the users, services and stores'
-    }),
-    (: reports, not steps of the work: they are opened when they are asked for :)
-    html:panel($index,
-      { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true(), 'fold': 'right',
-        'description': 'the entries of the indexes of the database' }),
-    html:panel($information,
-      { 'id': 'information-panel', 'label': 'Information', 'collapsed': true(),
-        'description': 'the properties and options of the database' }),
+    (: no steps of the work: what concerns a database as a whole, and the storage, are opened
+       when asked for; see initDatabases :)
+    panels:properties-dialog($name),
+    panels:storage-dialog(),
     (: what the language fields of the dialogs suggest :)
     form:languages()
   ) => html:wrap({
     'header' : $dba:CAT,
-    'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
+    'columns': ('35fr', '35fr', '30fr'),
     'rows'   : '1fr',
-    (: a view of its own per level: what is folded away while a document is shown is not what
-       is folded away while a database or the list of databases is; see foldResourcePanels :)
-    'panels' : if ($document?exists) then 'resource' else if ($name) then 'database' else (),
     'scripts': ('cm6', 'editor', 'databases'),
     'init'   : `initDatabases({ $document?editable });`
   })
@@ -366,7 +347,7 @@ function dba:backup-create() {
   utils:dispatch($dba:CAT, fn($args) {
     let $name := string($args?name)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       (: an empty name addresses the data that belongs to no database :)
       'info'  : if ($name) then utils:info($name, 'database', 'backed up')
                 else 'Users, services, and stores were backed up.',
@@ -391,7 +372,7 @@ function dba:backup-drop() {
   utils:dispatch($dba:CAT, fn($args) {
     let $name := string($args?name)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info($args?backup, 'backup', 'dropped'),
       'run'   : %updating fn() { $args?backup ! db:drop-backup(`{ $name }-{ . }`) }
     }
@@ -412,7 +393,7 @@ function dba:backup-restore() {
     (: only the first backup will be restored :)
     let $backup := head($args?backup)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info($backup, 'backup', 'restored'),
       'run'   : %updating fn() { db:restore(`{ $name }-{ $backup }`) }
     }
@@ -434,7 +415,7 @@ function dba:backup-upload() {
     let $name := string($args?name)
     let $files := utils:files($args?files)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info(map:keys($files), 'backup', 'uploaded'),
       'run'   : %updating fn() {
         for key $file value $content in $files
@@ -661,4 +642,15 @@ declare %private function dba:index(
       )
     }
   }
+};
+
+(:~
+ : Returns the parameters of the page that shows the backups an action has changed.
+ : @param  $name  database; empty string for the general data
+ : @return query parameters
+ :)
+declare %private function dba:backups-shown(
+  $name  as xs:string
+) as map(*) {
+  if ($name) then { 'name': $name, 'show': 'properties' } else { 'show': 'storage' }
 };

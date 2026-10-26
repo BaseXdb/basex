@@ -39,7 +39,7 @@ declare function panels:stores(
         (: the values of a known format get the width they need; the name takes the rest :)
         { 'key': 'label', 'label': 'Name' },
         { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
-          'width': 'calc(7ch + 0.5rem)' },
+          'width': 'calc(8ch + 0.5rem)' },
         { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
           'width': 'calc(9ch + 0.5rem)' },
         { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
@@ -76,7 +76,7 @@ declare function panels:stores(
         'sticky': <h2>Stores</h2>,
         'noun': 'store'
       }
-      return table:create($headers, $entries, $buttons, {}, $options)
+      return table:create($headers, $entries, $buttons, options := $options)
     }
   </form>
 };
@@ -101,7 +101,7 @@ declare function panels:entries(
   let $root := if ($key) { store:get($key, $name) }
   (: a path that does not resolve any more is given up; the client adopts the one that is
      rendered, which is why it is stated in the markup :)
-  let $resolved := if (exists($root)) { panels:resolve($root, tail($path)) }
+  let $resolved := panels:resolve($root, tail($path))
   let $steps := if (exists($resolved)) then $path else if (exists($root)) { $key }
   let $value := $resolved otherwise $root
   let $text := panels:path($steps)
@@ -129,10 +129,10 @@ declare function panels:entries(
       {
         let $headers := (
           (: a position is ordered by its value, not as the string it is labelled by :)
-          { 'key': 'label', 'label': 'Key', 'width': '30%',
+          { 'key': 'label', 'label': 'Key', 'width': '40%',
             'sort': 'number'[$positional] },
-          { 'key': 'value', 'label': 'Value', 'width': '40%' },
-          { 'key': 'type', 'label': 'Type', 'width': '22%' }
+          { 'key': 'value', 'label': 'Value', 'width': '33%' },
+          { 'key': 'type', 'label': 'Type', 'width': '19%' }
         )
         (: the type and the value of a child are only produced for the rows that are shown:
            a store may hold values that are expensive to inspect :)
@@ -159,7 +159,7 @@ declare function panels:entries(
           'select': 'step',
           (: what can be done with the level stays in view while its children scroll; the path
              that leads to it is stated below what acts on it :)
-          'sticky': <h2>{ 'Store: ' || utils:label($name) }</h2>,
+          'sticky': <h2>Store: { utils:label($name) }</h2>,
           'below': panels:breadcrumb($root, $steps),
           'empty': if (exists($steps)) then 'This level is empty.'
             else 'The store is empty. Add an entry with Add…'
@@ -168,8 +168,7 @@ declare function panels:entries(
       }
     </form>,
 
-    <div class='note'>Read-only: all steps of the path must be strings and
-      integers.</div>[not($editable)],
+    <div class='note'>Read-only: path steps must be strings or integers.</div>[not($editable)],
 
     (: the index that follows the last child appends one :)
     panels:add-dialog($name, $text, if ($value instance of array(*)) then (
@@ -260,7 +259,7 @@ declare function panels:value(
 ) as utils:editor {
   let $key := head($path)
   let $root := if ($key) { store:get($key, $name) }
-  let $value := if (exists($root)) { panels:resolve($root, tail($path)) }
+  let $value := panels:resolve($root, tail($path))
   return if (empty($value)) then (
     (: the store itself has no value, and a path that is gone leads to none :)
     { 'exists': false(), 'text': '', 'editable': false() }
@@ -269,8 +268,8 @@ declare function panels:value(
        can be stored again :)
     let $expression := utils:expression($value)
     return utils:editable($expression?text, (
-      'all steps of the path must be strings and integers'[not(panels:addressable($path))],
-      'the value is too large for editing'[$expression?truncated]
+      'path steps must be strings or integers'[not(panels:addressable($path))],
+      'value too large'[$expression?truncated]
     ))
   )
 };
@@ -530,12 +529,13 @@ declare function panels:resolve(
     $value
   ) else (
     let $step := head($steps)
-    let $child := if ($value instance of map(*)) then (
-      $value?(panels:key($value, $step))
-    ) else if ($value instance of array(*)) then (
-      $value[$step instance of xs:integer and $step = 1 to array:size($value)]($step)
-    ) else if (count($value) > 1 and $step instance of xs:integer) {
-      $value[$step]
+    let $child := switch () {
+      case $value instance of map(*) return $value?(panels:key($value, $step))
+      case $value instance of array(*) return (
+        $value[$step instance of xs:integer and $step = 1 to array:size($value)]($step)
+      )
+      case count($value) > 1 and $step instance of xs:integer return $value[$step]
+      default return ()
     }
     return if (exists($child)) { panels:resolve($child, tail($steps)) }
   )

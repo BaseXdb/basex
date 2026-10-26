@@ -33,15 +33,16 @@ function dba:ws-message(
   let $panels := {
     'jobs-panel'   : fn() { panels:jobs($sort('jobs-panel'), $page('jobs-panel'), $dba) },
     (: the connection of this view is pointed out in the list of clients :)
-    'clients-panel': fn() { panels:clients(ws:id(), $json?idle = true(), $dba) },
+    'clients-panel': fn() {
+      panels:clients($sort('clients-panel'), ws:id(), $json?idle = true(), $dba)
+    },
     'db-panel'     : fn() { panels:db-sessions($sort('db-panel'), $page('db-panel')) },
     'caches-panel' : fn() { panels:caches($sort('caches-panel'), $page('caches-panel')) }
   }
   (: a folded panel is not rendered: it is asked for once it is opened :)
-  let $open := if (map:contains($json, 'open')) then $json?open?* else map:keys($panels)
   return utils:ws-send({
     'type': 'panels',
-    'panels': map:build($open[map:contains($panels, .)],
+    'panels': map:build($json?open?*[map:contains($panels, .)],
       value := fn($id) { utils:html($panels($id)()) }),
     (: the details of a job are not a panel: they are shown in a dialog, and are left alone
        once they are final :)

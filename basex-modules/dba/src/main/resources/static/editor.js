@@ -137,7 +137,7 @@ function loadCodeMirror(language, edit, resize) {
   restoreIndent();
 
   const outputArea = document.getElementById("output");
-  if(outputArea != null) {
+  if(outputArea) {
     loaded.push("output");
     if(useCM) {
       _output = CM6.fromTextArea(outputArea, { language: "xml", readOnly: true });

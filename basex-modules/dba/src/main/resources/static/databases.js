@@ -27,11 +27,11 @@ let _request;
 /**
  * Shows another database. Its resources replace the ones that were listed before, and the
  * document of the previous database is closed with it.
- * @param {string} name database; the selected one, or an empty string, closes it
+ * @param {string} name database
  */
 function selectDatabase(name) {
-  // without a database, the page shows the general backups again
-  _db = name === _db ? "" : name;
+  if(name === _db) return;
+  _db = name;
   _resource = "";
   _dir = "";
   pushSelection();
@@ -39,12 +39,12 @@ function selectDatabase(name) {
 }
 
 /**
- * Shows another resource of the selected database; an empty name, or the open one, closes the
- * document.
+ * Shows another resource of the selected database.
  * @param {string} resource resource
  */
 function selectResource(resource) {
-  _resource = resource === _resource ? "" : resource;
+  if(resource === _resource) return;
+  _resource = resource;
   pushSelection();
   mark("database-panel", _resource);
   refreshResource();
@@ -65,9 +65,7 @@ function pushSelection() {
  */
 function enterDbDir(dir) {
   // a level and a filter are two ways of looking at the database: entering one gives up the other
-  const filter = document.getElementById("resource-filter");
-  if(filter) filter.value = "";
-  storeField("resource-filter", _db);
+  clearField("resource-filter", _db);
   _dir = dir === ".." ? _dir.replace(/[^/]+\/$/, "") : dir;
   pushSelection();
   refreshDatabase();
@@ -92,13 +90,77 @@ function showDatabase() {
   mark("databases-panel", _db);
   refreshDatabase();
   refreshResource();
-  refreshBackups();
-  requestPanel(DB_WS, "information-panel", { type: "information", name: _db });
-  refreshIndex();
+  // the properties of another database are dropped; they are requested once looked at
+  const properties = document.getElementById("properties-dialog");
+  if(properties.querySelector("input[name=name]")?.value !== _db) properties.replaceChildren();
+}
+
+/** Dialog that is opened once its contents arrive, and the block it shows. */
+let _opening;
+
+/**
+ * Opens a dialog whose contents are rendered by the server, requesting them if it is empty.
+ * @param {string} dialog name of the dialog ('properties', 'storage')
+ * @param {string} id id of the block that is shown; if omitted, the remembered one
+ */
+function openDialog(dialog, id) {
+  if(document.getElementById(`${dialog}-dialog`).childElementCount) {
+    showTab(dialog, id);
+    showDialog(dialog);
+  } else if(_opening?.dialog !== dialog) {
+    _opening = { dialog, id };
+    // the properties list the index that was browsed in the database again
+    requestPanel(DB_WS, `${dialog}-dialog`, dialog === "properties" ?
+      { type: dialog, name: _db, ...indexState() } : { type: dialog });
+  }
+}
+for(const dialog of [ "properties", "storage" ]) {
+  _panel_filled[`${dialog}-dialog`] = () => {
+    if(_opening?.dialog !== dialog) return;
+    const { id } = _opening;
+    _opening = undefined;
+    // nothing is opened if there is nothing to show
+    if(document.getElementById(`${dialog}-dialog`).childElementCount) openDialog(dialog, id);
+  };
 }
 
 /**
- * Requests the backups panel: the backups of the selected database, or the general ones.
+ * Shows a tab of a dialog, which is remembered.
+ * @param {string} dialog name of the dialog
+ * @param {string} id id of the block that the tab shows; if omitted, the remembered one
+ */
+function showTab(dialog, id) {
+  const key = `dba-${dialog}-tab`;
+  const tabs = [ ...document.querySelectorAll(`#${dialog}-dialog .tab`) ];
+  const block = t => t.getAttribute("aria-controls");
+  const tab = tabs.find(t => block(t) === (id ?? stored(key))) ?? tabs[0];
+  for(const t of tabs) {
+    t.classList.toggle("active", t === tab);
+    t.setAttribute("aria-selected", t === tab);
+    t.tabIndex = t === tab ? 0 : -1;
+    document.getElementById(block(t)).hidden = t !== tab;
+  }
+  store(key, block(tab));
+}
+
+/**
+ * Switches the tabs of a dialog with the cursor keys, as a tab list does.
+ * @param {string} dialog name of the dialog
+ * @param {KeyboardEvent} event key event
+ */
+function tabKey(dialog, event) {
+  const tabs = [ ...event.currentTarget.children ];
+  const p = tabs.indexOf(event.target);
+  const next = { ArrowLeft: p - 1, ArrowRight: p + 1, Home: 0, End: tabs.length - 1 }[event.key];
+  if(p === -1 || next === undefined) return;
+  event.preventDefault();
+  const tab = tabs.at(next % tabs.length);
+  showTab(dialog, tab.getAttribute("aria-controls"));
+  tab.focus();
+}
+
+/**
+ * Requests the backups block of the properties dialog: the backups of the selected database.
  * @param {string} sort sort key; if omitted, the shown order is kept
  * @param {number} page page; if omitted, the first one
  */
@@ -107,15 +169,33 @@ function refreshBackups(sort, page) {
 }
 
 /**
+ * Requests the list of the general backups dialog.
+ * @param {string} sort sort key; if omitted, the shown order is kept
+ * @param {number} page page; if omitted, the first one
+ */
+function refreshGeneralBackups(sort, page) {
+  requestPanel(DB_WS, "general-backups-panel", { type: "general-backups" }, sort, page);
+}
+
+/**
  * Requests the panel that browses an index of the selected database.
  * @param {string} sort sort key; if omitted, the shown order is kept
  * @param {number} page page; if omitted, the first one
  */
 function refreshIndex(sort, page) {
+  requestPanel(DB_WS, "index-panel", { type: "index", name: _db, ...indexState() }, sort, page);
+}
+
+/**
+ * Returns the index that is browsed in the selected database, and the prefix of its entries.
+ * @returns {object} index and prefix
+ */
+function indexState() {
   // the index that was chosen for the database, as the prefix, outlives the page
-  requestPanel(DB_WS, "index-panel", { type: "index", name: _db,
+  return {
     index: storedField("index-select", _db) || fieldValue("index-select") || "element-name",
-    prefix: storedField("index-prefix", _db) }, sort, page);
+    prefix: storedField("index-prefix", _db)
+  };
 }
 
 /**
@@ -131,18 +211,15 @@ function selectIndex() {
  * Empties the prefix of the index list: it belongs to the index it was typed for.
  */
 function clearPrefix() {
-  const prefix = document.getElementById("index-prefix");
-  if(prefix) prefix.value = "";
-  storeField("index-prefix", _db);
+  clearField("index-prefix", _db);
 }
 
 /**
  * Requests the index entries that start with the supplied prefix.
- * @param {string} key typed key
  */
-function filterIndex(key) {
+function filterIndex() {
   storeField("index-prefix", _db);
-  filterKey(key, "index-prefix", refreshIndex);
+  refreshIndex();
 }
 
 /**
@@ -167,15 +244,12 @@ function refreshDatabase(sort, page) {
 
 /**
  * Requests the resources that match the filter.
- * @param {string} key typed key
  */
-function filterResources(key) {
+function filterResources() {
   storeField("resource-filter", _db);
   // the filtered list keeps the number of entries that are shown, and starts at the top
-  filterKey(key, "resource-filter", () => {
-    _toTop.add("database-panel");
-    refreshDatabase(undefined, shownPages("database-panel"));
-  });
+  _toTop.add("database-panel");
+  refreshDatabase(undefined, shownPages("database-panel"));
 }
 
 /**
@@ -192,31 +266,9 @@ function refreshResource() {
  */
 function showResource(json) {
   fillPanel("resource-panel", json.html);
-  // every selection asks for the resource panel, so this is where the level is known
-  foldResourcePanels();
   // the 'Indent' preference belongs to the editor, and outlives the panel that shows it
   restoreIndent();
   initDocument(json.editable, json.text);
-}
-
-/**
- * Assigns the collapsed state of the panels for the level that the view shows.
- */
-function foldResourcePanels() {
-  // the panel decides, not the selection: a resource that does not exist opens nothing
-  const shown = panelShown("Resource");
-  // every level keeps the panels that were folded by hand on it; see panelsKey
-  const content = document.querySelector(".content");
-  if(shown) content.dataset.panels = "resource";
-  else if(_db) content.dataset.panels = "database";
-  else delete content.dataset.panels;
-  const folded = storedPanels();
-  // a document folds what it was chosen from; the backups are shown on the top level only
-  foldPanels([
-    [ "Databases", shown ], [ "Database", false ], [ "Resource", false ],
-    [ "Backups", shown || Boolean(_db) ], [ "Information", true ]
-  ].map(([ label, collapse ]) =>
-    [ label, folded[label] ?? collapse ]));
 }
 
 /**
@@ -231,7 +283,7 @@ function initDocument(editable, text) {
   // the editor normalizes line endings: what it holds is the baseline, not what was sent
   _saved = editorValue();
   const note = document.getElementById("note");
-  _note = note ? [ note.textContent, note.className ] : [ "", "note" ];
+  _note = note ? [ note.textContent, note.className ] : undefined;
 
   // the query field is rendered empty: what was typed for the database is run again
   if(restoreField("input", _db) || document.getElementById("input") && indentOn()) {
@@ -256,7 +308,7 @@ function queryResource(enforce, keep) {
   // re-run whenever the query or the indent preference changes
   if(!enforce && _request?.input === input && _request?.indent === indent) return;
   // remember what was requested: the reply is evaluated when it arrives
-  _request = { input: input, indent: indent };
+  _request = { input, indent };
   // what the last rendering reported is outdated as soon as a new one is asked for
   if(!keep) setText("", "");
 
@@ -268,19 +320,16 @@ function queryResource(enforce, keep) {
   // block edits until the result has been received; a query result is read-only
   setEditable("save-resource", false);
   if(input && _editable) {
-    showResourceNote("Read-only: query result. Clear the query to edit the document again.");
+    showResourceNote("Read-only: query result; clear the query to edit.");
   }
 
-  const run = startRequest();
-  sendMessage(DB_WS, {
+  sendRequest(DB_WS, {
     type: "query",
-    run: run,
     name: _db,
     resource: _resource,
     query: input || ".",
-    indent: indent
+    indent
   });
-  awaitResult(run);
 }
 
 /**
@@ -391,7 +440,8 @@ _indent_changed = () => queryResource(true);
 
 /** The sort and page links of the list panels are followed in place. */
 followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
-  "backups-panel": refreshBackups, "index-panel": refreshIndex });
+  "backups-panel": refreshBackups, "general-backups-panel": refreshGeneralBackups,
+  "index-panel": refreshIndex });
 
 /** The controls of the list panels keep the focus and the caret while their panel is replaced. */
 _panel_focus["database-panel"] = [ "#resource-filter" ];
@@ -415,11 +465,20 @@ function initDatabases(editable) {
   loadCodeMirror("xml", true, "fill");
 
   initSelection(adoptSelection, showDatabase);
+  // the server opens the first database if the address names none: the address is completed
+  _db ||= adoptOpened("database-panel");
   initDocument(editable);
+  // the dialog of an action is opened again, at the remembered tab; a reload does not repeat it
+  const show = new URLSearchParams(window.location.search).get("show");
+  if(show) {
+    hideParams("show");
+    openDialog(show);
+  }
   // the lists are rendered unfiltered: what was typed for the database is asked for again
   if(restoreField("resource-filter", _db)) refreshDatabase();
   const index = storedField("index-select", _db);
-  if(restoreField("index-prefix", _db) || index && index !== fieldValue("index-select")) {
+  if(document.getElementById("index-select") &&
+      (restoreField("index-prefix", _db) || index && index !== fieldValue("index-select"))) {
     refreshIndex();
   }
 }

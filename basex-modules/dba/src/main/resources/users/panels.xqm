@@ -29,8 +29,8 @@ declare function panels:users(
     let $headers := (
       (: the values of a known format get the width they need; the name takes the rest :)
       { 'key': 'name', 'label': 'Name' },
-      { 'key': 'permission', 'label': 'Permission', 'width': 'calc(12ch + 0.5rem)' },
-      { 'key': 'you', 'label': 'You', 'width': '3rem' }
+      { 'key': 'permission', 'label': 'Permission', 'width': 'calc(13ch + 0.5rem)' },
+      { 'key': 'you', 'label': 'You', 'width': '3.5rem' }
     )
     let $entries := (
       let $current := session:get($config:SESSION-KEY)
@@ -45,8 +45,8 @@ declare function panels:users(
         'permission': fn() {
           let $local := $user/database
           return if ($local) then (
-            <span title='{ string-join($local ! (@pattern || ' → ' || @permission), ', ') }'>{
-              $user/@permission || ' +' || count($local)
+            <span title='{ string-join($local ! `{ @pattern } → { @permission }`, ', ') }'>{
+              `{ $user/@permission } +{ count($local) }`
             }</span>
           ) else string($user/@permission)
         },
@@ -59,9 +59,13 @@ declare function panels:users(
       <button type='button' onclick='showDialog("create")'
               title='Create a new user'>New…</button>,
       form:button('users/drop', 'Drop', ('CHECK', 'CONFIRM'),
-        title := 'Delete the selected users')
+        title := 'Delete the selected users'),
+      <button type='button' onclick='showDialog("info")'
+              title='Edit the custom data that belongs to no user in particular'>{
+        'General Data…'
+      }</button>
     )
-    return table:create($headers, $entries, $buttons, {},
+    return table:create($headers, $entries, $buttons, options :=
       { 'sort': $sort, 'page': $page, 'presort': 'name', 'sticky': <h2>Users</h2>,
         'noun': 'user' })
   }</form>,
@@ -92,7 +96,7 @@ declare function panels:user(
     (: the admin is the one user whose name and permission are not up for discussion :)
     let $admin := $name eq 'admin'
     return (
-      <h2>{ 'User: ' || $name }</h2>,
+      <h2>User: { $name }</h2>,
       <div class='buttons'><button title='Save the changes to this user'>Save</button></div>,
       <input type='hidden' name='name' value='{ $name }'/>,
       if ($admin) {
@@ -172,19 +176,13 @@ declare function panels:pattern-dialog() as element(dialog) {
 };
 
 (:~
- : Creates the contents of the information panel: the information that is attached to no user
- : in particular.
- : @return panel contents
+ : Creates the dialog with the information that is attached to no user in particular.
+ : @return dialog
  :)
-declare function panels:information() as element()+ {
-  <form method='post' action='users/info' autocomplete='off' class='pane column'>
-    <h2>General User Data</h2>
-    <div class='buttons'><button title='Save the general user data'>Save</button></div>
-    {
-      panels:info-editor('user-info',
-        'Custom XML data that belongs to no user in particular', ())
-    }
-  </form>
+declare function panels:info-dialog() as element(dialog) {
+  form:dialog('info', 'General User Data', 'users/info', false(),
+    panels:info-editor('user-info',
+      'Custom XML data that belongs to no user in particular', (), 16))
 };
 
 (:~
@@ -192,15 +190,18 @@ declare function panels:information() as element()+ {
  : @param  $id    id of the editor
  : @param  $note  what the data belongs to
  : @param  $name  user; empty sequence for the data that belongs to no user in particular
+ : @param  $rows  height of the editor in lines; empty sequence if it fills the panel
  : @return note and editor
  :)
 declare %private function panels:info-editor(
   $id    as xs:string,
   $note  as xs:string,
-  $name  as xs:string?
+  $name  as xs:string?,
+  $rows  as xs:integer? := ()
 ) as element()+ {
   <div class='note'>{ $note }, with an &lt;info&gt; root element.</div>,
   <textarea name='info' id='{ $id }' spellcheck='false'>{
+    attribute rows { $rows }[exists($rows)],
     serialize(user:info($name), { 'indent': true() })
   }</textarea>
 };

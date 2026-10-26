@@ -85,7 +85,7 @@ declare function utils:expression(
   )
   let $truncated := string-length($text) > $max
   return {
-    'text': if ($truncated) then substring($text, 1, $max) else $text,
+    'text': substring($text, 1, $max),
     'truncated': $truncated
   }
 };
@@ -100,7 +100,7 @@ declare function utils:value(
 ) as map(*) {
   let $expression := utils:expression($value)
   return if ($expression?truncated) then (
-    { 'text': '', 'note': 'The value is too large to be shown; supply a new one.' }
+    { 'text': '', 'note': 'Value too large to show; supply a new one.' }
   ) else (
     { 'text': $expression?text, 'note': '' }
   )
@@ -231,14 +231,14 @@ declare function utils:ws-error(
 (:~
  : Starts a job that pushes the outcome of a query to the client, and registers both jobs for the
  : current connection.
- : @param  $id       id of the job to wait for
- : @param  $run      number of the run (echoed to the client, which drops outdated results)
- : @param  $options  serialization parameters
+ : @param  $id    id of the job to wait for
+ : @param  $run   number of the run (echoed to the client, which drops outdated results)
+ : @param  $chop  chop the serialized result
  :)
 declare function utils:ws-start(
-  $id       as xs:string,
-  $run      as xs:integer,
-  $options  as map(*)
+  $id    as xs:string,
+  $run   as xs:integer,
+  $chop  as xs:boolean
 ) as empty-sequence() {
   let $maxchars := config:get($config:MAXCHARS)
   (: the reader is registered as well: it must be gone before the ID is assigned again :)
@@ -249,13 +249,18 @@ declare function utils:ws-start(
       let $info := job:info($id)
       return {
         try {
+          (: the job returns a serialized result; the bytes of a binary one are shown as text :)
           let $result := job:result($id)
-          let $string := serialize($result, $options)
+          let $string := if ($result instance of xs:string) then (
+            $result
+          ) else (
+            serialize($result, { 'method': 'basex' })
+          )
           return {
             'type'  : 'result',
             'run'   : $run,
-            'result': if ($options?limit) then utils:chop($string, $maxchars) else $string,
-            'items' : count($result)
+            'result': if ($chop) then utils:chop($string, $maxchars) else $string,
+            { 'items': xs:integer($info?result?items) }[exists($info)]
           }
         } catch * {
           {
@@ -298,15 +303,13 @@ declare function utils:query-info(
     return (
       <dt>{ utils:title($key) }:</dt>,
       <dd>{
-        if ($value instance of map(*)) then (
-          <ul>{
+        switch () {
+          case $value instance of map(*) return <ul>{
             for key $name value $entry in $value return <li>{ utils:title($name) }: { $entry }</li>
           }</ul>
-        ) else if ($value instance of array(*)) then (
-          <ul>{ $value?* ! <li>{ . }</li> }</ul>
-        ) else (
-          <pre>{ $value }</pre>
-        )
+          case $value instance of array(*) return <ul>{ $value?* ! <li>{ . }</li> }</ul>
+          default return <pre>{ $value }</pre>
+        }
       }</dd>
     )
   }</dl>
@@ -612,7 +615,7 @@ declare function utils:outcome(
  : @param  $params   query parameters of the target page
  : @param  $message  outcome: an 'info' or an 'error' entry; empty if there is nothing to report
  :)
-declare %updating function utils:redirect(
+declare %private %updating function utils:redirect(
   $page     as xs:string,
   $params   as map(*),
   $message  as map(*)?

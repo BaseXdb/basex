@@ -52,7 +52,7 @@ function dba:workspace() as element(html) {
     </div>,
     (: the open documents are known to the client, which draws the strip :)
     <div class='panel' style='grid-area: 2 / 2 / -1 / 3'>
-      <div id='tabs' class='tabs'/>
+      <div id='tabs' class='tabs' role='tablist' aria-label='Open documents'/>
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
     </div>,
@@ -103,7 +103,7 @@ function dba:files-download(
 ) as item()+ {
   let $dir := config:files-dir($dir)
   let $paths :=
-    for $name in $names[. != '..']
+    for $name in $names
     let $path := utils:safe-path($dir, $name)
     where file:is-file($path)
     return $path
@@ -148,9 +148,8 @@ function dba:delete() {
   utils:dispatch($dba:CAT, fn($args) { {
     'info': utils:info($args?name, 'file', 'deleted'),
     'run' : %updating fn() {
-      (: delete all files, ignore reference to parent directory :)
       let $dir := config:files-dir($args?dir)
-      return $args?name[. != '..'] ! file:delete(utils:safe-path($dir, .))
+      return $args?name ! file:delete(utils:safe-path($dir, .))
     }
   } })
 };

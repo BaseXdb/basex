@@ -15,7 +15,6 @@ declare record html:page-options(
   divided  as xs:boolean?,
   columns  as xs:string*,
   rows     as xs:string*,
-  panels   as xs:string?,
   scripts  as xs:string*,
   init     as xs:string?
 );
@@ -36,7 +35,6 @@ declare record html:panel-options(
   collapsed    as xs:boolean?,
   hidden       as xs:boolean?,
   fold         as xs:string?,
-  close        as xs:string?,
   extra        as node()*,
   description  as xs:string?
 );
@@ -51,8 +49,6 @@ declare record html:panel-options(
  :   * columns: grid track widths, one per panel; defaults to equal widths
  :   * rows: grid track heights; the panels then fill the viewport instead of growing with
  :     their content, and each panel scrolls on its own
- :   * panels: name of the subview, if the page shows different panels in different subviews;
- :     the collapsed state is then remembered for each of them, as it is kept by position
  :   * scripts: names of the scripts the page needs, besides the shared one
  :   * init: call that prepares the page, evaluated after the shared setup
  : @return page
@@ -91,9 +87,9 @@ declare function html:wrap(
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name='robots' content='noindex'/>
       <link rel='icon' href='.static/basex.svg'/>
-      <link rel='stylesheet' href='.static/style.css'/>
-      <script src='.static/js.js'/>
-      { $options?scripts ! <script src='.static/{ . }.js'/> }
+      <link rel='stylesheet' href='{ html:static('style.css') }'/>
+      <script src='{ html:static('js.js') }'/>
+      { $options?scripts ! <script src='{ html:static(. || '.js') }'/> }
     </head>
     <body>
       <header>
@@ -158,7 +154,6 @@ declare function html:wrap(
       <main>
         <div class='content{ ' fill'[$rows] }{ ' divided'[$options?divided] }'
              style='--columns: { $columns }{ $rows[.] ! ('; --rows: ' || .) }'>{
-          $options?panels ! attribute data-panels { . },
           $panels
         }</div>
       </main>
@@ -199,6 +194,19 @@ declare function html:wrap(
 };
 
 (:~
+ : Returns the address of a static file of the application, versioned by its modification time.
+ : @param  $file  file name
+ : @return address
+ :)
+declare %private function html:static(
+  $file  as xs:string
+) as xs:string {
+  (: the browser caches the files: a changed file is requested under a new address :)
+  let $modified := try { file:last-modified(file:base-dir() || '../static/' || $file) } catch * { }
+  return `.static/{ $file }{ $modified ! `?v={ replace(string(.), '\D', '') }` }`
+};
+
+(:~
  : Creates a content panel of a view: one grid track of the page that html:wrap lays out.
  : @param  $contents  panel contents
  : @param  $options   options:
@@ -211,8 +219,6 @@ declare function html:wrap(
  :   * collapsed: whether the panel opens folded away
  :   * hidden: whether the panel is left out; by default, one with nothing to show is
  :   * fold: 'right' if the panel folds towards the right edge
- :   * close: client call that clears the selection the panel shows; a cross in its corner
- :     makes it
  :   * extra: content beside the block, which a pushed panel does not replace
  :   * description: what the panel holds, stated by the strip it folds to
  : @return panel
@@ -241,10 +247,7 @@ declare function html:panel(
     ) else (
       $contents
     ),
-    $options?extra,
-    (: beside the block, so that it is not replaced with it; a folded panel hides it :)
-    $options?close ! <button type='button' class='dismiss' onclick='{ . }'
-      title='{ 'Close ' || $options?label }'>×</button>
+    $options?extra
   }</div>
 };
 
@@ -265,18 +268,16 @@ declare function html:symbol(
  : Creates the heading of a panel or a block, with the controls that belong to it.
  : @param  $text      heading text
  : @param  $controls  controls placed beside the heading
- : @param  $level     name of the heading element
  : @return heading and its controls
  :)
 declare function html:heading(
   $text      as xs:string,
-  $controls  as item()+,
-  $level     as xs:string := 'h2'
+  $controls  as item()+
 ) as element(div) {
   (: the controls sit beside the heading, not inside it: a heading that does not fit is
      clipped, and a button that belongs to it must not be clipped away with it :)
   <div class='pane-title'>{
-    element { $level } { $text },
+    <h2>{ $text }</h2>,
     $controls
   }</div>
 };
@@ -348,9 +349,10 @@ declare function html:action(
     $options?title ! attribute title { . },
     (: the function is named as a global: in an inline handler, a plain name is looked up on the
        element first (a function named 'setAttribute' would not be called) :)
-    attribute onclick { 'window.' || $call ||
-      '(this.dataset' || ('.' || head(map:keys($data)))[map:size($data) = 1] ||
-      '); return false;' },
+    attribute onclick {
+      let $arg := `.{ head(map:keys($data)) }`[map:size($data) = 1]
+      return `window.{ $call }(this.dataset{ $arg }); return false;`
+    },
     $label
   }</a>
 };
@@ -363,7 +365,7 @@ declare function html:action(
 declare function html:exact(
   $date  as xs:dateTime
 ) as xs:string {
-  format-dateTime(html:adjust($date), '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]')
+  format-dateTime(adjust-dateTime-to-timezone($date), '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]')
 };
 
 (:~
@@ -374,7 +376,7 @@ declare function html:exact(
 declare function html:short-date(
   $date  as xs:dateTime
 ) as element(span) {
-  let $adjusted := html:adjust($date)
+  let $adjusted := adjust-dateTime-to-timezone($date)
   (: the year is only shown if it is not the current one; the time only if it is :)
   let $picture := if (year-from-dateTime($adjusted) = year-from-dateTime(current-dateTime())) then (
     '[M00]-[D00] [H00]:[m00]'
@@ -394,14 +396,14 @@ declare function html:short-date(
 declare function html:time(
   $date  as xs:dateTime
 ) as element(span) {
-  let $adjusted := html:adjust($date)
+  let $adjusted := adjust-dateTime-to-timezone($date)
   (: a value of another day is shown as its date, which would otherwise be lost :)
   let $picture := if (xs:date($adjusted) = current-date()) then (
     '[H00]:[m00]:[s00]'
   ) else (
     '[Y0000]-[M00]-[D00]'
   )
-  return <span title='{ $adjusted }'>{ format-dateTime($adjusted, $picture) }</span>
+  return <span title='{ html:exact($date) }'>{ format-dateTime($adjusted, $picture) }</span>
 };
 
 (:~
@@ -427,17 +429,6 @@ declare function html:localhost(
 };
 
 (:~
- : Returns a dateTime value adjusted to the current time zone.
- : @param  $date  date
- : @return adjusted value
- :)
-declare function html:adjust(
-  $date  as xs:dateTime
-) as xs:dateTime {
-  adjust-dateTime-to-timezone($date)
-};
-
-(:~
  : Formats a duration.
  : @param  $seconds  seconds
  : @return string
@@ -445,9 +436,7 @@ declare function html:adjust(
 declare function html:duration(
   $seconds  as xs:decimal
 ) as xs:string {
-  let $min := $seconds idiv 60
-  let $sec := $seconds - $min * 60
-  return `{ format-number($min, '00') }:{ format-number($sec, '00') }`
+  `{ format-number($seconds idiv 60, '00') }:{ format-number($seconds mod 60, '00') }`
 };
 
 (:~
@@ -462,26 +451,16 @@ declare function html:js(
 };
 
 (:~
- : Creates a new map with the current query parameters.
- : @return map with query parameters
- :)
-declare function html:parameters() as map(*) {
-  {
-    for $param in request:parameter-names()[not(starts-with(., '_'))]
-    return { $param: request:parameter($param) }
-  }
-};
-
-(:~
  : Creates a new map with query parameters.
  : @param  $map  predefined parameters
  : @return all current query parameters, and the given ones, prefixed with an underscore
  :)
 declare function html:parameters(
-  $map  as map(*)?
+  $map  as map(*)? := ()
 ) as map(*) {
   {
-    html:parameters(),
-    for key $name value $value in $map return { '_' || $name: $value }
+    for $param in request:parameter-names()[not(starts-with(., '_'))]
+    return { $param: request:parameter($param) },
+    for key $name value $value in $map return { `_{ $name }`: $value }
   }
 };
