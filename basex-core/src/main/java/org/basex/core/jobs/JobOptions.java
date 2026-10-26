@@ -2,6 +2,7 @@ package org.basex.core.jobs;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
+import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.options.*;
@@ -45,6 +46,9 @@ public class JobOptions extends Options {
   public static final StringOption ID = new StringOption("id");
   /** Log entry. */
   public static final StringOption LOG = new StringOption("log");
+  /** Parameters for serializing the query result. */
+  public static final OptionsOption<SerializerOptions> SERIALIZER =
+      new OptionsOption<>("serializer", SerializerOptions.class);
 
   /** Runtime restrictions, which must not be assigned to a service. */
   public static final Option<?>[] RESTRICTIONS = { MEMORY, TIMEOUT, PERMISSION };

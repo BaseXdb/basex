@@ -13,10 +13,12 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
@@ -250,6 +252,7 @@ public final class QueryJob extends Job implements Runnable {
       result.init();
 
       final JobOptions opts = job.options;
+      final boolean cache = opts.get(JobOptions.CACHE) == Boolean.TRUE;
 
       String log = opts.get(JobOptions.LOG);
       if(log != null && log.isEmpty()) log = null;
@@ -265,6 +268,7 @@ public final class QueryJob extends Job implements Runnable {
         job.resolver = null;
       }
       boolean registered = false;
+      long items = 0;
       try {
         // the job may have been stopped before its execution started
         checkStop();
@@ -309,8 +313,22 @@ public final class QueryJob extends Job implements Runnable {
         perf.nanoRuntime();
         if(remove) ctx.jobs.tasks.remove(id);
 
-        // retrieve result; copy nodes of databases that can be updated by other queries
-        result.value = qp.value().materialize(TransferVisitor.unshared(ctx), null, qp.qc);
+        // retrieve result; if it is passed on, serialize it or copy nodes of updatable databases
+        final Value value = qp.value();
+        items = value.size();
+        if(!cache && notify == null) {
+          // the result is discarded: load lazy items to raise their errors, then release it
+          value.cache(false, null);
+          result.value = Empty.VALUE;
+        } else if(opts.get(JobOptions.SERIALIZER) instanceof final SerializerOptions sopts) {
+          final byte[] bytes = Serializer.serialize(value.iter(), sopts, SERPARAM_X, null, qp.qc);
+          // binary items are output as raw bytes by the BaseX method
+          final boolean raw = value instanceof Bin && sopts.yes(SerializerOptions.BINARY) &&
+              sopts.get(SerializerOptions.METHOD) == SerialMethod.BASEX;
+          result.value = raw ? B64.get(bytes) : Str.get(bytes);
+        } else {
+          result.value = value.materialize(TransferVisitor.unshared(ctx), null, qp.qc);
+        }
       } catch(final JobException ex) {
         // query was interrupted: report exceeded limits, discard result of a stopped query
         Util.debug(ex);
@@ -329,8 +347,7 @@ public final class QueryJob extends Job implements Runnable {
         // collect query information before the job is marked as finished
         if(qi != null && qp != null) {
           try {
-            final Value value = result.value;
-            result.info = qi.toMap(qp, value != null ? value.size() : 0, jc.locks);
+            result.info = qi.toMap(qp, items, jc.locks);
           } catch(final QueryException | RuntimeException ex) {
             // the information is dropped; it must not replace the outcome or skip the release
             Util.debug(ex);
@@ -350,7 +367,7 @@ public final class QueryJob extends Job implements Runnable {
         }
         try {
           // close and invalidate query after result has been assigned. order is important!
-          if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
+          if(cache) {
             ctx.jobs.scheduleResult(this);
             state(JobState.CACHED);
           } else {

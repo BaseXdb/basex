@@ -18,7 +18,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -206,25 +205,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final byte[] serialize(final Iter iter, final SerializerOptions sopts,
       final QueryError err, final QueryContext qc) throws QueryException {
-
-    // use line feeds if no line ending was requested
-    if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
-      sopts.set(SerializerOptions.NEWLINE, SerializerOptions.Newline.NL);
-    }
-    try {
-      final ArrayOutput ao = new ArrayOutput();
-      try(Serializer ser = Serializer.unencoded(ao, sopts)) {
-        ser.qc(qc).sc(info.sc());
-        for(Item item; (item = qc.next(iter)) != null;) {
-          ser.serialize(item);
-        }
-      }
-      return ao.finish();
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      throw err.get(info, ex);
-    }
+    return Serializer.serialize(iter, sopts, err, info, qc);
   }
 
   @Override
@@ -752,6 +733,9 @@ public abstract class StandardFunc extends Arr {
       for(final Option<?> restriction : JobOptions.RESTRICTIONS) {
         if(options.modified(restriction)) throw JOBS_SERVICE_X.get(info, restriction.name());
       }
+      // services are restarted from their persisted options, which have no nested parameters
+      final Option<?> serializer = JobOptions.SERIALIZER;
+      if(options.contains(serializer)) throw JOBS_SERVICE_X.get(info, serializer.name());
     }
 
     // copy database nodes of variable values

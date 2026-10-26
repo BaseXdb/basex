@@ -5378,6 +5378,8 @@ return
     error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
     // numeric options must not wrap around
     query(func.args("<a/>", " { 'limit': 2147483647 }"), "&lt;a/&gt;");
+    // serialization stops when the limit is reached
+    query(func.args(" (1, true#0)", " { 'limit': 1 }"), 1);
     error(func.args("<a/>", " { 'limit': 4294967298 }"), INVALIDOPTION_X_X_X_X);
 
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");

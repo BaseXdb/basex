@@ -319,38 +319,38 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * The index options of the create dialog reach the new database: the optimize dialog offers
-     * what the database really has, which is not what the create dialog defaults to.
+     * The index options of the create dialog reach the new database: the properties dialog
+     * offers what the database really has, which is not what the create dialog defaults to.
      * @throws IOException I/O exception
      */
     @Test public void createWithOptions() throws IOException {
       post("databases/create", Map.of("name", DB, "opts", "textindex", "lang", "en"));
-      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      final String dialog = dialog(get("databases?name=" + DB), "properties");
       assertTrue(dialog.contains("value=\"textindex\" checked"), "text index not enabled");
       assertFalse(dialog.contains("value=\"attrindex\" checked"), "attribute index not disabled");
     }
 
     /**
      * Mixed content and the element names it refers to reach the new database, and are offered
-     * again by the optimize dialog.
+     * again by the properties dialog.
      * @throws IOException I/O exception
      */
     @Test public void createWithMixedContent() throws IOException {
       post("databases/create", Map.of("name", DB, "opts", "ftmixed", "ftinclude", "p"));
-      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      final String dialog = dialog(get("databases?name=" + DB), "properties");
       assertTrue(dialog.contains("value=\"ftmixed\" checked"), "mixed content not enabled");
       assertTrue(dialog.contains("name=\"ftinclude\" value=\"p\""), "element names not offered");
     }
 
     /**
      * Automatic optimization and the names of the value indexes reach the new database, and are
-     * offered again by the optimize dialog.
+     * offered again by the properties dialog.
      * @throws IOException I/O exception
      */
     @Test public void createWithNames() throws IOException {
       post("databases/create", Map.of("name", DB, "opts", "autooptimize",
           "textinclude", "a", "attrinclude", "b", "tokeninclude", "c"));
-      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      final String dialog = dialog(get("databases?name=" + DB), "properties");
       assertTrue(dialog.contains("value=\"autooptimize\" checked"), "optimization not enabled");
       assertTrue(dialog.contains("name=\"textinclude\" value=\"a\""), "text names not offered");
       assertTrue(dialog.contains("name=\"attrinclude\" value=\"b\""), "attribute names lost");
@@ -358,14 +358,15 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * Incremental indexing can be changed by the optimize dialog: the optimization is then full.
+     * Incremental indexing can be changed by the properties dialog: the optimization is then
+     * full.
      * @throws IOException I/O exception
      */
     @Test public void optimizeIncremental() throws IOException {
       post("databases/create", Map.of("name", DB, "opts", "textindex"));
       final String page = post("databases/optimize-db", Map.of("name", DB, "opts", "updindex"));
       assertTrue(page.contains("optimized"), "optimization failed");
-      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      final String dialog = dialog(get("databases?name=" + DB), "properties");
       assertTrue(dialog.contains("value=\"updindex\" checked"), "incremental indexing not enabled");
     }
 
@@ -432,13 +433,25 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * Without a selection, only the lists are shown.
+     * Without a database, only the list is shown.
      * @throws IOException I/O exception
      */
     @Test public void noSelection() throws IOException {
       final String page = get("databases");
       assertTrue(page.contains("hidden\" data-label=\"Database\""), "database panel not hidden");
       assertTrue(page.contains("hidden\" data-label=\"Resource\""), "resource panel not hidden");
+    }
+
+    /**
+     * Without a selection, the first database is opened.
+     * @throws IOException I/O exception
+     */
+    @Test public void firstDatabase() throws IOException {
+      create();
+      post("databases/create", Map.of("name", OTHER));
+      final String page = get("databases");
+      assertTrue(page.contains("Database: " + DB + "<"), "first database not opened");
+      assertFalse(page.contains("class=\"dismiss\""), "panel can be closed");
     }
 
     /**
@@ -499,6 +512,42 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The properties dialog of a database that is only known from its backups can be closed.
+     * @throws Exception exception
+     */
+    @Test public void droppedProperties() throws Exception {
+      create();
+      execute("db:create-backup('" + DB + "')");
+      execute("db:drop('" + DB + "')");
+      try {
+        final String dialog = dialog(get("databases?name=" + DB), "properties");
+        assertFalse(dialog.contains("id=\"options-form\""), "options of a dropped database");
+        assertTrue(dialog.contains("<form method=\"dialog\" class=\"buttons\">"),
+            "dialog cannot be closed");
+      } finally {
+        execute("db:drop-backup('" + DB + "')");
+      }
+    }
+
+    /**
+     * Creates a general backup, finds it in the dialog the page opens again, and drops it.
+     * @throws IOException I/O exception
+     */
+    @Test public void generalBackups() throws IOException {
+      final String page = post("databases/backup-create",
+          Map.of("name", "", "comment", "junit-general"));
+      assertTrue(page.contains("Users, services, and stores were backed up."),
+          "backup not created");
+      final String dialog = dialog(page, "storage");
+      assertTrue(dialog.contains("<td>junit-general</td>"), "comment of the backup not listed");
+      final Matcher m = Pattern.compile("name=\"backup\" value=\"([^\"]+)\"").matcher(dialog);
+      assertTrue(m.find(), "backup not listed");
+
+      assertTrue(post("databases/backup-drop", Map.of("name", "", "backup", m.group(1))).
+          contains("was dropped"), "backup not dropped");
+    }
+
+    /**
      * An unknown action is rejected.
      * @throws IOException I/O exception
      */
@@ -514,15 +563,13 @@ public final class DBATest extends WebappTest {
      */
     @Test public void informationPanel() throws IOException {
       create();
-      final String page = get("databases?name=" + DB);
-      final int index = page.indexOf("id=\"information-panel\"");
-      assertTrue(index != -1, "information panel missing");
-      assertTrue(page.substring(index).contains("<h2>Information</h2><table class=\"fixed\">"),
+      final String dialog = dialog(get("databases?name=" + DB), "properties");
+      assertTrue(dialog.contains("\"information-panel-tab\"><table class=\"fixed\">"),
           "properties are not listed in a table of fixed width");
     }
 
     /**
-     * The index panel creates and drops the index it browses; the name indexes that every
+     * The index block creates and drops the index it browses; the name indexes that every
      * database has are rejected.
      * @throws IOException I/O exception
      */
@@ -530,12 +577,12 @@ public final class DBATest extends WebappTest {
       create();
       assertTrue(post("databases/index-create", Map.of("name", DB, "index", "text")).
           contains("was created"), "index not created");
-      assertTrue(dialog(get("databases?name=" + DB), "optimize").
+      assertTrue(dialog(get("databases?name=" + DB), "properties").
           contains("value=\"textindex\" checked"), "text index not enabled");
 
       assertTrue(post("databases/index-drop", Map.of("name", DB, "index", "text")).
           contains("was dropped"), "index not dropped");
-      assertFalse(dialog(get("databases?name=" + DB), "optimize").
+      assertFalse(dialog(get("databases?name=" + DB), "properties").
           contains("value=\"textindex\" checked"), "text index not disabled");
 
       assertTrue(post("databases/index-create", Map.of("name", DB, "index", "element-name")).
@@ -558,10 +605,22 @@ public final class DBATest extends WebappTest {
      * @return markup
      */
     private static String dialog(final String page, final String id) {
-      final String start = "<dialog id=\"" + id + "-dialog\">";
+      final String start = "<dialog id=\"" + id + "-dialog\"";
       final int s = page.indexOf(start);
       assertTrue(s != -1, id + " dialog not found");
-      return page.substring(s, page.indexOf("</dialog>", s));
+      // a dialog may contain dialogs of its own
+      int e = s, depth = 0;
+      do {
+        final int open = page.indexOf("<dialog", e + 1), close = page.indexOf("</dialog>", e + 1);
+        if(open != -1 && open < close) {
+          depth++;
+          e = open;
+        } else {
+          depth--;
+          e = close;
+        }
+      } while(depth >= 0);
+      return page.substring(s, e);
     }
   }
 
@@ -603,6 +662,16 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * Without a selected resource, the resource panel stays in place.
+     * @throws Exception exception
+     */
+    @Test public void noResource() throws Exception {
+      final String page = get("databases?name=" + DB);
+      assertFalse(page.contains("hidden\" data-label=\"Resource\""), "resource panel hidden");
+      assertTrue(page.contains("Choose a resource"), "placeholder missing");
+    }
+
+    /**
      * A document that is not XML is shown read-only, with the reason.
      * @throws Exception exception
      */
@@ -610,7 +679,7 @@ public final class DBATest extends WebappTest {
       execute("db:put-binary('" + DB + "', xs:base64Binary('SGVsbG8='), 'bin')");
       final String page = page("bin");
       assertTrue(page.contains("initDatabases(false)"), "binary reported as editable");
-      assertTrue(page.contains("only XML documents can be edited"), "reason not given");
+      assertTrue(page.contains("no XML document"), "reason not given");
     }
 
     /**
@@ -720,7 +789,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void resource() throws Exception {
       assertEquals("{\"type\":\"result\",\"run\":1," +
-          "\"result\":\"<x><y>1<\\/y><y>2<\\/y><\\/x>\",\"items\":1}", evaluate("."));
+          "\"result\":\"<x><y>1<\\/y><y>2<\\/y><\\/x>\"}", evaluate("."));
     }
 
     /**
@@ -728,7 +797,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void context() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\\n2\",\"items\":2}",
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\\n2\"}",
           evaluate("//y/string()"));
     }
 
@@ -864,12 +933,13 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * The user panel is only shown for a user that exists.
+     * The first user is opened if none is named; the user panel is only shown for a user that
+     * exists.
      * @throws IOException I/O exception
      */
     @Test public void noSelection() throws IOException {
-      final String page = get("users");
-      assertTrue(page.contains("class=\"panel hidden\" data-label=\"User\""),
+      assertTrue(get("users").contains("User: admin"), "first user not opened");
+      assertTrue(get("users?name=" + USER).contains("class=\"panel hidden\" data-label=\"User\""),
           "user panel not hidden");
     }
 
@@ -1027,15 +1097,20 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * The options, the environment variables and the system properties are listed with stable
-     * column widths: a long value is truncated instead of widening the panel.
+     * The options, the environment variables and the system properties are listed in one
+     * searchable table with stable column widths.
      * @throws IOException I/O exception
      */
-    @Test public void fixedTables() throws IOException {
+    @Test public void optionTable() throws IOException {
       final String page = get("settings");
-      assertTrue(page.contains("<table class=\"fixed\"><colgroup><col style=\"width: 40%\">"),
-          "properties are not listed in tables of fixed width");
-      assertFalse(page.contains("<table><colgroup>"), "table without stable column widths");
+      assertTrue(page.contains("id=\"input\""), "search field is missing");
+      assertTrue(page.contains("<table class=\"fixed\""), "table without stable column widths");
+      for(final String category : new String[] { "Global Option", "Local Option",
+          "System Property", "Environment Variable" }) {
+        assertTrue(page.contains("<td>" + category + "</td>"), category + " is missing");
+      }
+      assertTrue(get("settings?sort=-name").contains("<span class=\"sorted\">"),
+          "table is not sorted");
     }
 
     /**
@@ -1158,6 +1233,24 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The result is serialized by the job, without being materialized.
+     * @throws Exception exception
+     */
+    @Test public void serialized() throws Exception {
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"fn:true#0\",\"items\":1}",
+          evaluate("true#0"));
+    }
+
+    /**
+     * The bytes of a binary result are shown as text.
+     * @throws Exception exception
+     */
+    @Test public void binary() throws Exception {
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"AB\",\"items\":1}",
+          evaluate("xs:base64Binary('QUI=')"));
+    }
+
+    /**
      * An empty result is pushed as an empty string.
      * @throws Exception exception
      */
@@ -1274,10 +1367,28 @@ public final class DBATest extends WebappTest {
 
     /**
      * Drops the test service after each test.
-     * @throws IOException I/O exception
+     * @throws Exception exception
      */
-    @AfterEach public void cleanup() throws IOException {
+    @AfterEach public void cleanup() throws Exception {
       services().unregister(ID);
+      discard("('junit-long', 'junit-short') ! job:remove(.)");
+    }
+
+    /**
+     * The jobs table is sorted by the durations of its jobs.
+     * @throws Exception exception
+     */
+    @Test public void sortByDuration() throws Exception {
+      execute("job:eval('prof:sleep(10000)', (), { 'id': 'junit-long' })");
+      Thread.sleep(500);
+      execute("job:eval('prof:sleep(10000)', (), { 'id': 'junit-short' })");
+      connect("/activity");
+      sendMessage("{ \"type\": \"panels\", \"open\": [ \"jobs-panel\" ], " +
+          "\"sorts\": { \"jobs-panel\": \"duration\" } }");
+      final String message = pollMessage();
+      final int longer = message.indexOf("junit-long"), shorter = message.indexOf("junit-short");
+      assertTrue(longer != -1 && shorter != -1, "jobs missing: " + message);
+      assertTrue(longer < shorter, "longer job not listed first: " + message);
     }
 
     /**

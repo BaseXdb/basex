@@ -318,6 +318,9 @@ public final class JobModuleTest extends SandboxTest {
         JOBS_SERVICE_X);
     error(func.args("1", " ()", " { 'id': 'OPT', 'memory': 100, 'service': true() }"),
         JOBS_SERVICE_X);
+    // serialization parameters are not persisted
+    error(func.args("1", " ()", " { 'id': 'OPT', 'serializer': {}, 'service': true() }"),
+        JOBS_SERVICE_X);
   }
 
   /** Persists the assigned options of a service, but not the default ones. */
@@ -460,6 +463,36 @@ public final class JobModuleTest extends SandboxTest {
     // find log entry
     final String date = DateTime.DATE.format(LocalDate.now());
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
+  }
+
+  /** Discarded results are not materialized, but their lazy items are loaded. */
+  @Test public void evalDiscarded() {
+    // a function item would be rejected when the result is materialized
+    assertEquals("REQUEST OK", discarded("true#0"));
+    // errors raised by lazy items are reported
+    final String path = query(_FILE_CREATE_TEMP_FILE.args("lazy", ".txt"));
+    try {
+      query(_FILE_WRITE_BINARY.args(path, " xs:hexBinary('FF')"));
+      assertEquals("REQUEST ERROR", discarded("file:read-text('" + path + "')"));
+    } finally {
+      query(_FILE_DELETE.args(path));
+    }
+  }
+
+  /**
+   * Evaluates a query whose result is discarded, and returns the types of its log entries.
+   * @param query query
+   * @return log entry types
+   */
+  private static String discarded(final String query) {
+    final String id = UUID.randomUUID().toString();
+    query(_JOB_EVAL.args(query, " ()", " { 'id': '" + id + "', 'log': '" + id + "' }"));
+    // the concluding entry is written after the job has finished
+    query(_JOB_WAIT.args(id));
+    final String entries = _ADMIN_LOGS.args(DateTime.DATE.format(LocalDate.now())) +
+        "[@address = 'JOB:" + id + "']";
+    assertEquals("true", waitUntil("count(" + entries + ") = 2"));
+    return query("string-join(" + entries + "/@type, ' ')");
   }
 
   /** Executes a job. */
@@ -972,6 +1005,47 @@ public final class JobModuleTest extends SandboxTest {
       }
       Performance.sleep(10);
     }
+  }
+
+  /** Test method. */
+  @Test public void resultSerialized() {
+    final Function func = _JOB_RESULT;
+
+    // the result is serialized by the job
+    String id = query(_JOB_EVAL.args("<a>é</a>", " ()",
+        " { 'cache': true(), 'serializer': { 'encoding': 'US-ASCII' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " ! (. instance of xs:string, .)", "true\n<a>&#xE9;</a>");
+
+    // function items are not materialized
+    id = query(_JOB_EVAL.args("true#0", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'adaptive' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id), "fn:true#0");
+
+    // binary results are returned as binary items
+    id = query(_JOB_EVAL.args("xs:base64Binary('QUI=')", " ()",
+        " { 'cache': true(), 'serializer': {} }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " instance of xs:base64Binary", true);
+    // binary results that are serialized as text are returned as string
+    id = query(_JOB_EVAL.args("xs:base64Binary('QUI=')", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'xml' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " ! (. instance of xs:string, .)", "true\nQUI=");
+
+    // the information refers to the unserialized result
+    id = query(_JOB_EVAL.args("1 to 3", " ()",
+        " { 'cache': true(), 'info': true(), 'serializer': { 'item-separator': ' ' } }"));
+    query(_JOB_WAIT.args(id));
+    query(_JOB_INFO.args(id) + "?result?items", 3);
+    query(func.args(id), "1 2 3");
+
+    // serialization errors are reported as job errors
+    id = query(_JOB_EVAL.args("true#0", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'xml' } }"));
+    query(_JOB_WAIT.args(id));
+    error(func.args(id), SERFUNC_X);
   }
 
   /** Test method. */
