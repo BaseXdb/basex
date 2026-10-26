@@ -32,10 +32,22 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
    * @return collection
    */
   static Collection<Language> collection(final String ln) {
-    final HashSet<Language> coll = new HashSet<>();
     final Language lang = Language.get(ln);
-    if(lang != null) coll.add(lang);
-    return coll;
+    return lang != null ? Set.of(lang) : Set.of();
+  }
+
+  /**
+   * Returns the first implementation that supports the specified language.
+   * @param <T> implementation type
+   * @param impls implementations, sorted by precedence
+   * @param ln language
+   * @return implementation, or {@code null}
+   */
+  static <T extends LanguageImpl> T find(final List<T> impls, final Language ln) {
+    for(final T impl : impls) {
+      if(impl.supports(ln)) return impl;
+    }
+    return null;
   }
 
   /**
@@ -51,7 +63,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
 
   @Override
   public final int compareTo(final LanguageImpl o) {
-    return Integer.signum(o.prec() - prec());
+    return Integer.compare(o.prec(), prec());
   }
 
   @Override

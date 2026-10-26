@@ -31,16 +31,6 @@ public final class IntList extends ElementList {
   }
 
   /**
-   * Constructor, specifying a resize factor. Smaller values are more memory-saving,
-   * while larger values will provide better performance.
-   * @param factor resize factor
-   */
-  public IntList(final double factor) {
-    this();
-    this.factor = (byte) Math.max(10, (byte) (factor * 10));
-  }
-
-  /**
    * Lightweight constructor, adopting the specified elements.
    * @param elements initial array
    */
@@ -152,20 +142,6 @@ public final class IntList extends ElementList {
     }
     Array.insert(lst, index, l, s, elements);
     size = (int) ns;
-  }
-
-  /**
-   * Removes all occurrences of the specified element from the list.
-   * @param element element to be removed
-   */
-  public void removeAll(final int element) {
-    final int[] lst = list;
-    final int s = size;
-    int ns = 0;
-    for(int i = 0; i < s; i++) {
-      if(lst[i] != element) lst[ns++] = lst[i];
-    }
-    size = ns;
   }
 
   /**
@@ -486,7 +462,7 @@ public final class IntList extends ElementList {
     if(length < 7) {
       for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
-          final double h = values[j - 1] - values[j];
+          final int h = Double.compare(values[j - 1], values[j]);
           if(asc ? h < 0 : h > 0) break;
           swap(j, j - 1, values);
         }
@@ -511,13 +487,13 @@ public final class IntList extends ElementList {
     int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final double h = values[b] - v;
+        final int h = Double.compare(values[b], v);
         if(asc ? h > 0 : h < 0) break;
         if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final double h = values[c] - v;
+        final int h = Double.compare(values[c], v);
         if(asc ? h < 0 : h > 0) break;
         if(h == 0) swap(c, d--, values);
         --c;
@@ -665,8 +641,7 @@ public final class IntList extends ElementList {
    * @return result
    */
   private static int cmpNum(final byte[] value1, final byte[] value2) {
-    final double n = Token.toDouble(value1) - Token.toDouble(value2);
-    return n > 0 ? 1 : n < 0 ? -1 : 0;
+    return Double.compare(Token.toDouble(value1), Token.toDouble(value2));
   }
 
   /**

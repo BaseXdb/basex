@@ -76,7 +76,7 @@ public final class UserInfo {
    * @param rb HTTP request builder
    */
   public void basic(final HttpRequest.Builder rb) {
-    if(username != null && password != null) rb.header(AUTHORIZATION,
+    if(credentials()) rb.header(AUTHORIZATION,
         AuthScheme.BASIC + " " + Base64.encode(username + ':' + password));
   }
 

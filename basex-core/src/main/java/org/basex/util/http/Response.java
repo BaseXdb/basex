@@ -108,10 +108,9 @@ public final class Response {
     // add payload elements and contents
     final ResponseBody parsed = body(response, mode, mtype, null, xmlOptions, href);
     root.node(element(parsed));
-    final ItemList items = new ItemList().add((Item) null);
+    final ItemList items = new ItemList().add(root.finish());
     if(mode != BodyMode.NONE) items.add(parsed.values());
-
-    return items.set(0, root.finish()).value();
+    return items.value();
   }
 
   /**

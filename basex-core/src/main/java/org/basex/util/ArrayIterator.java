@@ -58,9 +58,4 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
   public E next() {
     return (E) array[start++];
   }
-
-  @Override
-  public void remove() {
-    throw Util.notExpected();
-  }
 }

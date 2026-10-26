@@ -485,6 +485,9 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("A bc", " { 'case': 'sensitive' }"), "A\nbc");
     query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
     query(func.args("gifts", " { 'stemming': true() }"), "gift");
+    // stemmer state must not leak into the next word
+    query(func.args("mengukur makanan", " { 'stemming': true(), 'language': 'id' }"),
+        "ukur\nmakan");
 
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query("count(" + func.args("") + ')', 0);

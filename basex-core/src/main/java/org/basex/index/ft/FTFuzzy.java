@@ -12,7 +12,7 @@ import org.basex.util.similarity.*;
  * query token. The tokens are traversed in sorted order: rows of the distance matrix are
  * shared between tokens with a common prefix, and if no completion of a prefix can stay
  * within the distance, all tokens with that prefix are skipped via binary search.
- * The matches are identical to those of {@link Levenshtein#similar(byte[], byte[], int)}.
+ * The matches are identical to those of {@link Levenshtein#similar(byte[], byte[])}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -2781,6 +2781,10 @@ public final class RewritingsTest extends SandboxTest {
         + "for $o in (xs:double('NaN'), 3e0, xs:double('NaN'), 3e0) "
         + "return string-join($cs[@n < $o]/@n, ',')", "\n1,2\n\n1,2",
         exists(RangeFilter.class));
+    // equal infinite keys
+    check("let $items := (1 to 20) ! (if(. >= 9 and . <= 13) then xs:double('INF') "
+        + "else xs:double(.)) for $p in (1 to 5) ! xs:double(.) "
+        + "return count($items[. > $p])", "19\n18\n17\n16\n15", exists(RangeFilter.class));
     // decimal probes, untyped probes: sequential evaluation
     check(cs + "for $o in (2.5, 4.5, 1.5) return string-join($cs[@n < $o]/@n, ',')",
         "1,2\n1,2,3,4\n1", empty(RangeFilter.class));

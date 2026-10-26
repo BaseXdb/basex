@@ -501,8 +501,7 @@ public final class Token {
     if(value == Double.NEGATIVE_INFINITY) return NEGATIVE_INF;
     if(value == 0) return 1 / value > 0 ? cpToken('0') : NEGATIVE_ZERO;
     if(Double.isNaN(value)) return NAN;
-    final double a = Math.abs(value);
-    if(a < 1.0e6) {
+    if(Math.abs(value) < 1.0e6) {
       final int i = (int) value;
       if(i == value) return token(i);
     }
@@ -675,7 +674,7 @@ public final class Token {
       v = v * 10 + b - '0';
     }
     while(p < end && ws(token[p])) ++p;
-    return p < end || v < 0 ? Integer.MIN_VALUE : m ? -v : v;
+    return p < end ? Integer.MIN_VALUE : m ? -v : v;
   }
 
   /**
@@ -811,18 +810,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean contains(final byte[] token, final byte[] sub) {
-    return contains(token, sub, 0);
-  }
-
-  /**
-   * Checks if the first token contains the second token.
-   * @param token token
-   * @param sub token to be found
-   * @param pos start position
-   * @return result of check
-   */
-  public static boolean contains(final byte[] token, final byte[] sub, final int pos) {
-    return indexOf(token, sub, pos) != -1;
+    return indexOf(token, sub) != -1;
   }
 
   /**
@@ -937,18 +925,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean startsWith(final byte[] token, final int ch) {
-    return startsWith(token, ch, 0);
-  }
-
-  /**
-   * Checks if the first token starts with the specified character.
-   * @param token token
-   * @param ch character to be found
-   * @param pos start position
-   * @return result of check
-   */
-  private static boolean startsWith(final byte[] token, final int ch, final int pos) {
-    return pos < token.length && token[pos] == ch;
+    return token.length != 0 && token[0] == ch;
   }
 
   /**
@@ -1262,7 +1239,7 @@ public final class Token {
     boolean inWs = false, replace = false;
     for(int i = s; i <= e; i++) {
       final byte b = token[i];
-      final boolean ws = ws(token[i]);
+      final boolean ws = ws(b);
       if(!(ws && inWs)) {
         size++;
         inWs = ws;

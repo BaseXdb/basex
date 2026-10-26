@@ -100,14 +100,11 @@ public final class MainParser {
     final int arl = args.length;
     while(arg < arl) {
       final String a = args[arg++];
-      int p = pos;
+      final int p = pos;
       pos = 0;
-      final int al = a.length();
-      if(p == al) continue;
+      if(p == a.length()) continue;
 
-      final StringBuilder sb = new StringBuilder();
-      while(p < al) sb.append(a.charAt(p++));
-      final String str = sb.toString();
+      final String str = a.substring(p);
       if(!str.equals("-")) return str;
 
       final Scanner scanner = new Scanner(System.in, Prop.STDIN_CHARSET).useDelimiter("\0");

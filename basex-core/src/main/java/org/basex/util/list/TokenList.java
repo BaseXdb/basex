@@ -116,7 +116,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   @Override
   public boolean equals(final Object obj) {
     return obj == this || obj instanceof final TokenList l &&
-        Arrays.equals(list, 0, size, l.list, 0, l.size);
+        Arrays.equals(list, 0, size, l.list, 0, l.size, Arrays::compare);
   }
 
   @Override

@@ -454,7 +454,7 @@ public final class RestXqFunction extends WebFunction {
       final InputInfo info) throws QueryException {
 
     if(body != null) {
-      final Method m = Method.get(method);
+      final Method m = Enums.get(Method.class, method);
       if(m != null && !m.body) throw error(info, METHOD_BODY_X, m);
       if(requestBody != null) throw error(info, ANN_BODY_TWICE);
       requestBody = checkVariable(toString(body), declared);

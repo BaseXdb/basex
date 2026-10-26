@@ -98,8 +98,7 @@ public final class FTOpt extends ExprInfo {
    * @return flag
    */
   public boolean is(final FTFlag flag) {
-    final Boolean b = map.get(flag);
-    return b != null && b;
+    return map.getOrDefault(flag, false);
   }
 
   /**

@@ -177,6 +177,8 @@ final class JapaneseTokenizer extends Tokenizer {
     }
     tokenList = list;
     tokens = list.iterator();
+    cpos = 0;
+    pos = -1;
 
     return this;
   }
@@ -187,8 +189,7 @@ final class JapaneseTokenizer extends Tokenizer {
    * @return result of check
    */
   private static boolean isFtChar(final String s) {
-    return ".".equals(s) || "?".equals(s) || "*".equals(s) || "+".equals(s) ||
-      "\\".equals(s) || "{".equals(s) || "}".equals(s);
+    return s.length() == 1 && Strings.contains(".?*+\\{}", s.charAt(0));
   }
 
   /**
@@ -371,78 +372,14 @@ final class JapaneseTokenizer extends Tokenizer {
     final TokenBuilder tb = new TokenBuilder(tl);
     for(int t = 0; t < tl; t += cl(text, t)) {
       final int c = cp(text, t);
-      if(c >= 0xFF10 && c <= 0xFF19 || c >= 0xFF21 && c <= 0xFF3A
-          || c >= 0xFF41 && c <= 0xFF5A) {
-        tb.add(c - 0xFEE0);
-      } else if(c == 0x3000) { // IDEOGRAPHIC SPACE
-        tb.add(0x0020);
-      } else if(c == 0xFF01) { // !
-        tb.add(0x0021);
-      } else if(c == 0xFF02 || c == 0x201C || c == 0x201D) { // " FULLWIDTH QUOTATION MARK
-        tb.add(0x0022);
-      } else if(c == 0xFF03) { // #
-        tb.add(0x0023);
-      } else if(c == 0xFF04) { // $
-        tb.add(0x0024);
-      } else if(c == 0xFF05) { // %
-        tb.add(0x0025);
-      } else if(c == 0xFF06) { // &
-        tb.add(0x0026);
-      } else if(c == 0xFF07 || c == 0x2018 || c == 0x2019) { // ' FULLWIDTH APOSTROPHE
-        tb.add(0x0027);
-      } else if(c == 0xFF08) { // (
-        tb.add(0x0028);
-      } else if(c == 0xFF09) { // )
-        tb.add(0x0029);
-      } else if(c == 0xFF0A) { // *
-        tb.add(0x002A);
-      } else if(c == 0xFF0B) { // +
-        tb.add(0x002B);
-      } else if(c == 0xFF0C) { // ,
-        tb.add(0x002C);
-      } else if(c == 0xFF0D) { // -
-        tb.add(0x002D);
-      } else if(c == 0xFF0E) { // .
-        tb.add(0x002E);
-      } else if(c == 0xFF0F) { // /
-        tb.add(0x002F);
-      } else if(c == 0xFF1A) { // :
-        tb.add(0x003A);
-      } else if(c == 0xFF1B) { // ;
-        tb.add(0x003B);
-      } else if(c == 0xFF1C) { // <
-        tb.add(0x003C);
-      } else if(c == 0xFF1D) { // =
-        tb.add(0x003D);
-      } else if(c == 0xFF1E) { // >
-        tb.add(0x003E);
-      } else if(c == 0xFF1F) { // ?
-        tb.add(0x003F);
-      } else if(c == 0xFF20) { // @
-        tb.add(0x0040);
-      } else if(c == 0xFF3B) { // [
-        tb.add(0x005B);
-      } else if(c == 0xFFE5) { // \
-        tb.add(0x005C);
-      } else if(c == 0xFF3D) { // ]
-        tb.add(0x005D);
-      } else if(c == 0xFF3E) { // ^
-        tb.add(0x005E);
-      } else if(c == 0xFF3F) { // _
-        tb.add(0x005F);
-      } else if(c == 0xFF40) { // `
-        tb.add(0x0060);
-      } else if(c == 0xFF5B) { // {
-        tb.add(0x007B);
-      } else if(c == 0xFF5C) { // |
-        tb.add(0x007C);
-      } else if(c == 0xFF5D) { // }
-        tb.add(0x007D);
-      } else if(c == 0xFF5E) { // ~
-        tb.add(0x007E);
-      } else {
-        tb.add(c);
-      }
+      // fullwidth ASCII (except reverse solidus, which is taken from the fullwidth yen sign)
+      tb.add(c >= 0xFF01 && c <= 0xFF5E && c != 0xFF3C ? c - 0xFEE0 : switch(c) {
+        case 0x3000 -> ' ';
+        case 0x201C, 0x201D -> '"';
+        case 0x2018, 0x2019 -> '\'';
+        case 0xFFE5 -> '\\';
+        default -> c;
+      });
     }
     return tb.finish();
   }

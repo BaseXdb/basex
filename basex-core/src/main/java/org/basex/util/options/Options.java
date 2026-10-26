@@ -367,7 +367,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized boolean modified(final Option<?> option) {
     final Object value = get(option);
-    return value != null && !value.equals(option.value());
+    return value != null && !Objects.deepEquals(value, option.value());
   }
 
   /**
@@ -826,9 +826,7 @@ public class Options implements Iterable<Option<?>> {
    * @return names
    */
   public final synchronized String[] names() {
-    final StringList sl = new StringList(meta.definitions.size());
-    for(final Option<?> option : this) sl.add(option.name());
-    return sl.finish();
+    return meta.definitions.keySet().toArray(String[]::new);
   }
 
   @Override

@@ -49,8 +49,8 @@ public final class Version implements Comparable<Version> {
 
   @Override
   public int compareTo(final Version ver) {
-    return Integer.signum(major == ver.major ? minor == ver.minor ?
-      patch - ver.patch : minor - ver.minor : major - ver.major);
+    return major != ver.major ? Integer.compare(major, ver.major) :
+      minor != ver.minor ? Integer.compare(minor, ver.minor) : Integer.compare(patch, ver.patch);
   }
 
   @Override

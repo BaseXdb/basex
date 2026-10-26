@@ -19,7 +19,7 @@ public final class WeakTokenSet extends ASet {
   /** Hashed keys. */
   private WeakTokenRef[] keys;
   /** Garbage collected keys. */
-  private ReferenceQueue<byte[]> gcedKeys = new ReferenceQueue<>();
+  private final ReferenceQueue<byte[]> gcedKeys = new ReferenceQueue<>();
   /** Head of free ID list. */
   private int free;
 
@@ -91,14 +91,6 @@ public final class WeakTokenSet extends ASet {
   @Override
   protected void rehash(final int newSize) {
     keys = Arrays.copyOf(keys, newSize);
-  }
-
-  @Override
-  protected void clear() {
-    gcedKeys = new ReferenceQueue<>();
-    free = 0;
-    Arrays.fill(keys, null);
-    super.clear();
   }
 
   @Override

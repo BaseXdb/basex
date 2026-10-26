@@ -123,12 +123,8 @@ public final class Prop {
    * @return configuration directory (can be {@code null})
    */
   private static String configDir(final String dir) {
-    if(dir != null) {
-      final String home = IO.BASEXSUFFIX + "home";
-      final IOFile file = new IOFile(dir, home);
-      if(file.exists() || new IOFile(dir, IO.BASEXSUFFIX).exists()) return dir;
-    }
-    return null;
+    return dir != null && (new IOFile(dir, IO.BASEXSUFFIX + "home").exists() ||
+      new IOFile(dir, IO.BASEXSUFFIX).exists()) ? dir : null;
   }
 
   /**

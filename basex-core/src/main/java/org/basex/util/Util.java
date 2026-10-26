@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import javax.net.ssl.*;
 
@@ -175,8 +176,8 @@ public final class Util {
     if(msg == null || msg.isEmpty() || th instanceof RuntimeException || th instanceof Error) {
       msg = th.toString();
     }
-    if(th instanceof ReflectiveOperationException) {
-      if(th.getCause() != null) msg += "; " + th.getCause();
+    if(th instanceof ReflectiveOperationException && th.getCause() != null) {
+      msg += "; " + th.getCause();
     }
     if(th instanceof FileNotFoundException || th instanceof NoSuchFileException) {
       return info(RES_NOT_FOUND_X, msg);
@@ -323,20 +324,16 @@ public final class Util {
    * @return error message or {@code null}
    */
   public static String error(final Process process, final int timeout) {
-    final int wait = 200, to = Math.max(timeout / wait, 1);
-    for(int c = 0; c < to; c++) {
-      try {
-        final int exit = process.exitValue();
-        if(exit == 1) return new IOStream(process.getErrorStream()).readString();
-        break;
-      } catch(final IllegalThreadStateException ex) {
-        debug(ex);
-        // process is still running
-        Performance.sleep(wait);
-      } catch(final IOException ex) {
-        // return error message of exception
-        return ex.getLocalizedMessage();
+    try {
+      if(process.waitFor(timeout, TimeUnit.MILLISECONDS) && process.exitValue() == 1) {
+        return new IOStream(process.getErrorStream()).readString();
       }
+    } catch(final InterruptedException ex) {
+      debug(ex);
+      Thread.currentThread().interrupt();
+    } catch(final IOException ex) {
+      // return error message of exception
+      return ex.getLocalizedMessage();
     }
     return null;
   }

@@ -106,8 +106,6 @@ public final class TokenIntMap extends TokenSet {
 
   @Override
   public String toString() {
-    final List<Object> v = new ArrayList<>();
-    for(final int value : values) v.add(value);
-    return toString(keys, v.toArray());
+    return toString(keys, Arrays.stream(values).boxed().toArray());
   }
 }

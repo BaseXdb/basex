@@ -98,15 +98,6 @@ public final class Payload {
   }
 
   /**
-   * Returns the character encoding for a media type.
-   * @param type media type
-   * @return encoding (can be {@code null})
-   */
-  private String charsetOf(final MediaType type) {
-    return charset != null ? charset : type.parameter(CHARSET);
-  }
-
-  /**
    * Parses the HTTP payload.
    * @param type media type
    * @param coding content coding
@@ -159,7 +150,7 @@ public final class Payload {
    */
   private Value text(final IO payload, final MediaType type) throws QueryException {
     try {
-      return Str.get(new NewlineInput(payload, charsetOf(type)).content());
+      return Str.get(new NewlineInput(payload, charset(type, charset)).content());
     } catch(final IOException ex) {
       throw HC_PARSE_X.get(info, ex);
     }
@@ -174,7 +165,7 @@ public final class Payload {
    */
   private Value parse(final IO payload, final MediaType type) throws QueryException {
     try {
-      return value(payload, type, options, charsetOf(type), xmlOptions);
+      return value(payload, type, options, charset, xmlOptions);
     } catch(final IOException ex) {
       // the unparsed payload is attached, so that callers can report it
       final QueryException qe = HC_PARSE_X.get(info, ex);
@@ -492,6 +483,17 @@ public final class Payload {
   }
 
   /**
+   * Returns the character encoding for a media type.
+   * @param type media type
+   * @param charset character encoding that replaces the one of the media type
+   *   (can be {@code null})
+   * @return encoding (can be {@code null})
+   */
+  private static String charset(final MediaType type, final String charset) {
+    return charset != null ? charset : type.parameter(CHARSET);
+  }
+
+  /**
    * Returns a normalized payload. Only text and XML input is materialized.
    * @param body body
    * @param type media type
@@ -506,8 +508,7 @@ public final class Payload {
     if(!(xml || text)) return body;
 
     // convert text to UTF8; skip redundant XML declaration
-    byte[] data = new NewlineInput(body,
-      charset != null ? charset : type.parameter(CHARSET)).content();
+    byte[] data = new NewlineInput(body, charset(type, charset)).content();
     // '<?xml' is only a declaration if followed by whitespace; otherwise it is a
     // processing instruction such as '<?xml-stylesheet?>', which must be kept
     if(xml && startsWith(data, DECLSTART) && data.length > DECLSTART.length &&
