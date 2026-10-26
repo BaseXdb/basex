@@ -106,7 +106,7 @@ public final class RestXqWadl {
         // create response
         final FBuilder response = FElem.build(Q_RESPONSE);
         final FBuilder representation = FElem.build(Q_REPRESENTATION);
-        representation.attr(Q_MEDIA_TYPE, func.sopts.mediaType());
+        representation.attr(Q_MEDIA_TYPE, func.sopts.mediaType(func.function.seqType()));
         response.node(representation);
         method.node(response);
 

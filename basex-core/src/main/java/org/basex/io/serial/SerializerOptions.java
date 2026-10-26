@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -320,6 +321,41 @@ public final class SerializerOptions extends Options {
     }
     if(sm == SerialMethod.CSV) return MediaType.TEXT_CSV;
     return MediaType.TEXT_PLAIN;
+  }
+
+  /**
+   * Returns the media type for the specified result.
+   * @param value result
+   * @return media type
+   */
+  public MediaType mediaType(final Value value) {
+    return mediaType(value.size() == 1 && Types.DOCUMENT_OR_ELEMENT_ZO.instance(value),
+        Types.BINARY_O.instance(value));
+  }
+
+  /**
+   * Returns the media type for results of the specified type.
+   * @param st sequence type
+   * @return media type
+   */
+  public MediaType mediaType(final SeqType st) {
+    return mediaType(st.one() && st.instanceOf(Types.DOCUMENT_OR_ELEMENT_ZO),
+        st.instanceOf(Types.BINARY_O));
+  }
+
+  /**
+   * Returns the media type for results of the default and the adaptive output method.
+   * @param xml single element or document with one element
+   * @param binary single binary item
+   * @return media type
+   */
+  private MediaType mediaType(final boolean xml, final boolean binary) {
+    final SerialMethod sm = get(METHOD);
+    if(!get(MEDIA_TYPE).isEmpty() || !sm.oneOf(SerialMethod.BASEX, SerialMethod.ADAPTIVE)) {
+      return mediaType();
+    }
+    return xml ? MediaType.APPLICATION_XML : binary && sm == SerialMethod.BASEX ?
+      MediaType.APPLICATION_OCTET_STREAM : MediaType.TEXT_PLAIN;
   }
 
   /**

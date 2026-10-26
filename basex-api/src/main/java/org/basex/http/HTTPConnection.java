@@ -128,8 +128,15 @@ public final class HTTPConnection implements ClientInfo {
    * Initializes the output and assigns the content-type.
    */
   public void initResponse() {
-    final SerializerOptions sopts = sopts();
-    contentType(sopts.mediaType(), sopts.get(SerializerOptions.ENCODING));
+    initResponse(sopts().mediaType());
+  }
+
+  /**
+   * Initializes the output and assigns the specified media type as content-type.
+   * @param type media type
+   */
+  public void initResponse(final MediaType type) {
+    contentType(type, sopts().get(SerializerOptions.ENCODING));
   }
 
   /**

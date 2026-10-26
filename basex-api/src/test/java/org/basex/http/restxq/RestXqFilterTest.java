@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
+import org.basex.util.http.HTTPText;
 import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
@@ -95,6 +96,44 @@ public final class RestXqFilterTest extends RestXqTest {
   @Test public void qualityFactor() throws Exception {
     register("declare %R:path('') %R:produces('text/plain;qs=5') function m:f() { 1 };");
     assertContains(get(500, ""), "Quality factor must be in the range 0-1: qs=5.");
+  }
+
+  /**
+   * Content types derived from the result.
+   * @throws Exception exception
+   */
+  @Test public void contentType() throws Exception {
+    contentType(MediaType.APPLICATION_XML, "", "<x/>");
+    contentType(MediaType.APPLICATION_XML, "", "document { comment { }, <x/> }");
+    contentType(MediaType.APPLICATION_XML, "", "<R:response/>, <x/>");
+    contentType(MediaType.APPLICATION_XML, "%output:method('adaptive')", "<x/>");
+    contentType(MediaType.APPLICATION_XML, "%output:method('xml')", "1");
+    contentType(MediaType.TEXT_PLAIN, "", "1");
+    contentType(MediaType.TEXT_PLAIN, "", "<x/>, <y/>");
+    contentType(MediaType.TEXT_PLAIN, "", "document { <x/>, <y/> }");
+    contentType(MediaType.TEXT_PLAIN, "", "attribute a { }");
+    contentType(MediaType.TEXT_PLAIN, "", "{ 'a': 1 }");
+    contentType(MediaType.TEXT_PLAIN, "%R:produces('application/json')", "{ 'a': 1 }");
+    contentType(MediaType.TEXT_PLAIN, "%output:method('adaptive')", "xs:base64Binary('AA==')");
+    contentType(MediaType.APPLICATION_OCTET_STREAM, "", "xs:base64Binary('AA==')");
+    contentType(MediaType.TEXT_HTML, "%output:media-type('text/html')", "1");
+    contentType(null, "", "()");
+    contentType(MediaType.APPLICATION_XML, "", "(1 to 2) ! <x/>[random:double() < 2]");
+  }
+
+  /**
+   * Registers a function and checks the content type of its response.
+   * @param expected expected media type (can be {@code null})
+   * @param anns annotations
+   * @param result function body
+   * @throws Exception exception
+   */
+  private static void contentType(final MediaType expected, final String anns,
+      final String result) throws Exception {
+    get(200, "declare %R:path('') " + anns + " function m:f() { " + result + " };", "");
+    final String type = header(HTTPText.CONTENT_TYPE);
+    assertEquals(expected != null ? expected.type() : null,
+        type != null ? new MediaType(type).type() : null, result);
   }
 
   /**
