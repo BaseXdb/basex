@@ -116,7 +116,7 @@ declare %private function chat:login() as element(html) {
         chat:field('Password:', (
           <input type='password' name='pass'/>,
           ' ',
-          <button type='submit'>Login</button>
+          <button type='submit'>Log In</button>
         ))
       }</form>
     </div>
@@ -219,7 +219,7 @@ declare %private function chat:wrap(
               if ($user) {
                 <div>
                   <b>{ $user }</b> · <form method='post' action='chat/logout'>
-                    <button type='submit' class='link'>logout</button>
+                    <button type='submit' class='link'>log out</button>
                   </form>
                 </div>
               }

@@ -54,7 +54,7 @@ function openRoom(newRoom) {
     if(info) info.title = ws.protocol ? "Connected via " + ws.protocol + "." : "";
     showInfo("", "note");
   };
-  ws.onclose = function() { showInfo("Connection to the server was lost.", "warning"); };
+  ws.onclose = function() { showInfo("Connection to the server was lost.", "error"); };
   ws.onmessage = onMessage;
 }
 

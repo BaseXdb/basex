@@ -5,7 +5,7 @@
   /* page gutter: margins, cell padding, and the gap between panels */
   --gap: 1rem;
   /* vertical separation between blocks */
-  --space: .6rem;
+  --space: .8rem;
   /* every line of the interface: rules, dividers, and the borders of controls */
   --line: .7px;
   /* the face of code, wherever it is shown */
@@ -25,8 +25,8 @@
   --shade-hover: #EEE;
   /* the rule below a heading or a table header, as on docs.basex.org */
   --rule: #C66;
-  --info: #090;
-  --warning: #999;
+  --info: #070;
+  --pending: #666;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,6 +43,7 @@
     --shade-hover: #333;
     --rule: #844;
     --info: #6c6;
+    --pending: #999;
   }
 }
 
@@ -104,14 +105,14 @@ h1 {
 h2 {
   font-size: 150%;
   color: var(--accent-strong);
-  margin: 0 0 .2rem 0;
+  margin: 0 0 .3rem 0;
 }
 
 h3 {
   font-size: 120%;
   color: var(--muted);
   /* the top margin also separates a heading from the block above it */
-  margin: var(--space) 0 .2rem 0;
+  margin: var(--space) 0 .3rem 0;
 }
 
 table {
@@ -124,13 +125,17 @@ table {
 /* lines between the rows, and a stronger one below the header, as on docs.basex.org */
 th, td {
   vertical-align: top;
-  padding: 1px var(--gap) 1px 0;
+  padding: .25rem var(--gap) .25rem 0;
   border-bottom: var(--line) solid var(--border-light);
 }
 
 th {
   text-align: left;
   border-bottom-color: var(--rule);
+}
+/* column labels are written in title case, and shown in capitals */
+thead th {
+  text-transform: uppercase;
 }
 
 /* the row that is pointed at */
@@ -143,7 +148,7 @@ tr:has(> td):hover {
   text-align: right;
 }
 
-ol, ul, dd {
+ol, ul {
   padding-left: 1.2rem;
   margin-left: 0;
 }
@@ -162,8 +167,8 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration:underline;
+a:hover, button.link:hover {
+  text-decoration: underline;
 }
 
 /* a control that acts on the server but reads as a link */
@@ -174,10 +179,6 @@ button.link {
   font: inherit;
   color: var(--accent);
   cursor: pointer;
-}
-
-button.link:hover {
-  text-decoration: underline;
 }
 
 b {
@@ -225,18 +226,19 @@ button {
 
 /* fields are written in the face of the page, as buttons are */
 input[type=text], input[type=password], input[type=number], select {
-  padding: 4px;
+  padding: 4px 8px;
   width: 200px;
   background-color: var(--bg);
   color: var(--fg);
   font: inherit;
 }
 
-/* a selection is drawn like a field, with a chevron instead of the native arrow */
-select {
+/* a selection is drawn like a field, with a chevron instead of the native arrow; a list box
+   opens nothing */
+select:not([multiple], [size]) {
   appearance: none;
-  padding-right: 22px;
-  background: var(--bg) right 7px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  padding-right: 26px;
+  background: var(--bg) right 9px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   cursor: pointer;
 }
 
@@ -362,18 +364,18 @@ body:has(.content.fill) main {
 
 /* the three states of a status message: told apart by their colour, and by a glyph, so that
    the colour is not the only thing that says which one it is */
-.info   { color: var(--info); }
-.warning { color: var(--warning); }
-.error   { color: var(--accent); }
+.info    { color: var(--info); }
+.pending { color: var(--pending); }
+.error   { color: var(--accent-strong); }
 
 .info::before    { content: "\2713\00a0"; }
-.warning::before { content: "\21bb\00a0"; }
+.pending::before { content: "\21bb\00a0"; }
 .error::before   { content: "\2717\00a0"; }
 
 /* the message of the header is a badge, tinted with its own colour. It keeps the height of the
    line, so that it does not shift the header, and the tint sets it off, so that it needs no
    bold face */
-#info:is(.info, .warning, .error) {
+#info:is(.info, .pending, .error) {
   padding: 0 .4rem;
   border-radius: var(--radius);
   background-color: color-mix(in srgb, currentColor 12%, transparent);
@@ -482,7 +484,7 @@ header {
 
 .header-nav ul {
   display: flex;
-  column-gap: .25rem;
+  column-gap: .4rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -491,7 +493,7 @@ header {
 /* the separator belongs to the line, not to the entries: it is neither read out nor clickable */
 .header-nav li + li::before {
   content: '\B7';
-  margin-right: .25rem;
+  margin-right: .4rem;
   color: var(--muted);
 }
 
@@ -499,11 +501,6 @@ header {
 .header-nav a[aria-current] {
   font-weight: bold;
   color: var(--accent-strong);
-}
-
-/* a long message truncates instead of pushing the navigation out of the line */
-#info {
-  min-width: 0;
 }
 
 .header-logo {
@@ -569,6 +566,10 @@ p.compose {
   body:has(.content.fill) {
     height: auto;
     overflow: visible;
+  }
+  /* the panels keep the height of their contents instead of sharing what the viewport leaves */
+  body:has(.content.fill) main {
+    display: block;
   }
   .content.fill .pane {
     min-height: 200px;

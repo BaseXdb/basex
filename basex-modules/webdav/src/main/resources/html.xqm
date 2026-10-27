@@ -114,17 +114,19 @@ declare %private function html:listing(
         <div class='content' style='--columns: 1fr'>
           <div class='panel'>
             <table>
-              <tr>
-                <th>Name</th>
-                <th>Content Type</th>
-                <th class='num'>Size</th>
-                <th>Modified</th>
-              </tr>
-              {
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Content Type</th>
+                  <th class='num'>Size</th>
+                  <th>Modified</th>
+                </tr>
+              </thead>
+              <tbody>{
                 for $child in res:children($rc)
                 order by $child?kind, $child?name
                 return html:entry($child)
-              }
+              }</tbody>
             </table>
           </div>
         </div>
