@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.options.Options.*;
 
 /**
  * Function implementation.
@@ -43,6 +44,7 @@ public class FileWrite extends FileWriteFn {
     final Path path = toTarget(arg(0), qc);
     final Iter input = arg(1).iter(qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);
+    if(!empty(path, append)) options.set(SerializerOptions.BYTE_ORDER_MARK, YesNo.NO);
 
     try(PrintOutput out = PrintOutput.get(output(path, append));
         Serializer ser = Serializer.get(out, options)) {

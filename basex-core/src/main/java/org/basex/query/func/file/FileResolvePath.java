@@ -17,16 +17,25 @@ import org.basex.query.value.*;
 public final class FileResolvePath extends FileFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException {
-    final Path path = toPath(toString(arg(0), qc), qc), abs;
-    final String base = toStringOrNull(arg(1), qc);
+    final String string = toString(arg(0), qc), base = toStringOrNull(arg(1), qc);
+    final Path path = toPath(string, qc), abs;
     if(base != null) {
       Path bs = toPath(base, qc);
       if(!bs.isAbsolute()) throw FILE_IS_RELATIVE_X.get(info, bs);
-      if(!endsWith(base, '/') && !endsWith(base, '\\')) bs = bs.getParent();
+      if(!separator(base)) bs = bs.getParent();
       abs = bs.resolve(path).normalize();
     } else {
       abs = absolute(path);
     }
-    return get(abs, Files.isDirectory(abs));
+    return get(abs, separator(string) || Files.isDirectory(abs));
+  }
+
+  /**
+   * Checks if a path ends with a directory separator.
+   * @param path path
+   * @return result of check
+   */
+  private static boolean separator(final String path) {
+    return endsWith(path, '/') || endsWith(path, '\\');
   }
 }

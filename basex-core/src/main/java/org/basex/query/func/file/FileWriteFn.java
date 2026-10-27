@@ -41,11 +41,15 @@ abstract class FileWriteFn extends FileFn {
     final Expr input = arg(1);
     final Value value = input.atomValue(qc, info);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
+    // UTF-16: write a single byte order mark, and only to empty files
+    final boolean utf16 = encoding == Strings.UTF16;
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? StandardCharsets.UTF_8 :
-      Charset.forName(encoding);
+      utf16 ? StandardCharsets.UTF_16BE : Charset.forName(encoding);
 
     for(final Item item : value) cacheSource(item, path);
+    final boolean bom = utf16 && empty(path, append);
     try(PrintOutput out = PrintOutput.get(output(path, append))) {
+      if(bom) out.write("\uFEFF".getBytes(cs));
       if(lines) {
         final byte[] nl = cs == StandardCharsets.UTF_8 ? token(Prop.NL) : Prop.NL.getBytes(cs);
         for(final Item item : value) {
@@ -85,6 +89,17 @@ abstract class FileWriteFn extends FileFn {
     final Path parent = path.getParent();
     if(parent != null && !Files.exists(parent)) throw FILE_NO_DIR_X.get(info, absolute(parent));
     return path;
+  }
+
+  /**
+   * Checks if a file will be empty before data is written to it.
+   * @param path path to the file
+   * @param append append flag
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  static boolean empty(final Path path, final boolean append) throws IOException {
+    return !append || !Files.exists(path) || Files.size(path) == 0;
   }
 
   /**

@@ -60,6 +60,8 @@ public class FileCopy extends FileFn {
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
+      // target is the directory of the source
+      if(Files.exists(trg) && Files.isSameFile(src, trg)) return;
       if(!dir && Files.isDirectory(trg)) throw FILE_IS_DIR_X.get(info, trg);
     } else if(dir && Files.exists(trg)) {
       // if target is file, source cannot be a directory

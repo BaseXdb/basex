@@ -1483,7 +1483,7 @@ public enum Function implements AFunction {
   _FILE_APPEND_TEXT(FileAppendText::new, "append-text(file, value, encoding?)",
       params(STRING_O, STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_APPEND_TEXT_LINES(FileAppendTextLines::new, "append-text-lines(file, values, encoding?)",
+  _FILE_APPEND_TEXT_LINES(FileAppendTextLines::new, "append-text-lines(file, lines, encoding?)",
       params(STRING_O, STRING_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_BASE_DIR(FileBaseDir::new, "base-dir()",
@@ -1587,7 +1587,7 @@ public enum Function implements AFunction {
   _FILE_WRITE_TEXT(FileWriteText::new, "write-text(file, value, encoding?)",
       params(STRING_O, STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_WRITE_TEXT_LINES(FileWriteTextLines::new, "write-text-lines(file, values, encoding?)",
+  _FILE_WRITE_TEXT_LINES(FileWriteTextLines::new, "write-text-lines(file, lines, encoding?)",
       params(STRING_O, STRING_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
 
   // Fulltext Module
