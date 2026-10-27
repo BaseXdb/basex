@@ -3,9 +3,12 @@ package org.basex.gui.text;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
+
+import org.basex.gui.*;
 
 /**
- * Popup window that is displayed below the caret of a text panel.
+ * Popup window that is displayed below or above a position of a text panel.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,6 +21,8 @@ abstract class TextPopup {
 
   /** Text panel. */
   final TextPanel panel;
+  /** Indicates if the popup is placed above its position. */
+  private final boolean above;
   /** Timer for showing the popup after a delay. */
   private final Timer timer;
   /** Popup window (can be {@code null}: popup is hidden). */
@@ -26,11 +31,21 @@ abstract class TextPopup {
   /**
    * Constructor.
    * @param panel text panel
+   * @param above place the popup above its position
    */
-  TextPopup(final TextPanel panel) {
+  TextPopup(final TextPanel panel, final boolean above) {
     this.panel = panel;
+    this.above = above;
     timer = new Timer(DELAY, e -> timeout());
     timer.setRepeats(false);
+  }
+
+  /**
+   * Returns the border of a popup.
+   * @return border
+   */
+  static Border border() {
+    return BorderFactory.createLineBorder(GUIConstants.gray);
   }
 
   /**
@@ -90,7 +105,8 @@ abstract class TextPopup {
     }
     window.pack();
     final Point screen = panel.getLocationOnScreen();
-    window.setLocation(screen.x + point.x, screen.y + point.y);
+    window.setLocation(screen.x + point.x,
+      screen.y + point.y - (above ? window.getHeight() : 0));
     window.setVisible(true);
   }
 

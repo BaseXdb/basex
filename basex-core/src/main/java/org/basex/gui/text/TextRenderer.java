@@ -76,6 +76,8 @@ final class TextRenderer extends BaseXBack {
   private int height;
   /** Indicates if the last scan stopped at the end of a row. */
   private boolean rowEnd;
+  /** Top of the row at which the last scan stopped. */
+  private int rowTop;
 
   /** Line-offset cache (maps document-space y or text position to a line). */
   private final TextLineCache cache = new TextLineCache();
@@ -1077,6 +1079,7 @@ final class TextRenderer extends BaseXBack {
     }
     // the scan walked past the target row: its last position is shared with the next row
     rowEnd = layout.y - fontHeight > yPos;
+    rowTop = rowEnd ? layout.lineY - fontHeight : layout.lineY;
   }
 
   /**
@@ -1165,6 +1168,14 @@ final class TextRenderer extends BaseXBack {
    */
   boolean rowEnd() {
     return rowEnd;
+  }
+
+  /**
+   * Returns the top of the rendered row at which the last scan stopped.
+   * @return position, relative to the text panel
+   */
+  int rowTop() {
+    return rowTop;
   }
 
   /**

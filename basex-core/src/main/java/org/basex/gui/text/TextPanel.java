@@ -62,6 +62,8 @@ public class TextPanel extends BaseXPanel {
   private String signatureName;
   /** Resolved signature (can be {@code null}: the called function is unknown). */
   private Signature signatureValue;
+  /** Popup with the outline of the function or variable referenced by the mouse pointer. */
+  private final SignaturePopup outline;
 
   /** Text caret. */
   private final Timer caretTimer;
@@ -147,7 +149,9 @@ public class TextPanel extends BaseXPanel {
     final EditorOptions opts = new EditorOptions(gui.gopts);
     editor = new TextEditor(opts);
     completion = new CompletionPopup(this);
-    signature = new SignaturePopup(this);
+    signature = new SignaturePopup(this, false);
+    // the outline is placed above the pointed row: the mouse cursor would hide it
+    outline = new SignaturePopup(this, true);
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
@@ -667,6 +671,7 @@ public class TextPanel extends BaseXPanel {
     final boolean link = linkListener != null, def = definition && hist.active();
     boolean hand = false;
     int[] reference = null;
+    boolean outlined = false;
     if(mouse != null && rend.sticky(mouse) != -1) {
       // pinned lines can be clicked
       hand = true;
@@ -684,15 +689,25 @@ public class TextPanel extends BaseXPanel {
         // the name of the reference is underlined
         // a checked name is not checked again
         final Definition dfn = rend.syntax().definition(text, pos);
-        if(dfn != null) pointed = new Pointer(text, dfn.start(), dfn.end(), true);
-        if(dfn != null && dfn.found()) {
-          reference = new int[] { dfn.start(), dfn.end() };
-          hand = true;
+        if(dfn != null) {
+          pointed = new Pointer(text, dfn.start(), dfn.end(), true);
+          if(dfn.found()) {
+            reference = new int[] { dfn.start(), dfn.end() };
+            hand = true;
+          }
+          // the outline is aligned with the name, above the pointed row
+          final String string = rend.syntax().outline(text, dfn, this::module);
+          if(string != null) {
+            outline.show(string(chop(token(string), 100)),
+              new Point(rend.x(dfn.start()), rend.rowTop()));
+            outlined = true;
+          }
         }
       }
     } else {
       pointed = null;
     }
+    if(!outlined) outline.hide();
     rend.underline(reference);
     final Cursor cursor = hand ? CURSORHAND : CURSORTEXT;
     if(mouse != null && getCursor() != cursor) setCursor(cursor);
@@ -726,6 +741,7 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void mousePressed(final MouseEvent e) {
     signature.hide();
+    outline.hide();
     // copy and paste text with middle mouse button (Unix only)
     if(SwingUtilities.isMiddleMouseButton(e)) {
       if(!Prop.WIN && !Prop.MAC) {
@@ -1603,11 +1619,12 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Hides the completion and signature popups.
+   * Hides the completion, signature and outline popups.
    */
   protected final void hidePopups() {
     completion.hide();
     signature.hide();
+    outline.hide();
   }
 
   /**
@@ -1625,7 +1642,7 @@ public class TextPanel extends BaseXPanel {
       // the signature is resolved once per name: a declaration lookup scans the text
       if(!name.equals(signatureName)) {
         signatureName = name;
-        signatureValue = signature(name);
+        signatureValue = syntax.signature(editor.text(), name, this::module);
       }
       final Signature sig = signatureValue;
       // the signature is shown if the function is known and can take a further argument
@@ -1644,16 +1661,6 @@ public class TextPanel extends BaseXPanel {
     signature.hide();
   }
 
-  /**
-   * Returns the signature of a built-in or declared function.
-   * @param name function name
-   * @return signature, or {@code null} if the function is unknown
-   */
-  private Signature signature(final String name) {
-    final Signature sig = rend.syntax().signature(name);
-    // declared functions are looked up in the text
-    return sig != null ? sig : rend.syntax().signature(editor.text(), name);
-  }
 
   /**
    * Refreshes the candidates of a visible completion popup.

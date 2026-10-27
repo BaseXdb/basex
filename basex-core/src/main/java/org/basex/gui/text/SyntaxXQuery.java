@@ -602,6 +602,84 @@ final class SyntaxXQuery extends SyntaxMarkup {
     return new Definition(null, name, -1, s, e);
   }
 
+  @Override
+  String outline(final byte[] text, final Definition definition,
+      final BiFunction<String, String, IOFile> modules) {
+    final String name = definition.name();
+    if(!name.startsWith("$")) {
+      // functions are outlined if they are called or referenced, even if they are built-in
+      final int s = definition.start(), e = definition.end();
+      if(!call(text, e) || Strings.eq(endName(text, s), FUNCTION, RECORD)) return null;
+      final String called = string(text, s, e - s);
+      final Signature signature = signature(text, called, modules);
+      return signature != null ? called + signature.args() : null;
+    }
+    final String location = definition.location();
+    if(location == null) return definition.found() ? outline(text, definition.pos()) : null;
+
+    // variable of an imported module
+    final IOFile file = modules.apply(null, location);
+    if(file == null) return null;
+    for(final Declaration declaration : module(file)) {
+      if(declaration.local().equals(name)) {
+        try {
+          return outline(file.read(), declaration.pos());
+        } catch(final IOException ex) {
+          Util.debug(ex);
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the binding of the variable whose name starts at the specified position.
+   * @param text text
+   * @param pos position of the variable name
+   * @return binding, or {@code null} if it cannot be determined
+   */
+  String outline(final byte[] text, final int pos) {
+    final int dollar = skipWsBack(text, pos);
+    reset();
+    if(dollar < 0 || text[dollar] != '$' || !name(text, pos)) return null;
+    // a clause starts with its keyword, a declaration or parameter with the variable
+    final String keyword = endName(text, dollar);
+    final int start = keyword.isEmpty() || VARIABLE.equals(keyword) ? dollar :
+      skipWsBack(text, dollar) + 1 - keyword.length();
+    // the binding ends with the variable name or its type; values are omitted
+    int end = nameEnd;
+    final int as = skipWs(text, end);
+    if(startsWith(text, as, AS) && !XMLToken.isNCChar(cp(text, as + 2))) {
+      end = type(text, skipWs(text, as + 2));
+    }
+    return string(normalize(subtoken(text, start, end)));
+  }
+
+  /**
+   * Returns the end of the sequence type that starts at the specified position.
+   * @param text text
+   * @param pos start position
+   * @return end position
+   */
+  private int type(final byte[] text, final int pos) {
+    int p = name(text, pos) ? nameEnd : pos;
+    // a type may be followed by arguments; a choice of types is parenthesized
+    final int open = skipWs(text, p), tl = text.length;
+    if(open < tl && text[open] == '(') {
+      for(int q = open, depth = 0; q < tl; q++) {
+        if(OPENING.indexOf(text[q]) != -1) {
+          depth++;
+        } else if(CLOSING.indexOf(text[q]) != -1 && --depth == 0) {
+          p = q + 1;
+          break;
+        }
+      }
+    }
+    // occurrence indicator
+    return p < tl && "?*+".indexOf(text[p]) != -1 ? p + 1 : p;
+  }
+
   /**
    * Checks if a name is followed by an argument list or a function reference.
    * @param text text
@@ -623,13 +701,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
     return m.group(group) != null ? m.group(group) : m.group(group + 1);
   }
 
-  /**
-   * Returns the declarations of the modules that are imported by the specified text.
-   * @param text text
-   * @param modules resolver for imported modules (URI, optional location)
-   * @return declarations, with the namespace prefixes of the imports
-   */
-  private static ArrayList<Declaration> imported(final byte[] text,
+  @Override
+  ArrayList<Declaration> imported(final byte[] text,
       final BiFunction<String, String, IOFile> modules) {
     final ArrayList<Declaration> list = new ArrayList<>();
     final Matcher m = MODULE_IMPORT.matcher(string(text));

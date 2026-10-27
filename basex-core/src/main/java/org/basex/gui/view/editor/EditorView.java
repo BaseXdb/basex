@@ -1080,10 +1080,10 @@ public final class EditorView extends View {
    * @param next next/previous flag
    */
   public void visit(final boolean next) {
+    // the current position is remembered for returning to it, unless it equals the last one
+    final Visit position = new Visit(getEditor());
+    if(visit == visits.size() && visit > 0 && visits.getLast().equals(position)) visit--;
     if(next ? visit >= visits.size() - 1 : visit == 0) return;
-    // the current position is remembered for returning to it
-    final EditorArea current = getEditor();
-    final Visit position = new Visit(current);
     if(visit == visits.size()) visits.add(position);
     else visits.set(visit, position);
     visit += next ? 1 : -1;

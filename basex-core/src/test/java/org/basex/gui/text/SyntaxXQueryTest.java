@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.basex.core.*;
@@ -304,6 +305,34 @@ public final class SyntaxXQueryTest {
     assertNull(syntax.declaration(text, "f", false));
   }
 
+  /** Outlines of variable bindings. */
+  @Test public void outline() {
+    outline("declare %private variable $m:v as xs:int := 1;\n", "$m:v", "$m:v as xs:int");
+    outline("let $x := 1 + 2\nreturn $x", "$x", "let $x");
+    outline("let $x as item()* := 1 return $x", "$x", "let $x as item()*");
+    outline("for $i at $p in 1 to 3\nreturn $p", "$i", "for $i");
+    outline("for $i at $p in 1 to 3\nreturn $p", "$p", "at $p");
+    outline("for $i as xs:int in 1 to 3\nreturn $i", "$i", "for $i as xs:int");
+    outline("fn($args) { $args }", "$args", "$args");
+    outline("declare function f(\n  $a  as map( * ),\n  $b := (1, 2)\n) { };", "$a",
+      "$a as map( * )");
+    outline("declare function f(\n  $a  as map(*),\n  $b := (1, 2)\n) { };", "$b", "$b");
+    outline("fn($a as (xs:int | xs:string)?) { }", "$a", "$a as (xs:int | xs:string)?");
+    outline("$x", "$x", "$x");
+  }
+
+  /**
+   * Checks the outline of the variable binding with the specified name.
+   * @param query query string
+   * @param name variable name, which is located at its first occurrence
+   * @param expected expected outline
+   */
+  private static void outline(final String query, final String name, final String expected) {
+    final SyntaxXQuery syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+    assertEquals(expected, syntax.outline(Token.token(query), query.indexOf(name) + 1), query);
+  }
+
   /**
    * Checks the definition of the name at the specified position.
    * @param query query string
@@ -562,7 +591,7 @@ public final class SyntaxXQueryTest {
     final Syntax syntax = new SyntaxXQuery();
     syntax.init(PLAIN);
     final byte[] text = Token.token("declare function ab($a) {}; declare function ab($a, $b) {};");
-    assertEquals("(a, b?)", syntax.signature(text, "ab").args());
+    assertEquals("(a, b?)", syntax.signature(text, "ab", (uri, location) -> null).args());
   }
 
   /** Parameter names are proposed as keyword arguments. */
@@ -594,6 +623,19 @@ public final class SyntaxXQueryTest {
       completion(imprt + '_', "m:hello", "m:hello(_)");
       completion(imprt + '_', "$m:v", "$m:v");
       completion(imprt + "m:hello(_", "a", "a := ");
+      final Syntax syntax = new SyntaxXQuery();
+      syntax.init(PLAIN);
+      final byte[] text = Token.token(imprt + "m:hello($m:v)");
+      final BiFunction<String, String, IOFile> modules = (uri, location) ->
+        new IOFile(dir, location);
+      assertEquals("(a)", syntax.signature(text, "m:hello", modules).args());
+      final int f = imprt.length() + 2, v = f + 8;
+      assertEquals("m:hello(a)", syntax.outline(text, syntax.definition(text, f), modules));
+      assertEquals("$x:v", syntax.outline(text, syntax.definition(text, v), modules));
+      // declarations are not outlined
+      final byte[] decl = Token.token("declare %private function f($a) { }; f(1)");
+      assertNull(syntax.outline(decl, syntax.definition(decl, 26), modules));
+      assertEquals("f(a)", syntax.outline(decl, syntax.definition(decl, 37), modules));
       // modules without location are ignored
       completion("import module namespace m = 'x'; _", "m:hello", null);
     } finally {

@@ -331,13 +331,32 @@ abstract class Syntax {
   }
 
   /**
-   * Returns the signature of a declared function, merged from the arities with matching names.
+   * Returns the declarations of the modules that are imported by the specified text.
+   * @param text text
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return declarations, with the namespace prefixes of the imports
+   */
+  @SuppressWarnings("unused")
+  ArrayList<Declaration> imported(final byte[] text,
+      final BiFunction<String, String, IOFile> modules) {
+    return new ArrayList<>();
+  }
+
+  /**
+   * Returns the signature of a built-in, declared or imported function.
    * @param text text
    * @param name function name
-   * @return signature, or {@code null} if the function is not declared
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return signature, or {@code null} if the function is unknown
    */
-  final Signature signature(final byte[] text, final String name) {
-    return signature(merge(declarations(text)), name);
+  final Signature signature(final byte[] text, final String name,
+      final BiFunction<String, String, IOFile> modules) {
+    // built-in functions take precedence; declarations are merged from the matching arities
+    final Signature signature = signature(name);
+    if(signature != null) return signature;
+    final ArrayList<Declaration> declarations = declarations(text);
+    declarations.addAll(imported(text, modules));
+    return signature(merge(declarations), name);
   }
 
   /**
@@ -385,6 +404,19 @@ abstract class Syntax {
    */
   @SuppressWarnings("unused")
   Definition definition(final byte[] text, final int pos) {
+    return null;
+  }
+
+  /**
+   * Returns the outline of a referenced function or variable.
+   * @param text text
+   * @param definition definition of the referenced name
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return signature of a function, binding of a variable, or {@code null}
+   */
+  @SuppressWarnings("unused")
+  String outline(final byte[] text, final Definition definition,
+      final BiFunction<String, String, IOFile> modules) {
     return null;
   }
 
