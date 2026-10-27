@@ -1967,9 +1967,6 @@ public enum Function implements AFunction {
   _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(value)",
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
-  _STRING_FORMAT(StringFormat::new, "format(pattern, values...)",
-      params(STRING_O, ITEM_O), STRING_O, STRING_URI),
-  /** XQuery function. */
   _STRING_JARO_WINKLER(StringJaroWinkler::new, "jaro-winkler(value1, value2, options?)",
       params(STRING_O, STRING_O, MAP_ZO), DOUBLE_O, STRING_URI),
   /** XQuery function. */

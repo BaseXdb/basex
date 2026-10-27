@@ -23,7 +23,6 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.FnParseXml.*;
@@ -650,7 +649,7 @@ public final class Client {
 
     // choose serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.NEWLINE, Newline.NL);
+    sopts.set(SerializerOptions.LINE_ENDING, "\n");
 
     String method = null, type = null;
     for(final Entry<String, String> entry : atts.entrySet()) {

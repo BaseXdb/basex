@@ -362,6 +362,10 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @return exception
    */
   QueryException similarError(final QNm qname, final InputInfo info) {
+    final String removed = Removed.function(Token.string(qname.prefixId()));
+    if(removed != null) {
+      return WHICHFUNC_X.get(info, Util.info("% (%)", qname.prefixString(FN_URI), removed));
+    }
     final byte[] local = Token.lc(qname.local()), uri = qname.uri();
     // built-in function in the same URI (Levenshtein with prefix fallback)
     QNm similar = Levenshtein.similarOrPrefix(qname.local(), Functions.BUILT_IN.keys(),

@@ -157,6 +157,9 @@ public final class StaticOptions extends Options {
 
   @Override
   protected boolean assignOther(final String name, final String value) {
+    // ignore removed options that were written to the file by default
+    if(Strings.eq(name, "FAIRLOCK", "LANGKEYS") ||
+        name.equals("IGNOREHOSTNAME") && Strings.isFalse(value)) return true;
     // cache local options as global options
     final Option<?> option = new MainOptions(false).option(name);
     if(option == null) return false;

@@ -712,6 +712,7 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public static String similar(final Object option, final Map<String, Option<?>> options) {
+    if(Removed.option(string(token(option))) != null) return unknown(option);
     final String[] names = options.keySet().stream().sorted().toArray(String[]::new);
     final String similar = Levenshtein.similar(token(option), names);
     if(similar != null) return Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar);
@@ -725,7 +726,18 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public static String unknown(final Object option) {
-    return Util.info(Text.UNKNOWN_OPTION_X, option);
+    return removed(Util.info(Text.UNKNOWN_OPTION_X, option),
+        Removed.option(string(token(option))));
+  }
+
+  /**
+   * Appends a hint on a removed feature to an error string.
+   * @param string error string
+   * @param removed hint (can be {@code null})
+   * @return error string
+   */
+  private static String removed(final String string, final String removed) {
+    return removed != null ? string + ' ' + Strings.capitalize(removed) + '.' : string;
   }
 
   /**
@@ -986,7 +998,8 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public static String allowed(final Option<?> option, final String value, final Object... all) {
-    return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, list(all));
+    return removed(Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, list(all)),
+        Removed.value(option.name(), value));
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -1035,8 +1048,8 @@ public class Options implements Iterable<Option<?>> {
               Util.errln(file + ": " + ex.getMessage());
             }
           } else if(!assignOther(name, val)) {
-            final String similar = Levenshtein.similar(token(name),
-                meta.definitions.keySet().toArray(String[]::new));
+            final String similar = Removed.option(name) != null ? null :
+              Levenshtein.similar(token(name), meta.definitions.keySet().toArray(String[]::new));
             Util.errln(file + ": " + (similar != null ?
               Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) : unknown(name)));
           }

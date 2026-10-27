@@ -61,7 +61,6 @@ public final class Functions {
       if(BUILT_IN.put(name, fd) != null) throw Util.notExpected("Function % defined twice.", name);
       URIS.add(name.uri());
     }
-    HIDDEN.add(Function._STRING_FORMAT.definition().name);
   }
 
   /**

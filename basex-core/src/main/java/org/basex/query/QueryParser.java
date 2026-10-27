@@ -642,10 +642,17 @@ public class QueryParser extends InputParser {
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
             Object hnt = name.string();
-            final Annotation similar = Annotation.similar(name);
-            if(similar != null) {
-              hnt = QueryError.similar(hnt, ai.apply(name.hasPrefix() ?
-                concat(name.prefix(), cpToken(':'), similar.name.local()) : similar.name.local()));
+            final String removed = eq(uri, OUTPUT_URI) ? Removed.option(string(name.local())) :
+              null;
+            if(removed != null) {
+              hnt = Util.info("% (%)", hnt, removed);
+            } else {
+              final Annotation similar = Annotation.similar(name);
+              if(similar != null) {
+                hnt = QueryError.similar(hnt, ai.apply(name.hasPrefix() ?
+                  concat(name.prefix(), cpToken(':'), similar.name.local()) :
+                  similar.name.local()));
+              }
             }
             throw error(NSGlobal.reserved(uri) ? ANNRESERVED_X : BASEX_ANN1_X, ii, ai.apply(hnt));
           }
@@ -3447,10 +3454,20 @@ public class QueryParser extends InputParser {
       throws QueryException {
     if(name.hasPrefix()) {
       name.uri(qc.ns.resolve(name.prefix(), sc));
-      if(!name.hasURI()) throw error(NOURI_X, info, name.prefix());
+      if(!name.hasURI()) throw error(NOURI_X, info, undeclared(name.prefix()));
     } else if(elemNS != null) {
       name.uri(elemNS);
     }
+  }
+
+  /**
+   * Returns an undeclared prefix, followed by a hint if the module with this prefix was removed.
+   * @param prefix prefix
+   * @return prefix and hint
+   */
+  private static String undeclared(final byte[] prefix) {
+    final String pref = string(prefix), removed = Removed.prefix(pref);
+    return removed != null ? Util.info("% (%)", pref, removed) : pref;
   }
 
   /**
@@ -5036,7 +5053,7 @@ public class QueryParser extends InputParser {
     if(!name.hasURI()) {
       if(name.hasPrefix()) {
         pos = p;
-        throw error(NOURI_X, name.prefix());
+        throw error(NOURI_X, undeclared(name.prefix()));
       }
       name.uri(ns);
     }

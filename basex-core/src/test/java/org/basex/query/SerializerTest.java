@@ -49,9 +49,6 @@ public final class SerializerTest extends SandboxTest {
     // empty unit: line breaks but no indentation
     query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_UNIT.arg("") + input,
         "<a>\n<b/>\n</a>");
-    // takes precedence over tabulator/indents
-    query(METHOD.arg("xml") + INDENT.arg("yes") + TABULATOR.arg("yes") + INDENTS.arg("8")
-        + INDENT_UNIT.arg(" ") + input, "<a>\n <b/>\n</a>");
   }
 
   /** Test: line-ending. */
@@ -61,8 +58,6 @@ public final class SerializerTest extends SandboxTest {
     query(ser + ", 'line-ending': '&#13;&#10;' }) => contains('&#13;&#10;')", true);
     query(ser + ", 'line-ending': '\\r\\n' }) => contains('&#13;&#10;')", true);
     query(ser + ", 'line-ending': '\\r' }) => contains('&#10;')", false);
-    query(ser + ", 'newline': '\\n', 'line-ending': '&#13;&#10;' }) "
-        + "=> contains('&#13;&#10;')", true);
     query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 

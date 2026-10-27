@@ -127,21 +127,12 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());
-  /** Serialization parameter: line ending (takes precedence over 'newline' if assigned). */
+  /** Serialization parameter: line ending (default: system line separator). */
   public static final StringOption LINE_ENDING =
       new StringOption("line-ending", null, Types.STRING_ZO);
-  /** Specific serialization parameter: newline. */
-  public static final EnumOption<Newline> NEWLINE =
-      new EnumOption<>("newline",
-        "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL,
-        Types.STRING_ZO);
-  /** Serialization parameter: indentation unit (takes precedence over 'tabulator'/'indents'). */
+  /** Serialization parameter: indentation unit (default: two spaces). */
   public static final StringOption INDENT_UNIT =
       new StringOption("indent-unit", null, Types.STRING_ZO);
-  /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final EnumOption<YesNo> TABULATOR = new EnumOption<>("tabulator", YesNo.NO, YES_NO);
-  /** Specific serialization parameter: number of spaces to indent. */
-  public static final NumberOption INDENTS = new NumberOption("indents", 2);
   /** Specific serialization parameter: maximum number of bytes to serialize. */
   public static final NumberOption LIMIT = new NumberOption("limit", -1);
   /** Specific serialization parameter: binary serialization. */
@@ -165,41 +156,6 @@ public final class SerializerOptions extends Options {
     METHOD, CANONICAL, NORMALIZATION_FORM, MEDIA_TYPE, HTML_VERSION, INCLUDE_CONTENT_TYPE,
     JSON_LINES, JSON_NODE_OUTPUT_METHOD
   );
-
-  /** Newlines. */
-  public enum Newline {
-    /** NL.   */ NL("\\n", "\n"),
-    /** CR.   */ CR("\\r", "\r"),
-    /** CRNL. */ CRNL("\\r\\n", "\r\n");
-
-    /** Name. */
-    private final String name;
-    /** Newline. */
-    private final String newline;
-
-    /**
-     * Constructor.
-     * @param name name
-     * @param newline newline string
-     */
-    Newline(final String name, final String newline) {
-      this.name = name;
-      this.newline = newline;
-    }
-
-    /**
-     * Returns the newline string.
-     * @return newline string
-     */
-    String newline() {
-      return newline;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-  }
 
   /**
    * Checks if the specified option is true.
@@ -293,7 +249,7 @@ public final class SerializerOptions extends Options {
         for(final Option<?> option : this) {
           if(!CANONICAL_OPTIONS.contains(option)) put(option, option.value());
         }
-        set(NEWLINE, Newline.NL);
+        set(LINE_ENDING, "\n");
       } else {
         set(CANONICAL, YesNo.NO);
       }

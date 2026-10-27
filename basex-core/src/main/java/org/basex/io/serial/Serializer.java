@@ -135,7 +135,7 @@ public abstract class Serializer implements Closeable {
 
     // use line feeds if no line ending was requested
     if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
-      sopts.set(SerializerOptions.NEWLINE, SerializerOptions.Newline.NL);
+      sopts.set(SerializerOptions.LINE_ENDING, "\n");
     }
     try {
       final ArrayOutput ao = new ArrayOutput();

@@ -74,7 +74,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_INDENT_ATTRIBUTES("indent-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENTS("indents(value)", params(STRING), OUTPUT_URI),
+  _OUTPUT_INDENT_UNIT("indent-unit(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_ITEM_SEPARATOR("item-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -84,13 +84,13 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_LINE_ENDING("line-ending(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_LIMIT("limit(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_MEDIA_TYPE("media-type(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_METHOD("method(value)", params(STRING), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_NEWLINE("newline(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -101,8 +101,6 @@ public enum Annotation {
   _OUTPUT_STANDALONE("standalone(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", params(STRING), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_TABULATOR("tabulator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */

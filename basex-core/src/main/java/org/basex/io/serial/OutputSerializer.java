@@ -52,25 +52,17 @@ public abstract class OutputSerializer extends Serializer {
     indent = sopts.yes(INDENT);
     canonical = sopts.yes(CANONICAL);
 
-    // indentation unit: standard 'indent-unit' takes precedence over 'tabulator'/'indents'
     final String unit = sopts.get(INDENT_UNIT);
-    if(unit != null) {
-      indentUnit = token(unescape(INDENT_UNIT.name(), unit, "\t*| *"));
-    } else {
-      final byte ch = (byte) (sopts.yes(TABULATOR) ? '\t' : ' ');
-      indentUnit = new byte[sopts.get(INDENTS)];
-      Arrays.fill(indentUnit, ch);
-    }
+    indentUnit = token(unit != null ? unescape(INDENT_UNIT.name(), unit, "\t*| *") : "  ");
 
     encoding = encoding(sopts);
     PrintOutput po = PrintOutput.get(os);
     final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);
 
-    // line ending: standard 'line-ending' takes precedence over 'newline'
     final String le = sopts.get(LINE_ENDING);
-    final String newline = le != null ? unescape(LINE_ENDING.name(), le, "\r\n|\r|\n") :
-      sopts.get(NEWLINE).newline();
+    final String newline = le == null ? Prop.NL : le.equals("\n") ? le :
+      unescape(LINE_ENDING.name(), le, "\r\n|\r|\n");
     if(!newline.equals("\n")) po = new NewlineOutput(po, token(newline));
 
     // Unicode encodings: print byte order mark; others: check characters before printing
