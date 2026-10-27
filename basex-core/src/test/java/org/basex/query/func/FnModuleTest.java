@@ -750,6 +750,7 @@ public final class FnModuleTest extends SandboxTest {
         + "[. instance of map(*)][map:contains(., 'columns')]?columns", "x\ny");
     query("count(" + func.args(dir3, " { " + types + ", 'match': 'json' }") + ")", 1);
     query("count(" + URI_COLLECTION.args(dir3, " { " + types + " }") + ")", 6);
+    query("count(" + URI_COLLECTION.args(dir3) + "[. instance of xs:anyURI])", 1);
     error(func.args(dir3, " { " + types + ", 'json-options': { 'unknown': 1 } }"),
         INVALIDOPTION_X);
     write(new IOFile(dir3, "g.json"), "{");

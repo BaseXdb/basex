@@ -33,8 +33,8 @@ public class FnCollection extends Docs {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = super.opt(cc);
-    if(expr == this) {
-      // sharpen the type
+    // sharpen the type (options may assign non-XML media types to file extensions)
+    if(expr == this && COLLECTION.is(this) && !defined(1)) {
       final byte[] uri = staticUri();
       final QueryInput qi = uri != null ? queryInput(uri) : null;
       if(qi != null && qi.dbName != null) exprType.assign(Types.DOCUMENT_ZM);
