@@ -39,6 +39,15 @@ function selectDatabase(name) {
 }
 
 /**
+ * Selects a database and shows its backups.
+ * @param {string} name database
+ */
+function showBackups(name) {
+  selectDatabase(name);
+  openDialog("properties", "backups-panel");
+}
+
+/**
  * Shows another resource of the selected database.
  * @param {string} resource resource
  */
@@ -468,11 +477,12 @@ function initDatabases(editable) {
   // the server opens the first database if the address names none: the address is completed
   _db ||= adoptOpened("database-panel");
   initDocument(editable);
-  // the dialog of an action is opened again, at the remembered tab; a reload does not repeat it
-  const show = new URLSearchParams(window.location.search).get("show");
+  // the dialog of an action is opened again, at the named or remembered tab; a reload does not repeat it
+  const params = new URLSearchParams(window.location.search);
+  const show = params.get("show");
   if(show) {
-    hideParams("show");
-    openDialog(show);
+    hideParams("show", "tab");
+    openDialog(show, params.get("tab") ?? undefined);
   }
   // the lists are rendered unfiltered: what was typed for the database is asked for again
   if(restoreField("resource-filter", _db)) refreshDatabase();

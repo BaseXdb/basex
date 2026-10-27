@@ -45,7 +45,12 @@ declare function panels:databases(
             'width': 'calc(11ch + 0.5rem)' },
           (: what Restore falls back to, and where a backup that was just written shows up :)
           { 'key': 'backup', 'label': 'Backup', 'type': 'dateTime', 'order': 'desc',
-            'width': 'calc(11ch + 0.5rem)' }
+            'width': 'calc(11ch + 0.5rem)', 'link': fn($entry, $date) {
+              html:action($date, 'showBackups', { 'name': $entry?db }, {
+                'href': web:create-url($panels:CAT,
+                  { 'name': $entry?db, 'show': 'properties', 'tab': 'backups-panel' })
+              })
+            } }
         )
         (: the date of the latest backup of each database; the backups are listed with the most
            recent one first :)
@@ -62,6 +67,7 @@ declare function panels:databases(
           where not($db-names = $db)
           return {
             'name': panels:select($db, $db = $name),
+            'db': $db,
             'backup': $backup
           }
         )
@@ -74,6 +80,7 @@ declare function panels:databases(
             'resources': $db/@resources,
             'size': $db/@size,
             'date': $db/@modified-date,
+            'db': string($db),
             'backup': $backups?(string($db))
           }
         let $buttons := (

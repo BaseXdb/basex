@@ -16,7 +16,8 @@ declare record table:column(
   type   as xs:string?,
   sort   as xs:string?,
   order  as xs:string?,
-  width  as xs:string?
+  width  as xs:string?,
+  link   as (fn(map(*), item()*) as element(a))?
 );
 
 (:~ Options of a table; see table:create. :)
@@ -197,6 +198,8 @@ declare function table:sort(
  :   * 'order': 'desc' for descending order, otherwise ascending
  :   * 'width': fixed column width. If widths are supplied, the table layout gets stable:
  :     overflowing values are truncated and can be expanded via clicks
+ :   * 'link': turns the formatted value of an entry into a link; the value is still sorted as
+ :     it is supplied, and a missing value is not linked
  : @param  $entries  table entries, each of them a map from a column key to its value
  : @param  $buttons  buttons and other controls, placed above the table
  : @param  $params   additional query parameters, included in the table links
@@ -359,6 +362,7 @@ declare function table:create(
           } catch * {
             $err:description
           }
+          let $value := if (exists($header?link) and exists($v)) then $header?link($entry, $value) else $value
           return element td {
             attribute class { 'num' }[$type = $table:NUMBER],
             if ($pos = 1 and $buttons) {
