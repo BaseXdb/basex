@@ -44,6 +44,8 @@ public abstract class Sandbox {
   protected static final int STOP_PORT = 9864;
   /** HTTP port. */
   protected static final int HTTP_PORT = 9865;
+  /** Concurrent client logins (the server limits the pending logins per address). */
+  private static final Semaphore LOGINS = new Semaphore(BaseXServer.PENDING / 2);
 
   /** REST identifier. */
   protected static final String REST = "rest";
@@ -644,7 +646,12 @@ public abstract class Sandbox {
   public static ClientSession createClient(final String... login) throws IOException {
     final String username = login.length > 0 ? login[0] : UserText.ADMIN;
     final String password = login.length > 1 ? login[1] : NAME;
-    return new ClientSession(S_LOCALHOST, DB_PORT, username, password);
+    LOGINS.acquireUninterruptibly();
+    try {
+      return new ClientSession(S_LOCALHOST, DB_PORT, username, password);
+    } finally {
+      LOGINS.release();
+    }
   }
 
   /**

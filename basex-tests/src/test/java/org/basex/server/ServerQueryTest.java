@@ -11,8 +11,7 @@ import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class performs a client/server stress tests with a specified
- * number of threads and queries.
+ * Queries a database from concurrent client sessions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -25,9 +24,6 @@ public final class ServerQueryTest extends SandboxTest {
   private static final int MAX = 1000;
   /** Maximum delay between two queries (ms). */
   private static final int DELAY = 50;
-
-  /** Server reference. */
-  BaseXServer server;
 
   /**
    * Runs the test.
@@ -67,9 +63,8 @@ public final class ServerQueryTest extends SandboxTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
-    // run server instance
-    server = createServer();
+  private static void run(final int clients, final int runs) throws Exception {
+    final BaseXServer server = createServer();
     try {
       // create test database
       try(ClientSession cs = createClient()) {
@@ -101,7 +96,6 @@ public final class ServerQueryTest extends SandboxTest {
         cs.execute("DROP DB " + NAME);
       }
     } finally {
-      // stop server
       stopServer(server);
     }
   }

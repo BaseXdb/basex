@@ -17,9 +17,6 @@ import org.junit.jupiter.api.*;
  */
 @Timeout(600)
 public final class ServerReadWriteTest extends SandboxTest {
-  /** Server reference. */
-  BaseXServer server;
-
   /**
    * Runs the test.
    * @throws Exception exception
@@ -58,9 +55,8 @@ public final class ServerReadWriteTest extends SandboxTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
-    // run server instance
-    server = createServer();
+  private static void run(final int clients, final int runs) throws Exception {
+    final BaseXServer server = createServer();
     try {
       // create test database
       try(ClientSession cs = createClient()) {
@@ -99,7 +95,6 @@ public final class ServerReadWriteTest extends SandboxTest {
         cs.execute("DROP DB " + NAME);
       }
     } finally {
-      // stop server
       stopServer(server);
     }
   }

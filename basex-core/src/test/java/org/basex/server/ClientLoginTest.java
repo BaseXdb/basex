@@ -84,7 +84,7 @@ public final class ClientLoginTest extends SandboxTest {
   @Test public void pending() throws Exception {
     final ArrayList<Socket> sockets = new ArrayList<>();
     try {
-      for(int s = 0; s < 32; s++) {
+      for(int s = 0; s < BaseXServer.PENDING; s++) {
         final Socket socket = new Socket(S_LOCALHOST, DB_PORT);
         sockets.add(socket);
         assertNotEquals(-1, socket.getInputStream().read());

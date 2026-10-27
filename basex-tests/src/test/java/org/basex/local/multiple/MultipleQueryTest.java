@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 /**
- * This class performs local stress tests with a specified number of threads and queries.
+ * Queries a database from concurrent local threads.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

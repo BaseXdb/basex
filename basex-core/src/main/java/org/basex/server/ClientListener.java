@@ -221,6 +221,8 @@ public final class ClientListener extends Thread implements ClientInfo {
           null;
         return hash != null && stored != null && Strings.sha256(stored + nonce).equals(hash);
       });
+      // release the pending login before the client receives the reply
+      server.remove(this);
 
       // write log information
       if(ok) {
@@ -238,9 +240,9 @@ public final class ClientListener extends Thread implements ClientInfo {
         log(LogType.ERROR, Util.message(ex));
         ok = false;
       }
+    } finally {
+      server.remove(this);
     }
-
-    server.remove(this);
     authenticated = ok;
     return ok;
   }
