@@ -98,17 +98,13 @@ public final class ModuleLoader {
         return true;
       }
       // check XQuery modules
-      final IOFile repo = context.soptions.repoPath();
-      final String path = Strings.uri2path(uri);
-      for(final String suffix : IO.XQSUFFIXES) {
-        final IOFile file = new IOFile(repo, path + suffix);
-        if(file.exists()) {
-          qp.module(file.path(), uri, info);
-          return true;
-        }
+      final IOFile file = file(context.soptions.repoPath(), uri);
+      if(file != null) {
+        qp.module(file.path(), uri, info);
+        return true;
       }
       // convert to Java notation
-      className = Strings.uriToClasspath(path);
+      className = Strings.uriToClasspath(Strings.uri2path(uri));
     }
     className = JavaCall.classPath(className);
 
@@ -136,6 +132,21 @@ public final class ModuleLoader {
     } catch(final Throwable ex) {
       throw MODINST_X_X.get(info, className, ex);
     }
+  }
+
+  /**
+   * Returns the file of an XQuery module in the repository.
+   * @param repo repository path
+   * @param uri module URI
+   * @return module file, or {@code null} if it does not exist
+   */
+  public static IOFile file(final IOFile repo, final String uri) {
+    final String path = Strings.uri2path(uri);
+    for(final String suffix : IO.XQSUFFIXES) {
+      final IOFile file = new IOFile(repo, path + suffix);
+      if(file.exists()) return file;
+    }
+    return null;
   }
 
   /**

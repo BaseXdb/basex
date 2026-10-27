@@ -18,6 +18,7 @@ import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -76,8 +77,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
         } else {
-          final String path = repoFilePath(modUri, qc.context);
-          if(path != null) locs.add(path);
+          final IOFile file = ModuleLoader.file(qc.context.soptions.repoPath(),
+            Token.string(modUri));
+          if(file != null) locs.add(file.path());
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
@@ -202,23 +204,6 @@ public final class FnLoadXQueryModule extends StandardFunc {
     // an empty context item indicates the absence of a context value
     final Value ctx = item ? opt.get(CONTEXT_ITEM) : null;
     return ctx == null || ctx.isEmpty() ? null : ctx;
-  }
-
-  /**
-   * Returns the repository file path of the XQuery module with the given module URI, or
-   * {@code null}, if there is no such module in the repository.
-   * @param modUri module URI
-   * @param context database context
-   * @return file path of the XQuery module in the repository (maybe {@code null})
-   */
-  private static String repoFilePath(final byte[] modUri, final Context context) {
-    final String path = Strings.uri2path(Token.string(modUri));
-    final IOFile repo = context.soptions.repoPath();
-    for(final String suffix : IO.XQSUFFIXES) {
-      final IOFile file = new IOFile(repo, path + suffix);
-      if(file.exists()) return file.path();
-    }
-    return null;
   }
 
   /**

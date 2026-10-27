@@ -40,6 +40,65 @@ record Signature(String args, int[] starts, int[] ends) {
   }
 
   /**
+   * Returns the argument string for the specified parameters.
+   * @param params parameter names
+   * @param optional optionality of the parameters
+   * @return argument string, enclosed in parentheses, with question marks after optional names
+   */
+  static String args(final StringList params, final BoolList optional) {
+    final StringBuilder args = new StringBuilder().append('(');
+    final int ps = params.size();
+    for(int p = 0; p < ps; p++) {
+      if(p > 0) args.append(", ");
+      args.append(params.get(p));
+      if(optional.get(p)) args.append('?');
+    }
+    return args.append(')').toString();
+  }
+
+  /**
+   * Merges this signature with the signature of another arity of the same function.
+   * @param other other signature
+   * @return merged signature, or {@code null} if the parameter names differ
+   */
+  Signature merge(final Signature other) {
+    final Signature longer = params() < other.params() ? other : this;
+    final Signature shorter = longer == this ? other : this;
+    for(int p = 0; p < shorter.params(); p++) {
+      if(!shorter.name(p).equals(longer.name(p))) return null;
+    }
+    // parameters beyond the smallest arity are optional
+    final int min = Math.min(required(), other.required()), ps = longer.params();
+    final StringList params = new StringList(ps);
+    final BoolList optional = new BoolList(ps);
+    for(int p = 0; p < ps; p++) {
+      params.add(longer.name(p));
+      optional.add(p >= min);
+    }
+    return get(args(params, optional));
+  }
+
+  /**
+   * Returns the name of the specified parameter.
+   * @param p index of the parameter
+   * @return name
+   */
+  String name(final int p) {
+    return args.substring(starts[p], ends[p]);
+  }
+
+  /**
+   * Returns the number of required parameters.
+   * @return number of parameters without a trailing question mark
+   */
+  private int required() {
+    final int ps = params();
+    int r = 0;
+    while(r < ps && args.charAt(ends[r]) != '?') r++;
+    return r;
+  }
+
+  /**
    * Returns the index of the parameter with the specified name.
    * @param name parameter name
    * @return index, or {@code -1} if the parameter does not exist

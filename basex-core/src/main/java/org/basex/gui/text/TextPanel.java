@@ -1511,6 +1511,17 @@ public class TextPanel extends BaseXPanel {
   protected void definition(final String location, final String name) { }
 
   /**
+   * Resolves an imported module.
+   * @param uri URI of the module
+   * @param location location of the module (can be {@code null})
+   * @return module file, or {@code null} if it does not exist
+   */
+  @SuppressWarnings("unused")
+  protected IOFile module(final String uri, final String location) {
+    return null;
+  }
+
+  /**
    * Jumps to the declaration with the specified local name.
    * @param name local name of the function or variable (variables are prefixed with a dollar sign)
    */
@@ -1560,7 +1571,7 @@ public class TextPanel extends BaseXPanel {
     if(!completing(start, explicit) || !syntax.completable(text, editor.pos()))
       return new ArrayList<>();
 
-    proposals = syntax.completions(text, start);
+    proposals = syntax.completions(text, start, this::module);
     return Completions.candidates(word(start), proposals);
   }
 
@@ -1640,10 +1651,8 @@ public class TextPanel extends BaseXPanel {
    */
   private Signature signature(final String name) {
     final Signature sig = rend.syntax().signature(name);
-    if(sig != null) return sig;
     // declared functions are looked up in the text
-    final Declaration declaration = rend.syntax().declaration(editor.text(), name, false);
-    return declaration != null ? Signature.get(declaration.args()) : null;
+    return sig != null ? sig : rend.syntax().signature(editor.text(), name);
   }
 
   /**

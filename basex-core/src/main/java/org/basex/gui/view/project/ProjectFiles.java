@@ -266,7 +266,7 @@ final class ProjectFiles {
   private static boolean nameMatches(final int mode, final String file, final String query) {
     return mode == 0 ? SmartStrings.startsWith(file, query) :
            mode == 1 ? SmartStrings.contains(file, query) :
-           SmartStrings.containsChars(file, query, false);
+           SmartStrings.containsChars(file, query);
   }
 
   /**

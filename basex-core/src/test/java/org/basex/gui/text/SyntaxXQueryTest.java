@@ -3,9 +3,14 @@ package org.basex.gui.text;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
+import org.basex.core.*;
 import org.basex.gui.*;
+import org.basex.io.*;
+import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
@@ -503,6 +508,117 @@ public final class SyntaxXQueryTest {
     assertTrue(proposed("declare %_publi", "public"));
   }
 
+  /** Declarations are also matched by the keywords that introduce them. */
+  @Test public void declareKeywords() {
+    assertTrue(proposed("_decl", "declare decimal-format"));
+    assertTrue(proposed("_declare f", "declare function"));
+    assertTrue(proposed("_declare context", "declare context value"));
+    // the keywords of a declaration do not match expression snippets
+    assertFalse(proposed("1, _decl", "declare decimal-format"));
+    // no duplicates
+    final StringList proposals = proposals("_dec");
+    assertFalse(proposals.contains("decimal-format") &&
+        proposals.contains("declare decimal-format"));
+    // continuations are unaffected
+    assertFalse(proposed("declare _", "declare function"));
+  }
+
+  /** Keywords are proposed first after an operand. */
+  @Test public void operandKeywords() {
+    assertEquals("return", proposals("for $x in 1 to 3 _re").get(0));
+    assertEquals("order by", proposals("for $x in 1 to 3 where $x > 1 _ord").get(0));
+    assertEquals("then", proposals("if (1) _th").get(0));
+    assertEquals("else", proposals("if ($a) then 'b' _el").get(0));
+    assertEquals("in", proposals("for $x _i").get(0));
+    // no keywords at the start of an expression
+    assertFalse(proposed("for $x in _re", "return"));
+    assertFalse(proposed("1, _re", "return"));
+    assertFalse(proposed("_re", "return"));
+  }
+
+  /** Variables are only proposed if they are bound. */
+  @Test public void boundVariables() {
+    completion("let $a as xs:integer := 1 return _", "$a", "$a");
+    completion("for $a at $p in 1 return _", "$p", "$p");
+    completion("function($a) { _ }", "$a", "$a");
+    completion("$undefined, _", "$undefined", null);
+  }
+
+  /** Declared types and the fields of records. */
+  @Test public void declaredTypes() {
+    completion("declare record person(name, age); declare variable $p as _", "person", "person");
+    completion("declare type my-type as xs:string; let $v as _", "my-type", "my-type");
+    completion("declare record person(name, age as xs:integer); $p?_", "age", "age");
+    completion("declare record person(name, age); $p?_", "name", "name");
+  }
+
+  /** Arities of a function are merged if their parameter names match. */
+  @Test public void arities() {
+    labels("declare function abc($a) {}; declare function abc($a, $b) {}; _abc", "abc(a, b?)");
+    labels("declare function abc($a, $b) {}; declare function abc() {}; _abc", "abc(a?, b?)");
+    labels("declare function abc($a, $b := 1) {}; declare function abc($a, $b, $c) {}; _abc",
+      "abc(a, b?, c?)");
+    // the signature of a declared function
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+    final byte[] text = Token.token("declare function ab($a) {}; declare function ab($a, $b) {};");
+    assertEquals("(a, b?)", syntax.signature(text, "ab").args());
+  }
+
+  /** Parameter names are proposed as keyword arguments. */
+  @Test public void keywordArguments() {
+    completion("replace('a', 'b', 'c', _", "flags", "flags := ");
+    completion("fn:replace(_", "value", "value := ");
+    completion("array:put(_", "position", "position := ");
+    completion("array:put(_", "source", null);
+    completion("declare function f($a, $b) { 1 }; f(1, _", "b", "b := ");
+    completion("declare function f($a, $b) { 1 }; declare function f($a) { 1 }; f(1, _", "b",
+      "b := ");
+    // no keyword arguments outside of argument lists
+    completion("replace('a', 'b', 'c') + _", "flags", null);
+    completion("(1, _", "flags", null);
+  }
+
+  /**
+   * Functions and variables of imported modules.
+   * @throws IOException I/O exception
+   */
+  @Test public void modules() throws IOException {
+    final IOFile dir = Sandbox.sandbox(), module = new IOFile(dir, "m.xqm");
+    dir.md();
+    module.write("module namespace x = 'x';\n" +
+      "declare variable $x:v := 1;\n" +
+      "declare function x:hello($a) { $a };");
+    try {
+      final String imprt = "import module namespace m = 'x' at 'm.xqm'; ";
+      completion(imprt + '_', "m:hello", "m:hello(_)");
+      completion(imprt + '_', "$m:v", "$m:v");
+      completion(imprt + "m:hello(_", "a", "a := ");
+      // modules without location are ignored
+      completion("import module namespace m = 'x'; _", "m:hello", null);
+    } finally {
+      module.delete();
+    }
+  }
+
+  /**
+   * Functions of imported repository modules.
+   * @throws IOException I/O exception
+   */
+  @Test public void repoModules() throws IOException {
+    final String uri = "http://basex.org/modules/syntax-test";
+    final IOFile module = new IOFile(Sandbox.sandbox(), Strings.uri2path(uri) + IO.XQMSUFFIX);
+    module.parent().md();
+    module.write("module namespace x = '" + uri + "';\n" +
+      "declare function x:hello($a) { $a };");
+    try {
+      completion("import module namespace r = '" + uri + "'; _", "r:hello", "r:hello(_)");
+      completion("import module namespace r = 'http://unknown'; _", "r:hello", null);
+    } finally {
+      module.delete();
+    }
+  }
+
   /** Full names are proposed before abbreviated ones. */
   @Test public void ranking() {
     final StringList proposals = proposals("declare %_pu");
@@ -526,13 +642,33 @@ public final class SyntaxXQueryTest {
    * @return matched names, ordered by relevance
    */
   private static StringList proposals(final String query) {
+    return proposals(query, Completion::match);
+  }
+
+  /**
+   * Returns the strings of the candidates that are proposed for the completed string.
+   * @param query query string, in which an underscore marks the completed string
+   * @param string string of a candidate
+   * @return strings, ordered by relevance
+   */
+  private static StringList proposals(final String query,
+      final Function<Completion, String> string) {
     final int pos = query.indexOf('_');
-    final StringList names = new StringList();
+    final StringList strings = new StringList();
     for(final Completion completion :
         Completions.candidates(query.substring(pos + 1), lists(query))) {
-      if(completion != null) names.add(completion.match());
+      if(completion != null) strings.add(string.apply(completion));
     }
-    return names;
+    return strings;
+  }
+
+  /**
+   * Compares the labels of the candidates that are proposed for the completed string.
+   * @param query query string, in which an underscore marks the completed string
+   * @param expected expected labels
+   */
+  private static void labels(final String query, final String... expected) {
+    assertArrayEquals(expected, proposals(query, Completion::label).finish(), query);
   }
 
   /**
@@ -545,7 +681,9 @@ public final class SyntaxXQueryTest {
     syntax.init(PLAIN);
 
     final int pos = query.indexOf('_');
-    return syntax.completions(Token.token(query.substring(0, pos) + query.substring(pos + 1)), pos);
+    return syntax.completions(Token.token(query.substring(0, pos) + query.substring(pos + 1)), pos,
+      (uri, location) -> location != null ? new IOFile(Sandbox.sandbox(), location) :
+        ModuleLoader.file(Sandbox.sandbox(), uri));
   }
 
   /**

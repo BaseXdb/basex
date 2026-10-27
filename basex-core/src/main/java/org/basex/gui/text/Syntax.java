@@ -4,7 +4,9 @@ import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.function.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -329,6 +331,53 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the signature of a declared function, merged from the arities with matching names.
+   * @param text text
+   * @param name function name
+   * @return signature, or {@code null} if the function is not declared
+   */
+  final Signature signature(final byte[] text, final String name) {
+    return signature(merge(declarations(text)), name);
+  }
+
+  /**
+   * Returns the signature of the first declared function with the specified name.
+   * @param declarations declarations
+   * @param name function name
+   * @return signature, or {@code null} if the function is not declared
+   */
+  static Signature signature(final ArrayList<Declaration> declarations, final String name) {
+    for(final Declaration declaration : declarations) {
+      if(declaration.name().equals(name)) return Signature.get(declaration.args());
+    }
+    return null;
+  }
+
+  /**
+   * Merges the declarations of functions with the same name if their parameter names match.
+   * @param declarations declarations
+   * @return merged declarations
+   */
+  static ArrayList<Declaration> merge(final ArrayList<Declaration> declarations) {
+    final ArrayList<Declaration> list = new ArrayList<>();
+    next:
+    for(final Declaration declaration : declarations) {
+      final String name = declaration.name();
+      for(int d = list.size() - 1; d >= 0 && name.indexOf('$') == -1; d--) {
+        final Declaration old = list.get(d);
+        if(!old.name().equals(name)) continue;
+        final Signature merged = Signature.get(old.args()).merge(Signature.get(declaration.args()));
+        if(merged != null) {
+          list.set(d, new Declaration(name, merged.args(), old.pos(), old.line()));
+          continue next;
+        }
+      }
+      list.add(declaration);
+    }
+    return list;
+  }
+
+  /**
    * Returns the definition of the function or variable referenced at the specified position.
    * @param text text
    * @param pos position
@@ -388,10 +437,12 @@ abstract class Syntax {
    * Returns the code completion candidates for the specified text.
    * @param text text
    * @param pos start position of the completed string
+   * @param modules resolver for imported modules (URI, optional location)
    * @return candidates, ordered by relevance
    */
   @SuppressWarnings("unused")
-  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
+      final BiFunction<String, String, IOFile> modules) {
     return new ArrayList<>();
   }
 

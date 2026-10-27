@@ -5,10 +5,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -50,14 +53,18 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final ArrayList<Completion> DEFAULTS = new ArrayList<>();
   /** Code completions (start and snippets of prolog declarations). */
   private static final ArrayList<Completion> DECLARATIONS = new ArrayList<>();
+  /** Code completions (keywords that follow an operand). */
+  private static final ArrayList<Completion> FOLLOWERS = new ArrayList<>();
   /** Signatures of the built-in functions, with and without namespace prefix. */
   private static final HashMap<String, Signature> SIGNATURES = new HashMap<>();
   /** Keywords that precede the name of a bound variable. */
   private static final Set<String> BINDERS = Set.of(AT, CASE, COPY, COUNT, END, EVERY, FOR, KEY,
     LET, MEMBER, NEXT, PREVIOUS, SCORE, SOME, START, "value", VARIABLE);
-  /** Pattern for the location of an imported module. */
+  /** Pattern for the prefix, URI and optional location of an imported module. */
   private static final Pattern MODULE_IMPORT = Pattern.compile("import\\s+module\\s+namespace\\s+" +
-    "([^\\s=]+)\\s*=\\s*(?:\"[^\"]*\"|'[^']*')\\s*at\\s*(?:\"([^\"]*)\"|'([^']*)')");
+    "([^\\s=]+)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')(?:\\s*at\\s*(?:\"([^\"]*)\"|'([^']*)'))?");
+  /** Declarations of imported modules, indexed by their paths. */
+  private static final HashMap<String, Imported> MODULES = new HashMap<>();
   /** Code completions (documentation tags of a comment). */
   private static final ArrayList<Completion> TAGS = new ArrayList<>();
   /** Placeholder in a snippet for the namespace prefix of a library module. */
@@ -130,6 +137,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final int FUNCTION_PARAMS = 6;
   /** Declaration scan: after the {@code record} keyword. */
   private static final int RECORD_NAME = 7;
+  /** Declaration scan: after the {@code type} keyword. */
+  private static final int TYPE_NAME = 8;
 
   /** Module scan: before the module declaration. */
   private static final int MODULE_KEYWORD = 0;
@@ -182,8 +191,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
       final String value = string(map.get(key));
       final Completion snippet = new Completion(string(key), value, value, false);
       // declarations are no expressions: they are only proposed where a new one may start
-      (value.startsWith(DECLARE + ' ') || value.startsWith(MODULE + ' ') ||
+      final boolean declare = value.startsWith(DECLARE + ' ');
+      (declare || value.startsWith(MODULE + ' ') ||
         value.startsWith(IMPORT + ' ') ? DECLARATIONS : SNIPPETS).add(snippet);
+      // declarations are also matched by their keywords: 'declare decimal-format'
+      if(declare) DECLARATIONS.add(new Completion(
+        value.replaceAll("[^a-z -].*", "").strip(), value, value, true));
+    }
+    // add the keywords of clauses and operators, ordered by relevance
+    for(final String keyword : new String[] { "return", "where", "order by", "group by",
+      "stable order by", "then", "else", "in", "at", "as", "satisfies", "case", "default",
+      "ascending", "descending", "and", "or", "otherwise", "to", "div", "idiv", "mod", "union",
+      "intersect", "except", "instance of", "treat as", "castable as", "cast as" }) {
+      FOLLOWERS.add(new Completion(keyword, keyword, keyword + ' ', false));
     }
     // add node kinds and atomic types
     for(final Kind kind : Kind.values()) TYPES.add(Completion.get(kind.toString(), false));
@@ -469,7 +489,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
-  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
+      final BiFunction<String, String, IOFile> modules) {
     final Context context = new Context(pos);
     final ArrayList<Declaration> declarations = scan(text, context);
     // snippets adopt the namespace prefix of a library module
@@ -486,18 +507,28 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // an end tag is closed by the name of the innermost open element
     if(context.mode == ETAG) return context.element == null ? new ArrayList<>() :
       single(candidates(new TokenSet(context.element), ""));
-    // a question mark introduces the lookup of a map or array
-    if(before == '?') return single(candidates(context.lookups, ""));
+    // a question mark introduces the lookup of a map or array, or of a record field
+    if(before == '?') {
+      final ArrayList<ArrayList<Completion>> lists = single(candidates(context.fields, ""));
+      lists.add(candidates(context.lookups, ""));
+      return lists;
+    }
     // a sequence type follows the 'as' and 'instance of' keywords
-    if(Strings.eq(endName(text, pos), AS, OF)) return single(TYPES);
+    if(Strings.eq(endName(text, pos), AS, OF)) {
+      final ArrayList<ArrayList<Completion>> lists = single(candidates(context.types, ""));
+      lists.add(TYPES);
+      return lists;
+    }
     // a declaration is continued by the keywords of its syntax
     if(context.scan == DECLARED) return single(resolve(PROLOG, prefix));
     if(context.scan == DEFAULTED) return single(resolve(DEFAULTS, prefix));
     // the name of a new declaration has no candidates
     if(context.scan == FUNCTION_NAME || context.scan == VARIABLE_NAME) return new ArrayList<>();
 
+    declarations.addAll(imported(text, modules));
+    final ArrayList<Declaration> merged = merge(declarations);
     final ArrayList<Completion> local = new ArrayList<>();
-    for(final Declaration declaration : declarations) {
+    for(final Declaration declaration : merged) {
       // functions are completed with their parameters; variables are in scope in the whole module
       final String name = declaration.name();
       if(name.indexOf('$') != -1) {
@@ -511,7 +542,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
     }
     local.addAll(candidates(context.variables, ""));
 
-    final ArrayList<ArrayList<Completion>> lists = single(local);
+    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>();
+    // an operand is followed by a keyword; an argument may start with its parameter name
+    final int last = skipWsBack(text, pos), ch = cp(text, last);
+    if(operand(text, pos)) lists.add(FOLLOWERS);
+    else if(ch == '(' || ch == ',') lists.add(arguments(text, last, merged));
+    lists.add(local);
     // a new declaration may be started
     if(context.scan == INITIAL) lists.add(resolve(DECLARATIONS, prefix));
     lists.add(resolve(SNIPPETS, prefix));
@@ -557,8 +593,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
       final Matcher m = MODULE_IMPORT.matcher(string(text));
       final String prefix = word.substring(0, colon), local = word.substring(colon + 1);
       while(m.find()) {
-        if(m.group(1).equals(prefix)) {
-          final String location = m.group(2) != null ? m.group(2) : m.group(3);
+        final String location = group(m, 4);
+        if(m.group(1).equals(prefix) && location != null) {
           return new Definition(location, variable ? '$' + local : local, -1, s, e);
         }
       }
@@ -575,6 +611,112 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static boolean call(final byte[] text, final int end) {
     final int ch = cp(text, skipWs(text, end));
     return ch == '(' || ch == '#';
+  }
+
+  /**
+   * Returns a string of a module import, which is either double- or single-quoted.
+   * @param m matcher of a module import
+   * @param group group of the double-quoted string, followed by the one of the single-quoted string
+   * @return string, or {@code null} if it does not exist
+   */
+  private static String group(final Matcher m, final int group) {
+    return m.group(group) != null ? m.group(group) : m.group(group + 1);
+  }
+
+  /**
+   * Returns the declarations of the modules that are imported by the specified text.
+   * @param text text
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return declarations, with the namespace prefixes of the imports
+   */
+  private static ArrayList<Declaration> imported(final byte[] text,
+      final BiFunction<String, String, IOFile> modules) {
+    final ArrayList<Declaration> list = new ArrayList<>();
+    final Matcher m = MODULE_IMPORT.matcher(string(text));
+    while(m.find()) {
+      final IOFile file = modules.apply(group(m, 2), group(m, 4));
+      if(file == null) continue;
+      final String prefix = m.group(1) + ':';
+      for(final Declaration declaration : module(file)) {
+        final String local = declaration.local(), name = local.startsWith("$") ?
+          '$' + prefix + local.substring(1) : prefix + local;
+        list.add(new Declaration(name, declaration.args(), -1, declaration.line()));
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns the declarations of a module file, which are cached until the file is changed.
+   * @param file module file
+   * @return declarations
+   */
+  private static ArrayList<Declaration> module(final IOFile file) {
+    final String path = file.path();
+    final long time = file.timeStamp();
+    final Imported cached = MODULES.get(path);
+    if(cached != null && cached.time() == time) return cached.declarations();
+
+    ArrayList<Declaration> declarations;
+    try {
+      declarations = new SyntaxXQuery().declarations(file.read());
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      declarations = new ArrayList<>();
+    }
+    MODULES.put(path, new Imported(time, declarations));
+    return declarations;
+  }
+
+  /**
+   * Returns the parameter names of the function whose argument list encloses the specified
+   * position.
+   * @param text text
+   * @param last position of the opening parenthesis or comma before the completed string
+   * @param declarations declarations of the module
+   * @return candidates
+   */
+  private ArrayList<Completion> arguments(final byte[] text, final int last,
+      final ArrayList<Declaration> declarations) {
+    final ArrayList<Completion> list = new ArrayList<>();
+    final int open = opening(text, last);
+    if(open == -1 || text[open] != '(') return list;
+
+    // a variable is a dynamic call
+    final int before = skipWsBack(text, open);
+    if(!name(text, before) || nameStart > 0 && text[nameStart - 1] == '$') return list;
+
+    // built-in functions take precedence, as in the signature popup
+    final String name = string(text, nameStart, nameEnd - nameStart);
+    Signature signature = signature(name);
+    if(signature == null) signature = signature(declarations, name);
+    if(signature != null) {
+      for(int p = 0; p < signature.params(); p++) {
+        final String param = signature.name(p);
+        list.add(new Completion(param, param + " :=", param + " := ", false));
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns the position of the innermost unclosed bracket at or before the specified position.
+   * @param text text
+   * @param pos position
+   * @return position, or {@code -1} if there is none
+   */
+  private static int opening(final byte[] text, final int pos) {
+    int depth = 0;
+    for(int p = pos; p >= 0; p--) {
+      final int ch = text[p];
+      if(ch == ')' || ch == ']' || ch == '}') {
+        depth++;
+      } else if(ch == '(' || ch == '[' || ch == '{') {
+        if(depth == 0) return p;
+        depth--;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -613,16 +755,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // parameter of a declared or inline function
     final int before = skipWsBack(text, dollar);
     if(before < 0 || text[before] != '(' && text[before] != ',') return false;
-    int depth = 0, p = before;
-    for(; p >= 0; p--) {
-      final int ch = text[p];
-      if(ch == ')' || ch == ']' || ch == '}') {
-        depth++;
-      } else if(ch == '(' || ch == '[' || ch == '{') {
-        if(depth == 0) break;
-        depth--;
-      }
-    }
+    final int p = opening(text, before);
     if(p < 0 || text[p] != '(') return false;
     final String fn = endName(text, p);
     if(Strings.eq(fn, FUNCTION, FN)) return true;
@@ -641,7 +774,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
     for(final Completion snippet : DECLARATIONS) {
       final String value = snippet.value();
       // the keywords themselves continue no declaration
-      if(value.length() > keywords.length() && value.startsWith(keywords)) {
+      if(!snippet.alias() && value.length() > keywords.length() && value.startsWith(keywords)) {
         // the candidate is matched by the keyword that follows
         final String string = value.substring(keywords.length());
         final int s = string.indexOf(' ');
@@ -676,30 +809,11 @@ final class SyntaxXQuery extends SyntaxMarkup {
     for(final Completion candidate : candidates) {
       final String label = candidate.label();
       list.add(label.contains(PLACEHOLDER) ? new Completion(candidate.match(),
-        label.replace(PLACEHOLDER, prefix), candidate.value().replace(PLACEHOLDER, prefix), false) :
+        label.replace(PLACEHOLDER, prefix), candidate.value().replace(PLACEHOLDER, prefix),
+        candidate.alias()) :
         candidate);
     }
     return list;
-  }
-
-  /**
-   * Returns the argument string of a function declaration and resets the specified lists.
-   * Optional parameters are suffixed with a question mark, as with built-in functions.
-   * @param params parameter names
-   * @param optional optionality of the parameters
-   * @return argument string, enclosed in parentheses
-   */
-  private static String args(final StringList params, final BoolList optional) {
-    final StringBuilder args = new StringBuilder().append('(');
-    final int ps = params.size();
-    for(int p = 0; p < ps; p++) {
-      if(p > 0) args.append(", ");
-      args.append(params.get(p));
-      if(optional.get(p)) args.append('?');
-    }
-    params.reset();
-    optional.reset();
-    return args.append(')').toString();
   }
 
   /**
@@ -768,7 +882,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
             final int prev = text[begin - 1];
             // a dollar sign indicates the declaration or reference of a variable
             if(prev == '$') {
-              if(begin < pos) context.variables.add(token('$' + word));
+              final byte[] var = token('$' + word);
+              if(begin < pos && !context.variables.contains(var) && bound(text, begin - 1, p)) {
+                context.variables.add(var);
+              }
               // the first variable of a parameter is its name; the others occur in default values
               if(scan == FUNCTION_PARAMS && parameter && !record) {
                 params.add(word);
@@ -826,6 +943,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
                 scan = VARIABLE_NAME;
               } else if(RECORD.equals(word)) {
                 scan = RECORD_NAME;
+              } else if(TYPE.equals(word)) {
+                scan = TYPE_NAME;
               } else if(DEFAULT.equals(word)) {
                 scan = DEFAULTED;
               } else if(!UPDATING.equals(word)) {
@@ -833,6 +952,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
               }
             }
             case DEFAULTED -> scan = OUTSIDE;
+            case TYPE_NAME -> {
+              context.types.add(token(word));
+              scan = OUTSIDE;
+            }
             case FUNCTION_PARAMS -> {
               // the words of a parameter list are names, types and keywords
               if(record && parameter && depth == 1 && text[begin - 1] != '%') {
@@ -875,8 +998,13 @@ final class SyntaxXQuery extends SyntaxMarkup {
           } else if(ch == ')' && depth > 0 && --depth == 0) {
             // the declaration adopts the collected parameter names
             final Declaration decl = declarations.getLast();
+            // records are types with fields
+            if(record) {
+              context.types.add(token(decl.name()));
+              for(final String field : params) context.fields.add(token(field));
+            }
             declarations.set(declarations.size() - 1, new Declaration(decl.name(),
-              args(params, optional), decl.pos(), decl.line()));
+              Signature.args(params, optional), decl.pos(), decl.line()));
             parameter = false;
             scan = OUTSIDE;
           }
@@ -1145,6 +1273,13 @@ final class SyntaxXQuery extends SyntaxMarkup {
     return true;
   }
 
+  /**
+   * Declarations of an imported module.
+   * @param time timestamp of the module file
+   * @param declarations declarations
+   */
+  private record Imported(long time, ArrayList<Declaration> declarations) { }
+
   /** Names and states that are collected by a text scan for a code completion. */
   private static final class Context {
     /** Start of the completed string ({@code -1} if no completion is requested). */
@@ -1153,6 +1288,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
     private final TokenSet variables = new TokenSet();
     /** Names of all lookups. */
     private final TokenSet lookups = new TokenSet();
+    /** Names of declared types and records. */
+    private final TokenSet types = new TokenSet();
+    /** Names of the fields of declared records. */
+    private final TokenSet fields = new TokenSet();
     /** Names of all element constructors. */
     private final TokenSet elements = new TokenSet();
     /** Names of all attribute constructors. */

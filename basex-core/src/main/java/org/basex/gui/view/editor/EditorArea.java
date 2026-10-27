@@ -15,6 +15,7 @@ import org.basex.gui.text.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 
 /**
@@ -281,10 +282,17 @@ public final class EditorArea extends TextPanel {
 
   @Override
   protected void definition(final String location, final String name) {
-    // the module is resolved against the directory of the edited file
-    if(!(file.merge(location) instanceof final IOFile module) || !module.exists()) return;
+    final IOFile module = module(null, location);
+    if(module == null) return;
     final EditorArea edit = view.open(module);
     if(edit != null) edit.gotoDeclaration(name);
+  }
+
+  @Override
+  protected IOFile module(final String uri, final String location) {
+    // a location is resolved against the directory of the edited file, a URI in the repository
+    if(location == null) return ModuleLoader.file(gui.context.soptions.repoPath(), uri);
+    return file.merge(location) instanceof final IOFile module && module.exists() ? module : null;
   }
 
   /**
