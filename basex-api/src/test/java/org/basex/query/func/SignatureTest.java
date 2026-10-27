@@ -6,9 +6,12 @@ import java.util.*;
 import java.util.stream.*;
 
 import org.basex.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -38,6 +41,18 @@ public final class SignatureTest extends SandboxTest {
   @TestFactory public Stream<DynamicTest> annotations() {
     return Arrays.stream(Annotation.values()).map(ann ->
         DynamicTest.dynamicTest(ann.toString(), () -> annotation(ann)));
+  }
+
+  /**
+   * Tests if the output annotations match the serialization parameters.
+   */
+  @Test public void outputAnnotations() {
+    final Set<String> anns = new TreeSet<>(), params = new TreeSet<>();
+    for(final Annotation ann : Annotation.values()) {
+      if(Token.eq(ann.name.uri(), QueryText.OUTPUT_URI)) anns.add(Token.string(ann.name.local()));
+    }
+    for(final Option<?> option : new SerializerOptions()) params.add(option.name());
+    assertEquals(params, anns);
   }
 
   /**

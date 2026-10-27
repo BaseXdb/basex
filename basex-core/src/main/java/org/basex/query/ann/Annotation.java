@@ -52,9 +52,17 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_CANONICAL("canonical(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_CSV("csv(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_HEADER("csv-header(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_QUOTE_CHARACTER("csv-quote-character(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_SEPARATOR("csv-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -65,6 +73,8 @@ public enum Annotation {
   _OUTPUT_ESCAPE_SOLIDUS("escape-solidus(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_EXPRESSION("expression(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_HTML_VERSION("html-version(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */

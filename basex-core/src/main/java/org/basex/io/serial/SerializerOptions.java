@@ -48,7 +48,7 @@ public final class SerializerOptions extends Options {
       new StringOption("cdata-section-elements", "", Types.QNAME_ZM);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> CSV_HEADER =
-      new EnumOption<>("csv-header", YesNo.NO, YES_NO);
+      new EnumOption<>("csv-header", YesNo.class, YES_NO);
   /** Serialization parameter: single character. */
   public static final StringOption CSV_QUOTE_CHARACTER =
       new StringOption("csv-quote-character", null, Types.STRING_ZO);

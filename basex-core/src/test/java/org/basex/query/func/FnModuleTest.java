@@ -1125,6 +1125,10 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_000)", true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_001)", false);
+    // empty argument
+    check(func.args(" (1 to 3)[. > random:integer(1)]", " ()"), false, empty(func));
+    check(func.args(" ()", " (1 to 3)[. > random:integer(1)]"), false, empty(func));
+    check(func.args(" (1 to 3)[. > random:integer(1) + 3]", " ()"), true, empty(func));
     // options supplied as JNode
     query(func.args(1, 1, " jtree({ 'o': { 'debug': false() } })/o"), true);
     // normalization forms
@@ -5325,11 +5329,15 @@ return
         "\"a;b\"\n");
     query(func.args(" { 'rows': [ 'a|b' ] }", " { 'method': 'csv', 'csv-quote-character': '|' }"),
         "|a||b|\n");
-    query(func.args(" parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })",
-        " { 'method': 'csv', 'csv-header': true() }"), "a,b\n1,2\n");
+    final String csv = " parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })";
+    query(func.args(csv, " { 'method': 'csv', 'csv-header': true() }"), "a,b\n1,2\n");
     // CSV output method: flat parameters override format-specific options
     query(func.args(" parse-csv('a,b')",
         " { 'method': 'csv', 'csv': { 'separator': ';' }, 'csv-separator': '|' }"), "a|b\n");
+    query(func.args(csv,
+        " { 'method': 'csv', 'csv': { 'header': true() }, 'csv-header': false() }"), "1,2\n");
+    query(func.args(csv,
+        " { 'method': 'csv', 'csv': { 'header': false() }, 'csv-header': true() }"), "a,b\n1,2\n");
     // CSV output method: quoting
     query(func.args(" { 'rows': [ 'a' || char('\\t') || 'b', 'c' ] }", " { 'method': 'csv' }"),
         "a\tb,c\n");

@@ -80,7 +80,8 @@ public abstract class CsvSerializer extends StandardSerializer {
     for(final int col : selectColumns) {
       if(col > maxCol) maxCol = col;
     }
-    header = copts.header() == Boolean.TRUE || sopts.yes(SerializerOptions.CSV_HEADER);
+    header = sopts.contains(SerializerOptions.CSV_HEADER) ?
+      sopts.yes(SerializerOptions.CSV_HEADER) : copts.header() == Boolean.TRUE;
   }
 
   /**
