@@ -46,12 +46,14 @@ function dba:workspace() as element(html) {
       </form>
     </div>,
     (: the client knows the directory to be shown, and fills the panel :)
-    <div class='panel' style='grid-area: 1 / 1 / -1 / 2'>
+    <div class='panel' data-label='' style='grid-area: 1 / 1 / -1 / 2'>
+      <h2 class='sr-only'>Files</h2>
       <div id='files-panel' class='pane'/>
       <div class='resizer' data-split='0'/>
     </div>,
     (: the open documents are known to the client, which draws the strip :)
-    <div class='panel' style='grid-area: 2 / 2 / -1 / 3'>
+    <div class='panel' data-label='' style='grid-area: 2 / 2 / -1 / 3'>
+      <h2 class='sr-only'>Editor</h2>
       <div id='tabs' class='tabs' role='tablist' aria-label='Open documents'/>
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
@@ -60,7 +62,7 @@ function dba:workspace() as element(html) {
        so that its text area starts at the height of the editor :)
     <div class='panel' data-label='' style='grid-area: 2 / 3 / 3 / 4'>
       <div class='tabs'>
-        <span class='tab active' id='result-label'>Result</span>
+        <h2 class='tab active' id='result-label'>Result</h2>
         <label title='Show the information of the last query'><input type='checkbox'
           id='query-info' onchange='queryInfoChanged()'/> Query Info</label>
       </div>
@@ -71,7 +73,7 @@ function dba:workspace() as element(html) {
     <div class='panel hidden' data-label='' id='info-view'
          style='grid-area: 3 / 3 / 4 / 4'>
       <div class='tabs'>
-        <span class='tab active'>Query Info</span>
+        <h2 class='tab active'>Query Info</h2>
         { (: the outcome of the last run: its time, or the position of its error :) }
         <output id='run-info'/>
       </div>

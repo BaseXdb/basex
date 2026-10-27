@@ -38,8 +38,8 @@
   --row-selected: #FBEDED;
   /* a table row that was added by a refresh */
   --row-added: #E3F3E3;
-  --info: #090;
-  --warning: #999;
+  --info: #070;
+  --pending: #666;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,6 +58,7 @@
     --row-selected: #3a2526;
     --row-added: #253a25;
     --info: #6c6;
+    --pending: #999;
   }
 }
 
@@ -123,7 +124,7 @@ h2 {
   margin: 0 0 .3rem 0;
 }
 
-h3 {
+h3, details.folded > summary {
   font-size: 120%;
   color: var(--muted);
   /* the top margin also separates a heading from the block above it */
@@ -157,6 +158,10 @@ th, td {
 th {
   text-align: left;
   border-bottom-color: var(--rule);
+}
+/* column labels are written in title case, and shown in capitals */
+thead th {
+  text-transform: uppercase;
 }
 /* the direction of the sorted column; its label reverses it */
 th .sorted {
@@ -302,6 +307,13 @@ button.tab:not(.active):hover {
   background: var(--bg);
   color: var(--fg);
   box-shadow: inset 0 2px var(--rule);
+}
+/* a tab that heads a pane is its heading, but looks like the other tabs */
+.tabs h2.tab {
+  font-weight: normal;
+  &::after {
+    content: none;
+  }
 }
 .tabs .close {
   margin-left: .4rem;
@@ -702,17 +714,27 @@ header {
 /* the three states of a status message: told apart by their colour, and by a glyph, so that
    the colour is not the only thing that says which one it is */
 .info    { color: var(--info); }
-.warning { color: var(--warning); }
-.error   { color: var(--accent); }
+.pending { color: var(--pending); }
+.error   { color: var(--accent-strong); }
 
 .info::before    { content: "\2713\00a0"; }
-.warning::before { content: "\21bb\00a0"; }
+.pending::before { content: "\21bb\00a0"; }
 .error::before   { content: "\2717\00a0"; }
 
 /* a badge, tinted with its own colour: the message of the header, and a failed request in the
    logs. It keeps the height of the line, so that it does not shift the header, and the tint
    sets it off, so that it needs no bold face */
-#info:is(.info, .warning, .error), .log-failed {
+/* the message is repeated in an open dialog, above its buttons */
+.dialog-info {
+  display: block;
+  width: fit-content;
+  margin-top: var(--space);
+}
+/* a message or detail of a dialog takes no room while it is empty */
+:is(.dialog-info, #confirm-detail):empty {
+  display: none;
+}
+:is(#info, .dialog-info):is(.info, .pending, .error), .log-failed {
   padding: 0 .4rem;
   border-radius: var(--radius);
   background-color: color-mix(in srgb, currentColor 12%, transparent);
@@ -880,6 +902,15 @@ dialog .buttons {
   margin-top: var(--gap);
   /* the dialog's own padding supplies the space below */
   margin-bottom: 0;
+}
+/* the answer that runs an action which cannot be undone */
+dialog button.danger {
+  border-color: var(--accent-strong);
+  background-color: var(--accent-strong);
+  color: var(--bg);
+}
+dialog button.danger:hover:not(:disabled) {
+  background-color: var(--accent);
 }
 
 /* the database and the resource that the panels to the right of it show */
@@ -1144,10 +1175,23 @@ dialog .field-columns :is(input[type=text], input[type=file], select) {
   width: 100%;
 }
 /* a label that wraps continues below its text, not below its checkbox */
-dialog .field-columns label:has(> input[type=checkbox]) {
+dialog :is(.field-columns, .option-list) label:has(> input[type=checkbox]) {
   display: inline-block;
   padding-left: 20px;
   text-indent: -20px;
+}
+/* options with sensible defaults: folded below the fields, and opened by a heading */
+details.folded > summary {
+  cursor: pointer;
+}
+/* the column headings inside follow the summary closely */
+details.folded .field-columns h3 {
+  margin-top: 0;
+}
+/* a long list of options is spread over two columns */
+.option-list {
+  columns: 2;
+  column-gap: var(--gap);
 }
 /* the options that concern updates are set apart from the index columns they are placed below */
 dialog .update-fields {

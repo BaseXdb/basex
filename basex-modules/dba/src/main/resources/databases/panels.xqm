@@ -90,7 +90,7 @@ declare function panels:databases(
             title := 'Update the outdated indexes and statistics of the selected databases'),
           form:button('databases/drop', 'Drop', ('CHECK', 'CONFIRM'),
             title := 'Delete the selected databases permanently'),
-          form:button('databases/backups-create', 'Back up', 'CHECK',
+          form:button('databases/backups-create', 'Back Up', 'CHECK',
             title := 'Write a zipped backup of each selected database'),
           form:button('databases/backups-restore', 'Restore', ('CHECK', 'CONFIRM'),
             title := 'Restore each selected database from its latest backup'),
@@ -115,28 +115,26 @@ declare function panels:databases(
 
     (: a new database is named and configured in one dialog; the defaults are the ones a
        database gets when nothing is chosen :)
-    form:dialog('create', 'New Database', 'databases/create', true(), (
-      (: the database and what is added, how it is parsed, the value indexes and the full-text
-         index: a column each, of similar length, so the dialog fits on the screen :)
-      <div class='field-columns'>{
-        <div>{
-          <h3>Database</h3>,
-          form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
-          (: the initial content is uploaded, or addressed on the server; a database that is
-             created without it is empty :)
-          form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
-          form:field('Input:', <input type='text' name='input'
-                                      placeholder='File, directory, archive or URL'/>),
-          form:parsing-fields(),
-          form:checkbox('binary', 'true', false(), 'Binary Storage',
-            title := 'Store the uploaded files as binary data, without parsing them')
-        }</div>,
-        <div>{ form:parsing-options(()) }</div>,
+    form:dialog('create', 'New Database', 'Create', 'databases/create', true(), (
+      (: the database and what is added; how it is parsed and indexed is folded away :)
+      form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
+      (: the initial content is uploaded, or addressed on the server; a database that is
+         created without it is empty :)
+      form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
+      form:field('Input:', <input type='text' name='input' class='wide'
+                                  placeholder='File, directory, archive or URL'/>),
+      form:parsing-fields(),
+      form:checkbox('binary', 'true', false(), 'Binary Storage',
+        title := 'Store the uploaded files as binary data, without parsing them'),
+      form:parsing-options(()),
+      form:folded('Index Options', (
         (: the defaults of the server :)
-        form:index-fields(('textindex', 'attrindex'), { 'language': 'English' })
-      }</div>,
-      (: incremental indexing is enabled by default :)
-      form:update-fields('updindex')
+        <div class='field-columns'>{
+          form:index-fields(('textindex', 'attrindex'), { 'language': 'English' })
+        }</div>,
+        (: incremental indexing is enabled by default :)
+        form:update-fields('updindex')
+      ))
     ))
   )
 };
@@ -326,26 +324,20 @@ declare %private function panels:add-dialog(
   (: the resources are stored under their own names; how they are parsed is chosen here. Files
      are uploaded by the browser, an input is read by the server: either of them adds resources,
      and both of them may be supplied at once :)
-  form:dialog('add', 'Add Resources', 'databases/put', true(), (
+  form:dialog('add', 'Add Resources', 'Add', 'databases/put', true(), (
     <input type='hidden' name='name' value='{ $name }'/>,
-    (: what is added, and how it is parsed: two columns, as one would be a list that is
-       longer than the screen :)
-    <div class='field-columns'>{
-      <div>{
-        <h3>Resources</h3>,
-        form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
-        form:field('Input:', <input type='text' name='input' class='wide'
-                                    placeholder='File, directory, archive or URL'
-                                    oninput='deriveTarget(this);'/>),
-        (: the path the input is stored under: it replaces what is found there, and an
-           empty one would address the database as a whole :)
-        form:field('Target:', <input type='text' name='target' id='add-target' class='wide'/>),
-        form:parsing-fields(),
-        form:checkbox('binary', 'true', false(), 'Binary Storage',
-          title := 'Store the uploaded files as binary data, without parsing them')
-      }</div>,
-      <div>{ form:parsing-options(()) }</div>
-    }</div>
+    (: what is added; how it is parsed is folded away :)
+    form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
+    form:field('Input:', <input type='text' name='input' class='wide'
+                                placeholder='File, directory, archive or URL'
+                                oninput='deriveTarget(this);'/>),
+    (: the path the input is stored under: it replaces what is found there, and an
+       empty one would address the database as a whole :)
+    form:field('Target:', <input type='text' name='target' id='add-target' class='wide'/>),
+    form:parsing-fields(),
+    form:checkbox('binary', 'true', false(), 'Binary Storage',
+      title := 'Store the uploaded files as binary data, without parsing them'),
+    form:parsing-options(())
   ))
 };
 
@@ -417,9 +409,10 @@ declare function panels:properties(
         if ($exists) {
           (: a report: what can be changed is offered by the options block :)
           { 'id': 'information-panel', 'label': 'Information',
-            'contents': table:properties($info) }
+            'contents': table:properties($info, $panels:LABELS) }
         }
       )),
+      form:dialog-info(),
       <form method='dialog' class='buttons'>{
         (: what is done with the database as a whole; the options are applied from every tab :)
         if ($exists) {
@@ -504,6 +497,7 @@ declare function panels:storage() as element()+ {
     { 'id': 'storage-information-panel', 'label': 'Information',
       'contents': panels:storage-information() }
   )),
+  form:dialog-info(),
   <form method='dialog' class='buttons'><button>Close</button></form>
 };
 
@@ -565,9 +559,39 @@ declare %private function panels:storage-information() as element()+ {
           <latest>{ ($latest ! html:exact(.)) otherwise '–' }</latest>
           <without-backup>{ count($databases[not(. = $backups/@database)]) }</without-backup>
         </backups>
-      </server>
+      </server>,
+      $panels:LABELS
     )
   )
+};
+
+(:~ Labels of the database and storage information; index options keep their names. :)
+declare %private variable $panels:LABELS := {
+  'databaseproperties': 'Database Properties',
+  'resourceproperties': 'Resource Properties',
+  'indexes': 'Indexes',
+  'name': 'Name',
+  'size': 'Size',
+  'nodes': 'Nodes',
+  'documents': 'Documents',
+  'binaries': 'Binaries',
+  'values': 'Values',
+  'timestamp': 'Timestamp',
+  'uptodate': 'Up to Date',
+  'inputpath': 'Input Path',
+  'inputsize': 'Input Size',
+  'inputdate': 'Input Date',
+  'drive': 'Drive',
+  'dbpath': 'Database Path',
+  'free': 'Free Space',
+  'total': 'Total Space',
+  'databases': 'Databases',
+  'count': 'Count',
+  'resources': 'Resources',
+  'backups': 'Backups',
+  'general': 'General Backups',
+  'latest': 'Latest',
+  'without-backup': 'Databases Without Backup'
 };
 
 (:~ Number of characters of an index entry that are listed. :)
@@ -921,7 +945,7 @@ declare %private function panels:backup-section(
                   title='Create a backup of { $what }'>{
             (: there is nothing to back up if the name is only known from a backup :)
             attribute disabled { }[$name][not(db:exists($name))],
-            'Back up…'
+            'Back Up…'
           }</button>,
           <button type='button' onclick='chooseUpload("upload-{ $id }s")'
                   title='Upload backup files'>Upload…</button>,
@@ -932,11 +956,11 @@ declare %private function panels:backup-section(
         )
         return table:create($headers, $entries, $buttons, { 'name': $name },
           { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'backup',
-            'empty': 'There are no backups yet. Create one with Back up…' })
+            'empty': 'There are no backups yet. Create one with Back Up…' })
       }
   </form>,
 
-  form:dialog($id, 'Back Up', 'databases/backup-create', false(), (
+  form:dialog($id, 'Back Up', 'Back Up', 'databases/backup-create', false(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     form:field('Comment:', <input type='text' name='comment' placeholder='optional' autofocus=''/>),
     form:checkbox('compress', 'true', true(), 'Compress',

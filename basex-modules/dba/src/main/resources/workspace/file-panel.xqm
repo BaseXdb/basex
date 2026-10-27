@@ -86,7 +86,7 @@ declare function panel:files(
     )
     (: the entries are sorted before they are truncated, so the order covers every file :)
     let $options := {
-      'sort': $sort, 'presort': 'name',
+      'sort': $sort, 'presort': 'name', 'noun': 'file',
       (: a directory is listed as a whole; its files are not spread over pages :)
       'all': true(),
       (: the panel scrolls as a whole, so its actions are pinned to the top of it :)

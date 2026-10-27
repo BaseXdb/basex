@@ -531,7 +531,7 @@ declare function utils:info(
 ) as xs:string {
   let $count := count($items)
   return if ($count = 1) then (
-    `{ utils:capitalize($name) } "{ $items }" was { $action }.`
+    `{ utils:capitalize($name) } “{ $items }” was { $action }.`
   ) else (
     `{ utils:count($count, $name) } were { $action }.`
   )

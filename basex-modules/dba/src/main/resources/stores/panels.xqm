@@ -230,7 +230,7 @@ declare %private function panels:add-dialog(
   $max   as xs:integer?
 ) as element(dialog) {
   let $index := exists($max)
-  return form:dialog('add', 'Add Entry', 'stores/add', false(), (
+  return form:dialog('add', 'Add Entry', 'Add', 'stores/add', false(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     <input type='hidden' name='path' value='{ $path }'/>,
     <input type='hidden' name='index' value='{ $index }'/>,

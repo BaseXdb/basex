@@ -76,8 +76,8 @@ declare function panels:jobs(
         { 'key': 'type', 'label': 'Type', 'width': 'calc(10ch + 0.5rem)' },
         { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
         { 'key': 'path', 'label': 'Path', 'width': 'calc(12ch + 0.5rem)' },
-        { 'key': 'duration', 'label': 'Dur.', 'type': 'duration', 'order': 'desc',
-          'width': 'calc(6ch + 0.5rem)' },
+        { 'key': 'duration', 'label': 'Duration', 'type': 'duration', 'order': 'desc',
+          'width': 'calc(11ch + 0.5rem)' },
         { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
         { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
           'width': 'calc(10ch + 0.5rem)' }
@@ -216,7 +216,7 @@ declare %private function panels:job-user(
 declare function panels:job-dialog() as element(dialog) {
   (: it is not part of a panel: the panels are replaced while the view refreshes, which would
      close the dialog while it is being filled in :)
-  form:dialog('job', 'New Job', 'jobs/create', false(), (
+  form:dialog('job', 'New Job', 'Start', 'jobs/create', false(), (
     form:editor-field('Query:', 'query', 'job-query'),
     (: what the job is called and when it runs, next to how it repeats and what is kept :)
     <div class='field-columns'>{
@@ -410,6 +410,7 @@ declare function panels:clients(
     { 'key': 'expires', 'label': 'Expires' }
   )
   let $label := fn($key) { table:label($headers[?key = $key], $sort) }
+  let $state := fn($key) { table:sort-state($headers[?key = $key], $sort) }
   (: sessions are sorted as groups, and the session of this view comes first :)
   let $order := table:order($headers, $sort)
   let $key := $order?key
@@ -469,14 +470,15 @@ declare function panels:clients(
             <thead>
               <tr>
                 <th>{
+                  $state('id'),
                   <input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>, ' ',
                   $label('id')
                 }</th>
-                <th>ATTRIBUTES</th>
-                <th>{ $label('created') }</th>
-                <th>{ $label('accessed') }</th>
+                <th>Attributes</th>
+                <th>{ $state('created'), $label('created') }</th>
+                <th>{ $state('accessed'), $label('accessed') }</th>
                 <th title='{ 'A session that is not accessed again is discarded at this ' ||
-                  'time' }'>{ $label('expires') }</th>
+                  'time' }'>{ $state('expires'), $label('expires') }</th>
               </tr>
             </thead>
             { $groups }
@@ -521,7 +523,7 @@ declare %private function panels:session-rows(
                aria-label='Select session { $id }'/>
         <b>Session</b>{ ' ' }
         { panels:id($id) }
-        { <span class='note'>{ html:symbol(' · ', ', ') }you</span>[$you] }
+        { html:marker('you')[$you] }
       </th>
       <td>{ $attributes?* }</td>
       <td>{ html:time($session/@created) }</td>
@@ -570,9 +572,8 @@ declare %private function panels:socket-row(
              aria-label='Select connection { $label }'/>
       <span class='nowrap' title='{ string-join(($id, $ws/@user,
         html:localhost($ws/@address)), ', ') }'>{ $label }</span>
-      { <span class='note'>{ html:symbol(' · ', ', ') }this tab</span>[$id = $socket] }
-      { <span class='note'>{ html:symbol(' · ', ', '), string($ws/@user) }</span>[
-        not($ws/@session)] }
+      { html:marker('this tab')[$id = $socket] }
+      { html:marker(string($ws/@user))[not($ws/@session)] }
     </td>
     <td>{ $attributes?* }</td>
     <td>{ html:time($ws/@created) }</td>
@@ -680,7 +681,7 @@ declare function panels:attribute-dialog(
 ) as element(dialog) {
   (: the ids of its fields are derived from what holds the attribute, so that the two dialogs
      of the view do not collide :)
-  form:dialog($kind, 'Edit Attribute', $actions || '/set', false(), (
+  form:dialog($kind, 'Edit Attribute', 'Save', $actions || '/set', false(), (
     (: what holds the attribute is chosen in the panel; the name is not, so an attribute that
        it does not hold yet can be assigned as well :)
     form:field('Name:',
@@ -751,7 +752,7 @@ declare function panels:caches(
       let $buttons := (
         form:button('caches/delete', 'Delete', ('CHECK', 'CONFIRM'),
           title := 'Delete the selected caches; options assigned with cache:init are kept'),
-        form:button('caches/clear', 'Reset All', 'CONFIRM',
+        form:button('caches/clear', 'Delete All', 'CONFIRM',
           title := 'Delete all caches and the options assigned with cache:init')
       )
       (: the checkbox submits the name: the default cache is addressed by an empty one :)
@@ -768,7 +769,7 @@ declare function panels:caches(
  :)
 declare function panels:cache-dialog() as element(dialog) {
   (: the name of the cache, its keys and the chosen value are filled in by the client :)
-  form:dialog('cache', 'Cache', 'caches/put', false(), (
+  form:dialog('cache', 'Cache', 'Save', 'caches/put', false(), (
     <input type='hidden' name='name' id='cache-name'/>,
     (: the keys to choose from, next to the entry that is shown :)
     <div class='field-columns'>{

@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/activity';
 
+import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/panels' at 'panels.xqm';
 
@@ -52,6 +53,7 @@ function dba:activity(
             data-done='{ panels:job-done($job) }'>{
         panels:job-view($job)
       }</form>
+      { form:dialog-info() }
     </dialog>,
     (: the result of a job that was closed: submitted as soon as the page is there, and the
        request that fetches the file is what consumes the job :)

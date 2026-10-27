@@ -132,16 +132,18 @@ declare function form:editor-field(
 (:~
  : Creates a modal dialog: a form that needs more room than a prompt can offer.
  : @param  $id      id of the dialog; opened by the client with showDialog
- : @param  $title   heading of the dialog; its buttons are the OK and Cancel of every dialog
+ : @param  $title   heading of the dialog
+ : @param  $submit  label of the button that submits the form
  : @param  $action  action the form posts to
  : @param  $upload  whether the dialog submits files
  : @param  $fields   form fields
- : @param  $buttons  buttons between OK and Cancel
+ : @param  $buttons  buttons between the submitting button and Cancel
  : @return dialog
  :)
 declare function form:dialog(
   $id       as xs:string,
   $title    as xs:string,
+  $submit   as xs:string,
   $action   as xs:string,
   $upload   as xs:boolean,
   $fields   as node()*,
@@ -155,14 +157,24 @@ declare function form:dialog(
       attribute onsubmit { 'uploading(this, event);' }[$upload],
       <h2>{ $title }</h2>,
       $fields,
+      form:dialog-info(),
       <div class='buttons'>{
-        <button>OK</button>,
+        <button>{ $submit }</button>,
         $buttons,
         (: 'dialog' closes the dialog instead of submitting it: native, and needs no script :)
         <button formmethod='dialog' formnovalidate=''>Cancel</button>
       }</div>
     }</form>
   </dialog>
+};
+
+(:~
+ : Creates the block of a dialog that repeats the status message, which the dialog hides.
+ : @return block
+ :)
+declare function form:dialog-info() as element(output) {
+  (: filled by the client while the dialog is open :)
+  <output class='dialog-info' role='status'/>
 };
 
 (:~
@@ -337,7 +349,7 @@ declare function form:index-map(
     (: an unknown language would be ignored by the full-text index without notice :)
     $args?lang[.] ! (
       if (form:language(.)) then { 'language': . }
-      else error((), `Unknown language: "{ . }".`)
+      else error((), `Unknown language: “{ . }”.`)
     ),
     for $include in $form:INDEX-OPTIONS?include
     return $args?($include?name) ! { $include?name: . }
@@ -380,16 +392,34 @@ declare function form:parsing-fields() as node()+ {
 (:~
  : Creates the parsing options of a database dialog.
  : @param  $opts  checked options
- : @return form fields
+ : @return folded section
  :)
 declare function form:parsing-options(
   $opts  as xs:string*
-) as node()+ {
+) as element(details) {
   (: kept next to form:parsing-map, which turns the same options into the arguments of the
      database operation :)
-  <h3>Parsing Options</h3>,
-  for $option in $form:PARSING-OPTIONS
-  return form:option($option?name, $option?label, $opts)
+  form:folded('Parsing Options', <div class='option-list'>{
+    for $option in $form:PARSING-OPTIONS
+    return form:option($option?name, $option?label, $opts)
+  }</div>)
+};
+
+(:~
+ : Creates a section of a dialog that is folded until it is opened.
+ : @param  $summary   text that opens the section
+ : @param  $contents  contents of the section
+ : @return section
+ :)
+declare function form:folded(
+  $summary   as xs:string,
+  $contents  as node()*
+) as element(details) {
+  (: the defaults suit most cases, so the section is closed at first :)
+  <details class='folded'>{
+    <summary>{ $summary }</summary>,
+    $contents
+  }</details>
 };
 
 (:~

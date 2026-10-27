@@ -1069,7 +1069,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void invalidInformation() throws IOException {
       assertTrue(post("users/info", Map.of("info", "<other/>")).
-          contains("\"info\" root element"), "invalid information not rejected");
+          contains("“info” root element"), "invalid information not rejected");
     }
 
     /**
@@ -1517,11 +1517,11 @@ public final class DBATest extends WebappTest {
     @Test public void assign() throws Exception {
       final String id = session();
       assertTrue(post("sessions/set", Map.of("id", id, "name", ATTRIBUTE, "value", "1 + 1")).
-          contains("Attribute \"" + ATTRIBUTE + "\" was saved."), "attribute not assigned");
+          contains("Attribute “" + ATTRIBUTE + "” was saved."), "attribute not assigned");
       assertTrue(get("activity").contains(ATTRIBUTE), "attribute missing from the panel");
 
       assertTrue(post("sessions/delete", Map.of("id", id, "name", ATTRIBUTE)).
-          contains("Attribute \"" + ATTRIBUTE + "\" was deleted."), "attribute not deleted");
+          contains("Attribute “" + ATTRIBUTE + "” was deleted."), "attribute not deleted");
       assertFalse(get("activity").contains(ATTRIBUTE), "attribute still listed");
     }
 
@@ -1566,7 +1566,7 @@ public final class DBATest extends WebappTest {
           "session that holds no attribute is not listed");
       assertTrue(page.contains("Show idle (0)"), "session in use is counted as idle");
       assertTrue(post("clients/close", Map.of("session", id)).
-          contains("Client \"" + id + "\" was closed."), "session not closed");
+          contains("Client “" + id + "” was closed."), "session not closed");
       assertFalse(sessions().contains(id), "closed session still listed");
     }
 
@@ -1643,7 +1643,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void putRemove() throws Exception {
       assertTrue(post("caches/put", Map.of("name", CACHE, "key", "k2", "value", "1 to 3")).
-          contains("Entry \"k2\" was saved."), "entry not saved");
+          contains("Entry “k2” was saved."), "entry not saved");
       assertTrue(get("cache-value?name=" + CACHE + "&key=k2").contains("(1, 2, 3)"),
           "value not assigned");
       assertEquals("2 entries were removed.",
@@ -1657,7 +1657,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void delete() throws Exception {
       assertTrue(post("caches/delete", Map.of("cache", CACHE)).
-          contains("Cache \"" + CACHE + "\" was deleted."), "cache not deleted");
+          contains("Cache “" + CACHE + "” was deleted."), "cache not deleted");
       assertFalse(get("activity").contains(CACHE), "cache still listed");
     }
 
@@ -1710,12 +1710,12 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void addAndRemove() throws IOException {
-      assertTrue(add("", false, "'key'", "'value'").contains("Entry \"key\" was added."),
+      assertTrue(add("", false, "'key'", "'value'").contains("Entry “key” was added."),
           "entry not added");
       assertTrue(get("stores?name=" + STORE).contains("data-select=\"key\""),
           "entry missing from the list");
       assertTrue(post("stores/remove", Map.of("name", STORE, "path", "", "step", "key")).
-          contains("Entry \"key\" was removed."), "entry not removed");
+          contains("Entry “key” was removed."), "entry not removed");
       assertFalse(get("stores?name=" + STORE).contains("data-select=\"key\""),
           "entry still listed after removal");
     }
@@ -1739,7 +1739,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void stringKey() throws Exception {
       add("", false, "'map'", "{ 'a': 1 }");
-      assertTrue(add("map", false, "'abcde'", "'text'").contains("Entry \"abcde\" was added."),
+      assertTrue(add("map", false, "'abcde'", "'text'").contains("Entry “abcde” was added."),
           "child not added");
 
       final String level = get("stores?name=" + STORE + "&path=map");
@@ -1761,7 +1761,7 @@ public final class DBATest extends WebappTest {
       assertFalse(level.contains("Index:"), "position asked for");
       assertTrue(level.contains("name=\"step\" value=\"4\""), "position to append at not offered");
 
-      assertTrue(add("seq", true, "4", "4").contains("Entry \"4\" was added."), "child not added");
+      assertTrue(add("seq", true, "4", "4").contains("Entry “4” was added."), "child not added");
       assertTrue(get("stores?name=" + STORE + "&path=seq").
           contains("name=\"step\" value=\"5\""), "child not appended");
     }
@@ -1775,7 +1775,7 @@ public final class DBATest extends WebappTest {
       assertTrue(get("stores?name=" + STORE + "&path=array").
           contains("name=\"step\" value=\"2\""), "position to append at not offered");
 
-      assertTrue(add("array", true, "2", "'b'").contains("Entry \"2\" was added."),
+      assertTrue(add("array", true, "2", "'b'").contains("Entry “2” was added."),
           "member not added");
       assertTrue(get("stores?name=" + STORE + "&path=array").
           contains("name=\"step\" value=\"3\""), "member not appended");
@@ -1842,7 +1842,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void typedKey() throws Exception {
       add("", false, "'map'", "{}");
-      assertTrue(add("map", false, "1", "'int'").contains("Entry \"1\" was added."),
+      assertTrue(add("map", false, "1", "'int'").contains("Entry “1” was added."),
           "child not added");
       assertTrue(value("map.1").contains("\\\"int\\\""), "integer key not addressed by its value");
 

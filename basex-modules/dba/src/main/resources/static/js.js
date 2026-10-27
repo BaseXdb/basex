@@ -400,13 +400,16 @@ function confirmAction(button, action) {
     delete button.dataset.confirmed;
     return true;
   }
-  // the entries are named by the table the question is asked from; the number is what the
-  // question adds, and a long list of paths would only bury it
-  const count = entries(button.closest("form")).filter(input => input.checked).length;
+  // ticked rows are counted and named by the summary of their table, as a long list of paths
+  // would bury the number; any other action is described by the tooltip of its button
+  const form = button.form;
+  const count = button.dataset.check ? entries(form).filter(input => input.checked).length : 0;
+  const summary = form.querySelector("h3[data-plural]")?.dataset;
+  const nouns = summary ? [ summary.singular, summary.plural ] : [ "entry", "entries" ];
   const message = count
-    ? `${action} ${plural(count, "entry", "entries")}?`
-    : "Are you sure?";
-  confirmDialog(message).then(ok => {
+    ? `${action} ${plural(count, ...nouns.map(noun => noun.toLowerCase()))}?`
+    : `${button.title || action}?`;
+  confirmDialog(message, action).then(ok => {
     if(ok) {
       button.dataset.confirmed = "true";
       button.click();
@@ -429,13 +432,16 @@ function plural(count, one, many = `${one}s`) {
 /**
  * Displays text with the specified type.
  * @param {string} message message to display
- * @param {string} type message type (info, warning, error)
+ * @param {string} type message type (info, pending, error)
  */
 function setText(message, type) {
   const info = document.getElementById("info");
   info.className = type;
   info.textContent = message;
   info.title = message;
+  // an open dialog hides the header, so it repeats the message
+  const output = document.querySelector("dialog[open] .dialog-info");
+  if(output) [ output.className, output.textContent ] = [ `dialog-info ${type}`, message ];
 }
 
 /**
@@ -446,7 +452,7 @@ function setText(message, type) {
 function uploading(form, event) {
   // a button that closes a dialog submits its form as well, but nothing is sent
   if(event.submitter?.formMethod === "dialog") return;
-  setText("Files are being uploaded…", "warning");
+  setText("Files are being uploaded…", "pending");
   // disable buttons after dispatch, so the clicked button's 'formaction' is still evaluated
   setTimeout(() => {
     for(const button of form.querySelectorAll("button")) button.disabled = true;
@@ -550,7 +556,7 @@ function showMessage(path, data) {
     if(endRequest()) setText("", "");
   }
   if(json.type === "error") showError(json.message, undefined, json);
-  if(json.type === "stopped") setText("Query was stopped.", "warning");
+  if(json.type === "stopped") setText("Query was stopped.", "info");
   // a panel is named by the block it is filled into, so it needs no case of its own
   if(json.type === "panel") insertPanel(json.id, json.html);
   _handlers[path]?.(json);
@@ -566,7 +572,7 @@ async function sendRequest(path, message) {
   if(!await sendMessage(path, { ...message, run })) return;
   setTimeout(() => {
     if(_pending === run) {
-      setText("Please wait…", "warning");
+      setText("Please wait…", "pending");
       _waiting = true;
       setDisabled("stop", false);
     }
@@ -862,12 +868,13 @@ function refocus(fill, ...selectors) {
  * question and an empty answer submit nothing.
  * @param {string} id id of the field that carries the answer
  * @param {string} label text of the question
+ * @param {string} submit label of the button that submits the answer
  * @param {string} value value to start from
  * @param {string} action action the form posts to; if omitted, the one it was rendered with
  * @returns {Promise} promise
  */
-async function promptSubmit(id, label, value, action) {
-  const answer = await promptDialog(label, value);
+async function promptSubmit(id, label, submit, value, action) {
+  const answer = await promptDialog(label, submit, value);
   if(!answer) return;
   const input = document.getElementById(id);
   if(action) input.form.action = action;
@@ -1077,25 +1084,30 @@ function askDialog(id) {
  * Asks a question and waits for one of the answers it offers. The last answer is the way out:
  * it is the one that Escape and a dismissed dialog give, so it carries an empty value.
  * @param {string} message question to be answered
- * @param {Array} answers answers, as [ value, label ] pairs
+ * @param {Array} answers answers, as [ value, label, class ] triples; the class is optional
+ * @param {string} detail consequence of the answer (optional)
  * @returns {Promise} promise, resolved with the value of the chosen answer
  */
-function askQuestion(message, answers) {
+function askQuestion(message, answers, detail = "") {
   document.getElementById("confirm-text").textContent = message;
+  document.getElementById("confirm-detail").textContent = detail;
   const dialog = document.getElementById("confirm-dialog");
-  dialog.querySelector(".buttons").replaceChildren(...answers.map(([ value, label ]) => {
+  const keys = new Set();
+  dialog.querySelector(".buttons").replaceChildren(...answers.map(([ value, label, cls ]) => {
     const button = document.createElement("button");
     button.value = value;
     button.textContent = label;
-    // 'Yes' and 'No' are chosen with their first letter
-    if(ANSWER_KEYS[label]) button.dataset.key = ANSWER_KEYS[label];
+    if(cls) button.className = cls;
+    // an answer is chosen with its first letter, unless an earlier answer has taken it
+    const key = label.charAt(0).toLowerCase();
+    if(!keys.has(key)) {
+      keys.add(key);
+      button.dataset.key = key;
+    }
     return button;
   }));
   return askDialog("confirm");
 }
-
-/** Keys that choose an answer of a question, by the label of the answer. */
-const ANSWER_KEYS = { Yes: "y", No: "n" };
 
 /**
  * Chooses the answer of a question whose key was pressed, with or without Alt.
@@ -1111,12 +1123,14 @@ function answerKey(event) {
 }
 
 /**
- * Asks for confirmation.
+ * Asks for the confirmation of an action that cannot be undone.
  * @param {string} message question to be answered
+ * @param {string} action label of the action, which is the label of the confirming answer
  * @returns {Promise} promise, resolved with true if the action was confirmed
  */
-async function confirmDialog(message) {
-  return await askQuestion(message, [ [ "ok", "Yes" ], [ "", "No" ] ]) === "ok";
+async function confirmDialog(message, action) {
+  return await askQuestion(message, [ [ "ok", action, "danger" ], [ "", "Cancel" ] ],
+    "This cannot be undone.") === "ok";
 }
 
 /**
@@ -1131,12 +1145,14 @@ function announce(text) {
 /**
  * Asks for a text value.
  * @param {string} message question to be answered
+ * @param {string} submit label of the button that submits the answer
  * @param {string} value value to start from
  * @returns {Promise} promise, resolved with the entered text, or null if it was cancelled
  */
-async function promptDialog(message, value) {
+async function promptDialog(message, submit, value) {
   const input = document.getElementById("prompt-input");
   document.getElementById("prompt-text").textContent = message;
+  document.getElementById("prompt-submit").textContent = submit;
   input.value = value ?? "";
   const answer = askDialog("prompt");
   // the dialog is open now: the text is offered for replacement, as a prompt does
@@ -1621,7 +1637,25 @@ function ready() {
   // the labels of the buttons are complete once the page is parsed
   hintShortcuts(document.body);
   document.getElementById("info")?.addEventListener("click", jumpToError);
+  initDialogInfo();
   initLive();
+}
+
+/**
+ * Prepares the dialogs that repeat the status message: a dialog that is opened starts with the
+ * error that the page reports, or with no message; see setText for the messages that follow.
+ */
+function initDialogInfo() {
+  const info = document.getElementById("info");
+  new MutationObserver(records => {
+    for(const { target } of records) {
+      const output = target.matches("dialog[open]") && target.querySelector(".dialog-info");
+      if(!output) continue;
+      const error = info?.classList.contains("error");
+      [ output.className, output.textContent ] = error ?
+        [ "dialog-info error", info.textContent ] : [ "dialog-info", "" ];
+    }
+  }).observe(document.body, { subtree: true, attributeFilter: [ "open" ] });
 }
 
 /**

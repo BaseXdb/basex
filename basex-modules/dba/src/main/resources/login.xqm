@@ -43,7 +43,7 @@ function dba:login(
           form:field('Password:', (
             <input type='password' name='_pass'/>,
             ' ',
-            form:button('login', 'Login')
+            form:button('login', 'Log In')
           ))
         }
       </form>,

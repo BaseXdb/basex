@@ -434,7 +434,7 @@ function dba:backup-upload() {
           (: reject the backup of another database: it would be invisible in the panel it was
              uploaded from. Without a selected database there is nothing to contradict, and a
              backup of a database that no longer exists is what a recovery starts from :)
-          error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
+          error((), `Backup “{ $file }” does not belong to database “{ $name }”.`)
         },
         let $dir := db:option('dbpath') || '/'
         for key $file value $content in $files
@@ -607,7 +607,7 @@ declare %private function dba:rename-database(
   return {
     (: an operation that fails leaves the database it was started from selected :)
     'params': { 'name': if ($select and not($exists)) then $args?newname else $args?name },
-    'info'  : `Database "{ $args?name }" was { $action } to "{ $args?newname }".`,
+    'info'  : `Database “{ $args?name }” was { $action } to “{ $args?newname }”.`,
     'run'   : %updating fn() {
       if ($exists) then (
         error((), 'Database already exists.')

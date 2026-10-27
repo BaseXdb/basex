@@ -243,7 +243,7 @@ async function closeTab(index) {
     // ask about the document the user is looking at
     if(index !== _tab) selectTab(index);
     const answer = await askQuestion(`Save changes to ${tabLabel(t)}?`,
-      [ [ "yes", "Yes" ], [ "no", "No" ], [ "", "Cancel" ] ]);
+      [ [ "yes", "Save" ], [ "no", "Don’t Save" ], [ "", "Cancel" ] ]);
     // the question was about closing as much as about saving: cancelling closes nothing
     if(!answer) return;
     if(answer === "yes") {
@@ -567,7 +567,7 @@ async function saveFile(saveAs) {
   let name = t.name;
   if(!name || saveAs) {
     // the label of an unnamed document is a name it can be saved under
-    name = await promptDialog("Name of the file:", tabLabel(t));
+    name = await promptDialog("Name of the file:", "Save", tabLabel(t));
     if(!name) return false;
     // append file suffix
     if(!name.includes(".")) name += ".xq";
@@ -627,7 +627,7 @@ function saveDraft() {
  * @returns {Promise} promise
  */
 function createDir() {
-  return promptSubmit("dir-name", "Name of the new directory:", "");
+  return promptSubmit("dir-name", "Name of the new directory:", "Create", "");
 }
 
 /**

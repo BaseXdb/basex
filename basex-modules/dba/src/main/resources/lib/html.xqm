@@ -105,7 +105,7 @@ declare function html:wrap(
                    or a link scanner could follow :)
                 <div>
                   <b>{ $user }</b> · <form method='post' action='logout'>
-                    <button type='submit' class='link'>logout</button>
+                    <button type='submit' class='link'>log out</button>
                   </form>
                 </div>
               }
@@ -158,7 +158,11 @@ declare function html:wrap(
         }</div>
       </main>
       <hr/>
-      <footer><sup>BaseX Team, BSD License</sup></footer>
+      <footer><sup>{
+        (: the version is only disclosed to administrators :)
+        if ($user) { `BaseX { Q{org.basex.util.Prop}VERSION() } ·` },
+        'BaseX Team, BSD License'
+      }</sup></footer>
       {
         (: what changes while a view refreshes itself is announced to screen readers; it is
            not shown, as the panels show it already :)
@@ -171,6 +175,7 @@ declare function html:wrap(
         <dialog id='confirm-dialog'>
           <form method='dialog'>
             <p id='confirm-text'/>
+            <p id='confirm-detail' class='note'/>
             <div class='buttons'/>
           </form>
         </dialog>,
@@ -179,7 +184,7 @@ declare function html:wrap(
             <p id='prompt-text'/>
             <input type='text' id='prompt-input' class='wide'/>
             <div class='buttons'>
-              <button value='ok'>OK</button>
+              <button value='ok' id='prompt-submit'>OK</button>
               <button value=''>Cancel</button>
             </div>
           </form>
@@ -262,6 +267,17 @@ declare function html:symbol(
   $text    as xs:string
 ) as element(span) {
   <span><span aria-hidden='true'>{ $symbol }</span><span class='sr-only'>{ $text }</span></span>
+};
+
+(:~
+ : Creates a note that is appended to an entry, such as the marker of the current user.
+ : @param  $text  text of the note
+ : @return note
+ :)
+declare function html:marker(
+  $text  as xs:string
+) as element(span) {
+  <span class='note'>{ html:symbol(' · ', ', '), $text }</span>
 };
 
 (:~

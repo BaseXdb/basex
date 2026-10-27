@@ -56,7 +56,7 @@ function showLevel() {
  * @returns {Promise} promise
  */
 async function newStore() {
-  const name = await promptDialog("Name of the new store:");
+  const name = await promptDialog("Name of the new store:", "Create");
   if(!name) return;
   if(name === _store) {
     showDialog("add");

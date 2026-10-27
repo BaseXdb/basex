@@ -17,7 +17,7 @@ declare record table:column(
   sort   as xs:string?,
   order  as xs:string?,
   width  as xs:string?,
-  link   as (fn(map(*), item()*) as element(a))?
+  link   as (fn(map(*), item()*) as node()+)?
 );
 
 (:~ Options of a table; see table:create. :)
@@ -77,24 +77,27 @@ declare function table:pairs(
 
 (:~
  : Creates a property list.
- : @param  $props  properties
+ : @param  $props   properties
+ : @param  $labels  labels of the sections and properties; other names are shown as option names
  : @return table
  :)
 declare function table:properties(
-  $props  as element()
+  $props   as element(),
+  $labels  as map(xs:string, xs:string)
 ) as element(table) {
-  table:pairs(
+  let $label := fn($node) { $labels?(name($node)) otherwise upper-case(name($node)) }
+  return table:pairs(
     for $header in $props/*
     return (
       <tr>
         <th colspan='2'>
-          <h3>{ upper-case(name($header)) }</h3>
+          <h3>{ $label($header) }</h3>
         </th>
       </tr>,
       for $option in $header/*
       let $value := $option/data()
       return <tr>
-        <td><b>{ upper-case($option/name()) }</b></td>
+        <td><b>{ $label($option) }</b></td>
         <td>{ table:option-value($value) }</td>
       </tr>
     )
@@ -127,7 +130,7 @@ declare function table:label(
   $params  as map(*) := {}
 ) as item()* {
   let $name := $header?key
-  let $label := upper-case($header?label)
+  let $label := $header?label
   return switch () {
     (: sorting disabled, and a column with no label to click: only the label :)
     case empty($sort) or not($label) return $label
@@ -143,6 +146,23 @@ declare function table:label(
     )
     (: generate sort link :)
     default return html:link($label, '', ($params, { 'sort': $name }))
+  }
+};
+
+(:~
+ : Returns the sort state of a column, as it is announced to screen readers.
+ : @param  $header  column
+ : @param  $sort    key of the ordered column, prefixed with '-' to reverse its order
+ : @return attribute, or nothing if the table is not ordered by the column
+ :)
+declare function table:sort-state(
+  $header  as table:column,
+  $sort    as xs:string?
+) as attribute()? {
+  if ($sort = ($header?key, `-{ $header?key }`)) {
+    attribute aria-sort {
+      if (table:order($header, $sort)?desc) then 'descending' else 'ascending'
+    }
   }
 };
 
@@ -198,8 +218,8 @@ declare function table:sort(
  :   * 'order': 'desc' for descending order, otherwise ascending
  :   * 'width': fixed column width. If widths are supplied, the table layout gets stable:
  :     overflowing values are truncated and can be expanded via clicks
- :   * 'link': turns the formatted value of an entry into a link; the value is still sorted as
- :     it is supplied, and a missing value is not linked
+ :   * 'link': turns the formatted value of an entry into a link, optionally followed by notes;
+ :     the value is still sorted as it is supplied, and a missing value is not linked
  : @param  $entries  table entries, each of them a map from a column key to its value
  : @param  $buttons  buttons and other controls, placed above the table
  : @param  $params   additional query parameters, included in the table links
@@ -330,6 +350,7 @@ declare function table:create(
           return element th {
             attribute class { 'num' }[$header?type = $table:NUMBER],
             attribute style { `width: { $header?width }` }[$header?width],
+            table:sort-state($header, $sort),
 
             if ($pos = 1 and $buttons) {
               <input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>, ' '

@@ -409,7 +409,8 @@ _editor_changed = () => {
  * @returns {Promise} promise
  */
 function renameDatabase() {
-  return promptSubmit("database-newname", "New name of the database:", _db, "databases/rename");
+  return promptSubmit("database-newname", "New name of the database:", "Rename", _db,
+    "databases/rename");
 }
 
 /**
@@ -417,7 +418,7 @@ function renameDatabase() {
  * @returns {Promise} promise
  */
 function copyDatabase() {
-  return promptSubmit("database-newname", "Name of the copy:", _db, "databases/copy");
+  return promptSubmit("database-newname", "Name of the copy:", "Copy", _db, "databases/copy");
 }
 
 /**
@@ -425,7 +426,7 @@ function copyDatabase() {
  * @returns {Promise} promise
  */
 function renameResource() {
-  return promptSubmit("rename-target", "New path of the resource:", _resource);
+  return promptSubmit("rename-target", "New path of the resource:", "Rename", _resource);
 }
 
 /**

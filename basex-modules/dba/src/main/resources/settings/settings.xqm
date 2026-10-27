@@ -77,11 +77,11 @@ function dba:settings(
   )
   (: the search line resembles the one of the logs :)
   let $search := <div class='searchbar'>{
-    <h2>Options</h2>,
+    <h2>System</h2>,
     <input type='text' id='input' placeholder='Search, e.g. cache' autofocus=''
            title='Words that the name, value or category of an entry must contain'
            data-filter='filterSettings'/>,
-    form:button('settings/gc', 'GC', title := 'Run the Java garbage collector')
+    form:button('settings/gc', 'Free Memory', title := 'Run the Java garbage collector')
   }</div>
   let $filter-row := <tr>{
     $headers ! <td>{
@@ -90,7 +90,7 @@ function dba:settings(
              data-filter='filterSettings'/>
     }</td>
   }</tr>
-  (: the options of the server are shown first, the settings of the DBA last :)
+  (: the information on the server is shown first, the settings of the DBA last :)
   return (
     html:panel(
       <form method='post' autocomplete='off'>{
@@ -98,10 +98,11 @@ function dba:settings(
           'sort': $sort, 'all': true(), 'sticky': $search, 'filters': $filter-row
         })
       }</form>,
-      { 'label': 'Options' }),
+      { 'label': 'System' }),
     html:panel(
       <form method='post' autocomplete='off'>{
-        html:heading('Settings', form:button('settings/save', 'Save', title := 'Save the settings')),
+        html:heading('DBA Settings',
+          form:button('settings/save', 'Save', title := 'Save the settings')),
         <h3>Queries</h3>,
         $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
         $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),
@@ -111,7 +112,7 @@ function dba:settings(
         $number($config:INTERVAL, 'Delay between requests, in seconds',
           (1, $config:MAX-INTERVAL))
       }</form>,
-      { 'label': 'Settings' })
+      { 'label': 'DBA Settings' })
   ) => html:wrap({
     'header': $dba:CAT, 'divided': true(), 'rows': '1fr', 'columns': ('3fr', '1fr'),
     'scripts': 'settings', 'init': 'initSettings();'
