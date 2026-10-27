@@ -3638,6 +3638,9 @@ return
         + "parse-xml(\"<!DOCTYPE x SYSTEM \"\"x.dtd\"\"><x/>\", "
         + "{ ''trust-external'': true() }) };' }") + call, EXTERNALRESOURCE_X);
     query(_DB_DROP.args(NAME));
+    // trust: functions that untrusted code must not reference are unavailable
+    query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { function-lookup(#fn:unparsed-text, 1) };' }") + call, "");
 
     // advanced and caching tests
     // run simple HTTP server for module hosting

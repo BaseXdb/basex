@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -36,6 +37,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    if(!qc.has(Perm.ADMIN, null, info)) return Bln.FALSE;
     try {
       return Bln.get(doc(qc) == Bln.TRUE);
     } catch(final QueryException ex) {

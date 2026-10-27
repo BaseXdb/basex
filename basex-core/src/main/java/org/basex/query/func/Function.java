@@ -101,7 +101,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
-      params(), STRING_ZM, flag(), FN_URI, Perm.ADMIN),
+      params(), STRING_ZM, flag()),
   /** XQuery function. */
   AVG(FnAvg::new, "avg(values)",
       params(ANY_ATOMIC_TYPE_ZM), ANY_ATOMIC_TYPE_ZO),
@@ -269,7 +269,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
-      params(STRING_O), STRING_ZO, flag(), FN_URI, Perm.ADMIN),
+      params(STRING_O), STRING_ZO, flag()),
   /** XQuery function. */
   ERROR(FnError::new, "error(code?, description?, value?)",
       params(QNAME_ZO, STRING_ZO, ITEM_ZM), ERROR_O, flag(NDT)),
@@ -773,7 +773,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(source, options?)",
-      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.ADMIN),
+      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT)),
   /** XQuery function. */
   UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(source, options?)",
       params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.ADMIN),

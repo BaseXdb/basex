@@ -181,7 +181,7 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(_DB_OPTION.args("stripns").trim(), " ()", none), false);
 
     // compilation of parsed queries
-    error(func.args(_XQUERY_PARSE.args("environment-variable('PATH')",
+    error(func.args(_XQUERY_PARSE.args("unparsed-text('x')",
         " { 'compile': true() }").trim(), " ()", " { 'permission': 'write' }"),
         XQUERY_PERM_X);
 
