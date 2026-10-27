@@ -682,12 +682,12 @@ public final class GFLWORTest extends SandboxTest {
     check("for $i in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
   }
 
-  /** Order by: NaN precedes all other numbers, regardless of the empty order. */
+  /** Order by: NaN is placed next to empty keys (qt4cg/qtspecs#3011). */
   @Test public void orderByNaN() {
     final String keys = "let $keys := { 'E': (), 'N': xs:double('NaN'), '1': 1, '2': 2 } "
         + "return string-join(for $k in map:keys($keys) order by $keys($k) ";
-    query(keys + "empty greatest return $k)", "N12E");
-    query(keys + "descending empty greatest return $k)", "E21N");
+    query(keys + "empty greatest return $k)", "12NE");
+    query(keys + "descending empty greatest return $k)", "EN21");
     query(keys + "empty least return $k)", "EN12");
     query(keys + "descending empty least return $k)", "21NE");
   }
@@ -702,6 +702,10 @@ public final class GFLWORTest extends SandboxTest {
         + "order by $p?1 return $p?2)", "bca");
     query(pairs + "[ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ]) "
         + "order by $p?1 descending return $p?2)", "acb");
+    query(pairs + "[ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ]) "
+        + "order by $p?1 empty greatest return $p?2)", "cab");
+    query(pairs + "[ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ]) "
+        + "order by $p?1 descending empty greatest return $p?2)", "bac");
     // strings and untyped values, empty keys
     final String strings = pairs + "[ 'b', 'x' ], [ (), 'y' ], [ <a>a</a>/text(), 'z' ]) ";
     query(strings + "order by $p?1 empty least return $p?2)", "yzx");

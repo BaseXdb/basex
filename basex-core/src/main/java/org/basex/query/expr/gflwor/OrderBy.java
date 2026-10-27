@@ -198,10 +198,25 @@ public final class OrderBy extends Clause {
     if(item1 != Empty.VALUE && item2 != Empty.VALUE && !item1.comparable(item2))
       throw typeError(item2, item1.type, ii);
 
-    return item1 == Empty.VALUE
-        ? item2 == Empty.VALUE ? 0             : key.least ? -1 : 1
-        : item2 == Empty.VALUE ? key.least ? 1 : -1
-        : Collation.compare(item1, coll1, item2, coll2, key.coll, qc, ii);
+    if(item1 == Empty.VALUE) return item2 == Empty.VALUE ? 0 : key.least ? -1 : 1;
+    if(item2 == Empty.VALUE) return key.least ? 1 : -1;
+    // empty greatest: NaN follows all other numbers
+    if(!key.least) {
+      final boolean n1 = nan(item1, ii), n2 = nan(item2, ii);
+      if(n1 != n2) return n1 ? 1 : -1;
+    }
+    return Collation.compare(item1, coll1, item2, coll2, key.coll, qc, ii);
+  }
+
+  /**
+   * Checks if the specified item is a NaN value.
+   * @param item item
+   * @param info input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean nan(final Item item, final InputInfo info) throws QueryException {
+    return (item instanceof Dbl || item instanceof Flt) && Double.isNaN(item.dbl(info));
   }
 
   /**

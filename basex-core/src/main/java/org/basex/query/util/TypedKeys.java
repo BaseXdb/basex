@@ -23,7 +23,7 @@ public final class TypedKeys {
    * @param size number of keys
    * @param keys function returning the key at the specified index ({@link Empty#VALUE}: no key)
    * @param coll collation (can be {@code null})
-   * @param least empty keys precede all other keys
+   * @param least empty keys precede all other keys, NaN precedes all other numbers
    * @param info input info (can be {@code null})
    * @return comparator, or {@code null} if the keys have no common type
    * @throws QueryException query exception
@@ -54,7 +54,13 @@ public final class TypedKeys {
     if(dbl) {
       final double[] values = new double[size];
       for(int i = 0; i < size; i++) values[i] = keys.apply(i).dbl(info);
-      return (x, y) -> Dbl.compare(values[x], values[y], true);
+      if(least) return (x, y) -> Dbl.compare(values[x], values[y], true);
+      // empty greatest: NaN follows all other numbers
+      return (x, y) -> {
+        final double a = values[x], b = values[y];
+        final boolean n1 = Double.isNaN(a), n2 = Double.isNaN(b);
+        return n1 || n2 ? n1 == n2 ? 0 : n1 ? 1 : -1 : Dbl.compare(a, b, true);
+      };
     }
     if(str) {
       final byte[][] values = new byte[size][];
