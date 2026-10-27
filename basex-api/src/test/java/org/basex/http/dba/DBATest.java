@@ -12,7 +12,9 @@ import java.util.regex.*;
 import org.basex.core.cmd.XQuery;
 import org.basex.core.jobs.*;
 import org.basex.http.*;
+import org.basex.http.ws.WsPool;
 import org.basex.io.*;
+import org.basex.util.Performance;
 import org.junit.jupiter.api.*;
 
 /**
@@ -263,6 +265,9 @@ public final class DBATest extends WebappTest {
         }
       });
       try {
+        // the server may register the socket after the client handshake has completed
+        final long end = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while(WsPool.ids().isEmpty() && System.nanoTime() < end) Performance.sleep(10);
         action.execute();
         assertNotNull(closed.get(10, TimeUnit.SECONDS));
       } finally {
