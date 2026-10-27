@@ -27,6 +27,7 @@ abstract class Main {
    * @throws XQException XQException
    */
   static XQConnection connect() throws XQException {
+    // Adjust the credentials to those of your server
     return new BaseXXQDataSource().getConnection("admin", "admin");
   }
 

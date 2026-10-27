@@ -2,6 +2,10 @@ package org.basex.examples.rest;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpRequest.*;
+import java.net.http.HttpResponse.*;
+import java.nio.file.*;
 
 import org.basex.*;
 
@@ -14,37 +18,25 @@ import org.basex.*;
 public final class RESTPut {
   /**
    * Runs the example.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  static void run() throws IOException {
+  static void run() throws Exception {
     System.out.println("=== PUT: create a new database ===");
 
-    // The java URL connection to the resource
-    URL url = URI.create("http://admin:admin@localhost:8080/rest/factbook").toURL();
-    System.out.println("\n* URL: " + url);
+    URI uri = URI.create("http://localhost:8080/rest/factbook");
+    System.out.println("\n* URL: " + uri);
 
-    // Establish the connection to the URL
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    // Set an output connection
-    conn.setDoOutput(true);
-    // Set as PUT request
-    conn.setRequestMethod("PUT");
+    // Send the document to the server
+    System.out.println("\n* Send document...");
+    try(HttpClient client = HttpClient.newHttpClient()) {
+      HttpRequest request = HttpRequest.newBuilder(uri).
+          PUT(BodyPublishers.ofFile(Path.of("src/main/resources/xml/factbook.xml"))).build();
+      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-    // Get and cache output stream; create and cache file input stream
-    try(OutputStream out = new BufferedOutputStream(conn.getOutputStream());
-        InputStream in = new BufferedInputStream(
-            new FileInputStream("src/main/resources/xml/factbook.xml"))) {
-      // Send document to server
-      System.out.println("\n* Send document...");
-      for(int i; (i = in.read()) != -1;) out.write(i);
+      // Print the HTTP status code
+      System.out.println("\n* HTTP status: " + response.statusCode());
+      if(response.statusCode() >= 400) throw new IOException(response.body());
     }
-
-    // Print the HTTP response code
-    System.out.println("\n* HTTP response: " + conn.getResponseCode() +
-        " (" + conn.getResponseMessage() + ')');
-
-    // Close connection
-    conn.disconnect();
   }
 
   /**
@@ -53,11 +45,12 @@ public final class RESTPut {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start server, set admin as default user
+    // Start the HTTP server with admin as default user, so requests need no credentials
     final BaseXHTTP http = new BaseXHTTP("-U", "admin");
-    // Run example
-    run();
-    // Stop servers
-    http.stop();
+    try {
+      run();
+    } finally {
+      http.stop();
+    }
   }
 }

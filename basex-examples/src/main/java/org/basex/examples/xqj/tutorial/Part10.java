@@ -42,7 +42,7 @@ public final class Part10 extends Main {
     XQSequence xqs2 = xqe2.executeQuery(
       "declare variable $orders as element() external; " +
       "for $order in $orders where $order/@status = 'closed' " +
-      "return <closed_order id = '{$order/@id}'>{ " +
+      "return <closed_order id = '{$order/id}'>{ " +
       " $order/* }</closed_order>");
 
     print("Pipeline XQuery expressions", xqs2);
@@ -75,8 +75,8 @@ public final class Part10 extends Main {
     // Passing XQuery results to XSLT
     info("Passing XQuery results to XSLT");
 
-    // Create an XQuery expression
-    xqp = xqc.prepareExpression("doc('" + path + "/orders.xml')");
+    // Create an XQuery expression (the XQJ driver cannot stream document nodes to SAX)
+    xqp = xqc.prepareExpression("doc('" + path + "/orders.xml')/orders");
     // Create an XQJFilter
     XQJFilter xqjf = new XQJFilter(xqp);
 

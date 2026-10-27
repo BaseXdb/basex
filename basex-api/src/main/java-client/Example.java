@@ -1,5 +1,3 @@
-package org.basex.examples.api;
-
 import java.io.*;
 
 /**
@@ -17,7 +15,7 @@ public final class Example {
    * @throws IOException I/O exception
    */
   public static void main(final String... args) throws IOException {
-    // create session
+    // create session (adjust the credentials to those of your server)
     try(BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // initialize timer
       final long time = System.nanoTime();

@@ -2,6 +2,9 @@ package org.basex.examples.rest;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpResponse.*;
+import java.nio.charset.*;
 
 import org.basex.*;
 
@@ -14,43 +17,27 @@ import org.basex.*;
 public final class RESTGet {
   /**
    * Runs the example.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  static void run() throws IOException {
+  static void run() throws Exception {
     System.out.println("=== GET: execute a query ===");
 
-    // The java URL connection to the resource
-    String base = "http://localhost:8080/rest/";
+    // Create the URL, with a URL-encoded query
+    String query = URLEncoder.encode("(//city/name)[position() = 1 to 5]", StandardCharsets.UTF_8);
+    URI uri = URI.create("http://localhost:8080/rest/factbook?query=" + query);
+    System.out.println("\n* URL: " + uri);
 
-    URL url = URI.create(base + "factbook?query=(//city/name)%5Bposition()=1+to+5%5D").toURL();
-    System.out.println("\n* URL: " + url);
+    // Send the request
+    try(HttpClient client = HttpClient.newHttpClient()) {
+      HttpRequest request = HttpRequest.newBuilder(uri).build();
+      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-    // Establish the connection to the URL
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-    // Print the HTTP response code
-    int code = conn.getResponseCode();
-    System.out.println("\n* HTTP response: " + code +
-        " (" + conn.getResponseMessage() + ')');
-
-    // Check if request was successful
-    if(code == HttpURLConnection.HTTP_OK) {
-      // Print the received result to standard output
+      // Print the HTTP status code and the result
+      System.out.println("\n* HTTP status: " + response.statusCode());
+      if(response.statusCode() >= 400) throw new IOException(response.body());
       System.out.println("\n* Result:");
-
-      // Get and cache input as UTF-8 encoded stream
-      try(BufferedReader br = new BufferedReader(
-          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
-
-        // Print all lines of the result
-        for(String line; (line = br.readLine()) != null;) {
-          System.out.println(line);
-        }
-      }
+      System.out.println(response.body());
     }
-
-    // Close connection
-    conn.disconnect();
   }
 
   /**
@@ -59,11 +46,12 @@ public final class RESTGet {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start server, set admin as default user
+    // Start the HTTP server with admin as default user, so requests need no credentials
     final BaseXHTTP http = new BaseXHTTP("-U", "admin");
-    // Run example
-    run();
-    // Stop servers
-    http.stop();
+    try {
+      run();
+    } finally {
+      http.stop();
+    }
   }
 }

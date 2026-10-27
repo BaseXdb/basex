@@ -43,7 +43,7 @@ public final class Part11 extends Main {
     XQSequence xqs2 = xqe2.executeQuery(
         "declare variable $orders as element() external; " +
         "for $order in $orders where $order/@status = 'closed' " +
-        "return <closed_order id = '{$order/@id}'>{ " +
+        "return <closed_order id = '{$order/id}'>{ " +
         " $order/* }</closed_order>");
     xqs2.writeSequence(System.out, null);
     xqe2.close();

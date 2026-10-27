@@ -16,7 +16,7 @@ public final class UserExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String... args) throws BaseXException {
-    /** Database context. */
+    // Database context
     final Context context = new Context();
 
     System.out.println("=== UserExample ===");
@@ -26,10 +26,10 @@ public final class UserExample {
 
     new CreateDB("input", "src/main/resources/xml/input.xml").execute(context);
 
-    // Create a new user with password 'password' (MD5 encoded)
+    // Create a new user with password 'password'
     System.out.println("\n* Create a user.");
 
-    new CreateUser("testuser", "5f4dcc3b5aa765d61d8327deb882cf99").execute(context);
+    new CreateUser("testuser", "password").execute(context);
 
     // Remove global user rights
     System.out.println("\n* Remove global user rights.");

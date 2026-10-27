@@ -1,6 +1,6 @@
 package org.basex.examples.xqj.cfoster;
 
-import java.net.*;
+import java.io.*;
 
 import javax.xml.namespace.*;
 import javax.xml.xquery.*;
@@ -37,16 +37,16 @@ public final class Part5 extends Main {
 
     XQExpression xqe = conn.createExpression(properties);
 
-    String surl = "http://www.w3.org/TR/2007/REC-xquery-20070123/xquery.xml";
-    URL url = URI.create(surl).toURL();
-    xqe.bindDocument(new QName("x"), url.openStream(), null, null);
+    try(InputStream in = new FileInputStream("src/main/resources/xml/factbook.xml")) {
+      xqe.bindDocument(new QName("x"), in, null, null);
 
-    String xqueryString = "declare variable $x external; $x//p";
-    XQResultSequence rs = xqe.executeQuery(xqueryString);
+      String xqueryString = "declare variable $x external; $x//city";
+      XQResultSequence rs = xqe.executeQuery(xqueryString);
 
-    int c = 0;
-    while(rs.next()) ++c;
-    System.out.println(c + " results.");
+      int c = 0;
+      while(rs.next()) ++c;
+      System.out.println(c + " results.");
+    }
 
     // Closing connection to the Database.
     close(conn);

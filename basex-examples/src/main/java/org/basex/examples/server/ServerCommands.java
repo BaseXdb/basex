@@ -19,29 +19,25 @@ public final class ServerCommands {
   public static void main(final String... args) throws Exception {
     System.out.println("=== ServerCommands ===");
 
-    // Start server on default port 1984
-    BaseXServer server = new BaseXServer();
+    // Start a server on the default port 1984, with a known admin password
+    System.out.println("\n* Start server.");
+    BaseXServer server = new BaseXServer("-c", "PASSWORD admin");
 
     // Create a client session with host name, port, username and password
     System.out.println("\n* Create a client session.");
-
     try(ClientSession session = new ClientSession("localhost", 1984, "admin", "admin")) {
-
       // Create a database
       System.out.println("\n* Create a database.");
-
       session.execute(new CreateDB("input", "src/main/resources/xml/input.xml"));
 
       // Run a query
       System.out.println("\n* Run a query:");
-
       try(ClientQuery query = session.query("//li")) {
         System.out.println(query.execute());
       }
 
       // Faster version: specify an output stream and run a query
       System.out.println("\n* Run a query (faster):");
-
       session.setOutputStream(System.out);
       try(ClientQuery query = session.query("//li")) {
         query.execute();
@@ -51,9 +47,8 @@ public final class ServerCommands {
       // Reset output stream
       session.setOutputStream(null);
 
-      // Run a query
-      System.out.println("\n\n* Run a buggy query: ");
-
+      // Run a query with a syntax error
+      System.out.println("\n* Run a buggy query:");
       try {
         session.execute(new XQuery("///"));
       } catch(final BaseXException ex) {
@@ -61,14 +56,12 @@ public final class ServerCommands {
       }
 
       // Drop the database
-      System.out.println("\n* Close and drop the database.");
-
+      System.out.println("\n* Drop the database.");
       session.execute(new DropDB("input"));
+    } finally {
+      // Stop the server
+      System.out.println("\n* Stop the server.");
+      server.stop();
     }
-
-    // Stop the server
-    System.out.println("\n* Stop the server.");
-
-    server.stop();
   }
 }
