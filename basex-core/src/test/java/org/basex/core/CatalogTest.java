@@ -91,6 +91,11 @@ public final class CatalogTest extends SandboxTest {
     query(func.args("document", DIR + "doc.xml", " ()",
       " { 'catalog': '" + CATALOG + "', 'dtd': true() }"));
     query(_DB_GET.args("document"), "<doc>X</doc>");
+
+    // the catalog of the session is adopted
+    set(MainOptions.CATALOG, CATALOG);
+    query(func.args("document", DIR + "doc.xml", " ()", " { 'dtd': true() }"));
+    query(_DB_GET.args("document"), "<doc>X</doc>");
   }
 
   /** Test method.*/

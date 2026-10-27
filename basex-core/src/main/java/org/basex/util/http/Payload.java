@@ -458,7 +458,7 @@ public final class Payload {
     } else if(type.isXml()) {
       // remote input: parse as untrusted
       return new DBNode(Parser.xmlParser(io, xmlOptions != null ? xmlOptions :
-        new MainOptions().allowExternal(false)));
+        new MainOptions(options).allowExternal(false)));
     } else if(type.isText() || type.isXQuery()) {
       return Str.get(io.read());
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {

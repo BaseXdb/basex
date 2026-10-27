@@ -58,6 +58,10 @@ public final class FetchModuleTest extends SandboxTest {
         "//text()[not(normalize-space())])", false);
     query("exists(" + func.args(XML, " { 'stripws': false() }") +
         "//text()[not(normalize-space())])", true);
+    query("(# db:stripws true #) { exists(" + func.args(XML) +
+        "//text()[not(normalize-space())]) }", false);
+    query("(# db:stripws true #) { " + _XQUERY_EVAL.args(" 'exists(" + func.args(XML) +
+        "//text()[not(normalize-space())])'") + " }", false);
     query(COUNT.args(func.args(CSV,
         " { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,

@@ -63,6 +63,7 @@ public final class DbModuleTest extends SandboxTest {
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
     set(MainOptions.FTINCLUDE, "");
+    set(MainOptions.STRIPWS, false);
     execute(new DropDB(NAME));
   }
 
@@ -490,6 +491,26 @@ public final class DbModuleTest extends SandboxTest {
 
     query("(# db:stripws true #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
     query(_DB_GET.args(NAME), "<a/>");
+
+    // global options are ignored; declarations, pragmas and supplied options are applied
+    final String updindex = _DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()";
+    set(MainOptions.STRIPWS, true);
+    set(MainOptions.UPDINDEX, false);
+    query(func.args(NAME, " '<a> </a>'", "a.xml"));
+    query(_DB_GET.args(NAME), "<a> </a>");
+    query(updindex, true);
+    set(MainOptions.STRIPWS, false);
+    set(MainOptions.UPDINDEX, true);
+
+    query("declare option db:stripws 'true'; " + func.args(NAME, " '<a> </a>'", "a.xml"));
+    query(_DB_GET.args(NAME), "<a/>");
+    query("(# db:updindex false #) { " + func.args(NAME) + " }");
+    query(updindex, false);
+    query("declare option db:updindex 'false'; " + func.args(NAME));
+    query(updindex, false);
+    query("(# db:updindex false #) { " +
+        func.args(NAME, " ()", " ()", " { 'updindex': true() }") + " }");
+    query(updindex, true);
 
     final String path = "src/test/resources/example.json";
     query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");

@@ -133,6 +133,7 @@ public final class Context {
   public Context(final StaticOptions soptions) {
     this.soptions = soptions;
     options = new MainOptions();
+    options.setSystem();
     datas = new Datas();
     sessions = new Sessions();
     blocker = new ClientBlocker();

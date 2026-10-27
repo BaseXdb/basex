@@ -1233,6 +1233,8 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %."),
   /** Error code. */
+  INVALIDBOOLOPTION_X_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %; use %."),
+  /** Error code. */
   INVALIDOPTION_X_X_X(XPTY, 4, "Option: % expected, % found: %."),
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "%"),

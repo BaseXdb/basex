@@ -161,7 +161,7 @@ public final class StaticOptions extends Options {
     if(Strings.eq(name, "FAIRLOCK", "LANGKEYS") ||
         name.equals("IGNOREHOSTNAME") && Strings.isFalse(value)) return true;
     // cache local options as global options
-    final Option<?> option = new MainOptions(false).option(name);
+    final Option<?> option = new MainOptions().option(name);
     if(option == null) return false;
     Prop.put(option, value);
     return true;

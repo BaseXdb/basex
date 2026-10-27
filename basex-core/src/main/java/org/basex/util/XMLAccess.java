@@ -32,7 +32,7 @@ public final class XMLAccess {
   public static XNode root(final IOFile file, final QNm name) {
     if(!file.exists()) return null;
     try {
-      final MainOptions options = new MainOptions(false);
+      final MainOptions options = new MainOptions();
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
       final XNode doc = new DBNode(Parser.singleParser(file, options, ""));

@@ -43,7 +43,7 @@ public final class DBCreate extends NameUpdate {
 
     super(UpdateType.DBCREATE, name, qc, info);
     final DBOptions dbopts = new DBOptions(qopts, MainOptions.CREATING, qc, info);
-    options = dbopts.assignIndexing(new MainOptions(qc.context.options, false), null, info);
+    options = dbopts.indexingOptions(null);
     newDocs = new DBNew(qc, options, info, inputs);
   }
 

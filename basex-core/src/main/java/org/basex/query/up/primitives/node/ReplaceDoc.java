@@ -39,7 +39,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
     super(UpdateType.REPLACENODE, pre, data, info);
     final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, qc, info);
-    final MainOptions mopts = dbopts.assignTo(new MainOptions(qc.context.options, false));
+    final MainOptions mopts = dbopts.mainOptions();
     newDocs = new DBNew(qc, mopts, info, input);
   }
 

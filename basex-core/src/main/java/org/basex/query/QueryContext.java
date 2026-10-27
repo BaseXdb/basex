@@ -48,6 +48,7 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class organizes both static and dynamic properties that are specific to a
@@ -216,6 +217,7 @@ public final class QueryContext extends Job implements Closeable {
     user = parent != null ? parent.user : context.user();
     maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;
     resolver = parent != null ? parent.resolver : null;
+    if(parent != null) options.inherit(parent.options);
   }
 
   /**
@@ -635,6 +637,36 @@ public final class QueryContext extends Job implements Closeable {
       defaultOutput = main != null;
     }
     return sopts;
+  }
+
+  /**
+   * Returns new main options with the query-local and default options.
+   * @return main options
+   */
+  public MainOptions dbOptions() {
+    return options.dbOptions();
+  }
+
+  /**
+   * Assigns a pragma value to the global and query-local options.
+   * @param option option
+   * @param value value
+   * @param ii input info (can be {@code null})
+   * @return old values
+   * @throws QueryException query exception
+   */
+  public Object[] assign(final Option<?> option, final String value, final InputInfo ii)
+      throws QueryException {
+    return options.assign(option, value, ii);
+  }
+
+  /**
+   * Restores the values that were replaced by a pragma.
+   * @param option option
+   * @param old old values
+   */
+  public void restore(final Option<?> option, final Object[] old) {
+    options.restore(option, old);
   }
 
   /**

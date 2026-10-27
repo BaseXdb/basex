@@ -25,6 +25,10 @@ import org.basex.util.options.*;
 public final class DBOptions {
   /** Runtime options. */
   private final HashMap<Option<?>, Object> map = new HashMap<>();
+  /** Query context. */
+  private final QueryContext qc;
+  /** Input info (can be {@code null}). */
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -37,6 +41,8 @@ public final class DBOptions {
   public DBOptions(final XQMap qopts, final Option<?>[] supported, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
+    this.qc = qc;
+    this.info = info;
     final HashMap<String, Option<?>> options = new HashMap<>();
     for(final Option<?> option : supported) {
       options.put(option.name().toLowerCase(Locale.ENGLISH), option);
@@ -77,27 +83,25 @@ public final class DBOptions {
   }
 
   /**
-   * Assigns runtime options to the specified main options.
-   * @param opts main options
+   * Returns main options with the runtime, query-local and default options.
    * @return main options
    */
-  public MainOptions assignTo(final MainOptions opts) {
+  public MainOptions mainOptions() {
+    final MainOptions opts = qc.dbOptions();
     map.forEach(opts::put);
     return opts;
   }
 
   /**
-   * Assigns runtime options to the specified main options and checks the indexing options.
-   * @param opts main options
+   * Returns main options with the runtime, query-local and default options and checks indexing.
    * @param data existing database (can be {@code null})
-   * @param info input info (can be {@code null})
    * @return main options
    * @throws QueryException query exception
    */
-  public MainOptions assignIndexing(final MainOptions opts, final Data data,
-      final InputInfo info) throws QueryException {
+  public MainOptions indexingOptions(final Data data) throws QueryException {
+    final MainOptions opts = mainOptions();
     try {
-      IndexBuilder.check(assignTo(opts), data);
+      IndexBuilder.check(opts, data);
     } catch(final IOException ex) {
       throw BASEX_OPTIONS_X.get(info, ex);
     }

@@ -1080,9 +1080,15 @@ public class Options implements Iterable<Option<?>> {
       throw INVALIDOPTION_X.get(info, similar(name));
     }
 
-    final SeqType st = value.seqType();
-    final QueryFunction<Object, QueryException> expected = type ->
-      INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
+    final QueryFunction<SeqType, QueryException> expected = type -> {
+      final SeqType st = value.seqType();
+      // suggest a boolean literal for lexical booleans ("yes", "no", ...)
+      final Boolean bool = type.type == BasicType.BOOLEAN && value instanceof final Item it &&
+        it.type.isStringOrUntyped() ? Strings.toBoolean(string(it.string(info))) : null;
+      return bool != null ?
+        INVALIDBOOLOPTION_X_X_X_X_X.get(info, name, type, st, value, Bln.get(bool)) :
+        INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
+    };
 
     // apply coercion rules if a required type is defined (other values are parsed lexically)
     Value val = value;
@@ -1135,7 +1141,7 @@ public class Options implements Iterable<Option<?>> {
         yield constant;
       }
       case final OptionsOption<?> oo -> {
-        if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);
+        if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP_O);
         final Options options = oo.newInstance();
         options.assign(map, qc, info);
         yield options;

@@ -5374,7 +5374,8 @@ return
     query(func.args("1", " { 'indent': true() }"), 1);
     query(func.args("1", " { 'indent': xs:untypedAtomic('true') }"), 1);
     query(func.args("1", " { 'indent': () }"), 1);
-    error(func.args("1", " { 'indent': 'yes' }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("1", " { 'indent': 'yes' }"), INVALIDBOOLOPTION_X_X_X_X_X);
+    error(func.args("1", " { 'indent': 'maybe' }"), INVALIDOPTION_X_X_X_X);
     error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
     // numeric options must not wrap around
     query(func.args("<a/>", " { 'limit': 2147483647 }"), "&lt;a/&gt;");

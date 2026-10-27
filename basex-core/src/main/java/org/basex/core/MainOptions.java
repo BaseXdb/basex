@@ -199,13 +199,11 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.RETAIN_LOCATION, RETAINLOCATION);
   }
 
-  /** XML parsing options. */
-  private static final Option<?>[] XMLPARSING = XMLPARSINGMAP.values().toArray(Option[]::new);
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
   /** All parsing options. */
-  public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
+  public static final Option<?>[] PARSING = Stream.concat(XMLPARSINGMAP.values().stream(),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
   /** All create options. */
   public static final Option<?>[] CREATING = Stream.concat(Stream.of(INDEXING),
@@ -265,15 +263,6 @@ public final class MainOptions extends Options {
    * Default constructor.
    */
   public MainOptions() {
-    this(true);
-  }
-
-  /**
-   * Default constructor.
-   * @param system parse system properties
-   */
-  public MainOptions(final boolean system) {
-    if(system) setSystem();
   }
 
   /**
@@ -288,23 +277,10 @@ public final class MainOptions extends Options {
 
   /**
    * Constructor, adopting parsing options from the specified instance.
-   * @param options parent options
-   * @param xml limit to XML parsing options
-   */
-  public MainOptions(final MainOptions options, final boolean xml) {
-    this(false);
-    for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
-    resolver = options.resolver;
-    allowExternal = options.allowExternal;
-  }
-
-  /**
-   * Constructor, adopting parsing options from the specified instance.
    * @param options options
    * @param parent parent options (can be {@code null})
    */
   public MainOptions(final Options options, final MainOptions parent) {
-    this(false);
     XMLPARSINGMAP.forEach((source, target) -> {
       final Object value = options.get(source);
       if(value instanceof final CommonOptions.StripSpace ss) {
@@ -340,6 +316,18 @@ public final class MainOptions extends Options {
     final XMLResolver rslvr = options.resolver();
     put(CATALOG, rslvr.catalog());
     resolver = rslvr;
+  }
+
+  /**
+   * Adopts the catalog, the XML resolver and the external access flag from the specified options.
+   * @param options main options
+   * @return self reference
+   */
+  public MainOptions adoptAccess(final MainOptions options) {
+    put(CATALOG, options.get(CATALOG));
+    resolver = options.resolver;
+    allowExternal = options.allowExternal;
+    return this;
   }
 
   /**

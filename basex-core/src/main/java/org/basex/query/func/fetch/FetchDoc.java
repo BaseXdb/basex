@@ -35,7 +35,7 @@ public class FetchDoc extends StandardFunc {
    */
   protected DBNode fetch(final IO source, final QueryContext qc) throws QueryException {
     final DBOptions dbopts = new DBOptions(toEmptyMap(arg(1), qc), MainOptions.PARSING, qc, info);
-    final MainOptions mopts = dbopts.assignTo(new MainOptions());
+    final MainOptions mopts = dbopts.mainOptions();
     // external entities, XIncludes and catalogs require ADMIN permission
     if(!qc.has(Perm.ADMIN, null, info)) mopts.allowExternal(false);
     try {

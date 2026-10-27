@@ -44,7 +44,7 @@ abstract class HttpFn extends StandardFunc {
     try {
       final Request request = ropts.request(method, info);
       if(body != null) ropts.body(body.value(qc), request, qc, info);
-      return new Client(info, qc.context.options).send(href, request, qc, definition);
+      return new Client(info).send(href, request, qc, definition);
     } catch(final QueryException ex) {
       throw Client.error(ex, info);
     }

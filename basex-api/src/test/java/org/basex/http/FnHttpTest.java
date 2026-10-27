@@ -19,6 +19,7 @@ import java.util.zip.*;
 import javax.net.ssl.*;
 
 import org.basex.build.html.*;
+import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -972,6 +973,25 @@ public abstract class FnHttpTest extends HTTPTest {
       final boolean nu = HtmlParser.Parser.NU.available(new HtmlOptions());
       assertEquals("1 1 true " + (nu ? "http://www.w3.org/1999/xhtml" : ""),
           qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests that response bodies are only parsed with query-local options.
+   * @throws Exception exception
+   */
+  @Test public final void sendRequestParserOptions() throws Exception {
+    final String json = REST_ROOT + "?method=json&amp;query=%7B%22a%22:1%7D";
+    final String body = _HTTP_SEND_REQUEST.args(" <http:request method='get'/>", json) + "[2]";
+    ctx.options.assign(MainOptions.JSONPARSER.name(), "format=w3");
+    try(QueryProcessor qp = new QueryProcessor(body + " instance of document-node()", ctx)) {
+      assertEquals("true", qp.value().serialize().toString());
+    } finally {
+      ctx.options.set(MainOptions.JSONPARSER, new JsonParserOptions());
+    }
+    try(QueryProcessor qp = new QueryProcessor("declare option db:jsonparser 'format=w3'; " +
+        body + " instance of map(*)", ctx)) {
+      assertEquals("true", qp.value().serialize().toString());
     }
   }
 

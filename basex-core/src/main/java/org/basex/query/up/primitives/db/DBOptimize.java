@@ -71,7 +71,7 @@ public final class DBOptimize extends DBUpdate {
     dbopts.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     dbopts.assignIfAbsent(MainOptions.MAXCATS, meta.maxcats);
     dbopts.assignIfAbsent(MainOptions.MAXLEN, meta.maxlen);
-    options = dbopts.assignIndexing(new MainOptions(qc.context.options, false), data, info);
+    options = dbopts.indexingOptions(data);
   }
 
   @Override
