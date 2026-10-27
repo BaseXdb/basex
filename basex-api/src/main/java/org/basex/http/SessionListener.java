@@ -19,7 +19,7 @@ public final class SessionListener implements HttpSessionListener {
 
   @Override
   public void sessionCreated(final HttpSessionEvent event) {
-    final HttpSession sess =  event.getSession();
+    final HttpSession sess = event.getSession();
     SESSIONS.put(sess.getId(), sess);
   }
 

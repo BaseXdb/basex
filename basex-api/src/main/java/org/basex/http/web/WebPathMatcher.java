@@ -34,7 +34,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
    * @return result of check
    */
   boolean matches(final String path) {
-    return matcher(path).matches();
+    return pattern.matcher(path).matches();
   }
 
   /**
@@ -44,7 +44,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
    */
   QNmMap<String> values(final String path) {
     final QNmMap<String> result = new QNmMap<>();
-    final Matcher m = matcher(path);
+    final Matcher m = pattern.matcher(path);
     if(m.matches()) {
       final int groupCount = m.groupCount();
       if(varNames.size() <= groupCount) {
@@ -58,15 +58,6 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
       }
     }
     return result;
-  }
-
-  /**
-   * Creates a pattern matcher for the given string.
-   * @param input input string
-   * @return pattern matcher
-   */
-  private Matcher matcher(final String input) {
-    return pattern.matcher(input);
   }
 
   @Override
@@ -102,7 +93,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
     final StringBuilder literals = new StringBuilder();
     final TokenBuilder variable = new TokenBuilder();
     final StringBuilder regex = new StringBuilder();
-    final BitSet varsPos = new BitSet();
+    BigInteger varsPos = ZERO;
     int segment = 0;
 
     final CharIterator i = new CharIterator(path);
@@ -142,7 +133,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
         if(!XMLToken.isQName(var)) throw err.get(info, Util.info(INV_VARNAME_X, variable));
         varNames.add(new QNm(var));
         variable.reset();
-        varsPos.set(segment);
+        varsPos = varsPos.setBit(segment);
 
         result.append('(').append(regex).append(')');
         regex.setLength(0);
@@ -153,8 +144,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
     }
     decodeAndEscape(literals, result, info, err);
 
-    final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
-    return new WebPathMatcher(Pattern.compile(result.toString()), varNames, segment + 1, vp);
+    return new WebPathMatcher(Pattern.compile(result.toString()), varNames, segment + 1, varsPos);
   }
 
   /**

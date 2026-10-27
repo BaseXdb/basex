@@ -163,8 +163,13 @@ public final class WebModule {
    */
   public QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
-    parse(qc);
-    return qc;
+    try {
+      parse(qc);
+      return qc;
+    } catch(final QueryException ex) {
+      qc.close();
+      throw ex;
+    }
   }
 
   /**

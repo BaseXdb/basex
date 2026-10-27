@@ -272,7 +272,8 @@ public enum ApiFunction implements AFunction {
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final byte[] uri, final Perm perm) {
-    definition = new FuncDefinition(supplier, desc, params, seqType, flag(Flag.NDT), uri, perm);
+    definition = new FuncDefinition(supplier, desc, params, seqType,
+        EnumSet.of(Flag.NDT), uri, perm);
   }
 
   @Override
@@ -287,17 +288,6 @@ public enum ApiFunction implements AFunction {
    */
   private static SeqType[] params(final SeqType... params) {
     return params;
-  }
-
-  /**
-   * Returns a set representation of the specified compiler flags.
-   * @param flags flags
-   * @return set
-   */
-  private static EnumSet<Flag> flag(final Flag... flags) {
-    final EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
-    Collections.addAll(set, flags);
-    return set;
   }
 
   /**

@@ -92,13 +92,7 @@ final class RESTPost {
           final String type = value("@type", item, ctx);
           bindings.compute(name, (k, v) -> {
             final StringList list = new StringList();
-            if(v != null) {
-              if(v.getKey() instanceof final String[] strings) {
-                for(final String string : strings) list.add(string);
-              } else if(v.getKey() instanceof String) {
-                list.add(k);
-              }
-            }
+            if(v != null) list.add((String[]) v.getKey());
             return new SimpleEntry<>(list.add(value).finish(), type);
           });
         }

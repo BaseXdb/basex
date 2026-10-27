@@ -4,7 +4,6 @@ import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.regex.*;
 
 import jakarta.servlet.http.*;
 
@@ -45,28 +44,23 @@ public final class RestXqWadl {
   /** QName. */
   private static final QNm Q_PARAM = qnm("param");
 
-  /** HTTP request. */
-  private final HttpServletRequest request;
-
-  /**
-   * Constructor.
-   * @param request HTTP request
-   */
-  public RestXqWadl(final HttpServletRequest request) {
-    this.request = request;
-  }
+  /** Private constructor. */
+  private RestXqWadl() { }
 
   /**
    * Returns a WADL description for all available URIs.
+   * @param request HTTP request
    * @param modules available modules
    * @return WADL description
    * @throws QueryException query exception
    */
-  public synchronized FNode create(final HashMap<String, WebModule> modules) throws QueryException {
+  public static FNode create(final HttpServletRequest request,
+      final HashMap<String, WebModule> modules) throws QueryException {
     // create root nodes
     final FBuilder application = FElem.build(Q_APPLICATION).ns();
-    final String base = request.getRequestURL().toString().replace(request.getRequestURI(),
-        request.getContextPath());
+    final String url = request.getRequestURL().toString();
+    final String base = url.substring(0, url.length() - request.getRequestURI().length()) +
+        request.getContextPath() + request.getServletPath();
     final FBuilder resources = FElem.build(Q_RESOURCES).attr(Q_BASE, base);
 
     // create children
@@ -84,9 +78,8 @@ public final class RestXqWadl {
         map.put(path.replaceAll("^/*", "/") + ' ' + methods, resource);
 
         // add documentation for path variables
-        final Matcher var = Pattern.compile("\\$[^}]*").matcher(path);
-        while(var.find()) {
-          addParam(var.group().substring(1), "template", resource, xqdoc, func);
+        for(final QNm var : func.path.varNames()) {
+          addParam(string(var.string()), var, "template", resource, xqdoc, func);
         }
 
         // create method, add function documentation
@@ -98,9 +91,15 @@ public final class RestXqWadl {
 
         // create request
         final FBuilder rqst = FElem.build(Q_REQUEST);
-        for(final WebParam wp : func.queryParams) addParam(wp.name(), "query", rqst, xqdoc, func);
-        for(final WebParam wp : func.formParams) addParam(wp.name(), "query", rqst, xqdoc, func);
-        for(final WebParam wp : func.headerParams) addParam(wp.name(), "header", rqst, xqdoc, func);
+        for(final WebParam wp : func.queryParams) {
+          addParam(wp.name(), wp.var(), "query", rqst, xqdoc, func);
+        }
+        for(final WebParam wp : func.formParams) {
+          addParam(wp.name(), wp.var(), "query", rqst, xqdoc, func);
+        }
+        for(final WebParam wp : func.headerParams) {
+          addParam(wp.name(), wp.var(), "header", rqst, xqdoc, func);
+        }
         method.node(rqst);
 
         // create response
@@ -122,21 +121,22 @@ public final class RestXqWadl {
   /**
    * Adds a parameter and its documentation to the specified element.
    * @param name name of parameter
+   * @param var name of bound variable
    * @param style style
    * @param root root element
    * @param xqdoc documentation
    * @param func function
    * @throws QueryException query exception
    */
-  private static void addParam(final String name, final String style, final FBuilder root,
-      final TokenObjectMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
+  private static void addParam(final String name, final QNm var, final String style,
+      final FBuilder root, final TokenObjectMap<TokenList> xqdoc, final RestXqFunction func)
+      throws QueryException {
 
     final FBuilder param = FElem.build(Q_PARAM).attr(Q_NAME, name).attr(Q_STYLE, style);
-    final QNm qnm = new QNm(name);
-    for(final Var var : func.function.params) {
-      if(var.name.eq(qnm) && var.declType != null) param.attr(Q_TYPE, var.declType);
+    for(final Var v : func.function.params) {
+      if(v.name.eq(var) && v.declType != null) param.attr(Q_TYPE, v.declType);
     }
-    addDoc(Inspect.doc(xqdoc, token(name)), param);
+    addDoc(Inspect.doc(xqdoc, var.string()), param);
     root.node(param);
   }
 

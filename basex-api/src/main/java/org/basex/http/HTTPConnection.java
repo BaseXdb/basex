@@ -255,17 +255,13 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Normalizes a redirection location. Prefixes absolute locations with the request URI.
+   * Prefixes absolute redirection locations with the context and servlet path.
    * @param location location
    * @return normalized representation
    */
   public String resolve(final String location) {
-    String loc = location;
-    if(Strings.startsWith(location, '/')) {
-      final String uri = uri(), info = request.getPathInfo();
-      loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
-    }
-    return loc;
+    return Strings.startsWith(location, '/') ?
+      request.getContextPath() + request.getServletPath() + location : location;
   }
 
   /**

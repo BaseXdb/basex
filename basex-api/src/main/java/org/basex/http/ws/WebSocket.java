@@ -323,9 +323,7 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
       if(func != null) new WsResponse(this).create(func, message, true);
       return true;
     } catch(final Exception ex) {
-      if(ann == Annotation._WS_ERROR) {
-        context.log.write(LogType.ERROR, message(ex), null, context);
-      }
+      if(ann == Annotation._WS_ERROR) context.log.write(LogType.ERROR, message(ex), null, context);
       else error(ex);
       return false;
     }
@@ -369,8 +367,7 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
       throw ex;
     }
     // a handler that raised an error has logged it; the request must not be reported as OK
-    Object type = LogType.ERROR;
-    if(ok) type = status != null ? status : LogType.OK;
+    final Object type = ok ? Objects.requireNonNullElse(status, LogType.OK) : LogType.ERROR;
     context.log.write(type, null, perf, context);
   }
 }

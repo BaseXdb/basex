@@ -225,11 +225,9 @@ public final class RestXqFunction extends WebFunction {
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn.path());
       for(final QNm qname : pathVars) {
-        final QNm qnm = new QNm(qname.string(), function.sc);
-        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         // variables of other path templates are bound to an empty sequence
         final String segment = qnames.get(qname);
-        bind(qnm, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
+        bind(qname, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
           "Path segment $" + string(qname.string()));
       }
     }
@@ -411,9 +409,7 @@ public final class RestXqFunction extends WebFunction {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(super.toString());
-    if(!produces.isEmpty()) sb.append(' ').append(produces);
-    return sb.toString();
+    return produces.isEmpty() ? super.toString() : super.toString() + ' ' + produces;
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -494,7 +490,7 @@ public final class RestXqFunction extends WebFunction {
    * @return parameter
    * @throws QueryException query exception
    */
-  private WebParam param(final Ann ann, final boolean... declared) throws QueryException {
+  private WebParam param(final Ann ann, final boolean[] declared) throws QueryException {
     // name of parameter
     final Value value = ann.value();
     final String name = toString(value.itemAt(0));

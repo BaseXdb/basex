@@ -16,7 +16,6 @@ public final class RestBaseUri extends ApiFunc {
   @Override
   public Uri value(final QueryContext qc) throws QueryException {
     final HttpServletRequest request = request(qc);
-    final String uri = request.getRequestURI(), path = request.getPathInfo();
-    return Uri.get(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
+    return Uri.get(request.getContextPath() + request.getServletPath());
   }
 }

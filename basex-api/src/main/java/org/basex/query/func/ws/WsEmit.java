@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
 public final class WsEmit extends WsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    WsPool.emit(arg(0).item(qc, info));
+    WsPool.emit(message(qc), info);
     return Empty.VALUE;
   }
 }

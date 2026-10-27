@@ -180,8 +180,7 @@ public final class RestXqResponse extends WebResponse {
    */
   private SerializerOptions build(final GNode response) throws QueryException {
     // don't allow attributes
-    final BasicNodeIter atts = response.attributeIter();
-    final GNode attr = atts.next();
+    final GNode attr = response.attributeIter().next();
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
