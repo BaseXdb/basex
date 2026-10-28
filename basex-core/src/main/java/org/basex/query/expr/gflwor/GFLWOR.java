@@ -594,7 +594,7 @@ public final class GFLWOR extends ParseExpr {
     // rewrite let clause with unused variable
     //   let $_ := file:write(...) return () → file:write(...)
     //   let $_ := void(1) return 2 → void(1), 2
-    final boolean let = fl instanceof Let, item = fl.size() == 1;
+    final boolean let = fl instanceof Let, item = (let ? inline : fl).size() == 1;
     if(let && expr.count(fl.var) == VarUsage.NEVER) return cc.voidAndReturn(inline, expr, info);
 
     // rewrite for/let clause to simple map

@@ -2985,4 +2985,24 @@ public final class RewritingsTest extends SandboxTest {
     query(f + "{ count((1 to 5)[not(position() <= $d)]) }; " + args, 5);
     query(f + "{ count((1 to 5)[not(position() >= $d)]) }; " + args, 5);
   }
+
+  /** Inlining of typed let clauses: the bound value may contain more than one item. */
+  @Test public void gh2794() {
+    inline(true);
+    final String a = "let $a := [1, 2] let $s as xs:int* := $a ";
+    query(a + "return sum(for $i in 1 to count($s) return $s[$i] ! $i)", 3);
+    query(a + "return (count($s), count($s), $s)", "2\n2\n1\n2");
+    query(a + "return count($s) + count($s[1])", 3);
+
+    // nondeterministic bindings
+    final String r = "let $s as xs:int* := [random:integer(1) + 1, 2] ";
+    query(r + "return (count($s), count($s), $s)", "2\n2\n1\n2");
+    query(r + "return $s[last()]", 2);
+    query(r + "return if (count($s) = 2) then 'ok' else 'bad'", "ok");
+
+    // function parameters
+    query("declare function local:f($s as xs:string*) {"
+        + "  string-join(for $i in 1 to count($s) let $v := $s[$i] return $v || $i || $v)"
+        + "}; let $a := ['a', 'b'] return local:f($a?*)", "a1ab2b");
+  }
 }
