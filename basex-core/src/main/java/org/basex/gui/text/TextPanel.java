@@ -672,11 +672,7 @@ public class TextPanel extends BaseXPanel {
     boolean hand = false;
     int[] reference = null;
     boolean outlined = false;
-    if(mouse != null && rend.sticky(mouse) != -1) {
-      // pinned lines can be clicked
-      hand = true;
-      pointed = null;
-    } else if(mouse != null && (link || def)) {
+    if(mouse != null && (link || def)) {
       final TextIterator iter = rend.jump(mouse);
       final byte[] text = editor.text();
       final int pos = iter.pos();
@@ -766,12 +762,6 @@ public class TextPanel extends BaseXPanel {
     final boolean shift = e.isShiftDown(), selected = editor.isSelected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       clicks = e.getClickCount();
-      // a click on a pinned line jumps to that line
-      final int sticky = rend.sticky(e.getPoint());
-      if(sticky != -1) {
-        jumpTo(sticky);
-        return;
-      }
       if(clicks == 1) {
         if(sc(e) && !shift && hist.active()) {
           // a click with the shortcut key jumps to the definition of the clicked name

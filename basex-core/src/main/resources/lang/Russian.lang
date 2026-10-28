@@ -359,7 +359,6 @@ srv_running          = Сервер уже запущен или недоста�
 srv_started          = Сервер запущен
 srv_stopped          = Сервер остановлен
 stemming             = Морфологический поиск
-sticky_scroll        = Закреплять охватывающие строки
 stop                 = Остановить
 stop_jobs            = Stop background jobs
 stopped_at           = Остановлен на строке

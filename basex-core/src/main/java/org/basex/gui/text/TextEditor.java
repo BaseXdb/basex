@@ -2243,26 +2243,6 @@ public final class TextEditor {
   }
 
   /**
-   * Returns the lines with a smaller indentation that enclose the specified line.
-   * @param p start of the line
-   * @param max maximum number of returned lines
-   * @return start positions of the innermost enclosing lines, starting with the outermost one
-   */
-  IntList enclosingLines(final int p, final int max) {
-    final IntList list = new IntList();
-    int indent = indentation(p);
-    for(int l = p, n = 0; l > 0 && indent > 0 && list.size() < max && n < 1000; n++) {
-      l = bol(l - 1);
-      final int i = indentation(l);
-      if(i != -1 && i < indent) {
-        list.add(l);
-        indent = i;
-      }
-    }
-    return list.reverse();
-  }
-
-  /**
    * Returns the name or the bracket that encloses the selection or the caret.
    * @param syntax syntax highlighter
    * @return start and end of the enclosing range, or {@code null} if the whole text is selected

@@ -359,7 +359,6 @@ srv_running          = Серверийн ажиллагаа эсвэл эрх �
 srv_started          = Сервер ажиллаж байна
 srv_stopped          = Сервер зогссон
 stemming             = Зогсоолт
-sticky_scroll        = Хамаарах мөрүүдийг бэхлэх
 stop                 = Зогсоох
 stop_jobs            = Stop background jobs
 stopped_at           = дээр зогссон

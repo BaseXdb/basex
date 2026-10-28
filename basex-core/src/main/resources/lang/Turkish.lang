@@ -359,7 +359,6 @@ srv_running          = Sunucu çalışıyor veya izin reddedildi
 srv_started          = Sunucu başlatıldı
 srv_stopped          = Sunucu durduruldu
 stemming             = Kök bulma (stemming)
-sticky_scroll        = Üst satırları sabitle
 stop                 = Durdur
 stop_jobs            = Stop background jobs
 stopped_at           = Şurada durduruldu

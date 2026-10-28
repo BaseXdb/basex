@@ -359,7 +359,6 @@ srv_running          = Server loopt al of toegang ontzegd
 srv_started          = Server is gestart
 srv_stopped          = Server is gestopt
 stemming             = Stam zoeken
-sticky_scroll        = Omvattende regels vastzetten
 stop                 = Stop
 stop_jobs            = Stop background jobs
 stopped_at           = Gestopt bij

@@ -359,7 +359,6 @@ srv_running          = Serveris veikia arba prieiga uždrausta
 srv_started          = Serveris paleistas
 srv_stopped          = Serveris sustabdytas
 stemming             = Kamiengrąža
-sticky_scroll        = Prisegti gaubiančias eilutes
 stop                 = Sustabdyti
 stop_jobs            = Stop background jobs
 stopped_at           = Sustabdyta ties

@@ -359,7 +359,6 @@ srv_running          = Serverul este pornit sau permisiunea a fost refuzata
 srv_started          = Serverul este pornit
 srv_stopped          = Serverul a fost oprit
 stemming             = Stemming
-sticky_scroll        = Fixează liniile părinte
 stop                 = Oprește
 stop_jobs            = Stop background jobs
 stopped_at           = Oprit la

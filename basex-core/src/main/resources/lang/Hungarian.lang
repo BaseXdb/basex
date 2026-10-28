@@ -359,7 +359,6 @@ srv_running          = Szerver fut vagy hozzáférés megtagadva
 srv_started          = Szerver elindult
 srv_stopped          = Szerver leállt
 stemming             = Csupaszítás
-sticky_scroll        = Befoglaló sorok rögzítése
 stop                 = Megállítás
 stop_jobs            = Stop background jobs
 stopped_at           = Megállítás itt:

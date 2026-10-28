@@ -359,7 +359,6 @@ srv_running          = La servilo funkcias aŭ aliro estis rifuzita
 srv_started          = La servilo estis startigita
 srv_stopped          = La servilo estis haltigita
 stemming             = Radikigo
-sticky_scroll        = Fiksi ĉirkaŭantajn liniojn
 stop                 = Halti
 stop_jobs            = Stop background jobs
 stopped_at           = Haltigita ĉe

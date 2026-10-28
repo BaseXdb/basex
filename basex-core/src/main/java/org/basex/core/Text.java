@@ -1358,8 +1358,6 @@ public interface Text {
   String MARK_OCCURRENCES = lang("mark_occurrences");
   /** Show indentation guides. */
   String SHOW_INDENT_GUIDES = lang("show_indent_guides");
-  /** Sticky scroll. */
-  String STICKY_SCROLL = lang("sticky_scroll");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Parse project files. */

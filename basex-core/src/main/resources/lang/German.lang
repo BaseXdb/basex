@@ -359,7 +359,6 @@ srv_running          = Der Server läuft, oder der Zugriff wurde untersagt
 srv_started          = Server wurde gestartet
 srv_stopped          = Server wurde gestoppt
 stemming             = Stemming
-sticky_scroll        = Umschließende Zeilen anheften
 stop                 = Stopp
 stop_jobs            = Hintergrund-Jobs stoppen
 stopped_at           = Gestoppt in

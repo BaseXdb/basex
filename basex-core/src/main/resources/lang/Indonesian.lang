@@ -359,7 +359,6 @@ srv_running          = Servis sudah berjalan atau izin ditolak
 srv_started          = Server sudah dijalankan
 srv_stopped          = Server sudah dihentikan
 stemming             = Memotong
-sticky_scroll        = Sematkan baris induk
 stop                 = Henti
 stop_jobs            = Stop background jobs
 stopped_at           = Berhenti pada

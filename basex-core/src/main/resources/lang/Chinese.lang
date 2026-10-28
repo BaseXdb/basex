@@ -359,7 +359,6 @@ srv_running          = 服务器已启动或者没有权限
 srv_started          = 服务器已启动
 srv_stopped          = 服务器已停止
 stemming             = Stemming
-sticky_scroll        = 固定外层行
 stop                 = 停止
 stop_jobs            = Stop background jobs
 stopped_at           = 停止在

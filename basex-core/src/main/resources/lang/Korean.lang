@@ -359,7 +359,6 @@ srv_running          = 서버가 실행 중이거나 접근이 거부되었습�
 srv_started          = 서버가 시작되었습니다
 srv_stopped          = 서버가 중지되었습니다
 stemming             = 형태소 분석
-sticky_scroll        = 상위 줄 고정
 stop                 = 중지
 stop_jobs            = Stop background jobs
 stopped_at           = 중지 위치

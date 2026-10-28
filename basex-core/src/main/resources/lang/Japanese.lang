@@ -359,7 +359,6 @@ srv_running          = サーバーが既に起動しているか、権限が足
 srv_started          = サーバーを開始しました
 srv_stopped          = サーバーを停止しました
 stemming             = 語幹処理
-sticky_scroll        = 外側の行を固定
 stop                 = 終了
 stop_jobs            = Stop background jobs
 stopped_at           = 停止しました

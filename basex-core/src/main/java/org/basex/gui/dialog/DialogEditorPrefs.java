@@ -40,8 +40,6 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox markoccurrences;
   /** Show indentation guides. */
   private final BaseXCheckBox guides;
-  /** Pin enclosing lines. */
-  private final BaseXCheckBox sticky;
   /** Single-line editor tabs. */
   private final BaseXCheckBox scrollTabs;
   /** Save before executing file. */
@@ -86,7 +84,6 @@ final class DialogEditorPrefs extends BaseXBack {
     markoccurrences = new BaseXCheckBox(dialog, MARK_OCCURRENCES, GUIOptions.MARKOCCURRENCES,
       gopts);
     guides = new BaseXCheckBox(dialog, SHOW_INDENT_GUIDES, GUIOptions.SHOWGUIDES, gopts);
-    sticky = new BaseXCheckBox(dialog, STICKY_SCROLL, GUIOptions.STICKYSCROLL, gopts);
     scrollTabs = new BaseXCheckBox(dialog, SCROLL_TABS, GUIOptions.SCROLLTABS, gopts);
     spaces = new BaseXCheckBox(dialog, TABS_AS_SPACES, GUIOptions.TABSPACES, gopts);
     indent = new BaseXTextField(dialog, GUIOptions.INDENT, gopts);
@@ -124,7 +121,6 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(markline);
     p.add(markoccurrences);
     p.add(guides);
-    p.add(sticky);
     p.add(scrollTabs);
     add(p);
 
@@ -178,7 +174,6 @@ final class DialogEditorPrefs extends BaseXBack {
     markline.assign();
     markoccurrences.assign();
     guides.assign();
-    sticky.assign();
     scrollTabs.assign();
     files.assign();
     spaces.assign();

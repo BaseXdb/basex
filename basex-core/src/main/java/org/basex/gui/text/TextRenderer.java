@@ -21,8 +21,6 @@ final class TextRenderer extends BaseXBack {
   private final EditorOptions opts;
   /** Offset. */
   private static final int OFFSET = 5;
-  /** Maximum number of pinned lines. */
-  private static final int MAXPINNED = 3;
 
   /** Text editor. */
   private final TextEditor text;
@@ -55,10 +53,6 @@ final class TextRenderer extends BaseXBack {
   private boolean markline;
   /** Show indentation guides. */
   private boolean guides;
-  /** Pin the lines that enclose the topmost visible line. */
-  private boolean sticky;
-  /** Positions and vertical offsets of the pinned lines. */
-  private final IntList pinned = new IntList();
   /** Start and end of an underlined reference (can be {@code null}). */
   private int[] underline;
   /** Antialiasing type. */
@@ -130,7 +124,6 @@ final class TextRenderer extends BaseXBack {
     showLines = edit && opts.get(GUIOptions.SHOWLINES);
     markline = edit && opts.get(GUIOptions.MARKLINE);
     guides = edit && opts.get(GUIOptions.SHOWGUIDES);
-    sticky = edit && opts.get(GUIOptions.STICKYSCROLL);
     antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
   }
@@ -178,7 +171,6 @@ final class TextRenderer extends BaseXBack {
     }
     if(s == iter.errorPos()) drawError(layout, g);
 
-    drawPinned(g);
     clipAll(g);
     drawLinesSep(g);
   }
@@ -222,55 +214,6 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Draws the lines that enclose the topmost visible line at the top of the panel.
-   * @param g graphics reference
-   */
-  private void drawPinned(final Graphics g) {
-    // the pinned lines are kept if the repainted area does not reach them
-    if(clip.y > fontHeight * (MAXPINNED + 1)) return;
-    pinned.reset();
-    if(!sticky || scroll.pos() == 0 || !cache.valid(text.size(), cacheWidth())) return;
-
-    // the lines are pinned that enclose the first line below the pinned ones
-    IntList lines;
-    for(int rows = 0;;) {
-      final int top = cache.pos(cache.indexByY(scroll.pos() + (rows + 1) * fontHeight));
-      lines = text.enclosingLines(top, MAXPINNED);
-      if(lines.size() <= rows) break;
-      rows = lines.size();
-    }
-    final int ls = lines.size();
-    if(ls == 0) return;
-
-    final int bottom = fontHeight * ls + fontHeight / 5;
-    clipAll(g);
-    g.setColor(GUIConstants.backColor);
-    g.fillRect(0, 0, getWidth(), bottom);
-    for(int l = 0; l < ls; l++) {
-      final int pos = lines.get(l), idx = cache.indexByPos(pos);
-      final Layout layout = init(true, false);
-      position(layout, idx, fontHeight - 2 + l * fontHeight - cache.y(idx));
-      syntax.state(cache.state(idx));
-      pinned.add(pos).add(layout.lineY + fontHeight);
-      drawGutter(layout, g);
-      clipText(g);
-      for(final int y = layout.y; more(layout) && layout.y == y; next(layout)) {
-        final TextIterator iter = layout.iter;
-        final int cp = iter.curr();
-        if(cp == TokenBuilder.NLINE) break;
-        final Color color = syntax.getColor(iter);
-        if(cp > ' ') {
-          g.setColor(color);
-          font.draw(g, iter.text(), iter.pos(), iter.posEnd(), layout.x, layout.y);
-        }
-      }
-      clipAll(g);
-    }
-    g.setColor(GUIConstants.lightGray);
-    g.drawLine(0, bottom, getWidth(), bottom);
-  }
-
-  /**
    * Assigns the range of an underlined reference.
    * @param range start and end (can be {@code null})
    */
@@ -278,19 +221,6 @@ final class TextRenderer extends BaseXBack {
     if(Arrays.equals(range, underline)) return;
     underline = range;
     repaint();
-  }
-
-  /**
-   * Returns the start of the pinned line at the specified position.
-   * @param point position
-   * @return line start, or {@code -1} if no pinned line is found
-   */
-  int sticky(final Point point) {
-    final int ps = pinned.size();
-    for(int p = 0; p < ps; p += 2) {
-      if(point.y < pinned.get(p + 1)) return pinned.get(p);
-    }
-    return -1;
   }
 
   /**
