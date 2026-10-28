@@ -242,6 +242,15 @@ public final class FuncType extends FType {
   }
 
   /**
+   * Checks if functions of this type take a single argument that is an instance of the given type.
+   * @param arg argument type
+   * @return result of check
+   */
+  boolean unary(final SeqType arg) {
+    return argTypes != null && argTypes.length == 1 && argTypes[0].instanceOf(arg);
+  }
+
+  /**
    * Return function type with fewer arguments.
    * @param arity arity of target type
    * @return function type

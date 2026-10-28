@@ -31,8 +31,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   private record UnresolvedRef(StaticVarRef ref, boolean hasImport, QNm[] localNames) { }
   /** All unresolved variable references. */
   private final ArrayList<UnresolvedRef> unresolvedRefs = new ArrayList<>();
-  /** The variables by declaring module. */
-  private final TokenObjectMap<QNmMap<StaticVar>> varsByModule = new TokenObjectMap<>();
+  /** Variables grouped by module URI, then by QName (private variables may share names). */
+  private final TokenObjectMap<QNmMap<ArrayList<StaticVar>>> varsByModule =
+      new TokenObjectMap<>();
   /** Variables with the initializing expressions of record fields. */
   private final ArrayList<StaticVar> fields = new ArrayList<>();
 
@@ -52,25 +53,28 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       final AnnList anns, final boolean external, final VarScope vs, final String doc)
       throws QueryException {
 
-    final byte[] modUri = QNm.uri(var.info.sc().module);
+    final StaticContext sc = var.info.sc();
+    final byte[] modUri = QNm.uri(sc.module);
     final byte[] varUri = var.name.uri();
+    final boolean priv = anns.contains(Annotation.PRIVATE);
     if(!Token.eq(modUri, varUri)) {
-      if(modUri != Token.EMPTY && !anns.contains(Annotation.PRIVATE)) {
-        throw MODULENS_X.get(var.info, var);
-      }
+      if(modUri != Token.EMPTY && !priv) throw MODULENS_X.get(var.info, var);
       if(imports.contains(varUri)) {
-        final StaticVar sv = get(var.name, varUri);
-        if(sv != null && !sv.anns.contains(Annotation.PRIVATE)) {
-          // variable already declared in imported module
-          throw VARDUPL_X.get(var.info, var.name.string());
-        }
+        // variable already declared in imported module
+        if(get(var.name, varUri, sc) != null) throw VARDUPL_X.get(var.info, var.name.string());
       }
     }
-    final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modUri, QNmMap::new);
-    if(vars.contains(var.name)) throw VARDUPL_X.get(var.info, var.name.string());
+    final ArrayList<StaticVar> vars = varsByModule.computeIfAbsent(modUri, QNmMap::new).
+        computeIfAbsent(var.name, ArrayList::new);
+    for(final StaticVar sv : vars) {
+      // private variables of other modules with the same URI are never in scope
+      if(sv.sc == sc || !priv && sv.visible(sc)) {
+        throw VARDUPL_X.get(var.info, var.name.string());
+      }
+    }
 
     final StaticVar sv = new StaticVar(var, expr, anns, external, vs, doc, false);
-    vars.put(var.name, sv);
+    vars.add(sv);
     return sv;
   }
 
@@ -107,22 +111,24 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       final StaticVarRef ref = ur.ref;
 
       // try to resolve the reference within the local module
-      final byte[] modUri = QNm.uri(ref.sc().module);
-      StaticVar var = get(ref.name, modUri);
+      final StaticContext sc = ref.sc();
+      final byte[] modUri = QNm.uri(sc.module);
+      StaticVar var = get(ref.name, modUri, sc);
 
       if(var == null) {
         // try to resolve the reference from a module
         final byte[] refUri = ref.name.uri();
-        var = get(ref.name, refUri);
-        if(var == null) throw VARUNDEF_X.get(ref.info(),
-            QueryError.similar(ref, similarName(ref.name, ur.localNames)));
+        var = get(ref.name, refUri, sc);
+        if(var == null) {
+          if(get(ref.name, modUri, null) != null || get(ref.name, refUri, null) != null) {
+            throw VARPRIVATE_X.get(ref.info(), ref);
+          }
+          throw VARUNDEF_X.get(ref.info(),
+              QueryError.similar(ref, similarName(ref.name, ur.localNames, sc)));
+        }
         if(!Token.eq(modUri, refUri) && !ur.hasImport) {
           throw INVISIBLEVAR_X.get(ref.info(), ref.name.varString());
         }
-      }
-
-      if(var.anns.contains(Annotation.PRIVATE) && !Token.eq(modUri, QNm.uri(var.sc.module))) {
-        throw VARPRIVATE_X.get(ref.info(), ref);
       }
       ref.init(var);
     }
@@ -169,7 +175,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @return result of check
    */
   public boolean declared(final QNm name) {
-    for(final QNmMap<StaticVar> vars : varsByModule.values()) {
+    for(final QNmMap<ArrayList<StaticVar>> vars : varsByModule.values()) {
       if(vars.contains(name)) return true;
     }
     return false;
@@ -180,26 +186,41 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * or {@code null} if no similar name is found among the in-scope and declared variables.
    * @param name unresolved variable name
    * @param localNames local variables in scope at reference time ({@code null} if not required)
+   * @param sc static context of the reference
    * @return formatted hint or {@code null}
    */
-  private String similarName(final QNm name, final QNm[] localNames) {
+  private String similarName(final QNm name, final QNm[] localNames, final StaticContext sc) {
     final ArrayList<QNm> candidates = new ArrayList<>();
     if(localNames != null) Collections.addAll(candidates, localNames);
-    for(final StaticVar sv : this) candidates.add(sv.name);
+    for(final StaticVar sv : this) {
+      if(sv.visible(sc)) candidates.add(sv.name);
+    }
     final QNm similar = Levenshtein.similarOrPrefix(name.local(),
         candidates.toArray(QNm[]::new), QNm::local);
     return similar != null ? Util.info("$%", similar.prefixString()) : null;
   }
 
   /**
-   * Returns the variable for the specified QName and module.
+   * Returns a visible variable for the specified QName and module, preferring the variable
+   * declared in the given static context.
    * @param name QName
    * @param module module URI
+   * @param sc static context of the reference ({@code null} to also return invisible variables)
    * @return variable entry, or {@code null}
    */
-  private StaticVar get(final QNm name, final byte[] module) {
-    final QNmMap<StaticVar> vars = varsByModule.get(module);
-    return vars == null ? null : vars.get(name);
+  private StaticVar get(final QNm name, final byte[] module, final StaticContext sc) {
+    final QNmMap<ArrayList<StaticVar>> map = varsByModule.get(module);
+    final ArrayList<StaticVar> vars = map != null ? map.get(name) : null;
+    if(vars == null) return null;
+
+    StaticVar var = null;
+    for(final StaticVar sv : vars) {
+      if(sc == null || sv.visible(sc)) {
+        if(sv.sc == sc) return sv;
+        if(var == null) var = sv;
+      }
+    }
+    return var;
   }
 
   /**
@@ -215,9 +236,11 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     for(final QNm qnm : bindings) {
       if(qnm != QNm.EMPTY) {
         final Value val = bindings.get(qnm);
-        for(final QNmMap<StaticVar> vars : varsByModule.values()) {
-          final StaticVar var = vars.get(qnm);
-          if(var != null) var.bind(val, qc, cast);
+        for(final QNmMap<ArrayList<StaticVar>> vars : varsByModule.values()) {
+          final ArrayList<StaticVar> list = vars.get(qnm);
+          if(list != null) {
+            for(final StaticVar var : list) var.bind(val, qc, cast);
+          }
         }
       }
     }
@@ -234,7 +257,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   private ArrayList<StaticVar> list() {
     final ArrayList<StaticVar> list = new ArrayList<>();
-    for(final QNmMap<StaticVar> vars : varsByModule.values()) vars.values().forEach(list::add);
+    for(final QNmMap<ArrayList<StaticVar>> vars : varsByModule.values()) {
+      for(final ArrayList<StaticVar> svs : vars.values()) list.addAll(svs);
+    }
     return list;
   }
 

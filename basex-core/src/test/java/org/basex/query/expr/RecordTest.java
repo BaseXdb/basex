@@ -705,6 +705,15 @@ public final class RecordTest extends SandboxTest {
     // a partial update does NOT trigger the rewrite: the merge is kept, unmentioned fields survive
     check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) but with { 'x': 0 }",
         "{\"x\":0,\"y\":<y>2</y>}", root(ButWith.class));
+    // the left operand must still be a single record
+    error(ab + "declare %basex:inline(0) function local:f($n) as local:ab* {"
+        + " (1 to $n) ! local:ab(., .) }; local:f(0) but with { 'a': 7, 'b': 8 }", INVTYPE_X);
+    error(ab + "declare %basex:inline(0) function local:f($n) as local:ab* {"
+        + " (1 to $n) ! local:ab(., .) }; local:f(2) but with { 'a': 7, 'b': 8 }", INVTYPE_X);
+    // record(*) has no fields: an update never covers the record
+    query("declare record local:ab(a, b); declare %basex:inline(0) function local:f("
+        + "$x as record(*)) { $x but with { 'a': 2 } }; local:f(local:ab(1, 3))",
+        "{\"a\":2,\"b\":3}");
 
     inline(true);
     // local:rec(...) is inlined and the whole expression constant-folds to a single record
@@ -1074,6 +1083,12 @@ public final class RecordTest extends SandboxTest {
     // empty record
     String constr = "{}";
     check("(" + constr + ", " + constr + ")", "{}\n{}", exists(SingletonSeq.class));
+    // a labeled record differs from a map with the same entries
+    query("declare record local:e(); declare %basex:inline(0) function local:f($x) {"
+        + " $x instance of local:e }; local:f({}), local:f(local:e())", "false\ntrue");
+    query("declare record local:a(a); declare record local:b(a); "
+        + "declare %basex:inline(0) function local:f($x) { $x instance of local:a };"
+        + " local:f(local:a(1)), local:f(local:b(1))", "true\nfalse");
 
     // single-entry record (compile-time evaluation)
     constr = "{ 'AA': 0 }";

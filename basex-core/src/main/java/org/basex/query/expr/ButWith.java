@@ -45,13 +45,15 @@ public final class ButWith extends Arr {
     // may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof final RecordType rt) {
-      // RECORD but with { } → RECORD
-      if(st.one() && exprs[1] instanceof final XQMap map && map.structSize() == 0) {
-        return cc.replaceWith(this, exprs[0]);
-      }
-      // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
-      if(covered(exprs[1], rt)) {
-        return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
+      if(st.one()) {
+        // RECORD but with { } → RECORD
+        if(exprs[1] instanceof final XQMap map && map.structSize() == 0) {
+          return cc.replaceWith(this, exprs[0]);
+        }
+        // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
+        if(covered(exprs[1], rt)) {
+          return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
+        }
       }
       exprType.assign(st.with(Occ.EXACTLY_ONE));
     }
@@ -65,7 +67,8 @@ public final class ButWith extends Arr {
    * @return result of check
    */
   private static boolean covered(final Expr update, final RecordType rt) {
-    if(!(update instanceof ShapeConstructor || update instanceof XQMap) ||
+    // the fields of record(*) are unknown
+    if(rt.any() || !(update instanceof ShapeConstructor || update instanceof XQMap) ||
         !(update.seqType().type instanceof final ShapeType ush)) return false;
     final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
     final int fs = fields.size();

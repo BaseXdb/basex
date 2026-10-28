@@ -140,7 +140,7 @@ public abstract class XQMap extends XQStruct {
     final Item k = key(args[0], qc, ii);
     final Value value = getOrNull(k);
     if(value != null) return value;
-    if(type instanceof final ShapeType sh && sh.strict() && sh.index(k) == 0) {
+    if(type instanceof final RecordType rt && rt.index(k) == 0) {
       throw RECORDFIELD_X_X.get(ii, this, k);
     }
     return Empty.VALUE;
@@ -650,6 +650,9 @@ public abstract class XQMap extends XQStruct {
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
     if(!(item instanceof final XQMap map)) return false;
+    // compile time: records with different labels, and records and maps, are different values
+    if(deep == null && (type instanceof RecordType || map.type instanceof RecordType) &&
+        !type.eq(map.type)) return false;
 
     // deep = null: ordered comparison at compile time
     final Boolean order = deep == null ? null : deep.options.get(DeepEqualOptions.MAP_ORDER);

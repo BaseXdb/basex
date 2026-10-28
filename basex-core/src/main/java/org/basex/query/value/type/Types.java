@@ -9,7 +9,6 @@ import static org.basex.query.value.type.Occ.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.hash.*;
 
 /**
  * Numeric access to types.
@@ -315,7 +314,7 @@ public final class Types {
       EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
 
   /** The empty record type. */
-  public static final ShapeType RECORD = new RecordType(new TokenObjectMap<>(0));
+  public static final ShapeType RECORD = new RecordType();
   /** Single empty record. */
   public static final SeqType RECORD_O = RECORD.seqType();
 

@@ -170,7 +170,7 @@ public final class ShapeConstructor extends StandardFunc {
   private static FuncDefinition definition(final ShapeType sh) {
     final QNm name = sh.name();
     final TokenBuilder tb = new TokenBuilder(name != null ? name.local() :
-      Token.token(sh instanceof RecordType ? QueryText.RECORD : QueryText.MAP)).add('(');
+      Token.token(QueryText.MAP)).add('(');
     final TokenObjectMap<ShapeField> fields = sh.fields();
     final int max = fields.size(), min = sh.minFields();
     for(int i = 1; i <= max; i++) {

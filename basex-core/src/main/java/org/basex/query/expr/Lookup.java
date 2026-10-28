@@ -47,9 +47,13 @@ public final class Lookup extends Arr {
    * @throws QueryException query exception
    */
   public static boolean mayLackField(final MapType mt, final Expr key) throws QueryException {
-    return mt instanceof final ShapeType sh ?
-      sh.strict() && !(key instanceof final Item item && sh.index(item) != 0) :
-      mt.keyType().intersect(BasicType.STRING) != null;
+    if(!(mt instanceof final ShapeType sh)) return mt.keyType().intersect(BasicType.STRING) != null;
+    // any shape may be matched by records: only declared fields are safe
+    if(!(key instanceof final Value keys) || keys.size() > sh.fields().size()) return true;
+    for(final Item item : keys) {
+      if(sh.index(item) == 0) return true;
+    }
+    return false;
   }
 
   @Override
@@ -74,8 +78,9 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
-    // pre-evaluate a single-key lookup
-    if(is == 1 && inputs instanceof Value && keys instanceof Item) return cc.preEval(this);
+    // pre-evaluate a lookup with a single input and a single key, or with a map and static keys
+    if(is == 1 && inputs instanceof Value &&
+        (keys instanceof Item || map && keys instanceof Value)) return cc.preEval(this);
 
     final Expr expr = opt(tp, cc);
     if(expr != this) return cc.replaceWith(this, expr);

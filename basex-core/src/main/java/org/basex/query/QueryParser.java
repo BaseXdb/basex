@@ -1230,7 +1230,10 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck(")");
     }
-    final RecordType rt = new RecordType(fields, qn, anns);
+    // private records of different library modules are different types
+    final RecordType rt = new RecordType(fields, qn, anns,
+      anns.contains(Annotation.PRIVATE) && sc.module != null ?
+      string(qc.modStack.peek()) : null);
     // record types may be recursive: references are not followed
     declareType(qn, rt.seqType(), new QNmSet(), anns);
     declareShapeConstructor(rt, ii);

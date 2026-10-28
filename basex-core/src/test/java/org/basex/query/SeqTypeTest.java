@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.function.*;
 
 import org.basex.query.expr.path.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -156,8 +157,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new RecordType(fld1));
-    ((TypeRef) r2.type).resolve(new RecordType(fld2));
+    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
+    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
@@ -422,8 +423,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new RecordType(fld1));
-    ((TypeRef) r2.type).resolve(new RecordType(fld2));
+    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
+    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
@@ -676,15 +677,17 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(fld1).seqType(),
+      r1 = new ShapeType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(fld2).seqType(),
+      r2 = new ShapeType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(fld3).seqType(),
+      r3 = new ShapeType(fld3).seqType(),
       // record(a as xs:integer?)
-      r5 = new RecordType(fld5).seqType(),
+      r5 = new ShapeType(fld5).seqType(),
       // record(b as xs:integer?)
-      r6 = new RecordType(fld6).seqType(),
+      r6 = new ShapeType(fld6).seqType(),
+      // n1 record(a as xs:integer)
+      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null).seqType(),
       // r8 record(next as r8?, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next as r9?, x, z)
@@ -698,13 +701,17 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
     fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new RecordType(fld8));
-    ((TypeRef) r9.type).resolve(new RecordType(fld9));
+    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
+    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
-    // a specific record type is a subtype of record(*)
-    combine(RECORD_O, r1, RECORD_O, op);
+    // a labeled record type is a subtype of record(*), a simple one is not
+    combine(RECORD_O, n1, RECORD_O, op);
+    combine(RECORD_O, r1, MapType.get(STRING, ITEM_ZM).seqType(), op);
+    // record(*) and record() have no fields in common: the field set of record(*) is unknown
+    combine(RECORD_O, new ShapeType(new TokenObjectMap<>()).seqType(),
+        MapType.get(STRING, ITEM_ZM).seqType(), op);
     combine(RECORD_O, ERROR_O, RECORD_O, op);
     combine(FUNCTION_O, r1, FUNCTION_O, op);
     combine(FUNCTION_O, ERROR_O, FUNCTION_O, op);
@@ -777,6 +784,13 @@ public final class SeqTypeTest {
     combine(STRING_ZO, INTEGER_O, null, op);
     combine(ArrayType.get(STRING_ZO).seqType(), ArrayType.get(INTEGER_ZO).seqType(),
         ArrayType.get(EMPTY_SEQUENCE_Z).seqType(), op);
+    // disjoint member, key or value types: only the empty array or map remains
+    combine(ArrayType.get(STRING_O).seqType(), ArrayType.get(INTEGER_O).seqType(),
+        ArrayType.get(ERROR_O).seqType(), op);
+    combine(MapType.get(STRING, INTEGER_O).seqType(), MapType.get(INTEGER, INTEGER_O).seqType(),
+        MapType.get(ERROR, ERROR_O).seqType(), op);
+    combine(MapType.get(STRING, INTEGER_O).seqType(), MapType.get(STRING, STRING_O).seqType(),
+        MapType.get(ERROR, ERROR_O).seqType(), op);
 
     combine(JNODE_O, NODE_O, JNODE_O, op);
     combine(XNODE_O, NODE_O, XNODE_O, op);
@@ -871,14 +885,15 @@ public final class SeqTypeTest {
     combine(m1, INTEGER_O, null, op);
     combine(m1, ERROR_O, ERROR_O, op);
     combine(m1, m2, m2, op);
-    combine(m2, MapType.get(BOOLEAN, BOOLEAN_O).seqType(), null, op);
+    combine(m2, MapType.get(BOOLEAN, BOOLEAN_O).seqType(), MapType.get(ERROR, ERROR_O).seqType(),
+        op);
     combine(m1, FUNCTION_O, m1, op);
     combine(m1, f3, null, op);
     combine(m1, f6, null, op);
     combine(m1, FuncType.get(INTEGER_O, ITEM_O).seqType(), null, op);
     combine(m1, m3,
         MapType.get(BOOLEAN, NON_NEGATIVE_INTEGER.seqType()).seqType(), op);
-    combine(m2, m4, null, op);
+    combine(m2, m4, MapType.get(ERROR, ERROR_O).seqType(), op);
     combine(m4, f7, m4, op);
 
     final SeqType
@@ -901,7 +916,7 @@ public final class SeqTypeTest {
     combine(a1, a2, a1, op);
     combine(a1, a3, ArrayType.get(NON_NEGATIVE_INTEGER.seqType()).seqType(), op);
     combine(a2, a4, a1, op);
-    combine(a2, ArrayType.get(BOOLEAN_O).seqType(), null, op);
+    combine(a2, ArrayType.get(BOOLEAN_O).seqType(), ArrayType.get(ERROR_O).seqType(), op);
     combine(a1, FUNCTION_O, a1, op);
     combine(a1, f3, null, op);
     combine(a1, f6, null, op);
@@ -995,15 +1010,17 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(fld1).seqType(),
+      r1 = new ShapeType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(fld2).seqType(),
+      r2 = new ShapeType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(fld3).seqType(),
+      r3 = new ShapeType(fld3).seqType(),
       // record(a? as xs:integer)
-      r5 = new RecordType(fld5).seqType(),
+      r5 = new ShapeType(fld5).seqType(),
       // record(b? as xs:integer)
-      r6 = new RecordType(fld6).seqType(),
+      r6 = new ShapeType(fld6).seqType(),
+      // n1 record(a as xs:integer)
+      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null).seqType(),
       // r8 record(next? as r8, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
@@ -1017,12 +1034,13 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
     fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new RecordType(fld8));
-    ((TypeRef) r9.type).resolve(new RecordType(fld9));
+    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
+    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);
-    // a specific record type is a subtype of record(*)
+    // a labeled record type is a subtype of record(*); a simple one includes the intersection
+    combine(RECORD_O, n1, n1, op);
     combine(RECORD_O, r1, r1, op);
     combine(RECORD_O, ERROR_O, ERROR_O, op);
     combine(FUNCTION_O, r1, r1, op);

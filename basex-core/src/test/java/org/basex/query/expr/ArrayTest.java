@@ -44,6 +44,13 @@ public final class ArrayTest extends SandboxTest {
     query("[] instance of array(xs:string)", true);
     query("[] instance of array(fn(xs:numeric) as xs:numeric)", true);
     query("[] instance of array(xs:integer)", true);
+    // the empty array is an instance of array types with disjoint member types
+    query("declare %basex:inline(0) function local:f($a as array(xs:integer)) {"
+        + " $a instance of array(xs:string) }; local:f([]), local:f([ 1 ])", "true\nfalse");
+    // arrays are functions that take an integer argument
+    query("declare %basex:inline(0) function local:f($a as array(xs:numeric)) {"
+        + " $a instance of fn(xs:integer) as xs:decimal }; local:f([ 1 ]), local:f([ 1e0 ])",
+        "true\nfalse");
   }
 
   /** Constructor. */

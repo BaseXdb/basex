@@ -106,7 +106,9 @@ public final class LookupTest extends SandboxTest {
     check("[ <x/>, <y/> ]?(1, 2)", "<x/>\n<y/>", exists(Lookup.class));
 
     check("({ 'a': <x/> })?a", "<x/>", exists(ShapeGet.class), empty(Lookup.class));
-    check("({ 'a': <x/> })?b", "", empty(Lookup.class));
+    check("({ 'a': <x/> })?b", "", exists(Lookup.class));
+    check("declare %basex:inline(0) function local:f($x as record(a, b)) { $x?('a', 'b') };"
+        + " local:f({ 'a': 1, 'b': 2 })", "1\n2", empty(Lookup.class));
     check("({ 1: <x/> })?1", "<x/>", exists(_MAP_GET), empty(Lookup.class));
     check("({ 'a': <x/> })?*", "<x/>", exists(_MAP_ITEMS), empty(Lookup.class));
     check("[ <x/> ]?1", "<x/>", exists(_ARRAY_GET), empty(Lookup.class));
@@ -137,5 +139,12 @@ public final class LookupTest extends SandboxTest {
     error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X_X);
     error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X_X);
     error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
+        + "$x as record(a, b)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
+        + "$x as record(*)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
+        + "$x as record(*)) { if($x instance of record(a, b)) { $x?c } };"
+        + " local:f(local:r(1, 2))", RECORDFIELD_X_X);
   }
 }

@@ -586,6 +586,10 @@ public final class MapModuleTest extends SandboxTest {
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("({}, <a/>/*) =>" + func.args(), 0, root(func));
+    // record(*): the number of fields is unknown
+    query("declare record local:r(a); declare record local:s(a, b);"
+        + " declare %basex:inline(0) function local:f($m as map(xs:string, record(*))) {"
+        + " map:get($m, 'x', local:r(1)) => map:size() }; local:f({ 'x': local:s(1, 2) })", 2);
 
     check("map:build(1 to 1_000_000_000) =>" + func.args(), 1_000_000_000, root(Itr.class));
 

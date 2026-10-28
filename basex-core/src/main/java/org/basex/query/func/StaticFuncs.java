@@ -68,7 +68,9 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
 
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
     final StaticFunc dupl = get(sc, name, sf.min, sf.arity(), false);
-    if(dupl != null) {
+    // a private function only clashes with public functions of other modules if they are imported
+    if(dupl != null && (dupl.sc == sc || !anns.contains(Annotation.PRIVATE) ||
+        sc.imports.contains(name.uri()))) {
       final boolean cnstr = sf.expr instanceof ShapeConstructor ||
           dupl.expr instanceof ShapeConstructor;
       final byte[] nm = name.prefixString();
@@ -232,28 +234,31 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   private StaticFunc get(final StaticContext sc, final QNm qname, final int min, final int max,
       final boolean dynamic) {
     final byte[] funcUri = qname.uri();
-    StaticFunc func = get(moduleUri(sc, funcUri), qname, min, max);
-    if(func == null && (dynamic || sc.imports.contains(funcUri))) {
-      func = get(funcUri, qname, min, max);
-      if(func != null && func.anns.contains(Annotation.PRIVATE)) func = null;
-    }
-    return func;
+    final StaticFunc func = get(sc, moduleUri(sc, funcUri), qname, min, max);
+    return func == null && (dynamic || sc.imports.contains(funcUri)) ?
+      get(sc, funcUri, qname, min, max) : func;
   }
 
   /**
    * Returns a function with the given name, and arity in the given range, from the specified
-   * module.
+   * module, preferring the function declared in the given static context.
+   * @param sc static context ({@code null} to also return functions that are not visible)
    * @param modUri module URI
    * @param qname function name
    * @param min minimum arity
    * @param max maximum arity
    * @return function if found, {@code null} otherwise
    */
-  private StaticFunc get(final byte[] modUri, final QNm qname, final int min, final int max) {
-    for(final StaticFunc func : funcs(modUri, qname)) {
-      if(min <= func.arity() && max >= func.min) return func;
+  private StaticFunc get(final StaticContext sc, final byte[] modUri, final QNm qname,
+      final int min, final int max) {
+    StaticFunc func = null;
+    for(final StaticFunc sf : funcs(modUri, qname)) {
+      if(min <= sf.arity() && max >= sf.min && (sc == null || sf.visible(sc))) {
+        if(sf.sc == sc) return sf;
+        if(func == null) func = sf;
+      }
     }
-    return null;
+    return func;
   }
 
   /**
@@ -311,7 +316,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       final InputInfo info) {
 
     final byte[] funcUri = name.uri();
-    final StaticFunc sf = get(funcUri, name, arity, arity);
+    final StaticFunc sf = get(null, funcUri, name, arity, arity);
     if(sf != null) return sf.anns.contains(Annotation.PRIVATE) ? FUNCPRIVATE_X.get(info, name)
                                                                : INVISIBLEFUNC_X.get(info, name);
     final StaticContext sc = info.sc();
@@ -320,6 +325,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     if(!Token.eq(funcUri, modUri) && sc.imports.contains(funcUri)) {
       candidates.addAll(funcs(funcUri, name));
     }
+    candidates.removeIf(func -> !func.visible(sc));
     final IntList arities = new IntList();
     for(final StaticFunc func : candidates) {
       for(int a = func.min; a <= func.arity(); a++) arities.add(a);
@@ -374,8 +380,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     if(similar == null && info != null) {
       final QNmSet names = new QNmSet();
       for(final StaticFunc func : this) {
-        if(func.expr != null && (!func.anns.contains(Annotation.PRIVATE)
-            || Token.eq(QNm.uri(info.sc().module), QNm.uri(func.sc.module)))) {
+        if(func.expr != null && func.visible(info.sc())) {
           names.add(func.name);
         }
       }

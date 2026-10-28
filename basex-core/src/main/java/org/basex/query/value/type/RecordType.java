@@ -22,33 +22,40 @@ public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
 
-  /** Record name (can be {@code null}). */
+  /** Record name ({@code null} for {@code record(*)}). */
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
+  /** Path of the declaring module of a private record (can be {@code null}). */
+  private final String module;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
   /** Initializing expressions of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
 
   /**
-   * Constructor for an unnamed record type.
-   * @param fields field declarations
+   * Constructor for the abstract record type {@code record(*)}.
    */
-  public RecordType(final TokenObjectMap<ShapeField> fields) {
-    this(fields, null, AnnList.EMPTY);
+  RecordType() {
+    super(new TokenObjectMap<>(0));
+    name = null;
+    anns = AnnList.EMPTY;
+    module = null;
   }
 
   /**
    * Constructor for a labeled record type.
    * @param fields field declarations
-   * @param name record name (can be {@code null})
+   * @param name record name
    * @param anns annotations
+   * @param module path of the declaring module of a private record (can be {@code null})
    */
-  public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns) {
+  public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
+      final String module) {
     super(fields);
     this.name = name;
     this.anns = anns;
+    this.module = module;
   }
 
   @Override
@@ -65,7 +72,7 @@ public final class RecordType extends ShapeType {
   @Override
   public Coercion coercion() {
     // the fields of records are coerced when the records are constructed
-    return strict() ? Coercion.REBUILD : Coercion.KEEP;
+    return any() ? Coercion.KEEP : Coercion.REBUILD;
   }
 
   @Override
@@ -75,7 +82,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns);
+    return new RecordType(map, name, anns, module);
   }
 
   /**
@@ -103,12 +110,17 @@ public final class RecordType extends ShapeType {
 
   @Override
   public ShapeType detach() {
-    return detached() ? this : new RecordType(detachedFields(), name, anns);
+    return detached() ? this : new RecordType(detachedFields(), name, anns, module);
   }
 
   @Override
   public QNm name() {
     return name;
+  }
+
+  @Override
+  String module() {
+    return module;
   }
 
   /**
@@ -191,7 +203,7 @@ public final class RecordType extends ShapeType {
       final ShapeField field = fields.get(key);
       final QueryString param = new QueryString();
       if(field.isStatic()) param.token("%static");
-      param.token(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
+      param.token(key);
       if(!field.seqType().eq(Types.ITEM_ZM)) param.token(AS).token(field.seqType());
       if(field.init() != null) param.token(":=").token(field.init());
       params[f++] = param;

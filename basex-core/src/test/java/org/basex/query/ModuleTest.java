@@ -285,10 +285,15 @@ public final class ModuleTest extends SandboxTest {
         + "declare function m:f() {$m:x};");
     final IOFile n1 = new IOFile(sandbox, "n1.xqm");
     write(n1, "module namespace n = 'n';\n"
-        + "declare function n:f() {$x};");
+        + "declare %private variable $n:x := 1;\n"
+        + "declare function n:f() {$n:x};");
     final IOFile n2 = new IOFile(sandbox, "n2.xqm");
     write(n2, "module namespace n = 'n';\n"
-        + "declare %private variable $x := 42;");
+        + "declare %private variable $n:x := 42;\n"
+        + "declare function n:g() {$n:x};");
+    final IOFile n3 = new IOFile(sandbox, "n3.xqm");
+    write(n3, "module namespace n = 'n';\n"
+        + "declare function n:h() {$n:x};");
     final IOFile o = new IOFile(sandbox, "o.xqm");
     write(o, "module namespace o = 'o';\n"
         + "import module 'o' at '" + o.path() + "';\n"
@@ -299,14 +304,34 @@ public final class ModuleTest extends SandboxTest {
         + "declare variable $m:x := 'main';\n"
         + "m:f(), $m:x", "module\nmain");
 
-    // private variable is visible throughout module, even in different file
+    // private variables of different files with the same module namespace do not clash
     query("import module namespace n = 'n' at '" + n1.path() + "', '" + n2.path() + "';\n"
-        + "n:f()", 42);
+        + "n:f(), n:g()", "1\n42");
+
+    // private variable is not visible in a different file with the same module namespace
+    error("import module namespace n = 'n' at '" + n2.path() + "', '" + n3.path() + "';\n"
+        + "n:h()", QueryError.VARPRIVATE_X);
 
     // variable in main module is not visible in imported module
     error("import module namespace o = 'o' at '" + o.path() + "';\n"
         + "declare variable $o:x := 42;\n"
         + "o:f()", QueryError.VARUNDEF_X);
+
+    // private variable of another file does not hide an imported public variable
+    final IOFile p = new IOFile(sandbox, "p.xqm");
+    write(p, "module namespace p = 'p';\n"
+        + "declare variable $p:x := 'public';");
+    final IOFile q1 = new IOFile(sandbox, "q1.xqm");
+    write(q1, "module namespace q = 'q';\n"
+        + "declare namespace p = 'p';\n"
+        + "declare %private variable $p:x := 'private';\n"
+        + "declare function q:f() {$p:x};");
+    final IOFile q2 = new IOFile(sandbox, "q2.xqm");
+    write(q2, "module namespace q = 'q';\n"
+        + "import module namespace p = 'p' at '" + p.path() + "';\n"
+        + "declare function q:g() {$p:x};");
+    query("import module namespace q = 'q' at '" + q1.path() + "', '" + q2.path() + "';\n"
+        + "q:f(), q:g()", "private\npublic");
   }
 
   /** Tests function visibility. */
@@ -318,10 +343,15 @@ public final class ModuleTest extends SandboxTest {
         + "declare function p:f() {p:x()};");
     final IOFile q1 = new IOFile(sandbox, "q1.xqm");
     write(q1, "module namespace q = 'q';\n"
-        + "declare function q:f() {x()};");
+        + "declare %private function q:x() {1};\n"
+        + "declare function q:f() {q:x()};");
     final IOFile q2 = new IOFile(sandbox, "q2.xqm");
     write(q2, "module namespace q = 'q';\n"
-        + "declare %private function x() {42};");
+        + "declare %private function q:x() {42};\n"
+        + "declare function q:g() {q:x()};");
+    final IOFile q3 = new IOFile(sandbox, "q3.xqm");
+    write(q3, "module namespace q = 'q';\n"
+        + "declare function q:h() {q:x()};");
     final IOFile s = new IOFile(sandbox, "s.xqm");
     write(s, "module namespace s = 's';\n"
         + "import module 's' at '" + s.path() + "';\n"
@@ -332,9 +362,13 @@ public final class ModuleTest extends SandboxTest {
         + "declare function p:x() {'main'};\n"
         + "p:f(), p:x()", "module\nmain");
 
-    // private function is visible throughout module, even in different file
+    // private functions of different files with the same module namespace do not clash
     query("import module namespace q = 'q' at '" + q1.path() + "', '" + q2.path() + "';\n"
-        + "q:f()", 42);
+        + "q:f(), q:g()", "1\n42");
+
+    // private function is not visible in a different file with the same module namespace
+    error("import module namespace q = 'q' at '" + q2.path() + "', '" + q3.path() + "';\n"
+        + "q:h()", QueryError.FUNCPRIVATE_X);
 
     // private function reported as such
     error("import module namespace p = 'p' at '" + p.path() + "';\n"
@@ -344,6 +378,28 @@ public final class ModuleTest extends SandboxTest {
     error("import module namespace s = 's' at '" + s.path() + "';\n"
         + "declare function s:x() {42};\n"
         + "s:f()", QueryError.WHICHFUNC_X);
+  }
+
+  /** Tests record visibility. */
+  @Test public void recordVisibility() {
+    final IOFile sandbox = sandbox();
+    final IOFile r1 = new IOFile(sandbox, "r1.xqm");
+    write(r1, "module namespace r = 'r';\n"
+        + "declare %private record r:r(a);\n"
+        + "declare function r:make1() { r:r(1) };\n"
+        + "declare function r:test1($x) { $x instance of r:r };");
+    final IOFile r2 = new IOFile(sandbox, "r2.xqm");
+    write(r2, "module namespace r = 'r';\n"
+        + "declare base-uri '" + r1.url() + "';\n"
+        + "declare %private record r:r(a);\n"
+        + "declare function r:make2() { r:r(1) };\n"
+        + "declare function r:test2($x) { $x instance of r:r };");
+
+    // private records of different files with the same module namespace are different types,
+    // even if the files declare the same base URI
+    query("import module namespace r = 'r' at '" + r1.path() + "', '" + r2.path() + "';\n"
+        + "r:test1(r:make1()), r:test1(r:make2()), r:test2(r:make1()), r:test2(r:make2())",
+        "true\nfalse\nfalse\ntrue");
   }
 
   /** Tests rejection of functions and variables, when their modules are not explicitly imported. */

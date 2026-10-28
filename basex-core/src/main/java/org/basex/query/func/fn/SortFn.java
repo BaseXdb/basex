@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
+import java.util.List;
 import java.util.function.*;
 
 import org.basex.query.*;

@@ -1,5 +1,7 @@
 package org.basex.query.scope;
 
+import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -54,6 +56,15 @@ public abstract class StaticDecl extends StaticScope {
    */
   public boolean has(final Flag... flags) {
     return expr != null && props.has(flags);
+  }
+
+  /**
+   * Checks if this declaration is visible in the given static context.
+   * @param ctx static context
+   * @return result of check
+   */
+  public boolean visible(final StaticContext ctx) {
+    return sc == ctx || !anns.contains(Annotation.PRIVATE);
   }
 
   /**

@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -160,11 +159,6 @@ public final class StaticFuncCall extends FuncCall {
             sf.paramName(a).prefixString());
         exprs[a] = Empty.UNDEFINED;
       }
-    }
-    // check visibility
-    if(sf.anns.contains(Annotation.PRIVATE) &&
-        !Token.eq(QNm.uri(sf.sc.module), QNm.uri(sc().module))) {
-      throw FUNCPRIVATE_X.get(info, name.string());
     }
   }
 
