@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <greenmail.version>2.1.14</greenmail.version>
+    <greenmail.version>2.1.15</greenmail.version>
   </properties>
 
   <dependencies>
