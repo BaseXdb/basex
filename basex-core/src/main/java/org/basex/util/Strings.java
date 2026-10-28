@@ -343,7 +343,7 @@ public final class Strings {
 
   /**
    * Converts a URI to a directory path.
-   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * See https://docs.basex.org/main/Java_Bindings#uri_rewriting for details.
    * @param uri namespace URI
    * @return converted path
    */

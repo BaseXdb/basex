@@ -7,8 +7,14 @@ updates:
       - "/basex-tests"
       - "/basex-examples"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     open-pull-requests-limit: 10
+    # minor and patch updates in one PR; major updates stay separate
+    groups:
+      maven:
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       # hosted on files.basex.org, which Dependabot cannot reach
       - dependency-name: "net.xqj:basex-xqj"

@@ -1,5 +1,5 @@
 # This example shows how database commands can be executed.
-# Documentation: https://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/main/Clients
 #
 # (C) BaseX Team, BSD License
 

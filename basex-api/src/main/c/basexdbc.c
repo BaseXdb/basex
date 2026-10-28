@@ -93,7 +93,7 @@ basex_connect(const char *host, const char *port)
  * Authenticate against BaseX server connected on sfd using user and passwd.
  *
  * Authentication as defined by BaseX transfer protocol (BaseX 13.0 ff.):
- * https://docs.basex.org/wiki/Server_Protocol
+ * https://docs.basex.org/main/Server_Protocol
  * {...} = string; \n = single byte
  *
  *   1. Client connects to server socket (basex_connect)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Documentation: https://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/main/Clients
 #
 # (C) BaseX Team, BSD License
 

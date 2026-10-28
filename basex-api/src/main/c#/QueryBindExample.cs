@@ -1,7 +1,7 @@
 ﻿/*
  * This example shows how external variables can be bound to XQuery expressions.
  *
- * Documentation: https://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/main/Clients
  *
  * (C) BaseX Team, BSD License
  */

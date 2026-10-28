@@ -4,7 +4,7 @@ import java.io.*;
  * This example shows how commands can be executed on a server.
  *
  * This example requires a running database server instance.
- * Documentation: https://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/main/Clients
  *
  * @author BaseX Team, BSD License
  */

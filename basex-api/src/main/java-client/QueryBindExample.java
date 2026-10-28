@@ -4,7 +4,7 @@ import java.io.*;
  * This example shows how external variables can be bound to XQuery expressions.
  *
  * This example requires a running database server instance.
- * Documentation: https://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/main/Clients
  *
  * @author BaseX Team, BSD License
  */

@@ -12,7 +12,7 @@ RUN apk add --no-cache unzip \
 
 FROM eclipse-temurin:25-jre-alpine
 
-LABEL org.opencontainers.image.source="https://basex.org" \
+LABEL org.opencontainers.image.source="https://github.com/BaseXdb/basex" \
       org.opencontainers.image.description="BaseX XML database / XQuery server"
 
 RUN apk add --no-cache bash \

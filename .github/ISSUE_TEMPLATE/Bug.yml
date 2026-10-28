@@ -59,6 +59,6 @@ body:
     label: What is your configuration?
     description: |
       - Include as much configuration as possible, including global and default sections.
-      - Don’t forget to remove confidential data.
+      - Donâ€™t forget to remove confidential data.
   validations:
     required: true

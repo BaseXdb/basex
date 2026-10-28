@@ -2,7 +2,7 @@
  * Language Binding for BaseX.
  * Works with BaseX 13.0 and later
  *
- * Documentation: https://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/main/Clients
  *
  * (C) BaseX Team, BSD License
  */
