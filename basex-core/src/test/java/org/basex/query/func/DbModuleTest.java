@@ -1402,13 +1402,14 @@ public final class DbModuleTest extends SandboxTest {
     final IOFile dir = new IOFile(sandbox(), "input");
     new IOFile(dir, "a.xml").write("<a/>");
     new IOFile(dir, "sub/b.xml").write("<b/>");
-    final String list = "string-join(" + _DB_LIST.args(NAME, "t") + ", ' ')";
+    // file systems do not guarantee the order in which directory entries are returned
+    final String list = "string-join(sort(" + _DB_LIST.args(NAME, "t") + "), ' ')";
     query(_DB_ADD.args(NAME, " <old/>", "t/old.xml"));
     query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "t"));
     query(_DB_PUT.args(NAME, dir.path(), "t"));
-    query(list, "t/a.xml t/sub/b.xml t");
+    query(list, "t t/a.xml t/sub/b.xml");
     query(_DB_PUT.args(NAME, dir.path(), "t"));
-    query(list, "t/a.xml t/sub/b.xml t");
+    query(list, "t t/a.xml t/sub/b.xml");
   }
 
   /** Test method. */
