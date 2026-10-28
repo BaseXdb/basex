@@ -23,14 +23,16 @@ function dba:redirect(
 (:~
  : Returns a static file of the application.
  : @param  $file  file or unknown path
+ : @param  $v     version of the file (see html:static)
  : @return rest binary data
  :)
 declare
   %rest:path('/dba/.static/{$file=.+}')
-  %output:method('basex')
+  %rest:query-param('v', '{$v}')
   %perm:allow('public')
 function dba:file(
-  $file  as xs:string
+  $file  as xs:string,
+  $v     as xs:string?
 ) as item()+ {
   let $path := 'static/' || $file
   return if (contains($file, '..')) then (
@@ -45,7 +47,9 @@ function dba:file(
         web:response-header(
           { 'media-type': web:content-type($path) },
           {
-            'Cache-Control': 'max-age=3600,public',
+            (: a versioned address changes with the file :)
+            'Cache-Control': if ($v) then 'max-age=31536000,public,immutable'
+                             else 'max-age=3600,public',
             'Content-Length': string($size)
           }
         ),
@@ -73,7 +77,6 @@ declare
   %rest:path('/dba/{$path=.*}')
   %rest:error-param('code', '{$code}')
   %rest:error-param('description', '{$description}')
-  %output:method('text')
 function dba:error(
   $path         as xs:string,
   $code         as xs:QName?,
@@ -85,18 +88,20 @@ function dba:error(
   (: web:error already states the status, and its message needs no code :)
   let $stated := $local[matches(., '^status\d+$')] ! xs:integer(substring(., 7))
   let $status := $stated otherwise (
-    if ($local = 'not-found') then 404
-    else if ($code ! namespace-uri-from-QName(.) = $dba:FILE-NS) then 400
-    else if (matches($local, '^X[PQ]ST')) then 400
-    else 500
+    switch () {
+      case $local = 'not-found' return 404
+      case $code ! namespace-uri-from-QName(.) = $dba:FILE-NS return 400
+      case matches($local, '^X[PQ]ST') return 400
+      default return 500
+    }
   )
   (: XQuery errors are known by their code alone, the errors of a module by their prefix :)
   let $name := if (not($stated)) {
-    ($code ! prefix-from-QName(.)[. != 'err'] ! (. || ':') otherwise '') || $local
+    string-join(($code ! prefix-from-QName(.)[. != 'err'], $local), ':')
   }
   return (
     web:response-header((), (), { 'status': $status }),
-    ('[' || $name || '] ')[$name] || ($description otherwise 'Unexpected error.')
+    string-join((`[{ $name }] `[$name], $description otherwise 'Unexpected error.'))
   )
 };
 

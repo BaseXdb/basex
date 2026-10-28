@@ -37,14 +37,23 @@ public abstract class UserPermUpdate extends UserUpdate {
 
     super(type, user, qc, info);
     this.perms = perms;
-    this.patterns = patterns;
+    final StringList pats = new StringList(patterns.size()).add(patterns);
+
+    // permissions without pattern are global
+    final int ps = perms != null ? perms.size() : 0;
+    while(pats.size() < ps) pats.add("");
+    if(perms != null && pats.size() > ps) throw USER_PATTERN2_X.get(info, pats.get(ps));
 
     final StringList tmp = new StringList();
-    for(final String pattern : patterns) {
+    for(final String pattern : pats) {
       if(tmp.contains(pattern)) throw pattern.isEmpty()
         ? USER_UPDATE3_X_X.get(info, user.name(), operation()) : USER_UPDATE2_X.get(info, pattern);
       tmp.add(pattern);
     }
+    for(int p = 0; p < ps; p++) {
+      if(perms.get(p) == Perm.ADMIN && !pats.get(p).isEmpty()) throw USER_LOCAL.get(info);
+    }
+    this.patterns = pats;
   }
 
   @Override
@@ -59,9 +68,7 @@ public abstract class UserPermUpdate extends UserUpdate {
    * Grants the specified permissions.
    */
   protected final void grant() {
-    final int ps = perms.size(), ts = patterns.size();
-    for(int p = 0; p < ps; p++) {
-      user.permission(perms.get(p), p < ts ? patterns.get(p) : "");
-    }
+    final int ps = perms.size();
+    for(int p = 0; p < ps; p++) user.permission(perms.get(p), patterns.get(p));
   }
 }

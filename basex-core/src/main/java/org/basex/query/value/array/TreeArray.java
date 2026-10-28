@@ -42,7 +42,7 @@ abstract class TreeArray extends XQArray {
    * the given array. Its length is always {@code to - from}. If {@code from} is smaller than zero,
    * the first {@code -from} entries in the resulting array are {@code null}.
    * If {@code to > values.length} then the last {@code to - values.length} entries are
-   * {@code null}. If {@code from == 0 && to == values.length}, the original array is returned.
+   * {@code null}.
    * @param values input values
    * @param from first index, inclusive (can be negative)
    * @param to last index, exclusive (can be greater than {@code values.length})

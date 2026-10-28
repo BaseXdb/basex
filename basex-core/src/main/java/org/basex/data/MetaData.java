@@ -92,6 +92,8 @@ public final class MetaData {
   public boolean diacritics;
   /** Full-text stopword file. */
   public String stopwords;
+  /** Full-text stopword file of the stored stopwords (can be {@code null}). */
+  public String swsource;
 
   /** Maximum number of categories. */
   public int maxcats;
@@ -127,7 +129,6 @@ public final class MetaData {
   public int lastid = -1;
   /** Committed length of the ID-PRE log ({@code 0} if there is no log). */
   public long idplog;
-
 
   /** Database directory. Set to {@code null} if database is in main memory. */
   private final IOFile dir;
@@ -193,6 +194,7 @@ public final class MetaData {
     casesens = meta.casesens;
     diacritics = meta.diacritics;
     stopwords = meta.stopwords;
+    swsource = meta.swsource;
     maxcats = meta.maxcats;
     maxlen = meta.maxlen;
     language = meta.language;
@@ -409,7 +411,7 @@ public final class MetaData {
   /**
    * Drops the specified database files.
    * Should only be called if database is disk-based.
-   * @param pattern file pattern or {@code null} if all files are to be deleted
+   * @param pattern file pattern
    * @return result of check
    */
   public synchronized boolean drop(final String pattern) {
@@ -561,6 +563,7 @@ public final class MetaData {
         case IDBSTR -> istorage = v;
         case DBFNAME -> original = v;
         case DBFTSW -> stopwords = v;
+        case DBFTSWSRC -> swsource = v;
         case DBFTLN -> language(Language.get(v));
         case DBSIZE -> size = toInt(v);
         case DBNDOCS -> ndocs = toInt(v);
@@ -602,12 +605,8 @@ public final class MetaData {
         case DBUPTODATE -> uptodate = isTrue(v);
         case DBCOUNTS -> counts = isTrue(v);
         case DBCOMPLETE -> complete = isTrue(v);
-        case DBOPTIMIZED -> {
-          for(final String type : split(v, ',')) optimized.add(IndexType.valueOf(type));
-        }
-        case DBSKIPPED -> {
-          for(final String type : split(v, ',')) skipped.add(IndexType.valueOf(type));
-        }
+        case DBOPTIMIZED -> readInfo(v, optimized);
+        case DBSKIPPED -> readInfo(v, skipped);
       }
     }
     // restore implications (relevant for databases created before version 13)
@@ -615,8 +614,9 @@ public final class MetaData {
     if(counts) complete = true;
 
     // check version of database storage
-    if(!storage.equals(STORAGE) && new Version(storage).compareTo(new Version(
-        STORAGE)) > 0) throw new BuildException(H_DB_FORMAT, storage);
+    if(!storage.equals(STORAGE) && new Version(storage).compareTo(new Version(STORAGE)) > 0) {
+      throw new BuildException(H_DB_FORMAT, storage);
+    }
     // check version of database indexes
     oldindex = !istorage.equals(ISTORAGE) &&
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
@@ -668,21 +668,14 @@ public final class MetaData {
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
     writeInfo(out, DBFTSW,     stopwords);
+    if(swsource != null) writeInfo(out, DBFTSWSRC, swsource);
     writeInfo(out, DBMAXLEN,   maxlen);
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBCOUNTS,   counts);
     writeInfo(out, DBCOMPLETE, complete);
-    if(!optimized.isEmpty()) {
-      final StringList types = new StringList();
-      for(final IndexType type : optimized) types.add(type.name());
-      writeInfo(out, DBOPTIMIZED, String.join(",", types.finish()));
-    }
-    if(!skipped.isEmpty()) {
-      final StringList types = new StringList();
-      for(final IndexType type : skipped) types.add(type.name());
-      writeInfo(out, DBSKIPPED, String.join(",", types.finish()));
-    }
+    writeInfo(out, DBOPTIMIZED, optimized);
+    writeInfo(out, DBSKIPPED,  skipped);
     writeInfo(out, DBLASTID,   lastid);
     if(idplog != 0) writeInfo(out, DBIDPLOG, idplog);
     final Language ln = language();
@@ -737,6 +730,15 @@ public final class MetaData {
   // PRIVATE METHODS ==============================================================================
 
   /**
+   * Adds comma-separated index types to the specified set.
+   * @param value value
+   * @param types index types
+   */
+  private static void readInfo(final String value, final EnumSet<IndexType> types) {
+    for(final String type : split(value, ',')) types.add(IndexType.valueOf(type));
+  }
+
+  /**
    * Writes a boolean option to the specified output.
    * @param out output stream
    * @param name key
@@ -758,6 +760,21 @@ public final class MetaData {
   private static void writeInfo(final DataOutput out, final String name, final long value)
       throws IOException {
     writeInfo(out, name, Long.toString(value));
+  }
+
+  /**
+   * Writes a non-empty set of index types to the specified output.
+   * @param out output stream
+   * @param name key
+   * @param types index types
+   * @throws IOException I/O exception
+   */
+  private static void writeInfo(final DataOutput out, final String name,
+      final EnumSet<IndexType> types) throws IOException {
+    if(types.isEmpty()) return;
+    final StringList list = new StringList();
+    for(final IndexType type : types) list.add(type.name());
+    writeInfo(out, name, String.join(",", list.finish()));
   }
 
   /**

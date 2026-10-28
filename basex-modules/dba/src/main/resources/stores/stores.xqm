@@ -34,6 +34,7 @@ function dba:stores(
   (: the default store is named by the empty string, and is what the view opens with. The level
      that is listed is the store, unless the address names a deeper one; within the store, the
      entry that is looked at is chosen, and the first one if the address names none :)
+  let $name := $name[exists(try { store:info(.) } catch store:name { })] otherwise ''
   let $level := panels:steps($path)
   let $selected := if (empty($level)) { $key[.] otherwise panels:first-key($name) }
   let $value-path := ($level, $selected)
@@ -51,10 +52,12 @@ function dba:stores(
       'label': 'Value',
       'pane' : false(),
       'extra': <textarea id='editor' spellcheck='false'>{ $value?text }</textarea>
-    })
+    }),
+    (: outside the panels: the list of stores is redrawn, the dialog and its editor are not :)
+    panels:create-dialog()
   ) => html:wrap({
     'header' : $dba:CAT,
-    'columns': ('30fr', '35fr', '35fr'),
+    'columns': ('35fr', '35fr', '30fr'),
     'rows'   : '1fr',
     'scripts': ('cm6', 'editor', 'stores'),
     'init'   : `initStores({ $value?editable });`
@@ -74,7 +77,6 @@ declare
   %rest:path('/dba/store-save')
   %rest:query-param('name', '{$name}')
   %rest:query-param('path', '{$path}')
-  %output:method('text')
 function dba:store-save(
   $name   as xs:string?,
   $path   as xs:string,
@@ -128,7 +130,6 @@ function dba:remove() {
        store are removed from the store itself :)
     let $path := panels:steps($args?path)
     let $steps := $args?step ! panels:steps(.)
-    let $key := head($path)
     return {
       (: the entries that were removed are gone; the level they belonged to is not :)
       'params': dba:selection($args, ()),
@@ -137,6 +138,7 @@ function dba:remove() {
         if (empty($path)) then (
           $steps ! store:remove(string(.), $args?name)
         ) else (
+          let $key := head($path)
           let $value := store:get($key, $args?name)
           let $level := panels:remove(panels:resolve($value, tail($path)), $steps)
           return store:put($key, panels:replace($value, tail($path), $level), $args?name)
@@ -292,7 +294,7 @@ declare %private function dba:key(
   $entry  as xs:boolean
 ) as xs:anyAtomicType {
   (: a map is keyed by any atomic value, so the key is supplied the way the value is :)
-  let $key := utils:evaluate($query)
+  let $key := utils:evaluate($query, 'key')
   return if (not($key instance of xs:anyAtomicType)) then (
     error((), 'The key must be a single atomic value.')
   ) else if ($entry and not($key instance of xs:string)) then (

@@ -47,9 +47,7 @@ public final class Put extends ACreate {
     // check if the input source has already been initialized
     final IO io = in == null ? IO.get(args[1]) : null;
     if(io != null) {
-      if(io.isExternal() && !context.user().has(Perm.CREATE)) {
-        return error(PERM_REQUIRED_X, Perm.CREATE);
-      }
+      if(denied(io)) return error(PERM_REQUIRED_X, Perm.ADMIN);
       if(!io.exists()) return error(RES_NOT_FOUND_X, io);
       in = io.inputSource();
     }

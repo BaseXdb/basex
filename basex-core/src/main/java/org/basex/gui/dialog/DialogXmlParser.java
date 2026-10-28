@@ -51,10 +51,12 @@ final class DialogXmlParser extends DialogParser {
     browsec = new BaseXButton(dialog, BROWSE_D);
     browsec.addActionListener(e -> {
       final GUIOptions gopts = dialog.gui().gopts;
-      final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR,
-          gopts.get(GUIOptions.INPUTPATH)).filter(XML_DOCUMENTS, true, IO.XMLSUFFIX);
+      final String path = cfile.getText();
+      final BaseXFileChooser fc = new BaseXFileChooser(dialog, OPEN,
+          path.isEmpty() ? gopts.get(GUIOptions.INPUTPATH) : path).
+          filter(XML_DOCUMENTS, true, IO.XMLSUFFIX);
 
-      final IO file = fc.select(Mode.FDOPEN);
+      final IO file = fc.select(Mode.FOPEN);
       if(file != null) cfile.setText(file.path());
     });
 

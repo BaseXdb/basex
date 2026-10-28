@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
@@ -38,7 +37,7 @@ public final class DbListDetails extends DbList {
           database.attr(Q_RESOURCES, meta.ndocs + stats.binaries() + stats.values());
           database.attr(Q_MODIFIED_DATE, DateTime.format(meta.dbTime()));
           database.attr(Q_SIZE, stats.size());
-          if(qc.has(Perm.CREATE, name, info)) database.attr(Q_PATH, meta.original);
+          database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);
@@ -62,7 +61,6 @@ public final class DbListDetails extends DbList {
     return new BasicIter<FNode>(size) {
       @Override
       public FNode get(final long i) {
-        if(i >= size) return null;
         final ResourceType type;
         final String pt;
         final long mdate, sz;

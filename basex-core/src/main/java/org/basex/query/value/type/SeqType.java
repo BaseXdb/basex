@@ -172,7 +172,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     final Type vt = TypeRef.deref(value.type);
-    if(instanceOf(vt, dt, coerce)) return true;
+    if(keptStatic(vt, dt, coerce)) return true;
     // check single item
     if(size == 1) return instance((Item) value, coerce);
     // check each item
@@ -180,7 +180,7 @@ public final class SeqType {
       if(!instance(item, coerce)) return false;
     }
     // remember the more specific type to skip subsequent checks
-    if(dt.assignable() && (coerce || !dt.coercive()) && dt.instanceOf(vt)) value.type = dt;
+    if(dt.assignable(coerce) && dt.instanceOf(vt)) value.type = dt;
     return true;
   }
 
@@ -227,6 +227,8 @@ public final class SeqType {
           if(it instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
         } else if(dt instanceof final RecordType rt) {
           if(it instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+        } else if(dt instanceof final ShapeType sh) {
+          if(it instanceof final XQMap map) cast = map.castTo(sh, error, qc, info);
         } else if(dt instanceof final MapType mt) {
           if(it instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
         }
@@ -422,8 +424,9 @@ public final class SeqType {
         try {
           final Value value = tp.seqType().coerce(item, name, qc, cc, info);
           if(value != null) return value;
-        } catch(final QueryException ignore) {
-          // try next type
+        } catch(final QueryException ex) {
+          // errors of initializers are raised, all others lead to the next type
+          if(ex.isInitializer()) throw ex;
         }
       }
       return null;
@@ -446,6 +449,7 @@ public final class SeqType {
         if(dt instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
       } else if(fitem instanceof final XQMap map) {
         if(dt instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
+        if(dt instanceof final ShapeType sh) return map.coerceTo(sh, qc, info, cc);
         if(dt instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
       if(dt instanceof final FuncType ft) return fitem.coerceTo(ft, qc, cc, info);
@@ -468,8 +472,7 @@ public final class SeqType {
       final InputInfo info) throws QueryException {
     final Type at = item.type;
     if(at.instanceOf(tp)) return item;
-    // xs:error has an empty value space: function conversion never casts to it, so coercion
-    // always fails and the caller reports a type error (XPTY0004)
+    // xs:error has no values: coercion fails, the caller raises XPTY0004
     if(tp == ERROR) return null;
 
     Item relabel = null;
@@ -499,7 +502,6 @@ public final class SeqType {
     return cast != null && (relabel == null || cast.compare(relabel, null, false, qc, info) == 0) ?
         cast : null;
   }
-
 
   /**
    * Computes the union of two sequence types, i.e. the lowest common ancestor of both types.
@@ -538,16 +540,25 @@ public final class SeqType {
    */
   public SeqType intersect(final SeqType st) {
     if(this == st) return this;
-    // a void type (xs:error, xs:error+) is the bottom of the sequence-type lattice, so it is the
-    // intersection (greatest lower bound) with any type, irrespective of the occurrence indicator.
-    // if both are void, the occurrences are intersected, so the result is order-independent
+    // void types (xs:error, xs:error+) are bottom types; two void occurrences are intersected
     if(voidType()) return st.voidType() ? get(type, occ.intersect(st.occ)) : this;
     if(st.voidType()) return st;
-    final Type tp = TypeRef.deref(type).intersect(TypeRef.deref(st.type));
-    if(tp == null) return null;
+    return intersect(st, TypeRef.deref(type).intersect(TypeRef.deref(st.type)));
+  }
+
+  /**
+   * Computes the intersection of two sequence types with the specified intersection of their
+   * item types.
+   * @param st second type
+   * @param tp intersection of the item types (can be {@code null})
+   * @return resulting type or {@code null}
+   */
+  SeqType intersect(final SeqType st, final Type tp) {
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    return get(tp, oc);
+    if(tp != null) return get(tp, oc);
+    // disjoint item types: the empty sequence is the only common instance
+    return oc.min == 0 ? Types.EMPTY_SEQUENCE_Z : null;
   }
 
   /**
@@ -583,9 +594,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if this is a sequence type of the <i>void</i> category ({@code xs:error} or
-   * {@code xs:error+}): it has no instances, so an expression of this type never returns a value
-   * (see the subtype rules in the specification, "Subtypes of Sequence Types").
+   * Tests if this is a sequence type without instances ({@code xs:error}, {@code xs:error+}).
    * @return result of check
    */
   public boolean voidType() {
@@ -593,8 +602,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if this is a sequence type of the <i>empty</i> category ({@code empty-sequence()},
-   * {@code xs:error?} or {@code xs:error*}): the empty sequence is its only instance.
+   * Tests if this type only matches the empty sequence ({@code xs:error?}, {@code xs:error*}).
    * @return result of check
    */
   public boolean emptyType() {
@@ -707,7 +715,7 @@ public final class SeqType {
   private static Type matched(final Type type) {
     final Type tp = TypeRef.deref(type);
     // matching records may have another record type: no record type can be assigned
-    if(tp instanceof final ShapeType sh) return sh.declared() ? Types.RECORD : type;
+    if(tp instanceof final ShapeType sh) return sh.labeled() ? Types.RECORD : type;
     if(tp instanceof final ArrayType at) {
       final SeqType vt = at.valueType(), mvt = vt.matched();
       return mvt == vt ? type : ArrayType.get(mvt);
@@ -742,8 +750,7 @@ public final class SeqType {
     if(this == st) return true;
     // void category (xs:error, xs:error+): no instances, a subtype of every sequence type
     if(voidType()) return true;
-    // empty category (empty-sequence(), xs:error?, xs:error*): the empty sequence is the only
-    // instance, a subtype of every sequence type that permits the empty sequence
+    // empty category (empty-sequence(), xs:error?, xs:error*): subtype of every optional type
     if(emptyType()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
     return TypeRef.deref(type).instanceOf(TypeRef.deref(st.type));
@@ -756,7 +763,7 @@ public final class SeqType {
    */
   public boolean coercible(final SeqType st) {
     // identical records are kept, typed functions are always wrapped
-    return instanceOf(st) && (!st.type.coercive() || instanceOf(type, st.type, true));
+    return instanceOf(st) && (!st.type.coercive() || keptStatic(type, st.type, true));
   }
 
   /**
@@ -776,7 +783,7 @@ public final class SeqType {
    * @param coerce coercion
    * @return result of check
    */
-  public static boolean instanceOf(final Type type, final Type target, final boolean coerce) {
+  public static boolean keptStatic(final Type type, final Type target, final boolean coerce) {
     // static function types are upper bounds: functions of the same type may still be wrapped
     return !(coerce && target.wraps()) && kept(type, target, coerce);
   }
@@ -825,7 +832,7 @@ public final class SeqType {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!one() && type instanceof FType && !(type instanceof MapType || type instanceof ArrayType)) {
+    if(!one() && type instanceof FuncType) {
       tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());

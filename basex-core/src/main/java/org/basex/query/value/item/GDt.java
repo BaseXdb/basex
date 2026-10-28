@@ -116,8 +116,7 @@ public final class GDt extends ADate {
     }
     if(has(MON) || has(DAY)) tb.add('-');
     if(has(MON)) prefix(tb, month, 2);
-    if(has(DAY)) tb.add('-');
-    if(has(DAY)) prefix(tb, day, 2);
+    if(has(DAY)) prefix(tb.add('-'), day, 2);
 
     zone(tb);
     return tb.finish();

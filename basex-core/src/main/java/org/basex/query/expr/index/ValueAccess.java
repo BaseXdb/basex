@@ -93,9 +93,7 @@ public final class ValueAccess extends IndexAccess {
     if(tokens == null) {
       cache = new TokenSet();
       final Iter ir = expr.iter(qc);
-      for(Item item; (item = qc.next(ir)) != null;) {
-        cache.add(toToken(item));
-      }
+      for(Item item; (item = qc.next(ir)) != null;) cache.add(toToken(item));
     } else {
       cache = tokens;
     }
@@ -253,7 +251,7 @@ public final class ValueAccess extends IndexAccess {
         while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1) {
             final DBNode node = new DBNode(data, pre, Data.ELEM);
-            if(test == null || test.matches(node)) return node;
+            if(test.matches(node)) return node;
           }
         }
         return null;

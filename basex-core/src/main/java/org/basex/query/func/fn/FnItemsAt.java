@@ -63,7 +63,7 @@ public final class FnItemsAt extends StandardFunc {
         if(value != null) return l < value.size() ? value.itemAt(l) : Empty.VALUE;
 
         // fast route if the result size is known
-        final Iter iter = input.iter(qc);
+        final Iter iter = FnSubsequence.iter(input, l + 1, qc);
         final long size = iter.size();
         if(size >= 0) {
           return l < size ? iter.get(l) : Empty.VALUE;
@@ -150,9 +150,7 @@ public final class FnItemsAt extends StandardFunc {
         if(REPLICATE.is(input)) {
           // static integer will always be greater than 1
           final Expr[] args = input.args();
-          if(args[0].size() == 1 && args[1] instanceof final Itr itr) {
-            return l > itr.itr() ? Empty.VALUE : args[0];
-          }
+          if(args[0].size() == 1 && args[1] instanceof Itr) return args[0];
         }
         // items-at(file:read-text-lines(E), pos) → file:read-text-lines(E, pos, 1)
         if(_FILE_READ_TEXT_LINES.is(input))

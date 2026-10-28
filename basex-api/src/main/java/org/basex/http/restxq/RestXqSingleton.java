@@ -37,7 +37,7 @@ final class RestXqSingleton {
     session = conn.requestCtx.state().session(true);
     synchronized(MUTEX) {
       queue();
-      register();
+      RequestState.attribute(session, id, qc);
     }
   }
 
@@ -50,23 +50,12 @@ final class RestXqSingleton {
 
     // request the running query to stop, wait until it deregisters itself
     oldQc.stop();
-    synchronized(MUTEX) {
-      while(qc() == oldQc) {
-        try {
-          MUTEX.wait(WAIT);
-        } catch(final InterruptedException ex) {
-          Util.debug(ex);
-        }
+    while(qc() == oldQc) {
+      try {
+        MUTEX.wait(WAIT);
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
       }
-    }
-  }
-
-  /**
-   * Registers a query.
-   */
-  private void register() {
-    synchronized(MUTEX) {
-      RequestState.attribute(session, id, qc);
     }
   }
 
@@ -87,9 +76,6 @@ final class RestXqSingleton {
    * @return query context or {@code null}
    */
   private QueryContext qc() {
-    synchronized(MUTEX) {
-      return RequestState.attribute(session, id)
-          instanceof final QueryContext qctx ? qctx : null;
-    }
+    return RequestState.attribute(session, id) instanceof final QueryContext qctx ? qctx : null;
   }
 }

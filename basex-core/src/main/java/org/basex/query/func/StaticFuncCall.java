@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -148,10 +147,8 @@ public final class StaticFuncCall extends FuncCall {
     // assign keyword arguments
     final int arity = sf.arity();
     if(keywords != null) {
-      final QNm[] names = new QNm[arity];
-      for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), names, arity,
-          (Supplier<String>) sf::paramString);
+      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), sf.paramNames(),
+          arity, (Supplier<String>) sf::paramString);
       keywords = null;
     }
     // mark arguments that will be replaced with default expressions
@@ -162,11 +159,6 @@ public final class StaticFuncCall extends FuncCall {
             sf.paramName(a).prefixString());
         exprs[a] = Empty.UNDEFINED;
       }
-    }
-    // check visibility
-    if(sf.anns.contains(Annotation.PRIVATE) &&
-        !Token.eq(QNm.uri(sf.sc.module), QNm.uri(sc().module))) {
-      throw FUNCPRIVATE_X.get(info, name.string());
     }
   }
 

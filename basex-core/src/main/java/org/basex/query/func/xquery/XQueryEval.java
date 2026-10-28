@@ -141,7 +141,6 @@ public class XQueryEval extends StandardFunc {
         throw qe.info(pass ? ii.path().equals(info.path()) ?
           new InputInfo(query.path(), ii.line(), ii.column(), ii.decl()) : ii : info);
       } catch(final StackOverflowError ex) {
-        // pass on error info: assign (possibly empty) path of module which caused the error
         throw XQUERY_UNEXPECTED_X.get(info, ex);
       } finally {
         qc.context.jobs.unwatchMemory(qctx);

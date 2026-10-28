@@ -5,6 +5,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -15,7 +16,11 @@ import org.basex.query.value.node.*;
 public final class FnUriCollection extends FnCollection {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter uri = collection(qc).iter();
+    // URIs of the files of a directory, or documents of a collection
+    final Value value = collection(true, qc);
+    if(value.type.instanceOf(BasicType.ANY_URI)) return value.iter();
+
+    final Iter uri = value.iter();
     final long size = uri.size();
 
     return new Iter() {
@@ -33,8 +38,8 @@ public final class FnUriCollection extends FnCollection {
         return size;
       }
 
-      private static Uri toUri(final Item item) {
-        return Uri.get(((XNode) item).baseURI(), false);
+      private static Item toUri(final Item item) {
+        return item instanceof final XNode node ? Uri.get(node.baseURI(), false) : item;
       }
     };
   }

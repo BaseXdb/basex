@@ -16,6 +16,7 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.ft.*;
 import org.basex.util.list.*;
 
 /**
@@ -133,6 +134,7 @@ public final class OptimizeAll extends ACreate {
     nmeta.time = ometa.time;
     nmeta.dirty = true;
     try {
+      StopWords.copy(odata, ndata);
       CreateIndex.create(ndata, cmd);
     } catch(final Throwable th) {
       // index creation failed: delete temporary database

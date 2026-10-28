@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.options.*;
 
 /**
@@ -120,8 +121,28 @@ public abstract class View extends BaseXPanel {
    * @return {@code true} if the marked nodes were changed
    */
   protected final boolean markFocused(final MouseEvent e) {
+    return mark(e, gui.context.focused);
+  }
+
+  /**
+   * Clears the marked nodes after a left click on empty space.
+   * @param e mouse event
+   */
+  protected final void unmark(final MouseEvent e) {
+    if(SwingUtilities.isLeftMouseButton(e) && !gui.context.marked.isEmpty()) {
+      gui.notify.mark(new DBNodes(gui.context.data()), null);
+    }
+  }
+
+  /**
+   * Adds the specified node to the marked nodes (Shift) or toggles it (shortcut key).
+   * @param e mouse event
+   * @param pre PRE value of the node
+   * @return {@code true} if the marked nodes were changed
+   */
+  protected final boolean mark(final MouseEvent e, final int pre) {
     final int mode = e.isShiftDown() ? 1 : sc(e) && SwingUtilities.isLeftMouseButton(e) ? 2 : 0;
-    if(mode != 0) gui.notify.mark(mode);
+    if(mode != 0) gui.notify.mark(mode, pre);
     return mode != 0;
   }
 

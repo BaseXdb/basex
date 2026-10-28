@@ -29,7 +29,12 @@ public final class Copy extends Command {
    * @param newdb new db name
    */
   public Copy(final String db, final String newdb) {
-    super(Perm.CREATE, db, newdb);
+    super(Perm.ADMIN, db, newdb);
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return true;
   }
 
   @Override
@@ -39,6 +44,8 @@ public final class Copy extends Command {
     // check if names are valid
     if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
+    // check local permissions
+    if(!create(src, trg)) return error(PERM_REQUIRED_X, Perm.ADMIN);
 
     // source database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);

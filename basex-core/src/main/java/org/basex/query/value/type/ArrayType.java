@@ -48,13 +48,13 @@ public final class ArrayType extends FType {
   }
 
   @Override
-  public boolean coercive() {
-    return valueType.type.coercive();
+  public Coercion coercion() {
+    return valueType.type.coercion();
   }
 
   @Override
-  public boolean wraps() {
-    return valueType.type.wraps();
+  public boolean assignable() {
+    return valueType.type.assignable();
   }
 
   @Override
@@ -90,8 +90,7 @@ public final class ArrayType extends FType {
       return this != ARRAY && valueType.instanceOf(at.valueType);
     }
     if(type instanceof final FuncType ft) {
-      return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
-          ft.argTypes[0].instanceOf(INTEGER_O);
+      return valueType.instanceOf(ft.declType) && ft.unary(INTEGER_O);
     }
     return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
@@ -122,10 +121,11 @@ public final class ArrayType extends FType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final ArrayType at) {
+      // disjoint member types: the empty array is still an instance of both types
       final SeqType mt = valueType.intersect(at.valueType);
-      if(mt != null) return get(mt);
+      return get(mt != null ? mt : ERROR_O);
     }
-    return null;
+    return type instanceof final FuncType ft && ft.unary(INTEGER_O) ? this : null;
   }
 
   @Override

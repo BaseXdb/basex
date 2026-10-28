@@ -429,7 +429,7 @@ public enum QueryError {
   /** Error code. */
   REQUEST_BODY(REQUEST, "body", "Request body cannot be read."),
   /** Error code. */
-  REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded."),
+  REQUEST_PARAMETER_X(REQUEST, "parameter", "Form parameters cannot be read: %"),
 
   // Session Module
 
@@ -472,8 +472,6 @@ public enum QueryError {
   /** Error code. */
   STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
   /** Error code. */
-  STRING_FORMAT_X_X(STRING, "format", "%: %."),
-  /** Error code. */
   STRING_NGRAM_X(STRING, "ngram", "N-gram length must be positive: %."),
 
   // Unit Module
@@ -511,6 +509,8 @@ public enum QueryError {
   USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
   /** Error code. */
   USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
+  /** Error code. */
+  USER_PATTERN2_X(USER, "pattern", "No permission specified for pattern '%'."),
   /** Error code. */
   USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
   /** Error code. */
@@ -628,6 +628,8 @@ public enum QueryError {
   /** Error code. */
   RESDIR_X(FODC, 2, "URI '%' points to a directory."),
   /** Error code. */
+  COLLFORM_X_X(FODC, 2, "Collection form '%' does not apply to '%'."),
+  /** Error code. */
   INVCOLL_X(FODC, 4, "Invalid collection URI: %."),
   /** Error code. */
   INVDOC_X(FODC, 5, "Invalid document URI: %."),
@@ -652,7 +654,7 @@ public enum QueryError {
   /** Error code. */
   SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
-  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted (check the function options): %."),
+  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted: %."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
@@ -1232,6 +1234,8 @@ public enum QueryError {
   UNKNOWNOP_X(XPTY, 4, "Unknown operator: %."),
   /** Error code. */
   INVALIDOPTION_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %."),
+  /** Error code. */
+  INVALIDBOOLOPTION_X_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %; use %."),
   /** Error code. */
   INVALIDOPTION_X_X_X(XPTY, 4, "Option: % expected, % found: %."),
   /** Error code. */

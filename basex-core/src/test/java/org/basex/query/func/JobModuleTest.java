@@ -123,6 +123,19 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalBaseUri() {
+    final Function func = _JOB_EVAL;
+    // relative URIs are resolved against the static base URI of the caller
+    for(final String[] test : new String[][] { { "b.xq", "http://x.x/a/b.xq" },
+        { "urn:x", "urn:x" } }) {
+      final String id = query("declare base-uri 'http://x.x/a/'; " + func.args("static-base-uri()",
+          " ()", " { 'cache': true(), 'base-uri': '" + test[0] + "' }"));
+      query(_JOB_WAIT.args(id));
+      query(_JOB_RESULT.args(id), test[1]);
+    }
+  }
+
+  /** Test method. */
   @Test public void evalTimeout() {
     final Function func = _JOB_EVAL;
     final String id = query(func.args(VERY_SLOW_QUERY, " ()",
@@ -261,19 +274,11 @@ public final class JobModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void evalEnd() {
-    // scheduled execution
-    final Function func = _JOB_EVAL;
-    final String id = query(func.args("123", " ()",
-      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
-    // ensure that query is running
-    Performance.sleep(500);
-    query(_JOB_LIST.args() + "='" + id + '\'', true);
-    assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + id + "')"));
-
     // job is removed if it is still running when the end time is exceeded
-    final String slow = query(func.args("prof:sleep(2000)", " ()",
-      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
-    Performance.sleep(1500);
+    final Function func = _JOB_EVAL;
+    final String slow = query(func.args("prof:sleep(1000)", " ()",
+      " { 'interval': 'PT1S', 'end': 'PT0.5S' }"));
+    Performance.sleep(700);
     query(_JOB_LIST.args() + "='" + slow + '\'', true);
     assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + slow + "')"));
 
@@ -312,6 +317,9 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1", " ()", " { 'id': 'OPT', 'timeout': 0, 'service': true() }"),
         JOBS_SERVICE_X);
     error(func.args("1", " ()", " { 'id': 'OPT', 'memory': 100, 'service': true() }"),
+        JOBS_SERVICE_X);
+    // serialization parameters are not persisted
+    error(func.args("1", " ()", " { 'id': 'OPT', 'serializer': {}, 'service': true() }"),
         JOBS_SERVICE_X);
   }
 
@@ -455,6 +463,36 @@ public final class JobModuleTest extends SandboxTest {
     // find log entry
     final String date = DateTime.DATE.format(LocalDate.now());
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
+  }
+
+  /** Discarded results are not materialized, but their lazy items are loaded. */
+  @Test public void evalDiscarded() {
+    // a function item would be rejected when the result is materialized
+    assertEquals("REQUEST OK", discarded("true#0"));
+    // errors raised by lazy items are reported
+    final String path = query(_FILE_CREATE_TEMP_FILE.args("lazy", ".txt"));
+    try {
+      query(_FILE_WRITE_BINARY.args(path, " xs:hexBinary('FF')"));
+      assertEquals("REQUEST ERROR", discarded("file:read-text('" + path + "')"));
+    } finally {
+      query(_FILE_DELETE.args(path));
+    }
+  }
+
+  /**
+   * Evaluates a query whose result is discarded, and returns the types of its log entries.
+   * @param query query
+   * @return log entry types
+   */
+  private static String discarded(final String query) {
+    final String id = UUID.randomUUID().toString();
+    query(_JOB_EVAL.args(query, " ()", " { 'id': '" + id + "', 'log': '" + id + "' }"));
+    // the concluding entry is written after the job has finished
+    query(_JOB_WAIT.args(id));
+    final String entries = _ADMIN_LOGS.args(DateTime.DATE.format(LocalDate.now())) +
+        "[@address = 'JOB:" + id + "']";
+    assertEquals("true", waitUntil("count(" + entries + ") = 2"));
+    return query("string-join(" + entries + "/@type, ' ')");
   }
 
   /** Executes a job. */
@@ -967,6 +1005,47 @@ public final class JobModuleTest extends SandboxTest {
       }
       Performance.sleep(10);
     }
+  }
+
+  /** Test method. */
+  @Test public void resultSerialized() {
+    final Function func = _JOB_RESULT;
+
+    // the result is serialized by the job
+    String id = query(_JOB_EVAL.args("<a>é</a>", " ()",
+        " { 'cache': true(), 'serializer': { 'encoding': 'US-ASCII' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " ! (. instance of xs:string, .)", "true\n<a>&#xE9;</a>");
+
+    // function items are not materialized
+    id = query(_JOB_EVAL.args("true#0", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'adaptive' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id), "fn:true#0");
+
+    // binary results are returned as binary items
+    id = query(_JOB_EVAL.args("xs:base64Binary('QUI=')", " ()",
+        " { 'cache': true(), 'serializer': {} }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " instance of xs:base64Binary", true);
+    // binary results that are serialized as text are returned as string
+    id = query(_JOB_EVAL.args("xs:base64Binary('QUI=')", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'xml' } }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id) + " ! (. instance of xs:string, .)", "true\nQUI=");
+
+    // the information refers to the unserialized result
+    id = query(_JOB_EVAL.args("1 to 3", " ()",
+        " { 'cache': true(), 'info': true(), 'serializer': { 'item-separator': ' ' } }"));
+    query(_JOB_WAIT.args(id));
+    query(_JOB_INFO.args(id) + "?result?items", 3);
+    query(func.args(id), "1 2 3");
+
+    // serialization errors are reported as job errors
+    id = query(_JOB_EVAL.args("true#0", " ()",
+        " { 'cache': true(), 'serializer': { 'method': 'xml' } }"));
+    query(_JOB_WAIT.args(id));
+    error(func.args(id), SERFUNC_X);
   }
 
   /** Test method. */

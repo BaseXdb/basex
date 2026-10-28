@@ -31,17 +31,10 @@ public final class IndexCache {
     rwl.readLock().lock();
 
     try {
-      final int i = indexFor(hash, buckets.length);
-      BucketEntry e = buckets[i];
-      while(e != null) {
-        final IndexEntry entry = e.get();
-        if(entry != null && e.hash == hash && Token.eq(entry.key, key)) return entry;
-        e = e.next;
-      }
+      return find(hash, key);
     } finally {
       rwl.readLock().unlock();
     }
-    return null;
   }
 
   /**
@@ -58,27 +51,31 @@ public final class IndexCache {
 
     try {
       purge();
-      final int i = indexFor(hash, buckets.length);
-      BucketEntry current = buckets[i], prev = current;
-      while(current != null) {
-        final BucketEntry next = current.next;
-        final IndexEntry entry = current.get();
-        if(entry == null) {
-          delete(i, current, prev, next);
-        } else if(current.hash == hash && Token.eq(entry.key, key)) {
-          update(entry, count, offset);
-          return entry;
-        }
-        prev = current;
-        current = next;
+      IndexEntry entry = find(hash, key);
+      if(entry != null) {
+        update(entry, count, offset);
+      } else {
+        entry = new IndexEntry(key, count, offset);
+        add(indexFor(hash, buckets.length), hash, entry);
       }
-
-      final IndexEntry entry = new IndexEntry(key, count, offset);
-      add(i, hash, entry);
       return entry;
     } finally {
       rwl.writeLock().unlock();
     }
+  }
+
+  /**
+   * Returns the live cache entry for the specified key.
+   * @param hash hash of the key
+   * @param key key
+   * @return cache entry or {@code null}
+   */
+  private IndexEntry find(final int hash, final byte[] key) {
+    for(BucketEntry e = buckets[indexFor(hash, buckets.length)]; e != null; e = e.next) {
+      final IndexEntry entry = e.get();
+      if(entry != null && e.hash == hash && Token.eq(entry.key, key)) return entry;
+    }
+    return null;
   }
 
   /**
@@ -88,15 +85,14 @@ public final class IndexCache {
     for(Object x; (x = queue.poll()) != null;) {
       final BucketEntry e = (BucketEntry) x;
       final int i = indexFor(e.hash, buckets.length);
-      BucketEntry prev = buckets[i], p = prev;
-      while(p != null) {
-        final BucketEntry next = p.next;
+      for(BucketEntry prev = null, p = buckets[i]; p != null; prev = p, p = p.next) {
         if(p == e) {
-          delete(i, e, prev, next);
+          if(prev == null) buckets[i] = e.next;
+          else prev.next = e.next;
+          e.next = null;
+          --size;
           break;
         }
-        prev = p;
-        p = next;
       }
     }
   }
@@ -124,29 +120,14 @@ public final class IndexCache {
   }
 
   /**
-   * Deletes a cached entry from the buckets with the specified index.
-   * @param i buckets index
-   * @param e cached entry to delete
-   * @param p previous cache entry
-   * @param n next cache entry
-   */
-  private void delete(final int i, final BucketEntry e, final BucketEntry p, final BucketEntry n) {
-    if(p == e) buckets[i] = n;
-    else p.next = n;
-    e.next = null;
-    --size;
-  }
-
-  /**
    * Resizes the hash table.
    */
   private void rehash() {
     purge();
 
-    final int newSize = size * 2;
-    final BucketEntry[] tmp = new BucketEntry[newSize];
-
     final int l = buckets.length;
+    if(size < l) return;
+    final BucketEntry[] tmp = new BucketEntry[l << 1];
     for(int i = 0; i < l; i++) {
       BucketEntry e = buckets[i];
       buckets[i] = null;

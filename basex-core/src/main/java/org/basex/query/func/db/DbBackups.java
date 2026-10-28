@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -23,7 +24,11 @@ public final class DbBackups extends BackupFn {
     if(name != null && !name.isEmpty()) toName(Str.get(name), qc);
 
     final Context ctx = qc.context;
-    final StringList backups = name == null ? ctx.databases.backups() : ctx.databases.backups(name);
+    final StringList backups = new StringList();
+    for(final String backup : name == null ? ctx.databases.backups() :
+      ctx.databases.backups(name)) {
+      if(Databases.permitted(qc.user, Perm.READ, backup)) backups.add(backup);
+    }
     return new BasicIter<FNode>(backups.size()) {
       final IOFile dbpath = ctx.soptions.dbPath();
 

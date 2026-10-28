@@ -185,7 +185,8 @@ final class TreeRects {
   int prePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
     final TreeRect r = treeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x()) / (double) r.w();
-    final int idx = (int) (ratio * sub.levelSize(rn, lv));
+    // the right border is part of the rectangle
+    final int size = sub.levelSize(rn, lv), idx = Math.min((int) (ratio * size), size - 1);
     return sub.prePerIndex(rn, lv, idx);
   }
 

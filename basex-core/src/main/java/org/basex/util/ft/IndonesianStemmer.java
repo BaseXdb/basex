@@ -75,6 +75,7 @@ final class IndonesianStemmer extends InternalStemmer {
   @Override
   protected byte[] stem(final byte[] word) {
     final TokenBuilder tb = new TokenBuilder().add(word);
+    flags = 0;
     numSyllables = countSyllables(tb);
     int s = tb.size();
 

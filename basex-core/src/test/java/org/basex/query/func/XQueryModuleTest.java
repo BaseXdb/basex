@@ -104,7 +104,7 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args("admin:sessions()", " ()", " { 'permission': 'none' }"), XQUERY_PERM_X);
     // returned function items keep the reduced permissions
     query(func.args("fn() { admin:sessions() }") + "() => count() >= 0", true);
-    error(func.args("fn() { admin:sessions() }", " ()", " { 'permission': 'create' }") + "()",
+    error(func.args("fn() { admin:sessions() }", " ()", " { 'permission': 'write' }") + "()",
         BASEX_PERMISSION_X_X);
     error(func.args("fn() { file:list('.') }", " ()", " { 'permission': 'write' }") + "()",
         BASEX_PERMISSION_X_X);
@@ -180,7 +180,7 @@ public final class XQueryModuleTest extends SandboxTest {
 
     // compilation of parsed queries
     error(func.args(_XQUERY_PARSE.args("environment-variable('PATH')",
-        " { 'compile': true() }").trim(), " ()", " { 'permission': 'create' }"),
+        " { 'compile': true() }").trim(), " ()", " { 'permission': 'write' }"),
         XQUERY_PERM_X);
 
     // file system paths
@@ -256,6 +256,11 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     query(func.args("static-base-uri()", " {}", " { 'base-uri': 'http://x.x/' }"),
         "http://x.x/");
+    // relative URIs are resolved against the static base URI of the caller
+    query("declare base-uri 'http://x.x/a/'; " +
+        func.args("static-base-uri()", " {}", " { 'base-uri': 'b.xq' }"), "http://x.x/a/b.xq");
+    query("declare base-uri 'http://x.x/a/'; " +
+        func.args("static-base-uri()", " {}", " { 'base-uri': 'urn:x' }"), "urn:x");
   }
 
   /** Test method. */
@@ -490,17 +495,17 @@ xquery:fork-join(
     query("import module namespace x = 'x' at \"" + x.path() + "\"; "
         + func.args(" (1 to 16) ! fn() { sum($x:V) }"));
 
-    query("declare %basex:lazy variable $V := (prof:sleep(200), random:double());\n"
+    query("declare %basex:lazy variable $V := (prof:sleep(50), random:double());\n"
         + "count(distinct-values(xquery:fork-join((1 to 16) ! fn() { $V })))", 1);
 
     final IOFile f = new IOFile(sandbox(), "f.txt");
     query("declare %basex:lazy variable $V :=\n"
-        + "  (prof:sleep(200), file:append-text('" + f.path() + "', 'x'), random:double());\n"
+        + "  (prof:sleep(50), file:append-text('" + f.path() + "', 'x'), random:double());\n"
         + "count(distinct-values(xquery:fork-join((1 to 16) ! fn() { $V }))),\n"
         + "file:size('" + f.path() + "')", "1\n1");
 
     // all waiting threads must see the same error value and location as the evaluating thread
-    query("declare %basex:lazy variable $v := (prof:sleep(200), error(xs:QName('err:FOER0000'), 'd'"
+    query("declare %basex:lazy variable $v := (prof:sleep(50), error(xs:QName('err:FOER0000'), 'd'"
         + ", 7));\nxquery:fork-join((1 to 8) ! fn() { $v }, { 'report': true() })?error?value[. = 7"
         + "] => count()", 8);
     query("declare %basex:lazy variable $V := (prof:sleep(200), error());\n"
@@ -668,6 +673,9 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query("contains(try {" + func.args("1 +",
         " { 'base-uri': 'XXXX', 'pass': true() }") + "} catch * { $err:module }, 'XXXX')",
         true);
+    query("declare base-uri 'http://x.x/a/'; try {" + func.args("1 +",
+        " { 'base-uri': 'b.xq', 'pass': true() }") + "} catch * { $err:module }",
+        "http://x.x/a/b.xq");
 
     // queries
     query(func.args(" xs:anyURI('src/test/resources/input.xq')") + "/name()", "MainModule");

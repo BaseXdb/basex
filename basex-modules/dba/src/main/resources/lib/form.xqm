@@ -14,7 +14,7 @@ import module namespace config = 'dba/lib/config' at 'config.xqm';
  : @param  $opts   checked options
  : @return checkbox
  :)
-declare function form:option(
+declare %private function form:option(
   $value  as xs:string,
   $label  as xs:string,
   $opts   as xs:string*
@@ -75,19 +75,22 @@ declare function form:select(
  : @param  $label    label
  : @param  $options  options: 'CONFIRM' (ask before the action is run), 'CHECK' (consider checkboxes)
  : @param  $title    tooltip
+ : @param  $require  selector of what one of the checked rows must contain (can be empty)
  : @return button
  :)
 declare function form:button(
   $action   as xs:string,
   $label    as xs:string,
   $options  as enum('CONFIRM', 'CHECK')* := (),
-  $title    as xs:string? := ()
+  $title    as xs:string? := (),
+  $require  as xs:string? := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action },
     $title ! attribute title { . },
     attribute onclick { `return confirmAction(this, "{ $label }");` }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
+    $require ! attribute data-require { . },
     $label
   }</button>
 };
@@ -132,16 +135,18 @@ declare function form:editor-field(
 (:~
  : Creates a modal dialog: a form that needs more room than a prompt can offer.
  : @param  $id      id of the dialog; opened by the client with showDialog
- : @param  $title   heading of the dialog; its buttons are the OK and Cancel of every dialog
+ : @param  $title   heading of the dialog
+ : @param  $submit  label of the button that submits the form
  : @param  $action  action the form posts to
  : @param  $upload  whether the dialog submits files
  : @param  $fields   form fields
- : @param  $buttons  buttons between OK and Cancel
+ : @param  $buttons  buttons between the submitting button and Cancel
  : @return dialog
  :)
 declare function form:dialog(
   $id       as xs:string,
   $title    as xs:string,
+  $submit   as xs:string,
   $action   as xs:string,
   $upload   as xs:boolean,
   $fields   as node()*,
@@ -155,14 +160,24 @@ declare function form:dialog(
       attribute onsubmit { 'uploading(this, event);' }[$upload],
       <h2>{ $title }</h2>,
       $fields,
+      form:dialog-info(),
       <div class='buttons'>{
-        <button>OK</button>,
+        <button>{ $submit }</button>,
         $buttons,
         (: 'dialog' closes the dialog instead of submitting it: native, and needs no script :)
         <button formmethod='dialog' formnovalidate=''>Cancel</button>
       }</div>
     }</form>
   </dialog>
+};
+
+(:~
+ : Creates the block of a dialog that repeats the status message, which the dialog hides.
+ : @return block
+ :)
+declare function form:dialog-info() as element(output) {
+  (: filled by the client while the dialog is open :)
+  <output class='dialog-info' role='status'/>
 };
 
 (:~
@@ -215,7 +230,7 @@ declare function form:prompt(
 
 (:~ Index options that can be assigned when a database is created and optimized. :)
 (: the full-text index heads the options that refine it; 'include' is the option with the names
-   an index is restricted to :)
+   an index is restricted to; 'update' marks the options that concern updates :)
 declare %private variable $form:INDEX-OPTIONS := (
   { 'name': 'textindex', 'label': 'Text Index', 'include': {
     'name': 'textinclude', 'kind': 'Elements', 'title': 'Elements whose texts are indexed' } },
@@ -225,8 +240,8 @@ declare %private variable $form:INDEX-OPTIONS := (
     'name': 'tokeninclude', 'kind': 'Attributes',
     'title': 'Attributes whose values are indexed as tokens' } },
   (: changing it requires a full optimization :)
-  { 'name': 'updindex', 'label': 'Incremental Indexing' },
-  { 'name': 'autooptimize', 'label': 'Automatic Optimization' },
+  { 'name': 'updindex', 'label': 'Incremental Indexing', 'update': true() },
+  { 'name': 'autooptimize', 'label': 'Automatic Optimization', 'update': true() },
   (: the names are what Mixed Content refers to: string values are indexed for these
      elements, so the option is rejected if no name is supplied :)
   { 'name': 'ftindex', 'label': 'Full-Text', 'heading': true(), 'fulltext': true(), 'include': {
@@ -253,7 +268,7 @@ declare function form:index-fields(
   for $fulltext in (false(), true())
   return <div>{
     if (not($fulltext)) { <h3>Indexes</h3> },
-    for $option in $form:INDEX-OPTIONS[$fulltext = exists(?fulltext)]
+    for $option in $form:INDEX-OPTIONS[$fulltext = exists(?fulltext)][not(?update)]
     let $checkbox := form:option($option?name, $option?label, $opts)
     return (
       if ($option?heading) then <h3>{ $checkbox }</h3> else $checkbox,
@@ -266,11 +281,28 @@ declare function form:index-fields(
 };
 
 (:~
+ : Creates the options of a database dialog that concern updates.
+ : @param  $opts    checked options
+ : @param  $fields  fields placed above them
+ : @return block, placed below the index columns
+ :)
+declare function form:update-fields(
+  $opts    as xs:string*,
+  $fields  as node()* := ()
+) as element(div) {
+  <div class='update-fields'>{
+    $fields,
+    for $option in $form:INDEX-OPTIONS[?update]
+    return form:option($option?name, $option?label, $opts)
+  }</div>
+};
+
+(:~
  : Creates the field that chooses the language of the full-text index.
  : @param  $lang  language
  : @return form field
  :)
-declare function form:language-field(
+declare %private function form:language-field(
   $lang  as xs:string?
 ) as element(div) {
   (: the field is labeled, so it belongs to the fields of a dialog, not to the flags of the
@@ -320,7 +352,7 @@ declare function form:index-map(
     (: an unknown language would be ignored by the full-text index without notice :)
     $args?lang[.] ! (
       if (form:language(.)) then { 'language': . }
-      else error((), `Unknown language: "{ . }".`)
+      else error((), `Unknown language: “{ . }”.`)
     ),
     for $include in $form:INDEX-OPTIONS?include
     return $args?($include?name) ! { $include?name: . }
@@ -363,16 +395,34 @@ declare function form:parsing-fields() as node()+ {
 (:~
  : Creates the parsing options of a database dialog.
  : @param  $opts  checked options
- : @return form fields
+ : @return folded section
  :)
 declare function form:parsing-options(
   $opts  as xs:string*
-) as node()+ {
+) as element(details) {
   (: kept next to form:parsing-map, which turns the same options into the arguments of the
      database operation :)
-  <h3>Parsing Options</h3>,
-  for $option in $form:PARSING-OPTIONS
-  return form:option($option?name, $option?label, $opts)
+  form:folded('Parsing Options', <div class='option-list'>{
+    for $option in $form:PARSING-OPTIONS
+    return form:option($option?name, $option?label, $opts)
+  }</div>)
+};
+
+(:~
+ : Creates a section of a dialog that is folded until it is opened.
+ : @param  $summary   text that opens the section
+ : @param  $contents  contents of the section
+ : @return section
+ :)
+declare function form:folded(
+  $summary   as xs:string,
+  $contents  as node()*
+) as element(details) {
+  (: the defaults suit most cases, so the section is closed at first :)
+  <details class='folded'>{
+    <summary>{ $summary }</summary>,
+    $contents
+  }</details>
 };
 
 (:~
@@ -423,7 +473,7 @@ declare function form:directory(
         file:list-roots() ! [ 'Root', string(.) ],
         [ 'Current'   , $dir ]
       )
-      let $selected := head(index-where($options, fn($option) { $option?2 = $dir }))
+      let $selected := head(index-where($options, fn { ?2 = $dir }))
       for $option at $pos in $options
       let $[$name, $path] := $option
       where $path

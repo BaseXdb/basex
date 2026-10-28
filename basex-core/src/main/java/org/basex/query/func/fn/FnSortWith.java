@@ -33,8 +33,7 @@ public final class FnSortWith extends SortFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     // even single items must be sorted, as the input might be invalid
-    final Expr input = arg(0);
-    return adoptType(input);
+    return adoptType(arg(0));
   }
 
   @Override

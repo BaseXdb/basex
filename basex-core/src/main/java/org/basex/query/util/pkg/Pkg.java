@@ -124,25 +124,6 @@ public final class Pkg {
   }
 
   /**
-   * Extracts the package name from a unique package name.
-   * @param pkg unique package name: name-version
-   * @return package name
-   */
-  public static String name(final String pkg) {
-    final int idx = pkg.lastIndexOf('-');
-    return idx == -1 ? pkg : pkg.substring(0, idx);
-  }
-
-  /**
-   * Extracts the package version from a unique package name.
-   * @param pkg unique package name: name-version
-   * @return package version
-   */
-  public static String version(final String pkg) {
-    return pkg.substring(pkg.lastIndexOf('-') + 1);
-  }
-
-  /**
    * Chooses module directory (support for both 2010 and 2012 specs).
    * @param pkgPath package path
    * @return module directory

@@ -112,7 +112,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     label = new BaseXLabel(" ").resize(1.25f);
 
-    text = new TextPanel(gui, false);
+    text = new TextPanel(gui);
     text.setLinkListener(this);
     editor = new SearchEditor(gui, text);
 

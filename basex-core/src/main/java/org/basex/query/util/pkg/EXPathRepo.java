@@ -16,14 +16,10 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class EXPathRepo {
-  /** Namespace dictionary with namespace URIs and package IDs. */
-  private final HashMap<String, HashSet<String>> nsDict = new HashMap<>();
-  /** Package dictionary with package IDs and instances. */
-  private final HashMap<String, Pkg> pkgDict = new HashMap<>();
   /** Static options. */
   private final StaticOptions sopts;
-  /** Repository path (can be {@code null}; lazy instantiation). */
-  private IOFile repo;
+  /** Current repository state, replaced on updates (can be {@code null}; lazy instantiation). */
+  private volatile State state;
 
   /**
    * Constructor.
@@ -37,10 +33,8 @@ public final class EXPathRepo {
    * Resets the repository.
    * @return self reference
    */
-  public EXPathRepo reset() {
-    repo = null;
-    nsDict.clear();
-    pkgDict.clear();
+  public synchronized EXPathRepo reset() {
+    state = null;
     return this;
   }
 
@@ -49,7 +43,7 @@ public final class EXPathRepo {
    * @return path
    */
   public IOFile path() {
-    return init().repo;
+    return state().path;
   }
 
   /**
@@ -57,7 +51,7 @@ public final class EXPathRepo {
    * @return dictionary
    */
   public HashMap<String, HashSet<String>> nsDict() {
-    return init().nsDict;
+    return state().nsDict;
   }
 
   /**
@@ -65,7 +59,22 @@ public final class EXPathRepo {
    * @return dictionary
    */
   public HashMap<String, Pkg> pkgDict() {
-    return init().pkgDict;
+    return state().pkgDict;
+  }
+
+  /**
+   * Returns the packages that contain components with the specified namespace URI.
+   * @param uri namespace URI
+   * @return packages
+   */
+  public ArrayList<Pkg> pkgs(final String uri) {
+    final State st = state();
+    final ArrayList<Pkg> pkgs = new ArrayList<>();
+    final HashSet<String> ids = st.nsDict.get(uri);
+    if(ids != null) {
+      for(final String id : ids) pkgs.add(st.pkgDict.get(id));
+    }
+    return pkgs;
   }
 
   /**
@@ -81,78 +90,80 @@ public final class EXPathRepo {
    * Adds a newly installed package to the namespace and package dictionaries.
    * @param pkg new package
    */
-  void add(final Pkg pkg) {
-    init();
-    addPkg(pkg);
+  synchronized void add(final Pkg pkg) {
+    final State st = state();
+    final HashMap<String, Pkg> pkgDict = new HashMap<>(st.pkgDict);
+    pkgDict.put(pkg.id(), pkg);
+    state = new State(st.path, pkgDict);
   }
 
   /**
    * Deletes a package from the namespace and package dictionaries when it is deleted.
    * @param pkg deleted package
    */
-  void delete(final Pkg pkg) {
-    init();
+  synchronized void delete(final Pkg pkg) {
+    final State st = state();
+    final HashMap<String, Pkg> pkgDict = new HashMap<>(st.pkgDict);
+    pkgDict.remove(pkg.id());
+    state = new State(st.path, pkgDict);
+  }
 
-    final String id = pkg.id();
-    // delete package from namespace dictionary
-    for(final PkgComponent comp : pkg.comps) {
-      final String uri = comp.uri;
-      final HashSet<String> pkgs = nsDict.get(uri);
-      if(pkgs != null) {
-        if(pkgs.size() > 1) {
-          pkgs.remove(id);
-        } else {
-          nsDict.remove(uri);
+  /**
+   * Returns the current repository state, initializing it if necessary.
+   * @return state
+   */
+  private State state() {
+    final State st = state;
+    return st != null ? st : init();
+  }
+
+  /**
+   * Initializes the repository state.
+   * @return state
+   */
+  private synchronized State init() {
+    if(state == null) {
+      final IOFile path = sopts.repoPath();
+      final HashMap<String, Pkg> pkgDict = new HashMap<>();
+      // ignore directories starting with dot (#1122)
+      path.children((name, attrs) -> {
+        if(attrs.isDirectory() && !IOFile.isDotFile(name)) {
+          final IOFile desc = new IOFile(new IOFile(path, name + '/'), DESCRIPTOR);
+          if(desc.exists()) {
+            try {
+              final Pkg pkg = new PkgParser(null).parse(desc).path(name);
+              pkgDict.put(pkg.id(), pkg);
+            } catch(final QueryException ex) {
+              Util.errln(ex);
+            }
+          }
+        }
+      });
+      state = new State(path, pkgDict);
+    }
+    return state;
+  }
+
+  /**
+   * Immutable repository state.
+   * @param path repository path
+   * @param pkgDict package dictionary with package IDs and instances
+   * @param nsDict namespace dictionary with namespace URIs and package IDs
+   */
+  private record State(IOFile path, HashMap<String, Pkg> pkgDict,
+      HashMap<String, HashSet<String>> nsDict) {
+    /**
+     * Constructor, deriving the namespace dictionary.
+     * @param path repository path
+     * @param pkgDict package dictionary
+     */
+    State(final IOFile path, final HashMap<String, Pkg> pkgDict) {
+      this(path, pkgDict, new HashMap<>());
+      for(final Pkg pkg : pkgDict.values()) {
+        for(final PkgComponent comp : pkg.comps) {
+          if(comp.uri != null) nsDict.computeIfAbsent(comp.uri, k -> new HashSet<>()).add(pkg.id());
         }
       }
     }
-    // delete package from package dictionary
-    pkgDict.remove(id);
-  }
-
-  /**
-   * Initializes the package repository.
-   * @return self reference
-   */
-  private synchronized EXPathRepo init() {
-    if(repo == null) {
-      repo = sopts.repoPath();
-      // ignore directories starting with dot (#1122)
-      repo.children((name, attrs) -> {
-        if(attrs.isDirectory() && !IOFile.isDotFile(name)) readPkg(new IOFile(repo, name + '/'));
-      });
-    }
-    return this;
-  }
-
-  /**
-   * Reads a package descriptor and adds components namespaces to
-   * namespace-dictionary and packages - to package dictionary.
-   * @param dir package directory
-   */
-  private void readPkg(final IOFile dir) {
-    final IOFile desc = new IOFile(dir, DESCRIPTOR);
-    if(!desc.exists()) return;
-    try {
-      addPkg(new PkgParser(null).parse(desc).path(dir.name()));
-    } catch(final QueryException ex) {
-      Util.errln(ex);
-    }
-  }
-
-  /**
-   * Adds a package to the package dictionary.
-   * @param pkg package
-   */
-  private void addPkg(final Pkg pkg) {
-    // read package components
-    final String id = pkg.id();
-    for(final PkgComponent comp : pkg.comps) {
-      // add component's namespace to namespace dictionary
-      if(comp.uri != null) {
-        nsDict.computeIfAbsent(comp.uri, k -> new HashSet<>()).add(id);
-      }
-    }
-    pkgDict.put(id, pkg);
   }
 }

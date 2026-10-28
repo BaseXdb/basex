@@ -7,6 +7,7 @@ import javax.xml.*;
 import javax.xml.parsers.*;
 import javax.xml.validation.*;
 
+import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -71,7 +72,9 @@ public final class XmlParser {
     final boolean xinclude = options.get(MainOptions.XINCLUDE);
     final boolean xsdValidation = CommonOptions.STRICT.equals(
         options.get(MainOptions.XSDVALIDATION));
-    final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
+    final boolean trusted = options.allowExternal();
+    // schema locations are only followed if external resources may be accessed
+    final boolean xsiLocation = options.get(MainOptions.XSILOCATION) && trusted;
     final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
     f.setNamespaceAware(true);
     f.setValidating(dtdValidation);
@@ -92,12 +95,13 @@ public final class XmlParser {
     xr.setFeature("http://xml.org/sax/features/validation", dtdValidation);
     xr.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
     english(xr::setProperty);
-    if(options.allowExternal()) {
+    if(trusted) {
       for(final String limit : LIMITS) xr.setProperty(limit, "0");
     }
     if(xsdValidation && !xsiLocation) {
       xr.setEntityResolver((pubId, sysId) -> {
-        throw new SAXException("External access not allowed: " + sysId);
+        throw trusted ? new SAXException("External access not allowed: " + sysId) :
+          new TrustedViolationException(sysId);
       });
     }
     return xr;

@@ -3,7 +3,9 @@ package org.basex.gui.text;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.function.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -42,7 +44,8 @@ public final class SyntaxXML extends SyntaxMarkup {
   }
 
   @Override
-  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
+      final BiFunction<String, String, IOFile> modules) {
     elements = new TokenSet();
     attributes = new TokenSet();
 

@@ -51,8 +51,8 @@ public final class ProfType extends StandardFunc {
       info.append(" (").append(type);
       if(XQStruct.class.isAssignableFrom(clazz)) {
         info.append(", ").append(size).append(' ').append(size == 1 ? "entry" : "entries");
-      } else {
-        if(size > 1) info.append(", ").append(size).append(" items");
+      } else if(size > 1) {
+        info.append(", ").append(size).append(" items");
       }
       return info.append(')').toString();
     }

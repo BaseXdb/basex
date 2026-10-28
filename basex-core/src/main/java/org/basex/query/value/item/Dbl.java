@@ -123,7 +123,7 @@ public final class Dbl extends ANum {
    * @param transitive transitive comparison
    * @return difference
    */
-  static int compare(final double d1, final double d2, final boolean transitive) {
+  public static int compare(final double d1, final double d2, final boolean transitive) {
     final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
     return n1 || n2 ? transitive ? n1 == n2 ? 0 : n1 ? -1 : 1 : NAN_DUMMY :
       d1 < d2 ? -1 : d1 > d2 ? 1 : 0;

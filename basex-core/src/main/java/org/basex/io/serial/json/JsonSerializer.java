@@ -18,7 +18,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.*;
-import org.basex.util.options.Options.*;
 
 /**
  * Abstract JSON serializer class.
@@ -70,9 +69,9 @@ public abstract class JsonSerializer extends StandardSerializer {
     jopts = sopts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     escapeSolidus = escape && !canonical && jopts.get(JsonSerialOptions.ESCAPE_SOLIDUS) &&
-        sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
-    nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
-    lines = sopts.get(SerializerOptions.JSON_LINES) == YesNo.YES;
+        sopts.yes(SerializerOptions.ESCAPE_SOLIDUS);
+    nodups = !sopts.yes(SerializerOptions.ALLOW_DUPLICATE_NAMES);
+    lines = sopts.yes(SerializerOptions.JSON_LINES);
     final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
     if(ji != null) indent = ji;
   }

@@ -50,9 +50,6 @@ public final class ReplaceValue extends NodeUpdate {
   }
 
   @Override
-  public void prepare(final MemData memData, final QueryContext qc) { }
-
-  @Override
   public void limits(final NameLimits limits) {
     if(substituted()) return;
     // processing instructions: name and value are stored as a single text
@@ -146,9 +143,5 @@ public final class ReplaceValue extends NodeUpdate {
 
     // no substitution
     return new NodeUpdate[] { this };
-  }
-
-  @Override
-  public void update(final NamePool pool) {
   }
 }

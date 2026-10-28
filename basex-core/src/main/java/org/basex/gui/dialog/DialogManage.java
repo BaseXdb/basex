@@ -75,8 +75,7 @@ public final class DialogManage extends BaseXDialog {
 
     doc1 = new BaseXLabel(" ").large();
 
-    detail = new TextPanel(this, false);
-    detail.setFont(panel.getFont());
+    detail = new TextPanel(this);
     detail.setPreferredSize(new Dimension(600, 1));
 
     // database buttons
@@ -104,10 +103,10 @@ public final class DialogManage extends BaseXDialog {
     back.add(comment);
 
     // backup buttons
-    backup = new BaseXButton(this, BACKUP);
+    backup = new BaseXButton(this, BACKUP + ELLIPSIS);
     restore = new BaseXButton(this, RESTORE);
-    delete = new BaseXButton(this, DELETE);
-    deleteAll = new BaseXButton(this, DELETE_ALL + ELLIPSIS);
+    delete = new BaseXButton(this, DROP + ELLIPSIS);
+    deleteAll = new BaseXButton(this, DROP_ALL + ELLIPSIS);
 
     // second tab
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -155,7 +154,7 @@ public final class DialogManage extends BaseXDialog {
         if(ctx.soptions.dbExists(s)) cmds.add(new DropDB(s));
       }
       final String count = BaseXLayout.format(cmds.size());
-      if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, count))) return;
+      if(!BaseXDialog.confirmDestructive(gui, Util.info(DROPPING_DB_X, count))) return;
       refresh = true;
     } else if(cmp == rename) {
       final DialogInput input = new DialogInput(db, this, Action.ALTER_DATABASE);
@@ -173,20 +172,22 @@ public final class DialogManage extends BaseXDialog {
       for(final String name : dbs) cmds.add(new CreateBackup(name, input.input()));
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.soptions.dbExists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
+      if(!gui.context.soptions.dbExists(db) ||
+          BaseXDialog.confirmDestructive(gui, OVERWRITE_DB_QUESTION)) {
         cmds.add(new Restore(backups.getValue()));
+      }
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
       comment.setText(ShowBackups.comment(backups.getValue(), ctx));
     } else if(cmp == delete) {
-      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, 1))) return;
+      if(!BaseXDialog.confirmDestructive(gui, Util.info(DROP_BACKUPS_X, 1))) return;
       cmds.add(new DropBackup(backups.getValue()));
       refresh = backups.getList().length == 1;
       backups.requestFocusInWindow();
     } else if(cmp == deleteAll) {
       final String[] back = backups.getList();
       final String count = BaseXLayout.format(back.length);
-      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, count))) return;
+      if(!BaseXDialog.confirmDestructive(gui, Util.info(DROP_BACKUPS_X, count))) return;
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
     } else {

@@ -324,6 +324,24 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * The result is serialized by the job, without being materialized.
+   * @throws Exception exception
+   */
+  @Test public void evalSerialized() throws Exception {
+    register("declare %ws:message('/ser', '{$m}') function m:msg($m) {"
+        + " void(ws:eval('true#0', {}, { 'serializer': { 'method': 'adaptive' } })) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/ser", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      assertEquals("fn:true#0", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * A larger binary payload survives the byte-buffer round trip unchanged.
    * @throws Exception exception
    */

@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
+import org.basex.core.Text;
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
 import org.basex.util.*;
@@ -94,8 +95,20 @@ public class BaseXTextField extends JTextField {
    * @param text input text (can be {@code null})
    */
   public BaseXTextField(final BaseXWindow win, final String text) {
+    this(win, text, true);
+  }
+
+  /**
+   * Constructor.
+   * @param win window (of type {@link BaseXDialog} or {@link GUI})
+   * @param text input text (can be {@code null})
+   * @param keys add window-specific key listeners
+   */
+  BaseXTextField(final BaseXWindow win, final String text, final boolean keys) {
     BaseXLayout.setWidth(this, DWIDTH);
-    BaseXLayout.addInteraction(this, win);
+    if(keys) BaseXLayout.addInteraction(this, win);
+    // combo box editors: key listeners are delegated by the combo box
+    else addMouseListener((MouseEnteredListener) e -> BaseXLayout.focus(this));
     if(back == null) back = getBackground();
 
     if(text != null) setText(text);
@@ -116,11 +129,12 @@ public class BaseXTextField extends JTextField {
       }
     });
 
-    // copy and paste text with middle mouse button
+    // copy and paste text with middle mouse button (Unix only)
+    final BaseXDialog dialog = keys ? win.dialog() : null;
     addMouseListener(new MouseInputAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
-        if(!SwingUtilities.isMiddleMouseButton(e)) return;
+        if(!SwingUtilities.isMiddleMouseButton(e) || Prop.WIN || Prop.MAC) return;
         final String txt = getSelectedText();
         if(txt != null) {
           BaseXLayout.toClipboard(txt);
@@ -130,12 +144,12 @@ public class BaseXTextField extends JTextField {
           if(!clips.isEmpty()) {
             final String string = clips.getFirst().toString();
             setText(new StringBuilder(getText()).insert(getCaretPosition(), string).toString());
+            // pasting triggers no key event
+            if(dialog != null) dialog.action(BaseXTextField.this);
           }
         }
       }
     });
-
-    final BaseXDialog dialog = win.dialog();
     if(dialog != null) addKeyListener(dialog.keys);
   }
 
@@ -173,7 +187,7 @@ public class BaseXTextField extends JTextField {
    */
   public final BaseXTextField hint(final String label) {
     hint = label;
-    setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
+    setToolTipText(label.replaceAll(Text.ELLIPSIS + '$', ""));
     repaint();
     return this;
   }

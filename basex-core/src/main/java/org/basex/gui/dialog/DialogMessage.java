@@ -7,7 +7,6 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.text.*;
 
 /**
  * Dialog window for messages.
@@ -27,7 +26,21 @@ public final class DialogMessage extends BaseXDialog {
    * @param buttons additional buttons
    */
   public DialogMessage(final GUI gui, final String txt, final Msg ic, final String... buttons) {
-    super(gui, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
+    this(gui, txt, ic, false, buttons);
+  }
+
+  /**
+   * Constructor.
+   * @param gui         reference to the main window
+   * @param txt         message text
+   * @param ic          message type
+   * @param destructive focus the No button of a question
+   * @param buttons     additional buttons
+   */
+  public DialogMessage(final GUI gui, final String txt, final Msg ic, final boolean destructive,
+      final String... buttons) {
+    super(gui, ic == Msg.ERROR ? Text.ERROR :
+      ic == Msg.QUESTION || ic == Msg.YESNOCANCEL ? Text.QUESTION : Text.INFORMATION);
 
     panel.setLayout(new BorderLayout());
 
@@ -35,12 +48,7 @@ public final class DialogMessage extends BaseXDialog {
     final BaseXLabel label = new BaseXLabel();
     label.setIcon(ic.large);
     back.add(label);
-
-    // break longer texts
-    final TextPanel tp = new TextPanel(this, txt.replaceAll("(.{1,160})", "$1").trim(), false);
-    tp.setFont(label.getFont());
-    back.add(tp);
-
+    back.add(new BaseXTextArea(this, txt.trim()));
     set(back, BorderLayout.NORTH);
 
     final ArrayList<Object> list = new ArrayList<>();
@@ -53,7 +61,7 @@ public final class DialogMessage extends BaseXDialog {
       Collections.addAll(list, buttons);
       list.add(Text.B_OK);
     }
-    setButtons(newButtons(list.toArray(Object[]::new)));
+    setButtons(newButtons(list.toArray(Object[]::new)), destructive ? 1 : 0);
     finish();
   }
 

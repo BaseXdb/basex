@@ -14,7 +14,7 @@ public final class FTPosNode extends DBNode {
   public final FTPosData ftpos;
 
   /**
-   * Constructor, called by the sequential variant.
+   * Constructor.
    * @param data data reference
    * @param pre PRE value
    * @param ftpos full-text positions

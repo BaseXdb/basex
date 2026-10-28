@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
+import org.basex.core.*;
+import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
@@ -24,6 +26,14 @@ public final class RestXqMethodTest extends RestXqTest {
     String f = "declare %R:POST('{$x}') %R:path('') function m:f($x) { $x };";
     post(f, "12", "12", MediaType.TEXT_PLAIN);
     post(f, "<x>A</x>", "<x>A</x>", MediaType.APPLICATION_XML);
+    // XML bodies are parsed with the options of the server
+    final MainOptions mopts = HTTPContext.get().context().options;
+    mopts.set(MainOptions.STRIPWS, true);
+    try {
+      post(f, "<x/>", "<x> </x>", MediaType.APPLICATION_XML);
+    } finally {
+      mopts.set(MainOptions.STRIPWS, false);
+    }
     // json
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) { $x/json/* };";
     post(f, "<A>B</A>", "{ \"A\":\"B\" }", MediaType.APPLICATION_JSON);

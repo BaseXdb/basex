@@ -53,7 +53,7 @@ public final class DynamicStep extends Single {
     // updating expressions are no JNode selectors
     if(expr.has(Flag.UPD)) return compile ? expr.compile(cc) : expr;
 
-    final Expr ctx = new ContextValue(info).optimize(cc);
+    final Expr ctx = ContextValue.get(cc, info);
     // static checks first: no info output for the internal instance test
     final SeqType st = ctx.seqType();
     final Expr cond = st.instanceOf(Types.XNODE_O) ? Bln.TRUE :

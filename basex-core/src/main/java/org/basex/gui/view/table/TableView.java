@@ -185,46 +185,31 @@ public final class TableView extends View {
     final Data data = gui.context.data();
     gui.notify.focus(valid ? cell(data, tdata.rows.get(l), tdata.mouseX) : -1, this);
     content.repaint();
-
-    final String str = content.focusedString;
-    setCursor(valid && str != null && str.length() <= data.meta.maxlen ? CURSORHAND : CURSORARROW);
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-    gui.notify.focus(-1, null);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    super.mousePressed(e);
     final int pre = gui.context.focused;
     if(pre == -1) return;
 
-    super.mousePressed(e);
     final Context context = gui.context;
     final Data data = gui.context.data();
 
     if(tdata.rows == null || e.getY() < header.getHeight()) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
-      if(e.getClickCount() == 1) {
-        final int c = tdata.column(getWidth() - scroll.getWidth(), e.getX());
-        final String str = content.focusedString;
-        if(str == null || str.length() > data.meta.maxlen) return;
-        if(!e.isShiftDown()) tdata.resetFilter();
-        tdata.cols[c].filter = str;
-        query();
-        //repaint();
+      if(e.getClickCount() == 2) {
+        gui.notify.context(context.marked, false, null);
       } else {
-        DBNodes nodes = context.marked;
-        if(getCursor() == CURSORARROW) {
-          nodes = new DBNodes(nodes.data(), tdata.getRoot(nodes.data(), pre));
-        }
-        gui.notify.context(nodes, false, null);
+        // mark the row
+        final int row = tdata.getRoot(data, pre);
+        if(!mark(e, row)) gui.notify.mark(0, row);
       }
     } else {
-      final int cell = cell(data, pre, e.getX());
-      if(cell != -1) gui.notify.mark(new DBNodes(data, cell), null);
+      final int row = tdata.getRoot(data, pre);
+      final int cell = row == -1 ? -1 : cell(data, row, e.getX());
+      if(!context.marked.contains(cell)) gui.notify.mark(0, cell);
     }
   }
 
@@ -265,16 +250,16 @@ public final class TableView extends View {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(tdata.rows == null) return;
+    if(gui.updating || tdata.rows == null || tdata.rows.isEmpty()) return;
 
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
     final int oldPre = tdata.getRoot(gui.context.data(), gui.context.focused);
     int pre = oldPre;
 
     final IntList rows = tdata.rows;
-    if(LINESTART.is(e)) {
+    if(TEXTSTART.is(e)) {
       pre = rows.get(0);
-    } else if(LINEEND.is(e)) {
+    } else if(TEXTEND.is(e)) {
       pre = rows.peek();
     } else if(PREVLINE.is(e)) {
       pre = rows.get(Math.max(0, getOff(pre) - 1));

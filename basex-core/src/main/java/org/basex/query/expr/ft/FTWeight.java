@@ -59,11 +59,12 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTIter iter(final QueryContext qc) {
+  public FTIter iter(final QueryContext qc) throws QueryException {
+    final FTIter iter = exprs[0].iter(qc);
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
-        final FTNode node = exprs[0].iter(qc).next();
+        final FTNode node = iter.next();
         return node == null ? null : weight(node, qc);
       }
     };

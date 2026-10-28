@@ -34,38 +34,62 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   public FTBuilder(final Data data) throws IOException {
+    this(data, lexer(data, true));
+  }
+
+  /**
+   * Constructor with an existing lexer.
+   * @param data data reference
+   * @param lexer lexer
+   */
+  FTBuilder(final Data data, final FTLexer lexer) {
     super(data, IndexType.FULLTEXT);
     tree = new FTIndexTrees(data.meta.maxlen);
-    lexer = lexer(data);
+    this.lexer = lexer;
     ids = data.meta.updindex;
   }
 
   /**
    * Returns a lexer for the full-text index of the specified database.
    * @param data data reference
+   * @param build build a new index (otherwise, the stored stopwords are used)
    * @return lexer
    * @throws IOException I/O exception
    */
-  public static FTLexer lexer(final Data data) throws IOException {
+  static FTLexer lexer(final Data data, final boolean build) throws IOException {
     final MetaData meta = data.meta;
+    final Language ln = meta.language();
+    if(build) {
+      check(meta.ftmixed, meta.ftinclude, ln, meta.stemming);
+      StopWords.check(data, meta.stopwords);
+    }
+
     final FTOpt fto = new FTOpt();
     fto.set(FTFlag.DC, meta.diacritics);
     fto.set(FTFlag.ST, meta.stemming);
     fto.cs = meta.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    fto.sw = new StopWords(data, meta.stopwords);
-    fto.ln = meta.language();
+    fto.ln = ln;
+    // stopwords are normalized like the indexed tokens
+    fto.sw = (build ? StopWords.build(data) : StopWords.get(data)).normalize(fto);
+    return new FTLexer(fto);
+  }
 
+  /**
+   * Checks if a full-text index can be built with the specified settings.
+   * @param ftmixed mixed-content indexing
+   * @param ftinclude included elements
+   * @param ln language
+   * @param stemming stemming
+   * @throws IOException I/O exception
+   */
+  public static void check(final boolean ftmixed, final String ftinclude, final Language ln,
+      final boolean stemming) throws IOException {
     // element names are required; wildcards are allowed (all elements on all levels)
-    if(meta.ftmixed && meta.ftinclude.isEmpty())
+    if(ftmixed && ftinclude.isEmpty())
       throw new BaseXException("% requires %.", MainOptions.FTMIXED.name(),
           MainOptions.FTINCLUDE.name());
-    if(!Tokenizer.supportFor(fto.ln))
-      throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(meta.stemming && !Stemmer.supportFor(fto.ln))
-      throw new BaseXException(NO_STEMMER_X, fto.ln);
-    // stop words are normalized like the indexed tokens
-    fto.sw = fto.sw.normalize(fto);
-    return new FTLexer(fto);
+    if(!Tokenizer.supportFor(ln)) throw new BaseXException(NO_TOKENIZER_X, ln);
+    if(stemming && !Stemmer.supportFor(ln)) throw new BaseXException(NO_STEMMER_X, ln);
   }
 
   @Override

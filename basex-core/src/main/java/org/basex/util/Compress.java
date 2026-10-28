@@ -104,7 +104,7 @@ public final class Compress {
         bits = 8;
       }
       for(int bit = 0; bit < bits; bit++, pos++) {
-        if((text[pos >>> 3] & 1 << (pos & 7)) != 0) out |= 1 << bit;
+        if(isSet(text, pos)) out |= 1 << bit;
       }
       bytes[b] = (byte) (out >= 0x80 ? out : map[out]);
     }

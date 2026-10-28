@@ -34,10 +34,6 @@ public final class BackupAlter extends NameUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     try {
       AlterBackup.alter(name, newname, qc.context.soptions);

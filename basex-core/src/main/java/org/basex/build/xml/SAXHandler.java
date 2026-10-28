@@ -234,15 +234,6 @@ public final class SAXHandler extends DefaultHandler2 {
     return ioe;
   }
 
-  // EntityResolver
-
-  /* public InputSource resolveEntity(String pub, String sys) { } */
-
-  // DTDHandler
-
-  /* public void notationDecl(String name, String pub, String sys) { } */
-  /* public void unparsedEntityDecl(String name, String pub, String sys, String not) { } */
-
   // ContentHandler
 
   @Override
@@ -254,9 +245,6 @@ public final class SAXHandler extends DefaultHandler2 {
   public void startPrefixMapping(final String prefix, final String uri) {
     if(!stripNS) nsp.add(token(prefix), token(uri));
   }
-
-  /*public void endPrefixMapping(String prefix) { } */
-  /*public void ignorableWhitespace(char[] ch, int s, int l) { } */
 
   @Override
   public void skippedEntity(final String name) {
@@ -276,9 +264,6 @@ public final class SAXHandler extends DefaultHandler2 {
   }
 
   // ErrorHandler
-
-  /* public void warning(SAXParseException ex) { } */
-  /* public void fatalError(SAXParseException ex) { } */
 
   @Override
   public void error(final SAXParseException ex) throws SAXException {

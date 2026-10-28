@@ -823,7 +823,7 @@ public abstract class ParseExpr extends Expr {
   protected GNode toContextNode(final Value value) throws QueryException {
     if(value instanceof final GNode gnode) return gnode;
     if(value instanceof XQStruct) return new JNode(value);
-    if(value == null) throw QueryError.NOCTX_X.get(info, this);
+    if(value == null) throw NOCTX_X.get(info, this);
     throw PATHNODE_X_X_X.get(info, this, value.seqType(), value);
   }
 
@@ -901,7 +901,7 @@ public abstract class ParseExpr extends Expr {
     if(!input.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, input.type, input);
     final String string = string(input.string(info));
     final IO io = IO.get(string);
-    if(io.isExternal()) checkPerm(qc, Perm.CREATE);
+    if(io.isExternal()) checkPerm(qc, Perm.ADMIN);
     if(!io.exists() || io.isDir()) throw WHICHRES_X.get(info, string);
     return io;
   }

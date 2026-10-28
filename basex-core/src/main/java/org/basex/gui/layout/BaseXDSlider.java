@@ -92,6 +92,7 @@ public final class BaseXDSlider extends BaseXPanel {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    requestFocusInWindow();
     mouseMoved(e);
   }
 
@@ -182,6 +183,7 @@ public final class BaseXDSlider extends BaseXPanel {
             (long) currMax) : Math.min(oldMax - 1, (long) currMax);
       }
       listener.actionPerformed(null);
+      setToolTipText(range());
       repaint();
     }
   }

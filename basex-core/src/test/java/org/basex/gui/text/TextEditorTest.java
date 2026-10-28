@@ -2,7 +2,10 @@ package org.basex.gui.text;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
+
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -36,6 +39,98 @@ public final class TextEditorTest {
     assertEquals(2, lineStart("  \nx", 1));
     assertEquals(0, lineStart("  \nx", 2));
     assertEquals(2, lineStart("a\n\nb", 2));
+  }
+
+  /** Joins lines. */
+  @Test public void joinLines() {
+    TextEditor editor = editor("a  \n  b\nc");
+    editor.pos(0);
+    assertTrue(editor.joinLines());
+    assertEquals("a b\nc", Token.string(editor.text()));
+    assertEquals(1, editor.pos());
+
+    editor = editor("a\n  b\n\nc\n");
+    editor.select(0, 8);
+    assertTrue(editor.joinLines());
+    assertEquals("a b c\n", Token.string(editor.text()));
+
+    editor = editor("a");
+    assertFalse(editor.joinLines());
+  }
+
+  /** Splits lines that exceed the line margin. */
+  @Test public void splitLines() {
+    // default margin: 80 characters
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(java.awt.Color.BLACK);
+    final String w = "w".repeat(9), words = String.join(" ", Collections.nCopies(10, w));
+    final String seven = String.join(" ", Collections.nCopies(7, w));
+    final String three = String.join(" ", Collections.nCopies(3, w));
+
+    TextEditor editor = editor("  " + words + "\nx");
+    assertTrue(editor.splitLines(syntax));
+    assertEquals("  " + seven + "\n  " + three + "\nx", Token.string(editor.text()));
+    // strings and comments are not split, words that exceed the margin are kept
+    final String string = "'" + words + "'", comment = "(: " + words + " :)";
+    editor = editor("a " + string + ' ' + comment + " b");
+    assertTrue(editor.splitLines(syntax));
+    assertEquals("a\n" + string + '\n' + comment + "\nb", Token.string(editor.text()));
+    // lines that fit are preserved
+    editor = editor("a b");
+    assertFalse(editor.splitLines(syntax));
+
+    // joining reverts the split
+    editor = editor("  " + words);
+    editor.splitLines(syntax);
+    editor.select(0, editor.size());
+    editor.joinLines();
+    assertEquals("  " + words, Token.string(editor.text()));
+  }
+
+  /** Expands the selection to enclosing names and brackets. */
+  @Test public void enclosing() {
+    final TextEditor editor = editor("f( a-b, (c) )");
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(java.awt.Color.BLACK);
+    editor.pos(4);
+    final int[][] ranges = { { 3, 6 }, { 3, 11 }, { 1, 13 }, { 0, 13 } };
+    for(final int[] range : ranges) {
+      final int[] r = editor.enclosing(syntax);
+      assertArrayEquals(range, r);
+      editor.select(r[0], r[1]);
+    }
+    assertNull(editor.enclosing(syntax));
+  }
+
+  /** Bookmarks follow the edited text. */
+  @Test public void bookmarks() {
+    final TextEditor editor = editor("a\nb\nc");
+    editor.pos(2);
+    editor.toggleBookmark();
+    assertTrue(editor.bookmarked(2));
+    // a line that is inserted before the bookmarked line
+    editor.text(Token.token("a\nx\nb\nc"));
+    assertTrue(editor.bookmarked(4));
+    assertEquals(4, editor.bookmark(true));
+    // a line break that is inserted at the start of the bookmarked line
+    editor.text(Token.token("a\nx\n\nb\nc"));
+    assertTrue(editor.bookmarked(5));
+    // text that is typed in the bookmarked line
+    editor.text(Token.token("a\nx\n\nbb\nc"));
+    assertTrue(editor.bookmarked(5));
+    // next and previous bookmarks wrap around
+    editor.pos(0);
+    editor.toggleBookmark();
+    assertEquals(5, editor.bookmark(true));
+    assertEquals(5, editor.bookmark(false));
+    editor.pos(5);
+    assertEquals(0, editor.bookmark(true));
+    assertEquals(0, editor.bookmark(false));
+    editor.pos(0);
+    editor.toggleBookmark();
+    // the bookmarked line is deleted
+    editor.text(Token.token("a\nc"));
+    assertEquals(-1, editor.bookmark(true));
   }
 
   /** Home key extends an existing selection. */
@@ -417,6 +512,110 @@ public final class TextEditorTest {
     assertEquals("abcd", surround("abcd", 1, 3, 'x'));
     // no selection
     assertEquals("abcd", surround("abcd", 2, 2, '('));
+    // single brackets and quotes are replaced
+    assertEquals("a\"b", surround("a\"b", 1, 2, '\''));
+    assertEquals("a(b", surround("a(b", 1, 2, '('));
+    assertEquals("a)b", surround("a)b", 2, 1, '['));
+  }
+
+  /** Typing a quote adds a second quote or skips the next one. */
+  @Test public void quote() {
+    // second quote is added
+    assertEquals("\"|\"", type("", 0, '"'));
+    assertEquals("(\"|\")", type("()", 1, '"'));
+    // no second quote before quotes and names
+    assertEquals("\"|'", type("'", 0, '"'));
+    assertEquals("\"|a", type("a", 0, '"'));
+    // closing quote is skipped
+    assertEquals("\"\"|", type("\"\"", 1, '"'));
+    assertEquals("\"a\"|", type("\"a\"", 2, '"'));
+    // opening quote is not skipped
+    assertEquals("\"|\"a\"", type("\"a\"", 0, '"'));
+    assertEquals("x \"|\"a\"", type("x \"a\"", 2, '"'));
+    assertEquals("(\"|\"a\")", type("(\"a\")", 1, '"'));
+    assertEquals("x \"|\"\"", type("x \"\"", 2, '"'));
+    assertEquals("\"|\"ü\"", type("\"ü\"", 0, '"'));
+    assertEquals("ä\"|", type("ä", 2, '"'));
+    // closing quote after whitespace, brackets and backslashes is skipped
+    assertEquals("\", \"|", type("\", \"", 3, '"'));
+    assertEquals("\"(\"|", type("\"(\"", 2, '"'));
+    assertEquals("\"C:\\\"|", type("\"C:\\\"", 4, '"'));
+  }
+
+  /** Typing a bracket adds a closing bracket. */
+  @Test public void bracketPair() {
+    assertEquals("f(|)", type("f", 1, '('));
+    assertEquals("f(|), 1", type("f, 1", 1, '('));
+    assertEquals("f(|);", type("f;", 1, '('));
+    assertEquals("(|a", type("a", 0, '('));
+  }
+
+  /** Typing {@code >} closes an opening element. */
+  @Test public void closeElement() {
+    assertEquals("<a>|</a>", type("<a", 2, '>'));
+    assertEquals("<ä>|</ä>", type("<ä", 3, '>'));
+    // no element names
+    assertEquals("$a<$b>|", type("$a<$b", 5, '>'));
+    assertEquals("$a < 1 >|", type("$a < 1 ", 7, '>'));
+  }
+
+  /** Deleting an opening quote or bracket removes the closing one. */
+  @Test public void deletePair() {
+    assertEquals("|", backspace("\"\"", 1));
+    assertEquals("(|)", backspace("(\"\")", 2));
+    assertEquals("|", backspace("()", 1));
+    // the next quote opens a string
+    assertEquals("x |\"a\"", backspace("x \"\"a\"", 3));
+  }
+
+  /**
+   * Deletes the previous character.
+   * @param string text
+   * @param pos caret position
+   * @return new text, with {@code |} marking the caret
+   */
+  private static String backspace(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.deletePrev();
+    return caret(editor);
+  }
+
+  /**
+   * Types a character.
+   * @param string text
+   * @param pos caret position
+   * @param ch typed character
+   * @return new text, with {@code |} marking the caret
+   */
+  private static String type(final String string, final int pos, final char ch) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.add(new StringBuilder().append(ch), false);
+    return caret(editor);
+  }
+
+  /** The caret is placed relative to the insertion point. */
+  @Test public void typeCaret() {
+    // closing bracket in leading whitespace: the whitespace is removed
+    assertEquals("  )|x", type("    )x", 4, ')'));
+    // enter replaces the selected text
+    final TextEditor editor = editor("f(abc)");
+    editor.select(2, 5);
+    editor.delete();
+    editor.enter(new StringBuilder("\n"));
+    assertEquals("f(\n  |\n)", caret(editor));
+  }
+
+  /**
+   * Returns the text of an editor with {@code |} marking the caret.
+   * @param editor editor
+   * @return text
+   */
+  private static String caret(final TextEditor editor) {
+    final byte[] text = editor.text();
+    final int pos = editor.pos();
+    return Token.string(text, 0, pos) + '|' + Token.string(text, pos, text.length - pos);
   }
 
   /** The text surrounded by a bracket or quote stays selected. */
@@ -443,6 +642,173 @@ public final class TextEditorTest {
     editor.select(start, end);
     editor.surround(ch);
     return Token.string(editor.text());
+  }
+
+  /** Typing and deleting at multiple carets. */
+  @Test public void multipleCarets() {
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(1);
+    editor.addCaret(4);
+    editor.addCaret(7);
+    assertTrue(editor.multiple());
+    editor.forEach(() -> editor.insert("x"));
+    assertEquals("axb\ncxd\nexf", Token.string(editor.text()));
+    assertEquals(10, editor.pos());
+    editor.forEach(editor::deletePrev);
+    editor.forEach(editor::deletePrev);
+    assertEquals("b\nd\nf", Token.string(editor.text()));
+    editor.forEach(() -> editor.lineEnd(false));
+    editor.forEach(() -> editor.insert(";"));
+    assertEquals("b;\nd;\nf;", Token.string(editor.text()));
+    // carets that meet are merged
+    editor.forEach(() -> editor.moveTo(0, false));
+    assertFalse(editor.multiple());
+  }
+
+  /** Adding carets for the occurrences of the selected text. */
+  @Test public void occurrences() {
+    final TextEditor editor = editor("$a + $ab + $a");
+    editor.pos(1);
+    // select word, add the next occurrences, which wrap around
+    editor.nextOccurrence();
+    assertEquals("a", editor.selected());
+    editor.nextOccurrence();
+    editor.nextOccurrence();
+    editor.nextOccurrence();
+    assertEquals(2, editor.carets().length);
+    editor.forEach(() -> {
+      editor.delete();
+      editor.insert("x");
+    });
+    assertEquals("$x + $xb + $x", Token.string(editor.text()));
+
+    // remove the caret that was added last
+    editor.select(1, 2);
+    editor.allOccurrences();
+    assertEquals(2, editor.carets().length);
+    editor.prevOccurrence();
+    assertEquals(1, editor.carets().length);
+    editor.singleCaret();
+    assertFalse(editor.multiple());
+
+    // a text change from outside discards secondary carets
+    editor.allOccurrences();
+    editor.text(Token.token("x"));
+    assertFalse(editor.multiple());
+  }
+
+  /** Adding and removing carets in adjacent rows. */
+  @Test public void cloneCaret() {
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(1);
+    editor.cloneCaret(4);
+    editor.cloneCaret(7);
+    assertEquals(2, editor.carets().length);
+    assertEquals(7, editor.pos());
+    // moving back removes the primary caret
+    editor.cloneCaret(4);
+    assertEquals(1, editor.carets().length);
+    assertEquals(4, editor.pos());
+    // first or last row: no caret is added
+    editor.cloneCaret(4);
+    assertEquals(1, editor.carets().length);
+  }
+
+  /** Copying and pasting at multiple carets. */
+  @Test public void copyPaste() {
+    // selections are joined in text order
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(0);
+    editor.cloneCaret(3);
+    editor.forEach(editor::selectWord);
+    assertEquals("ab\ncd", editor.selectedAll());
+
+    // lines are distributed if their number matches the number of carets
+    editor.paste("1\n2");
+    assertEquals("1\n2\nef", Token.string(editor.text()));
+    editor.paste("x");
+    assertEquals("1x\n2x\nef", Token.string(editor.text()));
+
+    // carets without selection contribute empty lines
+    final TextEditor column = editor("abc\n\nghi");
+    column.columns(new IntList(new int[] { 1, 4, 6 }), new IntList(new int[] { 2, 4, 7 }));
+    assertEquals("b\n\nh", column.selectedAll());
+    column.paste("x\ny\nz");
+    assertEquals("axc\ny\ngzi", Token.string(column.text()));
+
+    // a selection of a secondary caret counts if the primary one has none
+    final TextEditor empty = editor("abc\ndef\n");
+    empty.columns(new IntList(new int[] { 1, 5, 8 }), new IntList(new int[] { 2, 6, 8 }));
+    assertFalse(empty.isSelected());
+    assertTrue(empty.anySelected());
+  }
+
+  /** Line commands at multiple carets. */
+  @Test public void lineCommands() {
+    // one caret per line is kept
+    final TextEditor editor = editor("ab\ncd\nef");
+    editor.pos(0);
+    editor.addCaret(1);
+    editor.addCaret(3);
+    editor.caretPerLine();
+    assertEquals(1, editor.carets().length);
+    editor.forEach(editor::duplLines);
+    assertEquals("ab\nab\ncd\ncd\nef", Token.string(editor.text()));
+
+    final TextEditor comment = editor("a\nb");
+    comment.pos(0);
+    comment.addCaret(2);
+    comment.forEach(() -> comment.comment(new SyntaxXQuery()));
+    assertEquals("(: a :)\n(: b :)", Token.string(comment.text()));
+  }
+
+  /** A line with two carets is unindented once. */
+  @Test public void lineIndent() {
+    final TextEditor indent = editor("    ab");
+    indent.pos(4);
+    indent.addCaret(5);
+    indent.forEachLine(() -> indent.indent(new StringBuilder("\t"), true));
+    assertEquals("  ab", Token.string(indent.text()));
+  }
+
+  /** Edits at a caret that remove the positions of other carets. */
+  @Test public void overlappingEdits() {
+    final TextEditor editor = editor("abcdef");
+    editor.pos(2);
+    editor.addCaret(4);
+    editor.forEach(() -> editor.delete(false, false));
+    assertEquals("ef", Token.string(editor.text()));
+
+    final TextEditor words = editor("ab cd");
+    words.pos(4);
+    words.addCaret(5);
+    words.forEach(() -> words.delete(true, false));
+    assertTrue(words.pos() <= words.size());
+
+    // forward deletion removes the position of a caret that has already been processed
+    final TextEditor next = editor("xx ab cd ef");
+    next.pos(3);
+    next.addCaret(4);
+    next.forEach(() -> next.delete(true, true));
+    assertEquals(3, next.pos());
+    for(final TextEditor.Caret c : next.carets()) assertEquals(3, c.pos());
+
+    // deleted text that repeats the remaining text
+    final TextEditor repeat = editor("ababab");
+    repeat.pos(1);
+    repeat.addCaret(4);
+    repeat.forEach(() -> repeat.delete(false, false));
+    assertEquals("ab", Token.string(repeat.text()));
+  }
+
+  /** Column selections. */
+  @Test public void columns() {
+    final TextEditor editor = editor("abc\ndef\ng");
+    editor.columns(new IntList(new int[] { 1, 5, 9 }), new IntList(new int[] { 2, 6, 9 }));
+    assertEquals(2, editor.carets().length);
+    assertEquals(9, editor.pos());
+    editor.forEach(() -> editor.toCase(TextEditor.Case.UPPER));
+    assertEquals("aBc\ndEf\ng", Token.string(editor.text()));
   }
 
   /**

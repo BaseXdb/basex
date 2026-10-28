@@ -24,7 +24,7 @@ public final class Run extends Execute {
    * @param fl input file
    */
   public Run(final String fl) {
-    super(Perm.CREATE, fl);
+    super(Perm.ADMIN, fl);
   }
 
   /**

@@ -145,9 +145,10 @@ public final class RepoManager {
         }
 
         final boolean isExpath = pkg.type() == PkgType.EXPATH;
+        final IOFile pkgFile = repo.path(pkgPath);
         ClassLoaderCache.invalidate(isExpath
-            ? ModuleLoader.pkgUrls(repo.path(pkgPath), pkg.modDir(repo.path(pkgPath)), info)
-            : ModuleLoader.jarUrls(context, Strings.uriToClasspath(name)));
+            ? ModuleLoader.pkgUrls(pkgFile, pkg.modDir(pkgFile), info)
+            : ModuleLoader.jarUrls(context, Strings.uriToClasspath(pkg.name())));
 
         if(isExpath) {
           // check if package to be deleted participates in a dependency
@@ -156,8 +157,6 @@ public final class RepoManager {
           // delete files in main-memory repository
           repo.delete(pkg);
         }
-
-        final IOFile pkgFile = repo.path(pkgPath);
 
         // delete directory with extracted jars
         final String className = Strings.uriToClasspath(pkg.name().replaceAll("^.*\\.", ""));
@@ -483,9 +482,7 @@ public final class RepoManager {
           // extract XQM file
           trg = new IOFile(repo, name);
         }
-        if(trg != null) {
-          trg.write(jarFile.getInputStream(entry));
-        }
+        if(trg != null) trg.write(jarFile.getInputStream(entry));
       }
     }
   }
@@ -562,18 +559,13 @@ public final class RepoManager {
    * Checks if a package participates in a dependency.
    * @param pkg package
    * @return package (that depends on the current one) or {@code null}
-   * @throws QueryException query exception
    */
-  private String dependency(final Pkg pkg) throws QueryException {
-    final String id = pkg.id();
-    final EXPathRepo repo = context.repo;
-    final HashMap<String, Pkg> dict = repo.pkgDict();
-    for(final Pkg pkgDep : dict.values()) {
+  private String dependency(final Pkg pkg) {
+    final String id = pkg.id(), name = pkg.name();
+    for(final Pkg pkgDep : context.repo.pkgDict().values()) {
       if(!pkgDep.id().equals(id)) {
         // check only packages different from the current one
-        final IOFile desc = new IOFile(repo.path(pkgDep.path()), DESCRIPTOR);
-        final String name = pkg.name();
-        for(final PkgDep dep : new PkgParser(info).parse(desc).dep) {
+        for(final PkgDep dep : pkgDep.dep) {
           // check only package dependencies
           if(name.equals(dep.name)) return pkgDep.name();
         }

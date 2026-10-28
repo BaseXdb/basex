@@ -58,7 +58,7 @@ public class FnMin extends StandardFunc {
     final boolean string = item instanceof AStr;
     final boolean dateTime = item instanceof Dtm, duration = item instanceof Dur;
     final boolean numeric = !(string || dateTime || duration || type == BOOLEAN || type == QNAME ||
-        item instanceof ADate || item instanceof Dur || item instanceof Bin);
+        item instanceof ADate || item instanceof Bin);
     if(numeric) {
       if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
       if(item == Dbl.NAN || item == Flt.NAN) return item;

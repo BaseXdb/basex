@@ -28,11 +28,15 @@ abstract class MapFn extends StandardFunc {
    */
   static boolean noRecords(final Expr expr) {
     if(expr instanceof final XQMap map) return !(map.type instanceof RecordType);
-    return expr.seqType().type.intersect(Types.RECORD) == null;
+    final Type tp = expr.seqType().type;
+    // records have string keys (labeled records without fields are ignored)
+    return tp.intersect(Types.RECORD) == null ||
+        tp instanceof final MapType mt && mt.keyType().intersect(BasicType.STRING) == null;
   }
 
   @Override
   public long structSize() {
-    return seqType().type instanceof final ShapeType sh ? sh.fields().size() : -1;
+    // the fields of record(*) are unknown
+    return seqType().type instanceof final ShapeType sh && !sh.any() ? sh.fields().size() : -1;
   }
 }

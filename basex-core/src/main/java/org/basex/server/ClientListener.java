@@ -37,9 +37,11 @@ public final class ClientListener extends Thread implements ClientInfo {
   /** Secret for deriving the salts of unknown users. */
   private static final String SECRET =
       Strings.sha256(Long.toString(new SecureRandom().nextLong()));
+  /** Maximum length of login strings, in bytes. */
+  private static final int LOGIN = 1 << 10;
+  /** Password algorithm of the login handshake. */
+  private static final Algorithm ALGORITHM = Algorithm.SALTED_SHA256;
 
-  /** Timer for authentication time out. */
-  public final Timer timeout = new Timer();
   /** Timestamp of last interaction. */
   public long last;
 
@@ -86,13 +88,15 @@ public final class ClientListener extends Thread implements ClientInfo {
 
   @Override
   public void run() {
-    if(!authenticate()) return;
+    if(!authenticate()) {
+      close();
+      return;
+    }
 
     try {
       while(authenticated) {
         command(null);
-        String cmd;
-        final ServerCmd sc;
+        String cmd = null;
         try {
           final int b = in.read();
           if(b == -1) {
@@ -103,21 +107,15 @@ public final class ClientListener extends Thread implements ClientInfo {
 
           last = System.currentTimeMillis();
           perf.nanoRuntime();
-          sc = ServerCmd.get(b);
-          cmd = null;
-          if(sc == ServerCmd.CREATE) {
-            create();
-          } else if(sc == ServerCmd.ADD) {
-            add();
-          } else if(sc == ServerCmd.PUT) {
-            put();
-          } else if(sc == ServerCmd.PUTBINARY) {
-            putBinary();
-          } else if(sc != ServerCmd.EXECUTE) {
-            query(sc);
-          } else {
+          final ServerCmd sc = ServerCmd.get(b);
+          switch(sc) {
+            case CREATE -> execute(new CreateDB(in.readString()));
+            case ADD -> execute(new Add(in.readString()));
+            case PUT -> execute(new Put(in.readString()));
+            case PUTBINARY -> execute(new BinaryPut(in.readString()));
             // database command
-            cmd = new ByteList().add(b).add(in.readBytes()).toString();
+            case EXECUTE -> cmd = new ByteList().add(b).add(in.readBytes()).toString();
+            default -> query(sc);
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
@@ -125,24 +123,17 @@ public final class ClientListener extends Thread implements ClientInfo {
           close();
           break;
         }
-        if(sc != ServerCmd.EXECUTE) continue;
+        if(cmd == null) continue;
 
         // parse input and create command instance
         try {
           command(CommandParser.get(cmd, context).parseSingle());
           log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
-          // log invalid command
-          final String msg = ex.getMessage();
+          // log invalid command, send 0 to mark end of potential result, send error info
           log(LogType.REQUEST, cmd);
-          log(LogType.ERROR, msg);
-          // send 0 to mark end of potential result
           out.write(0);
-          // send {INFO}0
-          out.print(msg);
-          out.write(0);
-          // send 1 to mark error
-          send(false);
+          info(ex.getMessage(), false);
           continue;
         }
 
@@ -200,7 +191,6 @@ public final class ClientListener extends Thread implements ClientInfo {
     boolean ok = false;
     try {
       final String nonce = Long.toString(System.nanoTime());
-      final byte[] address = socket.getInetAddress().getAddress();
 
       // send {REALM:NONCE}0
       out = PrintOutput.get(socket.getOutputStream());
@@ -210,45 +200,38 @@ public final class ClientListener extends Thread implements ClientInfo {
       // evaluate login data
       in = BufferInput.get(socket.getInputStream());
       // receive {USER}0
-      final String name = in.readString();
+      final String name = in.readString(LOGIN);
 
       // loopback-only server shutdown request (see BaseXServer#stop)
       if(name.equals(BaseXServer.STOP)) {
         server.remove(this);
-        final boolean local = Util.localHost(socket.getInetAddress());
+        final boolean local = Util.localHost(inetAddress());
         // shut the server down, then send the completion flag (0: stopped, 1: refused)
         if(local) server.close();
         send(local);
-        socket.close();
         return false;
       }
 
       // receive {}0 to request the salted handshake (the MD5 hash of clients < 13.0 is rejected)
       final User user = context.users.get(name);
-      if(in.readString().isEmpty()) {
-        // send {ALGORITHM:SALT}0; unknown users receive a pseudo-random salt
-        final Algorithm algorithm = Algorithm.SALTED_SHA256;
-        String salt = user != null ? user.code(algorithm, Code.SALT) : null;
-        if(salt == null) salt = salt(name);
-        out.print(algorithm + ":" + salt);
-        send(true);
-        // receive {HASH}0
-        final String hash = in.readString();
-        final String stored = user != null ? user.code(algorithm, Code.HASH) : null;
-        ok = stored != null && Strings.sha256(stored + nonce).equals(hash) && user.enabled();
-      }
+      final String hash = in.readString(LOGIN).isEmpty() ? hash(user, name) : null;
+      // delay users with wrong passwords
+      ok = context.blocker.login(inetAddress(), name, () -> {
+        final String stored = user != null && user.enabled() ? user.code(ALGORITHM, Code.HASH) :
+          null;
+        return hash != null && stored != null && Strings.sha256(stored + nonce).equals(hash);
+      });
+      // release the pending login before the client receives the reply
+      server.remove(this);
 
       // write log information
       if(ok) {
         context.user(user);
         // send {OK}
         send(true);
-        context.blocker.remove(address, name);
         context.sessions.add(this);
       } else {
         if(!name.isEmpty()) log(LogType.ERROR, Util.info(ACCESS_DENIED_X, name));
-        // delay users with wrong passwords
-        context.blocker.delay(address, name);
         send(false);
       }
     } catch(final IOException ex) {
@@ -257,11 +240,28 @@ public final class ClientListener extends Thread implements ClientInfo {
         log(LogType.ERROR, Util.message(ex));
         ok = false;
       }
+    } finally {
+      server.remove(this);
     }
-
-    server.remove(this);
     authenticated = ok;
     return ok;
+  }
+
+  /**
+   * Sends the salt of a user and receives the hashed password.
+   * @param user user (can be {@code null})
+   * @param name username
+   * @return hashed password
+   * @throws IOException I/O exception
+   */
+  private String hash(final User user, final String name) throws IOException {
+    // send {ALGORITHM:SALT}0; unknown users receive a pseudo-random salt
+    String salt = user != null ? user.code(ALGORITHM, Code.SALT) : null;
+    if(salt == null) salt = salt(name);
+    out.print(ALGORITHM + ":" + salt);
+    send(true);
+    // receive {HASH}0
+    return in.readString(LOGIN);
   }
 
   /**
@@ -323,7 +323,15 @@ public final class ClientListener extends Thread implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return ClientInfo.address(socket.getInetAddress().getHostAddress(), socket.getPort());
+    return ClientInfo.address(inetAddress().getHostAddress(), socket.getPort());
+  }
+
+  /**
+   * Returns the IP address of the client.
+   * @return IP address
+   */
+  public InetAddress inetAddress() {
+    return socket.getInetAddress();
   }
 
   @Override
@@ -334,24 +342,6 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   // PRIVATE METHODS ==============================================================================
-
-  /**
-   * Returns error feedback.
-   * @param info error string
-   * @throws IOException I/O exception
-   */
-  private void error(final String info) throws IOException {
-    info(info, false);
-  }
-
-  /**
-   * Returns user feedback.
-   * @param info information string
-   * @throws IOException I/O exception
-   */
-  private void success(final String info) throws IOException {
-    info(info, true);
-  }
 
   /**
    * Returns user feedback.
@@ -369,39 +359,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Creates a database.
-   * @throws IOException I/O exception
-   */
-  private void create() throws IOException {
-    execute(new CreateDB(in.readString()));
-  }
-
-  /**
-   * Adds a document to a database.
-   * @throws IOException I/O exception
-   */
-  private void add() throws IOException {
-    execute(new Add(in.readString()));
-  }
-
-  /**
-   * Puts (adds or replaces) a document in the opened database.
-   * @throws IOException I/O exception
-   */
-  private void put() throws IOException {
-    execute(new Put(in.readString()));
-  }
-
-  /**
-   * Puts (adds or replaces) a binary resource in the opened database.
-   * @throws IOException I/O exception
-   */
-  private void putBinary() throws IOException {
-    execute(new BinaryPut(in.readString()));
-  }
-
-  /**
-   * Executes the specified command.
+   * Executes a command with streamed input.
    * @param cmd command to be executed
    * @throws IOException I/O exception
    */
@@ -411,10 +369,10 @@ public final class ClientListener extends Thread implements ClientInfo {
     try {
       cmd.setInput(si);
       cmd.execute(context);
-      success(cmd.info());
+      info(cmd.info(), true);
     } catch(final BaseXException ex) {
       si.drain();
-      error(ex.getMessage());
+      info(ex.getMessage(), false);
     }
   }
 
@@ -426,21 +384,17 @@ public final class ClientListener extends Thread implements ClientInfo {
   private void query(final ServerCmd sc) throws IOException {
     // iterator argument (query or identifier)
     String arg = in.readString();
-
-    String error = null;
     try {
       final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
       if(sc == ServerCmd.QUERY) {
-        final String query = arg;
-        qp = new ServerQuery(query, context);
+        qp = new ServerQuery(arg, context);
+        info.append(arg);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
         out.print(arg);
         out.write(0);
-        // write log file
-        info.append(query);
       } else {
         // find query process
         qp = queries.get(arg);
@@ -485,12 +439,10 @@ public final class ClientListener extends Thread implements ClientInfo {
     } catch(final Throwable ex) {
       // log exception (static or runtime)
       Util.debug(ex);
-      error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
+      final String error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
       log(LogType.REQUEST, sc + "[" + arg + ']');
       log(LogType.ERROR, error);
       queries.remove(arg);
-    }
-    if(error != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);

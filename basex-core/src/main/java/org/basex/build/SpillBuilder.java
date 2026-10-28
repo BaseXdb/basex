@@ -59,8 +59,7 @@ public final class SpillBuilder extends Builder {
     }
     // assign data reference after building: the main-memory data may be dropped when spilling
     path.data(data);
-    data.lastid = data.nodes() - 1;
-    if(meta.updindex) data.idmap.finish(data.lastid);
+    data.finishBuild();
     data.release(MemoryLimit.hold(data, used));
     return data;
   }

@@ -31,9 +31,9 @@ abstract class MarkupSerializer extends StandardSerializer {
   private static final Pattern PUBID = Pattern.compile("[ \r\na-zA-Z0-9\\-'()+,./:=?;!*#@$_%]*");
 
   /** System document type (can be {@code null}). */
-  String docsys;
+  final String docsys;
   /** Public document type. */
-  String docpub;
+  final String docpub;
 
   /** Indicates if root element has been serialized. */
   boolean root;
@@ -82,15 +82,14 @@ abstract class MarkupSerializer extends StandardSerializer {
     final YesNoOmit sa = sopts.get(STANDALONE);
     saomit = sa == YesNoOmit.OMIT;
 
-    docsys  = sopts.get(DOCTYPE_SYSTEM);
-    docpub  = sopts.get(DOCTYPE_PUBLIC);
     escape  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
     indAttr = indent && sopts.yes(INDENT_ATTRIBUTES);
 
-    if(docsys.isEmpty()) docsys = null;
-    if(docpub.isEmpty()) docpub = null;
+    final String sys = sopts.get(DOCTYPE_SYSTEM), pub = sopts.get(DOCTYPE_PUBLIC);
+    docsys = sys.isEmpty() ? null : sys;
+    docpub = pub.isEmpty() ? null : pub;
     // public identifier: PubidChar characters; system identifier: not both quote characters
     if(docpub != null && !PUBID.matcher(docpub).matches())
       throw SERPARAM_X.getIO(Util.info("Invalid public identifier: %.", docpub));

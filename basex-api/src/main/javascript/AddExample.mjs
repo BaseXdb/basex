@@ -1,6 +1,6 @@
 // This example shows how new documents can be added.
 //
-// Documentation: https://docs.basex.org/wiki/Clients
+// Documentation: https://docs.basex.org/main/Clients
 //
 // (C) BaseX Team, BSD License
 

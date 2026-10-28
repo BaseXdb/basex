@@ -18,7 +18,7 @@ public final class FnCollationAvailable extends StandardFunc {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-   final byte[] collation = toToken(arg(0), qc);
+    final byte[] collation = toToken(arg(0), qc);
     try {
       toCollation(collation, qc);
     } catch(final QueryException ignore) {

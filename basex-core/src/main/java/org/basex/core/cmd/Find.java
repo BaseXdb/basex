@@ -35,7 +35,7 @@ public final class Find extends AQuery {
 
     // parse user input
     final StringBuilder pre = new StringBuilder(), preds = new StringBuilder();
-    for(String term : split(search.replace(" +", " "))) {
+    for(String term : split(search)) {
       if(term.startsWith("@=")) {
         preds.append("[@* = \"").append(term.substring(2)).append("\"]");
       } else if(Strings.startsWith(term, '=')) {

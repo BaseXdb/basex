@@ -10,6 +10,9 @@ import module namespace config = 'dba/lib/config' at 'config.xqm';
 (:~ WebSocket attribute: id of the job that runs for the current connection. :)
 declare variable $utils:JOB := 'dba-job';
 
+(:~ Request parameters that state what a page shows; see utils:dispatch. :)
+declare %private variable $utils:SELECTION := ('name', 'path', 'resource', 'dir');
+
 (:~ Regular expression for XQuery files; matches the suffixes of IO.XQSUFFIXES. :)
 declare variable $utils:XQUERY-REGEX := '\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$';
 
@@ -20,6 +23,8 @@ declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\
 declare record utils:action(
   run     as %updating fn() as item()*,
   params  as map(*)?,
+  (: parameters of the page if the action fails; by default, the ones it succeeds with :)
+  failed  as map(*)?,
   info    as xs:string?
 );
 
@@ -52,12 +57,19 @@ declare function utils:query-parse(
 (:~
  : Evaluates a query, considering the configured limits.
  : @param  $query  query string
+ : @param  $noun   what the query supplies, as named in the error for a missing one
  : @return result
  :)
 declare function utils:evaluate(
-  $query  as xs:string?
+  $query  as xs:string?,
+  $noun   as xs:string := 'value'
 ) as item()* {
-  xquery:eval($query, (), { config:limits(), 'pass': true() })
+  (: an empty sequence is supplied as (); an empty field was left out :)
+  if (normalize-space($query)) then (
+    xquery:eval($query, (), { config:limits(), 'pass': true() })
+  ) else (
+    error((), `No { $noun } was supplied.`)
+  )
 };
 
 (:~
@@ -85,7 +97,7 @@ declare function utils:expression(
   )
   let $truncated := string-length($text) > $max
   return {
-    'text': if ($truncated) then substring($text, 1, $max) else $text,
+    'text': substring($text, 1, $max),
     'truncated': $truncated
   }
 };
@@ -100,7 +112,7 @@ declare function utils:value(
 ) as map(*) {
   let $expression := utils:expression($value)
   return if ($expression?truncated) then (
-    { 'text': '', 'note': 'The value is too large to be shown; supply a new one.' }
+    { 'text': '', 'note': 'Value too large to show; supply a new one.' }
   ) else (
     { 'text': $expression?text, 'note': '' }
   )
@@ -231,14 +243,14 @@ declare function utils:ws-error(
 (:~
  : Starts a job that pushes the outcome of a query to the client, and registers both jobs for the
  : current connection.
- : @param  $id       id of the job to wait for
- : @param  $run      number of the run (echoed to the client, which drops outdated results)
- : @param  $options  serialization parameters
+ : @param  $id    id of the job to wait for
+ : @param  $run   number of the run (echoed to the client, which drops outdated results)
+ : @param  $chop  chop the serialized result
  :)
 declare function utils:ws-start(
-  $id       as xs:string,
-  $run      as xs:integer,
-  $options  as map(*)
+  $id    as xs:string,
+  $run   as xs:integer,
+  $chop  as xs:boolean
 ) as empty-sequence() {
   let $maxchars := config:get($config:MAXCHARS)
   (: the reader is registered as well: it must be gone before the ID is assigned again :)
@@ -249,13 +261,18 @@ declare function utils:ws-start(
       let $info := job:info($id)
       return {
         try {
+          (: the job returns a serialized result; the bytes of a binary one are shown as text :)
           let $result := job:result($id)
-          let $string := serialize($result, $options)
+          let $string := if ($result instance of xs:string) then (
+            $result
+          ) else (
+            serialize($result, { 'method': 'basex' })
+          )
           return {
             'type'  : 'result',
             'run'   : $run,
-            'result': if ($options?limit) then utils:chop($string, $maxchars) else $string,
-            'items' : count($result)
+            'result': if ($chop) then utils:chop($string, $maxchars) else $string,
+            { 'items': xs:integer($info?result?items) }[exists($info)]
           }
         } catch * {
           {
@@ -298,15 +315,13 @@ declare function utils:query-info(
     return (
       <dt>{ utils:title($key) }:</dt>,
       <dd>{
-        if ($value instance of map(*)) then (
-          <ul>{
+        switch () {
+          case $value instance of map(*) return <ul>{
             for key $name value $entry in $value return <li>{ utils:title($name) }: { $entry }</li>
           }</ul>
-        ) else if ($value instance of array(*)) then (
-          <ul>{ $value?* ! <li>{ . }</li> }</ul>
-        ) else (
-          <pre>{ $value }</pre>
-        )
+          case $value instance of array(*) return <ul>{ $value?* ! <li>{ . }</li> }</ul>
+          default return <pre>{ $value }</pre>
+        }
       }</dd>
     )
   }</dl>
@@ -415,7 +430,10 @@ declare function utils:safe-path(
 ) as xs:string {
   (: guards file access against path traversal, independent of the servlet container: a path
      that escapes the base is a bad request, never a file :)
-  let $base := file:resolve-path($dir)
+  (: the base ends with a separator: a name is resolved within it, even if it does not exist,
+     and a sibling whose name starts with the same characters is not taken for a part of it :)
+  let $sep := file:dir-separator()
+  let $base := file:resolve-path($dir) ! (if (ends-with(., $sep)) then . else . || $sep)
   let $path := file:resolve-path($name, $base)
   return if (starts-with($path, $base)) then (
     $path
@@ -528,7 +546,7 @@ declare function utils:info(
 ) as xs:string {
   let $count := count($items)
   return if ($count = 1) then (
-    `{ utils:capitalize($name) } "{ $items }" was { $action }.`
+    `{ utils:capitalize($name) } “{ $items }” was { $action }.`
   ) else (
     `{ utils:count($count, $name) } were { $action }.`
   )
@@ -612,7 +630,7 @@ declare function utils:outcome(
  : @param  $params   query parameters of the target page
  : @param  $message  outcome: an 'info' or an 'error' entry; empty if there is nothing to report
  :)
-declare %updating function utils:redirect(
+declare %private %updating function utils:redirect(
   $page     as xs:string,
   $params   as map(*),
   $message  as map(*)?
@@ -633,14 +651,19 @@ declare %updating function utils:dispatch(
      so a request that touches no database must not reach the actions of others :)
   (: an action can fail before it runs: a parameter that is evaluated is reported like the
      update it was meant for, not as a server error :)
+  let $args := request:parameter-map()
   let $target := try {
-    $action(request:parameter-map())
+    $action($args)
   } catch * {
     $err:description
   }
   (: an info message is shown if the action succeeds, the error description if it fails :)
   return if ($target instance of xs:string) then (
-    utils:redirect($page, {}, { 'error': $target })
+    (: what was selected when the request was sent stays selected :)
+    let $selection := map:filter($args, fn($key, $value) {
+      $key = $utils:SELECTION and count($value) = 1 and $value != ''
+    })
+    return utils:redirect($page, $selection, { 'error': $target })
   ) else (
     let $params := $target?params otherwise {}
     let $run := $target?run
@@ -648,7 +671,7 @@ declare %updating function utils:dispatch(
       updating $run(),
       utils:redirect($page, $params, { 'info': $target?info }[$target?info])
     } catch * {
-      utils:redirect($page, $params, { 'error': $err:description })
+      utils:redirect($page, $target?failed otherwise $params, { 'error': $err:description })
     }
   )
 };

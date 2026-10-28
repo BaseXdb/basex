@@ -1,3 +1,5 @@
-/doc
 /lib
-/target
+/.basex
+/data
+/repo
+/webapp

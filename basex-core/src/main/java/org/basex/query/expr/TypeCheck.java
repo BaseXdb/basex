@@ -77,8 +77,7 @@ public final class TypeCheck extends Single {
       // raise static error if no intersection is possible:
       //   () coerce to item()
       if(nocc == null) {
-        // the void type xs:error is a subtype of every type, so its occurrence indicator must
-        // not trigger a cardinality error
+        // xs:error is a subtype of every type; its occurrence indicator must not trigger an error
         //   fn:error() coerce to empty-sequence()
         if(et.instanceOf(st)) {
           cc.info(OPTTYPE_X_X, st, expr);

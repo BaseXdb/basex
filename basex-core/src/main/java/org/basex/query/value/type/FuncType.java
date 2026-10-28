@@ -229,13 +229,8 @@ public final class FuncType extends FType {
   }
 
   @Override
-  public boolean coercive() {
-    return typedArgs() || declType.type.coercive();
-  }
-
-  @Override
-  public boolean wraps() {
-    return typedArgs() || declType.type.wraps();
+  public Coercion coercion() {
+    return typedArgs() ? Coercion.WRAP : declType.type.coercion();
   }
 
   /**
@@ -244,6 +239,15 @@ public final class FuncType extends FType {
    */
   private boolean typedArgs() {
     return argTypes != null && Checks.any(argTypes, st -> !st.eq(ITEM_ZM));
+  }
+
+  /**
+   * Checks if functions of this type take a single argument that is an instance of the given type.
+   * @param arg argument type
+   * @return result of check
+   */
+  boolean unary(final SeqType arg) {
+    return argTypes != null && argTypes.length == 1 && argTypes[0].instanceOf(arg);
   }
 
   /**

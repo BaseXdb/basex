@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -34,7 +35,9 @@ public class FetchDoc extends StandardFunc {
    */
   protected DBNode fetch(final IO source, final QueryContext qc) throws QueryException {
     final DBOptions dbopts = new DBOptions(toEmptyMap(arg(1), qc), MainOptions.PARSING, qc, info);
-    final MainOptions mopts = dbopts.assignTo(new MainOptions());
+    final MainOptions mopts = dbopts.mainOptions();
+    // external entities, XIncludes and catalogs require ADMIN permission
+    if(!qc.has(Perm.ADMIN, null, info)) mopts.allowExternal(false);
     try {
       return new DBNode(Parser.singleParser(source, mopts, ""));
     } catch(final IOException ex) {

@@ -51,7 +51,9 @@ public final class OptionsTest extends SandboxTest {
     final boolean value = true;
     System.setProperty(Prop.DBPREFIX + name.name(), Boolean.toString(value));
     try {
-      assertEquals(true, new MainOptions().get(name));
+      final MainOptions mopts = new MainOptions();
+      mopts.setSystem();
+      assertEquals(true, mopts.get(name));
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }
@@ -59,15 +61,15 @@ public final class OptionsTest extends SandboxTest {
 
   /** Tests that option definitions cannot be modified. */
   @Test public void immutableDefinitions() {
-    final Iterator<Option<?>> iter = new MainOptions(false).iterator();
+    final Iterator<Option<?>> iter = new MainOptions().iterator();
     iter.next();
     assertThrows(UnsupportedOperationException.class, iter::remove);
-    assertNotNull(new MainOptions(false).option(MainOptions.STRIPWS.name()));
+    assertNotNull(new MainOptions().option(MainOptions.STRIPWS.name()));
   }
 
   /** Tests that option values are instance-specific. */
   @Test public void instanceValues() {
-    final MainOptions opts1 = new MainOptions(false), opts2 = new MainOptions(false);
+    final MainOptions opts1 = new MainOptions(), opts2 = new MainOptions();
     opts1.set(MainOptions.STRIPWS, true);
     assertTrue(opts1.get(MainOptions.STRIPWS));
     assertFalse(opts2.get(MainOptions.STRIPWS));

@@ -44,7 +44,7 @@ final class ProjectFiles {
   /** Files with errors. */
   private TreeMap<String, InputInfo> errors = new TreeMap<>();
   /** Current file cache (can be {@code null}). */
-  private ProjectCache cache;
+  private volatile ProjectCache cache;
 
   /**
    * Project files.
@@ -98,7 +98,8 @@ final class ProjectFiles {
   String[] filter(final String files, final ContentFilter content, final IOFile root,
       final int max, final Job job) throws InterruptedException {
 
-    final long id = ++filterId;
+    // jobs must not interrupt the background search
+    final long id = job == null ? ++filterId : filterId;
     final StringList results = new StringList();
 
     // glob pattern
@@ -195,12 +196,20 @@ final class ProjectFiles {
    * @throws InterruptedException interrupted exception
    */
   private ProjectCache cache(final IOFile root) throws InterruptedException {
-    final ProjectCache pc = cache;
-    if(pc == null) {
-      // no file cache available: create and return new one
-      final GUIOptions gopts = view.gui.gopts;
-      cache = new ProjectCache(gopts.get(GUIOptions.SHOWHIDDEN), gopts.get(GUIOptions.MAXFILES));
-      cache.scan(Paths.get(root.path()), p -> p != cache);
+    final ProjectCache pc;
+    final boolean create;
+    // filter and parse workers may request the cache at the same time: only one may create it
+    synchronized(this) {
+      create = cache == null;
+      if(create) {
+        final GUIOptions gopts = view.gui.gopts;
+        cache = new ProjectCache(gopts.get(GUIOptions.SHOWHIDDEN), gopts.get(GUIOptions.MAXFILES));
+      }
+      pc = cache;
+    }
+    if(create) {
+      // no file cache available: populate new one
+      pc.scan(Paths.get(root.path()), p -> p != cache);
     } else {
       // wait until file cache is initialized
       while(!pc.valid()) {
@@ -209,8 +218,7 @@ final class ProjectFiles {
         if(pc != cache) throw new InterruptedException();
       }
     }
-    // return existing file cache
-    return cache;
+    return pc;
   }
 
   /**
@@ -258,7 +266,7 @@ final class ProjectFiles {
   private static boolean nameMatches(final int mode, final String file, final String query) {
     return mode == 0 ? SmartStrings.startsWith(file, query) :
            mode == 1 ? SmartStrings.contains(file, query) :
-           SmartStrings.containsChars(file, query, false);
+           SmartStrings.containsChars(file, query);
   }
 
   /**

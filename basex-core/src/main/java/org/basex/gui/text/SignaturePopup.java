@@ -9,7 +9,7 @@ import javax.swing.*;
 import org.basex.gui.layout.*;
 
 /**
- * Popup window with the signature of the function that is currently called.
+ * Popup window with the signature of a called function, or the outline of a referenced name.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -23,12 +23,13 @@ final class SignaturePopup extends TextPopup {
   /**
    * Constructor.
    * @param panel text panel
+   * @param above place the popup above its position
    */
-  SignaturePopup(final TextPanel panel) {
-    super(panel);
-    content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(lightGray),
+  SignaturePopup(final TextPanel panel, final boolean above) {
+    super(panel, above);
+    content.setBorder(BorderFactory.createCompoundBorder(border(),
       BaseXLayout.border(2, MARGIN, 2, MARGIN)));
-    content.setBackground(backColor);
+    content.setBackground(paleGray);
   }
 
   @Override
@@ -37,7 +38,7 @@ final class SignaturePopup extends TextPopup {
   }
 
   /**
-   * Shows a signature below the current line.
+   * Shows a signature.
    * @param signature signature
    * @param name function name, as it was specified in the call
    * @param index index of the argument at the caret ({@code -1}: no argument is emphasized)
@@ -54,7 +55,25 @@ final class SignaturePopup extends TextPopup {
     add(name + args.substring(0, s), false);
     add(args.substring(s, e), true);
     add(args.substring(e), false);
+    display();
+  }
 
+  /**
+   * Shows a string.
+   * @param string string
+   * @param pnt position of the popup, relative to the text panel
+   */
+  void show(final String string, final Point pnt) {
+    point = pnt;
+    content.removeAll();
+    add(string, false);
+    display();
+  }
+
+  /**
+   * Displays the popup.
+   */
+  private void display() {
     // a visible popup is updated at once, a new one is displayed after a delay
     if(visible()) open(point);
     else schedule();

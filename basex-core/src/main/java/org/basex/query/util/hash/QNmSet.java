@@ -43,8 +43,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return index of stored key (larger than {@code 0})
    */
   public final int put(final QNm key) {
-    final int i = store(key);
-    return Math.abs(i);
+    return Math.abs(store(key));
   }
 
   /**

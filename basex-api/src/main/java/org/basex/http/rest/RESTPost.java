@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.AbstractMap.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -42,7 +43,9 @@ final class RESTPost {
     // perform queries
     final DBNode doc;
     try(NewlineInput ni = new NewlineInput(conn.request.getInputStream(), encoding)) {
-      doc = new DBNode(new IOContent(ni.content()));
+      // remote input: parse as untrusted
+      doc = new DBNode(Parser.xmlParser(new IOContent(ni.content()),
+          new MainOptions().allowExternal(false)));
     } catch(final IOException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }
@@ -75,6 +78,7 @@ final class RESTPost {
         for(final Item item : qp.value()) {
           final String name = value("@name", item, ctx).toUpperCase(Locale.ENGLISH);
           final String value = value("@value", item, ctx);
+          RESTCmd.check(ctx.options.option(name), ctx.user());
           ctx.options.assign(name, value);
         }
       }
@@ -88,13 +92,7 @@ final class RESTPost {
           final String type = value("@type", item, ctx);
           bindings.compute(name, (k, v) -> {
             final StringList list = new StringList();
-            if(v != null) {
-              if(v.getKey() instanceof final String[] strings) {
-                for(final String string : strings) list.add(string);
-              } else if(v.getKey() instanceof String) {
-                list.add(k);
-              }
-            }
+            if(v != null) list.add((String[]) v.getKey());
             return new SimpleEntry<>(list.add(value).finish(), type);
           });
         }

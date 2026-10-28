@@ -3,7 +3,7 @@
 Python 3 client for BaseX.
 Works with BaseX 13.0 and later
 
-Documentation: https://docs.basex.org/wiki/Clients
+Documentation: https://docs.basex.org/main/Clients
 
 (C) 2012, Hiroaki Itoh. BSD License
     updated 2014 by Marc van Grootel
@@ -90,7 +90,7 @@ directly."""
 class Session:
     """class Session.
 
-    see https://docs.basex.org/wiki/Server_Protocol
+    see https://docs.basex.org/main/Server_Protocol
     """
 
     def __init__(self, host, port, user, password,
@@ -226,7 +226,7 @@ The type codes (see https://docs.basex.org/main/Server_Protocol#type_ids) are sk
 class Query:
     """class Query.
 
-    see https://docs.basex.org/wiki/Server_Protocol
+    see https://docs.basex.org/main/Server_Protocol
     """
 
     def __init__(self, session, querytxt):

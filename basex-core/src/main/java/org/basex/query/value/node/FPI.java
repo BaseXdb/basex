@@ -20,8 +20,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
-  /** Opening characters. */
-  public static final byte[] OPEN = { '<', '?' };
   /** Closing characters. */
   public static final byte[] CLOSE = { '?', '>' };
 
@@ -69,12 +67,6 @@ public final class FPI extends FNode {
   public FPI materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) {
     return materialized(test, funcs, ii) ? this : new FPI(name, value);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FPI f && name.eq(f.name) &&
-        Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

@@ -1,9 +1,6 @@
 package org.basex.gui.text;
 
 import java.util.*;
-import java.util.function.*;
-
-import org.basex.util.*;
 
 /**
  * Matcher for the code completion of the {@link TextPanel}.
@@ -28,14 +25,6 @@ final class Completions {
     final ArrayList<Completion> matches = new ArrayList<>();
     // duplicate insertions are skipped
     final HashSet<String> values = new HashSet<>();
-    // indicates if the string at the cursor is a complete candidate
-    final boolean[] exact = new boolean[1];
-    final Consumer<Completion> add = completion -> {
-      // trailing whitespace is ignored: a candidate must insert more than the string at the cursor
-      final String value = completion.value().stripTrailing();
-      if(value.equals(word)) exact[0] = true;
-      else if(values.add(value)) matches.add(completion);
-    };
 
     // add matches that start with the input string
     for(final ArrayList<Completion> list : lists) {
@@ -46,25 +35,12 @@ final class Completions {
         final int c = completion.alias() ? -1 : match.indexOf(':');
         if(match.startsWith(input) || c != -1 && match.startsWith(input, c + 1) ||
           match.replace(":", "").startsWith(input)) {
-          add.accept(completion);
+          // trailing whitespace is ignored: a candidate must insert more than the input
+          final String value = completion.value().stripTrailing();
+          if(!value.equals(word) && values.add(value)) matches.add(completion);
         }
       }
       separate(matches, size);
-    }
-    // add matches that start with and contain the input string; skipped for a single candidate,
-    // and if the string at the cursor is a complete candidate itself
-    if(!exact[0] && matches.size() != 1) {
-      for(final boolean strt : new boolean[] { true, false }) {
-        final int size = matches.size();
-        for(final ArrayList<Completion> list : lists) {
-          for(final Completion completion : list) {
-            if(!completion.alias() && SmartStrings.containsChars(completion.match(), input, strt)) {
-              add.accept(completion);
-            }
-          }
-        }
-        separate(matches, size);
-      }
     }
     return matches;
   }

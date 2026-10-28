@@ -250,8 +250,8 @@ public abstract sealed class SimpleMap extends Mapping
 
     // merge filter with context value as root: A ! .[B] → A[B]
     Preds preds = null;
-    if(next instanceof final Filter filter) {
-      if(filter.root instanceof ContextValue) preds = filter;
+    if(next instanceof final Filter filter && filter.root instanceof ContextValue) {
+      preds = filter;
     } else if(next instanceof final SingleIterPath path) {
       final Step step = path.step(0);
       final Type tp = expr.seqType().type;
@@ -428,7 +428,7 @@ public abstract sealed class SimpleMap extends Mapping
   @Override
   final Expr simplifyEbv(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       final int el = exprs.length;
       final Expr last = exprs[el - 1], prev = exprs[el - 2];
       if(seqType().zeroOrOne() && prev.seqType().type instanceof NodeType && last instanceof Bln) {
@@ -438,7 +438,7 @@ public abstract sealed class SimpleMap extends Mapping
         // $node[nodes ! text()] → $node[nodes/text()]
         expr = toPath(mode, cc);
       }
-    } else if(mode.oneOf(Simplify.SET, Simplify.EXISTENCE, Simplify.COUNT)) {
+    } else if(mode.unordered()) {
       // order is irrelevant: exists(//a ! b) → exists(//a/b), count(//a ! b) → count(//a/b)
       expr = toPath(mode, cc);
     }

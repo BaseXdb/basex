@@ -114,13 +114,22 @@ final class ClassLoaderCache {
       final Class<?> cached = classes.get(name);
       if(cached != null) return cached;
       try {
-        final Class<?> c = Class.forName(name, true, loader);
+        final Class<?> c = Class.forName(name, false, loader);
         classes.putIfAbsent(name, c);
         return c;
       } catch(final ClassNotFoundException ignore) {
         // class not found
         return null;
       }
+    }
+
+    /**
+     * Checks if the specified class was defined by this loader.
+     * @param clz class
+     * @return result of check
+     */
+    boolean defines(final Class<?> clz) {
+      return clz.getClassLoader() == loader;
     }
 
     /**

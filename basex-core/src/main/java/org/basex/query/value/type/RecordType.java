@@ -8,11 +8,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Record type: a shape that is declared in a query and assigned to its records as type annotation.
+ * Labeled record type: a shape that is assigned to its records as type annotation (label).
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -21,49 +22,57 @@ public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
 
-  /** Record name (can be {@code null}). */
+  /** Record name ({@code null} for {@code record(*)}). */
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
+  /** Path of the declaring module of a private record (can be {@code null}). */
+  private final String module;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
   /** Initializing expressions of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
 
   /**
-   * Constructor for a structural record type.
-   * @param fields field declarations
+   * Constructor for the abstract record type {@code record(*)}.
    */
-  public RecordType(final TokenObjectMap<ShapeField> fields) {
-    this(fields, null, AnnList.EMPTY);
+  RecordType() {
+    super(new TokenObjectMap<>(0));
+    name = null;
+    anns = AnnList.EMPTY;
+    module = null;
   }
 
   /**
-   * Constructor for a nominative record type.
+   * Constructor for a labeled record type.
    * @param fields field declarations
-   * @param name record name (can be {@code null})
+   * @param name record name
    * @param anns annotations
+   * @param module path of the declaring module of a private record (can be {@code null})
    */
-  public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns) {
+  public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
+      final String module) {
     super(fields);
     this.name = name;
     this.anns = anns;
+    this.module = module;
   }
 
   @Override
-  boolean declared() {
+  boolean labeled() {
     return true;
   }
 
   @Override
-  public boolean coercive() {
-    return strict();
+  public boolean matches(final XQMap map, final boolean coerce) {
+    // the map must be a record with a matching label
+    return map.type instanceof final RecordType rt && SeqType.kept(rt, this, coerce);
   }
 
   @Override
-  public boolean wraps() {
+  public Coercion coercion() {
     // the fields of records are coerced when the records are constructed
-    return false;
+    return any() ? Coercion.KEEP : Coercion.REBUILD;
   }
 
   @Override
@@ -73,7 +82,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns);
+    return new RecordType(map, name, anns, module);
   }
 
   /**
@@ -101,12 +110,17 @@ public final class RecordType extends ShapeType {
 
   @Override
   public ShapeType detach() {
-    return detached() ? this : new RecordType(detachedFields(), name, anns);
+    return detached() ? this : new RecordType(detachedFields(), name, anns, module);
   }
 
   @Override
   public QNm name() {
     return name;
+  }
+
+  @Override
+  String module() {
+    return module;
   }
 
   /**
@@ -163,7 +177,7 @@ public final class RecordType extends ShapeType {
         case final MapType mt -> collect(mt.valueType().type);
         case final ArrayType at -> collect(at.valueType().type);
         case final FuncType ft -> {
-          if(ft.declType != null) collect(ft.declType.type);
+          collect(ft.declType.type);
           if(ft.argTypes != null) {
             for(final SeqType st : ft.argTypes) collect(st.type);
           }
@@ -189,7 +203,7 @@ public final class RecordType extends ShapeType {
       final ShapeField field = fields.get(key);
       final QueryString param = new QueryString();
       if(field.isStatic()) param.token("%static");
-      param.token(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
+      param.token(key);
       if(!field.seqType().eq(Types.ITEM_ZM)) param.token(AS).token(field.seqType());
       if(field.init() != null) param.token(":=").token(field.init());
       params[f++] = param;
@@ -200,8 +214,6 @@ public final class RecordType extends ShapeType {
 
   @Override
   public String toString() {
-    if(name != null) return Token.string(name.prefixString());
-    return new QueryString().token(RECORD).token('(').
-        token(any() ? "*" : fieldNames()).token(')').toString();
+    return name != null ? Token.string(name.prefixString()) : super.toString();
   }
 }

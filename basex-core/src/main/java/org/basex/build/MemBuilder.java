@@ -75,8 +75,7 @@ public final class MemBuilder extends Builder {
     try {
       parse();
     } finally {
-      data.lastid = data.nodes() - 1;
-      if(data.meta.updindex) data.idmap.finish(data.lastid);
+      data.finishBuild();
     }
     finishLocations();
     return data;
@@ -108,8 +107,7 @@ public final class MemBuilder extends Builder {
    * @return data reference
    */
   public MemData finish() {
-    data.lastid = data.nodes() - 1;
-    if(meta.updindex) data.idmap.finish(data.lastid);
+    data.finishBuild();
     path.finish(meta, elemNames);
     finishLocations();
     return data;

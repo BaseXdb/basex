@@ -294,9 +294,7 @@ public final class Inspection {
    */
   private void value(final int pre, final int kind, final int par) {
     final byte[] value = data.text(pre, kind != Data.ATTR);
-    boolean valid = true;
-    final int vl = value.length;
-    for(int v = 0; v < vl && valid; v += cl(value, v)) valid = XMLToken.valid11(cp(value, v));
+    boolean valid = XMLToken.isValid(value);
 
     switch(kind) {
       case Data.COMM -> valid &= !contains(value, token("--")) && !endsWith(value, '-');
@@ -305,7 +303,7 @@ public final class Inspection {
         valid &= XMLToken.isNCName(target) && !eq(lc(target), XML) && !contains(value, token("?>"));
       }
       case Data.TEXT -> {
-        if(vl == 0 || pre > 0 && data.kind(pre - 1) == Data.TEXT &&
+        if(value.length == 0 || pre > 0 && data.kind(pre - 1) == Data.TEXT &&
             data.parent(pre - 1, Data.TEXT) == par) add(Check.TEXT_STRUCTURE, pre);
       }
       case Data.DOC -> {
@@ -398,7 +396,7 @@ public final class Inspection {
         final int pre = iter.pre();
         size++;
         if(pre <= last || pre >= nodes || !names.unit(pre) || (tokenize ?
-          !Arrays.stream(distinctTokens(data.text(pre, false))).anyMatch(t -> eq(t, key)) :
+          Arrays.stream(distinctTokens(data.text(pre, false))).noneMatch(t -> eq(t, key)) :
           !eq(data.text(pre, text), key))) {
           add(check, pre);
         } else {

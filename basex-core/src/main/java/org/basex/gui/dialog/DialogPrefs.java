@@ -66,6 +66,13 @@ public final class DialogPrefs extends BaseXDialog {
     dialog.setVisible(true);
   }
 
+  /**
+   * Reloads the serialization parameters of the opened dialog.
+   */
+  public static void refresh() {
+    if(dialog != null && dialog.isVisible()) dialog.result.init();
+  }
+
   @Override
   public void action(final Object cmp) {
     general.action(cmp);
@@ -83,7 +90,6 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void cancel() {
-    result.cancel();
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
     gui.notify.layout();
     super.close();

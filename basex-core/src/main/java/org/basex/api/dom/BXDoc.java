@@ -2,6 +2,7 @@ package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
 
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -89,12 +90,9 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXElem getDocumentElement() {
-    final BXNList list = getChildNodes();
-    for(int l = 0; l < list.getLength(); l++) {
-      final BXNode n = list.item(l);
-      if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
-    }
-    throw Util.notExpected();
+    final GNode elem = nd.childIter(NodeTest.ELEMENT, false).next();
+    if(elem == null) throw Util.notExpected();
+    return new BXElem((XNode) elem);
   }
 
   @Override

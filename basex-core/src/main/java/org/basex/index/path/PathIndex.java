@@ -176,8 +176,8 @@ public final class PathIndex implements Index {
   // Traverse Index ===============================================================================
 
   /**
-   * Returns the root node.
-   * @return root node
+   * Returns a list with the root node.
+   * @return list with the root node
    */
   public ArrayList<PathNode> root() {
     final ArrayList<PathNode> out = new ArrayList<>();

@@ -29,9 +29,6 @@ abstract class XQHashMap extends XQMap {
   }
 
   @Override
-  public abstract long structSize();
-
-  @Override
   public abstract int index(Item key) throws QueryException;
 
   @Override

@@ -42,8 +42,7 @@ public final class FnReplace extends RegExFn {
 
     final boolean func = rep instanceof FItem;
     final FItem action = func ? toFunction(rep, 2, qc) : null;
-    final byte[] replace = func ? null : rep.isEmpty() ? EMPTY :
-      toToken(rep, replacement);
+    final byte[] replace = func ? null : rep.isEmpty() ? EMPTY : toToken(rep, replacement);
 
     // shortcut for literal replacements
     if(!func) {
@@ -56,7 +55,7 @@ public final class FnReplace extends RegExFn {
     }
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final String input = string(value);
-    final Matcher matcher = regExpr.pattern.matcher(input);
+    final Matcher matcher = regExpr.matcher(input, qc);
 
     if(func) {
       // deprecated: groups are passed on as sequence
@@ -135,7 +134,13 @@ public final class FnReplace extends RegExFn {
         string = sb.toString();
       }
     }
-    return Str.get(matcher.replaceAll(string));
+    // no replaceAll: it would reset the matcher region
+    if(!matcher.find()) return Str.get(value);
+    final StringBuilder sb = new StringBuilder();
+    do {
+      matcher.appendReplacement(sb, string);
+    } while(matcher.find());
+    return Str.get(matcher.appendTail(sb).toString());
   }
 
   /**
@@ -151,7 +156,7 @@ public final class FnReplace extends RegExFn {
       final QueryContext qc) throws QueryException {
     final int gc = regExpr.groupCount(matcher);
     if(names == null) {
-      final ValueBuilder vb = new ValueBuilder(qc);
+      final ValueBuilder vb = new ValueBuilder(qc, gc);
       for(int g = 1; g <= gc; g++) {
         final String group = matcher.group(regExpr.group(g));
         vb.add(group == null ? Atm.EMPTY : Atm.get(group));

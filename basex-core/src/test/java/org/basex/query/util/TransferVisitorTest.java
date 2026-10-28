@@ -67,7 +67,8 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void evaluatedStaticVariable() {
     execute(new CreateDB(NAME, "<a/>"));
     try {
-      assertEquals("database '" + NAME + "' in static variable $v", dependency(
+      // the evaluated value is inlined in the dynamic pass
+      assertEquals("database '" + NAME + '\'', dependency(
           "declare variable $v := db:get('" + NAME + "'); let $c := count($v) return fn() { $v }"));
     } finally {
       execute(new DropDB(NAME));

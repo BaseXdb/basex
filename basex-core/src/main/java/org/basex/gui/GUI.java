@@ -171,14 +171,8 @@ public final class GUI extends JFrame implements BaseXWindow {
     final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
     go.addActionListener(e -> execute());
 
-    stop = BaseXButton.get("c_stop", STOP, false, this);
+    stop = BaseXButton.command(GUIMenuCmd.C_STOP, this);
     stop.setEnabled(false);
-    stop.addActionListener(e -> {
-      if(command != null) {
-        command.stop();
-        stop.setEnabled(false);
-      }
-    });
 
     final BaseXToolBar tb = new BaseXToolBar();
     tb.add(go);
@@ -359,16 +353,13 @@ public final class GUI extends JFrame implements BaseXWindow {
   private boolean execute(final Command cmd, final boolean editing) {
     // wait when command is still running
     final int id = commandID.incrementAndGet();
-    while(true) {
-      final Command c = command;
-      if(c == null) break;
-      c.stop();
+    while(command != null) {
+      stop();
       Performance.sleep(1);
       if(commandID.get() != id) return true;
     }
 
     // indicate to the user that the command will be executed
-    stop.setEnabled(true);
     status.start(cmd.baseURI());
     if(editing) editor.pleaseWait(id);
 
@@ -378,7 +369,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // remember current command and context nodes
     final DBNodes current = context.current();
-    command = cmd;
+    command(cmd);
 
     // execute command and cache result
     final ArrayOutput output = new ArrayOutput();
@@ -479,8 +470,10 @@ public final class GUI extends JFrame implements BaseXWindow {
       updating = false;
       running = false;
       BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
+    } finally {
+      status.stop();
+      command(null);
     }
-    stop();
     return ok;
   }
 
@@ -488,10 +481,26 @@ public final class GUI extends JFrame implements BaseXWindow {
    * Stops the current command.
    */
   public void stop() {
-    if(command != null) command.stop();
-    stop.setEnabled(false);
-    status.stop();
-    command = null;
+    final Command c = command;
+    if(c != null) c.stop();
+  }
+
+  /**
+   * Checks if a command can be stopped.
+   * @return result of check
+   */
+  public boolean stoppable() {
+    return command != null;
+  }
+
+  /**
+   * Assigns the current command and refreshes the controls for stopping it.
+   * @param cmd command (can be {@code null})
+   */
+  private void command(final Command cmd) {
+    command = cmd;
+    stop.setEnabled(cmd != null);
+    SwingUtilities.invokeLater(menu::refresh);
   }
 
   /**
@@ -561,7 +570,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     final boolean inf = gopts.get(GUIOptions.SHOWINFO);
     context.options.set(MainOptions.QUERYINFO, inf);
-    context.options.set(MainOptions.XMLPLAN, inf);
+    context.options.set(MainOptions.XMLPLAN, String.valueOf(inf));
 
     final Data data = context.data();
     status.database(data);

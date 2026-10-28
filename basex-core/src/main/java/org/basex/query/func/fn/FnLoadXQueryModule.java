@@ -18,6 +18,7 @@ import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -53,7 +54,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     // check for cached result (callers must not bypass the location check)
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
-    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.CREATE, null, info)) {
+    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.ADMIN, null, info)) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
       modCache = qcAnc.caches.moduleCache().get();
@@ -76,14 +77,15 @@ public final class FnLoadXQueryModule extends StandardFunc {
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
         } else {
-          final String path = repoFilePath(modUri, qc.context);
-          if(path != null) locs.add(path);
+          final IOFile file = ModuleLoader.file(qc.context.soptions.repoPath(),
+            Token.string(modUri));
+          if(file != null) locs.add(file.path());
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) {
         final IO src = info.sc().resolve(loc, info.path());
-        if(src.isExternal() && !provided) checkPerm(qc, Perm.CREATE);
+        if(src.isExternal() && !provided) checkPerm(qc, Perm.ADMIN);
         srcs.add(src);
       }
     }
@@ -166,8 +168,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final MapBuilder functions = new MapBuilder();
     for(final QNm qnm : funcs) {
       final MapBuilder arities = new MapBuilder();
-      final Map<Integer, Expr> funcItems = funcs.get(qnm);
-      for(final Map.Entry<Integer, Expr> entry : funcItems.entrySet()) {
+      for(final Map.Entry<Integer, Expr> entry : funcs.get(qnm).entrySet()) {
         arities.put(Itr.get(entry.getKey()), entry.getValue().value(mqc));
       }
       functions.put(qnm, arities.map());
@@ -203,23 +204,6 @@ public final class FnLoadXQueryModule extends StandardFunc {
     // an empty context item indicates the absence of a context value
     final Value ctx = item ? opt.get(CONTEXT_ITEM) : null;
     return ctx == null || ctx.isEmpty() ? null : ctx;
-  }
-
-  /**
-   * Returns the repository file path of the XQuery module with the given module URI, or
-   * {@code null}, if there is no such module in the repository.
-   * @param modUri module URI
-   * @param context database context
-   * @return file path of the XQuery module in the repository (maybe {@code null})
-   */
-  private static String repoFilePath(final byte[] modUri, final Context context) {
-    final String path = Strings.uri2path(Token.string(modUri));
-    final IOFile repo = context.soptions.repoPath();
-    for(final String suffix : IO.XQSUFFIXES) {
-      final IOFile file = new IOFile(repo, path + suffix);
-      if(file.exists()) return file.path();
-    }
-    return null;
   }
 
   /**

@@ -1,7 +1,6 @@
 package org.basex.api.dom;
 
 import org.basex.query.util.list.*;
-import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 
 /**
@@ -24,9 +23,7 @@ public class BXNList implements NodeList {
 
   @Override
   public BXNode item(final int index) {
-    GNode n = null;
-    if(index < nodes.size()) n = nodes.get(index);
-    return n != null ? BXNode.get(n) : null;
+    return index >= 0 && index < nodes.size() ? BXNode.get(nodes.get(index)) : null;
   }
 
   @Override

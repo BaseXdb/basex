@@ -92,7 +92,7 @@ public final class RunQueries {
   /**
    * This method uses the {@link QueryProcessor} to evaluate a query.
    * The results are iterated one by one and converted to their Java
-   * representation, using {{@link Item#toJava()}. This variant is especially
+   * representation, using {@link Item#toJava()}. This variant is especially
    * efficient if large result sets are expected.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query

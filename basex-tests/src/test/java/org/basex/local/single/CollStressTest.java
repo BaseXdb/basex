@@ -7,7 +7,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class adds and retrieves documents in a collection.
+ * Retrieves single documents from a database with many documents.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

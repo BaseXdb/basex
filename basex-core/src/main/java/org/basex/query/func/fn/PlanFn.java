@@ -216,7 +216,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param sc static context
    * @return resolver
    */
-  public static UnaryOperator<byte[]> uris(final QueryContext qc, final StaticContext sc) {
+  static UnaryOperator<byte[]> uris(final QueryContext qc, final StaticContext sc) {
     return prefix -> qc.ns.resolve(prefix, sc);
   }
 
@@ -493,7 +493,7 @@ public abstract class PlanFn extends StandardFunc {
    * Returns the children of the specified type.
    * @param kind kind to be found
    * @param nodes nodes
-   * @return result of check
+   * @return children
    */
   static GNodeList children(final Kind kind, final GNode... nodes) {
     final GNodeList list = new GNodeList();
@@ -519,23 +519,21 @@ public abstract class PlanFn extends StandardFunc {
   private static boolean differentNames(final GNode node) {
     final QNmSet names = new QNmSet();
     for(final GNode child : children(Kind.ELEMENT, node)) {
-      if(child.kind() == Kind.ELEMENT && !names.add(child.qname())) return false;
+      if(!names.add(child.qname())) return false;
     }
     return !names.isEmpty();
   }
 
   /**
-   * Checks if the element names are distinct or different.
-   * @param nodes node list
+   * Checks if all element names are equal.
+   * @param nodes element nodes
    * @return result of check
    */
   static boolean equalNames(final GNodeList nodes) {
     QNm name = null;
     for(final GNode node : nodes) {
-      if(node.kind() == Kind.ELEMENT) {
-        if(name == null) name = node.qname();
-        else if(!name.eq(node.qname())) return false;
-      }
+      if(name == null) name = node.qname();
+      else if(!name.eq(node.qname())) return false;
     }
     return true;
   }

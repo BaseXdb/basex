@@ -68,6 +68,9 @@ public final class XsltModuleTest extends SandboxTest {
     query(func.args(doc, ' ' + style) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("")) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("<xsl:x/>")) + "?error => exists()", true);
+    // several top-level nodes
+    query(func.args(doc, ' ' + wrap("<xsl:template match='/'><a/><b/></xsl:template>")) +
+        "?result ! name(*)", "a\nb");
 
     final String messages = wrap("<xsl:template match='/'><xsl:message><m>a</m></xsl:message>" +
         "<xsl:message>b</xsl:message></xsl:template>");

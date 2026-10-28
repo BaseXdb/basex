@@ -31,6 +31,14 @@ public final class IOTest {
     }
   }
 
+  /** Opaque URIs are no file paths, on any platform. */
+  @Test public void opaqueUri() {
+    assertInstanceOf(IOContent.class, IO.get("urn:x"));
+    assertInstanceOf(IOContent.class, IO.get("mailto:a@b.c"));
+    assertInstanceOf(IOUrl.class, IO.get("http://a/b"));
+    assertInstanceOf(IOFile.class, IO.get("file:///a/b"));
+  }
+
   /** File to URL conversions. */
   @Test public void fileToURL() {
     final String url = new IOFile("X Y").url();

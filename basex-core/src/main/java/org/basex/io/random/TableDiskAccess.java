@@ -119,13 +119,12 @@ public final class TableDiskAccess extends TableAccess {
           if(regular) removeMapping();
         }
 
+        out.writeNum(p);
         if(regular) {
           // no mapping available or required
           // (0: empty table; MAX: no mapping, see TableOutput#close)
-          out.writeNum(p);
           out.writeNum(used == 0 ? 0 : Integer.MAX_VALUE);
         } else {
-          out.writeNum(p);
           out.writeNum(used);
           out.writeNum(p);
           for(int s = 0; s < p; s++) out.writeNum(fPreIndex[s]);
@@ -410,8 +409,8 @@ public final class TableDiskAccess extends TableAccess {
       }
     }
 
-    // number of expected pages: existing pages + needed page - empty pages
-    final int exp = pages + needed - (pages - used);
+    // number of expected pages: used pages + needed pages
+    final int exp = used + needed;
     if(exp > fPreIndex.length) {
       // resize directory arrays if existing ones are too small
       final int ns = Math.max(fPreIndex.length * 2, exp);
@@ -430,9 +429,13 @@ public final class TableDiskAccess extends TableAccess {
       master.read(p);
       ++used;
       ++master.page;
-      nrem += write(all, nrem);
+      buffer = master.buffers.current();
+      final int len = Math.min(IO.BLOCKSIZE, all.length - nrem);
+      Array.copyToStart(all, nrem, len, buffer.data);
+      buffer.dirty = true;
+      nrem += len;
       fPreIndex[master.page] = fPreIndex[master.page - 1] + IO.ENTRIES;
-      pageIndex[master.page] = (int) master.buffers.current().pos;
+      pageIndex[master.page] = (int) buffer.pos;
     }
 
     // increment all fpre values after the last modified page
@@ -449,7 +452,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(Util.className(this)).append(" (").append("pages: ").append(pages);
+    sb.append(Util.className(this)).append(" (pages: ").append(pages);
     sb.append(", used: ").append(used).append(", page: ").append(master.page);
     sb.append(", firstPre: ").append(master.firstPre);
     sb.append(", nextPre: ").append(master.nextPre).append(")");
@@ -586,20 +589,6 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fills the current buffer with bytes from the specified array and offset.
-   * @param array source array
-   * @param offset array offset
-   * @return number of written bytes
-   */
-  private int write(final byte[] array, final int offset) {
-    final Buffer buffer = master.buffers.current();
-    final int len = Math.min(IO.BLOCKSIZE, array.length - offset);
-    Array.copyToStart(array, offset, len, buffer.data);
-    buffer.dirty = true;
-    return len;
-  }
-
-  /**
    * Calculates the occupied space in a page.
    * @param index page index
    * @return occupied space
@@ -663,8 +652,7 @@ public final class TableDiskAccess extends TableAccess {
      */
     private int read1(final int pre, final int offset) {
       final int o = offset + cursor(pre);
-      final byte[] data = buffers.current().data;
-      return data[o] & 0xFF;
+      return buffers.current().data[o] & 0xFF;
     }
 
     /**

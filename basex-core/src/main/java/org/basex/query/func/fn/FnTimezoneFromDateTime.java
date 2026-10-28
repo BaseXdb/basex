@@ -15,9 +15,7 @@ public final class FnTimezoneFromDateTime extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ADate value = toGregorianOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
-
-    return zon(value);
+    return value == null ? Empty.VALUE : zon(value);
   }
 
   @Override

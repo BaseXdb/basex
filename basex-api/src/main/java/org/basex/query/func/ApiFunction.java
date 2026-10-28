@@ -56,6 +56,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_FORM_MAP(RequestFormMap::new, "form-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name, default?)",
       params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
@@ -88,6 +91,9 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_QUERY(RequestQuery::new, "query()",
       params(), STRING_ZO, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_QUERY_MAP(RequestQueryMap::new, "query-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress::new, "remote-address()",
       params(), STRING_O, REQUEST_URI),
@@ -132,13 +138,13 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZO, SESSION_URI),
   /** XQuery function. */
   _SESSION_CLOSE(SessionClose::new, "close()",
-      params(), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSION_CREATED(SessionCreated::new, "created()",
       params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_DELETE(SessionDelete::new, "delete(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSION_GET(SessionGet::new, "get(key, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, SESSION_URI),
@@ -150,7 +156,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_SET(SessionSet::new, "set(key, value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.CREATE),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI, Perm.ADMIN),
 
   // Sessions Module
 
@@ -266,7 +272,8 @@ public enum ApiFunction implements AFunction {
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final byte[] uri, final Perm perm) {
-    definition = new FuncDefinition(supplier, desc, params, seqType, flag(Flag.NDT), uri, perm);
+    definition = new FuncDefinition(supplier, desc, params, seqType,
+        EnumSet.of(Flag.NDT), uri, perm);
   }
 
   @Override
@@ -281,17 +288,6 @@ public enum ApiFunction implements AFunction {
    */
   private static SeqType[] params(final SeqType... params) {
     return params;
-  }
-
-  /**
-   * Returns a set representation of the specified compiler flags.
-   * @param flags flags
-   * @return set
-   */
-  private static EnumSet<Flag> flag(final Flag... flags) {
-    final EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
-    Collections.addAll(set, flags);
-    return set;
   }
 
   /**

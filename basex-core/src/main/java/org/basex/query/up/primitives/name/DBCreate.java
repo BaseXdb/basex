@@ -43,7 +43,7 @@ public final class DBCreate extends NameUpdate {
 
     super(UpdateType.DBCREATE, name, qc, info);
     final DBOptions dbopts = new DBOptions(qopts, MainOptions.CREATING, qc, info);
-    options = dbopts.assignTo(new MainOptions(qc.context.options, false));
+    options = dbopts.indexingOptions(null);
     newDocs = new DBNew(qc, options, info, inputs);
   }
 
@@ -60,12 +60,19 @@ public final class DBCreate extends NameUpdate {
       // close existing database instance; raise error if it is still pinned or locked
       close();
 
-      final boolean move = clip != null && !clip.data.inMemory();
-      if(move) {
-        // temporary database on disk: rename it, and detach it from the clip
-        qc.checkPerm(Perm.CREATE, name, name, info);
-        final String tmpName = clip.data.meta.name;
-        clip.data.close();
+      if(clip != null && !clip.data.inMemory()) {
+        // temporary database on disk: build index structures before the existing one is replaced
+        qc.checkPerm(Perm.ADMIN, name, name, info);
+        final Data tmp = clip.data;
+        tmp.startUpdate(options);
+        try {
+          Optimize.optimize(tmp, null);
+        } finally {
+          tmp.finishUpdate(options);
+        }
+        // rename temporary database, and detach it from the clip
+        final String tmpName = tmp.meta.name;
+        tmp.close();
         clip.context(null);
         if(!AlterDB.alter(tmpName, name, ctx.soptions)) {
           DropDB.drop(tmpName, ctx.soptions);
@@ -74,18 +81,17 @@ public final class DBCreate extends NameUpdate {
         data = Open.open(name, ctx, options, true, true);
       } else {
         data = CreateDB.create(name, Parser.emptyParser(options), ctx, options);
-      }
-
-      // add initial documents and optimize database
-      if(clip != null) {
-        data.startUpdate(options);
-        try {
-          if(!move) newDocs.addTo(data, false);
-          // release temporary data before index structures are built
-          clip.finish();
-          Optimize.optimize(data, null);
-        } finally {
-          data.finishUpdate(options);
+        // add initial documents and optimize database
+        if(clip != null) {
+          data.startUpdate(options);
+          try {
+            newDocs.addTo(data, false);
+            // release temporary data before index structures are built
+            clip.finish();
+            Optimize.optimize(data, null);
+          } finally {
+            data.finishUpdate(options);
+          }
         }
       }
     } catch(final IOException ex) {

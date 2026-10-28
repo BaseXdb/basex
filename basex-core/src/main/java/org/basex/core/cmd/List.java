@@ -65,12 +65,9 @@ public final class List extends Command {
     final Table table = new Table();
     table.description = DATABASES_X;
 
-    final User user = context.user();
-    final boolean create = user.has(Perm.CREATE);
-    table.header.add(NAME).add(RESOURCES).add(SIZE);
-    if(create) table.header.add(INPUT_PATH);
+    table.header.add(NAME).add(RESOURCES).add(SIZE).add(INPUT_PATH);
 
-    for(final String name : context.databases.list(user, null)) {
+    for(final String name : context.databases.list(context.user(), Perm.READ, null)) {
       String file;
       long dbsize = 0;
       int count = 0;
@@ -88,12 +85,7 @@ public final class List extends Command {
       }
 
       // create entry
-      final TokenList tl = new TokenList(create ? 4 : 3);
-      tl.add(name);
-      tl.add(count);
-      tl.add(dbsize);
-      if(create) tl.add(file);
-      table.contents.add(tl);
+      table.contents.add(new TokenList(4).add(name).add(count).add(dbsize).add(file));
     }
     out.println(table.sort().finish());
     return true;
@@ -114,24 +106,27 @@ public final class List extends Command {
 
     try {
       final Data data = Open.open(db, context, options, true, true);
-      final Resources resources = data.resources;
+      try {
+        final Resources resources = data.resources;
 
-      // list XML documents
-      final IntList docs = resources.docs(root);
-      final int ds = docs.size();
-      for(int d = 0; d < ds; d++) {
-        final int pre = docs.get(d);
-        final String string = Token.string(data.text(pre, true));
-        add(table, string, data.size(pre, Data.DOC), ResourceType.XML);
-      }
-      // list file resources
-      for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.dir(type);
-        for(final String path : resources.paths(root, type)) {
-          add(table, path, type.filePath(bin, path).length(), type);
+        // list XML documents
+        final IntList docs = resources.docs(root);
+        final int ds = docs.size();
+        for(int d = 0; d < ds; d++) {
+          final int pre = docs.get(d);
+          final String string = Token.string(data.text(pre, true));
+          add(table, string, data.size(pre, Data.DOC), ResourceType.XML);
         }
+        // list file resources
+        for(final ResourceType type : Resources.BINARIES) {
+          final IOFile bin = data.meta.dir(type);
+          for(final String path : resources.paths(root, type)) {
+            add(table, path, type.filePath(bin, path).length(), type);
+          }
+        }
+      } finally {
+        Close.close(data, context);
       }
-      Close.close(data, context);
     } catch(final IOException ex) {
       return error(ex);
     }

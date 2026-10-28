@@ -45,7 +45,7 @@ public final class Intersect extends Set {
         if(!(st2.type instanceof NodeType)) return null;
         st = st.intersect(st2);
         // check for incompatible node types: text() intersect @a → ()
-        if(st == null) return Empty.VALUE;
+        if(st == null || st.zero()) return Empty.VALUE;
       }
     }
     exprType.assign(st.union(Occ.ZERO)).data(exprs);
@@ -71,7 +71,7 @@ public final class Intersect extends Set {
   @Override
   And mergePredicates(final Expr[] preds, final CompileContext cc) {
     // *[A] intersect *[B] → *[A and B]
-  return new And(info, preds);
+    return new And(info, preds);
   }
 
   @Override

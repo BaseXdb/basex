@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
@@ -103,8 +102,7 @@ public final class DialogProps extends BaseXDialog {
       labels[l] = new BaseXLabel(LABELS[l]).large();
       panels[l] = new BaseXBack(new BorderLayout(0, 4));
       BaseXLayout.setWidth(panels[l], 600);
-      infos[l] = new TextPanel(this, PLEASE_WAIT_D, false);
-      infos[l].setFont(dmfont);
+      infos[l] = new TextPanel(this, PLEASE_WAIT_D);
     }
     // create/drop buttons for value indexes
     for(int l = 0; l < ll; l++) {
@@ -141,15 +139,14 @@ public final class DialogProps extends BaseXDialog {
     final BaseXLabel db = new BaseXLabel().border(0, 0, 6, 0).large();
     dbPanel.add(db.setChoppedText(DATABASE + COLS + data.meta.name), BorderLayout.NORTH);
 
-    dbInfo = new TextPanel(this, "", false);
-    dbInfo.setFont(infoPanel.getFont());
+    dbInfo = new TextPanel(this);
     dbInfo.setPreferredSize(new Dimension(600, 1));
     dbPanel.add(new SearchEditor(gui, dbInfo), BorderLayout.CENTER);
 
     final BaseXBack nsPanel = new BaseXBack(new BorderLayout());
     nsPanel.add(new BaseXLabel(NAMESPACES).border(0, 0, 6, 0).large(), BorderLayout.NORTH);
 
-    nsInfo = new TextPanel(this, "", false);
+    nsInfo = new TextPanel(this);
     nsInfo.setPreferredSize(new Dimension(600, 1));
     nsPanel.add(new SearchEditor(gui, nsInfo), BorderLayout.CENTER);
 
@@ -233,6 +230,13 @@ public final class DialogProps extends BaseXDialog {
           running--;
           enableButtons();
         }
+
+        @Override
+        protected void failed(final Exception ex) {
+          super.failed(ex);
+          running--;
+          enableButtons();
+        }
       }.execute();
     }
   }
@@ -279,6 +283,7 @@ public final class DialogProps extends BaseXDialog {
     if(cmp == optimize) {
       cmd = new Optimize();
     } else if(cmp == optimizeAll) {
+      if(!optionsPanel.action()) return;
       cmd = new OptimizeAll();
       optionsPanel.setOptions(data);
     } else {
@@ -286,6 +291,7 @@ public final class DialogProps extends BaseXDialog {
       for(int b = 0; b < bl; b++) {
         if(cmp == buttons[b]) {
           if(exists[b]) {
+            if(!confirmDestructive(gui, Util.info(DROPPING_INDEX_X, LABELS[b]))) return;
             cmd = new DropIndex(TYPES[b]);
           } else {
             cmd = new CreateIndex(TYPES[b]);

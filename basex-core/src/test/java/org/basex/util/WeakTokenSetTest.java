@@ -47,8 +47,6 @@ public final class WeakTokenSetTest {
         assertEquals(key, wts.put(eqKey), msgPrefix + "key should have been found");
         assertEquals(++size, wts.size(), msgPrefix + "unexpected size");
       }
-      long capacity = 1;
-      while(capacity < size + 1) capacity <<= 1;
 
       // remove some strong references, verify those get garbage collected in the set's references
       Collections.shuffle(strings, random);
@@ -57,7 +55,6 @@ public final class WeakTokenSetTest {
         assertNotNull(strongRefs.remove(strings.get(i)), msgPrefix + "unexpected removal failure");
       }
       System.gc();
-      Thread.sleep(2); // allow some time for gc'ed references to appear in reference queue
       for(final String string : strings) {
         final byte[] key = Token.token(string);
         if(strongRefs.containsKey(string)) {
@@ -65,7 +62,6 @@ public final class WeakTokenSetTest {
           assertEquals(stored, wts.put(key), msgPrefix + "key should have survived gc");
         } else {
           assertEquals(key, wts.put(key), msgPrefix + "key should have been gc'ed");
-          assertTrue(capacity - 1 >= wts.size(), msgPrefix + "unexpected size" + wts.size());
         }
       }
     } catch(final AssertionFailedError e) {

@@ -204,7 +204,7 @@ public final class FuncItemTest extends SandboxTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := local:Y(function($x) { $x() }) return exists($f ! .)",
         true,
-        exists(FuncItem.class)
+        root(Bln.class)
     );
   }
 
@@ -234,7 +234,7 @@ public final class FuncItemTest extends SandboxTest {
         "let $b := local:bar($a) " +
         "return exists($b ! .)",
         true,
-        exists(FuncItem.class)
+        root(Bln.class)
     );
   }
 
@@ -527,6 +527,24 @@ public final class FuncItemTest extends SandboxTest {
         + "let $result := local:f(i := ?, s := ?)(4.0, xs:anyURI('XQuery'))"
         + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
         "true\ntrue");
+  }
+
+  /** Checks keyword placeholders that skip optional parameters. */
+  @Test public void placeholderDefaults() {
+    query("let $f := (' z ' -> trim-space(options := ?)) "
+        + "return $f({ 'side': 'end' }) || $f({ 'side': 'start' })", " zz ");
+    query("trim-space(options := ?) instance of function(map(*)?) as xs:string", true);
+    query("tokenize(?, flags := 'i')('a b')", "a\nb");
+
+    final String decl = "declare function local:f($a := 1, $b := 2, $c := 3) "
+        + "{ $a * 100 + $b * 10 + $c }; ";
+    query(decl + "local:f(c := ?)(5)", 125);
+    query(decl + "local:f(c := ?, a := 7)(5)", 725);
+    query("declare function local:f($a := ., $b := 2) { $a || $b }; "
+        + "let $f := ('x' -> local:f(b := ?)) return $f(5)", "x5");
+
+    error("declare function local:f($a, $b := 2) { $a + $b }; local:f(b := ?)", PARAMMISSING_X_X);
+    error("substring(?, length := ?)", PARAMMISSING_X_X);
   }
 
   /** Variable declarations with function-lookup. */

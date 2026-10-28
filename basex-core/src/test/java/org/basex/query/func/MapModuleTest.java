@@ -507,27 +507,27 @@ public final class MapModuleTest extends SandboxTest {
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x as xs:integer, y as xs:integer)"));
 
     record = "declare record local:x(x as xs:integer?);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer?)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer?)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer?)"));
+        type(func, "record(x as xs:integer?, y as xs:integer)"));
 
     record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
+        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x as xs:integer, y as xs:integer)"));
   }
 
   /** Test method. */
@@ -586,6 +586,10 @@ public final class MapModuleTest extends SandboxTest {
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("({}, <a/>/*) =>" + func.args(), 0, root(func));
+    // record(*): the number of fields is unknown
+    query("declare record local:r(a); declare record local:s(a, b);"
+        + " declare %basex:inline(0) function local:f($m as map(xs:string, record(*))) {"
+        + " map:get($m, 'x', local:r(1)) => map:size() }; local:f({ 'x': local:s(1, 2) })", 2);
 
     check("map:build(1 to 1_000_000_000) =>" + func.args(), 1_000_000_000, root(Itr.class));
 

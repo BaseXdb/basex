@@ -98,6 +98,12 @@ public final class UserModuleTest extends SandboxTest {
     error(func.args(NAME, "") + ',' + func.args(NAME, ""), USER_UPDATE1_X_X);
     error(func.args(NAME, "", " ('admin', 'admin')", " ('', '')"), USER_UPDATE3_X_X);
     error(func.args(NAME, "", " ('admin', 'admin')", " ('x', 'x')"), USER_UPDATE2_X);
+    error(func.args(NAME, "", " ('read', 'write')"), USER_UPDATE3_X_X);
+
+    // local admin permission
+    error(func.args(NAME, "", Perm.ADMIN, NAME), USER_LOCAL);
+    // more patterns than permissions
+    error(func.args(NAME, "", Perm.READ, " ('x', 'y')"), USER_PATTERN2_X);
   }
 
   /** Test method. */
@@ -165,10 +171,15 @@ public final class UserModuleTest extends SandboxTest {
 
     // grant list of permissions
     query(func.args(NAME, " ('admin', 'none')", " ('', 'x')"));
+    // more permissions than patterns
+    query(func.args(NAME, " ('read', 'write')", NAME));
+    query(_USER_LIST_DETAILS.args() + "[@name = '" + NAME + "']/@permission/string()", "write");
+    error(func.args(NAME, " ('read', 'write')", " ()"), USER_UPDATE3_X_X);
+    // more patterns than permissions
+    error(func.args(NAME, Perm.READ, " ('x', 'y')"), USER_PATTERN2_X);
 
     // admin permission can only be set globally
     error(func.args(NAME, Perm.ADMIN, NAME), USER_LOCAL);
-    error(func.args(NAME, Perm.CREATE, NAME), USER_LOCAL);
     // admin cannot be modified
     error(func.args(UserText.ADMIN, Perm.ADMIN), USER_ADMIN);
     error(func.args(UserText.ADMIN, Perm.ADMIN, NAME), USER_ADMIN);

@@ -82,6 +82,8 @@ final class XMLScanner extends Job {
   private boolean prolog = true;
   /** Parameter entity parsing. */
   private boolean pe;
+  /** XML 1.1 document. */
+  private boolean xml11;
   /** Text mode. */
   private boolean text = true;
   /** Current quote character. */
@@ -110,19 +112,18 @@ final class XMLScanner extends Job {
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {
-          if(!version()) throw error(DECLSTART);
+          final byte[] version = version();
+          if(version == null) throw error(DECLSTART);
+          xml11 = version == VERS11;
           boolean s = s();
           encoding = encoding();
           if(encoding != null) {
             if(!s) throw error(WSERROR);
             s = s();
           }
-          if(sddecl() != null && !s) throw error(WSERROR);
+          if(sddecl() && !s) throw error(WSERROR);
           s();
-          int ch = nextChar();
-          if(ch != '?') throw error(WRONGCHAR, '?', (char) ch);
-          ch = nextChar();
-          if(ch != '>') throw error(WRONGCHAR, '>', (char) ch);
+          check(PI_C);
         } else {
           prev(5);
         }
@@ -516,7 +517,7 @@ final class XMLScanner extends Job {
         ent.add(ch = nextChar());
       } while(ch != ';');
 
-      if(!valid10(n)) throw error(INVCHARREF, ent);
+      if(!(xml11 ? valid11(n) : valid10(n))) throw error(INVCHARREF, ent);
       ent.reset();
       ent.add(n);
       return ent.finish();
@@ -662,11 +663,10 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private void nmtoken() throws IOException {
-    final TokenBuilder name = new TokenBuilder();
-    int c;
-    while(isChar(c = nextChar())) name.add(c);
+    int n = 0;
+    while(isChar(nextChar())) n++;
     prev(1);
-    if(name.isEmpty()) throw error(INVNAME);
+    if(n == 0) throw error(INVNAME);
   }
 
   /**
@@ -744,14 +744,11 @@ final class XMLScanner extends Job {
     input = new XMLInput(new IOContent(content, io.path()));
     if(consume(XDECL)) {
       check(XML); s();
-      if(version()) checkS();
+      if(version() != null) checkS();
       s();
       if(encoding() == null) throw error(TEXTENC);
-      int ch = nextChar();
-      if(s(ch)) ch = nextChar();
-      if(ch != '?') throw error(WRONGCHAR, '?', ch);
-      ch = nextChar();
-      if(ch != '>') throw error(WRONGCHAR, '>', ch);
+      s();
+      check(PI_C);
       content = Arrays.copyOfRange(content, (int) input.pos(), content.length);
     }
     input = tin;
@@ -1065,16 +1062,17 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a document version.
-   * @return true if version was found
+   * @return version token, or {@code null} if no version was found
    * @throws IOException I/O exception
    */
-  private boolean version() throws IOException {
-    if(!consume(VERS)) return false;
+  private byte[] version() throws IOException {
+    if(!consume(VERS)) return null;
     s(); check('='); s();
     final int d = qu();
-    if(!consume(VERS10) && !consume(VERS11)) throw error(DECLVERSION);
+    final byte[] version = consume(VERS10) ? VERS10 : consume(VERS11) ? VERS11 : null;
+    if(version == null) throw error(DECLVERSION);
     check((char) d);
-    return true;
+    return version;
   }
 
   /**
@@ -1107,21 +1105,17 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a standalone flag.
-   * @return flag or {@code null}
+   * @return true if a standalone flag was found
    * @throws IOException I/O exception
    */
-  private byte[] sddecl() throws IOException {
-    if(!consume(STANDALONE)) return null;
+  private boolean sddecl() throws IOException {
+    if(!consume(STANDALONE)) return false;
     s(); check('='); s();
     final int d = qu();
-    byte[] sd = token(NO);
-    if(!consume(sd)) {
-      sd = token(YES);
-      if(!consume(sd)) sd = null;
-    }
+    final boolean sd = consume(token(NO)) || consume(token(YES));
     check((char) d);
-    if(sd == null || fragment) throw error(DECLSTANDALONE);
-    return sd;
+    if(!sd || fragment) throw error(DECLSTANDALONE);
+    return true;
   }
 
   /**
@@ -1136,9 +1130,7 @@ final class XMLScanner extends Job {
 
   @Override
   public String detailedInfo() {
-    final String path = input.io().path();
-    return path.isEmpty() ? Util.info(LINE_X, input.line()) :
-        Util.info(SCANPOS_X_X, input.io().path(), input.line());
+    return input.io().position(input.line());
   }
 
   @Override

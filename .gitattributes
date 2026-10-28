@@ -1,0 +1,4 @@
+# start scripts: LF for Unix, CRLF for Windows
+*/etc/* text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf

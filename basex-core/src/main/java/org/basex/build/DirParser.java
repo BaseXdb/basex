@@ -4,11 +4,13 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -46,6 +48,10 @@ public final class DirParser extends Parser {
   /** Archive name. */
   private final boolean archiveName;
 
+  /** Filter for resource paths. */
+  private Predicate<String> pathFilter = path -> true;
+  /** Parse resources in subdirectories. */
+  private boolean recursive = true;
   /** Last source. */
   private IO lastSrc;
   /** Parser reference (can be {@code null}). */
@@ -79,12 +85,82 @@ public final class DirParser extends Parser {
       Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
   }
 
+  /**
+   * Assigns a filter for the resources to be parsed.
+   * @param subdirs include resources in subdirectories
+   * @param uris filter for resource URIs (can be {@code null})
+   */
+  public void filter(final boolean subdirs, final Predicate<String> uris) {
+    final IO root = IO.get(original);
+    recursive = subdirs;
+    pathFilter = path -> (subdirs || path.indexOf('/') == -1) &&
+        (uris == null || uris.test(root.merge(path).url()));
+  }
+
+  /**
+   * Returns the files of a directory that are parsed as XML documents.
+   * @return files, or {@code null} if they can only be determined by parsing the input
+   */
+  public ArrayList<IOFile> files() {
+    if(!(source instanceof final IOFile file && file.isDir()) || skipCorrupt) return null;
+    final ArrayList<IOFile> files = new ArrayList<>();
+    // the binary parser stores all files as binaries
+    if(binaryParser) return files;
+    for(final String path : paths(file)) {
+      final IOFile input = new IOFile(file, path);
+      // archive entries are only known after parsing
+      if(archives && input.isArchive()) return null;
+      if(pathFilter.test(path) && include(input.name())) files.add(input);
+    }
+    return files;
+  }
+
+  /**
+   * Returns the files of a directory that are not parsed as XML documents or archives.
+   * @return files
+   */
+  public ArrayList<IOFile> others() {
+    final ArrayList<IOFile> files = new ArrayList<>();
+    if(source instanceof final IOFile file && file.isDir()) {
+      for(final String path : paths(file)) {
+        final IOFile input = new IOFile(file, path);
+        if(pathFilter.test(path) && !(archives && input.isArchive()) &&
+            (binaryParser || !include(input.name()))) files.add(input);
+      }
+    }
+    return files;
+  }
+
+  /**
+   * Checks if a file passes the name filter pattern.
+   * @param name file name
+   * @return result of check
+   */
+  private boolean include(final String name) {
+    return filter == null ||
+        filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
+  }
+
+  /**
+   * Returns the relative paths of the files of a directory to be parsed.
+   * @param file directory
+   * @return paths
+   */
+  private StringList paths(final IOFile file) {
+    if(recursive) return file.descendants();
+    final StringList paths = new StringList();
+    file.children((name, attrs) -> {
+      if(!attrs.isDirectory()) paths.add(name);
+    });
+    return paths;
+  }
+
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.inputsize = 0;
     build.meta.original = original;
     if(source instanceof final IOFile file && file.isDir()) {
-      for(final String path : file.descendants()) parse(build, new IOFile(file, path));
+      for(final String path : paths(file)) parse(build, new IOFile(file, path));
     } else {
       parse(build, source);
     }
@@ -106,10 +182,7 @@ public final class DirParser extends Parser {
           // process TAR files
           try(TarInputStream is = new TarInputStream(cin)) {
             for(TarEntry te; (te = is.getNextEntry()) != null;) {
-              if(te.isDirectory()) continue;
-              source = newStream(is, te.getName(), input);
-              source.length(te.getSize());
-              parseResource(builder);
+              if(!te.isDirectory()) parseEntry(builder, is, te.getName(), te.getSize(), input);
             }
           }
         } else if(compr != null) {
@@ -118,16 +191,14 @@ public final class DirParser extends Parser {
           // drop archive suffix, add .xml if no suffix remains
           name = input.name().replaceAll("\\.[^.]+$", "");
           if(!Strings.contains(name, '.')) name += IO.XMLSUFFIX;
-          source = newStream(cin, name, input);
-          parseResource(builder);
+          parseEntry(builder, cin, name, -1, input);
         } else {
           // process ZIP archive
           try(ZipInputStream is = new ZipInputStream(cin, Strings.CP437)) {
             for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
-              if(ze.isDirectory()) continue;
-              source = newStream(is, Strings.canonical(ze.getName()), input);
-              source.length(ze.getSize());
-              parseResource(builder);
+              if(!ze.isDirectory()) {
+                parseEntry(builder, is, Strings.canonical(ze.getName()), ze.getSize(), input);
+              }
             }
           }
         }
@@ -140,19 +211,29 @@ public final class DirParser extends Parser {
   }
 
   /**
-   * Creates a new stream.
+   * Parses an archive entry, or skips it if its path is invalid.
+   * @param builder builder instance
    * @param is input stream
    * @param path path inside archive
+   * @param size size of the entry ({@code -1} if unknown)
    * @param input input
-   * @return stream
+   * @throws IOException I/O exception
    */
-  private IOStream newStream(final InputStream is, final String path, final IO input) {
+  private void parseEntry(final Builder builder, final InputStream is, final String path,
+      final long size, final IO input) throws IOException {
+    final String norm = MetaData.normPath(path);
+    if(norm == null || norm.isEmpty()) {
+      skipped.add(input.path() + '/' + path);
+      return;
+    }
     // parsers must not close the archive stream
     final InputStream in = new FilterInputStream(is) {
       @Override
       public void close() { }
     };
-    return new IOStream(in, archiveName ? input.path() + '/' + path : path);
+    source = new IOStream(in, archiveName ? input.path() + '/' + norm : norm);
+    source.length(size);
+    parseResource(builder);
   }
 
   /**
@@ -175,9 +256,11 @@ public final class DirParser extends Parser {
       targ = (targ + path).replace("//", "/");
     }
 
+    // skip resources that do not pass the path filter
+    if(!pathFilter.test(targ + name)) return;
+
     // check if file passes the name filter pattern
-    final boolean include = filter == null ||
-        filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
+    final boolean include = include(name);
 
     if(include ? binaryParser : addBinary) {
       // store input in binary format if binary parser was chosen, or if file was included otherwise

@@ -306,9 +306,6 @@ public interface Text {
   /** Goodbye information. */
   String[] BYE = { lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4") };
 
-  /** No help available. */
-  String NOHELP = lang("no_help");
-
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.BACKUP + '|' + CmdCreate.DATABASE + '|' +
@@ -466,7 +463,7 @@ public interface Text {
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
-    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [pattern]) " + S_TO +
+    CmdPerm.ADMIN + "] (" + ON + " [pattern]) " + S_TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")
@@ -801,6 +798,8 @@ public interface Text {
   String PATH = lang("path");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
+  /** Context value. */
+  String CONTEXT_VALUE = lang("context_value");
   /** Indent result. */
   String INDENT_RESULT = lang("indent_result");
 
@@ -921,6 +920,8 @@ public interface Text {
   String ABOUT = lang("about_%", Prop.NAME);
   /** Command info. */
   String CLOSE = lang("close");
+  /** Command info. */
+  String LEAVE_CLOSE = lang("leave_close");
   /** Command info. */
   String GO_TO_LINE = lang("go_to_line");
   /** Command info. */
@@ -1072,8 +1073,10 @@ public interface Text {
   String CREATE = lang("create");
   /** Button for stopping the server. */
   String STOP = lang("stop");
-  /** Button for deleting all. */
-  String DELETE_ALL = lang("delete_all");
+  /** Button for stopping background jobs. */
+  String STOP_JOBS = lang("stop_jobs");
+  /** Button for dropping all. */
+  String DROP_ALL = lang("drop_all");
   /** Button for adding. */
   String PUT = lang("put");
   /** Button for resetting options. */
@@ -1096,6 +1099,8 @@ public interface Text {
 
   /** Open dialog - No database. */
   String INFORMATION = lang("information");
+  /** Dialog title for questions. */
+  String QUESTION = lang("question");
   /** Dialog title for choosing a directory. */
   String CHOOSE_DIR = lang("choose_dir");
   /** Command info. */
@@ -1181,6 +1186,22 @@ public interface Text {
   String TITLE_CASE = lang("title_case");
   /** Jump to bracket. */
   String JUMP_TO_BRACKET = lang("jump_to_bracket");
+  /** Join lines. */
+  String JOIN_LINES = lang("join_lines");
+  /** Split lines. */
+  String SPLIT_LINES = lang("split_lines");
+  /** Expand selection. */
+  String EXPAND_SELECTION = lang("expand_selection");
+  /** Shrink selection. */
+  String SHRINK_SELECTION = lang("shrink_selection");
+  /** Go to definition. */
+  String GO_TO_DEFINITION = lang("go_to_definition");
+  /** Toggle bookmark. */
+  String TOGGLE_BOOKMARK = lang("toggle_bookmark");
+  /** Next bookmark. */
+  String NEXT_BOOKMARK = lang("next_bookmark");
+  /** Previous bookmark. */
+  String PREVIOUS_BOOKMARK = lang("previous_bookmark");
   /** Treat first line as header. */
   String FIRST_LINE_HEADER = lang("first_line_header");
   /** Separator. */
@@ -1197,6 +1218,8 @@ public interface Text {
   String ESCAPE_CHARS = lang("escape_chars");
   /** Liberal parsing. */
   String LIBERAL_PARSING = lang("liberal_parsing");
+  /** Mapping. */
+  String MAPPING = lang("mapping");
   /** Backslash. */
   String BACKSLASHES = lang("backslashes");
 
@@ -1251,6 +1274,10 @@ public interface Text {
   String MANAGE_DB = lang("manage_db");
   /** Dialog text for dropping a database. */
   String DROPPING_DB_X = lang("dropping_db_%") + NL + ARE_YOU_SURE;
+  /** Dialog text for dropping an index. */
+  String DROPPING_INDEX_X = lang("dropping_index_%") + NL + ARE_YOU_SURE;
+  /** Dialog text for stopping background jobs. */
+  String STOPPING_JOBS_X = lang("stopping_jobs_%") + NL + ARE_YOU_SURE;
   /** Database only available as backup. */
   String ONLY_BACKUP = lang("only_backup");
   /** Dialog text for dropping a backup. */
@@ -1260,16 +1287,16 @@ public interface Text {
   /** Dialog text for overwriting a database. */
   String OVERWRITE_DB_QUESTION = OVERWRITE_DB + NL + ARE_YOU_SURE;
 
-  /** Dialog title for deleting nodes. */
-  String DELETE_NODES = lang("delete_nodes");
   /** Dialog title for closing a file. */
   String CLOSE_FILE_X = lang("close_file_%");
   /** Dialog title for deleting a file. */
   String DELETE_FILE_X = lang("delete_file_%");
+  /** Dialog title for deleting files. */
+  String DELETE_FILES_X = lang("delete_files_%");
   /** Dialog title for reverting a file. */
   String REVERT_FILE_X = lang("revert_file_%");
   /** Confirm the restoration of a number of files. */
-  String REVERT_FILES_X = lang("revert_files_%");
+  String REVERT_FILES_X = lang("revert_files_%") + NL + ARE_YOU_SURE;
   /** Close all. */
   String CLOSE_ALL = lang("close_all");
 
@@ -1292,6 +1319,10 @@ public interface Text {
   String VIEWS = lang("views");
   /** Look and feel. */
   String LOOK_AND_FEEL = "Look & Feel";
+  /** Antialiasing. */
+  String ANTIALIASING = lang("antialiasing");
+  /** Monospaced fonts. */
+  String MONOSPACE = lang("monospace");
   /** Scaling of the user interface. */
   String SCALING = lang("scaling");
   /** Header for preferences that are applied after a restart. */
@@ -1325,6 +1356,8 @@ public interface Text {
   String MARK_EDITED_LINE = lang("mark_edited_line");
   /** Mark occurrences. */
   String MARK_OCCURRENCES = lang("mark_occurrences");
+  /** Show indentation guides. */
+  String SHOW_INDENT_GUIDES = lang("show_indent_guides");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Parse project files. */
@@ -1348,18 +1381,8 @@ public interface Text {
 
   /** Comment. */
   String COMMENT = lang("comment");
-  /** Dialog title for inserting new data. */
-  String INSERT_NEW_DATA = lang("insert_new_data");
-  /** Dialog title for updating document data. */
-  String EDIT_DATA = lang("edit_data");
   /** Insert value. */
   String VALUE = lang("value");
-  /** Dialog title for updating text. */
-  String EDIT_X = lang("edit_%");
-  /** Dialog title for updating text. */
-  String[] NODE_KINDS = { lang("document"), lang("element"), lang("text"),
-      lang("attribute"), COMMENT, lang("pi")
-  };
 
   /** Color schema information. */
   String RED = lang("red");
@@ -1427,6 +1450,8 @@ public interface Text {
   String H_ATTR_INDEX = lang("h_attr_index");
   /** Token index information. */
   String H_TOKEN_INDEX = lang("h_token_index");
+  /** Hint for hidden attributes in the tree view. */
+  String H_TREE_ATTS = lang("h_tree_atts");
   /** Full-text index information. */
   String H_FULLTEXT_INDEX = lang("h_fulltext_index");
   /** Full-text index information. */

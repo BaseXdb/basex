@@ -3,15 +3,20 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
+import java.util.List;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -60,11 +65,40 @@ public abstract class SortFn extends StandardFunc {
   }
 
   /**
+   * Returns the arguments of an equivalent sort call for a single static sort key definition.
+   * @param desc descending order
+   * @return arguments, or {@code null} if no single static key with this order is defined
+   * @throws QueryException query exception
+   */
+  protected final Expr[] sortArgs(final boolean desc) throws QueryException {
+    if(!(arg(1) instanceof final Value keys)) return null;
+    final XQMap key = keys.isEmpty() ? XQMap.empty() : keys instanceof final XQMap map ? map : null;
+    if(key == null || descending(key) != desc) return null;
+
+    final Value collation = key.get(COLLATION), function = key.get(KEY);
+    if(function.isEmpty()) {
+      return collation.isEmpty() ? new Expr[] { arg(0) } : new Expr[] { arg(0), collation };
+    }
+    return new Expr[] { arg(0), collation, function };
+  }
+
+  /**
+   * Checks if a coerced sort key definition specifies descending order.
+   * @param key sort key definition
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean descending(final XQMap key) throws QueryException {
+    final Value order = key.get(ORDER);
+    return !order.isEmpty() && toEnum((Item) order, Order.class) == Order.DESCENDING;
+  }
+
+  /**
    * Checks if the index is sorted.
    * @param index index
    * @return result of check
    */
-  protected static boolean sorted(final Integer[] index) {
+  protected static boolean sorted(final int[] index) {
     final int il = index.length;
     for(int i = 0; i < il; i++) {
       if(index[i] != i) return false;
@@ -73,13 +107,12 @@ public abstract class SortFn extends StandardFunc {
   }
 
   /**
-   * Returns an array with an index to the original values.
-   * @param values values
+   * Returns the sort key definitions.
    * @param qc query context
-   * @return index
+   * @return key definitions
    * @throws QueryException query exception
    */
-  protected Integer[] index(final Value[] values, final QueryContext qc) throws QueryException {
+  protected Keys keys(final QueryContext qc) throws QueryException {
     Value maps = arg(1).unwrappedValue(qc);
     if(maps.isEmpty()) maps = XQMap.empty();
 
@@ -90,55 +123,57 @@ public abstract class SortFn extends StandardFunc {
     int m = 0;
     for(final Item item : maps) {
       final XQMap map = toRecord(item, keyRecord(), qc);
-      final Value key = map.get(KEY), order = map.get(ORDER);
+      final Value key = map.get(KEY);
       if(!key.isEmpty()) keys[m] = toFunction(key, 1, qc);
       collations[m] = toCollation(map.get(COLLATION), qc);
-      if(!order.isEmpty()) {
-        invert[m] = toEnum(order.atomItem(qc, info), Order.class) == Order.DESCENDING;
-      }
+      invert[m] = descending(map);
       m++;
     }
-    return index(values, keys, collations, invert, qc);
+    return new Keys(keys, collations, invert);
+  }
+
+  /**
+   * Returns the ascending key definition of the collation and key arguments.
+   * @param qc query context
+   * @return key definition
+   * @throws QueryException query exception
+   */
+  protected final Keys sortKeys(final QueryContext qc) throws QueryException {
+    return new Keys(new FItem[] { toFunctionOrNull(arg(2), 1, qc) },
+        new Collation[] { toCollation(arg(1), qc) }, new boolean[1]);
   }
 
   /**
    * Returns an array with an index to the original values.
    * @param values values
-   * @param keys keys
-   * @param collations collations
-   * @param invert ascending/descending order
    * @param qc query context
    * @return index
    * @throws QueryException query exception
    */
-  protected final Integer[] index(final Value[] values, final FItem[] keys,
-      final Collation[] collations, final boolean[] invert, final QueryContext qc)
+  protected final int[] index(final Value[] values, final QueryContext qc)
       throws QueryException {
 
+    final Keys defs = keys(qc);
+    final FItem[] keys = defs.keys;
+    final Collation[] collations = defs.collations;
+    final boolean[] invert = defs.invert;
     final int levels = keys.length, size = values.length;
     final SortKey[][] cached = new SortKey[levels][size];
-    final Integer[] indexes = new Integer[size];
-    for(int o = 0; o < size; o++) indexes[o] = o;
+    final IntBinaryOperator typed = size > 1 && levels > 0 ?
+      typed(cached, values, keys[0], collations[0], qc) : null;
     try {
-      Arrays.sort(indexes, (i1, i2) -> {
+      return Array.createOrder(size, (i1, i2) -> {
         qc.checkStop();
         try {
           for(int l = 0; l < levels; l++) {
-            final int ll = l;
-            final QueryFunction<Integer, SortKey> value = i -> {
-              SortKey sk = cached[ll][i];
-              if(sk == null) {
-                final FItem k = keys[ll];
-                final Value val = (k == null ? values[i] : k.invoke(qc, info, values[i])).
-                    atomValue(qc, info);
-                sk = new SortKey(val, collationKeys(val, collations[ll], info));
-                cached[ll][i] = sk;
-              }
-              return sk;
-            };
-            final SortKey sk1 = value.apply(i1), sk2 = value.apply(i2);
-            final int diff = compare(sk1.value, sk2.value, sk1.colls, sk2.colls, collations[l],
-                qc, info);
+            final int diff;
+            if(l == 0 && typed != null) {
+              diff = typed.applyAsInt(i1, i2);
+            } else {
+              final SortKey sk1 = sortKey(cached[l], i1, values[i1], keys[l], collations[l], qc);
+              final SortKey sk2 = sortKey(cached[l], i2, values[i2], keys[l], collations[l], qc);
+              diff = compare(sk1.value, sk2.value, sk1.colls, sk2.colls, collations[l], qc, info);
+            }
             if(diff != 0) return invert[l] ? -diff : diff;
           }
           return 0;
@@ -149,7 +184,99 @@ public abstract class SortFn extends StandardFunc {
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
-    return indexes;
+  }
+
+  /**
+   * Computes the sort keys of the first level and returns a comparator if they have a common type.
+   * @param cached cached sort keys
+   * @param values values
+   * @param key key function (can be {@code null})
+   * @param collation collation (can be {@code null})
+   * @param qc query context
+   * @return comparator, or {@code null} if the keys are no single items of a common type
+   * @throws QueryException query exception
+   */
+  private IntBinaryOperator typed(final SortKey[][] cached, final Value[] values, final FItem key,
+      final Collation collation, final QueryContext qc) throws QueryException {
+    // the keys are computed anyway when two or more values are compared
+    final int size = values.length;
+    final Item[] items = new Item[size];
+    for(int i = 0; i < size; i++) {
+      final Value value = sortKey(cached[0], i, values[i], key, collation, qc).value;
+      if(value.size() > 1) return null;
+      items[i] = value.isEmpty() ? Empty.VALUE : value.itemAt(0);
+    }
+    final IntBinaryOperator typed = TypedKeys.comparator(size, i -> items[i], collation, true,
+        info);
+    // primitive values: release the sort keys
+    if(typed != null) Arrays.fill(cached[0], null);
+    return typed;
+  }
+
+  /**
+   * Returns the cached sort key of a value, or computes it.
+   * @param cached cached sort keys
+   * @param index index of the sort key
+   * @param value value
+   * @param key key function (can be {@code null})
+   * @param collation collation (can be {@code null})
+   * @param qc query context
+   * @return sort key
+   * @throws QueryException query exception
+   */
+  private SortKey sortKey(final SortKey[] cached, final int index, final Value value,
+      final FItem key, final Collation collation, final QueryContext qc) throws QueryException {
+    SortKey sk = cached[index];
+    if(sk == null) {
+      final Value val = (key == null ? value : key.invoke(qc, info, value)).atomValue(qc, info);
+      sk = new SortKey(val, collationKeys(val, collation, info));
+      cached[index] = sk;
+    }
+    return sk;
+  }
+
+  /**
+   * Returns the smallest items of the input in ascending order.
+   * @param input input
+   * @param limit maximum number of items
+   * @param qc query context
+   * @return items
+   * @throws QueryException query exception
+   */
+  protected final Value smallest(final Iter input, final int limit, final QueryContext qc)
+      throws QueryException {
+    final Keys defs = keys(qc);
+    final TopK<Entry> top = new TopK<>(limit, (e1, e2) -> compare(e1, e2, defs, qc));
+    for(Item item; (item = qc.next(input)) != null;) {
+      top.add(new Entry(item, new SortKey[defs.keys.length]));
+    }
+    final List<Entry> entries = top.finish();
+    final ValueBuilder vb = new ValueBuilder(qc, entries.size());
+    for(final Entry entry : entries) vb.add(entry.item);
+    return vb.value(this);
+  }
+
+  /**
+   * Compares two entries.
+   * @param entry1 first entry
+   * @param entry2 second entry
+   * @param defs key definitions
+   * @param qc query context
+   * @return result of comparison
+   * @throws QueryException query exception
+   */
+  private int compare(final Entry entry1, final Entry entry2, final Keys defs,
+      final QueryContext qc) throws QueryException {
+    final int levels = defs.keys.length;
+    for(int l = 0; l < levels; l++) {
+      final FItem key = defs.keys[l];
+      final Collation collation = defs.collations[l];
+      final SortKey sk1 = sortKey(entry1.keys, l, entry1.item, key, collation, qc);
+      final SortKey sk2 = sortKey(entry2.keys, l, entry2.item, key, collation, qc);
+      final int diff = compare(sk1.value, sk2.value, sk1.colls, sk2.colls, collation, qc, info);
+      if(diff != 0) return defs.invert[l] ? -diff : diff;
+    }
+    return 0;
   }
 
   /**
@@ -222,6 +349,21 @@ public abstract class SortFn extends StandardFunc {
    * @param colls collation keys of its strings (can be {@code null})
    */
   private record SortKey(Value value, byte[][] colls) { }
+
+  /**
+   * Sort key definitions.
+   * @param keys key functions (entries can be {@code null})
+   * @param collations collations (entries can be {@code null})
+   * @param invert descending order
+   */
+  protected record Keys(FItem[] keys, Collation[] collations, boolean[] invert) { }
+
+  /**
+   * Heap entry.
+   * @param item item
+   * @param keys sort keys, computed on demand
+   */
+  private record Entry(Item item, SortKey[] keys) { }
 
   /**
    * Sorts values with user-defined comparators.

@@ -73,6 +73,14 @@ public final class MemData extends Data {
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }
 
+  /**
+   * Assigns the last node ID after the instance has been built.
+   */
+  public void finishBuild() {
+    lastid = nodes() - 1;
+    if(meta.updindex) idmap.finish(lastid);
+  }
+
   @Override
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
     final IndexBuilder ib = switch(type) {

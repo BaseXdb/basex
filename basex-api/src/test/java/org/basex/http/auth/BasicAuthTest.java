@@ -1,6 +1,7 @@
 package org.basex.http.auth;
 
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.*;
 import java.nio.charset.*;
@@ -8,6 +9,7 @@ import java.nio.charset.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.query.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -58,5 +60,18 @@ public final class BasicAuthTest extends AuthTest {
   /** Access denied. */
   @Test public void wrong() {
     responseFail(REST_ROOT.replace("://", "://user:unknown@"));
+  }
+
+  /**
+   * Malformed credentials.
+   * @throws Exception exception
+   */
+  @Test public void malformed() throws Exception {
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request xmlns:http='http://expath.org/ns/http-client' method='GET' href='" +
+        REST_ROOT + "'><http:header name='Authorization' value='Basic abc'/></http:request>") +
+        "[. instance of node()]/@status/string()", HTTPContext.get().context())) {
+      assertEquals("401", qp.value().serialize().toString());
+    }
   }
 }

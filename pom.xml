@@ -21,8 +21,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>12.1.14</jettyVersion>
-    <websocketVersion>2.2.0</websocketVersion>
+    <jetty.version>12.1.14</jetty.version>
+    <websocket.version>2.2.0</websocket.version>
     <junit.version>6.1.3</junit.version>
   </properties>
 
@@ -98,56 +98,56 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-servlet</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-servlets</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-webapp</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <!-- jakarta.websocket.server; the other packages are in jakarta.websocket-client-api -->
       <dependency>
         <groupId>jakarta.websocket</groupId>
         <artifactId>jakarta.websocket-api</artifactId>
-        <version>${websocketVersion}</version>
+        <version>${websocket.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>jakarta.websocket</groupId>
         <artifactId>jakarta.websocket-client-api</artifactId>
-        <version>${websocketVersion}</version>
+        <version>${websocket.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.ee10.websocket</groupId>
         <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.compression</groupId>
         <artifactId>jetty-compression-server</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.compression</groupId>
         <artifactId>jetty-compression-gzip</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -165,7 +165,7 @@
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>78.3</version>
+        <version>79.1</version>
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
@@ -411,7 +411,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
 
         <plugin>

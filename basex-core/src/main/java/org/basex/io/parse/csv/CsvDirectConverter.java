@@ -26,9 +26,6 @@ final class CsvDirectConverter extends CsvXmlConverter {
   /** Attribute name. */
   private static final byte[] NAME = token("name");
 
-  /** Record element is open. */
-  private boolean open;
-
   /**
    * Constructor.
    * @param copts CSV options
@@ -42,7 +39,6 @@ final class CsvDirectConverter extends CsvXmlConverter {
   protected void init(final String uri) throws IOException {
     super.init(uri);
     handler.openElem(E_CSV, atts, NO_NSP);
-    open = false;
   }
 
   @Override
@@ -52,11 +48,7 @@ final class CsvDirectConverter extends CsvXmlConverter {
 
   @Override
   protected void record() throws IOException {
-    line++;
-    closeRecord();
-    handler.openElem(E_RECORD, atts, NO_NSP);
-    open = true;
-    col = -1;
+    openRecord(E_RECORD);
   }
 
   @Override
@@ -79,16 +71,5 @@ final class CsvDirectConverter extends CsvXmlConverter {
     closeRecord();
     handler.closeElem();
     return super.finish(ii, qc);
-  }
-
-  /**
-   * Closes an open record element.
-   * @throws IOException I/O exception
-   */
-  private void closeRecord() throws IOException {
-    if(open) {
-      handler.closeElem();
-      open = false;
-    }
   }
 }

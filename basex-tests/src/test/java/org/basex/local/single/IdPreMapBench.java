@@ -8,23 +8,7 @@ import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Micro-benchmark for the updatable ID -&gt; PRE mapping ({@link IdPreMap}).
- *
- * <p>Isolates the two dominant costs of the structure so that optimizations
- * (interval coalescing, a last-interval cache, a secondary FID index) can be
- * measured without the noise of the full update stack:</p>
- * <ul>
- *   <li><b>Build</b> &ndash; {@code insert} shifts all following tuples (array
- *       copy) and re-touches them ({@code increment}), so a batch of {@code n}
- *       random-position updates is {@code O(n^2)}.</li>
- *   <li><b>Lookup</b> &ndash; {@code pre(id)} bisects for original IDs, but
- *       falls back to a linear scan over all tuples for inserted IDs
- *       ({@code id > baseid}).</li>
- * </ul>
- *
- * <p>The reported tuple count ({@link IdPreMap#size()}) is the figure that
- * coalescing would reduce; both build and scan costs are proportional to it.
- * Not part of the regular test run &ndash; execute on demand.</p>
+ * Micro-benchmark for the updatable ID -&gt; PRE mapping ({@link IdPreMap}), run on demand.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -41,6 +25,10 @@ public final class IdPreMapBench {
   /** Sink to keep the JIT from eliminating the lookup loops. */
   @SuppressWarnings("unused")
   private static volatile long blackhole;
+  /** Build time of the most recent {@link #build} call, in nanoseconds. */
+  private static long buildTime;
+  /** Last ID assigned by the most recent {@link #build} call. */
+  private static int lastId;
 
   /** Random single inserts, followed by inserted-ID and original-ID lookups. */
   @Test public void singleInserts() {
@@ -53,11 +41,7 @@ public final class IdPreMapBench {
   }
 
   /**
-   * Random single insert/delete churn: reports the resulting tuple count, which
-   * measures how much interval fragmentation the map accumulates (and hence how
-   * much coalescing can reclaim). Deletes always target a still-present inserted
-   * record, whose current PRE is obtained from the forward map, so the operation
-   * arguments stay valid without a reference map.
+   * Random single insert/delete churn, reporting the resulting tuple count.
    */
   @Test public void insertDeleteChurn() {
     // warm up the JIT
@@ -145,11 +129,6 @@ public final class IdPreMapBench {
           ops, map.size(), Performance.nanoToMilli(buildTime), scan / LOOKUPS, bisect / LOOKUPS));
     }
   }
-
-  /** Build time of the most recent {@link #build} call, in nanoseconds. */
-  private static long buildTime;
-  /** Last ID assigned by the most recent {@link #build} call. */
-  private static int lastId;
 
   /**
    * Builds a map by performing the given number of random-position inserts.

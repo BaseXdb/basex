@@ -116,8 +116,6 @@ public final class IntObjectMap<E> extends IntSet {
 
   @Override
   public String toString() {
-    final List<Object> k = new ArrayList<>();
-    for(final int key : keys) k.add(key);
-    return toString(k.toArray(), values);
+    return toString(Arrays.stream(keys).boxed().toArray(), values);
   }
 }

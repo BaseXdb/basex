@@ -402,7 +402,7 @@ public final class SaxonTransform {
    * @throws QueryException query exception
    */
   private Value value(final XdmValue xdm) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, xdm.size());
     for(final XdmItem item : xdm) {
       if(item instanceof final XdmNode node) vb.add(node(node));
       else if(item instanceof final XdmAtomicValue atomic) vb.add(atomic(atomic));
@@ -547,7 +547,7 @@ public final class SaxonTransform {
           output = new ArrayOutput();
           dest = serializer(Saxon.PROC.newSerializer(output), main);
         }
-        case FILE -> dest = serializer(Saxon.PROC.newSerializer(func.file(uri, qc).file()), main);
+        case FILE -> dest = serializer(Saxon.PROC.newSerializer(func.file(uri).file()), main);
         default -> dest = new RawDestination();
       }
     }

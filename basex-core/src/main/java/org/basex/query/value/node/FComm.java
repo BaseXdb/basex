@@ -54,12 +54,6 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FComm fcomm && Token.eq(value, fcomm.value) &&
-        super.equals(obj);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     qs.comment(value);
   }

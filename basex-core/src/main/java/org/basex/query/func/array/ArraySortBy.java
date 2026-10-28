@@ -1,5 +1,7 @@
 package org.basex.query.func.array;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -35,7 +37,7 @@ public class ArraySortBy extends SortFn {
     final ValueList list = new ValueList(as);
     for(final Value member : array.members()) list.add(member);
     final Value[] values = list.finish();
-    final Integer[] index = index(values, qc);
+    final int[] index = index(values, qc);
     if(sorted(index)) return array;
 
     final ArrayBuilder ab = new ArrayBuilder(qc, as);
@@ -55,6 +57,10 @@ public class ArraySortBy extends SortFn {
     if(array == XQArray.empty()) return array;
 
     coerceKeys(cc);
+
+    // array:sort-by(A, { 'key': K }) → array:sort(A, (), K)
+    final Expr[] args = sortArgs(false);
+    if(args != null) return cc.function(_ARRAY_SORT, info, args);
     if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
   }

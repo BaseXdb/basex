@@ -7,8 +7,7 @@ import org.basex.api.client.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class performs a client/server memory stress tests with a specified number of threads and
- * queries.
+ * Runs memory-intensive queries from concurrent client sessions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -20,8 +19,6 @@ public final class ServerMemTest extends SandboxTest {
   /** Query to be run: the random values keep the sequence from being pre-evaluated. */
   private static final String QUERY =
       "count(sort((1 to " + ITEMS + ") ! random:integer()))";
-  /** Server reference. */
-  BaseXServer server;
 
   /**
    * Runs the test with 10 clients.
@@ -44,9 +41,8 @@ public final class ServerMemTest extends SandboxTest {
    * @param clients number of clients
    * @throws Exception exception
    */
-  private void run(final int clients) throws Exception {
-    // run server instance
-    server = createServer();
+  private static void run(final int clients) throws Exception {
+    final BaseXServer server = createServer();
     try {
       // run clients, each executing one memory-intensive query
       parallel(clients, () -> {
@@ -56,7 +52,6 @@ public final class ServerMemTest extends SandboxTest {
         return null;
       });
     } finally {
-      // stop server
       stopServer(server);
     }
   }

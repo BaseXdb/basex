@@ -4,13 +4,11 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -25,21 +23,13 @@ public final class UtilValuesExcept extends StandardFunc {
     final Iter except = arg(1).atomIter(qc, info);
     final Collation collation = toCollation(arg(2), qc);
 
-    final IntSet ints = new IntSet();
     final ItemSet items = ItemSet.get(collation, info);
-    for(Item item; (item = qc.next(except)) != null;) {
-      final int v = FnDuplicateValues.toInt(item);
-      if(v != Integer.MIN_VALUE) ints.add(v);
-      else items.add(item);
-    }
+    for(Item item; (item = qc.next(except)) != null;) items.add(item);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
-          if(!items.contains(item)) {
-            if(item instanceof final ANum num && ints.contains(num.toInt())) continue;
-            return item;
-          }
+          if(!items.contains(item)) return item;
         }
         return null;
       }

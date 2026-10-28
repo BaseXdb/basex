@@ -1,5 +1,9 @@
 package org.basex.server;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.*;
+
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
@@ -53,8 +57,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
-    // run server instance
+  private static void run(final int clients, final int runs) throws Exception {
     final BaseXServer server = createServer();
     try {
       insert(clients, runs);
@@ -78,6 +81,7 @@ public final class XQUFServerStressTest extends SandboxTest {
       cs.execute(new CreateDB(NAME, "<doc/>"));
     }
     run("insert node <node/> into doc('" + NAME + "')/doc", clients, runs);
+    count(clients * runs);
   }
 
   /**
@@ -87,13 +91,26 @@ public final class XQUFServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void delete(final int clients, final int runs) throws Exception {
+    final int nodes = 100 + clients * clients;
     try(ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME, "<doc/>"));
-      final int c = 100 + clients * clients;
-      cs.execute(new XQuery("for $i in 1 to " + c +
+      cs.execute(new XQuery("for $i in 1 to " + nodes +
           " return insert node <node/> into doc('" + NAME + "')/doc"));
     }
     run("delete nodes (doc('" + NAME + "')/doc/node)[1]", clients, runs);
+    count(Math.max(0, nodes - clients * runs));
+  }
+
+  /**
+   * Checks the number of nodes in the test database.
+   * @param expected expected number of nodes
+   * @throws IOException I/O exception
+   */
+  private static void count(final int expected) throws IOException {
+    try(ClientSession cs = createClient()) {
+      assertEquals(Integer.toString(expected),
+          cs.execute(new XQuery("count(doc('" + NAME + "')/doc/node)")).trim());
+    }
   }
 
   /**

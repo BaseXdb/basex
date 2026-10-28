@@ -44,6 +44,12 @@ public final class QueryStringTest extends SandboxTest {
     roundtrip("comment { 'a&#xA;b' }");
     roundtrip("<a>{ " + ZERO + " }<!--a&amp;b--><?pi a&amp;b?></a>");
     roundtrip("parse-xml('<x><!--a&amp;b--><?pi a&amp;b?></x>')/x/node()");
+
+    // GH-2784: direct processing instructions: "(:" in the contents does not start a comment.
+    query("<?hello (:darkness, :)my old friend?>", "<?hello (:darkness, :)my old friend?>");
+    query("string(<?hello (:darkness, :)my old friend?>)", "(:darkness, :)my old friend");
+    query("<?hello    (: x :)?>/string()", "(: x :)");
+    roundtrip("<?hello (:darkness, :)my old friend?>");
   }
 
   /** Atomic items. */

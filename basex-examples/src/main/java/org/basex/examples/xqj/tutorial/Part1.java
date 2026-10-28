@@ -25,6 +25,7 @@ public final class Part1 extends Main {
     // Print 'Hello World!'
     info("Print 'Hello World'");
 
+    // Adjust the credentials to those of your server
     XQDataSource xqjd = new BaseXXQDataSource();
     XQConnection xqjc = xqjd.getConnection("admin", "admin");
     XQExpression xqje = xqjc.createExpression();

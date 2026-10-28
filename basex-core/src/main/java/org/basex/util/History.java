@@ -147,7 +147,7 @@ public final class History {
    * @param nc new caret position
    */
   public void store(final byte[] str, final int oc, final int nc) {
-    if(!active || str == current || Token.eq(str, current)) return;
+    if(!active || Token.eq(str, current)) return;
 
     // diff the current text against the new text: keep only the changed middle part
     final int prefix = Arrays.mismatch(current, str);

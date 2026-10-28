@@ -99,8 +99,8 @@ final class TrieKeys implements Iterable<Item> {
     final int sz = size - list.size;
     final ItemList tmp = new ItemList(sz);
     for(final Item key : this) {
-      if(!map.isEmpty() && map.containsKey(key)) {
-        final int occ = map.get(key);
+      final Integer occ = map.isEmpty() ? null : map.get(key);
+      if(occ != null) {
         if(occ == 1) map.remove(key);
         else map.put(key, occ - 1);
       } else {
@@ -117,6 +117,6 @@ final class TrieKeys implements Iterable<Item> {
 
   @Override
   public String toString() {
-    return Arrays.toString(keys);
+    return Arrays.toString(Arrays.copyOf(keys, size));
   }
 }

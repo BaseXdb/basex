@@ -36,10 +36,6 @@ public final class DBDelete extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() {
     paths.forEach((path, tp) -> {
       path.delete();

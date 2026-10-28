@@ -29,7 +29,7 @@ public class FnSlice extends StandardFunc {
     if(slice.reverse) input = input.reverse(qc);
     if(slice.step == 1) return input.subsequence(slice.start - 1, slice.length, qc);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, slice.length);
     for(long i = 0; i < slice.length; i++) vb.add(input.itemAt(slice.start - 1 + i * slice.step));
     return vb.value();
   }
@@ -55,12 +55,17 @@ public class FnSlice extends StandardFunc {
       }
       // input size is unknown: exact range cannot be computed, check original properties
       final long start = longArg(1, 1, cc.qc), end = longArg(2, Long.MAX_VALUE, cc.qc);
-      if(end == Long.MAX_VALUE && longArg(3, 1, cc.qc) == 1) {
-        // slice(E, -1) → foot(E)
-        if(start == -1) return cc.function(FOOT, info, input);
-        // slice(E, 1) → E
-        if(start == 0 || start == 1) return input;
-        // no rewritings possible for greater start values (slice always returns last item)
+      if(longArg(3, 1, cc.qc) == 1) {
+        if(end == Long.MAX_VALUE) {
+          // slice(E, -1) → foot(E)
+          if(start == -1) return cc.function(FOOT, info, input);
+          // slice(E, 1) → E
+          if(start == 0 || start == 1) return input;
+          // no rewritings possible for greater start values (slice always returns last item)
+        } else if(start > 0 && start <= end) {
+          // slice(E, 2, 4) → util:range(E, 2, 4)
+          return cc.function(_UTIL_RANGE, info, input, Itr.get(start), Itr.get(end));
+        }
       }
     }
 

@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class Dec extends ANum {
   /** Minimum long value. */
   public static final BigDecimal BD_MINLONG = BigDecimal.valueOf(Long.MIN_VALUE);
- /** Maximum long value. */
+  /** Maximum long value. */
   public static final BigDecimal BD_MAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
   /** Maximum unsigned long value. */
   public static final BigDecimal BD_MAXULN = new BigDecimal("18446744073709551615");
@@ -54,7 +54,7 @@ public final class Dec extends ANum {
   }
 
   /**
-   * Constructor.
+   * Returns an instance of this class.
    * @param value big decimal value
    * @return value
    */
@@ -134,7 +134,7 @@ public final class Dec extends ANum {
     final BigDecimal l = value.setScale(prec, RoundingMode.FLOOR);
     final BigDecimal u = value.setScale(prec, RoundingMode.CEILING);
     final boolean pos = value.signum() >= 0;
-    final BooleanSupplier mw = () -> l.add(u).divide(BigDecimal.valueOf(2)).compareTo(value) == 0;
+    final BooleanSupplier mw = () -> l.add(u).divide(BD_2).compareTo(value) == 0;
     final Supplier<BigDecimal> n = () -> value.setScale(prec, RoundingMode.HALF_UP);
     return switch(mode) {
       case FLOOR -> l;

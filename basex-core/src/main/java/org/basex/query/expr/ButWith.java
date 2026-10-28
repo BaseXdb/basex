@@ -41,17 +41,19 @@ public final class ButWith extends Arr {
       exprs = new Expr[] { bw.exprs[0], update };
       cc.info(OPTMERGE_X, this);
     }
-    // the result carries the record type of the left operand; an inferred shape is no record, but
-    // a record may still turn up at runtime, so the check is left to the evaluation step
+    // the result carries the label of the left operand; if no label is known statically, a record
+    // may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof final RecordType rt) {
-      // RECORD but with { } → RECORD
-      if(st.one() && exprs[1] instanceof final XQMap map && map.structSize() == 0) {
-        return cc.replaceWith(this, exprs[0]);
-      }
-      // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
-      if(covered(exprs[1], rt)) {
-        return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
+      if(st.one()) {
+        // RECORD but with { } → RECORD
+        if(exprs[1] instanceof final XQMap map && map.structSize() == 0) {
+          return cc.replaceWith(this, exprs[0]);
+        }
+        // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
+        if(covered(exprs[1], rt)) {
+          return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
+        }
       }
       exprType.assign(st.with(Occ.EXACTLY_ONE));
     }
@@ -65,7 +67,8 @@ public final class ButWith extends Arr {
    * @return result of check
    */
   private static boolean covered(final Expr update, final RecordType rt) {
-    if(!(update instanceof ShapeConstructor || update instanceof XQMap) ||
+    // the fields of record(*) are unknown
+    if(rt.any() || !(update instanceof ShapeConstructor || update instanceof XQMap) ||
         !(update.seqType().type instanceof final ShapeType ush)) return false;
     final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
     final int fs = fields.size();
@@ -136,7 +139,7 @@ public final class ButWith extends Arr {
       values[f] = sameOrder ? record.valueAt(f) : record.getOrNull(rt.key(f + 1));
     }
     update.forEach((key, value) -> {
-      final int i = key.type.isStringOrUntyped() ? fields.index(key.string(null)) : 0;
+      final int i = rt.index(key);
       // static fields cannot be updated
       if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
       values[i - 1] = rt.coerce(i, value, qc, info, null);

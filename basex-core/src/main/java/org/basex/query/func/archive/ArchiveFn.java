@@ -10,7 +10,6 @@ import java.util.AbstractMap.*;
 import java.util.Map.*;
 import java.util.zip.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -37,16 +36,14 @@ abstract class ArchiveFn extends StandardFunc {
    * @param value value to be encoded
    * @param encoding encoding (can be {@code null})
    * @param enforce enforce conversion for UTF-8
-   * @param qc query context
    * @return encoded string
    * @throws QueryException query exception
    */
-  final byte[] encode(final byte[] value, final String encoding, final boolean enforce,
-      final QueryContext qc) throws QueryException {
+  final byte[] encode(final byte[] value, final String encoding, final boolean enforce)
+      throws QueryException {
     if(encoding == Strings.UTF8 && !enforce) return value;
-    final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
     try(TextInput ti = new TextInput(new ArrayInput(value), encoding)) {
-      return ti.fallback(!validate).content();
+      return ti.fallback(false).content();
     } catch(final IOException ex) {
       throw ARCHIVE_ENCODE2_X.get(info, ex);
     }
@@ -165,7 +162,7 @@ abstract class ArchiveFn extends StandardFunc {
     if(content instanceof final Bin bin) {
       out.write(ze, bin, info, qc);
     } else if(content != XQArray.empty()) {
-      out.write(ze, encode(toBytes(content, qc), encoding(header), false, qc));
+      out.write(ze, encode(toBytes(content, qc), encoding(header), false));
     }
   }
 
@@ -198,7 +195,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final int level(final Item header) throws QueryException {
     if(header instanceof final XNode node) {
-      final byte[] value  = node.attribute(Q_LEVEL);
+      final byte[] value = node.attribute(Q_LEVEL);
       if(value != null) {
         final int level = toInt(value);
         if(level < 0 || level > 9) throw ARCHIVE_LEVEL_X.get(info, value);
@@ -217,7 +214,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final long timestamp(final Item header, final QueryContext qc) throws QueryException {
     if(header instanceof final XNode node) {
-      final byte[] value  = node.attribute(Q_LAST_MODIFIED);
+      final byte[] value = node.attribute(Q_LAST_MODIFIED);
       try {
         if(value != null) return toMs(new Dtm(value, BasicType.DATE_TIME, info), qc);
       } catch(final QueryException ex) {
@@ -347,7 +344,7 @@ abstract class ArchiveFn extends StandardFunc {
           final SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class));
           try(ArchiveOut out = ArchiveOut.get(format, in.method(), info, so)) {
             while(in.more()) {
-              if(action.apply(in.entry(), out)) out.write(in);
+              if(action.apply(in.entry(), out)) out.write(in.entry(), in);
             }
             finish.apply(out);
           }

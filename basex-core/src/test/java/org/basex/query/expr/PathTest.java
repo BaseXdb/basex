@@ -268,6 +268,14 @@ public final class PathTest extends SandboxTest {
     query("let $x := 'f' return element f {} ! self::f[name() = $x]", "<f/>");
   }
 
+  /** Name comparisons in databases with prefixed names. */
+  @Test public void nameWithPrefixes() {
+    execute(new CreateDB(NAME, "<r xmlns:p='u'><p:city/><city/></r>"));
+    query("//*[name() = 'city'] ! name()", "city");
+    query("//*[name() = 'p:city'] ! name()", "p:city");
+    query("//*[name() = ('city', 'p:city')] ! name()", "p:city\ncity");
+  }
+
   /** Retrieve double values from disk. */
   @Test public void gh1206() {
     execute(new CreateDB(NAME, "<x>a</x>"));

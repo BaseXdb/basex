@@ -68,7 +68,7 @@ public abstract class CommandParser {
    * @param pth input path
    * @return self reference
    */
-  public final CommandParser path(final String  pth) {
+  public final CommandParser path(final String pth) {
     path = pth;
     return this;
   }

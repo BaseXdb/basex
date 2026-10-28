@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -47,7 +48,7 @@ public final class SerializerOptions extends Options {
       new StringOption("cdata-section-elements", "", Types.QNAME_ZM);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> CSV_HEADER =
-      new EnumOption<>("csv-header", YesNo.NO, YES_NO);
+      new EnumOption<>("csv-header", YesNo.class, YES_NO);
   /** Serialization parameter: single character. */
   public static final StringOption CSV_QUOTE_CHARACTER =
       new StringOption("csv-quote-character", null, Types.STRING_ZO);
@@ -126,21 +127,12 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());
-  /** Serialization parameter: line ending (takes precedence over 'newline' if assigned). */
+  /** Serialization parameter: line ending (default: system line separator). */
   public static final StringOption LINE_ENDING =
       new StringOption("line-ending", null, Types.STRING_ZO);
-  /** Specific serialization parameter: newline. */
-  public static final EnumOption<Newline> NEWLINE =
-      new EnumOption<>("newline",
-        "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL,
-        Types.STRING_ZO);
-  /** Serialization parameter: indentation unit (takes precedence over 'tabulator'/'indents'). */
+  /** Serialization parameter: indentation unit (default: two spaces). */
   public static final StringOption INDENT_UNIT =
       new StringOption("indent-unit", null, Types.STRING_ZO);
-  /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final EnumOption<YesNo> TABULATOR = new EnumOption<>("tabulator", YesNo.NO, YES_NO);
-  /** Specific serialization parameter: number of spaces to indent. */
-  public static final NumberOption INDENTS = new NumberOption("indents", 2);
   /** Specific serialization parameter: maximum number of bytes to serialize. */
   public static final NumberOption LIMIT = new NumberOption("limit", -1);
   /** Specific serialization parameter: binary serialization. */
@@ -164,41 +156,6 @@ public final class SerializerOptions extends Options {
     METHOD, CANONICAL, NORMALIZATION_FORM, MEDIA_TYPE, HTML_VERSION, INCLUDE_CONTENT_TYPE,
     JSON_LINES, JSON_NODE_OUTPUT_METHOD
   );
-
-  /** Newlines. */
-  public enum Newline {
-    /** NL.   */ NL("\\n", "\n"),
-    /** CR.   */ CR("\\r", "\r"),
-    /** CRNL. */ CRNL("\\r\\n", "\r\n");
-
-    /** Name. */
-    private final String name;
-    /** Newline. */
-    private final String newline;
-
-    /**
-     * Constructor.
-     * @param name name
-     * @param newline newline string
-     */
-    Newline(final String name, final String newline) {
-      this.name = name;
-      this.newline = newline;
-    }
-
-    /**
-     * Returns the newline string.
-     * @return newline string
-     */
-    String newline() {
-      return newline;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-  }
 
   /**
    * Checks if the specified option is true.
@@ -292,7 +249,7 @@ public final class SerializerOptions extends Options {
         for(final Option<?> option : this) {
           if(!CANONICAL_OPTIONS.contains(option)) put(option, option.value());
         }
-        set(NEWLINE, Newline.NL);
+        set(LINE_ENDING, "\n");
       } else {
         set(CANONICAL, YesNo.NO);
       }
@@ -315,11 +272,45 @@ public final class SerializerOptions extends Options {
       return MediaType.APPLICATION_XML;
     if(sm.oneOf(SerialMethod.XHTML, SerialMethod.HTML)) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) {
-      return get(JSON_LINES) == YesNo.YES ? MediaType.APPLICATION_JSONL :
-        MediaType.APPLICATION_JSON;
+      return yes(JSON_LINES) ? MediaType.APPLICATION_JSONL : MediaType.APPLICATION_JSON;
     }
     if(sm == SerialMethod.CSV) return MediaType.TEXT_CSV;
     return MediaType.TEXT_PLAIN;
+  }
+
+  /**
+   * Returns the media type for the specified result.
+   * @param value result
+   * @return media type
+   */
+  public MediaType mediaType(final Value value) {
+    return mediaType(value.size() == 1 && Types.DOCUMENT_OR_ELEMENT_ZO.instance(value),
+        Types.BINARY_O.instance(value));
+  }
+
+  /**
+   * Returns the media type for results of the specified type.
+   * @param st sequence type
+   * @return media type
+   */
+  public MediaType mediaType(final SeqType st) {
+    return mediaType(st.one() && st.instanceOf(Types.DOCUMENT_OR_ELEMENT_ZO),
+        st.instanceOf(Types.BINARY_O));
+  }
+
+  /**
+   * Returns the media type for results of the default and the adaptive output method.
+   * @param xml single element or document with one element
+   * @param binary single binary item
+   * @return media type
+   */
+  private MediaType mediaType(final boolean xml, final boolean binary) {
+    final SerialMethod sm = get(METHOD);
+    if(!get(MEDIA_TYPE).isEmpty() || !sm.oneOf(SerialMethod.BASEX, SerialMethod.ADAPTIVE)) {
+      return mediaType();
+    }
+    return xml ? MediaType.APPLICATION_XML : binary && sm == SerialMethod.BASEX ?
+      MediaType.APPLICATION_OCTET_STREAM : MediaType.TEXT_PLAIN;
   }
 
   /**
@@ -329,7 +320,7 @@ public final class SerializerOptions extends Options {
    * @return character map or {@code null} if map is invalid
    * @throws QueryException query exception
    */
-  public static String characterMap(final GNode elem, final InputInfo info) throws QueryException {
+  private static String characterMap(final GNode elem, final InputInfo info) throws QueryException {
     final Supplier<QueryException> error = () -> SERDOC_X.get(info,
         Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
     if(elem.attributeIter().next() != null) throw error.get();

@@ -107,16 +107,11 @@ final class PlainDoc extends Inspect {
 
     final TokenObjectMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ft.argTypes.length;
-    QNm[] names = null;
-    if(sf != null) {
-      names = new QNm[al];
-      for(int n = 0; n < al; n++) names[n] = sf.params[n].name;
-    }
-
     for(int a = 0; a < al; a++) {
       final FBuilder argument = element("argument");
-      if(names != null) {
-        final byte[] name = names[a].string(), uri = names[a].uri(), pdoc = doc(doc, name);
+      if(sf != null) {
+        final QNm pname = sf.params[a].name;
+        final byte[] name = pname.string(), uri = pname.uri(), pdoc = doc(doc, name);
         argument.attr(Q_NAME, name);
         if(uri.length != 0) argument.attr(Q_URI, uri);
 

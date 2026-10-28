@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
 public final class WsBroadcast extends WsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    WsPool.broadcast(arg(0).item(qc, info), ws(qc).id);
+    WsPool.broadcast(message(qc), ws(qc).id, info);
     return Empty.VALUE;
   }
 }

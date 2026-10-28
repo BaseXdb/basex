@@ -23,7 +23,6 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.FnParseXml.*;
@@ -46,17 +45,13 @@ import org.basex.util.options.*;
 public final class Client {
   /** Input information (can be {@code null}). */
   private final InputInfo info;
-  /** Database options. */
-  private final MainOptions options;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param options main options
    */
-  public Client(final InputInfo info, final MainOptions options) {
+  public Client(final InputInfo info) {
     this.info = info;
-    this.options = options;
   }
 
   /**
@@ -72,13 +67,13 @@ public final class Client {
       final QueryContext qc) throws QueryException {
 
     final QueryResources resources = qc.resources;
+    final MainOptions options = qc.dbOptions();
     final Request request = new RequestParser(info).parse(node, bodies);
     final URI uri = uri(href, request);
-    final MainOptions mopts = new MainOptions(options);
     try {
-      final MainOptions xmlOptions = parsers(mopts, request, qc);
+      final MainOptions xmlOptions = parsers(options, request, qc);
       final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
-      return new Response(info, mopts, resources).getResponse(response, request.bodyMode,
+      return new Response(info, options, resources).getResponse(response, request.bodyMode,
           request.overrideMediaType, xmlOptions);
     } catch(final IOException ex) {
       throw error(ex, info);
@@ -98,12 +93,12 @@ public final class Client {
       final FuncDefinition definition) throws QueryException {
 
     final QueryResources resources = qc.resources;
-    final MainOptions mopts = new MainOptions(options);
+    final MainOptions options = qc.dbOptions();
     try {
       final URI uri = uri(Token.token(href), request);
-      final MainOptions xmlOptions = parsers(mopts, request, qc);
+      final MainOptions xmlOptions = parsers(options, request, qc);
       final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
-      return new Response(info, mopts, resources, definition).getRecord(response,
+      return new Response(info, options, resources, definition).getRecord(response,
           request.bodyMode, request.charset, xmlOptions);
     } catch(final RedirectException ex) {
       throw HTTP_REDIRECT_X.get(info, ex.getMessage());
@@ -131,23 +126,23 @@ public final class Client {
 
   /**
    * Assigns the parse options of the HTTP Client Module 2.0.
-   * @param mopts main options
+   * @param options main options
    * @param request request data
    * @param qc query context
-   * @return main options
+   * @return options for parsing XML responses (can be {@code null})
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private MainOptions parsers(final MainOptions mopts, final Request request,
+  private MainOptions parsers(final MainOptions options, final Request request,
       final QueryContext qc) throws IOException, QueryException {
 
     final XQMap map = request.parseOptions;
-    mopts.set(MainOptions.CSVPARSER, assign(
-      new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), request.csv, map, "csv", qc));
-    mopts.set(MainOptions.JSONPARSER, assign(
-      new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), request.json, map, "json", qc));
-    mopts.set(MainOptions.HTMLPARSER, assign(
-      new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), request.html, map, "html", qc));
+    options.set(MainOptions.CSVPARSER, assign(
+      new CsvParserOptions(options.get(MainOptions.CSVPARSER)), request.csv, map, "csv", qc));
+    options.set(MainOptions.JSONPARSER, assign(
+      new JsonParserOptions(options.get(MainOptions.JSONPARSER)), request.json, map, "json", qc));
+    options.set(MainOptions.HTMLPARSER, assign(
+      new HtmlOptions(options.get(MainOptions.HTMLPARSER)), request.html, map, "html", qc));
 
     if(request.xml == null && !(map != null && map.get(Str.get("xml")) instanceof XQMap))
       return null;
@@ -159,7 +154,7 @@ public final class Client {
        opts.get(ParseXmlOptions.USE_XSI_SCHEMA_LOCATION)) {
       throw HC_REQ_X.get(info, "External resources are not permitted for response bodies");
     }
-    return new MainOptions(opts, qc.context.options).allowExternal(false);
+    return new MainOptions(opts, options).allowExternal(false);
   }
 
   /**
@@ -650,7 +645,7 @@ public final class Client {
 
     // choose serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.NEWLINE, Newline.NL);
+    sopts.set(SerializerOptions.LINE_ENDING, "\n");
 
     String method = null, type = null;
     for(final Entry<String, String> entry : atts.entrySet()) {

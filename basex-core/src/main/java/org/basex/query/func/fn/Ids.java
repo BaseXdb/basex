@@ -31,16 +31,6 @@ abstract class Ids extends ContextFn {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return ids(qc);
-  }
-
-  /**
-   * Returns referenced nodes.
-   * @param qc query context
-   * @return referenced nodes
-   * @throws QueryException query exception
-   */
-  private Value ids(final QueryContext qc) throws QueryException {
     final Expr values = arg(0);
     final Iter ir = values.atomIter(qc, info);
     final XNode node = toNodeOrNull(arg(1), qc);

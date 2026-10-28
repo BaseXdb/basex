@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,8 +19,17 @@ import org.basex.query.value.type.*;
 public final class FnString extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = contextArg(qc).unwrappedItem(qc, info);
+    return string(contextArg(qc).unwrappedItem(qc, info), info);
+  }
 
+  /**
+   * Returns the string value of an item.
+   * @param value item
+   * @param info input info (can be {@code null})
+   * @return string item
+   * @throws QueryException query exception
+   */
+  static Item string(final Item value, final InputInfo info) throws QueryException {
     if(value.isEmpty()) return Str.EMPTY;
     if(value.type == BasicType.STRING) return value;
     if(!(value instanceof FItem) || value instanceof XQJava) return Str.get(value.string(info));
@@ -60,11 +70,10 @@ public final class FnString extends ContextFn {
     Expr expr = this;
     final Expr item = usesContext() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
-    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && st.type.isStringOrUntyped() &&
-        st.one()) {
+    if(mode.stringifying() && st.type.isStringOrUntyped() && st.one()) {
       // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
-    } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    } else if(mode.conditional()) {
       // boolean(string($number)) → true()
       if(st.instanceOf(Types.NUMERIC_O)) return Bln.TRUE;
       // boolean(string($node)) → boolean($node/descendant::text())

@@ -52,13 +52,11 @@ public final class ModuleLoader {
    */
   public void close() {
     for(final Object jm : javaModules) {
-      for(final Class<?> c : jm.getClass().getInterfaces()) {
-        if(c == QueryResource.class) {
-          try {
-            ((QueryResource) jm).close();
-          } catch(final RuntimeException ex) {
-            Util.debug(ex);
-          }
+      if(jm instanceof final QueryResource qr) {
+        try {
+          qr.close();
+        } catch(final RuntimeException ex) {
+          Util.debug(ex);
         }
       }
     }
@@ -86,34 +84,27 @@ public final class ModuleLoader {
       className = uri.substring(JAVA_PREFIX_COLON.length());
     } else {
       // no "java:" prefix: check EXPath repositories
-      final HashSet<String> pkgs = context.repo.nsDict().get(uri);
-      if(pkgs != null) {
-        Version ver = null;
-        String id = null;
-        for(final String pkg : pkgs) {
-          final Version v = new Version(Pkg.version(pkg));
-          if(ver == null || v.compareTo(ver) > 0) {
-            ver = v;
-            id = pkg;
-          }
+      Version ver = null;
+      String id = null;
+      for(final Pkg pkg : context.repo.pkgs(uri)) {
+        final Version v = new Version(pkg.version);
+        if(ver == null || v.compareTo(ver) > 0) {
+          ver = v;
+          id = pkg.id();
         }
-        if(id != null) {
-          addRepo(id, qp, info);
-          return true;
-        }
+      }
+      if(id != null) {
+        addRepo(id, qp, info);
+        return true;
       }
       // check XQuery modules
-      final IOFile repo = context.soptions.repoPath();
-      final String path = Strings.uri2path(uri);
-      for(final String suffix : IO.XQSUFFIXES) {
-        final IOFile file = new IOFile(repo, path + suffix);
-        if(file.exists()) {
-          qp.module(file.path(), uri, info);
-          return true;
-        }
+      final IOFile file = file(context.soptions.repoPath(), uri);
+      if(file != null) {
+        qp.module(file.path(), uri, info);
+        return true;
       }
       // convert to Java notation
-      className = Strings.uriToClasspath(path);
+      className = Strings.uriToClasspath(Strings.uri2path(uri));
     }
     className = JavaCall.classPath(className);
 
@@ -126,9 +117,12 @@ public final class ModuleLoader {
       if(java) throw WHICHMODCLASS_X.get(info, className).cause(ex);
       Util.debug(ex);
       return false;
-    } catch(final Throwable th) {
-      final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, className, t.getMessage(), Util.className(t)).cause(th);
+    } catch(final IOException | LinkageError ex) {
+      throw MODINIT_X_X_X.get(info, className, ex.getMessage(), Util.className(ex)).cause(ex);
+    }
+    // classes outside the repository must be query modules, or require admin permission
+    if(!QueryModule.class.isAssignableFrom(clz) && !repository(clz)) {
+      qp.checkExternal(className, info);
     }
 
     // instantiate class
@@ -141,7 +135,34 @@ public final class ModuleLoader {
   }
 
   /**
-   * Returns a reference to the specified class.
+   * Returns the file of an XQuery module in the repository.
+   * @param repo repository path
+   * @param uri module URI
+   * @return module file, or {@code null} if it does not exist
+   */
+  public static IOFile file(final IOFile repo, final String uri) {
+    final String path = Strings.uri2path(uri);
+    for(final String suffix : IO.XQSUFFIXES) {
+      final IOFile file = new IOFile(repo, path + suffix);
+      if(file.exists()) return file;
+    }
+    return null;
+  }
+
+  /**
+   * Checks if the specified class was loaded from the repository.
+   * @param clz class
+   * @return result of check
+   */
+  private boolean repository(final Class<?> clz) {
+    for(final Loader loader : loaders) {
+      if(loader.defines(clz)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns a reference to the specified class without initializing it.
    * @param name fully qualified class name
    * @return found class
    * @throws ClassNotFoundException class not found exception
@@ -149,8 +170,12 @@ public final class ModuleLoader {
   public Class<?> findClass(final String name) throws ClassNotFoundException {
     Class<?> c = resolved.get(name);
     if(c != null) return c;
-    c = Reflect.find(name);
-    if(c != null) return c;
+    try {
+      return Reflect.forName(name, false);
+    } catch(final ClassNotFoundException | LinkageError ex) {
+      // class is not on the classpath, or the case of the name is wrong
+      Util.debug(ex);
+    }
     for(int i = loaders.size() - 1; i >= 0; --i) {
       c = loaders.get(i).find(name);
       if(c != null) {
@@ -237,15 +262,9 @@ public final class ModuleLoader {
       @Override
       protected Iterable<String> next(final String pkgId) throws QueryException {
         // find package in package dictionary
-        Pkg pkg = context.repo.pkgDict().get(pkgId);
+        final Pkg pkg = context.repo.pkgDict().get(pkgId);
         if(pkg == null) throw REPO_NOTFOUND_X.get(info, pkgId);
         final IOFile pkgPath = context.repo.path(pkg.path());
-
-        // parse package descriptor
-        final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
-        if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, pkgId);
-
-        pkg = new PkgParser(info).parse(pkgDesc);
         final IOFile modDir = pkg.modDir(pkgPath);
         try {
           addLoader(pkgUrls(pkgPath, modDir, info));

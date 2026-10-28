@@ -23,7 +23,7 @@ public final class IndexNames {
   /** Index type. */
   private final IndexType type;
   /** First invalid entry (can be {@code null}). */
-  private String invalid;
+  private final String invalid;
 
   /**
    * Constructor.
@@ -33,30 +33,7 @@ public final class IndexNames {
   public IndexNames(final IndexType type, final Data data) {
     this.data = data;
     this.type = type;
-    for(final String entry : NamesOption.split(data.meta.names(type))) {
-      // global wildcard: ignore all assignments
-      if(entry.equals("*") || entry.equals("*:*")) {
-        qnames.reset();
-        return;
-      }
-
-      final byte[] name, uri;
-      final byte[][] parsed = QNm.parseExpanded(token(entry), true);
-      if(parsed != null) { // Q{uri}name, Q{uri}*
-        name = parsed[0];
-        uri = parsed[1];
-      } else if(entry.startsWith("*:")) { // *:name
-        name = token(entry.substring(2));
-        uri = null;
-      } else if(XMLToken.isNCName(token(entry))) { // name
-        name = token(entry);
-        uri = EMPTY;
-      } else { // invalid
-        if(invalid == null) invalid = entry;
-        continue;
-      }
-      qnames.add(name, uri);
-    }
+    invalid = parse(data.meta.names(type), qnames);
   }
 
   /**
@@ -64,7 +41,62 @@ public final class IndexNames {
    * @throws BaseXException database exception
    */
   public void check() throws BaseXException {
+    raise(type, invalid);
+  }
+
+  /**
+   * Raises an error if a name in the specified list is invalid.
+   * @param type index type
+   * @param names names to be included
+   * @throws BaseXException database exception
+   */
+  public static void check(final IndexType type, final String names) throws BaseXException {
+    raise(type, parse(names, new Atts()));
+  }
+
+  /**
+   * Raises an error if an invalid name was found.
+   * @param type index type
+   * @param invalid first invalid entry (can be {@code null})
+   * @throws BaseXException database exception
+   */
+  private static void raise(final IndexType type, final String invalid) throws BaseXException {
     if(invalid != null) throw new BaseXException("Invalid name for % index: %.", type, invalid);
+  }
+
+  /**
+   * Parses a list of names and adds local names and namespace URIs.
+   * @param names names to be included
+   * @param qnames local names and namespace URIs (will be reset if a global wildcard is found)
+   * @return first invalid entry (can be {@code null})
+   */
+  private static String parse(final String names, final Atts qnames) {
+    String invalid = null;
+    for(final String entry : NamesOption.split(names)) {
+      // global wildcard: ignore all assignments
+      if(entry.equals("*") || entry.equals("*:*")) {
+        qnames.reset();
+        return null;
+      }
+
+      final byte[] token = token(entry), name, uri;
+      final byte[][] parsed = QNm.parseExpanded(token, true);
+      if(parsed != null) { // Q{uri}name, Q{uri}*
+        name = parsed[0];
+        uri = parsed[1];
+      } else if(entry.startsWith("*:")) { // *:name
+        name = substring(token, 2);
+        uri = null;
+      } else if(XMLToken.isNCName(token)) { // name
+        name = token;
+        uri = EMPTY;
+      } else { // invalid
+        if(invalid == null) invalid = entry;
+        continue;
+      }
+      qnames.add(name, uri);
+    }
+    return invalid;
   }
 
   /**

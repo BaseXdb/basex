@@ -11,6 +11,7 @@ import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -128,7 +129,7 @@ abstract class RESTCmd extends Command {
   static void assignOptions(final RESTSession session) throws QueryException, IOException {
     final HTTPConnection conn = session.conn;
     for(final Entry<String, String[]> entry : conn.requestCtx.queryStrings().entrySet()) {
-      assign(conn.context.options, entry, true);
+      assign(conn.context.options, entry, true, conn.context.user());
     }
   }
 
@@ -137,24 +138,39 @@ abstract class RESTCmd extends Command {
    * @param options options
    * @param entry current parameter
    * @param enforce force assignment
+   * @param user user
    * @return success flag
    * @throws HTTPException HTTP exception
    */
   static boolean assign(final Options options, final Entry<String, String[]> entry,
-      final boolean enforce) throws HTTPException {
+      final boolean enforce, final User user) throws HTTPException {
 
     String key = entry.getKey();
     if(options instanceof MainOptions) key = key.toUpperCase(Locale.ENGLISH);
-    if(options.option(key) == null) {
+    final Option<?> option = options.option(key);
+    if(option == null) {
       if(enforce) throw HTTPStatus.UNKNOWN_PARAM_X.get(key);
       return false;
     }
+    check(option, user);
 
     try {
       options.assign(key, entry.getValue()[0]);
       return true;
     } catch(final BaseXException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
+    }
+  }
+
+  /**
+   * Rejects options that can only be assigned by admins.
+   * @param option option (can be {@code null})
+   * @param user user
+   * @throws HTTPException HTTP exception
+   */
+  static void check(final Option<?> option, final User user) throws HTTPException {
+    if(MainOptions.admin(option) && !user.has(Perm.ADMIN)) {
+      throw HTTPStatus.FORBIDDEN_X.get(Util.info(Text.PERM_REQUIRED_X, Perm.ADMIN));
     }
   }
 }

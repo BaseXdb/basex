@@ -495,10 +495,7 @@ public class CmpG extends Cmp {
 
   @Override
   public final CmpG invert() {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.atomOcc() == Occ.EXACTLY_ONE && st2.atomOcc() == Occ.EXACTLY_ONE ?
-      new CmpG(info, expr1, expr2, op.invert()) : null;
+    return invertible() ? new CmpG(info, exprs[0], exprs[1], op.invert()) : null;
   }
 
   @Override
@@ -521,7 +518,7 @@ public class CmpG extends Cmp {
 
     // if required, invert second operator (first operator need never be inverted)
     final boolean not2 = NOT.is(expr);
-    Expr expr2 = not2 ? expr.arg(0) : expr;
+    final Expr expr2 = not2 ? expr.arg(0) : expr;
     if(!(expr2 instanceof final CmpG cmp2)) return null;
 
     // compare first and second comparison
@@ -529,8 +526,11 @@ public class CmpG extends Cmp {
     if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
       return null;
 
-    // function for creating new comparison
+    // inverted order comparisons are only equivalent if no operand can be NaN
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
+    if((not2 || !or) && !nanSafe(op, exprL, exprR1, exprR2)) return null;
+
+    // function for creating new comparison
     final QueryFunction<CmpOp, Expr> newList = newOp -> {
       final Expr exprR = List.get(cc, info, exprR1, exprR2);
       return new CmpG(info, exprL, exprR, newOp).optimize(cc);
@@ -548,29 +548,25 @@ public class CmpG extends Cmp {
       /* rewriting is possible in all other cases. examples:
        * $number != 1  or  not($number = 2)  → $number != (1, 2)
        * $numbers = 2  or  $numbers = (3, 4) → $numbers = (2, 3, 4)  */
-      expr2 = newList.apply(op);
-    } else {
-      /* do not merge if left operand or first right operand is not a single item, or if
-       * second comparison was inverted and right operand is not a single item. examples:
-       * $numbers = 2      and  $numbers = 2
-       * $number = (1, 2)  and  $number  = 3
-       * $number = 1       and  not($number = (2, 3))  */
-      if(seqL || seqR1 || seqR2 && !not2) return null;
-      /* rewriting is possible in all other cases. examples:
-       * $number != 1  and  $number != 2            → not($number = (1, 2))
-       * $numbers = 2  and  not($numbers != (3, 4)) → not($numbers != (2, 3, 4))  */
-      expr2 = cc.function(NOT, info, newList.apply(op.invert()));
+      return newList.apply(op);
     }
-
-    // return merged expression
-    return expr2;
+    /* do not merge if left operand or first right operand is not a single item, or if
+     * second comparison was inverted and right operand is not a single item. examples:
+     * $numbers = 2      and  $numbers = 2
+     * $number = (1, 2)  and  $number  = 3
+     * $number = 1       and  not($number = (2, 3))  */
+    if(seqL || seqR1 || seqR2 && !not2) return null;
+    /* rewriting is possible in all other cases. examples:
+     * $number != 1  and  $number != 2            → not($number = (1, 2))
+     * $numbers = 2  and  not($numbers != (3, 4)) → not($numbers != (2, 3, 4))  */
+    return cc.function(NOT, info, newList.apply(op.invert()));
   }
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // E[node-name() = #a] → E[self::a]
-    final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
+    final Expr ex = mode.conditional() ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }
 
@@ -594,35 +590,32 @@ public class CmpG extends Cmp {
       final ArrayList<QNm> qnames = new ArrayList<>();
       Scope scope = null;
       if(expr2.seqType().type.isStringOrUntyped()) {
-        // local-name() eq 'a' → self::*:a
-        if(LOCAL_NAME.is(fn)) {
+        if(NAMESPACE_URI.is(fn)) {
+          // namespace-uri() = ('URI1', 'URI2') → self::Q{URI1}* | self::Q{URI2}*
+          scope = Scope.URI;
+          for(final Item item : value) {
+            qnames.add(new QNm(Token.cpToken(':'), item.string(info)));
+          }
+        } else if(LOCAL_NAME.is(fn)) {
+          // local-name() eq 'a' → self::*:a
           scope = Scope.LOCAL;
           for(final Item item : value) {
             final byte[] name = item.string(info);
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
           }
-        } else if(NAMESPACE_URI.is(fn)) {
-          // namespace-uri() = ('URI1', 'URI2') → self::Q{URI1}* | self::Q{URI2}*
+        } else if(NAME.is(fn) && val.data() instanceof final Data data &&
+            Token.eq(data.defaultNs(), Token.EMPTY)) {
+          // (db-without-default-ns)[name() = 'city'] → (db-without-default-ns)[self::Q{}city]
+          scope = Scope.FULL;
           for(final Item item : value) {
-            final byte[] uri = item.string(info);
-            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
-          }
-          if(qnames.size() == value.size()) scope = Scope.URI;
-        } else if(NAME.is(fn)) {
-          // (db-without-ns)[name() = 'city'] → (db-without-ns)[self::city]
-          final Data data = cc.qc.focus.value.data();
-          final byte[] dataNs = data != null ? data.defaultNs() : null;
-          if(dataNs != null && dataNs.length == 0) {
-            scope = Scope.LOCAL;
-            for(final Item item : value) {
-              final byte[] name = item.string(info);
-              if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
-            }
+            final byte[] name = item.string(info);
+            if(!XMLToken.isNCName(name)) return this;
+            qnames.add(new QNm(name, Token.EMPTY));
           }
         }
       } else if(NODE_NAME.is(fn) && expr2.seqType().type == BasicType.QNAME) {
         // node-name() = #prefix:local → self::prefix:local
-        scope = NameTest.Scope.FULL;
+        scope = Scope.FULL;
         for(final Item item : value) {
           qnames.add((QNm) item);
         }
@@ -672,7 +665,6 @@ public class CmpG extends Cmp {
     cmp.eager = eager;
     return super.copyType(cmp);
   }
-
 
   @Override
   public final boolean equals(final Object obj) {

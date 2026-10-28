@@ -29,10 +29,6 @@ public final class DBFlush extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() {
     if(!autoflush) data.flush(true);
   }

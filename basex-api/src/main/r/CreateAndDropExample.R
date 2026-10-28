@@ -1,12 +1,12 @@
 # Basic example. Show 2 different ways to create a database.
 # Works with BaseX 8.0 and later
 #
-# Documentation: https://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/main/Clients
 #
 # (C) Ben Engbers
 
 # This example requires a running database server instance.
-# Documentation: https://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/main/Clients
 
 # @author BaseX Team, BSD License
 

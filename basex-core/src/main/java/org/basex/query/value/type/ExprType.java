@@ -108,8 +108,7 @@ public final class ExprType {
    * @return self reference
    */
   public ExprType assign(final SeqType st) {
-    // a void type (xs:error) has no instances and never returns, so its result size is unknown;
-    // otherwise the size is derived from the occurrence indicator
+    // xs:error has no instances and never returns, so its result size is unknown
     if(st != seqType) asg(st, st.voidType() ? -1 : st.zero() ? 0 : st.one() ? 1 : -1);
     return this;
   }

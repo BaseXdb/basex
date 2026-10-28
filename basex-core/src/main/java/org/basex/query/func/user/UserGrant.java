@@ -26,12 +26,6 @@ public final class UserGrant extends UserFn {
     final StringList patterns = toPatterns(arg(2), qc);
 
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
-    final int ps = perms.size();
-    for(int p = 0; p < ps; p++) {
-      if(!patterns.get(p).isEmpty() && (perms.get(p) == Perm.CREATE || perms.get(p) == Perm.ADMIN))
-        throw USER_LOCAL.get(info);
-    }
-
     qc.updates().add(new Grant(user, perms, patterns, qc, info), qc);
     return Empty.VALUE;
   }

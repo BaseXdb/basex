@@ -17,4 +17,10 @@ public final class FnFunctionArity extends StandardFunc {
 
     return Itr.get(function.arity());
   }
+
+  @Override
+  public int hofOffsets() {
+    // the function is inspected, not invoked
+    return 0;
+  }
 }

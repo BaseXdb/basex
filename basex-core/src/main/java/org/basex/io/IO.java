@@ -150,6 +150,7 @@ public abstract class IO {
     return s.indexOf('<') == 0 ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOFile.toPath(s)) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
+           IOUrl.isOpaque(s)   ? new IOContent(s) :
            IOFile.isValid(s)   ? new IOFile(s) :
            new IOContent(s);
   }
@@ -285,7 +286,7 @@ public abstract class IO {
         Util.stack(ex);
       }
     }
-    return get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
+    return get(dir() + path);
   }
 
   /**
@@ -339,6 +340,15 @@ public abstract class IO {
   }
 
   /**
+   * Returns a position string for a line of the resource.
+   * @param line line number
+   * @return position string
+   */
+  public final String position(final int line) {
+    return pth.isEmpty() ? Util.info(Text.LINE_X, line) : Util.info(Text.SCANPOS_X_X, pth, line);
+  }
+
+  /**
    * Returns the directory path (all characters up to the last slash).
    * No check will be performed if the directory exists.
    * @return directory path
@@ -378,12 +388,7 @@ public abstract class IO {
    */
   public static boolean checkSuffix(final String path, final String... suffixes) {
     final int i = path.lastIndexOf('.');
-    if(i == -1) return false;
-    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-    for(final String suffix : suffixes) {
-      if(suf.equals(suffix)) return true;
-    }
-    return false;
+    return i != -1 && Strings.eq(path.substring(i).toLowerCase(Locale.ENGLISH), suffixes);
   }
 
   /**

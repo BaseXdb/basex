@@ -248,7 +248,7 @@ final class Unit {
         error.node(element(ue.expected, ue.expectedType, Q_EXPECTED, ue.count));
       } else if(!fail) {
         // exception other than failure: add type
-        error.attr(Q_TYPE, ex.qname().prefixId(QueryText.ERROR_URI));
+        error.attr(Q_TYPE, name.prefixId(QueryText.ERROR_URI));
       }
 
       // add info

@@ -73,8 +73,6 @@ public final class Context {
 
   /** Marked nodes. {@code null} if database is closed. */
   public DBNodes marked;
-  /** Copied nodes. {@code null} if database is closed. */
-  public DBNodes copied;
   /** Focused node. */
   public int focused = -1;
 
@@ -135,6 +133,7 @@ public final class Context {
   public Context(final StaticOptions soptions) {
     this.soptions = soptions;
     options = new MainOptions();
+    options.setSystem();
     datas = new Datas();
     sessions = new Sessions();
     blocker = new ClientBlocker();
@@ -180,6 +179,8 @@ public final class Context {
    */
   public void user(final User us) {
     user = us;
+    // external resources require ADMIN permission
+    options.allowExternal(us.has(Perm.ADMIN));
   }
 
   /**
@@ -247,7 +248,6 @@ public final class Context {
    */
   public void openDB(final Data dt) {
     data = dt;
-    copied = null;
     set(null, new DBNodes(dt));
   }
 
@@ -256,7 +256,6 @@ public final class Context {
    */
   public void closeDB() {
     data = null;
-    copied = null;
     set(null, null);
   }
 

@@ -37,7 +37,7 @@ public final class Export extends Command {
    * @param path export path
    */
   public Export(final String path) {
-    super(Perm.CREATE, true, path);
+    super(Perm.ADMIN, true, path);
   }
 
   @Override

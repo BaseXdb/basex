@@ -24,26 +24,22 @@ public final class HTMLExample {
     final Context ctx = new Context();
 
     // Input file and name of database
-    final String file = "http://news.google.com/index.html";
+    final String file = "src/main/resources/html/news.html";
     final String name = "htmlexample";
 
     // Import the specified file
     System.out.println("\n* Import: \"" + file + "\".");
-
-    new Set("parser", "html").execute(ctx);
+    new Set("PARSER", "html").execute(ctx);
     new CreateDB(name, file).execute(ctx);
 
     // Perform query
-    System.out.println("\n* First 10 headlines:");
-
-    String query =
-      "(for $i in //*:h2/*:a/*:span[@class='titletext']" +
-      "return <news>{ $i/text() }</news>)[position() <= 10]";
-    System.out.println(new XQuery(query).execute(ctx));
+    System.out.println("\n* Headlines:");
+    System.out.println(new XQuery("""
+        for $a in //li/a
+        return <news href='{ $a/@href }'>{ string($a) }</news>""").execute(ctx));
 
     // Drop database and close context
     System.out.println("\n* Drop database.");
-
     new DropDB(name).execute(ctx);
     ctx.close();
   }

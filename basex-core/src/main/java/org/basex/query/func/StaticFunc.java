@@ -40,7 +40,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Memoization flag. */
   private final boolean memo;
 
-  /** Indicates if the query focus is accessed or modified. */
+  /** Indicates if the function body neither accesses nor modifies the query focus. */
   private boolean simple;
   /** Indicates if the function body enforces the declared return type. */
   private boolean checked;
@@ -281,6 +281,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public QNm paramName(final int pos) {
     return params[pos].name;
+  }
+
+  /**
+   * Returns the names of all parameters.
+   * @return parameter names
+   */
+  public QNm[] paramNames() {
+    final int pl = params.length;
+    final QNm[] names = new QNm[pl];
+    for(int p = 0; p < pl; p++) names[p] = params[p].name;
+    return names;
   }
 
   @Override

@@ -31,7 +31,6 @@ public final class DialogPass extends BaseXDialog {
     super(gui, ALTER_PW);
 
     pass = new BaseXPassword(this);
-    pass.addKeyListener(keys);
     info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));

@@ -85,8 +85,8 @@ public final class FnReverse extends StandardFunc {
     if(TRUNK.is(input) && REVERSE.is(input.arg(0)))
       return cc.function(TAIL, info, input.arg(0).args());
     // reverse(replicate(ZOO, count)) → replicate(ZOO, count)
-    if(REPLICATE.is(input) && !input.has(Flag.NDT))
-      if(input.arg(0).seqType().zeroOrOne()) return input;
+    if(REPLICATE.is(input) && !input.has(Flag.NDT) && input.arg(0).seqType().zeroOrOne())
+      return input;
 
     // reverse((E1, E2)) → reverse(E2), reverse(E1)
     if(input instanceof List) {
@@ -97,9 +97,9 @@ public final class FnReverse extends StandardFunc {
       return List.get(cc, input.info(info), list.finish());
     }
     // reverse(E[test]) → reverse(E)[test]
-    if(input instanceof final IterFilter filter) {
-      if(filter.root.size() != -1) return Filter.get(cc, info,
-          cc.function(REVERSE, filter.info(info), filter.root), filter.exprs);
+    if(input instanceof final IterFilter filter && filter.root.size() != -1) {
+      return Filter.get(cc, info, cc.function(REVERSE, filter.info(info), filter.root),
+          filter.exprs);
     }
 
     adoptType(input);

@@ -14,9 +14,9 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Shape of a map: a fixed set of named, individually typed fields. A shape that is declared in a
- * query is a {@link RecordType}; all other shapes are inferred from map constructors and other
- * expressions with a statically known field set.
+ * Simple record type: a fixed set of named, individually typed fields that maps are matched against
+ * structurally. Shapes are declared in queries or inferred from expressions with a statically known
+ * field set; labeled record types are represented by {@link RecordType}.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -149,7 +149,7 @@ public class ShapeType extends MapType {
    */
   public final ShapeType refine(final SeqType... seqTypes) {
     final int fs = fields.size();
-    if(name() != null || seqTypes.length != fs) return this;
+    if(labeled() || seqTypes.length != fs) return this;
 
     final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fs);
     boolean narrowed = false;
@@ -206,7 +206,7 @@ public class ShapeType extends MapType {
     try {
       return fields.value(f).seqType().coerce(value, qc, ii, null, cc);
     } catch(final QueryException ex) {
-      if(ex.error() != INVTYPE_X) throw ex;
+      if(ex.error() != INVTYPE_X || ex.isInitializer()) throw ex;
       final String msg = ex.getLocalizedMessage();
       throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(
         fields.key(f), false)) + " of " + this + ": " +
@@ -236,11 +236,10 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this shape is declared in a query, i.e. if it carries a runtime type annotation
-   * and constrains field access.
+   * Indicates if this is a labeled record type, which is assigned to its records as label.
    * @return result of check
    */
-  boolean declared() {
+  boolean labeled() {
     return false;
   }
 
@@ -250,8 +249,15 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean sameIdentity(final ShapeType sh) {
-    final QNm id = name(), shid = sh.name();
-    return id == null ? shid == null : shid != null && id.eq(shid);
+    return Objects.equals(name(), sh.name()) && Objects.equals(module(), sh.module());
+  }
+
+  /**
+   * Returns the path of the declaring module of a private record.
+   * @return path (can be {@code null})
+   */
+  String module() {
+    return null;
   }
 
   /**
@@ -263,23 +269,18 @@ public class ShapeType extends MapType {
     return this == Types.RECORD;
   }
 
-  /**
-   * Indicates if lookups of undeclared fields raise an error, i.e. if this is a declared record
-   * type other than {@code record(*)}.
-   * @return result of check
-   */
-  public final boolean strict() {
-    return declared() && !any();
+  @Override
+  public Coercion coercion() {
+    Coercion coercion = Coercion.KEEP;
+    for(final ShapeField rf : fields.values()) {
+      coercion = coercion.max(rf.seqType().type.coercion());
+    }
+    return coercion;
   }
 
   @Override
-  public boolean coercive() {
-    return Checks.any(fields.values(), f -> f.seqType().type.coercive());
-  }
-
-  @Override
-  public boolean wraps() {
-    return Checks.any(fields.values(), f -> f.seqType().type.wraps());
+  public boolean assignable() {
+    return true;
   }
 
   @Override
@@ -317,8 +318,7 @@ public class ShapeType extends MapType {
     if(this == type) return true;
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
-    if(any() != sh.any() || declared() != sh.declared() ||
-        !sameIdentity(sh) || !sameOrder(sh)) return false;
+    if(labeled() != sh.labeled() || !sameIdentity(sh) || !sameOrder(sh)) return false;
 
     for(final byte[] key : fields) {
       final ShapeField f1 = fields.get(key), f2 = sh.fields.get(key);
@@ -342,20 +342,43 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Checks if the entries of a record match the fields of this structural record type.
-   * @param map record
+   * Checks if a map matches this record type.
+   * @param map map
+   * @param coerce item coercion
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean matches(final XQMap map) throws QueryException {
-    // records contain all fields of their type
-    if(!strict() || name() != null || !(map.type instanceof final ShapeType sh) ||
-        !sameFields(sh)) return false;
+  public boolean matches(final XQMap map, final boolean coerce) throws QueryException {
+    if(SeqType.keptStatic(map.type, this, coerce)) return true;
     final int fs = fields.size();
+    if(map.structSize() != fs) return false;
+    // coercion converts other keys to strings
+    if(coerce && !((MapType) map.type).keyType().instanceOf(BasicType.STRING)) return false;
+    // shape map with the same field order: access values by position
+    final boolean sameOrder = map instanceof XQShapeMap && sameOrder((ShapeType) map.type);
     for(int f = 1; f <= fs; f++) {
-      if(!fields.value(f).seqType().instance(map.getOrNull(key(f)), false)) return false;
+      final Value value = sameOrder ? map.valueAt(f - 1) : map.getOrNull(key(f));
+      if(value == null || !fields.value(f).seqType().instance(value, coerce)) return false;
     }
     return true;
+  }
+
+  /**
+   * Returns the index of the field with the specified name.
+   * @param key key
+   * @return field index (starting with 1), or {@code 0} if the key is no field name
+   * @throws QueryException query exception
+   */
+  public final int index(final Item key) throws QueryException {
+    if(!key.type.isStringOrUntyped()) return 0;
+    final byte[] name = key.string(null);
+    final int fs = fields.size();
+    if(fs > 8) return fields.index(name);
+    // few fields: comparing the names is cheaper than hashing the key
+    for(int f = 1; f <= fs; f++) {
+      if(Token.eq(name, fields.key(f))) return f;
+    }
+    return 0;
   }
 
   /**
@@ -365,26 +388,18 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
-      return true;
-    }
+    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
         if(instanceOf(TypeRef.deref(tp), pairs)) return true;
       }
       return false;
     }
-    // record(*) is only matched by record types
-    if(type == Types.RECORD) {
-      return declared();
-    }
+    // record(*) is only matched by labeled record types
+    if(type == Types.RECORD) return labeled();
     if(type instanceof final ShapeType sh) {
-      // an inferred shape is not an instance of a record (the annotation is an extra guarantee)
-      if(sh.declared() && !declared()) return false;
-      // record(*) has an unknown field set: it is only an instance of record(*)
-      if(any()) return false;
-      // a nominative record type is only a subtype of itself and of structural record types
-      if(sh.name() != null && !sameIdentity(sh)) return false;
+      // a labeled record type is only a subtype of itself (simple types have no name)
+      if(sh.labeled() && !sameIdentity(sh)) return false;
       if(!sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -439,15 +454,17 @@ public class ShapeType extends MapType {
               !fst.zero() && !shfst.zero()) {
             final Pair pair = new Pair(sh1, sh2);
             if(pairs.contains(pair)) return Types.MAP;
-            union = SeqType.get(sh1.union(sh2, pair.addTo(pairs)), fst.occ.union(shfst.occ));
+            final Set<Pair> set = pair.addTo(pairs);
+            union = SeqType.get(sh1.union(sh2, set), fst.occ.union(shfst.occ));
+            set.remove(pair);
           } else {
             union = fst.union(shfst);
           }
           map.put(key, new ShapeField(union));
         }
         // records with other identities or field orders must still be coerced
-        return declared() && sh.declared() && sameIdentity(sh) && sameOrder(sh) ?
-          new RecordType(map) : new ShapeType(map);
+        return labeled() && sameIdentity(sh) && sameOrder(sh) ?
+          with(map) : new ShapeType(map);
       }
       // fallback (map supertype)
       return union(sh.keyType(), sh.valueType());
@@ -461,7 +478,8 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean sameFields(final ShapeType sh) {
-    if(fields.size() != sh.fields.size()) return false;
+    // the fields of record(*) are unknown
+    if(any() || sh.any() || fields.size() != sh.fields.size()) return false;
     for(final byte[] key : fields) {
       if(!sh.fields.contains(key)) return false;
     }
@@ -490,7 +508,7 @@ public class ShapeType extends MapType {
   public final boolean sameOrder(final ShapeType sh) {
     if(this == sh) return true;
     final int fs = fields.size();
-    if(fs != sh.fields.size()) return false;
+    if(any() || sh.any() || fs != sh.fields.size()) return false;
     for(int f = 1; f <= fs; f++) {
       if(!Token.eq(fields.key(f), sh.fields.key(f))) return false;
     }
@@ -504,7 +522,8 @@ public class ShapeType extends MapType {
 
   /**
    * Computes the intersection between this type and the given one, i.e. the least specific type
-   * that is subtype of both types. If no such type exists, {@code null} is returned.
+   * that is subtype of both types, or a supertype if {@code record(*)} is involved.
+   * If no such type exists, {@code null} is returned.
    * @param type other type
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
    * @return intersection type or {@code null}
@@ -515,13 +534,12 @@ public class ShapeType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final ShapeType sh) {
-      // record(*) and an inferred shape: records with the fields of the shape
-      if(any() || sh.any()) return new RecordType((any() ? sh : this).fields);
-      // a record has the fields of its type, and a single nominative record type
-      final QNm id = name(), shid = sh.name();
-      if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;
-      final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
-        this : sh;
+      // record(*) and a simple record type: the simple type includes the intersection
+      if(any()) return sh;
+      if(sh.any()) return this;
+      // a record has the fields of its type, and a single labeled record type
+      if(!sameFields(sh) || labeled() && sh.labeled() && !sameIdentity(sh)) return null;
+      final ShapeType st = sh.labeled() ? sh : this;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : st.fields) {
         final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
@@ -532,6 +550,8 @@ public class ShapeType extends MapType {
       return st.with(map);
     }
     if(type instanceof final MapType mt) {
+      // record(*) has no fields to narrow, record() includes the empty map
+      if(fields.isEmpty()) return this;
       if(mt.keyType().intersect(BasicType.STRING) == null) return null;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
@@ -542,7 +562,7 @@ public class ShapeType extends MapType {
       }
       return with(map);
     }
-    return null;
+    return type instanceof final FuncType ft && callable(ft) ? this : null;
   }
 
   /**
@@ -557,8 +577,11 @@ public class ShapeType extends MapType {
     if(t1 instanceof final ShapeType sh1 && t2 instanceof final ShapeType sh2) {
       final Pair pair = new Pair(sh1, sh2);
       if(pairs.contains(pair)) return null;
-      final Type it = sh1.intersect(sh2, pair.addTo(pairs));
-      return it == null ? null : SeqType.get(it, st1.occ.intersect(st2.occ));
+      // pairs of sibling fields are no cycles: remove the pair after the check
+      final Set<Pair> set = pair.addTo(pairs);
+      final Type it = sh1.intersect(sh2, set);
+      set.remove(pair);
+      return st1.intersect(st2, it);
     }
     return st1.intersect(st2);
   }
@@ -605,23 +628,28 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns the field names of this type.
-   * @return comma-separated field names
+   * Returns the fields of this type.
+   * @param types include field types
+   * @return comma-separated fields
    */
-  public final String fieldNames() {
+  public final String fieldNames(final boolean types) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] key : fields) {
+    final int fs = fields.size();
+    for(int f = 1; f <= fs; f++) {
       if(!tb.isEmpty()) tb.add(", ");
       if(!tb.moreInfo()) break;
+      final byte[] key = fields.key(f);
       tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
+      final ShapeField field = fields.value(f);
+      if(types && !field.seqType().eq(Types.ITEM_ZM)) tb.add(' ').add(field.toString());
     }
     return tb.toString();
   }
 
   @Override
   public String toString() {
-    // an inferred shape is not a record: represent it by the map type it is an instance of
-    return MapType.get(this).toString();
+    return new QueryString().token(QueryText.RECORD).token('(').
+        token(any() ? "*" : fieldNames(true)).token(')').toString();
   }
 
   /**

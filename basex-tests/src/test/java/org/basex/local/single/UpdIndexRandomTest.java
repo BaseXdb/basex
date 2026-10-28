@@ -46,7 +46,7 @@ public final class UpdIndexRandomTest extends SandboxTest {
    * @param ftindex full-text index flag
    * @param ftmixed mixed-content flag
    */
-  public void init(final boolean mainmem, final boolean ftindex, final boolean ftmixed) {
+  private static void init(final boolean mainmem, final boolean ftindex, final boolean ftmixed) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.ATTRINDEX, false);

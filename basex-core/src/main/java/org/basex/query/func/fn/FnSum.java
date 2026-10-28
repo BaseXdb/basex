@@ -246,7 +246,7 @@ public class FnSum extends NumericFn {
     final boolean dtd = type == DAY_TIME_DURATION, ymd = type == YEAR_MONTH_DURATION;
     if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, type, result);
 
-    int c = 1;
+    long c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
       final Type tp = it.type;
       Type t = null;

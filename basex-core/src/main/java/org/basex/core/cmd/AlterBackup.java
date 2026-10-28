@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -36,6 +37,8 @@ public final class AlterBackup extends ABackup {
     final String name = args[0], newname = args[1];
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
     if(!Databases.validName(newname)) return error(NAME_INVALID_X, newname);
+    // check local permissions
+    if(!create(Databases.name(name), newname)) return error(PERM_REQUIRED_X, Perm.ADMIN);
 
     // rename all backups
     final StringList backups = context.databases.backups(name);
@@ -96,5 +99,6 @@ public final class AlterBackup extends ABackup {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.ALTER + " " + CmdDrop.BACKUP).args();
-  }}
+    cb.init(Cmd.ALTER + " " + CmdAlter.BACKUP).args();
+  }
+}

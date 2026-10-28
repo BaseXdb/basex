@@ -52,7 +52,7 @@ public final class TextView extends View {
     super(TEXTVIEW, notifier, GUIOptions.SHOWTEXT, false);
     border(5).layout(new BorderLayout(0, 5));
 
-    text = new TextPanel(gui, false);
+    text = new TextPanel(gui);
     text.setSyntax(new SyntaxXML());
     editor = new SearchEditor(gui, text);
     label = new BaseXLabel(" ").resize(1.25f);

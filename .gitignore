@@ -6,4 +6,4 @@
 *.out
 .claude/
 .idea/
-/target
+target/

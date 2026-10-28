@@ -197,8 +197,8 @@ public final class InlineTest extends SandboxTest {
     check("let $x := 2 for $i in 1 to 3 count $c where $i = $x return $c", 2,
         empty(Let.class), empty(Count.class));
     // count clause after an order by clause: no merge, inlining passes through the clause
-    check("let $x := -1 for $i in (1 to 5)[. != 9] order by $i * $x count $c return $c",
-        "1\n2\n3\n4\n5", empty(Let.class), exists(Count.class));
+    check("let $x := -1 for $i in (1 to 5)[. != 9] order by $i * $x empty greatest "
+        + "count $c return $c", "1\n2\n3\n4\n5", empty(Let.class), exists(Count.class));
 
     // while clause
     check("let $x := 3 for $i in 1 to 6 while $i < $x return $i", "1\n2",
@@ -208,8 +208,8 @@ public final class InlineTest extends SandboxTest {
     check("let $x := 'v' for $i in 1 to 2 trace $x return $i", "1\n2", exists(Trace.class));
 
     // order by clause
-    check("let $x := -1 for $i in (3, 1, 2) order by $i * $x return $i", "3\n2\n1",
-        empty(Let.class), exists(OrderBy.class));
+    check("let $x := -1 for $i in (3, 1, 2) order by $i * $x empty greatest return $i",
+        "3\n2\n1", empty(Let.class), exists(OrderBy.class));
 
     // window clause
     check("let $x := 3 for tumbling window $w in (1 to 6) start at $s when $s mod $x = 1 "

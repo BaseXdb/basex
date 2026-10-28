@@ -19,8 +19,6 @@ import org.basex.util.similarity.*;
  */
 public enum Annotation {
   /** XQuery annotation. */
-  CONSTRUCTOR("constructor()", params(), XQ_URI, false),
-  /** XQuery annotation. */
   PRIVATE("private()", params(), XQ_URI, false),
   /** XQuery annotation. */
   PUBLIC("public()", params(), XQ_URI, false),
@@ -52,9 +50,17 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_CANONICAL("canonical(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_CSV("csv(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_HEADER("csv-header(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_QUOTE_CHARACTER("csv-quote-character(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_CSV_SEPARATOR("csv-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -66,6 +72,8 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_EXPRESSION("expression(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_HTML_VERSION("html-version(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", params(STRING), OUTPUT_URI),
@@ -74,7 +82,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_INDENT_ATTRIBUTES("indent-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENTS("indents(value)", params(STRING), OUTPUT_URI),
+  _OUTPUT_INDENT_UNIT("indent-unit(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_ITEM_SEPARATOR("item-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -84,13 +92,13 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_LINE_ENDING("line-ending(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_LIMIT("limit(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_MEDIA_TYPE("media-type(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_METHOD("method(value)", params(STRING), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_NEWLINE("newline(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
@@ -101,8 +109,6 @@ public enum Annotation {
   _OUTPUT_STANDALONE("standalone(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", params(STRING), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_TABULATOR("tabulator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */

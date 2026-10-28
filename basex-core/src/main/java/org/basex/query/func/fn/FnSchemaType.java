@@ -41,7 +41,7 @@ public class FnSchemaType extends StandardFunc {
   protected static Value annotate(final QueryContext qc, final InputInfo info, final Type... types)
       throws QueryException {
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, types.length);
     for(final Type type : types) {
       final QNm name;
       final BasicType baseType;
@@ -56,10 +56,10 @@ public class FnSchemaType extends StandardFunc {
         variety = Variety.list;
         members = TypeAnnotation.funcItem(info, listType.atomic());
         constructor = true;
-      } else if(type instanceof final BasicType BasicType) {
-        name = BasicType.qname();
-        if(BasicType.atomic() != null) matches = Matches.funcItem(BasicType, qc, info);
-        switch(BasicType) {
+      } else if(type instanceof final BasicType bt) {
+        name = bt.qname();
+        if(bt.atomic() != null) matches = Matches.funcItem(bt, qc, info);
+        switch(bt) {
           case ANY_TYPE -> {
             baseType = null;
             variety = Variety.mixed;
@@ -83,10 +83,10 @@ public class FnSchemaType extends StandardFunc {
             constructor = true;
           }
           default -> {
-            final BasicType parent = BasicType.parent();
+            final BasicType parent = bt.parent();
             baseType = parent == NUMERIC ? ANY_ATOMIC_TYPE : parent;
             variety = Variety.atomic;
-            for(primType = BasicType; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
+            for(primType = bt; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
               primType = primType.parent();
             constructor = !type.oneOf(QNAME, NOTATION);
           }

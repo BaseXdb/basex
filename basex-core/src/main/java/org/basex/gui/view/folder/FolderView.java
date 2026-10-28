@@ -257,6 +257,7 @@ public final class FolderView extends View {
         return true;
       }
     }
+    setCursor(CURSORARROW);
     return false;
   }
 
@@ -349,14 +350,18 @@ public final class FolderView extends View {
     if(gui.updating || opened == null) return;
     super.mousePressed(e);
 
-    if(!focus(e.getX(), e.getY())) return;
+    if(!focus(e.getX(), e.getY())) {
+      unmark(e);
+      return;
+    }
 
     // add or remove marked node
     final DBNodes marked = gui.context.marked;
-    if(e.getClickCount() == 2) {
+    final boolean expander = getCursor() == CURSORHAND;
+    if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && !expander) {
       gui.notify.context(marked, false, null);
     } else if(!markFocused(e)) {
-      if(getCursor() != CURSORHAND) {
+      if(!expander) {
         if(!marked.contains(gui.context.focused)) gui.notify.mark(0);
       } else {
         // open/close entry
@@ -380,7 +385,9 @@ public final class FolderView extends View {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating) return;
-    scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
+    scroll.pos(scroll.pos() + e.getUnitsToScroll() * lineH);
+    startY = -scroll.pos();
+    focus(e.getX(), e.getY());
     repaint();
   }
 

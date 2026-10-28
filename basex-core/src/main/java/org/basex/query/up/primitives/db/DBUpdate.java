@@ -26,7 +26,7 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
 
   @Override
   public final int compareTo(final DBUpdate o) {
-    return Integer.signum(type.ordinal() - o.type.ordinal());
+    return type.compareTo(o.type);
   }
 
   /**
@@ -39,5 +39,6 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
    * Prepares this operation.
    * @throws QueryException query exception
    */
-  public abstract void prepare() throws QueryException;
+  @SuppressWarnings("unused")
+  public void prepare() throws QueryException { }
 }

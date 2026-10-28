@@ -33,16 +33,7 @@ public abstract class XQShapeMap extends XQMap {
 
   @Override
   public final int index(final Item key) throws QueryException {
-    if(!key.type.isStringOrUntyped()) return -1;
-    final byte[] name = key.string(null);
-    final TokenObjectMap<ShapeField> fields = fields();
-    final int fs = fields.size();
-    if(fs > 8) return fields.index(name) - 1;
-    // few fields: comparing the names is cheaper than hashing the key
-    for(int f = 0; f < fs; f++) {
-      if(Token.eq(name, fields.key(f + 1))) return f;
-    }
-    return -1;
+    return shape().index(key) - 1;
   }
 
   @Override

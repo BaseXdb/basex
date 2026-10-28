@@ -47,8 +47,7 @@ public final class StringRangeAccess extends IndexAccess {
 
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final IndexIterator iter = index.min().length <= data.meta.maxlen &&
-          index.max().length <= data.meta.maxlen ? data.iter(index) : scan(data);
+      final IndexIterator iter = iter(data);
 
       @Override
       public DBNode next() {
@@ -59,22 +58,21 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final IndexType it = index.type();
-    final Data data = db.data(qc, it);
-
-    final IndexIterator iter = index.min().length <= data.meta.maxlen &&
-        index.max().length <= data.meta.maxlen ? data.iter(index) : scan(data);
+    final Data data = db.data(qc, index.type());
+    final IndexIterator iter = iter(data);
     final IntList list = new IntList();
     while(iter.more()) list.add(iter.pre());
     return DBNodeSeq.get(list.finish(), data, this);
   }
 
   /**
-   * Returns scan-based iterator.
+   * Returns an index iterator, or a scan-based iterator if the bounds are too long for the index.
    * @param data data reference
    * @return node iterator
    */
-  private IndexIterator scan(final Data data) {
+  private IndexIterator iter(final Data data) {
+    final int maxlen = data.meta.maxlen;
+    if(index.min().length <= maxlen && index.max().length <= maxlen) return data.iter(index);
     return new IndexIterator() {
       final boolean text = index.type() == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;

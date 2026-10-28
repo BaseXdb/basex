@@ -30,17 +30,6 @@ abstract class StringFn extends StandardFunc {
 
   /**
    * Returns full-text options for normalizing the input.
-   * @param arg argument index of the string options
-   * @param qc query context
-   * @return options, or {@code null} if the input is to be compared literally
-   * @throws QueryException query exception
-   */
-  final FTOpt ftOpt(final int arg, final QueryContext qc) throws QueryException {
-    return ftOpt(options(arg, StringOptions::new, qc));
-  }
-
-  /**
-   * Returns full-text options for normalizing the input.
    * @param options string options
    * @return options, or {@code null} if the input is to be compared literally
    */

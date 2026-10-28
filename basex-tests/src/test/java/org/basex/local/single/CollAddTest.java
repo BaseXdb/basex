@@ -7,7 +7,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class adds and retrieves documents in a collection.
+ * Adds documents to a database, with and without flushing each update.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

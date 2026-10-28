@@ -90,6 +90,9 @@ public final class FnDeepEqual extends StandardFunc {
           input1.equals(input2) && !input1.has(Flag.NDT)) return Bln.TRUE;
       // reject arguments of different size
       final long size1 = input1.size(), size2 = input2.size();
+      // deep-equal($x, ()) → empty($x)
+      if(size2 == 0) return cc.function(Function.EMPTY, info, input1);
+      if(size1 == 0) return cc.function(Function.EMPTY, info, input2);
       // deep-equal((1, 2), (1, 2, 3)) → false()
       if(size1 != -1 && size2 != -1 && size1 != size2)
         return cc.voidAndReturn(input1, cc.voidAndReturn(input2, Bln.FALSE, info), info);

@@ -232,7 +232,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" abs#1", " [ 1 ]"), 1, type(func, "xs:integer"));
     check(func.args(" reverse#1", " [ () ]"), "", type(func, "empty-sequence()"));
     check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
-        type(func, "item()*"));
+        type(func, "xs:boolean"));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
@@ -647,6 +647,121 @@ public final class FnModuleTest extends SandboxTest {
         "http://www.w3.org/2013/collation/UCA?caseFirst=upper");
     query(func.args(" { 'case-first': 'upper' }"),
         "http://www.w3.org/2013/collation/UCA?case-first=upper");
+  }
+
+  /** Test method. */
+  @Test public void collection() {
+    final Function func = COLLECTION;
+    final String dir = new IOFile(sandbox(), "coll").path();
+    final String zip = new IOFile(sandbox(), "coll.zip").path();
+    write(new IOFile(dir, "a.xml"), "<a/>");
+    write(new IOFile(dir, "sub/b.xml"), "<b/>");
+    query(_FILE_WRITE_BINARY.args(zip,
+        _ARCHIVE_CREATE.args(" ('a.xml', 'sub/b.xml')", " ('<a/>', '<b/>')")));
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("sub/b.xml", "<b/>"));
+
+    // recursive (default)
+    query("count(" + func.args(dir) + ")", 2);
+    query("count(" + func.args(zip) + ")", 2);
+    query("count(" + func.args(NAME) + ")", 2);
+    query("count(" + func.args(" xs:anyURI('" + NAME + "')") + ")", 2);
+    query("count(" + func.args(NAME, " {}") + ")", 2);
+    query("count(" + func.args(NAME, " ()") + ")", 2);
+
+    // non-recursive
+    final String nonrec = " { 'recursive': false() }";
+    query(func.args(dir, nonrec) + "/*/name()", "a");
+    query(func.args(zip, nonrec) + "/*/name()", "a");
+    query(func.args(NAME, nonrec) + "/*/name()", "a");
+    query(func.args(NAME + "/sub", nonrec) + "/*/name()", "b");
+    query(func.args(NAME + "/sub/", nonrec) + "/*/name()", "b");
+    query(func.args(NAME + "/sub/b.xml", nonrec) + "/*/name()", "b");
+
+    // filter by URI
+    query(func.args(dir, " { 'match': 'B\\.xml$', 'match-flags': 'i' }") + "/*/name()", "b");
+    query(func.args(zip, " { 'match': 'a\\.xml' }") + "/*/name()", "a");
+    query(func.args(NAME, " { 'match': 'b\\.xml', 'match-flags': '' }") + "/*/name()", "b");
+    query("count(" + func.args(NAME, " { 'match': 'B\\.xml' }") + ")", 0);
+    error(func.args(NAME, " { 'match': '(' }"), REGINVALID_X);
+    error(func.args(NAME, " { 'match': 'a', 'match-flags': '!' }"), REGFLAG_X);
+
+    // form of the resource
+    query("count(" + func.args(dir, " { 'form': 'directory' }") + ")", 2);
+    query("count(" + func.args(zip, " { 'form': 'archive' }") + ")", 2);
+    query("count(" + func.args(NAME, " { 'form': 'database' }") + ")", 2);
+    query("count(" + func.args(NAME + "/sub", " { 'form': 'database' }") + ")", 1);
+    error(func.args(dir, " { 'form': 'archive' }"), COLLFORM_X_X);
+    error(func.args(dir, " { 'form': 'database' }"), COLLFORM_X_X);
+    error(func.args(zip, " { 'form': 'directory' }"), COLLFORM_X_X);
+    error(func.args(NAME, " { 'form': 'directory' }"), COLLFORM_X_X);
+    error(func.args(dir, " { 'form': 'unknown' }"), COLLFORM_X_X);
+
+    // unstable collections are parsed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " + GENERATE_ID.args(
+        " " + func.args(dir, " { 'stable': false() }") + "[1]") + "))", 2);
+    query("count(distinct-values(for $i in 1 to 2 return " + GENERATE_ID.args(
+        " " + func.args(dir, " { 'stable': true() }") + "[1]") + "))", 1);
+
+    // parsing options, erroneous resources
+    final String dir2 = new IOFile(sandbox(), "coll2").path();
+    write(new IOFile(dir2, "x.xml"), "<x xmlns='u'/>");
+    query(func.args(dir2) + "/*/namespace-uri()", "u");
+    query(func.args(dir2, " { 'xml-options': { 'stripns': true() } }") + "/*/namespace-uri()",
+        "");
+    error(func.args(NAME, " { 'xml-options': { 'stripns': true() } }"), NO_OPTIONS_WITH_DB_X);
+    write(new IOFile(dir2, "y.xml"), "<y");
+    error(func.args(dir2), IOERR_X);
+    query(func.args(dir2, " { 'ignore-errors': true() }") + "/*/name()", "x");
+    // resources that do not match are not parsed
+    query(func.args(dir2, " { 'match': 'x\\.xml' }") + "/*/name()", "x");
+    query(URI_COLLECTION.args(dir2, " { 'match': 'x\\.xml' }") + " ! ends-with(., '/x.xml')",
+        true);
+    // resources in subdirectories are not parsed
+    write(new IOFile(dir, "sub/c.xml"), "<c");
+    query(func.args(dir, nonrec) + "/*/name()", "a");
+    error(func.args(dir), IOERR_X);
+
+    // ignored for databases
+    query("count(" + func.args(NAME, " { 'file-extensions': { 'json': 'text/plain' },"
+        + " 'json-options': {}, 'text-options': {}, 'html-options': {}, 'csv-options': {} }")
+        + ")", 2);
+    error(func.args(NAME, " { 'unknown': 1 }"), INVALIDOPTION_X);
+
+    // resources of directories that are assigned to media types
+    final String dir3 = new IOFile(sandbox(), "coll3").path();
+    write(new IOFile(dir3, "a.xml"), "<a/>");
+    write(new IOFile(dir3, "b.json"), "{ \"b\": 1 }");
+    write(new IOFile(dir3, "c.csv"), "x,y\n1,2");
+    write(new IOFile(dir3, "d.txt"), "d");
+    write(new IOFile(dir3, "e.bin"), "e");
+    write(new IOFile(dir3, "f.xhtml"), "<f/>");
+    final String types = "'file-extensions': { 'json': 'application/json', 'csv': 'text/csv', "
+        + "'txt': 'text/plain', 'bin': 'application/octet-stream', 'xhtml': 'application/xml' }";
+    final String coll = func.args(dir3, " { " + types + " }");
+    query("count(" + func.args(dir3) + ")", 1);
+    query("count(" + coll + ")", 6);
+    query(coll + "[. instance of xs:string]", "d");
+    query(coll + "[. instance of xs:base64Binary] ! string()", "ZQ==");
+    query(coll + "[. instance of map(*)][map:contains(., 'b')]?b", 1);
+    query("sort(" + coll + "[. instance of node()]/*/name())", "a\nf");
+    query(func.args(dir3, " { " + types + ", 'csv-options': { 'header': true() } }")
+        + "[. instance of map(*)][map:contains(., 'columns')]?columns", "x\ny");
+    query("count(" + func.args(dir3, " { " + types + ", 'match': 'json' }") + ")", 1);
+    query("count(" + URI_COLLECTION.args(dir3, " { " + types + " }") + ")", 6);
+    query("count(" + URI_COLLECTION.args(dir3) + "[. instance of xs:anyURI])", 1);
+    error(func.args(dir3, " { " + types + ", 'json-options': { 'unknown': 1 } }"),
+        INVALIDOPTION_X);
+    write(new IOFile(dir3, "g.json"), "{");
+    error(coll, PARSE_JSON_X_X_X);
+    query("count(" + func.args(dir3, " { " + types + ", 'ignore-errors': true() }") + ")", 6);
+    // invalid parsing options are reported even if errors are ignored
+    error(func.args(dir3, " { " + types + ", 'ignore-errors': true(), "
+        + "'json-options': { 'unknown': 1 } }"), INVALIDOPTION_X);
+
+    execute(new Close());
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -1125,6 +1240,10 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_000)", true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_001)", false);
+    // empty argument
+    check(func.args(" (1 to 3)[. > random:integer(1)]", " ()"), false, empty(func));
+    check(func.args(" ()", " (1 to 3)[. > random:integer(1)]"), false, empty(func));
+    check(func.args(" (1 to 3)[. > random:integer(1) + 3]", " ()"), true, empty(func));
     // options supplied as JNode
     query(func.args(1, 1, " jtree({ 'o': { 'debug': false() } })/o"), true);
     // normalization forms
@@ -1310,6 +1429,9 @@ public final class FnModuleTest extends SandboxTest {
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 54);
     query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 54);
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 54);
+
+    // integer range must not overflow
+    query(func.args(" (2147483647, -2147483648)"), "2147483647\n-2147483648");
   }
 
   /** Test method. */
@@ -1392,6 +1514,9 @@ public final class FnModuleTest extends SandboxTest {
     error("xquery:eval(``[exists(" + func.args(xincDoc,
         " { 'xinclude': true(), 'trust-external': true() }")
         + "/root/root)" + "]``, (), {'permission': 'none'})", EXTERNALRESOURCE_X);
+    // first path segment is no database: no database permission check
+    error("xquery:eval(``[" + func.args("/unknown-db/doc.xml") + "]``, (), {'permission': 'none'})",
+        EXTERNALRESOURCE_X);
 
     // unstable documents are parsed anew for each evaluation
     query("count(distinct-values(for $i in 1 to 2 return " +
@@ -2055,6 +2180,16 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" tokenize(" + wrap(1) + ")"), 1, exists(FOOT));
     check(func.args(" tokenize(" + wrap("1 2") + ")"), 2, exists(FOOT));
 
+    // rewrite sort to highest or lowest (unless keys are untyped)
+    final String ints = "let $i := (3, 1, 2) ! xs:integer(data(attribute _ { . })) return ";
+    check(ints + func.args(SORT.args(" $i")), 3, exists(HIGHEST), empty(SORT));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'order': 'descending' }")), 1,
+        exists(LOWEST), empty(SORT_BY));
+    check(func.args(SORT.args(" (<a x='1'/>, <b x='1'/>, <c x='0'/>)", " ()",
+        " fn($n) as xs:integer { $n/@x }")), "<b x=\"1\"/>", exists(HIGHEST), empty(SORT));
+    check("let $u := (9, 10) ! data(attribute _ { . }) return " + func.args(SORT.args(" $u")),
+        9, exists(SORT), empty(HIGHEST));
+
     check(func.args(" tail(tokenize(<a/>))"), "", exists(TAIL));
     check(func.args(" tail(1 ! <_>{.}</_>)"), "", empty());
     check(func.args(" tail((1 to 2) ! <_>{.}</_>)"), "<_>2</_>", empty(TAIL));
@@ -2109,6 +2244,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void forEachPair() {
     final Function func = FOR_EACH_PAIR;
+
+    // structurally equal nodes must keep their identity
+    query("let $x := (<a/>, <a/>) let $y := (<a/>, <a/>) return count(($x, $y) except " +
+        func.args(" $x", " $y", " fn($a, $b) { $a, $b }") + ')', 0);
 
     query("(0, concat#2)[. instance of function(*)] ! " +
         func.args("A", "B", " ."), "AB");
@@ -2216,6 +2355,15 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(12345678, "16^#_xxxx"), "bc_614e");
     query(func.args(255, "2^xxxx xxxx"), "1111 1111");
     query(func.args(1023, "32^XXXX"), "00VV");
+    error(func.args(255, "16^xax"), INVDDPATTERN_X);
+    error(func.args(255, "16^x1x"), INVDDPATTERN_X);
+    error(func.args(255, "10^x1x"), INVDDPATTERN_X);
+    error(func.args(255, "016^xx"), INVDDPATTERN_X);
+    error(func.args(255, "+16^xx"), INVGROUP_X);
+    error(func.args(255, "16 ^xx"), INVGROUP_X);
+    error(func.args(255, "#²0"), INVDDPATTERN_X);
+    query(func.args(1, "Wwfoo"), 1);
+    error(func.args(1, "Ww1"), INVDDPATTERN_X);
 
     query(func.args(1, "Ww", "de"), "Eins");
     query(func.args(1, "Ww;o", "de"), "Erste");
@@ -2293,6 +2441,23 @@ public final class FnModuleTest extends SandboxTest {
         "#local:x\n#local:y");
     query("let $n := " + _RANDOM_INTEGER.args(1) + " return (%local:x fn() { $n }, "
         + "%local:y fn() { $n }) ! map:keys(" + func.args(" .") + ")", "#local:x\n#local:y");
+
+    // the function is inspected, not invoked: pre-evaluation
+    check(COUNT.args(func.args(" %local:x fn() { 1 }")), 1, root(Itr.class));
+  }
+
+  /** Test method. */
+  @Test public void functionArity() {
+    final Function func = FUNCTION_ARITY;
+    check(func.args(" fn($a) { $a }"), 1, root(Itr.class));
+    check(func.args(" true#0"), 0, root(Itr.class));
+  }
+
+  /** Test method. */
+  @Test public void functionName() {
+    final Function func = FUNCTION_NAME;
+    check(func.args(" true#0"), "#fn:true", root(QNm.class));
+    check(func.args(" fn() { 1 }"), "", empty());
   }
 
   /** Test method. */
@@ -2339,10 +2504,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void generate() {
     final Function func = GENERATE;
-    query(func.args(" ()", " fn {}"), "");
     query(func.args(" 1", " fn {}"), 1);
-    query(func.args(" ()", " fn { if(.) { . -1 } }"), "");
     query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
+    error(func.args(" ()", " fn {}"), INVTYPE_X);
+    error(func.args(" ()", " fn { if(.) { . -1 } }"), INVTYPE_X);
 
     final String init = "x";
     String step = " fn { . || 'x' }";
@@ -2485,6 +2650,24 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(TRUNK.args(" (<a/>, <b/>) ")), "<a/>", empty(TRUNK));
     check(func.args(TRUNK.args(" <a/>")), "", empty());
     check(func.args(TRUNK.args(" (1, 2)[. = 0]")), "", exists(TRUNK));
+
+    // rewrite sort to lowest or highest (unless keys are untyped)
+    final String ints = "let $i := (3, 1, 2) ! xs:integer(data(attribute _ { . })) return ";
+    check(ints + func.args(SORT.args(" $i")), 1, exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT.args(" $i", " ()", " fn($n) as xs:integer { -$n }")), 3,
+        exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT.args(" $i", " ()", " fn { -. }")), 3,
+        exists(LOWEST), empty(SORT));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'key': fn { -. } }")), 3,
+        exists(LOWEST), empty(SORT_BY));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'key': fn { -. }, 'order': 'descending' }")),
+        1, exists(HIGHEST), empty(SORT_BY));
+    check(ints + func.args(SORT_BY.args(" $i", " { 'order': 'descending' }")), 3,
+        exists(HIGHEST), empty(SORT_BY));
+    check(func.args(SORT.args(" (<a x='1'/>, <b x='0'/>, <c x='0'/>)", " ()",
+        " fn($n) as xs:integer { $n/@x }")), "<b x=\"0\"/>", exists(LOWEST), empty(SORT));
+    check("let $u := (9, 10) ! data(attribute _ { . }) return " + func.args(SORT.args(" $u")),
+        10, exists(SORT), empty(LOWEST));
 
     check(func.args(" tail((<a/>, <b/>, <c/>[. = '']))"), "<b/>", root(CElem.class));
     check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", root(CElem.class));
@@ -3087,7 +3270,7 @@ return
     // value type
     check(func.args(" array { (1 to 2) }"), "[1,2]", type(func, "jnode((), array(xs:integer))"));
     check(func.args(" { 'a': 1 }"), "{\"a\":1}",
-        type(func, "jnode((), map(xs:string, xs:integer))"));
+        type(func, "jnode((), record(a as xs:integer))"));
     check("for $i in (1, 'a') return " + func.args(" $i"), "1\na",
         type(func, "jnode((), xs:anyAtomicType)"));
 
@@ -3235,14 +3418,14 @@ return
     } finally {
       set(MainOptions.TRUSTEXTERNAL, false);
     }
-    // permissions: content requires none, external locations require create
+    // permissions: content requires none, external locations require admin
     query("xquery:eval(``[" + func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare variable $m:v := 1;' }") + "?variables?*]``, (), { 'permission': 'none' })", 1);
     final IOFile pmod = new IOFile(sandbox(), "perm.xqm");
     write(pmod, "module namespace p = 'p'; declare variable $p:v := 2;");
     final String load = func.args("p", " { 'location-hints': '" + pmod.path() + "' }");
-    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'read' })", XQUERY_PERM_X);
-    query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'create' })", 2);
+    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'write' })", XQUERY_PERM_X);
+    query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'admin' })", 2);
     error(func.args("m", String.format(doc, ", 'trusted': false()")) + call, EXTERNALRESOURCE_X);
     // trust: documents opened by trusted code are not accessible to untrusted code
     error("doc('src/test/resources/input.xml'), " + func.args("m", String.format(doc, "")) + call,
@@ -3752,6 +3935,8 @@ return
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
     query("<e xmlns:p='u'>{" + func.args(" xs:untypedAtomic(' p ')", " <e/>") + "}</e>/text()",
         "u");
+    query("let $a := parse-xml('<a xmlns:p=\" u \"><p:b/></a>')/a "
+        + "return " + func.args("p", " $a") + " eq namespace-uri($a/*)", true);
 
     error(func.args("p ", " <e/>"), INVTYPE_X);
     error(func.args("p:q", " <e/>"), INVTYPE_X);
@@ -3843,6 +4028,11 @@ return
     query("boolean(" + func.args(" <?_ x?>") + ')', true);
     query("boolean(" + func.args(" <?_  x ?>") + ')', true);
     query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
+
+    // context value defaults to fn:string(.)
+    query(func.args(" [ ' a ' ]"), "a");
+    error("[ ' a ' ] ! " + func.args(), FISTRING_X);
+    error("[ ' a ' ] ! boolean(" + func.args() + ')', FISTRING_X);
   }
 
   /** Test method. */
@@ -4367,6 +4557,11 @@ return
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'd://x/' }") + ")", "d://x/");
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'http://x/y.xml' }") + ")",
         "http://x/y.xml");
+    // relative URIs are resolved against the static base URI
+    query("declare base-uri 'http://x/a/'; base-uri(" +
+        func.args("<a/>", " { 'base-uri': 'b.xml' }") + ")", "http://x/a/b.xml");
+    query("declare base-uri 'http://x/a/'; base-uri(" +
+        PARSE_XML_FRAGMENT.args("<a/>", " { 'base-uri': 'b.xml' }") + ")", "http://x/a/b.xml");
 
     final String path = "src/test/resources/parse-xml.entity";
     final String dtd = "<!DOCTYPE a ["
@@ -4912,6 +5107,10 @@ return
     query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
     query(func.args(" <a/>", 2), "<a/>\n<a/>");
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
+    // structurally equal nodes must not be merged
+    query("declare %basex:inline(0) function local:f($a, $b) { $a, $b };" +
+        "let $a := (<a/>, <a/>) return local:f(" + func.args(" $a[1]", 2) + ", $a[2])[3] is $a[2]",
+        true);
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
     error(func.args(" <a/>", -1), INVTYPE_X);
@@ -5020,11 +5219,19 @@ return
     query(func.args("a.html", " ()") + " => ends-with('/a.html')", true);
     query(func.args("g:h") + " instance of xs:anyURI", true);
 
+    // database paths as base URIs (GH-1172)
+    query(func.args("a.xml", "/db/path/b.xml"), "/db/path/a.xml");
+    query(func.args("../x", "/db/path/b.xml"), "/db/x");
+    query(func.args("../../../x", "/db/path/b.xml"), "/x");
+    query(func.args("#t", "/db/path/b.xml#s"), "/db/path/b.xml#t");
+    query(func.args("a.xml", "/db/[x]/b.xml"), "/db/[x]/a.xml");
+    query(func.args("http://x/", "/db/path/b.xml"), "http://x/");
+
     // invalid URI reference
     error(func.args(":", base), URIARG_X);
-    // relative base URI (includes database paths, see GH-1172)
+    // relative base URI
     error(func.args("a.html", "b.html"), URIARG_X);
-    error(func.args("a.xml", "/db/path/b.xml"), URIARG_X);
+    error(func.args("a.html", "//host/b.html"), URIARG_X);
     // non-hierarchical base URI
     error(func.args("a.html", "urn:doi:234567"), URIARG_X);
   }
@@ -5098,6 +5305,17 @@ return
 
     check(func.args(" (1 to 6, (7 to " + wrap(13) + ")[. > 12], (14 to " + wrap(20) + ")[. > 18])"),
         "20\n19\n13\n6\n5\n4\n3\n2\n1", count(REVERSE, 2));
+
+    // reversed database nodes are not in document order
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("b.xml", "<b/>"));
+    final String rev = "declare variable $r := " + func.args(_DB_GET.args(NAME)) + "; ";
+    query(rev + "$r ! name(*)", "b\na");
+    query(rev + "head($r union ()) ! name(*)", "a");
+    query(rev + "head($r/.) ! name(*)", "a");
+    query(rev + "head(" + DISTINCT_ORDERED_NODES.args(" $r") + ") ! name(*)", "a");
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -5234,11 +5452,15 @@ return
         "\"a;b\"\n");
     query(func.args(" { 'rows': [ 'a|b' ] }", " { 'method': 'csv', 'csv-quote-character': '|' }"),
         "|a||b|\n");
-    query(func.args(" parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })",
-        " { 'method': 'csv', 'csv-header': true() }"), "a,b\n1,2\n");
+    final String csv = " parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })";
+    query(func.args(csv, " { 'method': 'csv', 'csv-header': true() }"), "a,b\n1,2\n");
     // CSV output method: flat parameters override format-specific options
     query(func.args(" parse-csv('a,b')",
         " { 'method': 'csv', 'csv': { 'separator': ';' }, 'csv-separator': '|' }"), "a|b\n");
+    query(func.args(csv,
+        " { 'method': 'csv', 'csv': { 'header': true() }, 'csv-header': false() }"), "1,2\n");
+    query(func.args(csv,
+        " { 'method': 'csv', 'csv': { 'header': false() }, 'csv-header': true() }"), "a,b\n1,2\n");
     // CSV output method: quoting
     query(func.args(" { 'rows': [ 'a' || char('\\t') || 'b', 'c' ] }", " { 'method': 'csv' }"),
         "a\tb,c\n");
@@ -5283,10 +5505,13 @@ return
     query(func.args("1", " { 'indent': true() }"), 1);
     query(func.args("1", " { 'indent': xs:untypedAtomic('true') }"), 1);
     query(func.args("1", " { 'indent': () }"), 1);
-    error(func.args("1", " { 'indent': 'yes' }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("1", " { 'indent': 'yes' }"), INVALIDBOOLOPTION_X_X_X_X_X);
+    error(func.args("1", " { 'indent': 'maybe' }"), INVALIDOPTION_X_X_X_X);
     error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
     // numeric options must not wrap around
     query(func.args("<a/>", " { 'limit': 2147483647 }"), "&lt;a/&gt;");
+    // serialization stops when the limit is reached
+    query(func.args(" (1, true#0)", " { 'limit': 1 }"), 1);
     error(func.args("<a/>", " { 'limit': 4294967298 }"), INVALIDOPTION_X_X_X_X);
 
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
@@ -5445,6 +5670,11 @@ return
     query(in + func.args(-1, +2, -3), "b");
     query(in + func.args(-1, -2, +3), "");
     query(in + func.args(-1, -2, -3), "b");
+    check(in + func.args(+1, +2), "a\nb", root(_UTIL_RANGE));
+    check(in + func.args(+2, +5), "b", root(_UTIL_RANGE));
+    check(in + func.args(+3, +4), "", root(_UTIL_RANGE));
+    check(in + func.args(+5, +2), "b", root(SLICE));
+    check(in + func.args(+1, +2, +2), "a", root(SLICE));
 
     in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'b'] =>";
     query(in + func.args(+0), "a");
@@ -5596,6 +5826,17 @@ return
 
     query(func.args(" true#0"), "fn:true#0");
     error(func.args(" (1 to 2) ! true#0"), FIATOMIZE_X);
+
+    // database nodes are sorted by value, not by document order
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a>3</a>"));
+    execute(new Add("b.xml", "<a>1</a>"));
+    execute(new Add("c.xml", "<a>2</a>"));
+    query(func.args(_DB_GET.args(NAME)) + " ! string()", "1\n2\n3");
+    query(func.args(_DB_GET.args(NAME) + "/a") + " ! string()", "1\n2\n3");
+    query(_ARRAY_SORT.args(" array { " + _DB_GET.args(NAME) + " }") + "?* ! string()",
+        "1\n2\n3");
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -5607,6 +5848,81 @@ return
     query(func.args(input, " { 'key': data#1 }"), "a\nb");
     query(func.args(input, " { 'key': data#1, 'order': 'descending' }"), "b\na");
     query(func.args(input, " { 'order': 'descending' }"), "b\na");
+
+    // single ascending key: rewrite to fn:sort
+    check(OPAQUE + func.args(" $o", " ()"), "1\n2\n3\n4\n5", empty(func), exists(SORT));
+    check(OPAQUE + func.args(" $o", " { 'key': data#1 }"), "1\n2\n3\n4\n5",
+        empty(func), exists(SORT));
+    check(OPAQUE + func.args(" $o", " { 'order': 'descending' }"), "5\n4\n3\n2\n1",
+        exists(func));
+    check(OPAQUE + func.args(" $o", " ({}, {})"), "1\n2\n3\n4\n5", exists(func));
+  }
+
+  /** Sorts values by keys of common types. */
+  @Test public void sortTypes() {
+    final String pairs = "string-join(" + SORT.args(" ([ 3, 'a' ], [ 1, 'b' ], [ 3, 'c' ], "
+        + "[ 2, 'd' ])", " ()", " fn($p) { $p?1 }") + "?2)";
+    query(pairs, "bdac");
+    query("string-join(" + SORT.args(" ([ 3e0, 'a' ], [ xs:double('NaN'), 'b' ], [ -1e0, 'c' ])",
+        " ()", " fn($p) { $p?1 }") + "?2)", "bca");
+    // empty keys precede strings and untyped values
+    query("string-join(" + SORT.args(" ([ 'b', 'x' ], [ (), 'y' ], [ <a>a</a>/text(), 'z' ])",
+        " ()", " fn($p) { $p?1 }") + "?2)", "yzx");
+    // two levels
+    query("string-join(" + SORT_BY.args(" ([ 'b', 2, 'w' ], [ 'a', 2, 'x' ], [ 'b', 1, 'y' ], "
+        + "[ 'a', 3, 'z' ])", " ({ 'key': fn($p) { $p?1 } }, "
+        + "{ 'key': fn($p) { $p?2 }, 'order': 'descending' })") + "?3)", "zxwy");
+    // incomparable keys
+    error(SORT.args(" (1, 'a', 2)", " ()", " fn($k) { $k }"), CMPTYPES_X_X_X_X);
+  }
+
+  /** Returns the smallest items of a sort. */
+  @Test public void sortTopK() {
+    final String ints = " (1 to 100) ! (. * 37 mod 101)";
+    query(SORT.args(ints) + "[position() <= 5]", "1\n2\n3\n4\n5");
+    query(SUBSEQUENCE.args(SORT.args(ints), 3, 4), "3\n4\n5\n6");
+    query(SLICE.args(SORT.args(ints), 2, 4), "2\n3\n4");
+    query(ITEMS_AT.args(SORT.args(ints), " 2 to 4"), "2\n3\n4");
+    query("for $k in (1, 3, 200) return count(" + SORT.args(ints) + "[position() <= $k])",
+        "1\n3\n100");
+    query("string-join(" + SORT.args(ints) + "[position() <= 5])", "12345");
+    query(SORT.args(ints + " ! string()") + "[position() <= 3]", "1\n10\n100");
+    query(SORT.args(" (" + ints + " ! xs:double(.), xs:double('NaN'), -0e0, 0e0)")
+        + "[position() <= 4] ! string()", "NaN\n-0\n0\n1");
+
+    // stable order of equal keys
+    final String pairs = " (1 to 100) ! [ . mod 7, . ]";
+    query(SORT.args(pairs, " ()", " fn($p) { $p?1 }") + "[position() <= 5] ! ?2",
+        "7\n14\n21\n28\n35");
+    query(SORT_BY.args(pairs, " { 'key': fn($p) { $p?1 }, 'order': 'descending' }")
+        + "[position() <= 5] ! ?2", "6\n13\n20\n27\n34");
+    query(SORT.args(pairs, " ()", " fn($p) { if($p?2 mod 2) then xs:decimal($p?1) else $p?1 }")
+        + "[position() <= 5] ! ?2", "7\n14\n21\n28\n35");
+    query(SORT_BY.args(pairs, " ({ 'key': fn($p) { $p?1 } }, "
+        + "{ 'key': fn($p) { $p?2 }, 'order': 'descending' })") + "[position() <= 3] ! ?2",
+        "98\n91\n84");
+    // empty keys come first
+    query(SORT.args(" 1 to 100", " ()", " fn($i) { if($i mod 25) then $i else () }")
+        + "[position() <= 5]", "25\n50\n75\n100\n1");
+    // incomparable keys
+    error(SORT.args(" (1 to 100) ! (if(. = 50) then 'a' else .)") + "[position() <= 3]",
+        CMPTYPES_X_X_X_X);
+
+    // input of unknown size
+    final String filtered = " (" + ints + ")[. > 0]";
+    query(SORT.args(filtered) + "[position() <= 5]", "1\n2\n3\n4\n5");
+    query(SUBSEQUENCE.args(SORT.args(filtered), 99, 5), "99\n100");
+    query(COUNT.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 200)), 100);
+    query(SUM.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 1000000000)), 5050);
+    query(SUM.args(SUBSEQUENCE.args(SORT.args(filtered), 1, 100000)), 5050);
+    // first item, single position: untyped keys are not rewritten to fn:lowest
+    final String untyped = " (" + ints + ") ! data(attribute _ { . })";
+    check(HEAD.args(SORT.args(untyped)), 1, exists(SORT), root(HEAD));
+    check(ITEMS_AT.args(SORT.args(untyped), 3), 100, exists(SORT), root(ITEMS_AT));
+    query(SUBSEQUENCE.args(SORT.args(filtered), 3, 0), "");
+    query(SORT.args(" ('b', 'A', 'a', 'B')[. != 'x']",
+        " 'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'")
+        + "[position() <= 2]", "A\na");
   }
 
   /** Test method. */
@@ -5731,6 +6047,11 @@ return
     query(func.args(111), 3);
     query(func.args(" ([ (), 'a' ])"), 1);
 
+    // context value defaults to fn:string(.)
+    error("[ 'a' ] ! " + func.args(), FISTRING_X);
+    error("{ 'a': 1 } ! " + func.args(), FISTRING_X);
+    error("for $a in ([ 'a' ], 'bc') return $a ! " + func.args(), FISTRING_X);
+
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query("<_>A</_>[" + func.args(" .") + ']', "<_>A</_>");
 
@@ -5765,7 +6086,7 @@ return
     check("<a/>[" + func.args() + " gt 1]", "", exists(func));
     check("<a/>[" + func.args() + " = <a>1</a>]", "", exists(func));
 
-    error("true#0[" + func.args() + ']', FIATOMIZE_X);
+    error("true#0[" + func.args() + ']', FISTRING_X);
   }
 
   /** Test method. */
@@ -5946,6 +6267,10 @@ return
     query(func.args(" ('a', 'b', 'c')", 1, " xs:double('INF')"), "a\nb\nc");
     query("let $e := (1 to 3)[. > 0] return " +
         func.args(" $e", " -9223372036854775808", " count($e)"), "");
+
+    // skip leading list operands
+    check("let $s := tokenize(" + wrap("c d e f g") + ") return " +
+        func.args(" ('a', 'b', $s)", 4, 2), "d\ne", empty(List.class));
   }
 
   /** Test method. */
@@ -6419,6 +6744,12 @@ return
         empty(func), exists(NORMALIZE_SPACE));
 
     error(func.args("a", " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
+
+    // context value defaults to fn:string(.)
+    query(func.args(" [ ' a ' ]"), "a");
+    error("[ 'a' ] ! " + func.args(), FISTRING_X);
+    error("[ 'a', 'b' ] ! " + func.args(), FISTRING_X);
+    error("[ 'a' ] -> " + func.args(" options := { 'side': 'end' }"), FISTRING_X);
   }
 
   /** Test method. */
@@ -6718,6 +7049,32 @@ return
     // leading whitespace is removed from processing instructions
     query(func.args(" <a><?pi v?></a>", " fn { .//processing-instruction() }", " '  y'") +
         "//processing-instruction() ! string()", "y");
+  }
+
+  /** Test method. */
+  @Test public void uriCollection() {
+    final Function func = URI_COLLECTION;
+    final IOFile dir = new IOFile(sandbox(), "uris/");
+    dir.md();
+    write(new IOFile(dir, "a.xml"), "<a/>");
+    write(new IOFile(dir, "dtd.xml"), "<!DOCTYPE x SYSTEM 'x.dtd'><x/>");
+    write(new IOFile(dir, "b.txt"), "b");
+
+    // files are listed without being parsed
+    query("string-join(sort(" + func.args(dir.path()) + ") ! substring-after(., '/uris/'), ',')",
+        "a.xml,dtd.xml");
+    error(COLLECTION.args(dir.path()), EXTERNALRESOURCE_X);
+
+    // options
+    final String coll = new IOFile(sandbox(), "uricoll").path();
+    write(new IOFile(coll, "a.xml"), "<a/>");
+    write(new IOFile(coll, "sub/b.xml"), "<b/>");
+
+    query("count(" + func.args(coll) + ")", 2);
+    query(func.args(coll, " { 'recursive': false() }") + " ! ends-with(., '/a.xml')", true);
+    query(func.args(coll, " { 'match': 'b\\.xml$' }") + " ! ends-with(., '/sub/b.xml')", true);
+    query("count(" + func.args(coll, " { 'form': 'directory' }") + ")", 2);
+    error(func.args(coll, " { 'form': 'archive' }"), COLLFORM_X_X);
   }
 
   /** Test method. */

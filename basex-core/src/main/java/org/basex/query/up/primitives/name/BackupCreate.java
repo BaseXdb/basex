@@ -38,10 +38,6 @@ public final class BackupCreate extends NameUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     try {
       CreateBackup.backup(name, comment, compress, qc.context.soptions, null);

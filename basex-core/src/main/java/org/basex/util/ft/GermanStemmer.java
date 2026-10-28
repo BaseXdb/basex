@@ -36,9 +36,7 @@ final class GermanStemmer extends InternalStemmer {
 
   @Override
   protected byte[] stem(final byte[] word) {
-    subst = 0;
-    final int wl = word.length;
-    return wl == 0 ? Token.EMPTY :
+    return word.length == 0 ? Token.EMPTY :
       part(resub(opt(strip(subst(new TokenBuilder(word)))))).finish();
   }
 

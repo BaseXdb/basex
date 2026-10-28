@@ -111,7 +111,7 @@ public final class JsonParser {
     skipWs();
     if(!more()) return false;
     if(parsed && (wsPos != pos || wsLine == line)) {
-      throw error("Expected: newline, found: %", currentAsString());
+      throw error("Expected: newline, found: %", InputParser.asString(current));
     }
     root();
     parsed = true;
@@ -295,8 +295,7 @@ public final class JsonParser {
       tb.add(cp);
     }
 
-    final boolean zero = cp == '0';
-    if(zero && current >= '0' && current <= '9') throw error("No digit allowed after '0'");
+    if(cp == '0' && current >= '0' && current <= '9') throw error("No digit allowed after '0'");
 
     LOOP:
     while(true) {
@@ -344,7 +343,7 @@ public final class JsonParser {
    * @throws IOException I/O exception
    */
   private byte[] string() throws QueryException, IOException {
-    if(!consume('"')) throw error("Expected: string, found: %", currentAsString());
+    if(!consume('"')) throw error("Expected: string, found: %", InputParser.asString(current));
     tb.reset();
     int high = 0; // cached high surrogate
     while(more()) {
@@ -377,10 +376,10 @@ public final class JsonParser {
               if(cp2 >= '0' && cp2 <= '9')      cp = 16 * cp + cp2      - '0';
               else if(cp2 >= 'a' && cp2 <= 'f') cp = 16 * cp + cp2 + 10 - 'a';
               else if(cp2 >= 'A' && cp2 <= 'F') cp = 16 * cp + cp2 + 10 - 'A';
-              else throw error("Illegal hexadecimal digit: %", currentAsString());
+              else throw error("Illegal hexadecimal digit: %", InputParser.asString(cp2));
             }
           }
-          default -> throw error("Unknown character escape: %", currentAsString());
+          default -> throw error("Unknown character escape: %", InputParser.asString(cp));
         }
       } else if(!liberal && cp <= 0x1F) {
         throw error("Non-escaped control character: %", CTRL[cp]);
@@ -480,18 +479,17 @@ public final class JsonParser {
       skipWs();
       return true;
     }
-    if(err) throw error("Expected: '%', found: %", ch, currentAsString());
+    if(err) throw error("Expected: '%', found: %", ch, InputParser.asString(current));
     return false;
   }
 
   /**
-   * Throws an end-of-input error.
+   * Returns an end-of-input error.
    * @param desc description
-   * @return never
-   * @throws QueryException query exception
+   * @return query exception
    */
-  private QueryException eof(final String desc) throws QueryException {
-    throw error("Unexpected end of input%", desc);
+  private QueryException eof(final String desc) {
+    return error("Unexpected end of input%", desc);
   }
 
   /**
@@ -597,15 +595,5 @@ public final class JsonParser {
       tb.add(cp);
     }
     return tb + (more() ? DOTS : "");
-  }
-
-  /**
-   * Returns the current code point as string.
-   * @return current code point
-   */
-  private String currentAsString() {
-    return !more() ? "END OF INPUT" : !XMLToken.valid10(current) || Character.isSpaceChar(current) ?
-      Character.getName(current) :
-      Character.toString(current);
   }
 }

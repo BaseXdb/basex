@@ -90,8 +90,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final SAXParseException | ValidationException ex) {
       final SAXParseException spex =
           (SAXParseException) (ex instanceof ValidationException ? ex.getCause() : ex);
-      final String msg = Util.info(SCANPOS_X_X, source.path(), spex.getLineNumber(),
-          spex.getColumnNumber()) + COLS + Util.message(spex);
+      final String msg = source.position(spex.getLineNumber()) + COLS + Util.message(spex);
       throw new IOException(msg, ex);
     } catch(final TrustedViolationException ex) {
       throw ex.wrap();
@@ -101,7 +100,7 @@ public final class SAXWrapper extends SingleParser {
       // invalid document encoding, catalog raises an error, external resource cannot be opened...
       final String msg = ex.getCause() != null ? ex.getCause().getMessage() : Util.message(ex);
       final String path = saxh != null && saxh.resource != null ? saxh.resource : source.path();
-      throw new IOException(path + ": " + msg, ex);
+      throw new IOException(path.isEmpty() ? msg : path + ": " + msg, ex);
     } finally {
       try(Reader r = is.getCharacterStream()) { /* no action */ }
       try(InputStream ist = is.getByteStream()) { /* no action */ }
@@ -188,7 +187,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public String detailedInfo() {
-    return length == 0 ? super.detailedInfo() : Util.info(SCANPOS_X_X, source.name(), lines + 1);
+    return length == 0 ? super.detailedInfo() : source.position(lines + 1);
   }
 
   @Override

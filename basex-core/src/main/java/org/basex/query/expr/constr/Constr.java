@@ -232,25 +232,8 @@ public final class Constr {
     for(int n = 0; n < sNs; n++) add(inscopeNS, staticNs.name(n), staticNs.value(n));
 
     final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
-    if(!eq(nmPrefix, XML)) {
-      // check declaration of default namespace (before dynamic namespaces are added)
-      final int defaultNS = dNs != 0 ? dynamicNs.get(EMPTY) : -1;
-      if(defaultNS != -1) {
-        if(nmUri.length == 0) throw EMPTYNSCONS.get(info);
-        final int scope = inscopeNS.get(EMPTY);
-        final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope)
-                                            : qc.ns.resolve(EMPTY, info.sc());
-        final byte[] uri = dynamicNs.value(defaultNS);
-        if(scopeUri != null && scopeUri.length != 0 && !eq(scopeUri, uri)) {
-          throw DUPLNSCONS_X.get(info, uri);
-        }
-      }
-
-      // bind the default namespace of the element name (before dynamic namespaces)
-      if(nmPrefix.length == 0 && nm.hasURI() && !inscopeNS.contains(EMPTY)) {
-        add(inscopeNS, EMPTY, nmUri);
-      }
-    }
+    // a default namespace must not be declared for an element in no namespace
+    if(nmUri.length == 0 && dNs != 0 && dynamicNs.contains(EMPTY)) throw EMPTYNSCONS.get(info);
 
     // add namespaces contributed by namespace nodes in the content sequence (prefixes are fixed)
     for(int n = 0; n < dNs; n++) {
@@ -264,7 +247,7 @@ public final class Constr {
 
     // bind the prefix of the element name; namespace nodes take precedence, so the element is
     // renamed with a generated prefix if its prefix is already bound to another URI (nscons-011)
-    if(!eq(nmPrefix, XML) && nmPrefix.length != 0 && nm.hasURI()) {
+    if(!eq(nmPrefix, XML) && nm.hasURI()) {
       final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri, qc.shared);
       if(npref != null) {
         builder.rename(qc.shared.qName(concat(npref, cpToken(':'), nm.local()), nmUri));

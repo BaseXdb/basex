@@ -23,6 +23,11 @@ public final class CharClass extends RegExp {
   }
 
   @Override
+  int minLength() {
+    return 1;
+  }
+
+  @Override
   void toRegEx(final StringBuilder sb) {
     sb.append('[');
     final boolean wrap = subtract != null && group.negative;

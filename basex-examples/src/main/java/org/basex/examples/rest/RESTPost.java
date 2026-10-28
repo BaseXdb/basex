@@ -2,72 +2,49 @@ package org.basex.examples.rest;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpRequest.*;
+import java.net.http.HttpResponse.*;
 
 import org.basex.*;
 
 /**
  * This class is a simple example to demonstrate the REST implementation.
- * It shows the function of the HTTP DELETE method.
+ * It shows the function of the HTTP POST method.
  *
  * @author BaseX Team, BSD License
  */
 public final class RESTPost {
   /**
    * Runs the example.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  static void run() throws IOException {
+  static void run() throws Exception {
     System.out.println("=== POST: execute a query ===");
 
-    // The java URL connection to the resource
-    URL url = URI.create("http://admin:admin@localhost:8080/rest/factbook").toURL();
-    System.out.println("\n* URL: " + url);
+    URI uri = URI.create("http://localhost:8080/rest/factbook");
+    System.out.println("\n* URL: " + uri);
 
     // Query to be sent to the server
-    String request =
-      "<query xmlns='http://basex.org/rest'>\n" +
-      "  <text>(//city/name)[position() le 3]</text>\n" +
-      "</query>";
-    System.out.println("\n* Query:\n" + request);
+    String body = """
+        <query xmlns='http://basex.org/rest'>
+          <text>(//city/name)[position() = 1 to 3]</text>
+        </query>""";
+    System.out.println("\n* Query:\n" + body);
 
-    // Establish the connection to the URL
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    // Set an output connection
-    conn.setDoOutput(true);
-    // Set as PUT request
-    conn.setRequestMethod("POST");
-    // Specify content type
-    conn.setRequestProperty("Content-Type", "application/query+xml");
+    // Send the request
+    try(HttpClient client = HttpClient.newHttpClient()) {
+      HttpRequest request = HttpRequest.newBuilder(uri).
+          header("Content-Type", "application/query+xml").
+          POST(BodyPublishers.ofString(body)).build();
+      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-    // Get and cache output stream
-    try(OutputStream out = conn.getOutputStream()) {
-      // Send UTF-8 encoded query to server
-      out.write(request.getBytes("UTF-8"));
-    }
-
-    // Print the HTTP response code
-    int code = conn.getResponseCode();
-    System.out.println("\n* HTTP response: " + code +
-        " (" + conn.getResponseMessage() + ')');
-
-    // Check if request was successful
-    if(code == HttpURLConnection.HTTP_OK) {
-      // Print the received result to standard output (same as GET request)
+      // Print the HTTP status code and the result
+      System.out.println("\n* HTTP status: " + response.statusCode());
+      if(response.statusCode() >= 400) throw new IOException(response.body());
       System.out.println("\n* Result:");
-
-      // Get and cache input as UTF-8 encoded stream
-      try(BufferedReader br = new BufferedReader(
-          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
-
-        // Print all lines of the result
-        for(String line; (line = br.readLine()) != null;) {
-          System.out.println(line);
-        }
-      }
+      System.out.println(response.body());
     }
-
-    // Close connection
-    conn.disconnect();
   }
 
   /**
@@ -76,11 +53,12 @@ public final class RESTPost {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start server, set admin as default user
+    // Start the HTTP server with admin as default user, so requests need no credentials
     final BaseXHTTP http = new BaseXHTTP("-U", "admin");
-    // Run example
-    run();
-    // Stop servers
-    http.stop();
+    try {
+      run();
+    } finally {
+      http.stop();
+    }
   }
 }

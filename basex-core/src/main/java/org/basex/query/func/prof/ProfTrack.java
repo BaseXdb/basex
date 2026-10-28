@@ -45,10 +45,7 @@ public final class ProfTrack extends StandardFunc {
     final boolean allocated = options.get(TrackOptions.ALLOCATED);
     final long alloc = allocated ? Performance.allocated(thread) : 0;
     // include execution time (called after garbage collection)
-    Performance perf = null;
-    if(options.get(TrackOptions.TIME)) {
-      perf = new Performance();
-    }
+    final Performance perf = options.get(TrackOptions.TIME) ? new Performance() : null;
     // include resulting value
     Value input = null;
     if(options.get(TrackOptions.VALUE)) {

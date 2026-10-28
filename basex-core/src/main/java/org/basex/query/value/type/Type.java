@@ -27,6 +27,7 @@ public interface Type {
     /** array(*).                 */ ARRAY(31),
 
     // node types
+    /** node().                   */ NOD(20),
     /** xnode().                  */ XND(8),
     /** text().                   */ TXT(9),
     /** processing-instruction(). */ PI(10),
@@ -39,7 +40,6 @@ public interface Type {
     /** schema-element().         */ SCE(17),
     /** schema-attribute().       */ SCA(18),
     /** jnode().                  */ JND(19),
-    /** node().                   */ NOD(20),
 
     // basic types
     /** choice item type.         */ CIT(29),
@@ -152,6 +152,22 @@ public interface Type {
         if(this == id) return true;
       }
       return false;
+    }
+  }
+
+  /** Effects of coercion on matching values, ordered by strength. */
+  enum Coercion {
+    /** Values are kept. */ KEEP,
+    /** Records may be rebuilt. */ REBUILD,
+    /** Records may be rebuilt, functions may be wrapped. */ WRAP;
+
+    /**
+     * Returns the stronger of this and the specified effect.
+     * @param coercion other effect
+     * @return stronger effect
+     */
+    public Coercion max(final Coercion coercion) {
+      return compareTo(coercion) >= 0 ? this : coercion;
     }
   }
 
@@ -361,11 +377,19 @@ public interface Type {
   }
 
   /**
+   * Returns the strongest effect that coercion to this type may have on a matching value.
+   * @return coercion effect
+   */
+  default Coercion coercion() {
+    return Coercion.KEEP;
+  }
+
+  /**
    * Checks if coercion to this type may rebuild records or wrap functions.
    * @return result of check
    */
   default boolean coercive() {
-    return false;
+    return coercion() != Coercion.KEEP;
   }
 
   /**
@@ -373,7 +397,7 @@ public interface Type {
    * @return result of check
    */
   default boolean wraps() {
-    return false;
+    return coercion() == Coercion.WRAP;
   }
 
   /**
@@ -382,6 +406,15 @@ public interface Type {
    */
   default boolean assignable() {
     return true;
+  }
+
+  /**
+   * Checks if this type can be assigned as runtime type to a value that matches it.
+   * @param coerce item coercion
+   * @return result of check
+   */
+  default boolean assignable(final boolean coerce) {
+    return assignable() && (coerce || !coercive());
   }
 
   /**

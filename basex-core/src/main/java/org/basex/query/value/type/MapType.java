@@ -21,7 +21,7 @@ import org.basex.util.*;
 public class MapType extends FType {
   /** Key type of the map. */
   private final Type keyType;
-  /** Value type (can be {@code null}, indicating that no type was specified). */
+  /** Value type. */
   private final SeqType valueType;
 
   /**
@@ -63,20 +63,20 @@ public class MapType extends FType {
 
   /**
    * Getter for the value type.
-   * @return value type, or {@code null} if no type was specified
+   * @return value type
    */
   public final SeqType valueType() {
     return valueType;
   }
 
   @Override
-  public boolean coercive() {
-    return valueType.type.coercive();
+  public Coercion coercion() {
+    return valueType.type.coercion();
   }
 
   @Override
-  public boolean wraps() {
-    return valueType.type.wraps();
+  public boolean assignable() {
+    return keyType.assignable() && valueType.type.assignable();
   }
 
   @Override
@@ -116,8 +116,7 @@ public class MapType extends FType {
       return this != MAP && valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }
     if(type instanceof final FuncType ft) {
-      return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
-          ft.argTypes[0].instanceOf(ANY_ATOMIC_TYPE_O);
+      return funcType().declType.instanceOf(ft.declType) && ft.unary(ANY_ATOMIC_TYPE_O);
     }
     return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
@@ -149,11 +148,22 @@ public class MapType extends FType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final MapType mt) {
+      // disjoint key or value types: the empty map is still an instance of both types
       final Type kt = keyType.intersect(mt.keyType);
       final SeqType vt = valueType.intersect(mt.valueType);
-      if(kt != null && vt != null) return get(kt, vt);
+      return kt != null && vt != null ? get(kt, vt) : get(BasicType.ERROR, ERROR_O);
     }
-    return null;
+    return type instanceof final FuncType ft && callable(ft) ? this : null;
+  }
+
+  /**
+   * Checks if maps can be instances of the specified function type.
+   * @param ft function type
+   * @return result of check
+   */
+  final boolean callable(final FuncType ft) {
+    // maps take a single atomic argument, and return the empty sequence for unknown keys
+    return ft.unary(ANY_ATOMIC_TYPE_O) && !ft.declType.oneOrMore();
   }
 
   @Override

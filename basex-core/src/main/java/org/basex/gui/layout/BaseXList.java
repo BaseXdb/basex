@@ -172,7 +172,7 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mouseClicked(final MouseEvent e) {
-        if(e.getClickCount() == 2) dialog.close();
+        if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) dialog.close();
       }
     };
 

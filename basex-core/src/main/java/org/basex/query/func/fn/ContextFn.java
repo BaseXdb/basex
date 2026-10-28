@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -44,6 +45,26 @@ public abstract class ContextFn extends StandardFunc {
   protected final Expr contextArg(final QueryContext qc) throws QueryException {
     final Expr expr = arg(contextIndex());
     return expr != Empty.UNDEFINED ? expr : ctxValue(qc);
+  }
+
+  /**
+   * Returns the atomized context argument, or the atomized or stringified context value.
+   * @param qc query context
+   * @return item (can be empty)
+   * @throws QueryException query exception
+   */
+  protected final Item atomArg(final QueryContext qc) throws QueryException {
+    final Expr expr = contextArg(qc);
+    return usesContext() && stringContext() ?
+      FnString.string(expr.unwrappedItem(qc, info), info) : expr.atomItem(qc, info);
+  }
+
+  /**
+   * Indicates if the context value defaults to its string value.
+   * @return result of check
+   */
+  protected boolean stringContext() {
+    return false;
   }
 
   /**
@@ -90,7 +111,10 @@ public abstract class ContextFn extends StandardFunc {
       // $v ! string() → string($v)
       final int ci = contextIndex();
       final Expr[] ctxArgs = Arrays.copyOf(args, Math.max(args.length, ci + 1));
-      ctxArgs[ci] = ic.copy();
+      final Expr ctx = ic.copy();
+      // [ 'a' ] ! string-length() → string-length(string([ 'a' ]))
+      ctxArgs[ci] = stringContext() && ctx.seqType().mayBeWrapped() ?
+        ic.cc.function(Function.STRING, info, ctx) : ctx;
       inlined = definition.get(info, ctxArgs);
     }
     return inlined != null ? inlined.optimize(ic.cc) : null;

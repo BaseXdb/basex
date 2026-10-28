@@ -48,6 +48,19 @@ public final class BaseXHistory {
   }
 
   /**
+   * Removes the specified value from the history and stores the history in the options.
+   * @param input value to remove
+   */
+  public void remove(final String input) {
+    final StringList list = new StringList(MAX);
+    for(final String value : values()) {
+      if(!input.equals(value)) list.add(value);
+    }
+    options.set(key, list.finish());
+    index = 0;
+  }
+
+  /**
    * Returns a history value.
    * @param next next/previous entry
    * @return entry, or {@code null} if history is empty

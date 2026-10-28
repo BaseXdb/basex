@@ -25,11 +25,7 @@ final class RestXqError implements Comparable<RestXqError> {
    * @return success flag
    */
   boolean add(final NameTest test) {
-    for(final NameTest nt : tests) {
-      if(Objects.equals(nt, test)) return false;
-    }
-    tests.add(test);
-    return true;
+    return !tests.contains(test) && tests.add(test);
   }
 
   /**

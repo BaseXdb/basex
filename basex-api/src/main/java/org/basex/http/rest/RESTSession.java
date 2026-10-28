@@ -43,9 +43,8 @@ final class RESTSession implements Iterable<Command> {
    * @return self reference
    */
   RESTSession add(final Command cmd, final InputStream is) {
-    commands.add(cmd);
     cmd.setInput(is);
-    return this;
+    return add(cmd);
   }
 
   /**

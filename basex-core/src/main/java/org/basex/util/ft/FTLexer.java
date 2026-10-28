@@ -53,28 +53,16 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
-    Tokenizer tkns = Tokenizer.IMPL.getFirst();
-    for(final Tokenizer tknzr : Tokenizer.IMPL) {
-      if(tknzr.supports(lang)) {
-        tkns = tknzr;
-        break;
-      }
-    }
-    tokens = tkns.get(ftOpt);
+    final Tokenizer tkns = LanguageImpl.find(Tokenizer.IMPL, lang);
+    tokens = (tkns != null ? tkns : Tokenizer.IMPL.getFirst()).get(ftOpt);
     iter = tokens;
 
     // wrap original iterator
     if(ftOpt != null && ftOpt.is(ST)) {
       if(ftOpt.sd == null) {
         // use default stemmer if specific stemmer is not available.
-        Stemmer st = Stemmer.IMPL.getFirst();
-        for(final Stemmer stem : Stemmer.IMPL) {
-          if(stem.supports(lang)) {
-            st = stem;
-            break;
-          }
-        }
-        iter = st.get(lang, iter);
+        final Stemmer st = LanguageImpl.find(Stemmer.IMPL, lang);
+        iter = (st != null ? st : Stemmer.IMPL.getFirst()).get(lang, iter);
       } else {
         iter = new DictionaryStemmer(ftOpt.sd, iter);
       }
@@ -226,10 +214,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     final TreeMap<Language, Stemmer> langs = new TreeMap<>();
     for(final Stemmer stem : Stemmer.IMPL) {
       for(final Language l : stem.languages()) {
-        if(langs.containsKey(l)) continue;
-        for(final Tokenizer tknzr : Tokenizer.IMPL) {
-          if(tknzr.languages().contains(l)) langs.put(l, stem);
-        }
+        if(!langs.containsKey(l) && Tokenizer.supportFor(l)) langs.put(l, stem);
       }
     }
     final StringList sl = new StringList();

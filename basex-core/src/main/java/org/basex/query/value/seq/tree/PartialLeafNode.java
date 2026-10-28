@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 final class PartialLeafNode implements NodeLike<Item, Item> {
-  /** The single element. */
+  /** Elements. */
   final Item[] elems;
 
   /**
@@ -33,22 +33,16 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
 
     final NodeLike<Item, Item> left = nodes[pos - 1];
     if(left instanceof final PartialLeafNode pln) {
-      final Item[] ls = pln.elems, rs = elems;
-      final int l = ls.length, r = rs.length, n = l + r;
-      final Item[] vals = new Item[n];
-      Array.copy(ls, l, vals);
-      Array.copyFromStart(rs, r, vals, l);
-      nodes[pos - 1] = n < TreeSeq.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
+      final Item[] vals = TreeSeq.concat(pln.elems, elems);
+      nodes[pos - 1] = vals.length < TreeSeq.MIN_LEAF ? new PartialLeafNode(vals) :
+        new LeafNode(vals);
       return pos;
     }
 
     final Item[] ls = ((LeafNode) left).values, rs = elems;
     final int l = ls.length, r = rs.length, n = l + r;
     if(n <= TreeSeq.MAX_LEAF) {
-      final Item[] vals = new Item[n];
-      Array.copy(ls, l, vals);
-      Array.copyFromStart(rs, r, vals, l);
-      nodes[pos - 1] = new LeafNode(vals);
+      nodes[pos - 1] = new LeafNode(TreeSeq.concat(ls, rs));
       return pos;
     }
 

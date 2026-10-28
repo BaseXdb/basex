@@ -33,7 +33,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 import jakarta.servlet.http.*;
 
@@ -119,6 +118,14 @@ public final class RestXqFunction extends WebFunction {
     AnnList starts = AnnList.EMPTY;
     Ann pathAnn = null;
     final Set<String> templates = new HashSet<>();
+    if(mopts != null) {
+      // module options are applied first: function annotations override them
+      final QNmMap<String> options = module.options();
+      for(final QNm name : options) {
+        final Annotation def = Annotation.get(name);
+        if(def != null) input(def, mopts, options.get(name));
+      }
+    }
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -181,16 +188,7 @@ public final class RestXqFunction extends WebFunction {
         permission = new RestXqPerm(p, v);
         starts = starts.attach(ann);
       } else if(mopts != null) {
-        if(def == _INPUT_CSV) {
-          final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
-          mopts.set(MainOptions.CSVPARSER, parse(opts, ann));
-        } else if(def == _INPUT_JSON) {
-          final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
-          mopts.set(MainOptions.JSONPARSER, parse(opts, ann));
-        } else if(def == _INPUT_HTML) {
-          final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
-          mopts.set(MainOptions.HTMLPARSER, parse(opts, ann));
-        }
+        for(final Item arg : value) input(def, mopts, string(arg.string(ann.info)));
       }
     }
 
@@ -227,11 +225,9 @@ public final class RestXqFunction extends WebFunction {
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn.path());
       for(final QNm qname : pathVars) {
-        final QNm qnm = new QNm(qname.string(), function.sc);
-        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         // variables of other path templates are bound to an empty sequence
         final String segment = qnames.get(qname);
-        bind(qnm, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
+        bind(qname, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
           "Path segment $" + string(qname.string()));
       }
     }
@@ -413,26 +409,33 @@ public final class RestXqFunction extends WebFunction {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(super.toString());
-    if(!produces.isEmpty()) sb.append(' ').append(produces);
-    return sb.toString();
+    return produces.isEmpty() ? super.toString() : super.toString() + ' ' + produces;
   }
 
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Assigns annotation values as options.
-   * @param <O> option type
-   * @param options options instance
-   * @param ann annotation
-   * @return options instance
-   * @throws QueryException query exception
+   * Assigns input options.
+   * @param def annotation definition
+   * @param mopts main options
+   * @param string options string
    * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O options, final Ann ann)
-      throws QueryException, IOException {
-    for(final Item arg : ann.value()) options.assign(string(arg.string(ann.info)));
-    return options;
+  private static void input(final Annotation def, final MainOptions mopts, final String string)
+      throws IOException {
+    if(def == _INPUT_CSV) {
+      final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.CSVPARSER, opts);
+    } else if(def == _INPUT_JSON) {
+      final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.JSONPARSER, opts);
+    } else if(def == _INPUT_HTML) {
+      final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
+      opts.assign(string);
+      mopts.set(MainOptions.HTMLPARSER, opts);
+    }
   }
 
   /**
@@ -447,7 +450,7 @@ public final class RestXqFunction extends WebFunction {
       final InputInfo info) throws QueryException {
 
     if(body != null) {
-      final Method m = Method.get(method);
+      final Method m = Enums.get(Method.class, method);
       if(m != null && !m.body) throw error(info, METHOD_BODY_X, m);
       if(requestBody != null) throw error(info, ANN_BODY_TWICE);
       requestBody = checkVariable(toString(body), declared);
@@ -487,7 +490,7 @@ public final class RestXqFunction extends WebFunction {
    * @return parameter
    * @throws QueryException query exception
    */
-  private WebParam param(final Ann ann, final boolean... declared) throws QueryException {
+  private WebParam param(final Ann ann, final boolean[] declared) throws QueryException {
     // name of parameter
     final Value value = ann.value();
     final String name = toString(value.itemAt(0));

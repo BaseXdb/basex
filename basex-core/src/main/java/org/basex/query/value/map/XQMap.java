@@ -140,8 +140,7 @@ public abstract class XQMap extends XQStruct {
     final Item k = key(args[0], qc, ii);
     final Value value = getOrNull(k);
     if(value != null) return value;
-    if(type instanceof final ShapeType sh && sh.strict() &&
-        (!k.type.isStringOrUntyped() || !sh.fields().contains(k.string(null)))) {
+    if(type instanceof final RecordType rt && rt.index(k) == 0) {
       throw RECORDFIELD_X_X.get(ii, this, k);
     }
     return Empty.VALUE;
@@ -339,13 +338,8 @@ public abstract class XQMap extends XQStruct {
     if(type == tp) return true;
 
     try {
-      // a map matches a record type only if it is a record, i.e. if it has a type annotation
-      if(tp instanceof final ShapeType sh) {
-        // coercion to a record type creates a record with the field order of that type
-        return type instanceof final RecordType rt && (coerce && sh.coercive() ?
-          SeqType.kept(rt, sh, true) : rt.instanceOf(sh) || sh.matches(this));
-      }
-      if(SeqType.instanceOf(type, tp, coerce)) return true;
+      if(tp instanceof final ShapeType sh) return sh.matches(this, coerce);
+      if(SeqType.keptStatic(type, tp, coerce)) return true;
 
       final Type kt;
       final SeqType vt;
@@ -365,8 +359,9 @@ public abstract class XQMap extends XQStruct {
       if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
       // remember the more specific type to skip subsequent checks (records keep their type)
-      if(tp instanceof MapType && !(type instanceof ShapeType) && (coerce || !tp.coercive()) &&
-          (kt == null || kt.assignable()) && (vt == null || vt.type.assignable())) refineType(tp);
+      if(tp instanceof MapType && !(type instanceof ShapeType) && tp.assignable(coerce)) {
+        refineType(tp);
+      }
       return true;
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
@@ -390,7 +385,7 @@ public abstract class XQMap extends XQStruct {
       return new BasicIter<>(size) {
         @Override
         public Item get(final long i) {
-          return (Item) valueAt((int) i);
+          return (Item) valueAt(i);
         }
       };
     }
@@ -455,9 +450,7 @@ public abstract class XQMap extends XQStruct {
     if(!sameOrder) {
       // reject undeclared keys
       for(final Item key : keys()) {
-        if(!key.type.isStringOrUntyped() || !fields.contains(key.string(null))) {
-          throw typeError(this, rt, ii);
-        }
+        if(rt.index(key) == 0) throw typeError(this, rt, ii);
       }
     }
 
@@ -481,6 +474,80 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
+   * Converts this map to the given simple record type.
+   * @param sh simple record type
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @return coerced map
+   * @throws QueryException query exception
+   */
+  public final XQMap coerceTo(final ShapeType sh, final QueryContext qc, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
+
+    // entries keep their order; a field that cannot be coerced is named in the error message
+    final int fs = sh.fields().size();
+    final MapBuilder mb = new MapBuilder(fs);
+    forEach((key, value) -> {
+      qc.checkStop();
+      final int f = sh.index(key);
+      if(f == 0) throw typeError(this, sh, ii);
+      mb.put(sh.key(f), sh.coerce(f, value, qc, ii, cc));
+    });
+    if(structSize() < fs && addMissing(sh, mb) != 0) throw typeError(this, sh, ii);
+    return mb.map();
+  }
+
+  /**
+   * Casts this map to the given simple record type (see {@link SeqType#cast}).
+   * @param sh simple record type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast map, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQMap castTo(final ShapeType sh, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+
+    // entries keep their order, undeclared entries are discarded
+    final TokenObjectMap<ShapeField> fields = sh.fields();
+    final MapBuilder mb = new MapBuilder(fields.size());
+    if(!test((key, value) -> {
+      qc.checkStop();
+      final int f = sh.index(key);
+      if(f == 0) return true;
+      final Value cv = fields.value(f).seqType().convert(value, error, qc, info);
+      if(cv == null) return false;
+      mb.put(sh.key(f), cv);
+      return true;
+    })) return null;
+    final int f = addMissing(sh, mb);
+    if(f == 0) return mb.map();
+    if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, fields.value(f).seqType());
+    return null;
+  }
+
+  /**
+   * Adds empty entries for the fields of a simple record type that are missing in a map.
+   * @param sh simple record type
+   * @param mb map builder
+   * @return {@code 0}, or the index of a missing field that does not permit the empty sequence
+   * @throws QueryException query exception
+   */
+  private static int addMissing(final ShapeType sh, final MapBuilder mb) throws QueryException {
+    final TokenObjectMap<ShapeField> fields = sh.fields();
+    final int fs = fields.size();
+    for(int f = 1; f <= fs; f++) {
+      final Str key = sh.key(f);
+      if(mb.contains(key)) continue;
+      if(!fields.value(f).seqType().instance(Empty.VALUE)) return f;
+      mb.put(key, Empty.VALUE);
+    }
+    return 0;
+  }
+
+  /**
    * Casts this map to the given map type (see {@link SeqType#cast}).
    * @param mt map type
    * @param error raise error (return {@code null} otherwise)
@@ -496,9 +563,7 @@ public abstract class XQMap extends XQStruct {
     final MapBuilder mb = new MapBuilder(structSize());
     return test((key, value) -> {
       qc.checkStop();
-      final Value ck = kt.convert(key, error, qc, info);
-      if(ck == null) return false;
-      final Item k = (Item) ck;
+      if(!(kt.convert(key, error, qc, info) instanceof final Item k)) return false;
       if(mb.contains(k)) {
         if(error) throw MAPDUPLKEY_X.get(info, k);
         return false;
@@ -585,6 +650,9 @@ public abstract class XQMap extends XQStruct {
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
     if(!(item instanceof final XQMap map)) return false;
+    // compile time: records with different labels, and records and maps, are different values
+    if(deep == null && (type instanceof RecordType || map.type instanceof RecordType) &&
+        !type.eq(map.type)) return false;
 
     // deep = null: ordered comparison at compile time
     final Boolean order = deep == null ? null : deep.options.get(DeepEqualOptions.MAP_ORDER);

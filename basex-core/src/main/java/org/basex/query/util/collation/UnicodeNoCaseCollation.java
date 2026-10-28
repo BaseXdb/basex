@@ -55,16 +55,7 @@ final class UnicodeNoCaseCollation extends Collation {
    * @return result of comparison (-1, 0, 1)
    */
   private static int compare(final int cp1, final int cp2) {
-    return Integer.signum(lc(cp1) - lc(cp2));
-  }
-
-  /**
-   * Converts a character to lower case.
-   * @param cp codepoint
-   * @return lower-case representation
-   */
-  private static int lc(final int cp) {
-    return Character.toLowerCase(cp);
+    return Integer.signum(Character.toLowerCase(cp1) - Character.toLowerCase(cp2));
   }
 
   @Override

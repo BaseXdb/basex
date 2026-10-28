@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 import java.util.function.*;
 import java.util.regex.*;
 
@@ -56,7 +55,7 @@ public final class Users {
         try {
           final User user = new User(child, file);
           final String name = user.name();
-          if(users.get(name) != null) {
+          if(users.containsKey(name)) {
             Util.errln("%: User '%' supplied more than once.", file, name);
           } else {
             users.put(name, user);
@@ -199,14 +198,7 @@ public final class Users {
   public synchronized ArrayList<User> users(final String db, final Predicate<User> visible) {
     final ArrayList<User> list = new ArrayList<>();
     for(final User user : users.values()) {
-      if(visible.test(user)) {
-        if(db == null) {
-          list.add(user);
-        } else {
-          final Entry<String, Perm> entry = user.find(db);
-          if(entry != null) list.add(user);
-        }
-      }
+      if(visible.test(user) && (db == null || user.find(db) != null)) list.add(user);
     }
     list.sort(Comparator.comparing(User::name, String.CASE_INSENSITIVE_ORDER));
     return list;

@@ -33,13 +33,7 @@ public interface Index {
   IndexIterator iter(IndexSearch search);
 
   /**
-   * Computes costs for performing the specified search. An integer is returned:
-   * <ul>
-   *   <li> A negative value indicates that index access is not possible.</li>
-   *   <li> A value of zero indicates that no results will be returned.</li>
-   *   <li> A small value indicates that index access is fast.</li>
-   * </ul>
-   * Smaller values are better, a value of zero indicates that no results will be returned.
+   * Computes costs for performing the specified search.
    * @param search index search definition
    * @return cost estimation, or {@code null} if index access is not possible
    */

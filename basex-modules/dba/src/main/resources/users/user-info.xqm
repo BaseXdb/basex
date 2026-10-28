@@ -24,7 +24,7 @@ declare function user-info:parse(
         delete node .//text()[not(normalize-space())]
       }
     ) else (
-      error((), 'User information has no "info" root element.')
+      error((), 'User information has no “info” root element.')
     )
   ) else (
     element info { }

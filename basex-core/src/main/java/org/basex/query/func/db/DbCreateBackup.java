@@ -20,7 +20,7 @@ public final class DbCreateBackup extends BackupFn {
     final String name = toBackup(arg(0), qc);
     final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
 
-    checkCreate(name, qc);
+    checkBackup(name, qc);
     if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);
 
     final String comment = options.get(CreateBackupOptions.COMMENT);

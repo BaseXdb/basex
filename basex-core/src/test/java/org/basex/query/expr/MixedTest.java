@@ -277,6 +277,7 @@ public final class MixedTest extends SandboxTest {
 
     query("element Q{ }x {}[namespace-uri() = (' ')]", "");
     query("element { 'Q{ }x' } {}[namespace-uri() = (' ')]", "");
+    query("parse-xml('<x xmlns=\" u \"/>')/*[namespace-uri() = ' u '] => count()", 1);
 
     query("attribute { ' a ' } {}", "a=\"\"");
 
@@ -535,8 +536,8 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(XQSmallMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
         new TypeInfo(XQSmallMap.class, "map(xs:integer, xs:integer+)", 2));
     test("{ 'a': ('x', 1 to 3) => remove(1), 'b': 3 }",
-        new TypeInfo(XQShapeValueMap.class, "map(xs:string, xs:anyAtomicType+)", 2),
-        new TypeInfo(XQShapeValueMap.class, "map(xs:string, xs:integer+)", 2));
+        new TypeInfo(XQShapeValueMap.class, "record(a as xs:anyAtomicType+, b as xs:integer)", 2),
+        new TypeInfo(XQShapeValueMap.class, "record(a as xs:integer+, b as xs:integer)", 2));
 
     test("[ (1, 2), 3, 4 ] => array:remove(1)",
         new TypeInfo(SmallArray.class, "array(xs:integer+)", 2),

@@ -1,0 +1,35 @@
+import java.io.*;
+
+/**
+ * This example shows how commands can be executed on a server.
+ *
+ * This example requires a running database server instance.
+ * Documentation: https://docs.basex.org/main/Clients
+ *
+ * @author BaseX Team, BSD License
+ */
+public final class Example {
+  /**
+   * Main method.
+   * @param args command-line arguments
+   * @throws IOException I/O exception
+   */
+  public static void main(final String... args) throws IOException {
+    // create session (adjust the credentials to those of your server)
+    try(BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
+      // initialize timer
+      final long time = System.nanoTime();
+
+      // version 1: perform command and print returned string
+      System.out.println(session.execute("info"));
+
+      // version 2 (faster): perform command and pass on result to output stream
+      final OutputStream out = System.out;
+      session.execute("XQUERY 1 to 10", out);
+
+      // print time needed
+      final double ms = (System.nanoTime() - time) / 1000000.0d;
+      System.out.println("\n\n" + ms + " ms");
+    }
+  }
+}

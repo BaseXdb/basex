@@ -28,7 +28,11 @@ function dba:ws-message(
         string($json?filter)))
     case 'backups'     return utils:ws-panel('backups-panel',
       panels:backups($json?name, $sort, $page))
-    case 'information' return utils:ws-panel('information-panel', panels:information($json?name))
+    case 'general-backups' return utils:ws-panel('general-backups-panel',
+      panels:general-backups($sort, $page))
+    case 'properties'  return utils:ws-panel('properties-dialog',
+      panels:properties($json?name, string($json?index), string($json?prefix)))
+    case 'storage'     return utils:ws-panel('storage-dialog', panels:storage())
     case 'index'       return utils:ws-panel('index-panel',
       panels:index($json?name, string($json?index), string($json?prefix), $sort, $page))
     case 'resource'    return dba:ws-resource($json?name, $json?resource)
@@ -98,6 +102,9 @@ declare %private function dba:ws-query(
   ) {
     let $context := head(panels:resource-value($db, $path))
     return xquery:eval($string, { '': $context }, { 'pass': true() })
-  }, [ $name, $resource, $query ], utils:job-options(`{ $name }/{ $resource }`, ()))
-  return utils:ws-start($id, $run, utils:serialize-options($indent))
+  }, [ $name, $resource, $query ], {
+    utils:job-options(`{ $name }/{ $resource }`, ()),
+    'serializer': utils:serialize-options($indent)
+  })
+  return utils:ws-start($id, $run, true())
 };

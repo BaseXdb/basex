@@ -23,7 +23,7 @@ public final class FnMapToElement extends PlanFn {
     if(value.isEmpty()) return Empty.VALUE;
 
     final MapToElement converter = new MapToElement(options, uris(qc, sc()), qc.shared,
-        qc.context.options, info);
+        mainOptions(qc), info);
     final NodeHandler handler = new NodeHandler("", false);
     try {
       converter.convert(value, handler);

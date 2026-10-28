@@ -4,7 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
+
 import org.basex.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -78,6 +83,25 @@ public final class ValidateModuleTest extends SandboxTest {
     // invalid arguments
     error(func.args("unknown"), RESWHICH_X);
     error(func.args(FILE, "unknown.dtd"), RESWHICH_X);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException I/O exception
+   */
+  @Test public void dtdSystemProperty() throws IOException {
+    // system properties are ignored when the input is parsed
+    final IOFile entity = new IOFile(sandbox(), "entity.txt");
+    entity.write("X");
+    final String property = Prop.DBPREFIX + MainOptions.DTD.name();
+    System.setProperty(property, "true");
+    try {
+      query(_VALIDATE_DTD_REPORT.args(
+        " '<!DOCTYPE x [<!ENTITY e SYSTEM \"" + entity.url() + "\">]><x>&amp;e;</x>'",
+        "<!ELEMENT x EMPTY>") + "//status/string()", "valid");
+    } finally {
+      System.clearProperty(property);
+    }
   }
 
   /** Test method. */

@@ -26,32 +26,31 @@ declare function panels:users(
   $name  as xs:string?
 ) as element()+ {
   <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>{
+    let $current := session:get($config:SESSION-KEY)
     let $headers := (
       (: the values of a known format get the width they need; the name takes the rest :)
-      { 'key': 'name', 'label': 'Name' },
-      { 'key': 'permission', 'label': 'Permission', 'width': 'calc(12ch + 0.5rem)' },
-      { 'key': 'you', 'label': 'You', 'width': '3rem' }
+      (: the link names the whole selection, so it can be followed and bookmarked; the view
+         follows it in place, over the connection it opened for its panels. The user of this
+         view is marked as in the list of clients :)
+      { 'key': 'name', 'label': 'Name', 'link': fn($entry, $value) {
+        html:select($value, $panels:CAT, { 'name': $value }, $value = $name, 'name',
+          'selectUser')(),
+        html:marker('you')[$value = $current]
+      } },
+      { 'key': 'permission', 'label': 'Permission', 'width': 'calc(13ch + 0.5rem)' }
     )
     let $entries := (
-      let $current := session:get($config:SESSION-KEY)
       for $user in user:list-details()
-      let $user-name := string($user/@name)
       return {
-        (: the link names the whole selection, so it can be followed and bookmarked; the
-           view follows it in place, over the connection it opened for its panels :)
-        'name': html:select($user-name, $panels:CAT, { 'name': $user-name },
-          $user-name = $name, 'name', 'selectUser'),
+        'name': string($user/@name),
         (: local permissions are counted; the patterns are named by the tooltip :)
         'permission': fn() {
           let $local := $user/database
           return if ($local) then (
-            <span title='{ string-join($local ! (@pattern || ' → ' || @permission), ', ') }'>{
-              $user/@permission || ' +' || count($local)
+            <span title='{ string-join($local ! `{ @pattern } → { @permission }`, ', ') }'>{
+              `{ $user/@permission } +{ count($local) }`
             }</span>
           ) else string($user/@permission)
-        },
-        'you': fn() {
-          if ($current = $user-name) then html:symbol('✓', 'yes') else html:symbol('–', 'no')
         }
       }
     )
@@ -59,17 +58,21 @@ declare function panels:users(
       <button type='button' onclick='showDialog("create")'
               title='Create a new user'>New…</button>,
       form:button('users/drop', 'Drop', ('CHECK', 'CONFIRM'),
-        title := 'Delete the selected users')
+        title := 'Delete the selected users'),
+      <button type='button' onclick='showDialog("info")'
+              title='Edit the custom data that belongs to no user in particular'>{
+        'General Data…'
+      }</button>
     )
-    return table:create($headers, $entries, $buttons, {},
-      { 'sort': $sort, 'page': $page, 'presort': 'name', 'sticky': <h2>Users</h2>,
-        'noun': 'user' })
+    return table:create($headers, $entries, $buttons, options :=
+      { 'sort': $sort, 'page': $page, 'presort': 'name', 'select': 'name',
+        'sticky': <h2>Users</h2>, 'noun': 'user' })
   }</form>,
 
-  form:dialog('create', 'New User', 'users/create', false(), (
+  form:dialog('create', 'New User', 'Create', 'users/create', false(), (
     form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
     form:field('Password:', <input type='password' name='pw' autocomplete='new-password'/>),
-    form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5], 'none'))
+    form:field('Permission:', form:select('perm', $config:PERMISSIONS, 'none'))
   ))
 };
 
@@ -92,7 +95,7 @@ declare function panels:user(
     (: the admin is the one user whose name and permission are not up for discussion :)
     let $admin := $name eq 'admin'
     return (
-      <h2>{ 'User: ' || $name }</h2>,
+      <h2>User: { $name }</h2>,
       <div class='buttons'><button title='Save the changes to this user'>Save</button></div>,
       <input type='hidden' name='name' value='{ $name }'/>,
       if ($admin) {
@@ -113,7 +116,7 @@ declare function panels:user(
         }</div>,
         if (not($admin)) {
           <div>{
-            form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5],
+            form:field('Permission:', form:select('perm', $config:PERMISSIONS,
               $perm otherwise $user/@permission)),
             panels:local-permissions($user)
           }</div>
@@ -142,7 +145,7 @@ declare %private function panels:local-permissions(
     return <div>{
       <code>{ string($db/@pattern) }</code>, ' → ', string($db/@permission), ' ',
       <button class='link' formaction='users/pattern-drop' name='pattern'
-              value='{ $db/@pattern }' title='Delete the database permission'
+              value='{ $db/@pattern }' title='Drop the permission for “{ $db/@pattern }”'
               onclick='return confirmAction(this, "Drop")'>✕</button>
     }</div>,
     <a href='#' onclick='addPattern(); return false;'
@@ -156,7 +159,7 @@ declare %private function panels:local-permissions(
  :)
 declare function panels:pattern-dialog() as element(dialog) {
   (: the user is filled in when the dialog is opened; see addPattern :)
-  form:dialog('pattern', 'Add Database Permission', 'users/pattern-add', false(), (
+  form:dialog('pattern', 'Add Database Permission', 'Add', 'users/pattern-add', false(), (
     <input type='hidden' name='name' id='pattern-user'/>,
     form:field('Pattern:', <input type='text' name='pattern' autofocus='' required=''/>,
       title := 'Database names, with * and ? as wildcards'),
@@ -172,19 +175,13 @@ declare function panels:pattern-dialog() as element(dialog) {
 };
 
 (:~
- : Creates the contents of the information panel: the information that is attached to no user
- : in particular.
- : @return panel contents
+ : Creates the dialog with the information that is attached to no user in particular.
+ : @return dialog
  :)
-declare function panels:information() as element()+ {
-  <form method='post' action='users/info' autocomplete='off' class='pane column'>
-    <h2>General User Data</h2>
-    <div class='buttons'><button title='Save the general user data'>Save</button></div>
-    {
-      panels:info-editor('user-info',
-        'Custom XML data that belongs to no user in particular', ())
-    }
-  </form>
+declare function panels:info-dialog() as element(dialog) {
+  form:dialog('info', 'General User Data', 'Save', 'users/info', false(),
+    panels:info-editor('user-info',
+      'Custom XML data that belongs to no user in particular', (), 16))
 };
 
 (:~
@@ -192,15 +189,18 @@ declare function panels:information() as element()+ {
  : @param  $id    id of the editor
  : @param  $note  what the data belongs to
  : @param  $name  user; empty sequence for the data that belongs to no user in particular
+ : @param  $rows  height of the editor in lines; empty sequence if it fills the panel
  : @return note and editor
  :)
 declare %private function panels:info-editor(
   $id    as xs:string,
   $note  as xs:string,
-  $name  as xs:string?
+  $name  as xs:string?,
+  $rows  as xs:integer? := ()
 ) as element()+ {
   <div class='note'>{ $note }, with an &lt;info&gt; root element.</div>,
   <textarea name='info' id='{ $id }' spellcheck='false'>{
+    attribute rows { $rows }[exists($rows)],
     serialize(user:info($name), { 'indent': true() })
   }</textarea>
 };

@@ -11,6 +11,15 @@ package org.basex.gui.text;
  * @param line line in which the declaration occurs
  */
 public record Declaration(String name, String args, int pos, int line) {
+  /**
+   * Returns the name without namespace prefix (variables keep their dollar sign).
+   * @return local name
+   */
+  public String local() {
+    final int c = name.indexOf(':');
+    return c == -1 ? name : (name.startsWith("$") ? "$" : "") + name.substring(c + 1);
+  }
+
   @Override
   public String toString() {
     return name;

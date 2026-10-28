@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.*;
@@ -127,7 +128,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XdmValue collection(final String name) {
     try {
       return XdmValue.get(qp.qc.resources.collection(name.isEmpty() ? null :
-        new QueryInput(name, qp.sc), qp.qc, null));
+        new QueryInput(name, qp.sc), new CollectionOptions(), false, qp.qc, null));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

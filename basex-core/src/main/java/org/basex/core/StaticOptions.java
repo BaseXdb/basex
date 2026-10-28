@@ -157,8 +157,11 @@ public final class StaticOptions extends Options {
 
   @Override
   protected boolean assignOther(final String name, final String value) {
+    // ignore removed options that were written to the file by default
+    if(Strings.eq(name, "FAIRLOCK", "LANGKEYS") ||
+        name.equals("IGNOREHOSTNAME") && Strings.isFalse(value)) return true;
     // cache local options as global options
-    final Option<?> option = new MainOptions(false).option(name);
+    final Option<?> option = new MainOptions().option(name);
     if(option == null) return false;
     Prop.put(option, value);
     return true;
@@ -191,10 +194,8 @@ public final class StaticOptions extends Options {
    * @return name of random database
    */
   public synchronized String createTempDb(final String name) {
-    String db;
-    int c = 0;
-    while(true) {
-      db = name + '.' + c++;
+    for(int c = 0;; c++) {
+      final String db = name + '.' + c;
       final IOFile io = dbPath(db);
       if(!io.exists()) {
         io.md();

@@ -188,7 +188,7 @@ public final class BaseXHTTP extends CLI {
         dir = new IOFile(dir, file);
         // update file in resource path if it has changed
         if(!dir.exists() || !Token.eq(data, dir.read())) {
-          Util.errln("Updating " +  dir);
+          Util.errln("Updating " + dir);
           dir.write(data);
         }
       }
@@ -205,7 +205,7 @@ public final class BaseXHTTP extends CLI {
       }
     }
     // create configuration file
-    Util.errln("Creating " +  target);
+    Util.errln("Creating " + target);
     target.write(data);
   }
 
@@ -264,58 +264,48 @@ public final class BaseXHTTP extends CLI {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // database command
-            commands.add(commands(arg.string()));
-            break;
-          case 'C': // command script
-            commands.add(script(arg.string()));
-            break;
-          case 'd': // activate debug mode
+          // database command
+          case 'c' -> commands.add(commands(arg.string()));
+          // command script
+          case 'C' -> commands.add(script(arg.string()));
+          // activate debug mode
+          case 'd' -> {
             option(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
-            break;
-          case 'D': // hidden flag: daemon mode
-            daemon = false;
-            break;
-          case 'g': // enable GZIP compression
-            option(StaticOptions.GZIP, Boolean.toString(true));
-            break;
-          case 'h': // parse HTTP port
-            option(StaticOptions.HTTPPORT, Integer.toString(arg.number()));
-            break;
-          case 'l': // use local mode
-            option(StaticOptions.HTTPLOCAL, Boolean.toString(true));
-            break;
-          case 'L': // start database server in addition
-            option(StaticOptions.HTTPLOCAL, Boolean.toString(false));
-            break;
-          case 'n': // parse host name
+          }
+          // hidden flag: daemon mode
+          case 'D' -> daemon = false;
+          // enable GZIP compression
+          case 'g' -> option(StaticOptions.GZIP, Boolean.toString(true));
+          // parse HTTP port
+          case 'h' -> option(StaticOptions.HTTPPORT, Integer.toString(arg.number()));
+          // use local mode
+          case 'l' -> option(StaticOptions.HTTPLOCAL, Boolean.toString(true));
+          // start database server in addition
+          case 'L' -> option(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+          // parse host name
+          case 'n' -> {
             final String n = arg.string();
             option(StaticOptions.HOST, n);
             option(StaticOptions.SERVERHOST, n);
-            break;
-          case 'p': // parse server port
-            final int p = arg.number();
-            option(StaticOptions.PORT, Integer.toString(p));
-            option(StaticOptions.SERVERPORT, Integer.toString(p));
-            break;
-          case 'q': // quiet flag (hidden)
-            quiet = true;
-            break;
-          case 's': // parse stop port
-            option(StaticOptions.STOPPORT, Integer.toString(arg.number()));
-            break;
-          case 'S': // set service flag
-            service = daemon;
-            break;
-          case 'U': // specify username
-            option(StaticOptions.USER, arg.string());
-            break;
-          case 'z': // suppress logging
-            option(StaticOptions.LOG, "");
-            break;
-          default:
-            throw arg.usage();
+          }
+          // parse server port
+          case 'p' -> {
+            final String p = Integer.toString(arg.number());
+            option(StaticOptions.PORT, p);
+            option(StaticOptions.SERVERPORT, p);
+          }
+          // quiet flag (hidden)
+          case 'q' -> quiet = true;
+          // parse stop port
+          case 's' -> option(StaticOptions.STOPPORT, Integer.toString(arg.number()));
+          // set service flag
+          case 'S' -> service = daemon;
+          // specify username
+          case 'U' -> option(StaticOptions.USER, arg.string());
+          // suppress logging
+          case 'z' -> option(StaticOptions.LOG, "");
+          default -> throw arg.usage();
         }
       } else {
         if(!S_STOP.equalsIgnoreCase(arg.string())) throw arg.usage();
@@ -414,8 +404,9 @@ public final class BaseXHTTP extends CLI {
             final boolean stp;
             try {
               // honor same-host shutdown requests only
-              stp = BaseXServer.STOP.equals(BufferInput.get(s.getInputStream()).readString()) &&
-                  Util.localHost(s.getInetAddress());
+              final String name = BufferInput.get(s.getInputStream()).readString(
+                  BaseXServer.STOP.length());
+              stp = BaseXServer.STOP.equals(name) && Util.localHost(s.getInetAddress());
               if(!stp) {
                 po.write(1);
                 po.flush();

@@ -96,9 +96,7 @@ public enum Compression {
    */
   public static Compression file(final String name) {
     for(final Compression compr : values()) {
-      if(name.endsWith(compr.suffix) || name.endsWith(compr.tarSuffix)) {
-        return compr;
-      }
+      if(name.endsWith(compr.suffix) || name.endsWith(compr.tarSuffix)) return compr;
     }
     return null;
   }

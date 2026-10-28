@@ -39,18 +39,14 @@ public final class Set extends Command {
   @Override
   protected boolean run() {
     final String name = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
-    Options opts = options;
-
-    // check static options: only "debug" can be changed by admin users
-    boolean debug = false;
-    if(context.user().has(Perm.ADMIN)) {
-      final Option<?> opt = soptions.option(name);
-      if(opt == StaticOptions.DEBUG) {
-        debug = true;
-        opts = soptions;
-      } else if(opt != null) {
-        return error(GLOBAL_OPTION_X, name);
-      }
+    // check static options: only "debug" can be changed
+    final Option<?> opt = soptions.option(name);
+    if(opt != null && opt != StaticOptions.DEBUG) return error(GLOBAL_OPTION_X, name);
+    final boolean debug = opt != null;
+    final Options opts = debug ? soptions : options;
+    // debugging and options that access files can only be assigned by admins
+    if((debug || MainOptions.admin(options.option(name))) && !context.user().has(Perm.ADMIN)) {
+      return error(PERM_REQUIRED_X, Perm.ADMIN);
     }
 
     try {

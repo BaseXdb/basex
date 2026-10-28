@@ -9,7 +9,11 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
+
+import jakarta.servlet.http.*;
+import jakarta.websocket.CloseReason.*;
 
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.
@@ -44,7 +48,7 @@ public final class WsPool {
    * @return client ID
    */
   static String add(final WebSocket socket) {
-    final String id = createId();
+    final String id = PREFIX + WEBSOCKET_ID.incrementAndGet();
     CLIENTS.put(id, socket);
     return id;
   }
@@ -58,41 +62,56 @@ public final class WsPool {
   }
 
   /**
+   * Closes all WebSockets of the specified HTTP session.
+   * @param session HTTP session
+   */
+  public static void close(final HttpSession session) {
+    for(final WebSocket socket : CLIENTS.values()) {
+      if(socket.session == session) socket.close(CloseCodes.NORMAL_CLOSURE.getCode(), null);
+    }
+  }
+
+  /**
    * Sends a message to all connected clients.
    * @param message message
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public static void emit(final Item message) throws QueryException {
-    send(message, new ArrayList<>(CLIENTS.values()));
+  public static void emit(final Item message, final InputInfo info) throws QueryException {
+    send(message, new ArrayList<>(CLIENTS.values()), info);
   }
 
   /**
    * Sends a message to all connected clients except to the one with the given ID.
    * @param message message
    * @param client client ID
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public static void broadcast(final Item message, final String client) throws QueryException {
+  public static void broadcast(final Item message, final String client, final InputInfo info)
+      throws QueryException {
     final List<WebSocket> list = new ArrayList<>();
     for(final Entry<String, WebSocket> entry : CLIENTS.entrySet()) {
       if(!client.equals(entry.getKey())) list.add(entry.getValue());
     }
-    send(message, list);
+    send(message, list, info);
   }
 
   /**
    * Sends a message to specific clients.
    * @param message message
+   * @param info input info (can be {@code null})
    * @param ids client IDs
    * @throws QueryException query exception
    */
-  public static void send(final Value message, final String... ids) throws QueryException {
+  public static void send(final Value message, final InputInfo info, final String... ids)
+      throws QueryException {
     final List<WebSocket> list = new ArrayList<>(ids.length);
     for(final String id : ids) {
       final WebSocket ws = CLIENTS.get(id);
       if(ws != null) list.add(ws);
     }
-    send(message, list);
+    send(message, list, info);
   }
 
   /**
@@ -108,30 +127,23 @@ public final class WsPool {
    * Sends a message to the specified clients.
    * @param message message
    * @param websockets clients
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private static void send(final Value message, final List<WebSocket> websockets)
-      throws QueryException {
+  private static void send(final Value message, final List<WebSocket> websockets,
+      final InputInfo info) throws QueryException {
 
     // serialize contents once
     final List<Object> values;
     try {
       values = WsResponse.serialize(message.iter(), new SerializerOptions());
     } catch(final QueryIOException ex) {
-      throw ex.getCause();
+      throw ex.getCause(info);
     }
 
     // send result to all clients
     for(final WebSocket ws : websockets) {
       for(final Object value : values) ws.send(value);
     }
-  }
-
-  /**
-   * Creates a new, unused WebSocket ID.
-   * @return new ID
-   */
-  private static String createId() {
-    return PREFIX + WEBSOCKET_ID.incrementAndGet();
   }
 }

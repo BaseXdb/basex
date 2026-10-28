@@ -8,8 +8,7 @@ import org.basex.core.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class performs a client/server stress tests with a specified
- * number of threads and queries.
+ * Adds documents to a database from concurrent client sessions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,9 +17,6 @@ import org.junit.jupiter.api.*;
 public final class ServerAddTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/input.xml";
-
-  /** Server reference. */
-  BaseXServer server;
 
   /**
    * Runs the test.
@@ -60,9 +56,8 @@ public final class ServerAddTest extends SandboxTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
-    // run server instance
-    server = createServer();
+  private static void run(final int clients, final int runs) throws Exception {
+    final BaseXServer server = createServer();
     try {
       // create test database
       try(ClientSession cs = createClient()) {
@@ -84,7 +79,6 @@ public final class ServerAddTest extends SandboxTest {
         cs.execute("DROP DB " + NAME);
       }
     } finally {
-      // stop server
       stopServer(server);
     }
   }

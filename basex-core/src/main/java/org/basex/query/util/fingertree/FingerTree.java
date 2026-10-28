@@ -324,9 +324,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
     } else {
       boolean fst = true;
       for(final String line : obj.toString().split("\r\n?|\n")) {
-        sb.repeat("  ", indent).append(line);
         if(fst) fst = false;
         else sb.append('\n');
+        sb.repeat("  ", indent).append(line);
       }
     }
   }

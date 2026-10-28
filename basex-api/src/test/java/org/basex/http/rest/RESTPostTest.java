@@ -129,4 +129,19 @@ public final class RESTPostTest extends RESTTest {
     post(500, "<query xmlns=\"" + URI + "\"><text>(</text></query>",
         MediaType.APPLICATION_XML, "");
   }
+
+  /**
+   * POST Test: reject excessive entity expansion.
+   * @throws IOException I/O exception
+   */
+  @Test public void postEntities() throws IOException {
+    final StringBuilder dtd = new StringBuilder("<!ENTITY e0 'xxxxxxxxxx'>");
+    for(int e = 1; e <= 6; e++) {
+      dtd.append("<!ENTITY e").append(e).append(" '").append(("&e" + (e - 1) + ';').repeat(10));
+      dtd.append("'>");
+    }
+    post(400, "<!DOCTYPE query [" + dtd + "]><query xmlns=\"" + URI +
+        "\"><text>&e6;</text></query>",
+        MediaType.APPLICATION_XML, "");
+  }
 }

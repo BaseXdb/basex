@@ -6,6 +6,7 @@ import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * WebSocket function.
@@ -40,9 +41,8 @@ abstract class WsFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final WebSocket ws(final QueryContext qc) throws QueryException {
-    final WebSocket ws = (WebSocket) qc.context.getExternal(WebSocket.class);
-    if(ws == null) throw BASEX_WS.get(info);
-    return ws;
+    if(qc.context.getExternal(WebSocket.class) instanceof final WebSocket ws) return ws;
+    throw BASEX_WS.get(info);
   }
 
   /**
@@ -54,7 +54,19 @@ abstract class WsFn extends StandardFunc {
   final WebSocket client(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
     final WebSocket ws = WsPool.get(id);
-    if(ws == null) throw WS_NOTFOUND_X.get(null, id);
+    if(ws == null) throw WS_NOTFOUND_X.get(info, id);
     return ws;
+  }
+
+  /**
+   * Returns the message to be sent.
+   * @param qc query context
+   * @return message
+   * @throws QueryException query exception
+   */
+  final Item message(final QueryContext qc) throws QueryException {
+    final Item message = arg(0).item(qc, info);
+    if(message.isEmpty()) throw typeError(message, BasicType.ITEM, info);
+    return message;
   }
 }

@@ -43,15 +43,17 @@ public final class Lookup extends Arr {
    * Checks if a map of the specified type may be a strict record that lacks the requested key.
    * @param mt map type
    * @param key key expression
-   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean mayLackField(final MapType mt, final Expr key, final InputInfo ii)
-      throws QueryException {
-    return mt instanceof final ShapeType sh ?
-      sh.strict() && !(key instanceof final AStr str && sh.fields().contains(str.string(ii))) :
-      mt.keyType().intersect(BasicType.STRING) != null;
+  public static boolean mayLackField(final MapType mt, final Expr key) throws QueryException {
+    if(!(mt instanceof final ShapeType sh)) return mt.keyType().intersect(BasicType.STRING) != null;
+    // any shape may be matched by records: only declared fields are safe
+    if(!(key instanceof final Value keys) || keys.size() > sh.fields().size()) return true;
+    for(final Item item : keys) {
+      if(sh.index(item) == 0) return true;
+    }
+    return false;
   }
 
   @Override
@@ -76,8 +78,9 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
-    // pre-evaluate a single-key lookup
-    if(is == 1 && inputs instanceof Value && keys instanceof Item) return cc.preEval(this);
+    // pre-evaluate a lookup with a single input and a single key, or with a map and static keys
+    if(is == 1 && inputs instanceof Value &&
+        (keys instanceof Item || map && keys instanceof Value)) return cc.preEval(this);
 
     final Expr expr = opt(tp, cc);
     if(expr != this) return cc.replaceWith(this, expr);
@@ -112,7 +115,7 @@ public final class Lookup extends Arr {
     if(ks == 0) return keys;
 
     // keep the lookup if a runtime value could be a strict record that lacks a requested key
-    if(keys != Str.WILDCARD && type instanceof final MapType mt && mayLackField(mt, keys, info)) {
+    if(keys != Str.WILDCARD && type instanceof final MapType mt && mayLackField(mt, keys)) {
       return this;
     }
 
@@ -239,15 +242,9 @@ public final class Lookup extends Arr {
     qs.token(exprs[0]).token('?');
 
     final Expr keys = exprs[1];
-    byte[] key = null;
-    if(keys == Str.WILDCARD) {
-      key = Str.WILDCARD.string();
-    } else if(keys instanceof final Str str) {
-      if(XMLToken.isNCName(str.string())) key = str.string();
-    } else if(keys instanceof final Itr itr) {
-      final long l = itr.itr();
-      if(l >= 0) key = Token.token(l);
-    }
+    final byte[] key = keys == Str.WILDCARD ? Str.WILDCARD.string() :
+      keys instanceof final Str str && XMLToken.isNCName(str.string()) ? str.string() :
+      keys instanceof final Itr itr && itr.itr() >= 0 ? Token.token(itr.itr()) : null;
     if(key != null) qs.value(key);
     else qs.paren(keys);
   }

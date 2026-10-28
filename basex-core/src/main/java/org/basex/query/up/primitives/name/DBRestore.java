@@ -35,10 +35,6 @@ public final class DBRestore extends NameUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     if(!name.isEmpty()) close();
     // restore backup

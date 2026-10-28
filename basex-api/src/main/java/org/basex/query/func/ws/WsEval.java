@@ -6,13 +6,13 @@ import java.util.function.*;
 import org.basex.core.jobs.*;
 import org.basex.http.web.*;
 import org.basex.http.ws.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,18 +23,20 @@ import org.basex.query.value.item.*;
 public final class WsEval extends WsFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
+    final JobOptions options = toOptions(arg(2), new JobOptions(), qc);
+    // the result is serialized by the job
+    if(options.get(JobOptions.SERIALIZER) == null)
+      options.set(JobOptions.SERIALIZER, new SerializerOptions());
     final QueryJobSpec spec = toJobSpec(arg(0), arg(1), options, false, qc);
     final WebSocket ws = ws(qc);
-    final SerializerOptions sopts = options.get(WsOptions.SERIALIZER);
     final Consumer<QueryJobResult> notify = result -> {
       // a stopped job has neither a result nor an error: nothing is sent
       if(result.value == null && result.exception == null) return;
       try {
         // the outcome of a query is one message; a failed query is reported as error
         final Value value = result.get();
-        final ArrayOutput ao = value.serializeUnencoded(sopts);
-        ws.send(value instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
+        ws.send(value instanceof final Bin bin ? ByteBuffer.wrap(bin.binary(null)) :
+          Token.string(((Item) value).string(null)));
       } catch(final Exception ex) {
         ws.error(ex);
       }

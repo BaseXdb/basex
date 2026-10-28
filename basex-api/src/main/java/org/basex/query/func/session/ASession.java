@@ -80,8 +80,8 @@ public final class ASession {
     if(names == null) throw notFound();
     final TokenList tl = new TokenList();
     for(final String name : names) {
-      final byte[] token = XMLToken.check(name, true);
-      if(token != null) tl.add(token);
+      final byte[] token = Token.token(name);
+      if(XMLToken.isValid(token)) tl.add(token);
     }
     return StrSeq.get(tl);
   }

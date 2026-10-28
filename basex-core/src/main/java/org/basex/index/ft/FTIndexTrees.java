@@ -27,13 +27,13 @@ final class FTIndexTrees {
   /**
    * Indexes a token with full-text data.
    * @param token token to be indexed
-   * @param pre PRE value for the token
+   * @param id ID or PRE value of the node
    * @param pos pos value of the token
    */
-  void index(final byte[] token, final int pre, final int pos) {
+  void index(final byte[] token, final int id, final int pos) {
     final int tl = token.length;
     if(trees[tl] == null) trees[tl] = new IndexTree(IndexType.FULLTEXT);
-    trees[tl].add(token, pre, pos);
+    trees[tl].add(token, id, pos);
   }
 
   /**

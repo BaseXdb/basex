@@ -72,6 +72,8 @@ public class QueryException extends Exception {
   private int markedCol;
   /** Marks if this exception is catchable by a {@code try/catch} expression. */
   private boolean catchable = true;
+  /** Marks if this exception was raised by the initializing expression of a record field. */
+  private boolean initializer;
 
   // no public constructor with a single Throwable: ForkJoinTask would use it to wrap thrown errors
 
@@ -318,6 +320,23 @@ public class QueryException extends Exception {
   }
 
   /**
+   * Checks if this exception was raised by the initializing expression of a record field.
+   * @return result of check
+   */
+  public final boolean isInitializer() {
+    return initializer;
+  }
+
+  /**
+   * Marks this exception as raised by the initializing expression of a record field.
+   * @return self reference for convenience
+   */
+  public final QueryException initializer() {
+    if(this != ERROR) initializer = true;
+    return this;
+  }
+
+  /**
    * Returns variables for a new catch expression.
    * @param qc query context
    * @param info input info
@@ -330,15 +349,6 @@ public class QueryException extends Exception {
       vars[v] = new Var(QNAMES[v], TYPES[v], qc, info);
     }
     return vars;
-  }
-
-  /**
-   * Returns an array with values for this exception.
-   * @return values
-   * @throws QueryException query exception
-   */
-  public ValueList values() throws QueryException {
-    return values(true);
   }
 
   /**
@@ -375,7 +385,7 @@ public class QueryException extends Exception {
    * @throws QueryException query exception
    */
   public XQMap map() throws QueryException {
-    return (XQMap) values().peek();
+    return (XQMap) values(true).peek();
   }
 
   /**

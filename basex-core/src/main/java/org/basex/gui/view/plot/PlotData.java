@@ -102,7 +102,7 @@ final class PlotData {
     final int[] contextPres = nodes.pres();
     for(int p : contextPres) {
       if(p >= data.nodes()) break;
-      final int nl = p + data.size(p, Data.ELEM);
+      final int nl = p + data.size(p, data.kind(p));
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {

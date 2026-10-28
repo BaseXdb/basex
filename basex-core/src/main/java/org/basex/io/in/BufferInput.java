@@ -61,9 +61,8 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    */
   public BufferInput(final IO input) throws IOException {
-    this(input.inputStream());
+    this(input.inputStream(), input.length());
     this.input = input;
-    length = input.length();
   }
 
   /**
@@ -161,8 +160,21 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    */
   public final String readString() throws IOException {
+    return readString(Integer.MAX_VALUE);
+  }
+
+  /**
+   * Reads a string from the input stream, suffixed by a {@code 0} byte, with a maximum length.
+   * @param max maximum number of bytes
+   * @return string
+   * @throws IOException I/O exception, or if the string exceeds the maximum length
+   */
+  public final String readString(final int max) throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = read()) > 0;) bl.add(l);
+    for(int l; (l = read()) > 0;) {
+      if(bl.size() == max) throw new IOException("String exceeds " + max + " bytes.");
+      bl.add(l);
+    }
     return bl.toString();
   }
 

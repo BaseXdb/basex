@@ -1,6 +1,7 @@
 package org.basex.gui.view.project;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -43,7 +44,18 @@ final class ProjectList extends JList<String> implements ProjectCommands {
     setCellRenderer(new CellRenderer());
     addMouseListener((MouseClickedListener) e -> {
       if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-        open(selectedFile());
+        final IOFile file = selectedFile();
+        if(file != null) open(file);
+      }
+    });
+    // select the entry before a popup menu is shown
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e) {
+        if(!SwingUtilities.isRightMouseButton(e)) return;
+        final int index = locationToIndex(e.getPoint());
+        if(index != -1 && getCellBounds(index, index).contains(e.getPoint()) &&
+          !isSelectedIndex(index)) setSelectedIndex(index);
       }
     });
 

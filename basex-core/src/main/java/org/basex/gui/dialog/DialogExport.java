@@ -50,7 +50,7 @@ public final class DialogExport extends BaseXDialog {
     pp.add(browse);
     p.add(pp);
 
-    serial = new BaseXSerial(this, gui.context.options.get(MainOptions.EXPORTER));
+    serial = new BaseXSerial(this, gui.context.options.get(MainOptions.EXPORTER), null);
     serial.border(8, 0, 6, 0);
     p.add(serial);
     info = new BaseXLabel(" ").border(8, 0, 0, 0);

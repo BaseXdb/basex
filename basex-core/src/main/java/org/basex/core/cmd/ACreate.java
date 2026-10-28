@@ -20,15 +20,13 @@ import org.basex.util.*;
 public abstract class ACreate extends Command {
   /** Flag for closing a data instance before executing the command. */
   private boolean newData;
-  /** Indicates if database should be locked. */
-  protected boolean lock = true;
 
   /**
    * Protected constructor, specifying command arguments.
    * @param args arguments
    */
   ACreate(final String... args) {
-    this(Perm.CREATE, false, args);
+    this(Perm.ADMIN, false, args);
     newData = true;
   }
 
@@ -67,16 +65,23 @@ public abstract class ACreate extends Command {
       }
     }
 
-    // local and remote resources require CREATE permission
-    if(io != null && io.isExternal() && !context.user().has(Perm.CREATE)) {
-      throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
-    }
+    // local and remote resources require ADMIN permission
+    if(io != null && denied(io)) throw new BaseXException(PERM_REQUIRED_X, Perm.ADMIN);
     // assign (intermediate) name to input reference
     if(io instanceof IOContent || io instanceof IOStream) {
       if(Strings.endsWith(name, '/')) throw new BaseXException(NAME_INVALID_X, name);
       io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;
+  }
+
+  /**
+   * Checks if the current user lacks the permission to access the specified input.
+   * @param io input
+   * @return result of check
+   */
+  final boolean denied(final IO io) {
+    return io.isExternal() && !context.user().has(Perm.ADMIN);
   }
 
   /**
@@ -88,10 +93,15 @@ public abstract class ACreate extends Command {
   final boolean update(final Data data, final Code update) {
     context.invalidate();
 
+    // prepare update, set locks
+    try {
+      data.startUpdate(options);
+    } catch(final IOException ex) {
+      return error(ex);
+    }
+
     IOException exc = null;
     try {
-      // prepare update, set locks
-      if(lock) data.startUpdate(options);
       // perform update, return success flag
       return update.run();
     } catch(final IOException ex) {
@@ -100,7 +110,7 @@ public abstract class ACreate extends Command {
       try {
         // finish update, remove locks
         Optimize.finish(data);
-        if(lock) data.finishUpdate(options);
+        data.finishUpdate(options);
       } catch(final IOException ex) {
         // do not overwrite existing error if something goes wrong
         if(exc == null) exc = ex;
@@ -108,6 +118,11 @@ public abstract class ACreate extends Command {
       }
     }
     return error(exc);
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return newData || super.updating(ctx);
   }
 
   @Override

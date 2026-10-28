@@ -24,7 +24,7 @@ final class ProjectCache implements Iterable<String> {
   /** Maximum number of paths to be cached. */
   private final int max;
   /** Valid flag. */
-  private boolean valid;
+  private volatile boolean valid;
 
   /**
    * Constructor.

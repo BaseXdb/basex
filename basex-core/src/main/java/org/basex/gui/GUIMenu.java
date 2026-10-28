@@ -70,9 +70,20 @@ public final class GUIMenu extends JMenuBar {
    */
   public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {
     final String label = cmd.label();
-    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(label) : new JMenuItem(label);
+    // accelerators would otherwise block the event thread for 68 ms (visual press time)
+    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(label) {
+      @Override
+      public void doClick(final int pressTime) {
+        super.doClick(0);
+      }
+    } : new JMenuItem(label) {
+      @Override
+      public void doClick(final int pressTime) {
+        super.doClick(0);
+      }
+    };
     item.addActionListener(e -> {
-      if(!gui.updating) cmd.execute(gui);
+      if(!gui.updating || cmd == GUIMenuCmd.C_STOP) cmd.execute(gui);
     });
     BaseXLayout.setMnemonic(item, mnem);
     return item;

@@ -4,6 +4,7 @@ import java.util.concurrent.*;
 
 import jakarta.servlet.http.*;
 
+import org.basex.http.ws.*;
 import org.basex.util.list.*;
 
 /**
@@ -18,13 +19,15 @@ public final class SessionListener implements HttpSessionListener {
 
   @Override
   public void sessionCreated(final HttpSessionEvent event) {
-    final HttpSession sess =  event.getSession();
+    final HttpSession sess = event.getSession();
     SESSIONS.put(sess.getId(), sess);
   }
 
   @Override
   public void sessionDestroyed(final HttpSessionEvent event) {
-    SESSIONS.remove(event.getSession().getId());
+    final HttpSession sess = event.getSession();
+    SESSIONS.remove(sess.getId());
+    WsPool.close(sess);
   }
 
   /**

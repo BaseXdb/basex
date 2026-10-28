@@ -50,8 +50,7 @@ public enum Occ {
   }
 
   /**
-   * Checks if the specified occurrence indicator is an instance of the current occurrence
-   * indicator.
+   * Checks if this occurrence indicator is an instance of the specified one.
    * @param occ occurrence indicator to check
    * @return result of check
    */

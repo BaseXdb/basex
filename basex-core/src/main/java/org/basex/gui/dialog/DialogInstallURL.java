@@ -4,9 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
-import org.basex.util.*;
 
 /**
  * URL dialog.
@@ -19,8 +17,6 @@ final class DialogInstallURL extends BaseXDialog {
   private final BaseXTextField url;
   /** Buttons. */
   private final BaseXBack buttons;
-  /** Info label. */
-  private final BaseXLabel info;
 
   /**
    * Default constructor.
@@ -30,16 +26,12 @@ final class DialogInstallURL extends BaseXDialog {
     super(dialog, INSTALL_FROM_URL);
 
     url = new BaseXTextField(this);
-    info = new BaseXLabel(" ");
 
     final BaseXLabel link = BaseXLayout.link(REPO_URL, gui);
 
-    BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
-    p.add(url, BorderLayout.NORTH);
-    p.add(info, BorderLayout.CENTER);
-    set(p, BorderLayout.CENTER);
+    set(url, BorderLayout.CENTER);
 
-    p = new BaseXBack(new BorderLayout());
+    final BaseXBack p = new BaseXBack(new BorderLayout());
     p.add(link, BorderLayout.WEST);
     buttons = newButtons(B_OK, B_CANCEL);
     p.add(buttons, BorderLayout.EAST);
@@ -52,7 +44,6 @@ final class DialogInstallURL extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     ok = !url().isEmpty();
-    info.setText(ok ? null : Util.info(INVALID_X, "URL"), Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }
 

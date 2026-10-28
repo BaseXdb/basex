@@ -102,7 +102,7 @@ final class DialogViewsPrefs extends BaseXBack {
     p.add(pp);
 
     pp = new BaseXBack(new RowLayout(8));
-    pp.add(new BaseXLabel(RATIO + COLS));
+    pp.add(new BaseXLabel(RATIO + COL));
     pp.add(mapWeight);
     pp.add(mapAtts);
     p.add(pp);
@@ -112,11 +112,11 @@ final class DialogViewsPrefs extends BaseXBack {
     p = new BaseXBack(new RowLayout());
     p.add(new BaseXLabel(COLORS + COL, true, true));
     pp = new BaseXBack(new TableLayout(3, 2, 16, 8));
-    pp.add(new BaseXLabel(RED));
+    pp.add(new BaseXLabel(RED + COL));
     pp.add(colorRed);
-    pp.add(new BaseXLabel(GREEN));
+    pp.add(new BaseXLabel(GREEN + COL));
     pp.add(colorGreen);
-    pp.add(new BaseXLabel(BLUE));
+    pp.add(new BaseXLabel(BLUE + COL));
     pp.add(colorBlue);
     p.add(pp);
     p.add(colorReset);

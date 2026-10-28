@@ -221,10 +221,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     exprType.assign(FuncType.get(anns, declType, params).withRefinedType(expr.seqType()));
 
     // only evaluate if:
+    // - the dynamic pass is reached (function item bodies are not recompiled)
     // - no query focus needs to be captured
     // - the closure is empty, so we don't lose variables
     // - the result size is not too large
-    if(!(focus && expr.has(Flag.CTX)) && global.isEmpty() && !cc.largeResult(expr)) {
+    if(cc.dynamic && !(focus && expr.has(Flag.CTX)) && global.isEmpty() &&
+        !cc.largeResult(expr)) {
       try {
         return cc.preEval(this);
       } catch(final QueryException ex) {
@@ -431,9 +433,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
     final Flag[] flgs = Flag.remove(flags, Flag.UPD);
-    if(flgs.length == 0) return false;
-
-    return props.has(flgs);
+    return flgs.length != 0 && props.has(flgs);
   }
 
   @Override
@@ -464,7 +464,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean vacuousBody() {
-    return declType != null && declType.itemless() && !expr.has(Flag.UPD);
+    return (declType != null && declType.itemless() || expr.seqType().itemless()) &&
+        !expr.has(Flag.UPD);
   }
 
   @Override

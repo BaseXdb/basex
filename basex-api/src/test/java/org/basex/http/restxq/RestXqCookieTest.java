@@ -25,6 +25,9 @@ public final class RestXqCookieTest extends RestXqTest {
     + "};"
     + "declare %R:path('cookie-echo') %output:method('text') function m:echo() {"
     + "request:header('Cookie', 'none')"
+    + "};"
+    + "declare %R:path('session-set') function m:session() {"
+    + "session:set('a', 1)"
     + "};";
 
   /**
@@ -55,6 +58,13 @@ public final class RestXqCookieTest extends RestXqTest {
   /** Cookies are stored and sent by the HTTP Client 2.0 functions. */
   @Test public void getCookies() {
     query(_HTTP_GET.args(HTTP_ROOT + "cookie-set", " { 'cookies': true() }") + "?body", "a=1");
+  }
+
+  /** Session cookies are not sent with cross-site requests. */
+  @Test public void sameSite() {
+    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get'/>",
+      HTTP_ROOT + "session-set") + "[1]/*:header[lower-case(@name) = 'set-cookie']/@value "
+      + "=> contains('SameSite=Lax')", true);
   }
 
   /**

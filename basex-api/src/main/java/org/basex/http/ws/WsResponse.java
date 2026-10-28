@@ -14,6 +14,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+
 /**
  * Creates WebSocket responses.
  *
@@ -38,7 +39,6 @@ public final class WsResponse extends WebResponse {
 
   @Override
   protected Expr[] init(final WebFunction function, final Object data) throws QueryException {
-
     qc = function.module.qc(ctx);
     qc.jc().type(WEBSOCKET);
     qc.jc().listed = true;

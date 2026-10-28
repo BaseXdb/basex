@@ -42,7 +42,7 @@ public final class FAttr extends FNode {
    * @param attr DOM node
    */
   public FAttr(final Attr attr) {
-    this(new QNm(attr.getName()), token(attr.getValue()));
+    this(new QNm(attr.getName(), attr.getNamespaceURI()), token(attr.getValue()));
   }
 
   @Override
@@ -69,12 +69,6 @@ public final class FAttr extends FNode {
   @Override
   public byte[] xdmInfo() {
     return new ByteList().add(typeId().asByte()).add(name.uri()).add(0).finish();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FAttr f && name.eq(f.name) &&
-        Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

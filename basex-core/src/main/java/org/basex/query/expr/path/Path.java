@@ -229,14 +229,14 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // drop irrelevant predicate: if(a[1]) → if(a)
       expr = dropPredicate(cc);
       // merge nested predicates: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
       if(expr == this) expr = flattenEbv(true, cc);
     }
-    if(expr == this && this instanceof final CachedPath cp && mode.oneOf(Simplify.EBV,
-        Simplify.PREDICATE, Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
+    if(expr == this && this instanceof final CachedPath cp &&
+        (mode.conditional() || mode.unordered()) && axisDistinct(cc)) {
       // skip sorting if order is irrelevant: count(preceding-sibling::a)
       expr = cp.copyCache(new UnorderedPath(info, root, steps));
     }
@@ -248,7 +248,7 @@ public abstract class Path extends ParseExpr {
    * @param cc compilation context
    * @return result of check
    */
-  private boolean unordered(final CompileContext cc) {
+  private boolean axisDistinct(final CompileContext cc) {
     final Expr rt = cc.focusOr(root);
     if(rt == null || !rt.seqType().zeroOrOne()) return false;
     final int sl = steps.length;
@@ -623,8 +623,7 @@ public abstract class Path extends ParseExpr {
     final Expr[] branches = switch(step) {
       case final If iff -> iff.exprs;
       case final Otherwise otherwise -> otherwise.exprs;
-      case final Switch swtch -> swtch.branches();
-      case final Typeswitch typeswitch -> typeswitch.branches();
+      case final ASwitch<?> swtch -> swtch.branches();
       default -> null;
     };
     if(branches == null || step.has(Flag.POS)) return null;
@@ -1049,12 +1048,10 @@ public abstract class Path extends ParseExpr {
    * @return axis or {@code null}
    */
   private static Axis mergedAxis(final Expr expr) {
-    if(expr instanceof final Step step) {
+    if(expr instanceof final Step step && !step.mayBePositional()) {
       final Axis axis = step.axis;
-      if(!step.mayBePositional()) {
-        if(axis.oneOf(CHILD, DESCENDANT)) return DESCENDANT;
-        if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
-      }
+      if(axis.oneOf(CHILD, DESCENDANT)) return DESCENDANT;
+      if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
     }
     return null;
   }

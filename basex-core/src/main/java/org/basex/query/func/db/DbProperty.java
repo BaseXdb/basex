@@ -19,7 +19,7 @@ public final class DbProperty extends DbPropertyMap {
     final String key = toString(arg(1), qc);
 
     for(final MetaProp prop : MetaProp.values()) {
-      if(prop.name().equalsIgnoreCase(key)) return item(prop.value(data.meta));
+      if(prop.name().equalsIgnoreCase(key)) return DbOptionMap.toValue(prop.value(data.meta));
     }
     throw DB_PROPERTY_X.get(info, key);
   }

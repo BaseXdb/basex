@@ -18,7 +18,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -178,6 +177,24 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Optimizes a function that returns an empty sequence when one of two atomized arguments
+   * is empty.
+   * @param expr1 first argument
+   * @param expr2 second argument
+   * @param cc compilation context
+   * @return original or optimized expression
+   * @throws QueryException query exception
+   */
+  protected final Expr optPair(final Expr expr1, final Expr expr2, final CompileContext cc)
+      throws QueryException {
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.zero()) return cc.voidAndReturn(expr2, expr1, info);
+    if(st2.zero()) return cc.voidAndReturn(expr1, expr2, info);
+    if(st1.atomOcc().min >= 1 && st2.atomOcc().min >= 1) exprType.assign(Occ.EXACTLY_ONE);
+    return this;
+  }
+
+  /**
    * Serializes the data from the specified iterator.
    * @param iter data to serialize
    * @param sopts serialization parameters
@@ -188,60 +205,35 @@ public abstract class StandardFunc extends Arr {
    */
   protected final byte[] serialize(final Iter iter, final SerializerOptions sopts,
       final QueryError err, final QueryContext qc) throws QueryException {
-
-    // use line feeds if no line ending was requested
-    if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
-      sopts.set(SerializerOptions.NEWLINE, SerializerOptions.Newline.NL);
-    }
-    try {
-      final ArrayOutput ao = new ArrayOutput();
-      try(Serializer ser = Serializer.unencoded(ao, sopts)) {
-        ser.qc(qc).sc(info.sc());
-        for(Item item; (item = qc.next(iter)) != null;) {
-          ser.serialize(item);
-        }
-      }
-      return ao.finish();
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      throw err.get(info, ex);
-    }
+    return Serializer.serialize(iter, sopts, err, info, qc);
   }
 
   @Override
   public final boolean has(final Flag... flags) {
     for(final Flag flag : flags) {
-      switch(flag) {
-        case HOF -> {
-          if(hofOffsets() > 0) return true;
-          continue;
-        }
-        case UPD -> {
-          if(hasUPD()) return true;
-        }
-        case CTX -> {
-          if(hasCTX()) return true;
-        }
-        case CNS -> {
-          if(hasCNS()) return true;
-          continue;
-        }
-        case NDT -> {
-          if(hasNDT()) return true;
-          // check whether function arguments may contain non-deterministic code
-          final int hof = hofOffsets(), al = args().length;
-          for(int a = 0; a < al; a++) {
-            if((hof & 1 << a) != 0 && (!(arg(a) instanceof final Item item) ||
-                !(item instanceof final FuncItem fi) || fi.ndt())) return true;
-          }
-        }
-        default -> { }
-      }
-      if(definition.has(flag)) return true;
+      if(switch(flag) {
+        case HOF -> hofOffsets() > 0;
+        case UPD -> hasUPD();
+        case CTX -> hasCTX();
+        case CNS -> hasCNS();
+        case NDT -> hasNDT() || ndtArgs();
+        default -> definition.has(flag);
+      }) return true;
     }
     // check arguments (without function invocation; it only applies to the function itself)
     return super.has(Flag.remove(flags, Flag.HOF));
+  }
+
+  /**
+   * Checks whether function arguments may contain non-deterministic code.
+   * @return result of check
+   */
+  private boolean ndtArgs() {
+    final int hof = hofOffsets(), al = args().length;
+    for(int a = 0; a < al; a++) {
+      if((hof & 1 << a) != 0 && (!(arg(a) instanceof final FuncItem fi) || fi.ndt())) return true;
+    }
+    return false;
   }
 
   /**
@@ -351,8 +343,7 @@ public abstract class StandardFunc extends Arr {
   protected final Expr simplifyOrder(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // count(reverse(A)) → count(A), $a = sort(B) → $a = B
-    return cc.simplify(this, mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE, Simplify.SET) &&
-        !has(Flag.NDT) ? arg(0) : this, mode);
+    return cc.simplify(this, mode.unordered() && !has(Flag.NDT) ? arg(0) : this, mode);
   }
 
   /**
@@ -742,14 +733,16 @@ public abstract class StandardFunc extends Arr {
       for(final Option<?> restriction : JobOptions.RESTRICTIONS) {
         if(options.modified(restriction)) throw JOBS_SERVICE_X.get(info, restriction.name());
       }
+      // services are restarted from their persisted options, which have no nested parameters
+      final Option<?> serializer = JobOptions.SERIALIZER;
+      if(options.contains(serializer)) throw JOBS_SERVICE_X.get(info, serializer.name());
     }
 
     // copy database nodes of variable values
     for(final Entry<String, Value> binding : bindings.entrySet()) {
-      bindings.put(binding.getKey(),
-          binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
+      binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
-    return new QueryJobSpec(options, bindings, content, sc().resolver());
+    return new QueryJobSpec(options, bindings, content, qc.resolver);
   }
 
   /**
@@ -811,7 +804,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final String source, final QueryContext qc)
       throws QueryException {
-    checkPerm(qc, Perm.CREATE);
+    checkPerm(qc, Perm.ADMIN);
     final IO io = toIO(source, false);
     try {
       return new IOContent(io.readString(), io.url());
@@ -830,8 +823,17 @@ public abstract class StandardFunc extends Arr {
   protected final String toBaseUri(final String path, final Options options,
       final StringOption option) {
     final String base = options.get(option);
-    return base != null && !base.isEmpty() ? base :
+    return base != null && !base.isEmpty() ? resolveUri(base) :
       path != null && !path.isEmpty() ? path : string(sc().baseURI().string());
+  }
+
+  /**
+   * Resolves a URI against the static base URI.
+   * @param uri URI
+   * @return resolved URI
+   */
+  protected final String resolveUri(final String uri) {
+    return string(sc().baseURI().resolve(Uri.get(uri)).string());
   }
 
   /**
@@ -969,6 +971,28 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns the main options of the context, without access to external resources for
+   * users and code without admin permissions.
+   * @param qc query context
+   * @return main options
+   */
+  protected final MainOptions mainOptions(final QueryContext qc) {
+    final MainOptions mopts = qc.context.options;
+    return !qc.has(Perm.ADMIN, null, info) ? new MainOptions(mopts).allowExternal(false) : mopts;
+  }
+
+  /**
+   * Indicates if the current user and code may retrieve external resources.
+   * @param options options
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean trustExternal(final Options options, final QueryContext qc) {
+    return qc.has(Perm.ADMIN, null, info) &&
+        trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
+  }
+
+  /**
    * Indicates if external resources may be retrieved. If the option was not specified, the value
    * of {@link MainOptions#TRUSTEXTERNAL} is returned.
    * @param options options
@@ -1097,7 +1121,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a function item.
+   * Checks the arity and the updating property of a function item.
    * @param function function
    * @param nargs maximum number of supplied arguments
    * @param updating updating flag
@@ -1239,8 +1263,7 @@ public abstract class StandardFunc extends Arr {
    * @return new exception
    */
   protected final QueryException error(final QueryException ex, final QueryError error) {
-    if(error == null) return ex;
-    return error.get(info, ex.getLocalizedMessage()).cause(ex);
+    return error == null ? ex : error.get(info, ex.getLocalizedMessage()).cause(ex);
   }
 
   @Override

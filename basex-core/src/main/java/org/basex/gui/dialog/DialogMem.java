@@ -8,7 +8,6 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.text.*;
 import org.basex.util.*;
 
 /**
@@ -22,7 +21,7 @@ public final class DialogMem extends BaseXDialog {
   private static Dialog dialog;
 
   /** Info text. */
-  private final TextPanel text;
+  private final BaseXTextArea text;
   /** GC Button. */
   private final BaseXButton gc;
   /** Timer for updating the display of memory consumption. */
@@ -36,8 +35,7 @@ public final class DialogMem extends BaseXDialog {
     super(gui, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new TextPanel(this, info(), false);
-    text.setFont(panel.getFont());
+    text = new BaseXTextArea(this, info());
     set(text, BorderLayout.CENTER);
 
     gc = new BaseXButton(this, "GC");

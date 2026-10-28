@@ -22,6 +22,19 @@ public final class RestXqInputTest extends RestXqTest {
   }
 
   /**
+   * JSON: {@code input} option declaration.
+   * @throws Exception exception
+   */
+  @Test public void jsonOption() throws Exception {
+    post("x", "declare option input:json 'format=w3'; "
+        + "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x?a};", "",
+        "{ \"a\": \"x\" }", MediaType.APPLICATION_JSON);
+    post("<A_B/>", "declare option input:json 'format=w3'; "
+        + "declare %R:POST('{$x}') %R:path('') %input:json('format=direct,lax=true') "
+        + "function m:f($x) {$x/*/*};", "", "{ \"A_B\": \"\" }", MediaType.APPLICATION_JSON);
+  }
+
+  /**
    * JSON: content-type parameters.
    * @throws Exception exception
    */

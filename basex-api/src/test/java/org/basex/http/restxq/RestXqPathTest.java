@@ -233,4 +233,23 @@ public final class RestXqPathTest extends RestXqTest {
     // invalid annotation
     get(500, "declare %R:path('') %R:xyz function m:f() { 'x' };", "");
   }
+
+  /**
+   * Prefixed path variable whose URI is the default element namespace.
+   * @throws Exception exception
+   */
+  @Test public void prefixedVariable() throws Exception {
+    get("x", "declare default element namespace 'U'; declare namespace p = 'U';" +
+        "declare %R:path('v/{$p:a}') function m:f($p:a) { $p:a };", "v/x");
+  }
+
+  /**
+   * Path variables in the WADL description.
+   * @throws Exception exception
+   */
+  @Test public void wadl() throws Exception {
+    get("x xs:integer id xs:string?", "declare %R:path('w/{ $x = [0-9]+ }') " +
+        "%R:query-param('id', '{$y}') function m:f($x as xs:integer, $y as xs:string?) {" +
+        "  string-join(rest:wadl()//*:param ! `{ @name } { @type }`, ' ') };", "w/1");
+  }
 }

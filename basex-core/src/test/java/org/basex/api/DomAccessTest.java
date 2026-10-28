@@ -39,6 +39,23 @@ public final class DomAccessTest {
     check(doc.getImplementation());
   }
 
+  /** Checks boundary cases of navigation methods. */
+  @Test public void navigation() {
+    final FNode root = FDoc.build().node(FElem.build(new QNm("e")).text("t")).finish();
+    final BXDoc doc = (BXDoc) BXNode.get(root);
+    final Element elem = doc.getDocumentElement();
+    final Node text = elem.getFirstChild();
+
+    assertFalse(doc.hasAttributes());
+    assertFalse(text.hasAttributes());
+    assertNull(elem.getChildNodes().item(-1));
+    assertNull(elem.getChildNodes().item(1));
+    assertEquals(Node.TEXT_NODE, elem.getLastChild().getNodeType());
+    assertEquals("e", elem.getNodeName());
+    assertEquals("#text", text.getNodeName());
+    assertTrue(doc.isSameNode(text.getOwnerDocument()));
+  }
+
   /**
    * Checks that the class and all DOM interface methods of an object are public.
    * @param object object to check

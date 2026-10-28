@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -93,6 +94,17 @@ public final class FTQueryTest extends SandboxTest {
     query("'a' contains text 'b' using fuzzy 0 errors", false);
     query("'a' contains text 'b' using fuzzy 1 errors", true);
     query("'a' contains text 'b' using fuzzy 10 errors", true);
+  }
+
+  /** Integer separators in full-text ranges. */
+  @Test public void gh2785() {
+    query("'fox' contains text 'cat' using fuzzy 1_0 errors", true);
+    query("'fox' contains text 'cat' using fuzzy 1 errors", false);
+    query("'fox' contains text 'cat' using fuzzy 1__0 errors", true);
+    error("'fox' contains text 'cat' using fuzzy 1_ errors", NUMBER_X);
+    error("'fox' contains text 'cat' using fuzzy _1 errors", QUERYEND_X);
+    error("'fox' contains text 'cat' using fuzzy errors", QUERYEND_X);
+    error("'fox' contains text 'cat' using fuzzy 99999999999999999999 errors", RANGE_X);
   }
 
   /** Fuzzy search: handling many similar terms. */

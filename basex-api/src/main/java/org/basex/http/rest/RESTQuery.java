@@ -32,14 +32,6 @@ class RESTQuery extends RESTCmd {
 
   @Override
   protected void run0() throws IOException {
-    query();
-  }
-
-  /**
-   * Evaluates the specified query.
-   * @throws IOException I/O exception
-   */
-  private void query() throws IOException {
     final HTTPConnection conn = session.conn;
     final SerializerOptions sopts = conn.sopts();
     context.options.set(MainOptions.SERIALIZER, sopts);

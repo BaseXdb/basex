@@ -1,9 +1,9 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -33,18 +33,13 @@ public final class DBPragma extends Pragma {
 
   @Override
   Object init(final QueryContext qc, final InputInfo info) throws QueryException {
-    final Object old = qc.context.options.get(option);
-    try {
-      qc.context.options.assign(option.name(), string(value));
-    } catch(final BaseXException ex) {
-      throw BASEX_OPTIONS_X_X.get(info, option.name(), value).cause(ex);
-    }
-    return old;
+    if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, option.name(), info);
+    return qc.assign(option, string(value), info);
   }
 
   @Override
   void finish(final QueryContext qc, final Object state) {
-    qc.context.options.put(option, state);
+    qc.restore(option, (Object[]) state);
   }
 
   @Override

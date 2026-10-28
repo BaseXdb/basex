@@ -18,7 +18,7 @@ declare variable $config:DBA-DIR := (
 );
 
 (:~ Permission values. :)
-declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
+declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'admin');
 
 (:~ Views, in the order in which the navigation offers them. :)
 (: a view is named by the path of its page, which is also the label of its entry :)
@@ -65,9 +65,14 @@ declare %basex:lazy %private variable $config:OPTIONS := (
       return {
         for key $key value $value in $config:DEFAULTS
         let $option := $options/*[name() = $key]
-        return { $key: if (not($option)) then $value
-          else if ($value instance of xs:numeric) then xs:integer($option)
-          else string($option) }
+        (: a missing or invalid option keeps its default, and leaves the others alone :)
+        return { $key: switch () {
+          case not($option) or exists(config:invalid($key, string($option))) return $value
+          case $value instance of xs:numeric return xs:integer($option)
+          (: the former create permission was merged into the admin permission :)
+          case $key = $config:PERMISSION and $option = 'create' return 'admin'
+          default return string($option)
+        } }
       }
     } catch * {
       (: use defaults if an error occurs while parsing the options :)
@@ -105,9 +110,31 @@ declare function config:save(
   $options  as map(*)
 ) as empty-sequence() {
   file:write($config:OPTIONS-FILE, element options {
-    for key $key value $value in $config:DEFAULTS
-    return element { $key } { $options?$key otherwise $value }
+    for key $key value $default in $config:DEFAULTS
+    let $value := $options?$key otherwise $default
+    let $invalid := config:invalid($key, $value)
+    return if (exists($invalid)) then error((), $invalid) else element { $key } { $value }
   })
+};
+
+(:~
+ : Checks the value of an option.
+ : @param  $key    option
+ : @param  $value  value
+ : @return error message; empty if the value is valid
+ :)
+declare %private function config:invalid(
+  $key    as xs:string,
+  $value  as xs:anyAtomicType
+) as xs:string? {
+  switch () {
+    case not($config:DEFAULTS?$key instance of xs:numeric) return ()
+    case not($value castable as xs:nonNegativeInteger) return
+      `Invalid number for { $key }: “{ $value }”.`
+    case $key = $config:INTERVAL and not(xs:integer($value) = 1 to $config:MAX-INTERVAL) return
+      `The { $key } must be between 1 and { $config:MAX-INTERVAL }: “{ $value }”.`
+    default return ()
+  }
 };
 
 (:~

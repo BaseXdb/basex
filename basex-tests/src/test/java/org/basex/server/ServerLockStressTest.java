@@ -27,9 +27,6 @@ public final class ServerLockStressTest extends SandboxTest {
   /** Query for counting the items of the source database. */
   private static final String COUNT = "XQUERY count(db:get('" + SOURCE + "')//item)";
 
-  /** Server reference. */
-  private BaseXServer server;
-
   /**
    * Runs the test.
    * @throws Exception exception
@@ -52,8 +49,8 @@ public final class ServerLockStressTest extends SandboxTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
-    server = createServer();
+  private static void run(final int clients, final int runs) throws Exception {
+    final BaseXServer server = createServer();
     try {
       try(ClientSession cs = createClient()) {
         final StringBuilder input = new StringBuilder("<source>");

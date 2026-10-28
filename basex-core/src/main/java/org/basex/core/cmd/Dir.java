@@ -47,7 +47,7 @@ public final class Dir extends Command {
     final Resources resources = data.resources;
 
     // list XML resources
-    final IntList docs = resources.docs(path, true);
+    final IntList docs = resources.docs(path, DocScope.DIRECTORY);
     final long ds = docs.size();
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);

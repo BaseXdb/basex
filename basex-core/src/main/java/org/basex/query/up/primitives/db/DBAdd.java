@@ -53,7 +53,7 @@ public final class DBAdd extends DBUpdate {
     this.replace = replace;
 
     final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, qc, info);
-    final MainOptions mopts = dbopts.assignTo(new MainOptions(qc.context.options, false));
+    final MainOptions mopts = dbopts.mainOptions();
     newDocs = new DBNew(qc, mopts, info, inputs);
     for(final NewInput input : inputs) {
       paths(input.type).add(pathKey(input));

@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import java.awt.*;
+import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -50,8 +51,14 @@ final class TextRenderer extends BaseXBack {
   private boolean showLines;
   /** Mark current line. */
   private boolean markline;
+  /** Show indentation guides. */
+  private boolean guides;
+  /** Start and end of an underlined reference (can be {@code null}). */
+  private int[] underline;
   /** Antialiasing type. */
   private String antiAlias;
+  /** Apply the antialiasing option. */
+  private final boolean custom;
   /** Area to be repainted. */
   private Rectangle clip = new Rectangle();
 
@@ -63,6 +70,8 @@ final class TextRenderer extends BaseXBack {
   private int height;
   /** Indicates if the last scan stopped at the end of a row. */
   private boolean rowEnd;
+  /** Top of the row at which the last scan stopped. */
+  private int rowTop;
 
   /** Line-offset cache (maps document-space y or text position to a line). */
   private final TextLineCache cache = new TextLineCache();
@@ -80,16 +89,18 @@ final class TextRenderer extends BaseXBack {
    * @param scroll vertical scrollbar reference
    * @param hscroll horizontal scrollbar reference
    * @param edit editable flag
+   * @param custom apply the antialiasing option
    * @param opts editor options
    */
   TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final BaseXScrollBar hscroll,
-      final boolean edit, final EditorOptions opts) {
+      final boolean edit, final boolean custom, final EditorOptions opts) {
 
     setOpaque(false);
     this.text = text;
     this.scroll = scroll;
     this.hscroll = hscroll;
     this.edit = edit;
+    this.custom = custom;
     this.opts = opts;
     setFont(GUIConstants.dmfont);
   }
@@ -112,6 +123,7 @@ final class TextRenderer extends BaseXBack {
     showNL = edit && opts.get(GUIOptions.SHOWNL);
     showLines = edit && opts.get(GUIOptions.SHOWLINES);
     markline = edit && opts.get(GUIOptions.MARKLINE);
+    guides = edit && opts.get(GUIOptions.SHOWGUIDES);
     antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
   }
@@ -128,7 +140,7 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    BaseXLayout.antiAlias(g, antiAlias);
+    if(custom) BaseXLayout.antiAlias(g, antiAlias);
     // rows outside the requested area are laid out, but not drawn
     final Rectangle bounds = g.getClipBounds();
     clip = bounds != null ? bounds : new Rectangle(getWidth(), getHeight());
@@ -141,21 +153,74 @@ final class TextRenderer extends BaseXBack {
     int oldL = layout.line - 1;
     while(more(layout) && layout.y < height) {
       if(layout.line != oldL && layout.y >= 0) {
-        drawLineNumber(layout, g);
+        drawGutter(layout, g);
         oldL = layout.line;
       }
       write(layout, g);
     }
     if(rowStart(layout)) markLine(layout, g);
-    if(layout.line != oldL) drawLineNumber(layout, g);
+    if(layout.line != oldL) drawGutter(layout, g);
 
     layout.stringWidth = 0;
     final int s = iter.pos();
-    if(caret && s == iter.caret()) drawCaret(g, layout.x, layout.lineY);
+    if(caret) {
+      if(s == iter.caret()) drawCaret(g, layout.x, layout.lineY, true);
+      for(final TextEditor.Caret c : iter.carets()) {
+        if(c.pos() == s) drawCaret(g, layout.x, layout.lineY, false);
+      }
+    }
     if(s == iter.errorPos()) drawError(layout, g);
 
     clipAll(g);
     drawLinesSep(g);
+  }
+
+  /**
+   * Renders the line number and the bookmark of the current line.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawGutter(final Layout layout, final Graphics g) {
+    drawLineNumber(layout, g);
+    drawBookmark(layout, g);
+  }
+
+  /**
+   * Marks the current line if it is bookmarked.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawBookmark(final Layout layout, final Graphics g) {
+    if(!edit || !rowVisible(layout) || !text.bookmarked(layout.iter.pos())) return;
+    final int w = Math.min(Math.max(3, fontHeight / 5), offset - 3);
+    g.setColor(GUIConstants.color4);
+    clipAll(g);
+    g.fillRect(1, layout.lineY + 1, w, fontHeight - 2);
+    clipText(g);
+  }
+
+  /**
+   * Draws the indentation guides of the current line.
+   * @param layout layout
+   * @param g graphics reference
+   */
+  private void drawGuides(final Layout layout, final Graphics g) {
+    final int cw = font.charWidth(' '), step = cw * opts.indent();
+    final int guide = cw * text.guides(layout.iter.pos());
+    g.setColor(GUIConstants.paleGray);
+    for(int x = 0; x < guide; x += step) {
+      g.drawLine(layout.startX + x, layout.lineY, layout.startX + x, layout.lineY + fontHeight);
+    }
+  }
+
+  /**
+   * Assigns the range of an underlined reference.
+   * @param range start and end (can be {@code null})
+   */
+  void underline(final int[] range) {
+    if(Arrays.equals(range, underline)) return;
+    underline = range;
+    repaint();
   }
 
   /**
@@ -713,7 +778,14 @@ final class TextRenderer extends BaseXBack {
    */
   private void write(final Layout layout, final Graphics g) {
     final TextIterator iter = layout.iter;
-    if(rowStart(layout)) markLine(layout, g);
+    if(rowStart(layout)) {
+      markLine(layout, g);
+      // guides are drawn in the first row of a line
+      final int p = iter.pos();
+      if(guides && rowVisible(layout) && (p == 0 || iter.text()[p - 1] == '\n')) {
+        drawGuides(layout, g);
+      }
+    }
 
     // advance the highlighter, and choose color for enabled text, depending on highlighting or link
     final Color syntaxColor = syntax.getColor(iter);
@@ -753,6 +825,12 @@ final class TextRenderer extends BaseXBack {
         for(final int[] oc : iter.occurrences()) mark(oc, layout, g, GUIConstants.color3A);
       }
       mark(iter.selection(), layout, g, GUIConstants.color2A);
+      final ArrayList<TextEditor.Caret> carets = iter.carets();
+      for(final TextEditor.Caret c : carets) {
+        if(c.start() != c.end()) {
+          mark(new int[] { c.min(), c.max() }, layout, g, GUIConstants.color2A);
+        }
+      }
       for(final int[] sr : iter.searchResults()) mark(sr, layout, g, GUIConstants.color2A);
 
       // mark erroneous text
@@ -786,12 +864,28 @@ final class TextRenderer extends BaseXBack {
           font.draw(g, iter.text(), pos, iter.posEnd(), x, y);
         }
       }
-      // underline linked text
+      // underline linked text and references
       if(layout.link) g.drawLine(x, y + 1, x + sw, y + 1);
+      if(underline != null) {
+        final int us = Math.max(pos, underline[0]), ue = Math.min(iter.posEnd(), underline[1]);
+        if(us < ue) {
+          final int ux = x + font.stringWidth(iter.text(), pos, us);
+          g.setColor(color);
+          g.drawLine(ux, y + 1, ux + font.stringWidth(iter.text(), us, ue), y + 1);
+        }
+      }
       // show cursor: a wrapped token shares its first position with the end of the previous row
-      if(caret && iter.edited()) {
-        if(atRowEnd(layout)) drawCaret(g, layout.rowX, layout.rowLineY);
-        else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY);
+      if(caret) {
+        if(iter.edited()) {
+          if(atRowEnd(layout)) drawCaret(g, layout.rowX, layout.rowLineY, true);
+          else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY, true);
+        }
+        for(final TextEditor.Caret c : carets) {
+          final int p = c.pos();
+          if(p >= pos && p < iter.posEnd()) {
+            drawCaret(g, x + font.stringWidth(iter.text(), pos, p), lineY, false);
+          }
+        }
       }
     }
 
@@ -846,12 +940,15 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    * @param xx x position
    * @param yy y position
+   * @param primary primary caret
    */
-  private void drawCaret(final Graphics g, final int xx, final int yy) {
+  private void drawCaret(final Graphics g, final int xx, final int yy, final boolean primary) {
     g.setColor(GUIConstants.darkGray);
     g.fillRect(xx, yy, 2, fontHeight);
-    cursor[0] = xx;
-    cursor[1] = yy + fontHeight;
+    if(primary) {
+      cursor[0] = xx;
+      cursor[1] = yy + fontHeight;
+    }
   }
 
   /**
@@ -912,6 +1009,7 @@ final class TextRenderer extends BaseXBack {
     }
     // the scan walked past the target row: its last position is shared with the next row
     rowEnd = layout.y - fontHeight > yPos;
+    rowTop = rowEnd ? layout.lineY - fontHeight : layout.lineY;
   }
 
   /**
@@ -1000,6 +1098,14 @@ final class TextRenderer extends BaseXBack {
    */
   boolean rowEnd() {
     return rowEnd;
+  }
+
+  /**
+   * Returns the top of the rendered row at which the last scan stopped.
+   * @return position, relative to the text panel
+   */
+  int rowTop() {
+    return rowTop;
   }
 
   /**

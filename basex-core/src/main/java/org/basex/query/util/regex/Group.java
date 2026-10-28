@@ -44,7 +44,6 @@ public final class Group extends RegExp {
     this.encl = encl;
     this.capture = capture;
     this.name = name;
-    hasBackRef = false;
     this.atomPath = atomPath;
   }
 
@@ -85,6 +84,11 @@ public final class Group extends RegExp {
    */
   public void setMarker(final int nr) {
     marker = nr;
+  }
+
+  @Override
+  int minLength() {
+    return encl.minLength();
   }
 
   @Override

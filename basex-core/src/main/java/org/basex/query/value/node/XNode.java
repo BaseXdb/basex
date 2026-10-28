@@ -78,7 +78,7 @@ public abstract class XNode extends GNode {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
+    if(mode.stringifying()) {
       // boolean(<a>A</a>) → boolean('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
@@ -392,6 +392,17 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Returns the base URI of the node without its own {@code xml:base} attribute.
+   * @return base URI (empty if unknown)
+   * @throws QueryException query exception
+   */
+  public byte[] contextBaseURI() throws QueryException {
+    final XNode parent = parent();
+    if(parent != null) return parent.baseURI(Uri.EMPTY, true, null).string();
+    return attribute(XML_BASE) == null ? baseURI(Uri.EMPTY, true, null).string() : Token.EMPTY;
+  }
+
+  /**
    * Returns the document URI of the node.
    * @return document URI
    */
@@ -417,9 +428,10 @@ public abstract class XNode extends GNode {
     XNode nd = this;
     do {
       final Uri bu = Uri.get(nd.baseURI(), false);
-      if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
+      final boolean stored = nd.kind() == DOCUMENT && nd instanceof DBNode;
+      if(!stored && !bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       uri = bu.resolve(uri);
-      if(nd.kind() == DOCUMENT && nd instanceof DBNode) break;
+      if(stored) break;
       nd = nd.parent();
     } while(!uri.isAbsolute() && nd != null);
     return nd == null || uri == Uri.EMPTY ? base.resolve(uri) : uri;
@@ -493,11 +505,10 @@ public abstract class XNode extends GNode {
    */
   public final byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributeIter();
-    while(true) {
-      final GNode node = iter.next();
-      if(node == null) return null;
+    for(GNode node; (node = iter.next()) != null;) {
       if(node.qname().eq(name)) return node.string();
     }
+    return null;
   }
 
   /**

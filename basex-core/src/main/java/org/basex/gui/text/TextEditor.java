@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.text.*;
 import java.util.*;
+import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -66,6 +67,80 @@ public final class TextEditor {
   private int pos;
   /** Caret position at the end of a rendered row ({@code -1} if the caret is elsewhere). */
   private int rowEndPos = -1;
+  /** Empty caret array. */
+  private static final Caret[] NO_CARETS = {};
+  /** Secondary carets, in the order in which they were added. */
+  private final ArrayList<Caret> carets = new ArrayList<>();
+  /** Start positions of the bookmarked lines, in ascending order. */
+  private final IntList bookmarks = new IntList();
+  /** Selections that were replaced by expanding them (start and end positions). */
+  private final IntList expanded = new IntList();
+  /** Range of the last expanded selection (can be {@code null}). */
+  private int[] expansion;
+
+  /**
+   * Caret with an optional text selection.
+   * @param pos caret position
+   * @param start start position of a text selection ({@code -1} if no text is selected)
+   * @param end end position of a text selection ({@code -1} if no text is selected)
+   */
+  record Caret(int pos, int start, int end) {
+    /**
+     * Constructor; an empty selection is stored as no selection.
+     * @param pos caret position
+     * @param start start position of a text selection
+     * @param end end position of a text selection
+     */
+    Caret {
+      if(start == end) {
+        start = -1;
+        end = -1;
+      }
+    }
+
+    /**
+     * Returns the first offset of the caret or its selection.
+     * @return offset
+     */
+    int min() {
+      return start != end ? Math.min(start, end) : pos;
+    }
+
+    /**
+     * Returns the last offset of the caret or its selection.
+     * @return offset
+     */
+    int max() {
+      return start != end ? Math.max(start, end) : pos;
+    }
+
+    /**
+     * Checks if this caret overlaps with another one.
+     * @param c other caret
+     * @return result of check
+     */
+    boolean overlaps(final Caret c) {
+      return pos == c.pos || min() < c.max() && c.min() < max();
+    }
+
+    /**
+     * Returns a caret whose positions are measured from the other end of the text.
+     * @param length text length
+     * @return new caret
+     */
+    Caret mirror(final int length) {
+      return new Caret(length - pos, length - start, length - end);
+    }
+
+    /**
+     * Returns a caret whose positions do not exceed the specified limit.
+     * @param p limit
+     * @return new caret
+     */
+    Caret limit(final int p) {
+      return new Caret(Math.min(pos, p), Math.min(start, p), Math.min(end, p));
+    }
+  }
 
   /**
    * Constructor.
@@ -87,9 +162,11 @@ public final class TextEditor {
   boolean text(final byte[] txt) {
     if(eq(txt, text)) return false;
     final int tl = txt.length;
+    if(!bookmarks.isEmpty()) bookmarks(text, txt);
     text = txt;
     lines = -1;
     resetSelection();
+    carets.clear();
     // repeat the last requested search, but not before the changes have come to a rest
     if(searchRequest != null) searchTimer.restart();
     if(pos > tl) pos = tl;
@@ -1089,9 +1166,8 @@ public final class TextEditor {
   /**
    * Processes the enter key and checks for opening brackets.
    * @param sb typed in string
-   * @return number of characters to move forward
    */
-  int enter(final StringBuilder sb) {
+  void enter(final StringBuilder sb) {
     // indent after opening bracket
     final boolean opening = pos > 0 && Syntax.OPENING.indexOf(text[pos - 1]) != -1;
     final boolean closing = pos < size() && Syntax.CLOSING.indexOf(text[pos]) != -1;
@@ -1111,18 +1187,18 @@ public final class TextEditor {
       indent -= ind;
     }
     sb.repeat(' ', Math.max(0, indent));
+    final int p = pos;
     add(sb, false);
-    return move;
+    if(move != 0) pos(p + move);
   }
 
   /**
    * Processes and adds the specified string.
    * @param sb string to be added
    * @param selected states if the text was selected
-   * @return number of characters to move forward
    */
-  int add(final StringBuilder sb, final boolean selected) {
-    if(sb.isEmpty()) return 0;
+  void add(final StringBuilder sb, final boolean selected) {
+    if(sb.isEmpty()) return;
 
     int move = 0;
     if(!selected && opts.get(GUIOptions.AUTO)) {
@@ -1134,7 +1210,8 @@ public final class TextEditor {
       final int opening = Syntax.OPENING.indexOf(ch);
       if(opening != -1) {
         // adds a closing to an opening bracket
-        if(Syntax.CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr) || curr == '<') {
+        if(Syntax.CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr) || curr == '<' ||
+            curr == ',' || curr == ';') {
           sb.append(Syntax.CLOSING.charAt(opening));
           move = 1;
         }
@@ -1145,11 +1222,11 @@ public final class TextEditor {
           move = 1;
         }
         close();
-      } else if(ch == '"' || ch == '\'' || ch == '`') {
-        // quote: ignore if it equals next character
-        if(ch == curr) sb.setLength(0);
+      } else if(quote(ch)) {
+        // quote: ignore if it equals next character, unless the next character opens a string
+        if(ch == curr && !opens(next)) sb.setLength(0);
         // add second quote
-        else if(!XMLToken.isNCChar(prev) && !XMLToken.isNCChar(curr)) sb.append(ch);
+        else if(!name(prev) && !opens(curr)) sb.append(ch);
         move = 1;
       } else if(ch == '>') {
         // closes an opening element
@@ -1188,8 +1265,10 @@ public final class TextEditor {
         }
       }
     }
+    // the caret is placed relative to the insertion point
+    final int p = pos;
     insert(sb.toString());
-    return move;
+    if(move != 0) pos(p + move);
   }
 
   /**
@@ -1201,15 +1280,53 @@ public final class TextEditor {
     if(!isSelected() || !opts.get(GUIOptions.AUTO)) return false;
     final int opening = Syntax.OPENING.indexOf(ch);
     final int closing = opening != -1 ? Syntax.CLOSING.charAt(opening) :
-      ch == '"' || ch == '\'' || ch == '`' ? ch : 0;
+      quote(ch) ? ch : 0;
     if(closing == 0) return false;
 
     final int s = selMin(), e = selMax();
+    // a single selected bracket or quote is replaced
+    if(e - s == 1 && delimiter(text[s])) return false;
     final boolean backward = start > end;
     insert(new TokenBuilder(e - s + 2).add(ch).add(text, s, e).add(closing).finish(), s, e);
     // reselect the surrounded text and preserve the direction of the selection
     select(backward ? e + 1 : s + 1, backward ? s + 1 : e + 1);
     return true;
+  }
+
+  /**
+   * Indicates if the specified character is a bracket or quote.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean delimiter(final int ch) {
+    return Syntax.OPENING.indexOf(ch) != -1 || Syntax.CLOSING.indexOf(ch) != -1 || quote(ch);
+  }
+
+  /**
+   * Indicates if the specified character is a quote.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean quote(final int ch) {
+    return ch == '"' || ch == '\'' || ch == '`';
+  }
+
+  /**
+   * Indicates if a quote followed by the specified character opens a string.
+   * @param next next character
+   * @return result of check
+   */
+  private static boolean opens(final int next) {
+    return name(next) || quote(next);
+  }
+
+  /**
+   * Indicates if the specified byte is part of a name (non-ASCII bytes are always accepted).
+   * @param b byte
+   * @return result of check
+   */
+  private static boolean name(final int b) {
+    return b < 0 || XMLToken.isNCChar(b);
   }
 
   /**
@@ -1236,10 +1353,9 @@ public final class TextEditor {
     int s = pos - 1;
     while(s >= 0 && text[s] != '<') s--;
     final int n = s + 1;
-    if(s < 0 || n >= pos || text[n] == '/' || text[n] == '?' || text[n] == '!') return;
+    if(s < 0 || n >= pos || !XMLToken.isNCStartChar(cp(text, n))) return;
     int e = n;
     while(e < pos && !ws(text[e]) && text[e] != '/' && text[e] != '>') e++;
-    if(e == n) return;
 
     int quote = 0;
     boolean slash = false;
@@ -1269,8 +1385,9 @@ public final class TextEditor {
       endSelection();
 
       if(opts.get(GUIOptions.AUTO)) {
-        if(curr == prev && (curr == '"' || curr == '\'' || curr == '`')) {
-          // remove closing quote
+        final int next = start + 1 < size() ? text[start + 1] : 0;
+        if(curr == prev && quote(curr) && !opens(next)) {
+          // remove closing quote, unless it opens a string
           start++;
         } else {
           // remove closing bracket
@@ -1597,11 +1714,19 @@ public final class TextEditor {
    * @return string
    */
   String selected() {
-    final int e = selMax();
-    int s = selMin();
+    return selected(selMin(), selMax());
+  }
+
+  /**
+   * Returns the string in the specified range without invalid characters.
+   * @param s start position
+   * @param e end position
+   * @return string
+   */
+  private String selected(final int s, final int e) {
     final TokenBuilder tb = new TokenBuilder(e - s);
-    for(; s < e; s += cl(text, s)) {
-      final int cp = cp(text, s);
+    for(int p = s; p < e; p += cl(text, p)) {
+      final int cp = cp(text, p);
       if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
@@ -1664,6 +1789,608 @@ public final class TextEditor {
   private void anchorSelection() {
     start = pos;
     end = pos;
+  }
+
+  // MULTIPLE CARETS ==============================================================================
+
+  /**
+   * Indicates if secondary carets exist.
+   * @return result of check
+   */
+  boolean multiple() {
+    return !carets.isEmpty();
+  }
+
+  /**
+   * Returns the secondary carets, sorted by their position.
+   * @return carets
+   */
+  Caret[] carets() {
+    if(carets.isEmpty()) return NO_CARETS;
+    final Caret[] array = carets.toArray(Caret[]::new);
+    Arrays.sort(array, Comparator.comparingInt(Caret::min));
+    return array;
+  }
+
+  /**
+   * Removes all secondary carets.
+   */
+  void singleCaret() {
+    carets.clear();
+  }
+
+  /**
+   * Adds a caret at the specified position, or removes a secondary caret placed there.
+   * @param p position
+   */
+  void addCaret(final int p) {
+    if(carets.removeIf(c -> c.pos() == p)) return;
+    carets.add(caret());
+    selectFrom(p);
+    normalize();
+  }
+
+  /**
+   * Adds a caret in the row above or below, or removes the primary caret if a caret exists there.
+   * @param p position in the adjacent row
+   */
+  void cloneCaret(final int p) {
+    if(p == pos) return;
+    final Caret c = new Caret(p, -1, -1);
+    if(carets.remove(c)) {
+      caret(c);
+    } else {
+      carets.add(caret());
+      pos(p);
+      normalize();
+    }
+  }
+
+  /**
+   * Indicates if the primary caret or a secondary caret has a text selection.
+   * @return result of check
+   */
+  boolean anySelected() {
+    return isSelected() || carets.stream().anyMatch(c -> c.start() != -1);
+  }
+
+  /**
+   * Returns the selected text of all carets, separated by newlines.
+   * @return string
+   */
+  String selectedAll() {
+    if(carets.isEmpty()) return selected();
+    final ArrayList<Caret> list = new ArrayList<>(carets);
+    list.add(caret());
+    list.sort(Comparator.comparingInt(Caret::min));
+    final StringList strings = new StringList();
+    for(final Caret c : list) strings.add(c.start() != -1 ? selected(c.min(), c.max()) : "");
+    return String.join("\n", strings);
+  }
+
+  /**
+   * Inserts a string at all carets, or one line per caret if the numbers match.
+   * @param string string
+   */
+  void paste(final String string) {
+    final String[] strings = multiple() ? string.split("\n", -1) : new String[0];
+    final int[] s = { strings.length };
+    final boolean spread = s[0] == carets.size() + 1;
+    forEach(() -> {
+      if(isSelected()) delete();
+      insert(spread ? strings[--s[0]] : string);
+    });
+  }
+
+  /**
+   * Selects the word at the caret, or adds a caret for the next occurrence of the selected text.
+   */
+  void nextOccurrence() {
+    if(!isSelected()) {
+      selectWord();
+      return;
+    }
+    final int s = selMin(), e = selMax(), sl = e - s;
+    final byte[] sel = substring(text, s, e);
+    boolean wrapped = false;
+    for(int p = e;;) {
+      int f = indexOf(text, sel, p);
+      if(f == -1 && !wrapped) {
+        wrapped = true;
+        f = indexOf(text, sel, 0);
+      }
+      // stop if all occurrences have been visited
+      if(f == -1 || wrapped && f >= s) return;
+      final Caret c = new Caret(f + sl, f, f + sl);
+      if(!c.overlaps(caret()) && carets.stream().noneMatch(c::overlaps)) {
+        carets.add(caret());
+        caret(c);
+        return;
+      }
+      p = f + 1;
+    }
+  }
+
+  /**
+   * Removes the caret that was added last.
+   */
+  void prevOccurrence() {
+    if(!carets.isEmpty()) caret(carets.removeLast());
+  }
+
+  /**
+   * Adds carets for all occurrences of the selected text or the word at the caret.
+   */
+  void allOccurrences() {
+    if(!isSelected()) selectWord();
+    if(!isSelected()) return;
+
+    final int s = selMin(), e = selMax(), sl = e - s;
+    final byte[] sel = substring(text, s, e);
+    carets.clear();
+    for(int f = indexOf(text, sel, 0); f != -1; f = indexOf(text, sel, f + sl)) {
+      if(f != s) carets.add(new Caret(f + sl, f, f + sl));
+    }
+    normalize();
+  }
+
+  /**
+   * Runs an operation for each caret, starting with the last one in the text.
+   * @param op operation
+   */
+  void forEach(final Runnable op) {
+    if(carets.isEmpty()) {
+      op.run();
+      return;
+    }
+    // the primary caret is the last entry
+    final ArrayList<Caret> list = new ArrayList<>(carets);
+    list.add(caret());
+    carets.clear();
+
+    final int cs = list.size();
+    final int[] order = Array.createOrder(cs,
+        (c1, c2) -> list.get(c2).min() - list.get(c1).min());
+    boolean rowEnd = false;
+    for(int o = 0; o < cs; o++) {
+      final int c = order[o];
+      final int min = list.get(c).min();
+      caret(list.get(c));
+      final byte[] old = text;
+      op.run();
+      if(c == cs - 1) rowEnd = atRowEnd();
+      final int m = Arrays.mismatch(old, text);
+      if(m != -1) {
+        // edited range: unchanged prefix of length p, unchanged suffix of length n
+        final int ol = old.length, tl = text.length, l = Math.min(ol, tl);
+        int n = 0;
+        while(n < l && old[ol - 1 - n] == text[tl - 1 - n]) n++;
+        // repeated text: choose the edit position next to the caret
+        final int p = m + n < l ? m : Math.max(l - n, Math.min(m, Math.min(min, caret().min())));
+        n = Math.min(n, l - p);
+        // carets inside the edited text are moved to its boundaries
+        for(int i = o + 1; i < cs && list.get(order[i]).max() > p; i++) {
+          list.set(order[i], list.get(order[i]).limit(p));
+        }
+        for(int i = o - 1; i >= 0 && list.get(order[i]).max() > n; i--) {
+          list.set(order[i], list.get(order[i]).limit(n));
+        }
+      }
+      // processed carets are stored as distances from the text end
+      list.set(c, caret().mirror(text.length));
+    }
+    for(int o = 0; o < cs; o++) list.set(o, list.get(o).mirror(text.length));
+    caret(list.removeLast());
+    atRowEnd(rowEnd);
+    carets.addAll(list);
+    normalize();
+  }
+
+  /**
+   * Returns the primary caret.
+   * @return caret
+   */
+  private Caret caret() {
+    return new Caret(pos, start, end);
+  }
+
+  /**
+   * Assigns the primary caret.
+   * @param c caret
+   */
+  private void caret(final Caret c) {
+    pos = c.pos();
+    start = c.start();
+    end = c.end();
+  }
+
+  /**
+   * Replaces all carets with a column selection; the last caret becomes the primary one.
+   * @param starts start positions of the selections
+   * @param ends end positions of the selections
+   */
+  void columns(final IntList starts, final IntList ends) {
+    carets.clear();
+    final int cs = starts.size();
+    for(int c = 0; c < cs; c++) carets.add(new Caret(ends.get(c), starts.get(c), ends.get(c)));
+    caret(carets.removeLast());
+    normalize();
+  }
+
+  /**
+   * Removes secondary carets whose lines are touched by the primary caret or by later ones.
+   */
+  void caretPerLine() {
+    normalize((c1, c2) -> bol(c1.min()) <= eol(c2.max()) && bol(c2.min()) <= eol(c1.max()));
+  }
+
+  /**
+   * Runs a line operation for each caret, keeping one caret per line.
+   * @param op operation
+   */
+  void forEachLine(final Runnable op) {
+    caretPerLine();
+    forEach(op);
+  }
+
+  /**
+   * Returns the start of the line that contains the specified position.
+   * @param p position
+   * @return line start
+   */
+  private int bol(final int p) {
+    return bol(text, p);
+  }
+
+  /**
+   * Returns the end of the line that contains the specified position.
+   * @param p position
+   * @return line end
+   */
+  private int eol(final int p) {
+    int e = p;
+    while(e < text.length && text[e] != '\n') e++;
+    return e;
+  }
+
+  /**
+   * Returns the start of the line that contains the specified position.
+   * @param text text
+   * @param p position
+   * @return line start
+   */
+  static int bol(final byte[] text, final int p) {
+    int s = p;
+    while(s > 0 && text[s - 1] != '\n') s--;
+    return s;
+  }
+
+  /**
+   * Removes secondary carets that overlap with the primary caret or with later ones.
+   */
+  private void normalize() {
+    normalize(Caret::overlaps);
+  }
+
+  /**
+   * Removes secondary carets that collide with the primary caret or with later ones.
+   * @param collides collision check
+   */
+  private void normalize(final BiPredicate<Caret, Caret> collides) {
+    final Caret primary = caret();
+    for(int c = carets.size() - 1; c >= 0; c--) {
+      final Caret caret = carets.get(c);
+      boolean coll = collides.test(caret, primary);
+      for(int d = c + 1; !coll && d < carets.size(); d++) {
+        coll = collides.test(caret, carets.get(d));
+      }
+      if(coll) carets.remove(c);
+    }
+  }
+
+  // LINES AND SELECTIONS =========================================================================
+
+  /**
+   * Joins the selected lines, or the line with the caret and the next one.
+   * @return {@code true} if text has changed
+   */
+  boolean joinLines() {
+    final int s = caret().min(), e = linesEnd(), ls = bol(s), first = eol(s);
+    if(first == size()) return false;
+    final int le = eol(Math.max(e, first + 1));
+
+    // the lines are separated by single spaces; leading and trailing whitespace is removed
+    final ByteList bl = new ByteList();
+    int join = 0;
+    for(int p = ls;; p++) {
+      final int lineEnd = eol(p);
+      int a = p, b = lineEnd;
+      if(p != ls) while(a < b && ws(text[a])) a++;
+      if(lineEnd < le) while(b > a && ws(text[b - 1])) b--;
+      if(a < b) {
+        if(!bl.isEmpty()) bl.add(' ');
+        bl.add(text, a, b);
+      }
+      if(p == ls) join = bl.size();
+      if(lineEnd == le) break;
+      p = lineEnd;
+    }
+    return replaceLines(ls, le, bl.finish(), ls + join);
+  }
+
+  /**
+   * Returns the end of the selected lines; a line that is only touched by the end of the
+   * selection is excluded.
+   * @return end of the selection, or the caret position
+   */
+  private int linesEnd() {
+    if(!isSelected()) return pos;
+    final int e = selMax();
+    return text[e - 1] == '\n' ? e - 1 : e;
+  }
+
+  /**
+   * Replaces lines; selected lines are reselected, otherwise the caret is placed.
+   * @param ls start of the first line
+   * @param le end of the last line
+   * @param list new lines
+   * @param caret caret position (ignored if text is selected)
+   * @return {@code true} if text has changed
+   */
+  private boolean replaceLines(final int ls, final int le, final byte[] list, final int caret) {
+    final boolean sel = isSelected(), changed = insert(list, ls, le);
+    if(sel) select(ls, ls + list.length);
+    else pos(caret);
+    return changed;
+  }
+
+  /**
+   * Splits the selected lines, or the line with the caret, if they exceed the line margin.
+   * @param syntax syntax highlighter
+   * @return {@code true} if text has changed
+   */
+  boolean splitLines(final Syntax syntax) {
+    final int ls = bol(caret().min()), le = eol(linesEnd());
+    final int margin = Math.max(1, opts.get(GUIOptions.MARGIN));
+
+    // lines are only split at whitespace in code: strings and comments are preserved
+    final boolean[] breaks = new boolean[le - ls];
+    syntax.reset();
+    for(int p = 0; p < le; p += cl(text, p)) {
+      syntax.color(text, p, p + cl(text, p));
+      if(p >= ls && ws(text[p]) && text[p] != '\n') breaks[p - ls] = syntax.code();
+    }
+
+    // words are added to a line as long as they fit; continued lines adopt the indentation
+    final ByteList bl = new ByteList();
+    for(int p = ls;; p++) {
+      final int lineEnd = eol(p);
+      int w = p;
+      while(w < lineEnd && ws(text[w])) w++;
+      final byte[] indent = Arrays.copyOfRange(text, p, w);
+      bl.add(indent);
+      final int ic = columns(p, w);
+      int col = ic;
+      for(boolean first = true; w < lineEnd; first = false) {
+        // whitespace before the word, word up to the next breakable whitespace
+        int ws = w;
+        while(!first && breaks[ws - 1 - ls]) ws--;
+        int we = w;
+        while(we < lineEnd && !breaks[we - ls]) we++;
+        final int width = columns(ws, we);
+        if(!first && col + width > margin) {
+          bl.add('\n').add(indent);
+          col = ic + columns(w, we);
+        } else {
+          bl.add(text, ws, w);
+          col += width;
+        }
+        bl.add(text, w, we);
+        w = we;
+        while(w < lineEnd && breaks[w - ls]) w++;
+        // trailing whitespace is preserved
+        if(w == lineEnd) bl.add(text, we, lineEnd);
+      }
+      if(lineEnd == le) break;
+      bl.add('\n');
+      p = lineEnd;
+    }
+    final byte[] split = bl.finish();
+    return replaceLines(ls, le, split, ls + split.length);
+  }
+
+  /**
+   * Returns the number of columns of the specified text range.
+   * @param s start position
+   * @param e end position
+   * @return columns
+   */
+  private int columns(final int s, final int e) {
+    final int indent = opts.indent();
+    int cols = 0;
+    for(int p = s; p < e; p += cl(text, p)) cols += text[p] == '\t' ? indent : 1;
+    return cols;
+  }
+
+  /**
+   * Returns the number of columns a line is indented by.
+   * @param p start of the line
+   * @return columns, or {@code -1} if the line is empty
+   */
+  private int indentation(final int p) {
+    int w = p;
+    final int tl = text.length;
+    while(w < tl && ws(text[w]) && text[w] != '\n') w++;
+    return w == tl || text[w] == '\n' ? -1 : columns(p, w);
+  }
+
+  /**
+   * Returns the number of columns of the indentation guides of a line; empty lines adopt the
+   * smaller indentation of the surrounding lines.
+   * @param p start of the line
+   * @return columns
+   */
+  int guides(final int p) {
+    final int indent = indentation(p);
+    if(indent != -1) return indent;
+    int prev = -1, next = -1;
+    for(int l = p, n = 0; prev == -1 && l > 0 && n < 100; n++) prev = indentation(l = bol(l - 1));
+    for(int l = eol(p), n = 0; next == -1 && l < size() && n < 100; n++) {
+      next = indentation(++l);
+      l = eol(l);
+    }
+    return Math.max(0, Math.min(prev, next));
+  }
+
+  /**
+   * Returns the name or the bracket that encloses the selection or the caret.
+   * @param syntax syntax highlighter
+   * @return start and end of the enclosing range, or {@code null} if the whole text is selected
+   */
+  int[] enclosing(final Syntax syntax) {
+    final Caret c = caret();
+    final int s = c.min(), e = c.max(), tl = size();
+
+    // name at the caret, or extended name of a selected name
+    boolean name = true;
+    for(int p = s; p < e && name; p++) name = nameChar(text[p]);
+    if(name) {
+      int ns = s, ne = e;
+      while(ns > 0 && nameChar(text[ns - 1])) ns--;
+      while(ne < tl && nameChar(text[ne])) ne++;
+      if(ns < s || ne > e) return new int[] { ns, ne };
+    }
+
+    // enclosing brackets: the innermost pair is closed first
+    syntax.reset();
+    final IntList positions = new IntList();
+    for(int p = 0; p < tl; p += cl(text, p)) {
+      syntax.color(text, p, p + cl(text, p));
+      if(!syntax.code()) continue;
+      final int cp = cp(text, p), closing = Syntax.CLOSING.indexOf(cp);
+      if(Syntax.OPENING.indexOf(cp) != -1) {
+        positions.add(p);
+      } else if(closing != -1 && !positions.isEmpty() &&
+          Syntax.OPENING.indexOf(cp(text, positions.peek())) == closing) {
+        final int o = positions.pop();
+        if(o > s || p + 1 < e) continue;
+        // contents without surrounding whitespace, then contents with brackets
+        int is = o + 1, ie = p;
+        while(is < ie && ws(text[is])) is++;
+        while(ie > is && ws(text[ie - 1])) ie--;
+        if(is < ie && encloses(is, ie, s, e)) return new int[] { is, ie };
+        if(encloses(o, p + 1, s, e)) return new int[] { o, p + 1 };
+      }
+    }
+    return s == 0 && e == tl ? null : new int[] { 0, tl };
+  }
+
+  /**
+   * Expands the selection to the enclosing name or bracket.
+   * @param syntax syntax highlighter
+   */
+  void expandSelection(final Syntax syntax) {
+    singleCaret();
+    final int[] range = enclosing(syntax);
+    if(range == null) return;
+    if(!expanded()) expanded.reset();
+    final boolean sel = isSelected();
+    expanded.add(sel ? start : pos).add(sel ? end : pos);
+    select(range[0], range[1]);
+    expansion = range;
+  }
+
+  /**
+   * Restores the selection that was replaced by the last expansion.
+   */
+  void shrinkSelection() {
+    if(!expanded() || expanded.isEmpty()) return;
+    final int e = expanded.pop(), s = expanded.pop();
+    if(s == e) {
+      pos(s);
+      expansion = null;
+    } else {
+      select(s, e);
+      expansion = new int[] { selMin(), selMax() };
+    }
+  }
+
+  /**
+   * Indicates if the current selection results from an expansion.
+   * @return result of check
+   */
+  private boolean expanded() {
+    return expansion != null && isSelected() && !multiple() && selMin() == expansion[0] &&
+      selMax() == expansion[1];
+  }
+
+  /**
+   * Checks if a range encloses and exceeds another one.
+   * @param os start of the outer range
+   * @param oe end of the outer range
+   * @param s start of the inner range
+   * @param e end of the inner range
+   * @return result of check
+   */
+  private static boolean encloses(final int os, final int oe, final int s, final int e) {
+    return os <= s && e <= oe && (os < s || e < oe);
+  }
+
+  // BOOKMARKS ====================================================================================
+
+  /**
+   * Adds or removes the bookmark of the line with the caret.
+   */
+  void toggleBookmark() {
+    final int b = bol(pos), i = bookmarks.sortedIndexOf(b);
+    if(i >= 0) bookmarks.remove(i);
+    else bookmarks.insert(-i - 1, b);
+  }
+
+  /**
+   * Returns the start of the next or previous bookmarked line.
+   * @param next next/previous flag
+   * @return position, or {@code -1} if no bookmark exists
+   */
+  int bookmark(final boolean next) {
+    final int bs = bookmarks.size();
+    if(bs == 0) return -1;
+    // insertion point of the next line, or of the line with the caret
+    final int b = bol(pos);
+    int i = bookmarks.sortedIndexOf(next ? b + 1 : b);
+    if(i < 0) i = -i - 1;
+    return bookmarks.get(((next ? i : i - 1) + bs) % bs);
+  }
+
+  /**
+   * Indicates if the specified line is bookmarked.
+   * @param p start of the line
+   * @return result of check
+   */
+  boolean bookmarked(final int p) {
+    return !bookmarks.isEmpty() && bookmarks.sortedIndexOf(p) >= 0;
+  }
+
+  /**
+   * Adjusts the bookmarks to a text change; the bookmarks of replaced lines are dropped.
+   * @param old old text
+   * @param txt new text
+   */
+  private void bookmarks(final byte[] old, final byte[] txt) {
+    final int ol = old.length, tl = txt.length, pre = Arrays.mismatch(old, txt);
+    int suf = 0;
+    while(suf < ol - pre && suf < tl - pre && old[ol - 1 - suf] == txt[tl - 1 - suf]) suf++;
+    final int tail = ol - suf, d = tl - ol;
+    // a line break that is inserted at the start of a line moves the line down
+    final boolean down = tail == pre && d > 0 && txt[pre + d - 1] == '\n';
+
+    final int[] list = bookmarks.toArray();
+    bookmarks.reset();
+    for(final int b : list) {
+      if(b > pre && b < tail) continue;
+      final int p = bol(txt, b >= tail && (b > pre || down) ? b + d : b);
+      if(bookmarks.isEmpty() || bookmarks.peek() != p) bookmarks.add(p);
+    }
   }
 
   // ERROR HIGHLIGHTING ===========================================================================

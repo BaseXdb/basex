@@ -45,6 +45,8 @@ final class LockQueue {
         } while(jobs >= parallel || write && !readers.isEmpty() || !id.equals(queue.peek()));
       } finally {
         queue.remove(id);
+        // the next queued job may now be first in line
+        notifyAll();
       }
     }
     jobs++;

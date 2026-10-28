@@ -104,7 +104,7 @@ public abstract class Collation {
    * @param uri collation URI
    * @param info input info (can be {@code null})
    * @param err error code for unknown collation URIs
-   * @return collation instance or {@code null} if URI is invalid
+   * @return collation instance
    * @throws QueryException query exception
    */
   private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)

@@ -10,7 +10,6 @@ import org.basex.build.xml.*;
 import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.CommonOptions.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -74,19 +73,15 @@ public class FnParseXmlFragment extends Docs {
     final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 
-    check(options, fragment, qc);
+    check(options, fragment);
 
-    final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ? uri :
-      string(sc().baseURI().string());
+    final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ?
+      resolveUri(uri) : string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options, qc.context.options).
-        allowExternal(trusted(options, CommonOptions.TRUST_EXTERNAL, qc));
-    // untrusted calls may only access catalog-mapped resources with create permissions
-    if(!mopts.allowExternal() && !qc.has(Perm.CREATE, null, info)) {
-      mopts.put(MainOptions.CATALOG, "");
-    }
+        allowExternal(trustExternal(options, qc));
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

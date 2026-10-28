@@ -17,9 +17,6 @@ let _path = [];
     panel lists; the selected child is what the value panel shows. */
 let _selected = null;
 
-/** Whether the entries panel opens its dialog as soon as it arrives. */
-let _add = false;
-
 /** Whether the first child of the level is chosen as soon as the panel arrives. */
 let _first = false;
 
@@ -48,23 +45,6 @@ function selectStore(name) {
 function showLevel() {
   refreshEntries();
   refreshValue();
-}
-
-/**
- * Asks for the name of a store and fills it. A store is its entries: an empty one does not
- * exist and would be gone with the next visit, so the first entry is asked for right away.
- * @returns {Promise} promise
- */
-async function newStore() {
-  const name = await promptDialog("Name of the new store:");
-  if(!name) return;
-  if(name === _store) {
-    showDialog("add");
-  } else {
-    // the dialog belongs to the level, and is opened once the panel that brings it has arrived
-    _add = true;
-    selectStore(name);
-  }
 }
 
 /**
@@ -248,11 +228,7 @@ _panel_filled["entries-panel"] = () => {
   syncPath();
   // the dialog is part of the replaced markup, and brings a new text area with it
   loadCodeMirror("xquery", [ "add-value" ]);
-  if(_add) {
-    _add = false;
-    _first = false;
-    showDialog("add");
-  } else if(_first) {
+  if(_first) {
     _first = false;
     // the label of a child selects it; the marker beside it opens the child instead
     const link = document.querySelector("#entries-panel a[data-select]");
@@ -271,9 +247,9 @@ _handlers[STORES_WS] = json => {
  * @param {boolean} editable whether the shown value can be replaced
  */
 function initStores(editable) {
-  // the value is held by an editor that outlives its panel; the dialog brings a second one
+  // the value is held by an editor that outlives its panel; the dialogs bring more of them
   loadCodeMirror("xquery", true, "fill");
-  loadCodeMirror("xquery", [ "add-value" ]);
+  loadCodeMirror("xquery", [ "add-value", "create-value" ]);
   initSelection(adoptSelection, () => {
     mark("stores-panel", _store);
     refreshStores();

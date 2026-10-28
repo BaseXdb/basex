@@ -49,10 +49,6 @@ public final class Put extends DBUpdate {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public void apply() throws QueryException {
     final int pre = data.pre(id);
     if(pre == -1) return;

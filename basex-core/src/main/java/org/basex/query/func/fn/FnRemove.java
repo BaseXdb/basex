@@ -31,9 +31,9 @@ public final class FnRemove extends StandardFunc {
     if(value != null) return value(value, pos, qc).iter();
     if(pos.size() > 1) return value(iter.value(qc, null), pos, qc).iter();
 
-    final long size = iter.size();
+    final long size = iter.size(), p = pos.get(0);
+    if(p < 0 || size != -1 && p >= size) return iter;
     return new Iter() {
-      final long p = pos.get(0);
       long c;
 
       @Override
@@ -55,8 +55,7 @@ public final class FnRemove extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     if(input.isEmpty()) return input;
-    final LongList positions = positions(qc);
-    return value(input, positions, qc);
+    return value(input, positions(qc), qc);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.http.*;
 
@@ -85,6 +86,7 @@ public final class RestXqResponse extends WebResponse {
 
       SerializerOptions so = func.sopts;
       boolean head = true;
+      int start = 0;
 
       // handle special cases
       if(response(item)) {
@@ -92,6 +94,7 @@ public final class RestXqResponse extends WebResponse {
         so = build((XNode) item);
         item = iter.next();
         head = item != null;
+        start = 1;
       }
       if(head && func.methods.size() == 1 && func.methods.contains(Method.HEAD.name()))
         throw func.error(HEAD_METHOD);
@@ -107,8 +110,13 @@ public final class RestXqResponse extends WebResponse {
       // initialize serializer
       conn.sopts(so);
       // an explicitly assigned content type is sent unchanged
-      if(contentType != null) conn.response.setContentType(contentType);
-      else conn.initResponse();
+      if(contentType != null) {
+        conn.response.setContentType(contentType);
+      } else if(item != null) {
+        // result of unknown size: the first item decides; several items: same type as empty result
+        final long size = iter.size();
+        conn.initResponse(so.mediaType(size == -1 || size - start == 1 ? item : Empty.VALUE));
+      }
       if(cache == null) conn.timing(qc.info);
 
       if(status != null) {
@@ -172,8 +180,7 @@ public final class RestXqResponse extends WebResponse {
    */
   private SerializerOptions build(final GNode response) throws QueryException {
     // don't allow attributes
-    final BasicNodeIter atts = response.attributeIter();
-    final GNode attr = atts.next();
+    final GNode attr = response.attributeIter().next();
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters

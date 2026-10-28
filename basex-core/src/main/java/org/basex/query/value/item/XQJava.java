@@ -38,8 +38,8 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
-    return Token.token(Objects.toString(value));
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Str.token(Objects.toString(value), ii);
   }
 
   @Override
@@ -78,7 +78,7 @@ public final class XQJava extends FItem {
     if(qs.error()) {
       qs.token(funcLabel());
     } else {
-      qs.quoted(string(null));
+      qs.quoted(Token.token(Objects.toString(value)));
     }
   }
 }

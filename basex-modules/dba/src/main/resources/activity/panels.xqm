@@ -34,7 +34,7 @@ declare %private variable $panels:STATES := {
  : @param  $job  job details
  : @return result of check
  :)
-declare function panels:dba-job(
+declare %private function panels:dba-job(
   $job  as element(job)
 ) as xs:boolean {
   (: see utils:job-id; requests of the DBA are identified by their path :)
@@ -76,8 +76,8 @@ declare function panels:jobs(
         { 'key': 'type', 'label': 'Type', 'width': 'calc(10ch + 0.5rem)' },
         { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
         { 'key': 'path', 'label': 'Path', 'width': 'calc(12ch + 0.5rem)' },
-        { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc',
-          'width': 'calc(6ch + 0.5rem)' },
+        { 'key': 'duration', 'label': 'Duration', 'type': 'duration', 'order': 'desc',
+          'width': 'calc(11ch + 0.5rem)' },
         { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
         { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
           'width': 'calc(10ch + 0.5rem)' }
@@ -86,11 +86,12 @@ declare function panels:jobs(
       (: the job that renders this table is of no interest :)
       let $jobs := job:list-details()[not(@id = job:current())]
       (: the queries that are run in the DBA itself are only listed on demand :)
-      let $hidden := $jobs[panels:dba-job(.)][not($dba)]
+      let $dba-jobs := $jobs[panels:dba-job(.)]
+      let $hidden := $dba-jobs[not($dba)]
       let $entries := (
         for $details in $jobs except $hidden
         let $id := $details/@id
-        let $sec := (xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S'))
+        let $sec := duration-to-seconds(xs:dayTimeDuration($details/@duration))
           otherwise 0
         let $time := data($details/@time)
         order by $time descending
@@ -100,7 +101,7 @@ declare function panels:jobs(
           'type': string($details/@type),
           'state': panels:job-state($details/@state, $details/@start),
           'path': string($details/@path),
-          'duration': html:duration($sec),
+          'duration': $sec,
           (: the address of the client is rarely of interest; the session that the job was
              started from lists it in the Clients panel :)
           'user': panels:job-user($details),
@@ -132,12 +133,12 @@ declare function panels:jobs(
         <label title='Show the queries that are run in the DBA itself'>{
           <input type='checkbox' id='dba-jobs' onchange='dbaJobsChanged()'>{
             attribute checked { }[$dba]
-          }</input>, ` DBA jobs ({ count($jobs[panels:dba-job(.)]) })`
+          }</input>, ` DBA jobs ({ count($dba-jobs) })`
         }</label>
       )
       let $options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'select': 'id',
         'noun': 'job', 'empty': 'No jobs are running or scheduled.' }
-      return table:create($headers, $entries, $buttons, {}, $options)
+      return table:create($headers, $entries, $buttons, options := $options)
     }
   </form>
 };
@@ -166,7 +167,7 @@ declare function panels:job-view(
 ) as element()* {
   if ($job) {
     panels:job-details($job) otherwise (
-      <h2>{ 'Job: ' || $job }</h2>,
+      <h2>Job: { $job }</h2>,
       <p>Job has expired.</p>,
       <div class='buttons'>{ panels:close-button() }</div>
     )
@@ -209,33 +210,13 @@ declare %private function panels:job-user(
 };
 
 (:~
- : Creates the locks of a job: the databases it reads and writes.
- : @param  $details  job details
- : @return function creating the locks
- :)
-declare %private function panels:job-locks(
-  $details  as element(job)
-) as fn() as item()+ {
-  let $locks := (
-    ('R: ' || $details/@reads)[not($details/@reads = ('', '(none)'))],
-    ('W: ' || $details/@writes)[not($details/@writes = ('', '(none)'))]
-  )
-  return fn() {
-    (
-      for $lock at $pos in $locks
-      return (html:symbol(' · ', ', ')[$pos > 1], $lock)
-    ) otherwise $table:NONE
-  }
-};
-
-(:~
  : Creates the dialog that starts a new job.
  : @return dialog
  :)
 declare function panels:job-dialog() as element(dialog) {
   (: it is not part of a panel: the panels are replaced while the view refreshes, which would
      close the dialog while it is being filled in :)
-  form:dialog('job', 'New Job', 'jobs/create', false(), (
+  form:dialog('job', 'New Job', 'Start', 'jobs/create', false(), (
     form:editor-field('Query:', 'query', 'job-query'),
     (: what the job is called and when it runs, next to how it repeats and what is kept :)
     <div class='field-columns'>{
@@ -266,10 +247,10 @@ declare function panels:job-dialog() as element(dialog) {
  : @param  $job  job id
  : @return details, or empty sequence if the id is unknown
  :)
-declare function panels:job-details(
-  $job  as xs:string?
+declare %private function panels:job-details(
+  $job  as xs:string
 ) as element()* {
-  let $details := $job[.] ! job:list-details(.)
+  let $details := job:list-details($job)
   let $service := job:services()[@id = $job]
   (: an id names a registered job, a persisted definition, or both: a service that has no job
      is dormant, and its definition is all that is left of it :)
@@ -295,7 +276,7 @@ declare function panels:job-details(
   return (
     <input type='hidden' name='id' value='{ $job }'/>,
     (: the heading ends after the id, which can be long and is clipped rather than wrapped :)
-    <h2>{ (if ($persisted) then 'Service: ' else 'Job: ') || $job }</h2>,
+    <h2>{ if ($persisted) then 'Service' else 'Job' }: { $job }</h2>,
     (: what is known about the job is listed on the left, what it computes on the right :)
     <div class='job-columns'>
       <div class='job-facts'>{
@@ -335,7 +316,7 @@ declare function panels:job-details(
       }</div>
     </div>,
     <div class='buttons'>{
-      form:button('jobs/remove', 'Remove',
+      form:button('jobs/remove', 'Remove', 'CONFIRM',
         title := 'Stop the job and discard its result')[$registered],
       (: reading a result closes the job: the action gives it up, and the page it leads to
          fetches the file :)
@@ -343,7 +324,7 @@ declare function panels:job-details(
         title := 'Download the result; the job is removed then')[$output],
       form:button('jobs/replace', 'Save',
         title := 'Save the edited query and restart the service')[$persisted],
-      form:button('jobs/unregister', 'Unregister',
+      form:button('jobs/unregister', 'Unregister', 'CONFIRM',
         title := 'Stop the service and unregister it, ' ||
           'so that it no longer starts with the server')[$persisted],
       panels:close-button()
@@ -355,7 +336,7 @@ declare function panels:job-details(
  : Creates the button that closes the details of a job.
  : @return button
  :)
-declare function panels:close-button() as element(button) {
+declare %private function panels:close-button() as element(button) {
   <button formmethod='dialog' formnovalidate=''>Close</button>
 };
 
@@ -384,9 +365,22 @@ declare %private function panels:job-information(
   table:pairs(
     for $value in $entry/@*
     for $name in name($value)[. != 'id']
+    let $string := string($value)
+    (: values are formatted as in the lists, with the exact value as tooltip :)
     return <tr>
       <td><b>{ utils:capitalize($name) }</b></td>
-      <td>{ string($value) }</td>
+      <td>{
+        switch () {
+          case $name = 'duration' and $string castable as xs:dayTimeDuration return
+            <span title='{ $string }'>{
+              html:duration(duration-to-seconds(xs:dayTimeDuration($string)))
+            }</span>
+          case $name = ('start', 'end', 'time') and $string castable as xs:dateTime return
+            html:time(xs:dateTime($string))
+          case $name = 'address' return html:address($string)
+          default return $string
+        }
+      }</td>
     </tr>
   )
 };
@@ -394,12 +388,14 @@ declare %private function panels:job-information(
 (:~
  : Creates the contents of the clients panel: the web sessions of the server, each followed by
  : the WebSocket connections and the jobs that were opened in it.
+ : @param  $sort    table sort key; empty string for the newest sessions first
  : @param  $socket  id of the connection of the requesting view (empty if unknown)
  : @param  $idle    whether the idle sessions are listed as well
  : @param  $dba     whether the jobs of the DBA itself are listed as well
  : @return panel contents
  :)
 declare function panels:clients(
+  $sort    as xs:string := '',
   $socket  as xs:string? := (),
   $idle    as xs:boolean := false(),
   $dba     as xs:boolean := false()
@@ -418,12 +414,25 @@ declare function panels:clients(
     xs:dateTime(@accessed) < current-dateTime() - $panels:IDLE
   ]/@id
   let $shown := if ($idle) then $sessions else $sessions[not(@id = $idle-ids)]
-  (: the session of this view comes first; the others by creation, so rows do not jump :)
+  (: the sortable columns are named by the attributes of a session :)
+  let $sort := $sort[.] otherwise 'created'
+  let $headers := (
+    { 'key': 'id', 'label': 'Client' },
+    { 'key': 'created', 'label': 'Opened', 'order': 'desc' },
+    { 'key': 'accessed', 'label': 'Access', 'order': 'desc' },
+    { 'key': 'expires', 'label': 'Expires' }
+  )
+  let $label := fn($key) { table:label($headers[?key = $key], $sort) }
+  let $state := fn($key) { table:sort-state($headers[?key = $key], $sort) }
+  (: sessions are sorted as groups, and the session of this view comes first :)
+  let $order := table:order($headers, $sort)
+  let $key := $order?key
+  let $value := fn($session) {
+    $session/@*[name() = $key] ! (if ($key = 'id') then string() else xs:dateTime(.))
+  }
   let $ordered := (
     $shown[@id = $current],
-    for $session in $shown[not(@id = $current)]
-    order by $session/@created descending
-    return $session
+    table:sort($shown[not(@id = $current)], $value, $order?desc)
   )
   (: a session and what belongs to it are a group of rows, which a screen reader states :)
   let $groups := (
@@ -441,7 +450,7 @@ declare function panels:clients(
       $orphans ! panels:socket-row(., $socket, $registered)
     }</tbody>
   )
-  return <form method='post' autocomplete='off'>
+  return <form method='post' autocomplete='off' data-sort='{ $sort }'>
     <h2>Clients</h2>
     <div class='buttons'>{
       form:button('clients/close', 'Close', ('CHECK', 'CONFIRM'),
@@ -457,9 +466,9 @@ declare function panels:clients(
     }</div>
     <h3>{
       (: worded as the summary of a table :)
-      count($sessions) || ' ' || utils:capitalize(utils:plural(count($sessions), 'session')),
+      `{ count($sessions) } { utils:capitalize(utils:plural(count($sessions), 'session')) }`,
       html:symbol(' · ', ', '),
-      count($sockets) || ' ' || utils:capitalize(utils:plural(count($sockets), 'connection'))
+      `{ count($sockets) } { utils:capitalize(utils:plural(count($sockets), 'connection')) }`
     }</h3>
     {
       if (empty($groups)) {
@@ -473,13 +482,16 @@ declare function panels:clients(
           <table class='clients'>
             <thead>
               <tr>
-                <th><input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>
-                  CLIENT</th>
-                <th>ATTRIBUTES</th>
-                <th>OPENED</th>
-                <th>ACCESS</th>
+                <th>{
+                  $state('id'),
+                  <input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>, ' ',
+                  $label('id')
+                }</th>
+                <th>Attributes</th>
+                <th>{ $state('created'), $label('created') }</th>
+                <th>{ $state('accessed'), $label('accessed') }</th>
                 <th title='{ 'A session that is not accessed again is discarded at this ' ||
-                  'time' }'>EXPIRES</th>
+                  'time' }'>{ $state('expires'), $label('expires') }</th>
               </tr>
             </thead>
             { $groups }
@@ -521,10 +533,10 @@ declare %private function panels:session-rows(
     <tr class='group' id='{ $id }'>
       <th scope='rowgroup'>
         <input type='checkbox' name='session' value='{ $id }' onclick='buttons(this)'
-               aria-label='{ 'Select session ' || $id }'/>
+               aria-label='Select session { $id }'/>
         <b>Session</b>{ ' ' }
         { panels:id($id) }
-        { <span class='note'>{ html:symbol(' · ', ', ') }you</span>[$you] }
+        { html:marker('you')[$you] }
       </th>
       <td>{ $attributes?* }</td>
       <td>{ html:time($session/@created) }</td>
@@ -570,12 +582,11 @@ declare %private function panels:socket-row(
   return <tr class='child' id='{ $id }'>
     <td>
       <input type='checkbox' name='websocket' value='{ $id }' onclick='buttons(this)'
-             aria-label='{ 'Select connection ' || $label }'/>
+             aria-label='Select connection { $label }'/>
       <span class='nowrap' title='{ string-join(($id, $ws/@user,
         html:localhost($ws/@address)), ', ') }'>{ $label }</span>
-      { <span class='note'>{ html:symbol(' · ', ', ') }this tab</span>[$id = $socket] }
-      { <span class='note'>{ html:symbol(' · ', ', '), string($ws/@user) }</span>[
-        not($ws/@session)] }
+      { html:marker('this tab')[$id = $socket] }
+      { html:marker(string($ws/@user))[not($ws/@session)] }
     </td>
     <td>{ $attributes?* }</td>
     <td>{ html:time($ws/@created) }</td>
@@ -599,9 +610,11 @@ declare %private function panels:job-row(
     <td>{
       panels:job-state($job/@state)(),
       (: what is locked is only stated if there is anything :)
-      if (some $locks in ($job/@reads, $job/@writes) satisfies not($locks = ('', '(none)'))) {
-        html:symbol(' · ', ', '), panels:job-locks($job)()
-      }
+      for $lock in (
+        ('R: ' || $job/@reads)[not($job/@reads = ('', '(none)'))],
+        ('W: ' || $job/@writes)[not($job/@writes = ('', '(none)'))]
+      )
+      return (html:symbol(' · ', ', '), $lock)
     }</td>
     <td>{ ($job/@start otherwise $job/@time) ! html:time(.) }</td>
     <td/>
@@ -668,38 +681,20 @@ declare %private function panels:dba-jobs(
 };
 
 (:~
- : Creates the dialog that assigns a session attribute.
- : @return dialog
- :)
-declare function panels:session-dialog() as element(dialog) {
-  (: as the dialog that starts a job, it is not part of a panel: the panels are replaced while
-     the view refreshes :)
-  panels:attribute-dialog('session', 'Session:', 'sessions')
-};
-
-(:~
- : Creates the dialog that assigns an attribute of a WebSocket connection.
- : @return dialog
- :)
-declare function panels:websocket-dialog() as element(dialog) {
-  panels:attribute-dialog('websocket', 'WebSocket:', 'websockets')
-};
-
-(:~
  : Creates the dialog that assigns or deletes an attribute.
  : @param  $kind     what holds the attribute ('session', 'websocket')
  : @param  $label    label of the field that names it
  : @param  $actions  endpoint the dialog posts to ('sessions', 'websockets')
  : @return dialog
  :)
-declare %private function panels:attribute-dialog(
+declare function panels:attribute-dialog(
   $kind     as xs:string,
   $label    as xs:string,
   $actions  as xs:string
 ) as element(dialog) {
   (: the ids of its fields are derived from what holds the attribute, so that the two dialogs
      of the view do not collide :)
-  form:dialog($kind, 'Edit Attribute', $actions || '/set', false(), (
+  form:dialog($kind, 'Edit Attribute', 'Save', $actions || '/set', false(), (
     (: what holds the attribute is chosen in the panel; the name is not, so an attribute that
        it does not hold yet can be assigned as well :)
     form:field('Name:',
@@ -714,8 +709,7 @@ declare %private function panels:attribute-dialog(
     )),
     (: filled in by the client if the value it fetched cannot be shown :)
     <div id='{ $kind }-note' class='note'/>
-  ), <button formaction='{ $actions }/delete'
-                 title='Delete the attribute'>Delete</button>)
+  ), form:button($actions || '/delete', 'Delete', 'CONFIRM', title := 'Delete the attribute'))
 };
 
 (:~
@@ -770,11 +764,11 @@ declare function panels:caches(
       let $buttons := (
         form:button('caches/delete', 'Delete', ('CHECK', 'CONFIRM'),
           title := 'Delete the selected caches; options assigned with cache:init are kept'),
-        form:button('caches/clear', 'Reset All', 'CONFIRM',
+        form:button('caches/clear', 'Delete All', 'CONFIRM',
           title := 'Delete all caches and the options assigned with cache:init')
       )
       (: the checkbox submits the name: the default cache is addressed by an empty one :)
-      return table:create($headers, $entries, $buttons, {},
+      return table:create($headers, $entries, $buttons, options :=
         { 'sticky': <h2>Caches</h2>, 'select': 'cache', 'sort': $sort, 'presort': $presort,
           'page': $page, 'noun': 'cache' })
     }
@@ -787,7 +781,7 @@ declare function panels:caches(
  :)
 declare function panels:cache-dialog() as element(dialog) {
   (: the name of the cache, its keys and the chosen value are filled in by the client :)
-  form:dialog('cache', 'Cache', 'caches/put', false(), (
+  form:dialog('cache', 'Cache', 'Save', 'caches/put', false(), (
     <input type='hidden' name='name' id='cache-name'/>,
     (: the keys to choose from, next to the entry that is shown :)
     <div class='field-columns'>{
@@ -832,7 +826,7 @@ declare function panels:db-sessions(
       let $address := string($session/@address)
       order by $address
       return { 'address': fn() { html:address($address) }, 'user': $session/@user },
-      (), {}, { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'session',
+      options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'noun': 'session',
         'empty': 'No clients are connected via the server protocol.' }
     )
   }</div>

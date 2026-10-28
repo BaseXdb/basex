@@ -59,9 +59,7 @@ public final class FTContains extends Single {
       for(Item input; (input = qc.next(iter)) != null;) {
         // arrays are atomized, as in the optimized expression
         final Value values = input instanceof XQArray ? input.atomValue(qc, info) : input;
-        final long vs = values.size();
-        for(long v = 0; v < vs; v++) {
-          final Item item = values.itemAt(v);
+        for(final Item item : values) {
           lexer.init(item.string(info));
           final FTNode it = ftexpr.value(qc);
           final FTMatches all = it.matches();
@@ -149,8 +147,7 @@ public final class FTContains extends Single {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // check if index can be utilized
-    final IndexType type = ii.type(expr, IndexType.FULLTEXT);
-    if(type == null || !ftexpr.indexAccessible(ii)) return false;
+    if(ii.type(expr, IndexType.FULLTEXT) == null || !ftexpr.indexAccessible(ii)) return false;
     return ii.create(new FTIndexAccess(info, ftexpr, ii.db), true,
         Util.info(OPTINDEX_X_X, "full-text", ftexpr), info);
   }

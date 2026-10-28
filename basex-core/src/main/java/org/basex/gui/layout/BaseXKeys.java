@@ -66,6 +66,13 @@ public enum BaseXKeys {
   /** Delete complete line.  */ DELLINES(META | SHIFT, VK_D),
   /** Duplicate line(s).     */ DUPLLINES(META, VK_D),
 
+  /** Next occurrence.       */ NEXTOCCUR(MAC ? CTRL : ALT, MAC ? VK_G : VK_J),
+  /** Remove occurrence.     */ PREVOCCUR(MAC ? CTRL | SHIFT : ALT | SHIFT, MAC ? VK_G : VK_J),
+  /** All occurrences.       */ ALLOCCUR(MAC ? CTRL | META : META | ALT | SHIFT,
+                                    MAC ? VK_G : VK_J),
+  /** Add caret above.       */ CARETUP(META | ALT | SHIFT, VK_UP),
+  /** Add caret below.       */ CARETDOWN(META | ALT | SHIFT, VK_DOWN),
+
   // Navigation
 
   /** Jump to input bar.     */ FOCUSINPUT(MAC ? META : NO_MOD, VK_F8),

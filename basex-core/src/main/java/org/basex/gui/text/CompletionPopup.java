@@ -42,9 +42,10 @@ final class CompletionPopup extends TextPopup {
    * @param panel text panel
    */
   CompletionPopup(final TextPanel panel) {
-    super(panel);
+    super(panel, false);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setCellRenderer(new CandidateRenderer());
+    list.setBackground(paleGray);
     list.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
@@ -89,8 +90,10 @@ final class CompletionPopup extends TextPopup {
 
   @Override
   Component content() {
-    return new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+    final JScrollPane pane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    pane.setBorder(border());
+    return pane;
   }
 
   /**
@@ -209,7 +212,7 @@ final class CompletionPopup extends TextPopup {
         g.setColor(lightGray);
         g.drawLine(0, 0, w, 0);
       }
-      g.setColor(selected ? list.getSelectionForeground() : darkGray);
+      g.setColor(selected ? list.getSelectionForeground() : textColor);
 
       final FontMetrics fm = g.getFontMetrics(boldFont);
       final int y = (h - fm.getHeight()) / 2 + fm.getAscent();

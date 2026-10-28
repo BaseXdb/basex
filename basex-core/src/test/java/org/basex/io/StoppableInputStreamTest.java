@@ -80,7 +80,7 @@ public final class StoppableInputStreamTest extends SandboxTest {
         for(final char ch : "abcd".toCharArray()) {
           os.write(ch);
           os.flush();
-          Thread.sleep(400);
+          Thread.sleep(50);
         }
       } catch(final InterruptedException ex) {
         Util.debug(ex);
@@ -96,7 +96,7 @@ public final class StoppableInputStreamTest extends SandboxTest {
   }
 
   /** A regular request reads its response body unaffected by the stoppable wrapper. */
-  @Test public void normalRequestSucceeds() {
+  @Test public void ok() {
     assertEquals("hello", query(
         "http:send-request(<http:request method='GET' href='" + url("/ok") + "'/>)[2]"));
   }
@@ -105,8 +105,8 @@ public final class StoppableInputStreamTest extends SandboxTest {
    * Stopping a job aborts a request whose response body has stalled mid-stream.
    * @throws Exception exception
    */
-  @Test public void stopInterruptsStalledBody() throws Exception {
-    assertInterrupted("http:send-request(<http:request method='GET' href='" +
+  @Test public void stall() throws Exception {
+    interrupt("http:send-request(<http:request method='GET' href='" +
         url("/stall") + "'/>)");
   }
 
@@ -114,30 +114,30 @@ public final class StoppableInputStreamTest extends SandboxTest {
    * Stopping a job aborts a stalled request that runs in a parallel fork-join branch.
    * @throws Exception exception
    */
-  @Test public void stopInterruptsParallelBranch() throws Exception {
+  @Test public void parallel() throws Exception {
     final String req = "http:send-request(<http:request method='GET' href='" +
         url("/stall") + "'/>)";
-    assertInterrupted("xquery:fork-join((function() { " + req + " }, function() { " + req + " }))");
+    interrupt("xquery:fork-join((function() { " + req + " }, function() { " + req + " }))");
   }
 
   /** A stalled response body raises a timeout error, also if it is returned as lazy item. */
-  @Test public void stalledBodyTimesOut() {
-    error(timeoutRequest("/timeout?text/plain"), QueryError.HC_TIMEOUT);
-    error(timeoutRequest("/timeout?application/octet-stream"), QueryError.HC_TIMEOUT);
+  @Test public void timeout() {
+    error(request("/timeout?text/plain"), QueryError.HC_TIMEOUT);
+    error(request("/timeout?application/octet-stream"), QueryError.HC_TIMEOUT);
   }
 
   /** A slow response body does not time out as long as data arrives. */
-  @Test public void slowBodySucceeds() {
-    query(timeoutRequest("/slow"), "abcd");
+  @Test public void slow() {
+    query(request("/slow"), "abcd");
   }
 
   /**
-   * Returns a query that requests the string value of a response body with a timeout of 1 second.
+   * Returns a query that requests the string value of a response body with a timeout of 250 ms.
    * @param path request path
    * @return query
    */
-  private static String timeoutRequest(final String path) {
-    return "http:send-request(<http:request method='GET' timeout='1' href='" + url(path) +
+  private static String request(final String path) {
+    return "http:send-request(<http:request method='GET' timeout='0.25' href='" + url(path) +
         "'/>)[2] => string()";
   }
 
@@ -147,7 +147,7 @@ public final class StoppableInputStreamTest extends SandboxTest {
    * @param query query to run
    * @throws Exception exception
    */
-  private static void assertInterrupted(final String query) throws Exception {
+  private static void interrupt(final String query) throws Exception {
     final XQuery cmd = new XQuery(query);
     final AtomicReference<Throwable> caught = new AtomicReference<>();
     final Thread worker = new Thread(() -> {

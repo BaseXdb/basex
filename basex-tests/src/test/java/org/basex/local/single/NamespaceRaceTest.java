@@ -1,5 +1,6 @@
 package org.basex.local.single;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.atomic.*;
@@ -26,8 +27,6 @@ public final class NamespaceRaceTest extends SandboxTest {
    */
   @Test public void compileDuringUpdate() throws Exception {
     // one namespace node per document: the compressed structure has a single inner node
-    final StringBuilder sb = new StringBuilder();
-    for(int d = 0; d < DOCS; d++) sb.append("<r xmlns='urn:d'><c/></r>");
     execute(new CreateDB(NAME));
     for(int d = 0; d < DOCS; d++) {
       execute(new Add(d + ".xml", "<r xmlns='urn:d'><c/></r>"));
@@ -41,7 +40,7 @@ public final class NamespaceRaceTest extends SandboxTest {
       try {
         while(!stop.get()) {
           // compilation inspects the namespaces without holding a lock
-          try(QueryProcessor qp = new QueryProcessor("db:get('" + NAME + "')//c", context)) {
+          try(QueryProcessor qp = new QueryProcessor(_DB_GET.args(NAME) + "//c", context)) {
             qp.compile();
           }
         }
@@ -54,7 +53,7 @@ public final class NamespaceRaceTest extends SandboxTest {
     try {
       for(int c = 0; c < 20 && error.get() == null; c++) {
         // the update inflates the compressed structure and closes it
-        execute(new XQuery("insert node <x/> into " + "db:get('" + NAME + "')/*[1]"));
+        execute(new XQuery("insert node <x/> into " + _DB_GET.args(NAME) + "/*[1]"));
         execute(new Close());
         execute(new Open(NAME));
       }

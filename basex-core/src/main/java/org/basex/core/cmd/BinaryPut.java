@@ -45,13 +45,12 @@ public final class BinaryPut extends ACreate {
 
   @Override
   protected boolean run() {
-    final boolean create = context.user().has(Perm.CREATE);
     String path = MetaData.normPath(args[0]);
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(io.isExternal() && !create) return error(PERM_REQUIRED_X, Perm.CREATE);
+      if(denied(io)) return error(PERM_REQUIRED_X, Perm.ADMIN);
       if(!io.exists() || io.isDir()) return error(RES_NOT_FOUND_X, io);
       in = io.inputSource();
       // set/add name of document
@@ -63,7 +62,7 @@ public final class BinaryPut extends ACreate {
     // ensure that the name is not empty and contains no trailing dots
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
-    if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
+    if(path.isEmpty()) return error(PATH_INVALID_X, args[0]);
 
     final String pth = path;
     return update(data, () -> put(data, pth));

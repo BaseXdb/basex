@@ -28,14 +28,15 @@ import org.basex.util.list.*;
  *
  * <ul>
  * <li>File <b>x</b> contains an entry for each token length.
- * Structure: {@code [l, p] ...}.
- * {@code l} is the length of a token [byte].
+ * Structure: {@code n, [l, p] ...}.
+ * {@code n} is the number of entries [{@link Num}].
+ * {@code l} is the length of a token [{@link Num}].
  * {@code p} is the pointer of the first token with length {@code l} [int].
  * </li>
  * <li>File <b>y</b> contains the tokens and references.
  * Structure: {@code [t0, t1, ... tl, z, s]}
  * {@code t0, t1, ... tl-1} is the token [byte[l]]
- * {@code z} is the pointer on the data entries of the token [long]
+ * {@code z} is the pointer on the data entries of the token [5 bytes]
  * {@code s} is the number of references, saved in data [int]
  * </li>
  * <li>File <b>z</b> contains the {@code ID/POS} references.
@@ -476,7 +477,7 @@ public final class FTIndex extends SegmentedIndex {
   private void rebuild() throws IOException {
     segments[0].close();
     FTBuilder.drop(data, DATAFTX);
-    new FTBuilder(data).build(0, data.nodes(), DATAFTX);
+    new FTBuilder(data, lexer()).build(0, data.nodes(), DATAFTX);
     segments[0] = new FTSegment(data, -1, buffer);
     touched = new IntSet();
   }
@@ -516,11 +517,20 @@ public final class FTIndex extends SegmentedIndex {
 
   @Override
   protected void unit(final int pre, final TokenList keys, final IntList poss) throws IOException {
-    if(lexer == null) lexer = FTBuilder.lexer(data);
-    FTBuilder.tokens(lexer, data.meta, data.atom(pre), (token, pos) -> {
+    FTBuilder.tokens(lexer(), data.meta, data.atom(pre), (token, pos) -> {
       keys.add(token);
       poss.add(pos);
     });
+  }
+
+  /**
+   * Returns the lexer for index updates, which uses the stopwords stored in the database.
+   * @return lexer
+   * @throws IOException I/O exception
+   */
+  private FTLexer lexer() throws IOException {
+    if(lexer == null) lexer = FTBuilder.lexer(data, false);
+    return lexer;
   }
 
   @Override
@@ -541,7 +551,7 @@ public final class FTIndex extends SegmentedIndex {
 
     final int number = next++;
     final String prefix = segment(number);
-    new FTBuilder(data).build(first, last, prefix);
+    new FTBuilder(data, lexer()).build(first, last, prefix);
     if(id != -1 && segments.length > 0) IndexSegment.superseded(data, prefix, new int[] { id });
     add(number);
   }

@@ -90,7 +90,7 @@ public final class AnnList implements Iterable<Ann> {
   }
 
   /**
-   * Returns the intersection of these annotations and the given ones.
+   * Combines these annotations with the given ones for an intersection of function types.
    * @param list other annotations
    * @return new instance with all annotations, or {@code null} if intersection is not possible
    */
@@ -122,7 +122,7 @@ public final class AnnList implements Iterable<Ann> {
   }
 
   /**
-   * Returns the union of these annotations and the given ones.
+   * Returns the annotations shared with the given ones for a union of function types.
    * @param list annotations
    * @return new instance with annotations that are present in both lists
    */

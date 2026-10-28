@@ -45,6 +45,8 @@ public final class CreateIndex extends ACreate {
         data.meta.diacritics = options.get(MainOptions.DIACRITICS);
         data.meta.language(Language.get(options));
         data.meta.stopwords = options.get(MainOptions.STOPWORDS);
+        // explicit creation: read stopword file again
+        StopWords.reset(data);
       }
       default -> {
         return error(UNKNOWN_CMD_X, this);

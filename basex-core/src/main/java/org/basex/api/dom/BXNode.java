@@ -24,7 +24,7 @@ public abstract class BXNode implements Node {
     Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE, Node.CDATA_SECTION_NODE,
     Node.DOCUMENT_FRAGMENT_NODE
   };
-  /** Node name mapping (see {@link Data} interface). */
+  /** Node name mapping (see {@link Data} interface; {@code null}: name of the node). */
   private static final String[] NAMES = {
     "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
@@ -57,8 +57,9 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public String getNodeName() {
-    return NAMES[kind()];
+  public final String getNodeName() {
+    final String name = NAMES[kind()];
+    return name != null ? name : string(nd.name());
   }
 
   @Override
@@ -123,7 +124,7 @@ public abstract class BXNode implements Node {
   public final BXNode getLastChild() {
     GNode node = null;
     for(final GNode n : nd.childIter()) node = n;
-    return node != null ? get(node) : null;
+    return get(node);
   }
 
   @Override
@@ -158,16 +159,13 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXDoc getOwnerDocument() {
-    XNode n = nd;
-    for(XNode p; (p = n.parent()) != null;) {
-      n = p;
-    }
-    return n.kind() == Kind.DOCUMENT ? (BXDoc) get(n) : null;
+    final XNode root = nd.root();
+    return root.kind() == Kind.DOCUMENT ? new BXDoc(root) : null;
   }
 
   @Override
   public final boolean hasAttributes() {
-    return getAttributes().getLength() != 0;
+    return nd.hasAttributes();
   }
 
   @Override

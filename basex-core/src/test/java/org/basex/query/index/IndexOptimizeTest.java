@@ -187,6 +187,18 @@ public final class IndexOptimizeTest extends SandboxTest {
         + "db:f('1')", 1);
   }
 
+  /** Checks index optimizations inside inline functions. */
+  @Test public void closures() {
+    createColl();
+    inline(false);
+
+    final String db = _DB_GET.args(NAME);
+    indexCheck("let $f := fn($x as xs:string) {" + db + "//text()[. = $x] } "
+        + "return $f('1')", 1);
+    indexCheck("let $f := fn($x) {" + db + "//text()[. contains text { $x }] } "
+        + "return $f('1')", 1);
+  }
+
   /** Checks index optimizations inside functions. */
   @Test public void gh1553() {
     createColl();

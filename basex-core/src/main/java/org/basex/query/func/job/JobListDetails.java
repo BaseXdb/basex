@@ -4,7 +4,6 @@ import static org.basex.core.jobs.JobsText.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -23,11 +22,9 @@ import org.basex.util.list.*;
 public final class JobListDetails extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Context ctx = qc.context;
     final String id = toStringOrNull(arg(0), qc);
-
-    final TokenList ids = id != null ? new TokenList(1).add(id) : qc.context.jobs.ids(true);
-    final JobPool jobs = ctx.jobs;
+    final JobPool jobs = qc.context.jobs;
+    final TokenList ids = id != null ? new TokenList(1).add(id) : jobs.ids(true);
     final ValueBuilder vb = new ValueBuilder(qc);
 
     for(final byte[] k : ids) {

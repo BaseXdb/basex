@@ -17,6 +17,7 @@ import org.basex.gui.*;
 import org.basex.gui.dialog.DialogInput.Action;
 import org.basex.gui.layout.*;
 import org.basex.index.resource.*;
+import org.basex.util.*;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database contents.
@@ -84,6 +85,7 @@ final class DialogResources extends BaseXBack {
     filterText = new BaseXTextField(dialog, PLEASE_WAIT_D);
     filterText.setEnabled(false);
     BaseXLayout.setWidth(filterText, 300);
+    BaseXLayout.defaultButton(filterText, filter);
 
     // left panel
     final BaseXBack panel = new BaseXBack(new BorderLayout());
@@ -119,7 +121,7 @@ final class DialogResources extends BaseXBack {
           tree.expandPath(new TreePath(root.getPath()));
           filterText.setText("/");
           filterText.setEnabled(true);
-          tree.setCursor(CURSORARROW);
+          tree.setCursor(null);
           filter.setEnabled(true);
           clear.setEnabled(true);
         });
@@ -160,6 +162,8 @@ final class DialogResources extends BaseXBack {
       filterText.setText("/");
       filterText.requestFocusInWindow();
       refreshFolder(root);
+      filtered = false;
+    } else if(comp == filterText) {
       filtered = false;
     } else {
       tree.repaint();
@@ -256,7 +260,8 @@ final class DialogResources extends BaseXBack {
     @Override
     public void execute() {
       final ResourceNode n = selection();
-      if(n == null || !BaseXDialog.confirm(dialog.gui(), DELETE_NODES)) return;
+      if(n == null || !BaseXDialog.confirmDestructive(dialog.gui(),
+          Util.info(DELETE_FILE_X, n.path()))) return;
 
       final Runnable run = () -> refreshNewFolder(n.path());
       DialogProgress.execute(dialog, run, new Delete(n.path()));

@@ -5,6 +5,8 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -32,7 +34,7 @@ public final class FnData extends ContextFn {
     if(input != null) {
       final SeqType st = input.seqType();
       // data(()) → ()
-      if(st.zero()) return input;
+      if(st.zero()) return input instanceof Dummy ? Empty.VALUE : input;
       final BasicType type = st.type.atomic();
       if(type == st.type) {
         // data('x') → 'x'
@@ -40,9 +42,7 @@ public final class FnData extends ContextFn {
         return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
-      if(type != null) {
-        exprType.assign(type.seqType(st.atomOcc()), input.atomSize());
-      }
+      if(type != null) exprType.assign(type.seqType(st.atomOcc()), input.atomSize());
     }
     return this;
   }

@@ -44,8 +44,8 @@ final class StaticVarRef extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Value value = var.value;
-    // declare variable $x := 1; $x → 1
-    if(value != null) {
+    // declare variable $x := 1; $x → 1 (skipped in functions passed on to other queries)
+    if(value != null && (cc.dynamicContext() || !cc.dynamic)) {
       cc.info(QueryText.OPTINLINE_X, this);
       return value;
     }

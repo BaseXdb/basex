@@ -205,7 +205,26 @@ public class DBNode extends XNode {
       return Token.concat('/', name, '/', base);
     }
     final byte[] base = attribute(XML_BASE);
+    if(copyRoot()) {
+      if(base == null) return Token.token(data.meta.original);
+      final Uri uri = Uri.get(base, false);
+      if(uri.isValid()) return Uri.get(data.meta.original).resolve(uri).string();
+    }
     return base != null ? base : Token.EMPTY;
+  }
+
+  @Override
+  public final byte[] contextBaseURI() throws QueryException {
+    return copyRoot() ? Token.token(data.meta.original) : super.contextBaseURI();
+  }
+
+  /**
+   * Indicates if this is a parentless element copy with the context base URI of the original node.
+   * @return result of check
+   */
+  private boolean copyRoot() {
+    return !data.meta.original.isEmpty() && kind() == Kind.ELEMENT && data.inMemory() &&
+        data.parent(pre, Data.ELEM) == -1;
   }
 
   @Override
@@ -218,6 +237,11 @@ public class DBNode extends XNode {
   public final boolean is(final GNode node) {
     return this == node || node instanceof final DBNode dbnode && data == dbnode.data &&
       pre == dbnode.pre && root == dbnode.root;
+  }
+
+  @Override
+  public final int hashCode() {
+    return 31 * System.identityHashCode(data) + pre;
   }
 
   @Override
@@ -539,11 +563,6 @@ public class DBNode extends XNode {
   @Override
   public final BXNode toJava() throws QueryException {
     return BXNode.get(copy(new MainOptions(), null));
-  }
-
-  @Override
-  public final boolean equals(final Object obj) {
-    return obj instanceof final DBNode dbnode && is(dbnode);
   }
 
   @Override

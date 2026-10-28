@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/activity';
 
+import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/panels' at 'panels.xqm';
 
@@ -41,17 +42,18 @@ function dba:activity(
         'description': 'the clients that are connected via the server protocol' }),
     (: outside the panels: they are replaced by the refresh, the dialogs are not :)
     panels:job-dialog(),
-    panels:session-dialog(),
-    panels:websocket-dialog(),
+    panels:attribute-dialog('session', 'Session:', 'sessions'),
+    panels:attribute-dialog('websocket', 'WebSocket:', 'websockets'),
     panels:cache-dialog(),
     (: the details of a job are opened over the panels, which are refreshed behind them; a job
        that is selected later is filled in by the refresh. A job that is done does not change
        any more: the client stops asking for it :)
     <dialog id='details-dialog'>
       <form method='post' autocomplete='off' id='job-details'
-            data-done='{ empty($job) or panels:job-done($job) }'>{
+            data-done='{ panels:job-done($job) }'>{
         panels:job-view($job)
       }</form>
+      { form:dialog-info() }
     </dialog>,
     (: the result of a job that was closed: submitted as soon as the page is there, and the
        request that fetches the file is what consumes the job :)

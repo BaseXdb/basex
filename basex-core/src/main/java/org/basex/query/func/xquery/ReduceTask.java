@@ -89,8 +89,8 @@ final class ReduceTask extends RecursiveTask<Value> {
       // fold the chunk sequentially, starting from the seed value
       return tc.branch(bqc -> {
         Value value = init;
-        for(long i = start; i < end; i++) {
-          value = action.invoke(bqc, tc.info, value, input.itemAt(i));
+        for(final Item item : input.subsequence(start, size, bqc)) {
+          value = action.invoke(bqc, tc.info, value, item);
         }
         return value;
       }, true);

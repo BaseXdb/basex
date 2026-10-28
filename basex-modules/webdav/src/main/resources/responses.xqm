@@ -46,7 +46,7 @@ declare function resp:encode(
 declare function resp:http-date(
   $dt  as xs:dateTime
 ) as xs:string {
-  format-dateTime(adjust-dateTime-to-timezone($dt, xs:dayTimeDuration('PT0S')),
+  format-dateTime(adjust-dateTime-to-timezone($dt, seconds(0)),
     '[FNn,*-3], [D01] [MNn,*-3] [Y0001] [H01]:[m01]:[s01] GMT', 'en', (), ())
 };
 
@@ -73,7 +73,7 @@ declare function resp:properties(
 ) as element()* {
   <DAV:displayname>{ $rc?name }</DAV:displayname>,
   <DAV:creationdate>{
-    adjust-dateTime-to-timezone($rc?modified, xs:dayTimeDuration('PT0S'))
+    adjust-dateTime-to-timezone($rc?modified, seconds(0))
   }</DAV:creationdate>,
   <DAV:getlastmodified>{ resp:http-date($rc?modified) }</DAV:getlastmodified>,
   <DAV:supportedlock>{

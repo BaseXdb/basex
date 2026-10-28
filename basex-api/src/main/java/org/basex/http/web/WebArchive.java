@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
+import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -14,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class WebArchive {
+public final class WebArchive implements UriResolver {
   /** Archive file. */
   private final IOFile file;
   /** Virtual root path of the archive contents. */
@@ -56,18 +57,13 @@ public final class WebArchive {
     return list;
   }
 
-  /**
-   * Resolves a path against the base URI of an archived resource.
-   * @param path path to be resolved
-   * @param base base URI (can be {@code null})
-   * @return IO reference, or {@code null} if the path is not part of this archive
-   */
-  IO resolve(final String path, final Uri base) {
+  @Override
+  public IO resolve(final String path, final String uri, final Uri base) {
     if(base == null || base == Uri.EMPTY) return null;
-    final String uri = IO.get(Token.string(base.string())).merge(path).path();
-    if(!uri.startsWith(root)) return null;
+    final String target = IO.get(Token.string(base.string())).merge(path).path();
+    if(!target.startsWith(root)) return null;
 
-    final String entry = uri.substring(root.length());
+    final String entry = target.substring(root.length());
     return entries.containsKey(entry) ? io(entry) : null;
   }
 

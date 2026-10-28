@@ -25,13 +25,6 @@ public final class Levenshtein {
 
   /**
    * Constructor.
-   */
-  public Levenshtein() {
-    this(-1);
-  }
-
-  /**
-   * Constructor.
    * @param maxErrors maximum number of allowed errors (dynamic calculation if negative)
    */
   public Levenshtein(final int maxErrors) {
@@ -62,11 +55,10 @@ public final class Levenshtein {
 
     T similar = null;
     int err = Integer.MAX_VALUE;
-    final Levenshtein ls = new Levenshtein();
     for(final T obj : objects) {
       final byte[] compare = token(prepare.apply(obj));
       if(compare != null) {
-        final int d = ls.distance(token, compare, -1);
+        final int d = distance(token, compare, -1);
         if(d < err) {
           similar = obj;
           err = d;
@@ -121,18 +113,7 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] compare) {
-    return similar(token, compare, maxErrors);
-  }
-
-  /**
-   * Compares two tokens for similarity.
-   * @param token input token
-   * @param compare token to be compared
-   * @param max number of allowed errors; dynamic calculation if value is negative
-   * @return true if the arrays are similar
-   */
-  public boolean similar(final byte[] token, final byte[] compare, final int max) {
-    return distance(token, compare, max) != Integer.MAX_VALUE;
+    return distance(token, compare, maxErrors) != Integer.MAX_VALUE;
   }
 
   /**
@@ -142,14 +123,14 @@ public final class Levenshtein {
    * @param max maximum number of allowed errors; dynamic calculation if value is negative
    * @return distance
    */
-  private int distance(final byte[] token, final byte[] compare, final int max) {
+  private static int distance(final byte[] token, final byte[] compare, final int max) {
     // create normalized copies of the tokens
     final int[] tkn = normalize(token), cmp = normalize(compare);
     final int tl = tkn.length, cl = cmp.length;
 
     // use exact search for too short values
     if(max < 0 && (tl < 4 || cl < 4)) {
-      return tl == cl && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
+      return Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
     }
 
     final int k = max < 0 ? Math.max(1, cl / 4) : max;

@@ -46,13 +46,15 @@ function dba:workspace() as element(html) {
       </form>
     </div>,
     (: the client knows the directory to be shown, and fills the panel :)
-    <div class='panel' style='grid-area: 1 / 1 / -1 / 2'>
+    <div class='panel' data-label='' style='grid-area: 1 / 1 / -1 / 2'>
+      <h2 class='sr-only'>Files</h2>
       <div id='files-panel' class='pane'/>
       <div class='resizer' data-split='0'/>
     </div>,
     (: the open documents are known to the client, which draws the strip :)
-    <div class='panel' style='grid-area: 2 / 2 / -1 / 3'>
-      <div id='tabs' class='tabs'/>
+    <div class='panel' data-label='' style='grid-area: 2 / 2 / -1 / 3'>
+      <h2 class='sr-only'>Editor</h2>
+      <div id='tabs' class='tabs' role='tablist' aria-label='Open documents'/>
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
     </div>,
@@ -60,7 +62,7 @@ function dba:workspace() as element(html) {
        so that its text area starts at the height of the editor :)
     <div class='panel' data-label='' style='grid-area: 2 / 3 / 3 / 4'>
       <div class='tabs'>
-        <span class='tab active' id='result-label'>Result</span>
+        <h2 class='tab active' id='result-label'>Result</h2>
         <label title='Show the information of the last query'><input type='checkbox'
           id='query-info' onchange='queryInfoChanged()'/> Query Info</label>
       </div>
@@ -71,7 +73,7 @@ function dba:workspace() as element(html) {
     <div class='panel hidden' data-label='' id='info-view'
          style='grid-area: 3 / 3 / 4 / 4'>
       <div class='tabs'>
-        <span class='tab active'>Query Info</span>
+        <h2 class='tab active'>Query Info</h2>
         { (: the outcome of the last run: its time, or the position of its error :) }
         <output id='run-info'/>
       </div>
@@ -103,7 +105,7 @@ function dba:files-download(
 ) as item()+ {
   let $dir := config:files-dir($dir)
   let $paths :=
-    for $name in $names[. != '..']
+    for $name in $names
     let $path := utils:safe-path($dir, $name)
     where file:is-file($path)
     return $path
@@ -145,14 +147,20 @@ declare
   %rest:POST
   %rest:path('/dba/workspace/delete')
 function dba:delete() {
-  utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'file', 'deleted'),
-    'run' : %updating fn() {
-      (: delete all files, ignore reference to parent directory :)
-      let $dir := config:files-dir($args?dir)
-      return $args?name[. != '..'] ! file:delete(utils:safe-path($dir, .))
+  utils:dispatch($dba:CAT, fn($args) {
+    let $paths := $args?name ! utils:file-path($args?dir, .)
+    (: the message names what was deleted: files, directories, or entries of both kinds :)
+    let $dirs := count($paths[file:is-dir(.)])
+    let $noun := switch () {
+      case $dirs = 0 return 'file'
+      case $dirs = count($paths) return 'directory'
+      default return 'entry'
     }
-  } })
+    return {
+      'info': utils:info($args?name, $noun, 'deleted'),
+      'run' : %updating fn() { $paths ! file:delete(.) }
+    }
+  })
 };
 
 (:~

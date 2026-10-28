@@ -167,6 +167,32 @@ function storeField(id, scope) {
 }
 
 /**
+ * Empties a text field of the current page, and forgets what was typed into it.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to (can be empty)
+ */
+function clearField(id, scope) {
+  const field = document.getElementById(id);
+  if(field) field.value = "";
+  storeField(id, scope);
+}
+
+/**
+ * Forgets what was typed into the text fields of the current page for the given scopes.
+ * @param {string[]} scopes what the fields apply to, e.g. databases
+ */
+function forgetFields(scopes) {
+  const prefix = pageKey(FIELD_KEY) + "/";
+  try {
+    for(const key of Object.keys(localStorage)) {
+      if(key.startsWith(prefix) && scopes.includes(key.slice(key.lastIndexOf("/") + 1))) {
+        store(key, null);
+      }
+    }
+  } catch { /* storage disabled: nothing was remembered */ }
+}
+
+/**
  * Fills an empty text field of the current page with what was typed into it before.
  * @param {string} id id of the field
  * @param {string} scope what the field applies to (can be empty)
@@ -225,7 +251,7 @@ function stored(key, fallback = null) {
 function storedJson(key, fallback, valid) {
   try {
     const value = JSON.parse(stored(key));
-    if(value !== null && valid(value)) return value;
+    if(valid(value)) return value;
   } catch { /* malformed: an older or foreign value is given up */ }
   return fallback;
 }
@@ -236,7 +262,7 @@ function storedJson(key, fallback, valid) {
  * @returns {boolean} result of check
  */
 function isRecord(value) {
-  return typeof value === "object" && !Array.isArray(value);
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -305,13 +331,15 @@ function buttons(source) {
   for(const form of (source ? [ source.closest("form") ] : document.querySelectorAll("form"))) {
     // refresh the header checkbox: it is ticked once every shown entry is
     const shown = entries(form);
-    const checked = shown.filter(input => input.checked).length;
+    const ticked = shown.filter(input => input.checked);
     const header = [ ...selection(form) ].find(input => !input.name && rowVisible(input));
-    if(header) header.checked = checked > 0 && checked === shown.length;
+    if(header) header.checked = ticked.length > 0 && ticked.length === shown.length;
 
-    // check button states
+    // check button states; a button that needs something of the ticked rows names it
     for(const button of form.querySelectorAll("button")) {
-      if(button.dataset.check) button.disabled = !checked;
+      const require = button.dataset.require;
+      if(button.dataset.check) button.disabled = !ticked.length ||
+        require && !ticked.some(input => input.closest("tr").querySelector(require));
     }
   }
 }
@@ -389,13 +417,17 @@ function confirmAction(button, action) {
     delete button.dataset.confirmed;
     return true;
   }
-  // the entries are named by the table the question is asked from; the number is what the
-  // question adds, and a long list of paths would only bury it
-  const count = entries(button.closest("form")).filter(input => input.checked).length;
+  // ticked rows are counted and named by the summary of their table, as a long list of paths
+  // would bury the number; any other action is described by the tooltip of its button, without
+  // the keys that hintShortcuts lists at its end
+  const form = button.form;
+  const count = button.dataset.check ? entries(form).filter(input => input.checked).length : 0;
+  const summary = form.querySelector("h3[data-plural]")?.dataset;
+  const nouns = summary ? [ summary.singular, summary.plural ] : [ "entry", "entries" ];
   const message = count
-    ? `${action} ${plural(count, "entry", "entries")}?`
-    : "Are you sure?";
-  confirmDialog(message).then(ok => {
+    ? `${action} ${plural(count, ...nouns.map(noun => noun.toLowerCase()))}?`
+    : `${(button.dataset.action ?? button.title) || action}?`;
+  confirmDialog(message, action).then(ok => {
     if(ok) {
       button.dataset.confirmed = "true";
       button.click();
@@ -418,13 +450,16 @@ function plural(count, one, many = `${one}s`) {
 /**
  * Displays text with the specified type.
  * @param {string} message message to display
- * @param {string} type message type (info, warning, error)
+ * @param {string} type message type (info, pending, error)
  */
 function setText(message, type) {
   const info = document.getElementById("info");
   info.className = type;
   info.textContent = message;
   info.title = message;
+  // an open dialog hides the header, so it repeats the message
+  const output = document.querySelector("dialog[open] .dialog-info");
+  if(output) [ output.className, output.textContent ] = [ `dialog-info ${type}`, message ];
 }
 
 /**
@@ -435,7 +470,7 @@ function setText(message, type) {
 function uploading(form, event) {
   // a button that closes a dialog submits its form as well, but nothing is sent
   if(event.submitter?.formMethod === "dialog") return;
-  setText("Files are being uploaded…", "warning");
+  setText("Files are being uploaded…", "pending");
   // disable buttons after dispatch, so the clicked button's 'formaction' is still evaluated
   setTimeout(() => {
     for(const button of form.querySelectorAll("button")) button.disabled = true;
@@ -497,6 +532,15 @@ function socket(path) {
   return _sockets[path];
 }
 
+// a page in the back/forward cache would keep its connections open, and is loaded again when
+// it is shown, as its requests were dropped
+window.addEventListener("pagehide", () => {
+  for(const open of Object.values(_sockets)) {
+    open.then(ws => { ws.onclose = null; ws.close(); }, () => {});
+  }
+});
+window.addEventListener("pageshow", event => { if(event.persisted) location.reload(); });
+
 /**
  * Sends a message to a WebSocket endpoint.
  * @param {string} path path, relative to the WebSocket root
@@ -539,28 +583,23 @@ function showMessage(path, data) {
     if(endRequest()) setText("", "");
   }
   if(json.type === "error") showError(json.message, undefined, json);
-  if(json.type === "stopped") setText("Query was stopped.", "warning");
+  if(json.type === "stopped") setText("Query was stopped.", "info");
   // a panel is named by the block it is filled into, so it needs no case of its own
   if(json.type === "panel") insertPanel(json.id, json.html);
   _handlers[path]?.(json);
 }
 
 /**
- * Registers a request whose outcome is awaited.
- * @returns {number} number of the run
+ * Sends a request whose outcome is awaited; one that takes longer is reported and can be stopped.
+ * @param {string} path path, relative to the WebSocket root
+ * @param {object} message message to be sent, without its run number
  */
-function startRequest() {
-  return _pending = ++_run;
-}
-
-/**
- * Reports a request that takes longer, and offers to stop it.
- * @param {number} run number of the run
- */
-function awaitResult(run) {
+async function sendRequest(path, message) {
+  const run = _pending = ++_run;
+  if(!await sendMessage(path, { ...message, run })) return;
   setTimeout(() => {
     if(_pending === run) {
-      setText("Please wait…", "warning");
+      setText("Please wait…", "pending");
       _waiting = true;
       setDisabled("stop", false);
     }
@@ -641,9 +680,10 @@ function fillPanel(id, html) {
       input.checked = values.includes(input.value);
     }
   }
-  // a panel with nothing to show is not shown at all, and gives up its grid track
+  // a panel with nothing to show is not shown at all, and gives up its grid track. A block of a
+  // dialog has none
   const panel = pane.closest(".panel"), empty = !html;
-  if(panel.classList.contains("hidden") !== empty) {
+  if(panel && panel.classList.contains("hidden") !== empty) {
     panel.classList.toggle("hidden", empty);
     applyColumns();
     remeasure();
@@ -751,14 +791,17 @@ function hintShortcuts(root) {
     // the keys a title names are listed in parentheses at its end
     const keys = title.match(/\(([^)]*)\)$/)?.[1].split(", ") ?? [ title ];
     if(keys.includes(key)) return;
+    // what the control does is kept without the keys, for the messages that name it
+    control.dataset.action ??= title;
     control.title = title.endsWith(")") ? `${title.slice(0, -1)}, ${key})` :
       title ? `${title} (${key})` : key;
   };
   // the controls are the ones that the shortcuts click; see shortcuts
   const controls = [ root, ...root.querySelectorAll("button, #live") ];
+  const create = newButton();
   for(const button of controls.filter(c => c.matches(".content button"))) {
     const text = button.textContent.trim();
-    if(button === pageButton(label => label.startsWith("New"))) hint(button, "N");
+    if(button === create) hint(button, "N");
     else if(text === "..") hint(button, "Backspace");
     else if(dropButton(button)) hint(button, "Del");
   }
@@ -786,13 +829,18 @@ new MutationObserver(mutations => {
     _row = _rowKey && document.querySelector(`.content ${_rowKey}`);
     _row?.classList.add("current");
   }
+  // so is a table that was worked with, e.g. when a directory was entered
+  if(_rowTable && !_rowTable.isConnected) {
+    const block = _rowPanel && document.getElementById(_rowPanel);
+    _rowTable = rowTables().find(table => block?.contains(table)) ?? null;
+  }
 }).observe(document.documentElement, { childList: true, subtree: true });
 
 /**
- * Requests what was typed into a filter field. Every key would be a request of its own, so the
- * ones that are typed in a row are collected first; Enter asks at once.
- * @param {string} key typed key
- * @param {string} id id of the filter field, which its pending request is kept under
+ * Requests what was typed into a filter field. Every change would be a request of its own, so the
+ * ones that are made in a row are collected first; Enter asks at once.
+ * @param {string} key 'Enter', or the cause of the request ('input', 'select')
+ * @param {string} id name that the pending request is kept under
  * @param {Function} action requests what the field names
  */
 function filterKey(key, id, action) {
@@ -800,6 +848,21 @@ function filterKey(key, id, action) {
   if(key === "Enter") action();
   else _filters[id] = setTimeout(action, FILTER_DELAY);
 }
+
+/**
+ * Requests what was typed into a filter field: it names the function in 'data-filter', which is
+ * called with the cause. Fields that name the same function share one pending request.
+ * @param {Event} event input or key event
+ * @param {string} key 'Enter', or 'input' for a changed text
+ */
+function filterField(event, key) {
+  const call = event.target.dataset?.filter;
+  if(call) filterKey(key, call, () => window[call](key));
+}
+document.addEventListener("input", event => filterField(event, "input"));
+document.addEventListener("keyup", event => {
+  if(event.key === "Enter") filterField(event, "Enter");
+});
 
 /**
  * Stops the query that is currently evaluated. The server confirms the request with a 'stopped'
@@ -840,12 +903,13 @@ function refocus(fill, ...selectors) {
  * question and an empty answer submit nothing.
  * @param {string} id id of the field that carries the answer
  * @param {string} label text of the question
+ * @param {string} submit label of the button that submits the answer
  * @param {string} value value to start from
  * @param {string} action action the form posts to; if omitted, the one it was rendered with
  * @returns {Promise} promise
  */
-async function promptSubmit(id, label, value, action) {
-  const answer = await promptDialog(label, value);
+async function promptSubmit(id, label, submit, value, action) {
+  const answer = await promptDialog(label, submit, value);
   if(!answer) return;
   const input = document.getElementById(id);
   if(action) input.form.action = action;
@@ -994,7 +1058,7 @@ function runLive(action) {
 document.addEventListener("pointerover", event => {
   const table = event.target.closest(".content table");
   _overTable = table !== null;
-  if(table) _rowTable = table;
+  if(table) useTable(table);
   // a button released outside the window reports no 'pointerup'
   _pressed = event.buttons !== 0;
 });
@@ -1055,25 +1119,30 @@ function askDialog(id) {
  * Asks a question and waits for one of the answers it offers. The last answer is the way out:
  * it is the one that Escape and a dismissed dialog give, so it carries an empty value.
  * @param {string} message question to be answered
- * @param {Array} answers answers, as [ value, label ] pairs
+ * @param {Array} answers answers, as [ value, label, class ] triples; the class is optional
+ * @param {string} detail consequence of the answer (optional)
  * @returns {Promise} promise, resolved with the value of the chosen answer
  */
-function askQuestion(message, answers) {
+function askQuestion(message, answers, detail = "") {
   document.getElementById("confirm-text").textContent = message;
+  document.getElementById("confirm-detail").textContent = detail;
   const dialog = document.getElementById("confirm-dialog");
-  dialog.querySelector(".buttons").replaceChildren(...answers.map(([ value, label ]) => {
+  const keys = new Set();
+  dialog.querySelector(".buttons").replaceChildren(...answers.map(([ value, label, cls ]) => {
     const button = document.createElement("button");
     button.value = value;
     button.textContent = label;
-    // 'Yes' and 'No' are chosen with their first letter
-    if(ANSWER_KEYS[label]) button.dataset.key = ANSWER_KEYS[label];
+    if(cls) button.className = cls;
+    // an answer is chosen with its first letter, unless an earlier answer has taken it
+    const key = label.charAt(0).toLowerCase();
+    if(!keys.has(key)) {
+      keys.add(key);
+      button.dataset.key = key;
+    }
     return button;
   }));
   return askDialog("confirm");
 }
-
-/** Keys that choose an answer of a question, by the label of the answer. */
-const ANSWER_KEYS = { Yes: "y", No: "n" };
 
 /**
  * Chooses the answer of a question whose key was pressed, with or without Alt.
@@ -1089,12 +1158,14 @@ function answerKey(event) {
 }
 
 /**
- * Asks for confirmation.
+ * Asks for the confirmation of an action that cannot be undone.
  * @param {string} message question to be answered
+ * @param {string} action label of the action, which is the label of the confirming answer
  * @returns {Promise} promise, resolved with true if the action was confirmed
  */
-async function confirmDialog(message) {
-  return await askQuestion(message, [ [ "ok", "Yes" ], [ "", "No" ] ]) === "ok";
+async function confirmDialog(message, action) {
+  return await askQuestion(message, [ [ "ok", action, "danger" ], [ "", "Cancel" ] ],
+    "This cannot be undone.") === "ok";
 }
 
 /**
@@ -1109,12 +1180,14 @@ function announce(text) {
 /**
  * Asks for a text value.
  * @param {string} message question to be answered
+ * @param {string} submit label of the button that submits the answer
  * @param {string} value value to start from
  * @returns {Promise} promise, resolved with the entered text, or null if it was cancelled
  */
-async function promptDialog(message, value) {
+async function promptDialog(message, submit, value) {
   const input = document.getElementById("prompt-input");
   document.getElementById("prompt-text").textContent = message;
+  document.getElementById("prompt-submit").textContent = submit;
   input.value = value ?? "";
   const answer = askDialog("prompt");
   // the dialog is open now: the text is offered for replacement, as a prompt does
@@ -1169,6 +1242,14 @@ function shortcuts(event) {
     return;
   }
   const target = event.target;
+  // Ctrl+S saves what is edited, wherever the focus is; the browser must not offer to save the
+  // page
+  if((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
+     event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    saveButton(target)?.click();
+    return;
+  }
   // a single-line field has no use for the arrow keys: they leave it for the rows of its table,
   // or of the table of its panel
   if((event.key === "ArrowDown" || event.key === "ArrowUp") && !dialogOpen() &&
@@ -1180,7 +1261,7 @@ function shortcuts(event) {
       event.preventDefault();
       target.blur();
       if(_row?.closest("table") !== table) selectRow(null);
-      _rowTable = table;
+      useTable(table);
       moveRow(event.key === "ArrowDown" ? 1 : -1);
     }
     return;
@@ -1207,7 +1288,7 @@ function shortcuts(event) {
   if(event.key === "g") {
     _go = Date.now();
   } else if(event.key === "n") {
-    pageButton(text => text.startsWith("New"))?.click();
+    newButton()?.click();
   } else if(event.key === "Delete") {
     dropRows();
   } else if(event.key === "Backspace" && !control) {
@@ -1277,6 +1358,40 @@ function pageButton(accept) {
 }
 
 /**
+ * Returns the button of the page that creates a new entry.
+ * @returns {HTMLElement} button (can be null)
+ */
+function newButton() {
+  return pageButton(text => text.startsWith("New"));
+}
+
+/**
+ * Returns the visible Save buttons below an element, enabled or not.
+ * @param {ParentNode} root element or document
+ * @returns {HTMLElement[]} buttons
+ */
+function saveButtons(root) {
+  return [ ...root.querySelectorAll("button") ].filter(button =>
+    button.offsetParent && button.textContent.trim() === "Save");
+}
+
+/**
+ * Returns the Save button that Ctrl+S clicks: the one of the open dialog, else the one of the
+ * panel that holds the focus, else the first one of the page.
+ * @param {HTMLElement} target element that has the focus
+ * @returns {HTMLElement} enabled button (can be null)
+ */
+function saveButton(target) {
+  // an open dialog is all that can be saved; a panel with a Save button of its own saves
+  // nothing else, even while there is nothing to save
+  const dialogs = document.querySelectorAll("dialog[open]");
+  const panel = dialogs[dialogs.length - 1] ?? target.closest?.(".panel");
+  const own = panel ? saveButtons(panel) : [];
+  return (own.length || dialogs.length ? own : saveButtons(document)).
+    find(button => !button.disabled) ?? null;
+}
+
+/**
  * Indicates whether a button drops or deletes the ticked rows of its table.
  * @param {HTMLElement} button button
  * @returns {boolean} result of check
@@ -1311,6 +1426,9 @@ let _rowKey = null;
 
 /** Table that the pointer was last over: the arrow keys move through its rows. */
 let _rowTable = null;
+
+/** Id of the panel of the table that was last worked with. */
+let _rowPanel = null;
 
 /**
  * Chooses a table row, or none.
@@ -1349,6 +1467,15 @@ function rowTable() {
   return document.activeElement?.closest(".content table") ||
     (_row?.isConnected && _row.closest("table")) || (_rowTable?.isConnected && _rowTable) ||
     rowTables().sort((a, b) => b.offsetWidth - a.offsetWidth)[0];
+}
+
+/**
+ * Makes a table the one that is worked with, and remembers the block that holds it.
+ * @param {HTMLElement} table table
+ */
+function useTable(table) {
+  _rowTable = table;
+  _rowPanel = table.closest("[id]")?.id ?? null;
 }
 
 /**
@@ -1398,12 +1525,13 @@ function moveTable(step) {
   const tables = rowTables(), index = tables.indexOf(rowTable());
   const table = tables[Math.min(Math.max(index + step, 0), tables.length - 1)];
   if(table) {
-    _rowTable = table;
+    useTable(table);
     selectRow(tableRows(table)[0] ?? null);
   }
 }
 
-/** Shortcuts of the page, as [ key, description ] pairs. */
+/** Shortcuts of the page, as [ key, description, test ] entries; a shortcut with a test is only
+    listed if the page offers what it works on. */
 const PAGE_SHORTCUTS = [
   [ "G L/A/D/S/U/W/X", "Go to a view (X: Settings)" ],
   [ "/", "Search or filter" ],
@@ -1411,8 +1539,9 @@ const PAGE_SHORTCUTS = [
   [ "Space", "Tick the chosen row" ],
   [ "Del", "Drop or delete the ticked rows, or the chosen one" ],
   [ "Backspace", "Go up one level" ],
-  [ "N", "Create a new entry" ],
-  [ "L", "Switch the live view on or off" ],
+  [ "N", "Create a new entry", newButton ],
+  [ "L", "Switch the live view on or off", () => document.getElementById("live") ],
+  [ "Ctrl+S", "Save the changes", () => saveButtons(document).length ],
   [ "Esc", "Close, clear the message" ],
   [ "?", "Show these shortcuts" ]
 ];
@@ -1435,7 +1564,8 @@ function showShortcuts() {
   document.getElementById("shortcuts")?.remove();
   const dialog = document.createElement("dialog");
   dialog.id = "shortcuts";
-  const column = (title, shortcuts) => `<div><h3>${title}</h3>` + shortcuts.map(([ key, text ]) =>
+  const column = (title, shortcuts) => `<div><h3>${title}</h3>` + shortcuts.
+    filter(([ , , test ]) => !test || test()).map(([ key, text ]) =>
     `<div class='field'><span><kbd>${key}</kbd></span><div>${text}</div></div>`).join("") + "</div>";
   // laid out like the other dialogs: a heading, a field per shortcut, and a button that closes.
   // The editor is a page of its own, which is created after the page in some views
@@ -1450,24 +1580,13 @@ function showShortcuts() {
 }
 
 /**
- * Returns the key the folded panels of the current page are stored under. A page that shows
- * different panels in its subviews keeps a state for each of them: the subview is what the page
- * calls itself in 'data-panels'.
- * @returns {string} key
- */
-function panelsKey() {
-  const subview = document.querySelector(".content")?.dataset.panels;
-  return pageKey(PANELS_KEY) + (subview ? `/${subview}` : "");
-}
-
-/**
- * Returns the panels that were folded by hand in the current subview.
+ * Returns the panels that were folded by hand on the current page.
  * @returns {object} collapsed state, by panel label
  */
 function storedPanels() {
   // a panel is named by its label, not by its position: a panel that is added, removed or moved
   // in a later version leaves the state of the others alone
-  const state = storedJson(panelsKey(), {}, isRecord);
+  const state = storedJson(pageKey(PANELS_KEY), {}, isRecord);
   return Object.fromEntries(Object.entries(state).filter(([ label, collapse ]) =>
     typeof collapse === "boolean" && _panels.some(panel => panelLabel(panel) === label)));
 }
@@ -1534,7 +1653,7 @@ function togglePanel(panel) {
   // what is written back is the state of the panels that exist: older entries are dropped
   const state = storedPanels();
   state[panelLabel(panel)] = collapse;
-  store(panelsKey(), JSON.stringify(state));
+  store(pageKey(PANELS_KEY), JSON.stringify(state));
 
   remeasure();
   if(!collapse) _panel_opened?.(panel);
@@ -1566,36 +1685,6 @@ function showPanel(panel, collapse) {
   button.title = `${collapse ? "Expand" : "Collapse"} ${title}` +
     (description ? `: ${description}` : "");
   button.setAttribute("aria-expanded", !collapse);
-}
-
-/**
- * Returns a content panel by the name it is labelled with.
- * @param {string} label panel label
- * @returns {HTMLElement} panel
- */
-function contentPanel(label) {
-  return document.querySelector(`.content > .panel[data-label='${label}']`);
-}
-
-/**
- * Indicates whether a content panel has anything to show. A panel with nothing is hidden, which
- * is not the same as one that was folded away.
- * @param {string} label panel label
- * @returns {boolean} whether the panel is shown
- */
-function panelShown(label) {
-  return !contentPanel(label).classList.contains("hidden");
-}
-
-/**
- * Assigns the collapsed state that follows from what the view shows, and is therefore not
- * remembered: a view states it whenever its selection changes.
- * @param {Array} rules collapsed state per panel, as [ label, collapse ] pairs
- */
-function foldPanels(rules) {
-  for(const [ label, collapse ] of rules) showPanel(contentPanel(label), collapse);
-  applyColumns();
-  remeasure();
 }
 
 /**
@@ -1640,7 +1729,25 @@ function ready() {
   // the labels of the buttons are complete once the page is parsed
   hintShortcuts(document.body);
   document.getElementById("info")?.addEventListener("click", jumpToError);
+  initDialogInfo();
   initLive();
+}
+
+/**
+ * Prepares the dialogs that repeat the status message: a dialog that is opened starts with the
+ * error that the page reports, or with no message; see setText for the messages that follow.
+ */
+function initDialogInfo() {
+  const info = document.getElementById("info");
+  new MutationObserver(records => {
+    for(const { target } of records) {
+      const output = target.matches("dialog[open]") && target.querySelector(".dialog-info");
+      if(!output) continue;
+      const error = info?.classList.contains("error");
+      [ output.className, output.textContent ] = error ?
+        [ "dialog-info error", info.textContent ] : [ "dialog-info", "" ];
+    }
+  }).observe(document.body, { subtree: true, attributeFilter: [ "open" ] });
 }
 
 /**
@@ -1649,23 +1756,16 @@ function ready() {
  * @param {...string} names parameter names
  */
 function hideParams(...names) {
-  const url = new URL(window.location.href);
-  for(const name of names) url.searchParams.delete(name);
-  window.history.replaceState(null, "", url);
+  setParams(Object.fromEntries(names.map(name => [ name, "" ])));
 }
 
 /**
- * Replaces a query parameter; empty values remove the parameter.
- * @param {string} url URL
- * @param {string} name name
- * @param {string} value value
- * @returns {string} new url
+ * Writes query parameters to the address bar, replacing the current step. A parameter with an
+ * empty value is dropped.
+ * @param {object} params values, by parameter name
  */
-function replaceParam(url, name, value) {
-  const u = new URL(url);
-  if(`${value}`) u.searchParams.set(name, value);
-  else u.searchParams.delete(name);
-  return u.href;
+function setParams(params) {
+  window.history.replaceState(null, "", replaceParams(window.location.href, params));
 }
 
 /**
@@ -1675,8 +1775,12 @@ function replaceParam(url, name, value) {
  * @returns {string} new url
  */
 function replaceParams(url, params) {
-  for(const [ name, value ] of Object.entries(params)) url = replaceParam(url, name, value);
-  return url;
+  const u = new URL(url);
+  for(const [ name, value ] of Object.entries(params)) {
+    if(`${value}`) u.searchParams.set(name, value);
+    else u.searchParams.delete(name);
+  }
+  return u.href;
 }
 
 /**
@@ -1686,6 +1790,34 @@ function replaceParams(url, params) {
  */
 function pushParams(params) {
   window.history.pushState({}, "", replaceParams(window.location.href, params));
+}
+
+/**
+ * Shows the table rows that pass a test, and restates the summary in the words it was rendered with.
+ * @param {HTMLElement} container element that holds the table and its summary
+ * @param {Iterable<HTMLTableRowElement>} rows rows to be filtered
+ * @param {Function} visible tests whether a row is shown
+ */
+function filterRows(container, rows, visible) {
+  let count = 0;
+  for(const row of rows) {
+    const shown = visible(row);
+    row.style.display = shown ? null : "none";
+    if(shown) count++;
+  }
+  const summary = container.querySelector("h3[data-singular]");
+  if(summary) summary.textContent = plural(count, summary.dataset.singular, summary.dataset.plural);
+}
+
+/**
+ * Returns the entry that the server opened as the address named none, and adds it to the address.
+ * @param {string} id id of the panel that shows the entry
+ * @returns {string} name of the entry, or an empty string
+ */
+function adoptOpened(id) {
+  const name = document.querySelector(`#${id} input[name=name]`)?.value ?? "";
+  if(name) setParams({ name });
+  return name;
 }
 
 /**

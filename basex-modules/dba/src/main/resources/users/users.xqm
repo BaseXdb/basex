@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/users';
 
+import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/user-panels' at 'panels.xqm';
 import module namespace user-info = 'dba/lib/user-info' at 'user-info.xqm';
@@ -36,6 +37,9 @@ function dba:users(
   $sort     as xs:string
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show :)
+  (: a user is always open: the first one if the address names none or an invalid one :)
+  let $name := $name[. and exists(try { user:exists(.) } catch user:name { })]
+    otherwise min(user:list(), '?lang=en')
   let $user := panels:user($name, $newname, $perm)
   return (
     html:panel(panels:users($sort, 1, $name), { 'id': 'users-panel', 'label': 'Users' }),
@@ -45,23 +49,12 @@ function dba:users(
       <form method='post' action='users/update' autocomplete='off' id='user-panel'
             class='pane column'>{ $user }</form>,
       { 'label': 'User', 'pane': false(), 'hidden': empty($user) }),
-    (: the panels follow the selection: what is attached to no user in particular steps back
-       once one of them is being looked at :)
-    html:panel(panels:information(),
-      { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user),
-        'description': 'custom data that belongs to no user in particular' }),
     (: outside the panels: the user panel is a form, and is replaced when another user is shown :)
-    panels:pattern-dialog()
+    panels:pattern-dialog(),
+    panels:info-dialog()
   ) => html:wrap({
     'header' : $dba:CAT,
-    'divided': true(),
-    (: the information panel is only open while no user is shown, where it is one of two
-       panels: its share is what the two of them then split :)
-    'columns': ('25fr', '50fr', '25fr'),
     'rows'   : '1fr',
-    (: a view of its own: what is folded away while a user is shown is not what is folded away
-       while the list is :)
-    'panels' : 'user'[$user],
     'scripts': ('cm6', 'editor', 'users'),
     'init'   : 'initUsers();'
   })
@@ -100,7 +93,16 @@ declare
 function dba:drop() {
   utils:dispatch($dba:CAT, fn($args) { {
     'info': utils:info($args?name, 'user', 'dropped'),
-    'run' : %updating fn() { $args?name ! user:drop(.) }
+    'run' : %updating fn() {
+      $args?name ! user:drop(.),
+      (: dropped users are logged out :)
+      void(
+        for $id in sessions:ids()
+        where (try { sessions:get($id, $config:SESSION-KEY) } catch sessions:not-found { })
+          = $args?name
+        return sessions:close($id)
+      )
+    }
   } })
 };
 
@@ -116,23 +118,18 @@ function dba:update() {
   utils:dispatch($dba:CAT, fn($args) {
     let $name := string($args?name)
     let $newname := string($args?newname)
-    (: a name that is taken is the one error that can be foreseen; it leaves the user where
-       it was, so the panel keeps showing the one that was being edited :)
-    let $taken := $newname != $name and user:exists($newname)
     return {
       (: the password is deliberately not carried back: it would end up in the address bar,
          in the browser history and in the log :)
-      'params': {
-        'name': if ($taken) then $name else $newname,
-        'newname': $newname,
-        'perm': $args?perm
-      },
+      'params': { 'name': $newname },
+      (: an update that fails leaves the user where it was, so the panel keeps showing the one
+         that was being edited, with what was entered :)
+      'failed': { 'name': $name, 'newname': $newname, 'perm': $args?perm },
       'info'  : utils:info($newname, 'user', 'saved'),
       'run'   : %updating fn() {
-        if ($taken) then (
-          error((), 'User already exists.')
-        ) else if ($name != $newname) {
-          user:alter($name, $newname)
+        if ($newname != $name) {
+          if (user:exists($newname)) then error((), 'User already exists.')
+          else user:alter($name, $newname)
         },
         (: an empty field leaves the password as it is :)
         if ($args?pw) { user:password($name, $args?pw) },
@@ -195,7 +192,7 @@ declare
 function dba:pattern-drop() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?pattern, 'database permission', 'deleted'),
+    'info'  : utils:info($args?pattern, 'database permission', 'dropped'),
     'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }
   } })
 };

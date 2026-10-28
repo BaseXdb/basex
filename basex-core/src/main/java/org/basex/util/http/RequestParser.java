@@ -64,7 +64,7 @@ public final class RequestParser {
           parseBody(body, bodies, request.payloadAtts, request.payload);
         // multipart request
         } else if(pl.eq(Q_HTTP_MULTIPART)) {
-          parseMultipart(body, bodies.iter(), request.payloadAtts, request.parts);
+          parseMultipart(body, bodies, request.payloadAtts, request.parts);
           request.isMultipart = true;
         } else {
           throw HC_REQ_X.get(info, "Unknown payload element: " + body.qname());
@@ -144,7 +144,7 @@ public final class RequestParser {
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
-  private void parseMultipart(final GNode multipart, final BasicIter<Item> bodies,
+  private void parseMultipart(final GNode multipart, final Value bodies,
       final HashMap<String, String> atts, final ArrayList<Part> parts) throws QueryException {
 
     parseAtts(multipart, atts);
@@ -152,6 +152,7 @@ public final class RequestParser {
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
     final BasicNodeIter iter = multipart.childIter();
+    long b = 0;
     while(true) {
       final Part part = new Part();
       final GNode payload = parseHeaders(iter, part.headers);
@@ -165,7 +166,7 @@ public final class RequestParser {
       for(final GNode attr : payload.attributeIter()) {
         if(string(attr.name()).equals(SRC)) { src = true; break; }
       }
-      final Item body = src ? null : bodies.next();
+      final Item body = src || b == bodies.size() ? null : bodies.itemAt(b++);
       parseBody(payload, body == null ? Empty.VALUE : body, part.attributes, part.contents);
       parts.add(part);
     }

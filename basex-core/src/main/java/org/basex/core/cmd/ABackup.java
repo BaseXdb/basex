@@ -16,7 +16,12 @@ abstract class ABackup extends Command {
    * @param args arguments
    */
   ABackup(final String... args) {
-    super(Perm.CREATE, false, args);
+    super(Perm.ADMIN, false, args);
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return true;
   }
 
   /**

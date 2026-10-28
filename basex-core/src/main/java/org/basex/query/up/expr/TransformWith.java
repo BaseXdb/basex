@@ -36,12 +36,7 @@ public final class TransformWith extends Copy {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     arg(target(), arg -> arg.compile(cc));
-    cc.pushFocus(new Dummy(arg(target()), true), true);
-    try {
-      arg(update(), arg -> arg.compile(cc));
-    } finally {
-      cc.removeFocus();
-    }
+    arg(update(), arg -> cc.get(arg(target()), true, () -> arg.compile(cc)));
     return optimize(cc);
   }
 
@@ -66,7 +61,7 @@ public final class TransformWith extends Copy {
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     qc.focus = qf;
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size());
     try {
       for(final Item item : value) {
         if(!(item instanceof final XNode node)) throw UPSOURCE_X.get(info, item);
@@ -123,7 +118,7 @@ public final class TransformWith extends Copy {
   public Expr inline(final InlineContext ic) throws QueryException {
     final Expr inlined = arg(target()).inline(ic);
     boolean changed = inlined != null;
-    if(changed) arg(1, arg -> inlined);
+    if(changed) arg(target(), arg -> inlined);
 
     // do not inline context reference in updating expressions
     changed |= ic.var != null && ic.cc.get(arg(target()), true, () -> {

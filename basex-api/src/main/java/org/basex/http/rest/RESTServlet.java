@@ -34,8 +34,7 @@ public final class RESTServlet extends BaseXServlet {
       if(cmd.status == null) throw ex;
     }
 
-    final HTTPStatus status = cmd.status;
-    if(status != null) throw status.get(cmd.info());
+    if(cmd.status != null) throw cmd.status.get(cmd.info());
   }
 
   /**

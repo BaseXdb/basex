@@ -111,8 +111,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return index of stored key (larger than {@code 0})
    */
   public final int put(final byte[] key) {
-    final int index = store(key);
-    return Math.abs(index);
+    return Math.abs(store(key));
   }
 
   /**
@@ -158,7 +157,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
     for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
       if(!Token.eq(key, keys[i])) continue;
       if(p == 0) buckets[b] = next[i];
-      else next[p] = next[next[p]];
+      else next[p] = next[i];
       keys[i] = null;
       return i;
     }

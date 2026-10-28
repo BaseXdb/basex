@@ -6,8 +6,8 @@ const WORKSPACE_WS = "/workspace";
 /** Id of the job of the query that is currently evaluated in the editor panel. */
 let _job;
 
-/** File names that are treated as XQuery. The suffixes are the server's, which knows them
-    from IO.XQSUFFIXES; a list of its own here would go stale the day one is added. */
+/** File names that are treated as XQuery. The suffixes are the server's ($utils:XQUERY-REGEX);
+    a list of its own here would go stale the day one is added. */
 const XQUERY_SUFFIXES =
   new RegExp(document.documentElement.dataset.xquery ?? "^$", "i");
 
@@ -60,7 +60,7 @@ function tab() {
  * @returns {object} tab
  */
 function newTab(dir, name) {
-  return { dir: name ? dir : "", name: name, id: _nextId++, saved: "", edited: false,
+  return { dir: name ? dir : "", name, id: _nextId++, saved: "", edited: false,
     state: undefined };
 }
 
@@ -83,7 +83,7 @@ function newFile() {
  */
 function tabText(t) {
   if(t === tab()) return editorValue();
-  return typeof t.state === "string" ? t.state : t.state ? t.state.doc.toString() : "";
+  return typeof t.state === "string" ? t.state : t.state?.doc.toString() ?? "";
 }
 
 /**
@@ -132,8 +132,10 @@ function renderTabs() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "tab";
+    button.setAttribute("role", "tab");
     const edited = tabModified(t);
     button.classList.toggle("active", i === _tab);
+    button.setAttribute("aria-selected", i === _tab);
     button.title = t.name ? t.dir + t.name : "New file";
     // file names are user input: they are text, never markup
     const label = document.createElement("span");
@@ -141,6 +143,8 @@ function renderTabs() {
     const close = document.createElement("span");
     close.className = "close";
     close.textContent = "\u00d7";
+    // a pointer control: the keyboard closes a document with its shortcut
+    close.setAttribute("aria-hidden", "true");
     close.addEventListener("click", event => {
       event.stopPropagation();
       closeTab(i);
@@ -169,7 +173,7 @@ function renderTabs() {
  */
 function captureTab() {
   const t = tab();
-  if(t) t.state = _editor.view ? _editor.view.state : editorValue();
+  if(t) t.state = _editor.view?.state ?? editorValue();
 }
 
 /**
@@ -204,7 +208,7 @@ function showTab() {
  * Refreshes the strip, the buttons and the language of the editor for the active document.
  */
 function refreshTab() {
-  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
+  _editor.setLanguage?.(fileLanguage(tab()?.name, editorValue()));
   renderTabs();
   checkButtons();
 }
@@ -233,12 +237,13 @@ function selectTab(index) {
  */
 async function closeTab(index) {
   const t = _tabs[index];
-  if(!t) return;
+  // closing the only, empty unnamed document would just open another one
+  if(!t || _tabs.length === 1 && !t.name && !tabModified(t)) return;
   if(tabModified(t)) {
     // ask about the document the user is looking at
     if(index !== _tab) selectTab(index);
     const answer = await askQuestion(`Save changes to ${tabLabel(t)}?`,
-      [ [ "yes", "Yes" ], [ "no", "No" ], [ "", "Cancel" ] ]);
+      [ [ "yes", "Save" ], [ "no", "Don’t Save" ], [ "", "Cancel" ] ]);
     // the question was about closing as much as about saving: cancelling closes nothing
     if(!answer) return;
     if(answer === "yes") {
@@ -320,25 +325,22 @@ function refreshFiles(sort, dir) {
  * Evaluates a query in the editor panel. The query is sent to the server, which pushes back the
  * result or the error; see showMessage.
  */
-async function runQuery() {
+function runQuery() {
   if(document.getElementById("run").disabled) return;
-  if(_editor) _editor.focus();
+  _editor?.focus();
 
   setDisabled("stop", true);
   setText("", "");
   setRunInfo("");
 
-  const run = startRequest();
-  if(!await sendMessage(WORKSPACE_WS, {
+  sendRequest(WORKSPACE_WS, {
     type: "run",
-    run: run,
     query: editorValue(),
     indent: indentOn(),
     // relative paths in the query resolve against the opened file, or against the directory
     dir: tabDir(),
     file: tab()?.name ?? ""
-  })) return;
-  awaitResult(run);
+  });
 }
 
 /**
@@ -347,7 +349,7 @@ async function runQuery() {
  */
 function showResult(json) {
   setText("Query was successful.", "info");
-  if(_output.setLanguage) _output.setLanguage(contentLanguage(json.result, "text"));
+  _output.setLanguage?.(contentLanguage(json.result, "text"));
   _output.setValue(json.result);
   document.getElementById("output-hint").hidden = true;
   const items = json.items;
@@ -521,22 +523,33 @@ async function loadTab(t) {
     t.saved = editorValue();
     t.edited = false;
     showTab();
-    setText("", "");
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
-    const draft = stored(draftKey(t));
-    if(draft !== null && draft !== t.saved) {
-      writing(() => _editor.setValue(draft));
-      // the document differs from the file: mark it
-      t.edited = true;
-      showTab();
-    }
+    applyDraft(t);
     storeTabs();
   } catch(response) {
-    // the file is gone or unreadable: drop its tab, so it is not requested again. The tab is
-    // unedited, so closing it asks nothing; its message is awaited, then replaced by the error
-    await closeTab(_tabs.indexOf(t));
+    // the file is gone or unreadable. An unsaved draft stays in its tab, and can be saved again;
+    // a tab without one is dropped, so it is not requested again. The tab is unedited, so
+    // closing it asks nothing; its message is awaited, then replaced by the error
+    t.saved = "";
+    if(t === tab() && applyDraft(t)) storeTabs();
+    else await closeTab(_tabs.indexOf(t));
     showError(response, t.name);
   }
+}
+
+/**
+ * Shows the unsaved draft of the active document if it differs from the saved text.
+ * @param {object} t tab
+ * @returns {boolean} whether a draft was applied
+ */
+function applyDraft(t) {
+  const draft = stored(draftKey(t));
+  if(draft === null || draft === t.saved) return false;
+  writing(() => _editor.setValue(draft));
+  // the document differs from the file: mark it
+  t.edited = true;
+  showTab();
+  return true;
 }
 
 /**
@@ -565,7 +578,7 @@ async function saveFile(saveAs) {
   let name = t.name;
   if(!name || saveAs) {
     // the label of an unnamed document is a name it can be saved under
-    name = await promptDialog("Name of the file:", tabLabel(t));
+    name = await promptDialog("Name of the file:", "Save", tabLabel(t));
     if(!name) return false;
     // append file suffix
     if(!name.includes(".")) name += ".xq";
@@ -574,9 +587,19 @@ async function saveFile(saveAs) {
   const text = editorValue();
   // the document is renamed below: its draft is dropped under both keys
   const key = draftKey(t);
+  // the file of the document is replaced; any other one only if the user agrees
+  let replace = dir === t.dir && name === t.name;
   try {
-    await request(`editor-save?${new URLSearchParams({ name: name, dir: dir })}`, text);
-    Object.assign(t, { dir: dir, name: name, saved: text, edited: false });
+    const save = () => request(`editor-save?${new URLSearchParams({ name, dir, replace })}`, text);
+    try {
+      await save();
+    } catch(response) {
+      if(response.status !== 409) throw response;
+      if(!await confirmDialog(`Replace “${name}”?`, "Replace")) return false;
+      replace = true;
+      await save();
+    }
+    Object.assign(t, { dir, name, saved: text, edited: false });
     store(key, null);
     store(draftKey(t), null);
     showTab();
@@ -621,14 +644,6 @@ function saveDraft() {
 }
 
 /**
- * Asks for a name and creates a directory.
- * @returns {Promise} promise
- */
-function createDir() {
-  return promptSubmit("dir-name", "Name of the new directory:", "");
-}
-
-/**
  * Refreshes the editor buttons.
  */
 function checkButtons() {
@@ -637,6 +652,34 @@ function checkButtons() {
   setDisabled("save", !(tab() && tabModified(tab())));
   setDisabled("saveas", !editorValue());
 }
+
+/** An upload that replaces files of the listed directory asks first, as Save as does. The check
+    runs before the form announces the upload, and the confirmed form is submitted again. */
+document.addEventListener("submit", event => {
+  const form = event.target;
+  if(form.getAttribute("action") !== "workspace/upload") return;
+  if(form.dataset.confirmed) {
+    delete form.dataset.confirmed;
+    return;
+  }
+  const listed = new Set([ ...document.querySelectorAll("#files-panel input[name=name]") ].
+    map(input => input.value));
+  const upload = document.getElementById("upload");
+  const taken = [ ...upload.files ].filter(file => listed.has(file.name));
+  if(!taken.length) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const message = taken.length === 1 ? `Replace “${taken[0].name}”?` :
+    `Replace ${plural(taken.length, "file")}?`;
+  confirmDialog(message, "Replace").then(ok => {
+    if(ok) {
+      form.dataset.confirmed = "true";
+      form.requestSubmit();
+    } else {
+      upload.value = "";
+    }
+  });
+}, true);
 
 /** The queries of the view run on the endpoint that also serves its file panel; the job of a
     query that is given up is gone with it. */
@@ -689,9 +732,10 @@ function workspaceKeys(event) {
   if(dialogOpen()) return;
   const key = event.key.toLowerCase();
   const ctrl = event.ctrlKey || event.metaKey;
-  // Alt is the key of all actions of the view; Ctrl+S and Ctrl+Enter are known from elsewhere
+  // Alt is the key of all actions of the view; Ctrl+S is the shortcut of every page (see
+  // shortcuts), Ctrl+Shift+S and Ctrl+Enter are known from elsewhere
   let action;
-  if((ctrl || event.altKey) && !(ctrl && event.altKey) && key === "s") {
+  if((event.altKey ? !ctrl : ctrl && event.shiftKey) && key === "s") {
     // the browser must not offer to save the page, whether or not there is anything to save
     action = () => document.getElementById(event.shiftKey ? "saveas" : "save").click();
   } else if(event.altKey && !ctrl && key === "enter") {
@@ -712,7 +756,7 @@ function workspaceKeys(event) {
 /** The shortcuts of the view, as the overview of the shortcuts lists them. */
 _editor_shortcuts.push(
   [ "Alt+Enter", "Run the query (also Ctrl+Enter)" ],
-  [ "Alt+S", "Save (also Ctrl+S)" ],
+  [ "Alt+S", "Save" ],
   [ "Alt+Shift+S", "Save as… (also Ctrl+Shift+S)" ],
   [ "Alt+N", "Open an empty tab" ],
   [ "Alt+W", "Close the tab" ],

@@ -49,13 +49,6 @@ abstract class ArchiveOut implements Closeable {
   public abstract void level(int level);
 
   /**
-   * Writes data from the specified archive.
-   * @param in input archive
-   * @throws IOException I/O exception
-   */
-  public abstract void write(ArchiveIn in) throws IOException;
-
-  /**
    * Writes the specified entry.
    * @param entry zip entry
    * @param value value to be written

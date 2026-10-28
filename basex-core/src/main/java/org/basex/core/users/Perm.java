@@ -15,8 +15,6 @@ public enum Perm {
   READ,
   /** Write permission (local+global). */
   WRITE,
-  /** Create permission (global). */
-  CREATE,
   /** Admin permission (global). */
   ADMIN;
 

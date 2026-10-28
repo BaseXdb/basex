@@ -112,14 +112,8 @@ final class Replace extends StructuralUpdate {
           }
           case Data.PI -> {
             // check processing instruction value
-            final byte[] srcText = src.text(s, true);
-            final byte[] trgText = data.text(t, true);
-            final int i = indexOf(srcText, ' ');
-            final byte[] pv = i == -1 ? EMPTY : substring(srcText, i + 1);
-            if(!eq(pv, indexOf(trgText, ' ') == -1 ? EMPTY :
-              substring(trgText, i + 1))) {
-              valueUpdates.add(UpdateValue.getInstance(data, t, pv));
-            }
+            final byte[] pv = src.atom(s);
+            if(!eq(pv, data.atom(t))) valueUpdates.add(UpdateValue.getInstance(data, t, pv));
           }
         }
       }

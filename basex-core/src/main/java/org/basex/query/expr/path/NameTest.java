@@ -279,9 +279,8 @@ public final class NameTest extends Test {
     // text { 'no' }/self::no, [ 'no' ]/self::no
     if(kn != kind) return Boolean.FALSE;
     // <yes/>/self::yes, <maybe/>/self::no
-    if(type instanceof final NodeType ntype && ntype.test instanceof final NameTest nt) {
-      if(nt.scope.oneOf(scope, Scope.FLEXIBLE, Scope.FULL)) return matches(nt.qname);
-    }
+    if(type instanceof final NodeType ntype && ntype.test instanceof final NameTest nt &&
+        nt.scope.oneOf(scope, Scope.FLEXIBLE, Scope.FULL)) return matches(nt.qname);
     // (<who/>, <knows/>)/self::no-one
     return null;
   }

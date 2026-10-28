@@ -92,7 +92,7 @@ public final class FTIndexAccess extends Simple {
     if(ftinlined != null) ftexpr = ftinlined;
     final IndexDb inlined = db.inline(ic);
     if(inlined != null) db = inlined;
-    return ftinlined != null || inlined != null ? optimize(ic.cc) : this;
+    return ftinlined != null || inlined != null ? optimize(ic.cc) : null;
   }
 
   @Override

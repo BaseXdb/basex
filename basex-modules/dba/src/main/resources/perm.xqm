@@ -18,25 +18,21 @@ declare
 function dba:check(
   $perm  as map(*)
 ) as element(rest:response)? {
-  (: redirects to the login page if a user is not logged in, or if the page is not public :)
-  let $path := $perm?path
-  let $allow := $perm?allow
-  return if ($allow = 'public') then (
+  (: redirects to the login page if the page is not public and no user is logged in :)
+  switch () {
     (: public function, register id for better log entries :)
-    request:set-attribute('id', $allow)
-  ) else if (session:get($config:SESSION-KEY)) then (
-    (: everything fine, user is logged in :)
-  ) else (
-    (: last visited page to redirect to (if there was one), current query parameters :)
-    let $page := replace($path, '^.*dba/?', '')[.]
-    let $params := {
-      for key $key value $value in request:parameter-map()
-      where not(starts-with($key, '_'))
-      return { $key: $value },
-      { '_page': $page }
-    }
-    return web:redirect('/dba/login', $params)
-  )
+    case $perm?allow = 'public' return request:set-attribute('id', $perm?allow)
+    case exists(session:get($config:SESSION-KEY)) return ()
+    default return (
+      (: last visited page to redirect to (if there was one), current query parameters :)
+      let $page := replace($perm?path, '^.*dba/?', '')[.]
+      let $params := {
+        map:filter($perm?parameters, fn($key) { not(starts-with($key, '_')) }),
+        { '_page': $page }
+      }
+      return web:redirect('/dba/login', $params)
+    )
+  }
 };
 
 (:~

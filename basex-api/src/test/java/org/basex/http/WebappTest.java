@@ -231,7 +231,7 @@ public abstract class WebappTest extends HTTPTest {
    * @param string string
    * @return encoded string
    */
-  private static String enc(final String string) {
+  protected static String enc(final String string) {
     return URLEncoder.encode(string, StandardCharsets.UTF_8);
   }
 }

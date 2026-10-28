@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.data.*;
@@ -76,6 +77,8 @@ public abstract class Builder extends Job implements XmlHandler {
     this.parser = parser;
   }
 
+  // PUBLIC METHODS ===============================================================================
+
   /**
    * Assigns the source location of the nodes that will be added next.
    * @param line line number
@@ -85,8 +88,6 @@ public abstract class Builder extends Job implements XmlHandler {
     nodeLine = line;
     nodeColumn = column;
   }
-
-  // PUBLIC METHODS ===============================================================================
 
   /**
    * Parses the given input source and builds the database.
@@ -212,7 +213,9 @@ public abstract class Builder extends Job implements XmlHandler {
    * @throws IOException I/O exception
    */
   public final void binary(final String target, final IO data) throws IOException {
-    BinaryPut.put(data.inputSource(), new IOFile(binariesDir, target));
+    final IOFile file = new IOFile(binariesDir, target);
+    if(!binariesDir.contains(file)) throw new BaseXException(PATH_INVALID_X, target);
+    BinaryPut.put(data.inputSource(), file);
   }
 
   // PROGRESS INFORMATION =========================================================================

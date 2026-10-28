@@ -138,12 +138,8 @@ final class FormatterDE extends Formatter {
       word(tb, n % 100, numType, suffix);
     } else if(n < 1000000) {
       final long m = n % 100000;
-      if(m >= 1000 && m < 2000) {
-        word(tb, n / 1000, NUMBERING, null);
-        tb.delete(tb.size() - 1, tb.size());
-      } else {
-        word(tb, n / 1000, NUMBERING, null);
-      }
+      word(tb, n / 1000, NUMBERING, null);
+      if(m >= 1000 && m < 2000) tb.delete(tb.size() - 1, tb.size());
       tb.add(TAUSEND);
       word(tb, n % 1000, numType, suffix);
     } else {

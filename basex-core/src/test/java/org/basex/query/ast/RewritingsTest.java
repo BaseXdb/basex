@@ -1512,6 +1512,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(1 to 2)[. = 1] => sort() => count()", 1, empty(SORT));
     check("(1 to 2)[. = 1] => reverse() => count()", 1, empty(REVERSE));
     check("(for $i in (1 to 2)[. = 1] order by $i return $i ) => count()", 1, empty(OrderBy.class));
+    check("4 = (for $a in (1 to 2)[. >= 0] for $b in (3 to 4)[. >= 0] "
+        + "order by $b - $a return $a * $b)", true, empty(OrderBy.class));
   }
 
   /** Rewrite order by to fn:sort. */
@@ -1544,7 +1546,9 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1 to 2)[. >= 0] order by $i, 1 return $i", "1\n2",
         exists(OrderBy.class));
     check("for $i in (1 to 2)[. >= 0] order by -$i return $i", "2\n1",
-        exists(OrderBy.class));
+        empty(OrderBy.class), root(SORT));
+    check("let $_ :=" + wrap(1) + "for $i in (1 to 2)[. >= 0] order by $i - $_ return $i",
+        "1\n2", exists(OrderBy.class));
   }
 
   /** distinct-values: simplify arguments. */
@@ -2298,6 +2302,17 @@ public final class RewritingsTest extends SandboxTest {
     error("xs:QName('x') = xs:untypedAtomic('')", FUNCCAST_X_X_X);
     error("xs:untypedAtomic('') = xs:QName('x')", FUNCCAST_X_X_X);
     query("xs:untypedAtomic(' x ') = xs:QName('x')", true);
+
+    query("<x xmlns:p='urn:p'>{ xs:untypedAtomic('p:a') = QName('urn:p', 'a') }</x>",
+        "<x xmlns:p=\"urn:p\">true</x>");
+    query("<x xmlns:p='urn:p'>{ QName('urn:p', 'a') = <a>p:a</a> }</x>",
+        "<x xmlns:p=\"urn:p\">true</x>");
+    query("data(<x xmlns:p='urn:p'>{ QName('urn:p', 'a') = <a>p:a</a> }</x>)", true);
+    query("let $s := 'p:a' return "
+        + "<x xmlns:p='urn:p'>{ namespace-uri-from-QName(xs:QName($s)) }</x>",
+        "<x xmlns:p=\"urn:p\">urn:p</x>");
+    query("let $n := 'p:b' return <x xmlns:p='urn:p'>{ element { $n } {} }</x>",
+        "<x xmlns:p=\"urn:p\"><p:b/></x>");
   }
 
   /** Bug of operation on non-existing attribute. */
@@ -2777,6 +2792,10 @@ public final class RewritingsTest extends SandboxTest {
         + "for $o in (xs:double('NaN'), 3e0, xs:double('NaN'), 3e0) "
         + "return string-join($cs[@n < $o]/@n, ',')", "\n1,2\n\n1,2",
         exists(RangeFilter.class));
+    // equal infinite keys
+    check("let $items := (1 to 20) ! (if(. >= 9 and . <= 13) then xs:double('INF') "
+        + "else xs:double(.)) for $p in (1 to 5) ! xs:double(.) "
+        + "return count($items[. > $p])", "19\n18\n17\n16\n15", exists(RangeFilter.class));
     // decimal probes, untyped probes: sequential evaluation
     check(cs + "for $o in (2.5, 4.5, 1.5) return string-join($cs[@n < $o]/@n, ',')",
         "1,2\n1,2,3,4\n1", empty(RangeFilter.class));
@@ -2957,5 +2976,54 @@ public final class RewritingsTest extends SandboxTest {
         + "{ $x/b[xs:integer($p)] }; ";
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a/>, 'a')", "<b/>");
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a><c/></a>, 'a')", "<b/>");
+  }
+
+  /** Inverted positional checks: bounds must not be empty. */
+  @Test public void invertPositionEmpty() {
+    query("for $p in (1, 9) let $q := $p[. > 5] return [ (1, 2, 3)[not(position() <= $q)] ]",
+        "[(1,2,3)]\n[()]");
+    query("for $p in (1, 9) return (1, 2, 3)[not(position() <= $p)]", "2\n3");
+  }
+
+  /** Inverted comparisons: operands must not be NaN. */
+  @Test public void invertNaN() {
+    final String f = "declare %basex:inline(0) function local:f($d as xs:double, $e as xs:double) ";
+    final String args = "local:f(xs:double('NaN'), 1)";
+    query(f + "{ not($d < $e) }; " + args, true);
+    query(f + "{ not($d lt $e) }; " + args, true);
+    query(f + "{ $d < $e or not($d >= $e + 1) }; " + args, true);
+    query(f + "{ $d < $e and $d < $e + 1 }; " + args, false);
+    query(f + "{ count((1 to 5)[not(position() <= $d)]) }; " + args, 5);
+    query(f + "{ count((1 to 5)[not(position() >= $d)]) }; " + args, 5);
+  }
+
+  /** Inlining of typed let clauses: the bound value may contain more than one item. */
+  @Test public void gh2794() {
+    inline(true);
+    final String a = "let $a := [1, 2] let $s as xs:int* := $a ";
+    query(a + "return sum(for $i in 1 to count($s) return $s[$i] ! $i)", 3);
+    query(a + "return (count($s), count($s), $s)", "2\n2\n1\n2");
+    query(a + "return count($s) + count($s[1])", 3);
+
+    // nondeterministic bindings
+    final String r = "let $s as xs:int* := [random:integer(1) + 1, 2] ";
+    query(r + "return (count($s), count($s), $s)", "2\n2\n1\n2");
+    query(r + "return $s[last()]", 2);
+    query(r + "return if (count($s) = 2) then 'ok' else 'bad'", "ok");
+
+    // function parameters
+    query("declare function local:f($s as xs:string*) {"
+        + "  string-join(for $i in 1 to count($s) let $v := $s[$i] return $v || $i || $v)"
+        + "}; let $a := ['a', 'b'] return local:f($a?*)", "a1ab2b");
+  }
+
+  /** Inlined constructed nodes: equal structure must not imply identity. */
+  @Test public void nodeIdentity() {
+    final String f = "declare variable $a := <a/>; declare variable $b := <a/>; " +
+        "declare %basex:inline(0) function local:f($c) { $c }; ";
+    query(f + "count($a except $b)", 1);
+    query(f + "count($a union $b)", 2);
+    query(f + "count(($a, $b) except $a)", 1);
+    query(f + "(if(local:f(false())) { $a } else { $b }) is $b", true);
   }
 }

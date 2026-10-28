@@ -3,6 +3,7 @@ package org.basex.gui;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -52,10 +53,13 @@ public final class GUIStatus extends BaseXPanel {
     label = new BaseXLabel(OK).border(0, 4, 2, 0);
     add(label, BorderLayout.CENTER);
 
-    final AbstractButton stopJobs = BaseXButton.get("c_stop", STOP, false, gui);
+    final AbstractButton stopJobs = BaseXButton.get("c_stop", STOP_JOBS + ELLIPSIS, false, gui);
     stopJobs.addActionListener(e -> stopJobs());
-    jobs = new Segment(() -> gui.execute(new XQuery("job:list-details()[@id != job:current()]")),
-        stopButton(stopJobs));
+    // do not interrupt a running command
+    jobs = new Segment(() -> {
+      if(!gui.stoppable()) gui.execute(new XQuery(
+          "job:list-details()[@id != job:current()][@state != 'finished']"));
+    }, stopButton(stopJobs));
     runtime = new Segment(null, stopButton(BaseXButton.command(GUIMenuCmd.C_STOP, gui)));
     database = new Segment(() -> GUIMenuCmd.C_PROPERTIES.execute(gui), null);
     database.text.setToolTipText(GUIMenuCmd.C_PROPERTIES.shortCut());
@@ -147,11 +151,14 @@ public final class GUIStatus extends BaseXPanel {
   }
 
   /**
-   * Stops all background jobs.
+   * Stops all background jobs after confirmation.
    */
   private void stopJobs() {
     final JobPool pool = gui.context.jobs;
-    for(final String id : pool.queryIds()) pool.remove(id);
+    final HashSet<String> ids = pool.queryIds();
+    if(ids.isEmpty() || !BaseXDialog.confirmDestructive(gui,
+        Util.info(STOPPING_JOBS_X, BaseXLayout.format(ids.size())))) return;
+    for(final String id : ids) pool.remove(id);
     jobs();
   }
 

@@ -324,6 +324,16 @@ public final class XMLParserTest extends SandboxTest {
     query("(a/@b, a) ! string-to-codepoints(.)", expected);
   }
 
+  /** Character references to control characters (valid in XML 1.1 only). */
+  @Test public void xml11CharRefs() {
+    for(final boolean b : new boolean[] { false, true }) {
+      set(MainOptions.INTPARSE, b);
+      execute(new CreateDB(NAME, "<?xml version='1.1'?><a>&#1;&#x7F;</a>"));
+      query("string-to-codepoints(a)", "1\n127");
+      assertNotNull(createError("<?xml version='1.0'?><a>&#1;</a>"));
+    }
+  }
+
   /** Duplicate attributes. */
   @Test public void duplicateAttributes() {
     for(final boolean stripNS : new boolean[] { false, true }) {

@@ -1,7 +1,7 @@
 /*
  * This example shows how to use the event feature.
  *
- * Documentation: https://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/main/Clients
  *
  * (C) BaseX Team, BSD License
  */

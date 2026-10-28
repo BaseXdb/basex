@@ -5,10 +5,8 @@ const ADDED_MS = 3000;
 /** Times when rows were added, keyed by panel and row id. */
 const _added = new Map();
 
-/** The sorted lists of the view, by the block they are filled into. */
-const LISTS = [ "jobs-panel", "caches-panel", "db-panel" ];
-/** The panels of the view, by the block they are filled into. */
-const PANELS = [ ...LISTS, "clients-panel" ];
+/** The panels of the view, all of them sorted lists, by the block they are filled into. */
+const LISTS = [ "jobs-panel", "clients-panel", "caches-panel", "db-panel" ];
 /** Whether the clients panel lists the idle sessions. */
 let _idle = false;
 /** Whether the jobs of the DBA itself are listed. */
@@ -77,7 +75,7 @@ async function refreshActivity(force) {
     // and keeps the pages that were loaded
     pages: Object.fromEntries(LISTS.map(id => [ id, shownPages(id) ])),
     // a folded panel is not rendered; it is asked for once it is opened
-    open: PANELS.filter(id => !document.getElementById(id)?.closest(".panel")
+    open: LISTS.filter(id => !document.getElementById(id)?.closest(".panel")
       .classList.contains("collapsed")),
     idle: _idle,
     dba: _dbaJobs,
@@ -153,14 +151,12 @@ function showActivity(json) {
       markTruncated(details);
     }
 
-    const live = document.getElementById("live");
-    if(live) live.checked = wasLive;
-    // as the 'Live' checkbox, the one for idle sessions is rendered with the state it was asked
-    // for, which can be older than the one it was given since
-    const idle = document.getElementById("idle");
-    if(idle) idle.checked = _idle;
-    const dbaJobs = document.getElementById("dba-jobs");
-    if(dbaJobs) dbaJobs.checked = _dbaJobs;
+    // the checkboxes are rendered with the state they were asked for, which can be older than
+    // the one they were given since
+    for(const [ id, checked ] of [ [ "live", wasLive ], [ "idle", _idle ], [ "dba-jobs", _dbaJobs ] ]) {
+      const box = document.getElementById(id);
+      if(box) box.checked = checked;
+    }
   }
   scheduleLive(refreshActivity, wasLive);
 }
@@ -191,24 +187,25 @@ async function editAttribute({ kind, id, name }) {
   document.getElementById(`${kind}-text`).textContent = id;
   document.getElementById(`${kind}-name`).value = name;
   // the value is fetched before the dialog opens: it is what the user edits
-  showValue(kind, await requestValue(`${kind}-value`, { id, name }, name));
+  showValue(kind, await requestJson(`${kind}-value`, { id, name }, name));
   showDialog(kind);
 }
 
 /**
- * Requests a value as the expression that yields it again.
+ * Requests what a dialog shows: by default, a value as the expression that yields it again.
  * @param {string} path path of the endpoint
- * @param {object} params query parameters that name the value
- * @param {string} label what the value is reported as if it cannot be read
- * @returns {Promise} promise, resolved with the text and the note of the value
+ * @param {object} params query parameters that name what is requested
+ * @param {string} label what is reported if it cannot be read
+ * @param {object} fallback result if it cannot be read
+ * @returns {Promise} promise, resolved with the parsed result
  */
-async function requestValue(path, params, label) {
+async function requestJson(path, params, label, fallback = { text: "", note: "" }) {
   try {
     return JSON.parse(await request(`${path}?${new URLSearchParams(params)}`));
   } catch(response) {
-    // the dialog is opened either way: a value that cannot be read can still be replaced
+    // the dialog is opened either way: what cannot be read can still be replaced or assigned
     showError(response, label);
-    return { text: "", note: "" };
+    return fallback;
   }
 }
 
@@ -239,13 +236,7 @@ async function showCache(name) {
  */
 async function listCacheKeys() {
   const name = document.getElementById("cache-name").value;
-  let result = { keys: [], count: 0 };
-  try {
-    result = JSON.parse(await request(`cache-keys?${new URLSearchParams({ name })}`));
-  } catch(response) {
-    // the dialog is opened either way: an entry can still be assigned
-    showError(response, name);
-  }
+  const result = await requestJson("cache-keys", { name }, name, { keys: [], count: 0 });
   document.getElementById("cache-keys").replaceChildren(
     ...result.keys.map(key => new Option(key, key)));
   const shown = result.keys.length;
@@ -273,7 +264,7 @@ async function showCacheEntry() {
   let value = { text: "", note: "" };
   if(key) {
     const name = document.getElementById("cache-name").value;
-    value = await requestValue("cache-value", { name, key }, key);
+    value = await requestJson("cache-value", { name, key }, key);
     // the selection may have changed while the value was requested
     const now = cacheKeys();
     if(now.length !== 1 || now[0] !== key) return;
@@ -285,8 +276,10 @@ async function showCacheEntry() {
  * Removes the selected entries of the cache dialog, which stays open.
  */
 async function removeCacheEntries() {
+  const keys = cacheKeys();
+  if(!await confirmDialog(`Remove ${plural(keys.length, "entry", "entries")}?`, "Remove")) return;
   const params = new URLSearchParams({ name: document.getElementById("cache-name").value });
-  for(const key of cacheKeys()) params.append("key", key);
+  for(const key of keys) params.append("key", key);
   try {
     setText(await request(`cache-remove?${params}`), "info");
   } catch(response) {

@@ -24,26 +24,13 @@ abstract class SessionFn extends ApiFunc {
    */
   final ASession session(final QueryContext qc, final boolean create) throws QueryException {
     // WebSocket context: access existing session
-    HttpSession session = wsSession(qc);
+    HttpSession session = qc.context.getExternal(WsSession.class) instanceof final WsSession ws ?
+      ws.session() : null;
     // HTTP context: get/create session (not available for detached requests)
-    if(session == null) {
-      session = state(qc).session(create);
-      // no session created (may happen with WebSockets): raise error or return null reference
-      if(session == null) {
-        if(create) throw SESSION_NOTFOUND.get(info);
-        return null;
-      }
-    }
-    return new ASession(session, null, info);
-  }
-
-  /**
-   * Tries to return a WebSocket session instance.
-   * @param qc query context
-   * @return session instance or {@code null}
-   */
-  private static HttpSession wsSession(final QueryContext qc) {
-    return qc.context.getExternal(WsSession.class) instanceof final WsSession ws ? ws.session() :
-      null;
+    if(session == null) session = state(qc).session(create);
+    if(session != null) return new ASession(session, null, info);
+    // no session created (may happen with WebSockets): raise error or return null reference
+    if(create) throw SESSION_NOTFOUND.get(info);
+    return null;
   }
 }

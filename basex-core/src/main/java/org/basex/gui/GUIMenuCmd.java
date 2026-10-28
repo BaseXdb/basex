@@ -15,10 +15,7 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.query.func.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -81,13 +78,14 @@ public enum GUIMenuCmd implements GUICommand {
         final IntList docs = data.resources.docs();
         final int ds = docs.size();
         for(int d = 0; d < ds; d++) {
-          file = root.resolve(Token.string(data.text(docs.get(d), true)));
-          if(file.exists()) {
+          final IOFile target = root.resolve(Token.string(data.text(docs.get(d), true)));
+          if(target.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
               file = null;
               break;
             }
+            file = target;
             overwrite = true;
           }
         }
@@ -95,7 +93,7 @@ public enum GUIMenuCmd implements GUICommand {
           // show message for overwriting files or directories
           final String msg = file == null ? FILES_REPLACE_X : FILE_EXISTS_X;
           if(file == null) file = root;
-          if(!BaseXDialog.confirm(gui, Util.info(msg, file))) return;
+          if(!BaseXDialog.confirmDestructive(gui, Util.info(msg, file))) return;
         }
       }
       DialogProgress.execute(gui, new Export(root.path()));
@@ -194,11 +192,29 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Runs the tests of the currently opened file. */
+  C_TEST(RUN_TESTS, "% shift ENTER", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.test();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.editor.testable();
+    }
+  },
+
   /** Stops the currently opened query. */
   C_STOP(STOP, "shift ESCAPE", Requires.NOTHING) {
     @Override
     public void execute(final GUI gui) {
       gui.stop();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.stoppable();
     }
   },
 
@@ -216,6 +232,7 @@ public enum GUIMenuCmd implements GUICommand {
     void toggled(final GUI gui, final boolean on) {
       final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
       sopts.put(SerializerOptions.INDENT, on ? YesNo.YES : YesNo.NO);
+      DialogPrefs.refresh();
       gui.layoutViews();
     }
   },
@@ -289,6 +306,93 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().bracket();
+    }
+  },
+
+  /** Joins lines. */
+  C_JOIN_LINES(JOIN_LINES, null, Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().joinLines();
+    }
+  },
+
+  /** Splits lines that exceed the line margin. */
+  C_SPLIT_LINES(SPLIT_LINES, null, Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().splitLines();
+    }
+  },
+
+  /** Expands the selection. */
+  C_EXPAND_SELECTION(EXPAND_SELECTION, Prop.MAC ? "ctrl shift % RIGHT" : "alt shift RIGHT",
+      Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().expandSelection();
+    }
+  },
+
+  /** Shrinks the selection. */
+  C_SHRINK_SELECTION(SHRINK_SELECTION, Prop.MAC ? "ctrl shift % LEFT" : "alt shift LEFT",
+      Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().shrinkSelection();
+    }
+  },
+
+  /** Jumps to the definition of a function or variable. */
+  C_GO_TO_DEFINITION(GO_TO_DEFINITION, "% shift J", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().gotoDefinition();
+    }
+
+    @Override
+    boolean available(final GUI gui) {
+      return gui.editor.getEditor().hasDeclarations();
+    }
+  },
+
+  /** Returns to the previously visited position. */
+  C_VISIT_BACK(GO_BACK, Prop.MAC ? "ctrl % LEFT" : "alt LEFT", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.visit(false);
+    }
+  },
+
+  /** Returns to the next visited position. */
+  C_VISIT_FORWARD(GO_FORWARD, Prop.MAC ? "ctrl % RIGHT" : "alt RIGHT", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.visit(true);
+    }
+  },
+
+  /** Adds or removes a bookmark. */
+  C_TOGGLE_BOOKMARK(TOGGLE_BOOKMARK, "% F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toggleBookmark();
+    }
+  },
+
+  /** Jumps to the next bookmark. */
+  C_NEXT_BOOKMARK(NEXT_BOOKMARK, "F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().bookmark(true);
+    }
+  },
+
+  /** Jumps to the previous bookmark. */
+  C_PREVIOUS_BOOKMARK(PREVIOUS_BOOKMARK, "shift F2", Requires.VISIBLE_EDITOR) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().bookmark(false);
     }
   },
 
@@ -394,7 +498,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copies the current database path to the clipboard. */
-  C_COPY_PATH(COPY_PATH, "% shift C", Requires.DATA) {
+  C_COPY_PATH(COPY_PATH, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pre(0);
@@ -403,131 +507,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     boolean available(final GUI gui) {
-      // disallow copy of empty node set or root node
-      return updatable(gui.context.marked);
-    }
-  },
-
-  /** Copies the currently marked nodes. */
-  C_COPY_NODES(COPY, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final Context ctx = gui.context;
-      final DBNodes n = ctx.marked;
-      ctx.copied = new DBNodes(n.data(), n.pres());
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      // disallow copy of empty node set or root node
-      return updatable(gui.context.marked);
-    }
-  },
-
-  /** Pastes the copied nodes. */
-  C_PASTE_NODES(PASTE, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final StringBuilder sb = new StringBuilder();
-      final DBNodes n = gui.context.copied;
-      final long ns = n.size();
-      for(int i = 0; i < ns; i++) {
-        if(i > 0) sb.append(',');
-        sb.append(openPre(n, i));
-      }
-      gui.context.copied = null;
-      gui.execute(new XQuery("insert nodes (" + sb + ") into " +
-        openPre(gui.context.marked, 0)));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      final Context ctx = gui.context;
-      // disallow copy of empty node set or root node
-      return updatable(ctx.marked, Data.DOC) && ctx.copied != null;
-    }
-  },
-
-  /** Deletes the currently marked nodes. */
-  C_DELETE_NODES(DELETE + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
-      final StringBuilder sb = new StringBuilder();
-      final DBNodes n = gui.context.marked;
-      final long ns = n.size();
-      for(int i = 0; i < ns; i++) {
-        if(i > 0) sb.append(',');
-        sb.append(openPre(n, i));
-      }
-      gui.context.marked = new DBNodes(n.data());
-      gui.context.copied = null;
-      gui.context.focused = -1;
-      gui.execute(new XQuery("delete nodes (" + sb + ')'));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.DOC);
-    }
-  },
-
-  /** Inserts new nodes. */
-  C_NEW_NODES(NEW + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final DBNodes n = gui.context.marked;
-      final DialogInsert insert = new DialogInsert(gui);
-      if(!insert.ok()) return;
-
-      final StringList sl = insert.result;
-      final Kind kind = XNode.type(insert.kind).kind();
-      final TokenBuilder item = new TokenBuilder();
-      item.add(kind.description()).add(" { ").add(quote(sl.get(0))).add(" }");
-
-      if(kind.oneOf(Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION)) {
-        item.add(" { ").add(quote(sl.get(1))).add(" }");
-      } else if(kind == Kind.ELEMENT) {
-        item.add(" { () }");
-      }
-
-      gui.context.copied = null;
-      gui.execute(new XQuery("insert node " + item.add(" into ").add(openPre(n, 0)).toString()));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.ATTR, Data.PI, Data.COMM, Data.TEXT);
-    }
-  },
-
-  /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT_NODES(EDIT + ELLIPSIS, null, Requires.DATA) {
-    @Override
-    public void execute(final GUI gui) {
-      final DBNodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.pre(0));
-      if(!edit.ok()) return;
-
-      String rename = null;
-      String replace = null;
-      final int k = edit.kind;
-      if(k == Data.ELEM || k == Data.PI || k == Data.ATTR) {
-        rename = edit.result.get(0);
-        if(k != Data.ELEM) replace = edit.result.get(1);
-      } else {
-        replace = edit.result.get(0);
-      }
-
-      if(rename != null) gui.execute(new XQuery("rename node " +
-        openPre(n, 0) + " as " + quote(rename)));
-      if(replace != null) gui.execute(new XQuery("replace value of node " +
-        openPre(n, 0) + " with " + quote(replace)));
-    }
-
-    @Override
-    boolean available(final GUI gui) {
-      return updatable(gui.context.marked, Data.DOC);
+      return marked(gui.context.marked);
     }
   },
 
@@ -547,7 +527,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     boolean available(final GUI gui) {
-      return updatable(gui.context.marked);
+      return marked(gui.context.marked);
     }
   },
 
@@ -700,7 +680,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens the update web page. */
-  C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES, null, Requires.NOTHING) {
+  C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES + ELLIPSIS, null, Requires.NOTHING) {
     @Override
     public void execute(final GUI gui) {
       gui.checkVersion(true);
@@ -718,7 +698,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  C_GO_BACK(GO_BACK, Prop.MAC ? null : "alt LEFT", Requires.DATA) {
+  C_GO_BACK(GO_BACK, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
@@ -731,7 +711,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one step forward. */
-  C_GO_FORWARD(GO_FORWARD, Prop.MAC ? null : "alt RIGHT", Requires.DATA) {
+  C_GO_FORWARD(GO_FORWARD, null, Requires.DATA) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);
@@ -908,37 +888,12 @@ public enum GUIMenuCmd implements GUICommand {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Checks if data can be updated.
-   * @param node node instance (can be {@code null})
-   * @param kinds disallowed node kinds
+   * Checks if nodes are marked.
+   * @param nodes marked nodes (can be {@code null})
    * @return result of check
    */
-  private static boolean updatable(final DBNodes node, final int... kinds) {
-    if(node == null || (kinds.length == 0 ? node.isEmpty() : node.size() != 1)) return false;
-    final int k = node.data().kind(node.pre(0));
-    for(final int kind : kinds) {
-      if(k == kind) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns a quoted string.
-   * @param string string to encode
-   * @return quoted string
-   */
-  private static String quote(final String string) {
-    return '"' + string.replace("\"", "&quot;") + '"';
-  }
-
-  /**
-   * Returns a database function for the specified node in a node set.
-   * @param nodes node set
-   * @param index node index
-   * @return function string
-   */
-  private static String openPre(final DBNodes nodes, final int index) {
-    return Function._DB_GET_PRE.args(nodes.data().meta.name, nodes.pre(index)).trim();
+  private static boolean marked(final DBNodes nodes) {
+    return nodes != null && !nodes.isEmpty();
   }
 
   /** Requirements for enabling a command. */

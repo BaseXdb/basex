@@ -54,7 +54,6 @@ public final class WsFunction extends WebFunction {
   @Override
   public boolean parseAnnotations(final MainOptions mopts) throws QueryException {
     final boolean[] declared = new boolean[function.arity()];
-    // counter for annotations that should occur only once
     boolean found = false;
     AnnList starts = AnnList.EMPTY;
 
@@ -68,19 +67,16 @@ public final class WsFunction extends WebFunction {
       found = true;
       final Value value = ann.value();
       switch(def) {
-        case _WS_SUBPROTOCOL:
+        case _WS_SUBPROTOCOL -> {
           for(final Item item : value) subprotocols.add(toString(item));
           continue;
-        case _WS_CLOSE:
+        }
+        case _WS_CLOSE -> {
           if(value.size() > 1) status = param(value.itemAt(1), "status", declared);
           if(value.size() > 2) reason = param(value.itemAt(2), "reason", declared);
-          break;
-        case _WS_ERROR:
-        case _WS_MESSAGE:
-          message = param(value.itemAt(1), "message", declared);
-          break;
-        default:
-          break;
+        }
+        case _WS_ERROR, _WS_MESSAGE -> message = param(value.itemAt(1), "message", declared);
+        default -> { }
       }
       path = parsePath(value, ann, declared);
       starts = starts.attach(ann);
@@ -103,9 +99,7 @@ public final class WsFunction extends WebFunction {
     // bind variables from path template (resolved once, at the handshake)
     final QNmMap<String> qnames = path.values(pth);
     for(final QNm qname : qnames) {
-      final QNm qnm = new QNm(qname.string(), function.sc);
-      if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-      bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
+      bind(qname, args, Atm.get(qnames.get(qname)), qc, "Path segment");
     }
     if(msg instanceof final CloseInfo info) {
       if(status != null) bind(status.var(), args, Itr.get(info.status()), qc, "Status");
@@ -124,12 +118,8 @@ public final class WsFunction extends WebFunction {
    * @return boolean result of check
    */
   public boolean matches(final Annotation definition, final String pth) {
-    if(pth != null && !path.matches(pth)) return false;
-    if(definition == null) return true;
-    for(final Ann ann : function.anns) {
-      if(ann.definition == definition) return true;
-    }
-    return false;
+    return (pth == null || path.matches(pth)) &&
+      (definition == null || function.anns.contains(definition));
   }
 
   @Override

@@ -61,9 +61,9 @@ final class JavaMapping {
     new SimpleEntry(Document.class, DOCUMENT),
     new SimpleEntry(DocumentFragment.class, DOCUMENT),
     new SimpleEntry(Element.class, ELEMENT),
-    new SimpleEntry(Node.class, XNODE),
     new SimpleEntry(ProcessingInstruction.class, PROCESSING_INSTRUCTION),
     new SimpleEntry(Text.class, TEXT),
+    new SimpleEntry(Node.class, XNODE),
   };
   /** XQuery pairs (no conversion required). */
   private static final Entry[] XQUERY = {
@@ -130,7 +130,7 @@ final class JavaMapping {
    */
   private static Type nodeType(final Class<?> clazz) {
     for(final Entry<Class<?>, Type> pair : NODES) {
-      if(pair.getKey().isInstance(clazz)) return pair.getValue();
+      if(pair.getKey().isAssignableFrom(clazz)) return pair.getValue();
     }
     return null;
   }

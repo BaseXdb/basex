@@ -78,7 +78,7 @@ public final class UtilRoot extends StandardFunc {
   /**
    * Returns the root of the specified path nodes.
    * @param nodes path nodes
-   * @return root, or {@code null} if node cannot be detected
+   * @return distinct root nodes
    */
   public static ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes) {
     final ArrayList<PathNode> list = new ArrayList<>();

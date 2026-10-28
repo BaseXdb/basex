@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.lang.invoke.*;
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -305,24 +304,6 @@ public final class FElem extends FNode {
       }
     }
     return elem.finish();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FElem f && name.eq(f.name) &&
-        sameContent(f) && Arrays.equals(attributes, f.attributes) &&
-        Objects.equals(namespaces, f.namespaces) && super.equals(obj);
-  }
-
-  /**
-   * Compares the children with those of another element.
-   * @param elem element to be compared
-   * @return result of check
-   */
-  private boolean sameContent(final FElem elem) {
-    final Object cont = content, cont2 = elem.content;
-    return !(cont instanceof byte[]) && !(cont2 instanceof byte[]) &&
-      Arrays.equals((GNode[]) cont, (GNode[]) cont2);
   }
 
   @Override

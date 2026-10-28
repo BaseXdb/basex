@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -24,8 +23,6 @@ public final class Str extends AStr {
   public static final Str EMPTY = new Str(Token.EMPTY);
   /** Wildcard of lookup expressions. */
   public static final Str WILDCARD = new Str(Token.cpToken('*'));
-  /** Key string. */
-  public static final Str KEY = Str.get("key");
 
   /** Unicode character cache. */
   private static final IntObjectMap<Str> CACHE = new IntObjectMap<>();
@@ -106,16 +103,25 @@ public final class Str extends AStr {
   /**
    * Returns a valid string representation of the specified value.
    * @param value object (can be {@code null}, will be converted to token otherwise)
-   * @param qc query context
    * @param info input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Str get(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-    final byte[] token = XMLToken.check(value, qc.context.options.get(MainOptions.CHECKSTRINGS));
-    if(token == null) throw INVCODE_X.get(info, value);
-    return Str.get(token);
+  public static Str get(final Object value, final InputInfo info) throws QueryException {
+    return get(token(value, info));
+  }
+
+  /**
+   * Returns a valid token representation of the specified value.
+   * @param value object (can be {@code null}, will be converted to token otherwise)
+   * @param info input info
+   * @return token
+   * @throws QueryException query exception
+   */
+  public static byte[] token(final Object value, final InputInfo info) throws QueryException {
+    final byte[] token = value == null ? Token.EMPTY : Token.token(value);
+    if(!XMLToken.isValid(token)) throw INVCODE_X.get(info, value);
+    return token;
   }
 
   @Override
@@ -132,14 +138,9 @@ public final class Str extends AStr {
   }
 
   @Override
-  public int hashCode() {
-    return Token.hashCode(value);
-  }
-
-  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E['x'] → E[true()]
       expr = Bln.get(value.length != 0);
     }

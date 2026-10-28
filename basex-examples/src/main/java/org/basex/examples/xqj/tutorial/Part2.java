@@ -31,7 +31,7 @@ public final class Part2 extends Main {
     Class<?> xqdsClass = Class.forName(xqdsClassName);
     XQDataSource xqds = (XQDataSource) xqdsClass.getDeclaredConstructor().newInstance();
 
-    // Connect with username and password
+    // Connect with username and password (adjust the credentials to those of your server)
     info("Connect with username and password");
     XQConnection xqjc = xqds.getConnection("admin", "admin");
 

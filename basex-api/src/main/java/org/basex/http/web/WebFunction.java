@@ -107,7 +107,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  protected final QNm checkVariable(final String tmp, final boolean... declared)
+  protected final QNm checkVariable(final String tmp, final boolean[] declared)
       throws QueryException {
 
     final Matcher matcher = TEMPLATE.matcher(tmp);

@@ -60,7 +60,7 @@ public final class ScanTest extends SandboxTest {
   }
 
   /**
-   * Initializes the benchmark.
+   * Drops the test database.
    */
   @AfterAll public static void finishDB() {
     execute(new DropDB(NAME));
@@ -71,7 +71,7 @@ public final class ScanTest extends SandboxTest {
     run("count( //*[text()] )");
   }
 
-  /** Counts the number of elements with text node or attribute as child. */
+  /** Counts the descendant elements and attributes of all elements. */
   @Test public void elementsWithTextOrAttribute() {
     run("count( descendant::*//(*|@*) )");
   }
@@ -86,7 +86,7 @@ public final class ScanTest extends SandboxTest {
    * the result is ignored.
    * @param query query to be evaluated
    */
-  private void run(final String query) {
+  private static void run(final String query) {
     Util.println("Query: " + query);
     // warm up
     query(query);

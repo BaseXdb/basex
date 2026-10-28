@@ -193,9 +193,4 @@ public abstract class FNode extends XNode {
   public final int hashCode() {
     return id;
   }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof final FNode n && type.eq(n.type) && parent == n.parent;
-  }
 }

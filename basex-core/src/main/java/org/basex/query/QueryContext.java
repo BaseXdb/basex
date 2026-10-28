@@ -48,6 +48,7 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class organizes both static and dynamic properties that are specific to a
@@ -94,10 +95,12 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
   /** User. */
   public User user;
-  /** Indicates if parsed code may access static resources without CREATE permission. */
+  /** Indicates if parsed code may access static resources without ADMIN permission. */
   public boolean parseResources;
   /** Maximum permission of the parsed code. */
   public Perm maxPerm;
+  /** Custom URI resolver for parsed modules (can be {@code null}). */
+  public UriResolver resolver;
 
   /** Cached full-text position data. */
   public FTPosData ftPosData;
@@ -213,6 +216,8 @@ public final class QueryContext extends Job implements Closeable {
     globals = parent != null ? parent.globals : new GlobalValues();
     user = parent != null ? parent.user : context.user();
     maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;
+    resolver = parent != null ? parent.resolver : null;
+    if(parent != null) options.inherit(parent.options);
   }
 
   /**
@@ -223,20 +228,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return parse(query, uri, null);
-  }
-
-  /**
-   * Parses the specified query.
-   * @param query query string
-   * @param uri base URI (can be {@code null})
-   * @param sc static context (can be {@code null})
-   * @return module
-   * @throws QueryException query exception
-   */
-  public AModule parse(final String query, final String uri, final StaticContext sc)
-      throws QueryException {
-    return QueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
+    return QueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri, null);
   }
 
   /**
@@ -281,22 +273,9 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
-    return parseLibrary(query, uri, null);
-  }
-
-  /**
-   * Parses the specified module.
-   * @param query query string
-   * @param uri base URI (can be {@code null})
-   * @param sc static context (can be {@code null})
-   * @return library module
-   * @throws QueryException query exception
-   */
-  public LibraryModule parseLibrary(final String query, final String uri, final StaticContext sc)
-      throws QueryException {
     return run(info.parsing, () -> {
       info.query = query;
-      return new QueryParser(query, uri, this, sc).parseLibrary(true);
+      return new QueryParser(query, uri, this, null).parseLibrary(true);
     });
   }
 
@@ -568,7 +547,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return result of check
    */
   public boolean trusted(final InputInfo ii) {
-    return perm(ii).has(Perm.CREATE);
+    return perm(ii).has(Perm.ADMIN);
   }
 
   /**
@@ -596,7 +575,7 @@ public final class QueryContext extends Job implements Closeable {
     if(!user.has(perm, db)) throw BASEX_PERMISSION_X_X.get(ii, perm, subject);
     if(!perm(ii).has(perm)) {
       // untrusted code: no access to external resources
-      throw perm.has(Perm.CREATE) && !trusted(ii) ? EXTERNALRESOURCE_X.get(ii, subject) :
+      throw perm == Perm.ADMIN ? EXTERNALRESOURCE_X.get(ii, subject) :
         BASEX_PERMISSION_X_X.get(ii, perm, subject);
     }
   }
@@ -630,7 +609,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void trace(final String label, final Supplier<String> message) {
     // discard output of users with insufficient permissions
-    if(!user.has(Perm.CREATE)) return;
+    if(!user.has(Perm.ADMIN)) return;
     if(parent != null) {
       parent.trace(label, message);
     } else {
@@ -661,6 +640,36 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Returns new main options with the query-local and default options.
+   * @return main options
+   */
+  public MainOptions dbOptions() {
+    return options.dbOptions();
+  }
+
+  /**
+   * Assigns a pragma value to the global and query-local options.
+   * @param option option
+   * @param value value
+   * @param ii input info (can be {@code null})
+   * @return old values
+   * @throws QueryException query exception
+   */
+  public Object[] assign(final Option<?> option, final String value, final InputInfo ii)
+      throws QueryException {
+    return options.assign(option, value, ii);
+  }
+
+  /**
+   * Restores the values that were replaced by a pragma.
+   * @param option option
+   * @param old old values
+   */
+  public void restore(final Option<?> option, final Object[] old) {
+    options.restore(option, old);
+  }
+
+  /**
    * Returns the full-text options of the prolog.
    * @return full-text options
    */
@@ -676,7 +685,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public FNode toXml(final boolean full) {
     // only show root node if functions or variables exist
-    final QueryPlan plan = new QueryPlan(compiled, closed, full);
+    final QueryPlan plan = new QueryPlan(compiled, updating, full);
     if(main != null) {
       for(final StaticDecl ss : main.references()) ss.toXml(plan);
       main.toXml(plan);
@@ -819,26 +828,24 @@ public final class QueryContext extends Job implements Closeable {
         final Iter iter = updating ? update().iter() : main.iter(this);
         Item item;
 
-        do {
-          // collect PRE values if a database is opened globally
-          if(defaultOutput && data != null) {
-            while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
-              pres.add(((DBNode) item).pre());
-            }
-            // skip if all results have been collected
-            if(item == null || pres.size() >= max) break;
-
-            // otherwise, add nodes to standard iterator
-            for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
-            items.add(item);
+        // collect PRE values if a database is opened globally
+        if(defaultOutput && data != null) {
+          while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
+            pres.add(((DBNode) item).pre());
           }
+          // skip if all results have been collected
+          if(item == null || pres.size() >= max) return null;
 
-          // use standard iterator
-          while((item = next(iter)) != null && items.size() < max) {
-            item.cache(false, null);
-            items.add(item);
-          }
-        } while(false);
+          // otherwise, add nodes to standard iterator
+          for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
+          items.add(item);
+        }
+
+        // use standard iterator
+        while((item = next(iter)) != null && items.size() < max) {
+          item.cache(false, null);
+          items.add(item);
+        }
         return null;
       });
     } catch(final QueryException | JobException ex) {

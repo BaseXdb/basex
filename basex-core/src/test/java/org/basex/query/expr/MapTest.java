@@ -87,6 +87,25 @@ public final class MapTest extends SandboxTest {
     query("count((array { <a/> }, {}))", 2);
   }
 
+  /** The empty map is an instance of map types with disjoint key or value types. */
+  @Test public void emptyMapType() {
+    final String f = "declare %basex:inline(0) function local:f($m as ";
+    final String calls = "local:f({}), local:f({ 'a': 1 })";
+    query(f + "map(xs:string, xs:integer)) { $m instance of map(xs:integer, xs:integer) }; "
+        + calls, "true\nfalse");
+    query(f + "map(xs:string, xs:integer)) { $m instance of map(xs:string, xs:string) }; "
+        + calls, "true\nfalse");
+    query(f + "map(xs:string, xs:integer)) { typeswitch($m) case map(xs:integer, item()*) "
+        + "return 'int' default return 'other' }; " + calls, "int\nother");
+    query(f + "record()) { $m instance of map(xs:integer, xs:integer) }; local:f({})", true);
+
+    // maps and records are functions that take an atomic argument
+    final String fn = ") { $m instance of fn(xs:string) as xs:integer? }; "
+        + "local:f({ 'a': 1 }), local:f({ 'a': 1e0 })";
+    query(f + "map(xs:string, xs:numeric)" + fn, "true\nfalse");
+    query(f + "record(a as xs:numeric)" + fn, "true\nfalse");
+  }
+
   /** GitHub bug (#1012). */
   @Test public void gh1012() {
     error("{}(())", INVKEY_X_X);

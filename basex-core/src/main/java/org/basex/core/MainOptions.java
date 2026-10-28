@@ -142,8 +142,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Default for the 'trust-external' option of XQuery functions. */
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
-  /** Validate string inputs. */
-  public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
   /** Runs the query, or only parses it. */
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
@@ -167,12 +165,10 @@ public final class MainOptions extends Options {
   public static final OptionsOption<SerializerOptions> EXPORTER =
       new OptionsOption<>("EXPORTER", new SerializerOptions());
 
-  /** Prints an XML plan. */
-  public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);
+  /** Stage at which an XML plan is printed. */
+  public static final StringOption XMLPLAN = new StringOption("XMLPLAN", "none");
   /** Creates comprehensive query plan information. */
   public static final BooleanOption FULLPLAN = new BooleanOption("FULLPLAN", false);
-  /** Creates the query plan before or after optimization. */
-  public static final BooleanOption OPTPLAN = new BooleanOption("OPTPLAN", true);
 
   /** Flushes the database after each update. */
   public static final BooleanOption AUTOFLUSH = new BooleanOption("AUTOFLUSH", true);
@@ -203,13 +199,11 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.RETAIN_LOCATION, RETAINLOCATION);
   }
 
-  /** XML parsing options. */
-  private static final Option<?>[] XMLPARSING = XMLPARSINGMAP.values().toArray(Option[]::new);
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
   /** All parsing options. */
-  public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
+  public static final Option<?>[] PARSING = Stream.concat(XMLPARSINGMAP.values().stream(),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
   /** All create options. */
   public static final Option<?>[] CREATING = Stream.concat(Stream.of(INDEXING),
@@ -243,6 +237,21 @@ public final class MainOptions extends Options {
     }
   }
 
+  /** Query plan stage. */
+  public enum PlanStage {
+    /** NONE.      */ NONE,
+    /** PARSED.    */ PARSED,
+    /** COMPILED.  */ COMPILED,
+    /** OPTIMIZED. */ OPTIMIZED;
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
+  }
+
+  /** Resolver without catalog. */
+  private static final XMLResolver NO_RESOLVER = new XMLResolver("");
   /** Resolver instance (can be {@code null}; lazy instantiation). */
   private XMLResolver resolver;
   /** Options version of the resolver. */
@@ -254,15 +263,6 @@ public final class MainOptions extends Options {
    * Default constructor.
    */
   public MainOptions() {
-    this(true);
-  }
-
-  /**
-   * Default constructor.
-   * @param system parse system properties
-   */
-  public MainOptions(final boolean system) {
-    if(system) setSystem();
   }
 
   /**
@@ -277,23 +277,10 @@ public final class MainOptions extends Options {
 
   /**
    * Constructor, adopting parsing options from the specified instance.
-   * @param options parent options
-   * @param xml limit to XML parsing options
-   */
-  public MainOptions(final MainOptions options, final boolean xml) {
-    this(false);
-    for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
-    resolver = options.resolver;
-    allowExternal = options.allowExternal;
-  }
-
-  /**
-   * Constructor, adopting parsing options from the specified instance.
    * @param options options
    * @param parent parent options (can be {@code null})
    */
   public MainOptions(final Options options, final MainOptions parent) {
-    this(false);
     XMLPARSINGMAP.forEach((source, target) -> {
       final Object value = options.get(source);
       if(value instanceof final CommonOptions.StripSpace ss) {
@@ -304,7 +291,6 @@ public final class MainOptions extends Options {
     });
     final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
-      resolver = null;
       allowExternal = t == Boolean.TRUE;
     } else {
       setResolver(parent);
@@ -333,10 +319,23 @@ public final class MainOptions extends Options {
   }
 
   /**
+   * Adopts the catalog, the XML resolver and the external access flag from the specified options.
+   * @param options main options
+   * @return self reference
+   */
+  public MainOptions adoptAccess(final MainOptions options) {
+    put(CATALOG, options.get(CATALOG));
+    resolver = options.resolver;
+    allowExternal = options.allowExternal;
+    return this;
+  }
+
+  /**
    * Returns an XML resolver.
    * @return XML resolver
    */
   public XMLResolver resolver() {
+    if(!allowExternal) return NO_RESOLVER;
     final int v = version();
     if(resolver == null || resolverVersion != v) {
       final String catalog = get(CATALOG);
@@ -364,5 +363,33 @@ public final class MainOptions extends Options {
   public MainOptions allowExternal(final boolean allow) {
     allowExternal = allow;
     return this;
+  }
+
+  @Override
+  public synchronized void assign(final String name, final String value) throws BaseXException {
+    // no plan stage: toggle query plan
+    final boolean toggle = value.isEmpty() && name.equalsIgnoreCase(XMLPLAN.name());
+    super.assign(name, toggle ? String.valueOf(planStage() == PlanStage.NONE) : value);
+  }
+
+  /**
+   * Returns the stage at which the query plan is printed.
+   * @return stage
+   */
+  public PlanStage planStage() {
+    final String value = get(XMLPLAN).trim().toLowerCase(Locale.ENGLISH);
+    final Boolean enable = Strings.toBoolean(value);
+    if(enable != null) return enable ? PlanStage.OPTIMIZED : PlanStage.NONE;
+    final PlanStage stage = Enums.get(PlanStage.class, value);
+    return stage != null ? stage : PlanStage.NONE;
+  }
+
+  /**
+   * Checks if the specified option accesses files and can only be assigned by admins.
+   * @param option option (can be {@code null})
+   * @return result of check
+   */
+  public static boolean admin(final Option<?> option) {
+    return option == STOPWORDS || option == WRITEBACK;
   }
 }

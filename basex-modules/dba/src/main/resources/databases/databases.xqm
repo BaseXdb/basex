@@ -34,55 +34,37 @@ function dba:databases(
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show; changing
      it refreshes the panels over the connection the view opens for its queries :)
-  (: the document is needed twice: its text fills the editor, its properties the panel :)
-  let $document := panels:document($name, $resource)
+  (: a database is always open: the first one if the address names none or an invalid one :)
+  let $name := $name[. and exists(try { db:exists(.) } catch db:name { })]
+    otherwise head(db:list())
   (: a link that names a resource alone opens the level that holds it; the client derives the
      directory in the same way :)
   let $dir := $dir[.] otherwise replace($resource, '[^/]+$', '')
+  (: the document is needed twice: its text fills the editor, its properties the panel :)
+  let $document := panels:document($name, $resource)
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
   let $database := panels:database($name, '', 1, $resource, $dir, '')
-  let $information := panels:information($name)
-  let $index := panels:index($name, 'element-name', '', '', 1)
-  (: the panels follow the selection: while a document is shown, what it was chosen from steps
-     back to a strip; without one, the lists are what there is to see. A panel that is folded by
-     hand keeps the state it was given :)
-  let $fold := $document?exists
   return (
-    html:panel(panels:databases('', 1, $name),
-      { 'id': 'databases-panel', 'label': 'Databases', 'collapsed': $fold }),
-    html:panel($database,
-      { 'id': 'database-panel', 'label': 'Database', 'close': 'selectDatabase("")' }),
+    html:panel(panels:databases('', 1, $name), { 'id': 'databases-panel', 'label': 'Databases' }),
+    html:panel($database, { 'id': 'database-panel', 'label': 'Database' }),
     (: the editor is created once and outlives the panel above it, which is redrawn :)
     html:panel(panels:resource($name, $resource, $document), {
       'id'   : 'resource-panel',
       'label': 'Resource',
-      'close': 'selectResource("")',
       'pane' : false(),
       'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
     }),
-    (: the last three sit at the right edge, so all fold that way; only the last one does so by
-       default. The backups are shown on the top level, and step back once a database is chosen :)
-    html:panel(panels:backups($name), {
-      'id': 'backups-panel', 'label': 'Backups', 'collapsed': boolean($name), 'fold': 'right',
-      'description': 'the backups of the database, or of the users, services and stores'
-    }),
-    (: reports, not steps of the work: they are opened when they are asked for :)
-    html:panel($index,
-      { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true(), 'fold': 'right',
-        'description': 'the entries of the indexes of the database' }),
-    html:panel($information,
-      { 'id': 'information-panel', 'label': 'Information', 'collapsed': true(),
-        'description': 'the properties and options of the database' }),
+    (: no steps of the work: what concerns a database as a whole, and the storage, are opened
+       when asked for; see initDatabases :)
+    panels:properties-dialog($name),
+    panels:storage-dialog(),
     (: what the language fields of the dialogs suggest :)
     form:languages()
   ) => html:wrap({
     'header' : $dba:CAT,
-    'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
+    'columns': ('35fr', '35fr', '30fr'),
     'rows'   : '1fr',
-    (: a view of its own per level: what is folded away while a document is shown is not what
-       is folded away while a database or the list of databases is; see foldResourcePanels :)
-    'panels' : if ($document?exists) then 'resource' else if ($name) then 'database' else (),
     'scripts': ('cm6', 'editor', 'databases'),
     'init'   : `initDatabases({ $document?editable });`
   })
@@ -92,7 +74,7 @@ function dba:databases(
  : Downloads a resource.
  : @param  $name      database
  : @param  $resource  resource
- : @return rest response and file content
+ : @return rest response and file content, or redirection
  :)
 declare
   %rest:POST
@@ -107,7 +89,8 @@ function dba:db-download(
     utils:attachment($resource, panels:resource-value($name, $resource),
       db:content-type($name, $resource))
   } catch * {
-    web:error(404, $err:description)
+    utils:outcome($dba:CAT, { 'name': $name, 'resource': $resource },
+      { 'error': 'Download failed: ' || $err:description })
   }
 };
 
@@ -175,10 +158,7 @@ function dba:backup-download(
 ) as item()+ {
   let $path := utils:safe-path(db:option('dbpath') || '/', $backup)
   return (
-    web:response-header(
-      { 'media-type': 'application/octet-stream' },
-      { 'Content-Length': file:size($path) }
-    ),
+    web:response-header((), { 'Content-Length': file:size($path) }),
     file:read-binary($path)
   )
 };
@@ -198,7 +178,6 @@ declare
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')
   %rest:query-param('indent',   '{$indent}')
-  %output:method('text')
 function dba:db-save(
   $name      as xs:string,
   $resource  as xs:string,
@@ -237,7 +216,7 @@ function dba:create() {
             (
               for value $content in $files
               return if ($args?binary) then $content else fetch:binary-doc($content),
-              $input
+              $input ! dba:input(.)
             ),
             (map:keys($files), $input ! ''), {
               form:index-map($args),
@@ -274,8 +253,9 @@ declare
   %rest:path('/dba/databases/optimize')
 function dba:optimize() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'database', 'optimized'),
-    'run' : %updating fn() { $args?name ! db:optimize(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'database', 'optimized'),
+    'run'   : %updating fn() { $args?name ! db:optimize(.) }
   } })
 };
 
@@ -338,8 +318,9 @@ declare
   %rest:path('/dba/databases/backups-create')
 function dba:backups-create() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'database', 'backed up'),
-    'run' : %updating fn() { $args?name ! db:create-backup(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'database', 'backed up'),
+    'run'   : %updating fn() { $args?name ! db:create-backup(.) }
   } })
 };
 
@@ -353,8 +334,9 @@ declare
   %rest:path('/dba/databases/backups-restore')
 function dba:backups-restore() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'backup', 'restored'),
-    'run' : %updating fn() { $args?name ! db:restore(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'backup', 'restored'),
+    'run'   : %updating fn() { $args?name ! db:restore(.) }
   } })
 };
 
@@ -370,7 +352,7 @@ function dba:backup-create() {
   utils:dispatch($dba:CAT, fn($args) {
     let $name := string($args?name)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       (: an empty name addresses the data that belongs to no database :)
       'info'  : if ($name) then utils:info($name, 'database', 'backed up')
                 else 'Users, services, and stores were backed up.',
@@ -395,7 +377,7 @@ function dba:backup-drop() {
   utils:dispatch($dba:CAT, fn($args) {
     let $name := string($args?name)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info($args?backup, 'backup', 'dropped'),
       'run'   : %updating fn() { $args?backup ! db:drop-backup(`{ $name }-{ . }`) }
     }
@@ -416,7 +398,7 @@ function dba:backup-restore() {
     (: only the first backup will be restored :)
     let $backup := head($args?backup)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info($backup, 'backup', 'restored'),
       'run'   : %updating fn() { db:restore(`{ $name }-{ $backup }`) }
     }
@@ -438,26 +420,27 @@ function dba:backup-upload() {
     let $name := string($args?name)
     let $files := utils:files($args?files)
     return {
-      'params': { 'name': $name },
+      'params': dba:backups-shown($name),
       'info'  : utils:info(map:keys($files), 'backup', 'uploaded'),
       'run'   : %updating fn() {
         for key $file value $content in $files
         let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
-        let $entries := archive:entries($content) ! data()
+        (: a file that is no archive has no entries, and is rejected like an invalid one :)
+        let $entries := try { archive:entries($content) ! data() } catch archive:* { }
         (: reject backups with invalid content :)
-        let $valid := if ($db) then (
+        let $valid := exists($entries) and (if ($db) then (
           $entries = $db || '/inf.basex' and
           (every $entry in $entries satisfies starts-with($entry, $db || '/'))
         ) else (
           every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
-        )
+        ))
         return if (not($valid)) then (
-          error((), 'Invalid backup file: ' || $file)
+          error((), `Invalid backup file: “{ $file }”.`)
         ) else if ($name and $db != $name) {
           (: reject the backup of another database: it would be invisible in the panel it was
              uploaded from. Without a selected database there is nothing to contradict, and a
              backup of a database that no longer exists is what a recovery starts from :)
-          error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
+          error((), `Backup “{ $file }” does not belong to database “{ $name }”.`)
         },
         let $dir := db:option('dbpath') || '/'
         for key $file value $content in $files
@@ -505,7 +488,7 @@ function dba:put() {
             ),
             (: a directory or an archive is expanded, and the paths it contains are kept
                below the target; what is stored there already is replaced :)
-            $input ! db:put($args?name, ., $target, $options)
+            $input ! db:put($args?name, dba:input(.), $target, $options)
           )
         )
       }
@@ -566,24 +549,19 @@ declare
   %rest:POST
   %rest:path('/dba/databases/resource-rename')
 function dba:resource-rename() {
-  utils:dispatch($dba:CAT, fn($args) {
-    let $exists := db:exists($args?name, $args?target)
-    return {
-      (: a rename that fails leaves the resource where it is, and selected :)
-      'params': {
-        'name': $args?name,
-        'resource': if ($exists) then $args?resource else $args?target
-      },
-      'info'  : utils:info($args?resource, 'resource', 'renamed'),
-      'run'   : %updating fn() {
-        if ($exists) then (
-          error((), 'Resource already exists.')
-        ) else (
-          db:rename($args?name, $args?resource, $args?target)
-        )
-      }
+  utils:dispatch($dba:CAT, fn($args) { {
+    (: a rename that fails leaves the resource where it is, and selected :)
+    'params': { 'name': $args?name, 'resource': $args?target },
+    'failed': { 'name': $args?name, 'resource': $args?resource },
+    'info'  : utils:info($args?resource, 'resource', 'renamed'),
+    'run'   : %updating fn() {
+      if (db:exists($args?name, $args?target)) then (
+        error((), 'Resource already exists.')
+      ) else (
+        db:rename($args?name, $args?resource, $args?target)
+      )
     }
-  })
+  } })
 };
 
 (:~
@@ -624,18 +602,17 @@ declare %private function dba:rename-database(
   $update  as %updating fn(*),
   $select  as xs:boolean
 ) as utils:action {
-  (: both take a new name and reject one that is assigned already :)
-  (: the name that was offered for editing is the current one: keeping it is no conflict :)
-  let $exists := $args?newname != $args?name and db:exists($args?newname)
-  return {
-    (: an operation that fails leaves the database it was started from selected :)
-    'params': { 'name': if ($select and not($exists)) then $args?newname else $args?name },
-    'info'  : `Database "{ $args?name }" was { $action } to "{ $args?newname }".`,
+  (: both take a new name and reject one that is assigned already. An operation that fails
+     leaves the database it was started from selected :)
+  {
+    'params': { 'name': if ($select) then $args?newname else $args?name },
+    'failed': { 'name': $args?name },
+    'info'  : `Database “{ $args?name }” was { $action } to “{ $args?newname }”.`,
     'run'   : %updating fn() {
-      if ($exists) then (
-        error((), 'Database already exists.')
-      ) else if ($args?name != $args?newname) {
-        updating $update($args?name, $args?newname)
+      (: the name that was offered for editing is the current one: keeping it is no conflict :)
+      if ($args?newname != $args?name) {
+        if (db:exists($args?newname)) then error((), 'Database already exists.')
+        else updating $update($args?name, $args?newname)
       }
     }
   }
@@ -665,4 +642,42 @@ declare %private function dba:index(
       )
     }
   }
+};
+
+(:~
+ : Returns the parameters that keep a database selected that a list action was run on.
+ : @param  $args  request parameters
+ : @return query parameters; empty if several databases were chosen
+ :)
+declare %private function dba:selected(
+  $args  as map(*)
+) as map(*)? {
+  { 'name': $args?name }[count($args?name) = 1]
+};
+
+(:~
+ : Checks the input of a dialog that adds resources: an existing file or directory, or a URL.
+ : @param  $input  input
+ : @return input
+ :)
+declare %private function dba:input(
+  $input  as xs:string
+) as xs:string {
+  if (matches($input, '^[a-z][a-z0-9+.-]+://', 'i') or
+    (try { file:exists($input) } catch file:invalid-path { false() })) then (
+    $input
+  ) else (
+    error((), `No file, directory, archive or URL: “{ $input }”.`)
+  )
+};
+
+(:~
+ : Returns the parameters of the page that shows the backups an action has changed.
+ : @param  $name  database; empty string for the general data
+ : @return query parameters
+ :)
+declare %private function dba:backups-shown(
+  $name  as xs:string
+) as map(*) {
+  if ($name) then { 'name': $name, 'show': 'properties' } else { 'show': 'storage' }
 };

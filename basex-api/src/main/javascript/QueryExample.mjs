@@ -1,6 +1,6 @@
 // This example shows how queries can be executed in an iterative manner.
 //
-// Documentation: https://docs.basex.org/wiki/Clients
+// Documentation: https://docs.basex.org/main/Clients
 //
 // (C) BaseX Team, BSD License
 

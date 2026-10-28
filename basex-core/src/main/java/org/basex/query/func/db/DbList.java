@@ -42,7 +42,7 @@ public class DbList extends DbAccessFn {
    * @return names of databases
    */
   final StringList databases(final QueryContext qc) {
-    return perm(qc).has(Perm.READ) ? qc.context.databases.list(qc.user, null) :
+    return perm(qc).has(Perm.READ) ? qc.context.databases.list(qc.user, Perm.READ, null) :
       new StringList();
   }
 

@@ -63,16 +63,15 @@ public final class Language implements Comparable<Language> {
    */
   public static Language get(final MainOptions opts) {
     final Language ln = get(opts.get(MainOptions.LANGUAGE));
-    return ln == null ? get("en") : ln;
+    return ln == null ? def() : ln;
   }
 
   /**
-   * Returns the user language as default language, or English if the language cannot be assigned.
+   * Returns English as default language.
    * @return default language
    */
   public static Language def() {
-    final Language ln = DISP.get(MainOptions.LANGUAGE.value());
-    return ln == null ? get("en") : ln;
+    return get("en");
   }
 
   /**

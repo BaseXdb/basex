@@ -52,7 +52,7 @@ public final class Except extends Set {
 
     final ExprList list = new ExprList(el);
     for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE || !list.isEmpty() && st.intersect(expr.seqType()) == null) {
+      if(expr == Empty.VALUE || !list.isEmpty() && st.type.intersect(expr.seqType().type) == null) {
         // ignore empty operands or incompatible node types
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!list.isEmpty() && !expr.has(Flag.CNS, Flag.NDT) && expr.equals(list.get(0))) {

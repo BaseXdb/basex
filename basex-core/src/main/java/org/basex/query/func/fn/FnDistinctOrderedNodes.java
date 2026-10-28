@@ -61,8 +61,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
       if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
         return cc.function(DISTINCT_ORDERED_NODES, info, nodes.arg(0));
       // distinct-ordered-nodes(/a/b/c) → /a/b/c
-      if(nodes.ddo())
-        return nodes;
+      if(nodes.ddo()) return nodes;
       // adopt type of input
       exprType.assign(type);
     }

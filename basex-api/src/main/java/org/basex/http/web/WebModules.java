@@ -82,14 +82,16 @@ public final class WebModules {
    * Returns a WADL description for all available URIs.
    * @param request HTTP request
    * @param ctx database context
+   * @param info input info (can be {@code null})
    * @return WADL description
    * @throws QueryException query exception
    */
-  public FNode wadl(final HttpServletRequest request, final Context ctx) throws QueryException {
+  public FNode wadl(final HttpServletRequest request, final Context ctx, final InputInfo info)
+      throws QueryException {
     try {
-      return new RestXqWadl(request).create(cache(ctx, true));
+      return RestXqWadl.create(request, cache(ctx, true));
     } catch(final IOException ex) {
-      throw QueryError.BASEX_ERROR_X.get(null, ex);
+      throw QueryError.BASEX_ERROR_X.get(info, ex);
     }
   }
 
@@ -384,12 +386,7 @@ public final class WebModules {
    */
   private static void bestMethod(final List<RestXqFunction> funcs) {
     // drop method-agnostic functions if a function with method annotations exists
-    for(final RestXqFunction func : funcs) {
-      if(!func.methods.isEmpty()) {
-        funcs.removeIf(f -> f.methods.isEmpty());
-        break;
-      }
-    }
+    if(Checks.any(funcs, f -> !f.methods.isEmpty())) funcs.removeIf(f -> f.methods.isEmpty());
   }
 
   /**

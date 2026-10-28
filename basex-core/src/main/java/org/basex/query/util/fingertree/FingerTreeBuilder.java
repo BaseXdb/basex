@@ -30,11 +30,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @param leaf leaf node to add
    */
   public void prepend(final Node<E, E> leaf) {
-    if(root == null) {
-      root = new BufferNode<>(leaf);
-    } else {
-      root.prepend(leaf);
-    }
+    if(root == null) root = new BufferNode<>(leaf);
+    else root.prepend(leaf);
   }
 
   /**
@@ -42,11 +39,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @param leaf leaf node to add
    */
   public void append(final Node<E, E> leaf) {
-    if(root == null) {
-      root = new BufferNode<>(leaf);
-    } else {
-      root.append(leaf);
-    }
+    if(root == null) root = new BufferNode<>(leaf);
+    else root.append(leaf);
   }
 
   /**
@@ -54,13 +48,9 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @param tree finger tree to append
    */
   public void append(final FingerTree<E, E> tree) {
-    if(!tree.isEmpty()) {
-      if(root == null) {
-        root = new BufferNode<>(tree);
-      } else {
-        root.append(tree);
-      }
-    }
+    if(tree.isEmpty()) return;
+    if(root == null) root = new BufferNode<>(tree);
+    else root.append(tree);
   }
 
   /**
@@ -84,8 +74,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
   @Override
   public Iterator<E> iterator() {
-    if(root == null) return Collections.emptyIterator();
-    return new BufferNodeIterator<>(root);
+    return root == null ? Collections.emptyIterator() : new BufferNodeIterator<>(root);
   }
 
   /**

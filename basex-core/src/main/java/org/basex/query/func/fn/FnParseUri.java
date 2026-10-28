@@ -123,24 +123,18 @@ public class FnParseUri extends StandardFunc {
         userinfo = "";
       }
     }
-    // parse host
+    // parse host and port (an IPv6/IPvFuture address may contain a colon)
+    String port = null;
     if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
       host = r.group(3);
+      port = r.group(5);
     } else if(r.has(authority, "^(([^@]*)@)?\\[.*$")) {
       throw PARSE_URI_X.get(info, value);
     } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
       host = r.group(3);
+      port = r.group(5);
     }
-    if(host == null) host = "";
-
-    // an IPv6/IPvFuture address may contain a colon
     Item prt = Empty.VALUE;
-    String port = null;
-    if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
-      port = r.group(5);
-    } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
-      port = r.group(5);
-    }
     if(port != null) {
       final long p = Strings.toInt(port);
       prt = omitPort(p, scheme, options) ? Empty.VALUE : Itr.get(p);
@@ -210,13 +204,13 @@ public class FnParseUri extends StandardFunc {
     private Matcher m;
 
     /**
-     * Attempts to find the input in the pattern.
-     * @param pattern pattern
+     * Checks if the input contains a match of the regular expression.
      * @param input input
+     * @param regex regular expression
      * @return result of check
      */
-    boolean has(final String pattern, final String input) {
-      m = Pattern.compile(input).matcher(pattern);
+    boolean has(final String input, final String regex) {
+      m = Pattern.compile(regex).matcher(input);
       return m.find();
     }
 

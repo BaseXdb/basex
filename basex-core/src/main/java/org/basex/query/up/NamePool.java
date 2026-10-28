@@ -26,22 +26,21 @@ public final class NamePool {
    */
   public void add(final QNm name, final NodeType type) {
     final Kind kind = type.kind();
-    final boolean elem = kind == Kind.ELEMENT, attr = kind == Kind.ATTRIBUTE;
-    if(elem || attr) {
-      final int i = index(name, attr);
+    if(kind == Kind.ELEMENT || kind == Kind.ATTRIBUTE) {
+      // index() may resize the cache
+      final int i = index(name, kind == Kind.ATTRIBUTE);
       cache[i].add++;
     }
   }
 
   /**
-   * Adds an entry to the pool and decreases its number of occurrence.
+   * Adds an entry to the pool and marks it as deleted.
    * @param node node
    */
   public void remove(final XNode node) {
     final Kind kind = node.kind();
-    final boolean elem = kind == Kind.ELEMENT, attr = kind == Kind.ATTRIBUTE;
-    if(elem || attr) {
-      final int i = index(node.qname(), attr);
+    if(kind == Kind.ELEMENT || kind == Kind.ATTRIBUTE) {
+      final int i = index(node.qname(), kind == Kind.ATTRIBUTE);
       cache[i].del = true;
     }
   }

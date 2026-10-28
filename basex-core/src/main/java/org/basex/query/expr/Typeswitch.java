@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -20,12 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Typeswitch extends ParseExpr {
-  /** Cases. */
-  private TypeswitchGroup[] groups;
-  /** Condition. */
-  private Expr cond;
-
+public final class Typeswitch extends ASwitch<TypeswitchGroup> {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -33,38 +27,18 @@ public final class Typeswitch extends ParseExpr {
    * @param groups case groups (last one is default)
    */
   public Typeswitch(final InputInfo info, final Expr cond, final TypeswitchGroup[] groups) {
-    super(info, Types.ITEM_ZM);
-    this.cond = cond;
-    this.groups = groups;
+    super(info, cond, groups);
   }
 
   @Override
-  public boolean navigational() {
-    return Checks.all(groups, group -> group.expr.navigational());
-  }
-
-  /**
-   * Returns the return expressions of all groups.
-   * @return expressions
-   */
-  public Expr[] branches() {
-    final int gl = groups.length;
-    final Expr[] branches = new Expr[gl];
-    for(int g = 0; g < gl; g++) branches[g] = groups[g].expr;
-    return branches;
+  Expr branch(final TypeswitchGroup group) {
+    return group.expr;
   }
 
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     checkAllUp(branches());
-  }
-
-  @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    cond = cond.compile(cc);
-    for(final TypeswitchGroup group : groups) group.compile(cc);
-    return optimize(cc);
   }
 
   @Override
@@ -101,12 +75,7 @@ public final class Typeswitch extends ParseExpr {
         // make sure that preceding groups do not branch on subtypes
         boolean branch = false;
         for(int h = 0; !branch && h < g; h++) {
-          for(final SeqType st : groups[h].seqTypes) {
-            if(Checks.any(matching, st::instanceOf)) {
-              branch = true;
-              break;
-            }
-          }
+          branch = Checks.any(groups[h].seqTypes, st -> Checks.any(matching, st::instanceOf));
         }
         // typeswitch($i) case xs:integer return A default return B → A
         if(!branch) tg = groups[g];
@@ -140,15 +109,6 @@ public final class Typeswitch extends ParseExpr {
       expr = new If(info, iff, thn, els).optimize(cc);
     }
     return cc.replaceWith(this, expr);
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    boolean changed = false;
-    for(final TypeswitchGroup group : groups) {
-      changed |= group.simplifyFor(mode, cc) == null;
-    }
-    return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   @Override
@@ -186,56 +146,8 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public boolean vacuous() {
-    return Checks.all(groups, group -> group.expr.vacuous());
-  }
-
-  @Override
-  public boolean ddo() {
-    return Checks.all(groups, group -> group.expr.ddo());
-  }
-
-  @Override
-  public boolean has(final Flag... flags) {
-    for(final TypeswitchGroup group : groups) {
-      if(group.has(flags)) return true;
-    }
-    return cond.has(flags);
-  }
-
-  @Override
-  public boolean inlineable(final InlineContext ic) {
-    for(final TypeswitchGroup group : groups) {
-      if(!group.inlineable(ic)) return false;
-    }
-    return cond.inlineable(ic);
-  }
-
-  @Override
   public VarUsage count(final Var var) {
     return cond.count(var).plus(VarUsage.maximum(var, groups));
-  }
-
-  @Override
-  public Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = ic.inline(groups, true);
-    final Expr inlined = cond.inline(ic);
-    if(inlined != null) {
-      changed = true;
-      cond = inlined;
-    }
-    return changed ? optimize(ic.cc) : null;
-  }
-
-  @Override
-  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // (typeswitch(C) case X return A default return B) coerce to T →
-    //   typeswitch(C) case X return (A coerce to T) default return (B coerce to T)
-    boolean changed = false;
-    for(final TypeswitchGroup group : groups) {
-      changed |= group.inlineTypeCheck(tc, cc) != null;
-    }
-    return changed ? optimize(cc) : this;
   }
 
   @Override
@@ -244,31 +156,8 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls(final CompileContext cc) {
-    for(final TypeswitchGroup group : groups) group.markTailCalls(cc);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return cond.accept(visitor) && visitAll(visitor, groups);
-  }
-
-  @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr group : groups) size += group.exprSize();
-    return size + cond.exprSize();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Typeswitch ts && cond.equals(ts.cond) &&
-        Arrays.equals(groups, ts.groups);
-  }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), cond, groups);
+    return this == obj || obj instanceof Typeswitch && super.equals(obj);
   }
 
   @Override

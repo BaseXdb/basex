@@ -4,9 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.List;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -260,6 +263,40 @@ public final class Window extends Clause {
     exprType.assign(expr.seqType().union(Occ.ZERO));
     var.refineType(seqType(), cc);
     return this;
+  }
+
+  /**
+   * Rewrites a sliding window with a fixed size to a loop over subsequences.
+   * @param clauses clauses
+   * @param p position of this clause
+   * @param unused checks if a variable is unused by the subsequent clauses
+   * @param cc compilation context
+   * @return success flag
+   * @throws QueryException query exception
+   */
+  boolean toSubsequence(final List<Clause> clauses, final int p, final Predicate<Var> unused,
+      final CompileContext cc) throws QueryException {
+
+    // for sliding window $w in E start at $s when true() [only] end at $e when $e - $s = K
+    // → let $in := E for $s in 1 to count($in) [- K] let $w := subsequence($in, $s, K + 1)
+    // only rewrite materialized input: evaluating it in full would defeat streaming
+    final Var spos = start.onlyPos();
+    if(!sliding || !(expr instanceof Value || expr instanceof VarRef) || spos == null ||
+        start.expr != Bln.TRUE) return false;
+    final long dist = end.distance(spos);
+    if(dist == -1 || !unused.test(end.onlyPos())) return false;
+
+    final Var in = cc.vs().addNew(new QNm("input"), null, cc.qc, info);
+    Expr max = cc.function(Function.COUNT, info, new VarRef(info, in).optimize(cc));
+    if(only) max = new Arith(info, max, Itr.get(dist), Calc.SUBTRACT).optimize(cc);
+    final Expr range = new Range(info, Itr.ONE, max).optimize(cc);
+    final Expr sub = cc.function(Function.SUBSEQUENCE, info, new VarRef(info, in).optimize(cc),
+        new VarRef(info, spos).optimize(cc), Itr.get(dist + 1));
+
+    clauses.set(p, new Let(in, expr).optimize(cc));
+    clauses.add(p + 1, new For(spos, range).optimize(cc));
+    clauses.add(p + 2, new Let(var, sub).optimize(cc));
+    return true;
   }
 
   @Override

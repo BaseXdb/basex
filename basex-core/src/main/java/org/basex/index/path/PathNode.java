@@ -122,12 +122,7 @@ public final class PathNode {
 
     final PathNode child = new PathNode(id, knd, this);
     child.index(value, meta);
-
-    final int cl = children.length;
-    final PathNode[] nodes = new PathNode[cl + 1];
-    Array.copy(children, cl, nodes);
-    nodes[cl] = child;
-    children = nodes;
+    children = Array.add(children, child);
     return child;
   }
 
@@ -243,7 +238,7 @@ public final class PathNode {
   /**
    * Returns a readable representation of this node.
    * @param data data reference
-   * @return completions
+   * @return token
    */
   public byte[] token(final Data data) {
     return switch(kind) {
@@ -261,12 +256,8 @@ public final class PathNode {
    * @return level
    */
   public int level() {
-    PathNode pn = parent;
     int c = 0;
-    while(pn != null) {
-      pn = pn.parent;
-      ++c;
-    }
+    for(PathNode pn = parent; pn != null; pn = pn.parent) c++;
     return c;
   }
 

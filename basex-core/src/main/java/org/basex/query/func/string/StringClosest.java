@@ -5,8 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.similarity.Levenshtein.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -99,12 +97,11 @@ public final class StringClosest extends StringFn {
 
     // sort by descending similarity; equal values are returned in input order
     final int size = values.size();
-    final Integer[] order = new Integer[size];
-    for(int o = 0; o < size; o++) order[o] = o;
-    Arrays.sort(order, (o1, o2) -> Double.compare(similarities.get(o2), similarities.get(o1)));
+    final int[] order = Array.createOrder(size,
+        (o1, o2) -> Double.compare(similarities.get(o2), similarities.get(o1)));
 
     final int max = limit > 0 ? Math.min(limit, size) : size;
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, max);
     for(int o = 0; o < max; o++) {
       final int p = order[o];
       vb.add(new MapBuilder().put(VALUE, Str.get(values.get(p))).

@@ -144,6 +144,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
   /** Mark occurrences of the name at the caret. */
   public static final BooleanOption MARKOCCURRENCES = new BooleanOption("MARKOCCURRENCES", true);
+  /** Show indentation guides. */
+  public static final BooleanOption SHOWGUIDES = new BooleanOption("SHOWGUIDES", true);
   /** Save before executing file. */
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
   /** Parse project files. */
@@ -174,8 +176,6 @@ public final class GUIOptions extends Options {
 
   /** Name of new database. */
   public static final StringOption DBNAME = new StringOption("DBNAME", "");
-  /** Last insertion type. */
-  public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
 
   /** Show attributes in treemap. */
   public static final BooleanOption MAPATTS = new BooleanOption("MAPATTS", false);

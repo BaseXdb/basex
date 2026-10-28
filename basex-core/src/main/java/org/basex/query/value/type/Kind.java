@@ -60,10 +60,8 @@ public enum Kind {
   ELEMENT("element", XNODE, ID.ELM) {
     @Override
     public GNode cast(final Object value, final InputInfo info) throws QueryException {
-      if(value instanceof final BXElem elem)
-        return elem.getNode();
-      if(value instanceof final Element elem)
-        return FElem.build(elem, null).finish();
+      if(value instanceof final BXElem elem) return elem.getNode();
+      if(value instanceof final Element elem) return FElem.build(elem, null).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {
@@ -157,10 +155,7 @@ public enum Kind {
    * @return kind or {@code null}
    */
   public static Kind get(final QNm qname) {
-    if(qname.uri().length == 0) {
-      return Kind.KINDS.get(qname.local());
-    }
-    return null;
+    return qname.uri().length == 0 ? KINDS.get(qname.local()) : null;
   }
 
   /**
@@ -208,9 +203,7 @@ public enum Kind {
    * @return union kind
    */
   public final Kind union(final Kind kind) {
-    if(kind.instanceOf(this)) return this;
-    if(parent != null) return parent.union(kind);
-    return NODE;
+    return kind.instanceOf(this) ? this : parent != null ? parent.union(kind) : NODE;
   }
 
   /**

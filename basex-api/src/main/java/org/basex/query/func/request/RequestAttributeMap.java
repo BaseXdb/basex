@@ -18,8 +18,7 @@ public final class RequestAttributeMap extends ApiFunc {
   public XQMap value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     for(final Entry<String, Object> entry : state(qc).attributes().entrySet()) {
-      final Object object = entry.getValue();
-      if(object instanceof final Value value) map.put(entry.getKey(), value);
+      if(entry.getValue() instanceof final Value value) map.put(entry.getKey(), value);
     }
     return map.map();
   }

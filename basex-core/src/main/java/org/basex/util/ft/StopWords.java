@@ -1,9 +1,11 @@
 package org.basex.util.ft;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -33,17 +35,73 @@ public final class StopWords {
   public StopWords() { }
 
   /**
-   * Constructor, reading stopword list from disk.
-   * And creating database stopword file.
+   * Constructor, reading a stopword file and storing the stopwords in the database.
    * @param data data reference
    * @param file stopwords file (can be empty string)
    * @throws IOException I/O exception
    */
-  public StopWords(final Data data, final String file) throws IOException {
+  private StopWords(final Data data, final String file) throws IOException {
     if(!file.isEmpty()) read(IO.get(file), false);
     try(DataOutput out = new DataOutput(data.meta.dbFile(DATASWL))) {
       set.write(out);
     }
+    data.meta.swsource = file;
+    data.meta.dirty = true;
+  }
+
+  /**
+   * Returns the stopwords for building a full-text index, reading the stopword file if necessary.
+   * @param data data reference
+   * @return stop words
+   * @throws IOException I/O exception
+   */
+  public static StopWords build(final Data data) throws IOException {
+    final String path = data.meta.stopwords;
+    return stored(data, path) ? get(data) : new StopWords(data, path);
+  }
+
+  /**
+   * Raises an error if the stopword file for building a full-text index does not exist.
+   * @param data existing database (can be {@code null})
+   * @param path path to stopword file
+   * @throws BaseXException database exception
+   */
+  public static void check(final Data data, final String path) throws BaseXException {
+    if(!path.isEmpty() && !stored(data, path) && !IO.get(path).exists()) {
+      throw new BaseXException(RES_NOT_FOUND_X, path);
+    }
+  }
+
+  /**
+   * Copies the stored stopwords to a new database if they were read from its stopword file.
+   * @param source source database
+   * @param target target database
+   * @throws IOException I/O exception
+   */
+  public static void copy(final Data source, final Data target) throws IOException {
+    if(stored(source, target.meta.stopwords)) {
+      source.meta.dbFile(DATASWL).copyTo(target.meta.dbFile(DATASWL));
+      target.meta.swsource = source.meta.swsource;
+    }
+  }
+
+  /**
+   * Discards the source of the stored stopwords, enforcing that the stopword file is read again.
+   * @param data data reference
+   */
+  public static void reset(final Data data) {
+    data.meta.swsource = null;
+  }
+
+  /**
+   * Checks if the stored stopwords of a database were read from the specified file.
+   * @param data data reference (can be {@code null})
+   * @param path path to stopword file
+   * @return result of check
+   */
+  private static boolean stored(final Data data, final String path) {
+    return data != null && !data.inMemory() && path.equals(data.meta.swsource) &&
+        data.meta.dbFile(DATASWL).exists();
   }
 
   /**

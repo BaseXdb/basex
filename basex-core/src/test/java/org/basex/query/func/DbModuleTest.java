@@ -21,6 +21,8 @@ import org.basex.util.list.*;
 import org.basex.util.options.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 /**
  * This class tests the functions of the Database Module.
@@ -61,6 +63,7 @@ public final class DbModuleTest extends SandboxTest {
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
     set(MainOptions.FTINCLUDE, "");
+    set(MainOptions.STRIPWS, false);
     execute(new DropDB(NAME));
   }
 
@@ -489,15 +492,35 @@ public final class DbModuleTest extends SandboxTest {
     query("(# db:stripws true #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
     query(_DB_GET.args(NAME), "<a/>");
 
+    // global options are ignored; declarations, pragmas and supplied options are applied
+    final String updindex = _DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()";
+    set(MainOptions.STRIPWS, true);
+    set(MainOptions.UPDINDEX, false);
+    query(func.args(NAME, " '<a> </a>'", "a.xml"));
+    query(_DB_GET.args(NAME), "<a> </a>");
+    query(updindex, true);
+    set(MainOptions.STRIPWS, false);
+    set(MainOptions.UPDINDEX, true);
+
+    query("declare option db:stripws 'true'; " + func.args(NAME, " '<a> </a>'", "a.xml"));
+    query(_DB_GET.args(NAME), "<a/>");
+    query("(# db:updindex false #) { " + func.args(NAME) + " }");
+    query(updindex, false);
+    query("declare option db:updindex 'false'; " + func.args(NAME));
+    query(updindex, false);
+    query("(# db:updindex false #) { " +
+        func.args(NAME, " ()", " ()", " { 'updindex': true() }") + " }");
+    query(updindex, true);
+
     final String path = "src/test/resources/example.json";
     query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");
     query(_DB_GET.args(NAME) + "/* ! name()", "json");
 
-    // a failed creation must leave no pinned and no incomplete database
+    // invalid index options are rejected before the existing database is replaced
     final String ftmixed = " { '" + lc(MainOptions.FTINDEX) + "': true(), '" +
         lc(MainOptions.FTMIXED) + "': true()";
-    error(func.args(NAME, " ()", " ()", ftmixed + " }"), UPDBERROR_X);
-    query(_DB_EXISTS.args(NAME), false);
+    error(func.args(NAME, " ()", " ()", ftmixed + " }"), BASEX_OPTIONS_X);
+    query(_DB_GET.args(NAME) + "/* ! name()", "json");
     query(func.args(NAME, " ()", " ()",
         ftmixed + ", '" + lc(MainOptions.FTINCLUDE) + "': 'p' }"));
     query(_DB_EXISTS.args(NAME), true);
@@ -601,6 +624,51 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, " <doc/>", " { 'x.bin': 'binary' }"), WHICHRES_X);
 
     // eventually drop database
+    query(_DB_DROP.args(NAME));
+  }
+
+  /** Invalid index options must not replace an existing database. */
+  @Test public void createIndexError() {
+    final Function func = _DB_CREATE;
+    execute(new Close());
+    query(func.args(NAME, " (<old/>, xs:hexBinary('00'))", " ('old.xml', 'old.bin')"));
+    for(final String options : new String[] {
+      " { 'ftindex': true(), 'stopwords': 'unknown-stopwords.txt' }",
+      " { 'ftindex': true(), 'ftmixed': true() }",
+      " { 'textindex': true(), 'textinclude': '1bad' }"
+    }) {
+      error(func.args(NAME, " <new>text</new>", "new.xml", options), BASEX_OPTIONS_X);
+      error(func.args(NAME, " (<new>text</new>, xs:hexBinary('00'))", " ('new.xml', 'new.bin')",
+          options), BASEX_OPTIONS_X);
+      error(_DB_OPTIMIZE.args(NAME, false, options), BASEX_OPTIONS_X);
+    }
+    query(_DB_LIST.args(NAME), "old.xml\nold.bin");
+    query(_DB_DROP.args(NAME));
+  }
+
+  /**
+   * Index updates and rebuilds use the stored stop words, even if the original file was deleted.
+   * @param updindex incremental index update flag
+   * @throws IOException I/O exception
+   */
+  @ParameterizedTest
+  @ValueSource(booleans = { false, true })
+  public void stopwordsDeleted(final boolean updindex) throws IOException {
+    execute(new Close());
+    final IOFile file = new IOFile(sandbox(), "stopwords.txt");
+    file.write("the");
+    query(_DB_CREATE.args(NAME, " <a><b>the cat</b></a>", "a.xml", " { 'ftindex': true(), " +
+        "'updindex': " + updindex + "(), 'stopwords': '" + file.path() + "' }"));
+    file.delete();
+
+    final String tokens = _FT_TOKENS.args(NAME) + " => string-join(' ')";
+    query("insert node <b>the dog</b> into " + _DB_GET.args(NAME) + "/a");
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", updindex);
+    query(_DB_OPTIMIZE.args(NAME));
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
+    query(tokens, "cat dog");
+    query(_DB_OPTIMIZE.args(NAME, true));
+    query(tokens, "cat dog");
     query(_DB_DROP.args(NAME));
   }
 
@@ -1334,13 +1402,14 @@ public final class DbModuleTest extends SandboxTest {
     final IOFile dir = new IOFile(sandbox(), "input");
     new IOFile(dir, "a.xml").write("<a/>");
     new IOFile(dir, "sub/b.xml").write("<b/>");
-    final String list = "string-join(" + _DB_LIST.args(NAME, "t") + ", ' ')";
+    // file systems do not guarantee the order in which directory entries are returned
+    final String list = "string-join(sort(" + _DB_LIST.args(NAME, "t") + "), ' ')";
     query(_DB_ADD.args(NAME, " <old/>", "t/old.xml"));
     query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "t"));
     query(_DB_PUT.args(NAME, dir.path(), "t"));
-    query(list, "t/a.xml t/sub/b.xml t");
+    query(list, "t t/a.xml t/sub/b.xml");
     query(_DB_PUT.args(NAME, dir.path(), "t"));
-    query(list, "t/a.xml t/sub/b.xml t");
+    query(list, "t t/a.xml t/sub/b.xml");
   }
 
   /** Test method. */

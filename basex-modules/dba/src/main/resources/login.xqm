@@ -43,7 +43,7 @@ function dba:login(
           form:field('Password:', (
             <input type='password' name='_pass'/>,
             ' ',
-            form:button('login', 'Login')
+            form:button('login', 'Log In')
           ))
         }
       </form>,
@@ -118,8 +118,8 @@ declare %private function dba:accept(
   session:set($config:SESSION-KEY, $name),
   admin:write-log('Login: ' || $name, 'DBA'),
 
-  (: redirect to supplied page or start page :)
-  web:redirect($page[.] otherwise head($config:VIEWS), html:parameters())
+  (: redirect to supplied page or start page; the prefix keeps the target on the DBA :)
+  web:redirect(`/dba/{ $page[.] otherwise head($config:VIEWS) }`, html:parameters())
 };
 
 (:~

@@ -2,6 +2,8 @@ package org.basex.build;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.function.*;
+
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
@@ -22,6 +24,10 @@ public final class CollectionPathTest extends SandboxTest {
   };
   /** Test ZIP. */
   private static final String ZIP = DIR + "xml.zip";
+  /** Paths with characters that are invalid or special in URIs. */
+  private static final String[] SPECIAL = {
+    "50%.xml", "[x].xml", "a#b#c.xml", "a#b.xml", "a b.xml", "%41.xml", "ä{}.xml", "c d.xml"
+  };
 
   /**
    * Creates an initial database.
@@ -30,6 +36,8 @@ public final class CollectionPathTest extends SandboxTest {
     execute(new CreateDB(NAME));
     for(final String file : FILES) execute(new Add(DIR, file));
     execute(new Add("test/zipped", ZIP));
+    for(final String path : SPECIAL) execute(new Add("special/" + path, "<a/>"));
+    execute(new Add("special/c%20d.xml", "<b/>"));
   }
 
   /**
@@ -62,5 +70,34 @@ public final class CollectionPathTest extends SandboxTest {
   @Test public void baseUri() {
     assertEquals('/' + NAME + '/' + FILES[1],
         query("base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))"));
+  }
+
+  /**
+   * Checks if the URIs of documents with special characters can be reused (GH-1172).
+   */
+  @Test public void reuseUris() {
+    final String docs = "collection('" + NAME + "/special')";
+    assertEquals(String.valueOf(SPECIAL.length + 1), query("count(" + docs + " ! base-uri(.))"));
+    assertEquals("true", query("every $d in " + docs + " satisfies ("
+        + "doc-available(document-uri($d)) and doc(base-uri($d)) is $d and "
+        + "collection(document-uri($d)) is $d)"));
+  }
+
+  /**
+   * Resolves percent-encoded references against database URIs (GH-1172).
+   */
+  @Test public void encodedUris() {
+    final String base = "'/" + NAME + "/special/x.xml'";
+    final Function<String, String> doc = href ->
+      query("name(doc(resolve-uri('" + href + "', " + base + "))/*)");
+    // literal path is favored, decoded path is the fallback
+    assertEquals("a", doc.apply("c d.xml"));
+    assertEquals("b", doc.apply("c%20d.xml"));
+    assertEquals("a", doc.apply("a%20b.xml"));
+    assertEquals("a", doc.apply("%C3%A4%7B%7D.xml"));
+    assertEquals("a", doc.apply("../special/%41.xml"));
+    assertEquals("1", query("count(collection(resolve-uri('a%20b.xml', " + base + ")))"));
+    assertEquals("true", query("doc-available(resolve-uri('50%25.xml', " + base + "))"));
+    assertEquals("false", query("doc-available(resolve-uri('%41%41.xml', " + base + "))"));
   }
 }

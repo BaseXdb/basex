@@ -74,8 +74,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   public final int put(final Item key) throws QueryException {
-    final int i = store(key);
-    return Math.abs(i);
+    return Math.abs(store(key));
   }
 
   @Override

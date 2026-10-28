@@ -185,12 +185,7 @@ public abstract class XQArray extends XQStruct {
    * @param job interruptible job
    * @return new array
    */
-  public XQArray reverseArray(final Job job) {
-    final long size = structSize();
-    final ArrayBuilder ab = new ArrayBuilder(job, size);
-    for(long i = size - 1; i >= 0; i--) ab.add(valueAt(i));
-    return ab.array(this);
-  }
+  public abstract XQArray reverseArray(Job job);
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
@@ -308,7 +303,7 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(SeqType.instanceOf(type, tp, coerce)) return true;
+    if(SeqType.keptStatic(type, tp, coerce)) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
@@ -326,8 +321,7 @@ public abstract class XQArray extends XQStruct {
         if(!mt.instance(value, coerce)) return false;
       }
       // remember the more specific type to skip subsequent checks
-      if(tp instanceof ArrayType && (coerce || !tp.coercive()) &&
-          mt.type.assignable()) refineType(tp);
+      if(tp instanceof ArrayType && tp.assignable(coerce)) refineType(tp);
     }
     return true;
   }

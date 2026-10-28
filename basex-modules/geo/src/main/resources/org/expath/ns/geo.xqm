@@ -1,5 +1,3 @@
-(: --- DELTA 6: module header — add GML version preservation + supported inputs summary --- :)
-
 (:~
  : BaseX Geo Module
  :
@@ -10,7 +8,7 @@
  : and uses the JTS and GeoTools libraries.
  :
  : The module supports geometries encoded as GML 2 and GML 3.2. Functions that
- : return GML elements preserve the input version: if the input geometry is 
+ : return GML elements preserve the input version: if the input geometry is
  : GML 2, results are returned in GML 2; if the input geometry is GML 3.2,
  : results are returned in GML 3.2.
  :
@@ -23,8 +21,8 @@
  :
  : @author BaseX Team, BSD License
  :)
- 
- module namespace geo = "http://expath.org/ns/geo";
+
+module namespace geo = "http://expath.org/ns/geo";
 
 (: Import Java class :)
 import module namespace java = "java:org.expath.ns.Geo";
@@ -43,7 +41,7 @@ declare function geo:area($geometry as element(*)) as xs:double {
 };
 
 (:~
- : Returns the WKB (Well-known Binary) representation of the supplied geometry 
+ : Returns the WKB (Well-known Binary) representation of the supplied geometry
  : <code>$geometry</code>.
  :
  : @param $geometry geometry element (GML)
@@ -277,7 +275,7 @@ declare function geo:exterior-ring($polygon as element(*)) as element(*) {
 
 (:~
  : Returns the Nth geometry in the geometry collection <code>$geometry</code>, in GML.
- : For geometries that are not collections, the geometry itself is returned if 
+ : For geometries that are not collections, the geometry itself is returned if
  : <code>$n</code> is <code>1</code>.
  :
  : @param $geometry geometry (collection or single geometry)
@@ -383,7 +381,7 @@ declare function geo:is-ring($line as element(*)) as xs:boolean {
 };
 
 (:~
- : Returns whether the supplied geometry <code>$geometry</code> is simple and has no anomalous 
+ : Returns whether the supplied geometry <code>$geometry</code> is simple and has no anomalous
  : geometric points (i.e., it does not self-intersect and does not pass through the same point
  : more than once; rings are allowed).
  :
@@ -397,7 +395,7 @@ declare function geo:is-simple($geometry as element(*)) as xs:boolean {
 };
 
 (:~
- : Returns the length of the supplied geometry <code>$geometry</code>. If the geometry is a point, 
+ : Returns the length of the supplied geometry <code>$geometry</code>. If the geometry is a point,
  : <code>0</code> is returned.
  :
  : @param $geometry geometry element (GML)
@@ -411,7 +409,7 @@ declare function geo:length($geometry as element(*)) as xs:double {
 
 (:~
  : Returns the number of geometries in the geometry collection
- : <code>$geometry</code>, in GML. For geometries that are not collections, 
+ : <code>$geometry</code>, in GML. For geometries that are not collections,
  : <code>1</code> is returned.
  :
  : This implementation is broader than the EXPath specification: it accepts all
@@ -488,7 +486,7 @@ declare function geo:point-n($line as element(*), $n as xs:integer) as element(*
 };
 
 (:~
- : Returns an interior point on the supplied geometry <code>$geometry</code>, as a 
+ : Returns an interior point on the supplied geometry <code>$geometry</code>, as a
  : <code>gml:Point</code>. An interior point is guaranteed to lie in the interior of the Geometry,
  : if it possible to calculate such a point exactly. Otherwise, the point may lie on the boundary
  : of the geometry.

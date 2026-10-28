@@ -121,6 +121,40 @@ public abstract class Serializer implements Closeable {
   }
 
   /**
+   * Serializes the items of an iterator to a byte array, as done by {@code fn:serialize}.
+   * @param iter items to serialize
+   * @param sopts serialization parameters
+   * @param err error to raise
+   * @param info input info (can be {@code null})
+   * @param qc query context
+   * @return serialized items
+   * @throws QueryException query exception
+   */
+  public static byte[] serialize(final Iter iter, final SerializerOptions sopts,
+      final QueryError err, final InputInfo info, final QueryContext qc) throws QueryException {
+
+    // use line feeds if no line ending was requested
+    if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
+      sopts.set(SerializerOptions.LINE_ENDING, "\n");
+    }
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      try(Serializer ser = unencoded(ao, sopts)) {
+        ser.qc(qc);
+        if(info != null) ser.sc(info.sc());
+        for(Item item; !ser.finished() && (item = qc.next(iter)) != null;) {
+          ser.serialize(item);
+        }
+      }
+      return ao.finish();
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
+    } catch(final IOException ex) {
+      throw err.get(info, ex);
+    }
+  }
+
+  /**
    * Returns the finalized serialization parameters.
    * @param sopts serialization parameters (can be {@code null})
    * @return serialization parameters

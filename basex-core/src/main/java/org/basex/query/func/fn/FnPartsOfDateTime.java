@@ -26,7 +26,7 @@ public final class FnPartsOfDateTime extends DateTimeFn {
       value.hasHours()   ? Itr.get(value.hour())    : Empty.VALUE,
       value.hasMinutes() ? Itr.get(value.minute())  : Empty.VALUE,
       value.hasSeconds() ? Dec.get(value.seconds()) : Empty.VALUE,
-      value.hasTz()      ? zon(value)               : Empty.VALUE
+      zon(value)
     );
   }
 }

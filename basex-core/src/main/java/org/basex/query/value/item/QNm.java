@@ -147,7 +147,7 @@ public final class QNm extends Item {
    * @param u URI to be set (can be {@code null}, or an empty or non-empty string)
    */
   public void uri(final byte[] u) {
-    uri = u == null ? null : normalize(u);
+    uri = u;
   }
 
   /**
@@ -280,7 +280,7 @@ public final class QNm extends Item {
     } else if(item.type.isUntyped() && sc != null) {
       final byte[] nm = trim(item.string(ii));
       if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
-      qnm = new QNm(nm, sc); // TODO: dynamic namespaces are needed here!
+      qnm = qc != null ? new QNm(nm, qc, sc) : new QNm(nm, sc);
       if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
       throw compareError(this, item, ii);
@@ -322,7 +322,7 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public byte[] unique() {
-    return uri == null ? name : internal(null, local(), uri);
+    return uri == null ? name : uri.length == 0 ? local() : eqName(uri, local());
   }
 
   /**
@@ -465,7 +465,7 @@ public final class QNm extends Item {
   public static byte[][] parseExpanded(final byte[] value, final boolean wc) {
     final Matcher matcher = EQNAME.matcher(Token.string(value));
     if(matcher.matches()) {
-      final byte[] uri = token(matcher.group(1)), name = token(matcher.group(2));
+      final byte[] uri = normalize(token(matcher.group(1))), name = token(matcher.group(2));
       if(wc && Token.eq(name, cpToken('*'))) return new byte[][] { null, uri };
       if(XMLToken.isQName(name)) return new byte[][] { name, uri };
     }
@@ -479,7 +479,14 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public static byte[] eqName(final byte[] uri, final byte[] local) {
-    return concat("Q{", uri, "}", local);
+    final int ul = uri.length;
+    final byte[] key = new byte[ul + 3 + local.length];
+    key[0] = 'Q';
+    key[1] = '{';
+    Array.copyFromStart(uri, ul, key, 2);
+    key[ul + 2] = '}';
+    Array.copyFromStart(local, local.length, key, ul + 3);
+    return key;
   }
 
   /**
@@ -490,36 +497,5 @@ public final class QNm extends Item {
    */
   public static String eqName(final String uri, final String local) {
     return Strings.concat("Q{", uri, "}", local);
-  }
-
-  /**
-   * Constructs an internal string representation for the components of a QName.
-   * @param prefix prefix (can be {@code null})
-   * @param local local name
-   * @param uri URI (can be {@code null})
-   * @return EQName representation
-   */
-  private static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
-    // return local name if no prefix and URI exist
-    final int ul = uri == null ? 0 : uri.length, pl = prefix == null ? 0 : prefix.length;
-    if(ul == 0 && pl == 0) return local;
-
-    final int l = (ul == 0 ? 0 : ul + 3) + (pl == 0 ? 0 : pl + 1) + local.length;
-    final byte[] key = new byte[l];
-    int i = 0;
-    if(ul != 0) {
-      key[i++] = 'Q';
-      key[i++] = '{';
-      Array.copyFromStart(uri, ul, key, i);
-      key[i + ul] = '}';
-      i += ul + 1;
-    }
-    if(pl != 0) {
-      Array.copyFromStart(prefix, pl, key, i);
-      key[i + pl] = ':';
-      i += pl + 1;
-    }
-    Array.copyFromStart(local, local.length, key, i);
-    return key;
   }
 }

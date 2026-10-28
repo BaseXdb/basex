@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -71,7 +72,7 @@ abstract class DbAccessFn extends StandardFunc {
    */
   final String toDbPathOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toDbPath(toString(expr, qc));
+    return item.isEmpty() ? null : toDbPath(toString(item, expr));
   }
 
   /**
@@ -98,13 +99,23 @@ abstract class DbAccessFn extends StandardFunc {
   }
 
   /**
-   * Checks create permissions.
+   * Checks admin permissions.
    * @param name name of database
    * @param qc query context
    * @throws QueryException query exception
    */
   protected final void checkCreate(final String name, final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.CREATE, name);
+    checkPerm(qc, Perm.ADMIN, name);
+  }
+
+  /**
+   * Checks the permissions for creating or modifying backups.
+   * @param name name of database or backup (empty string for general data)
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void checkBackup(final String name, final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.ADMIN, Databases.name(name));
   }
 
   @Override

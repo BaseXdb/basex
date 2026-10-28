@@ -24,12 +24,17 @@ public final class Wildcard extends RegExp {
   }
 
   /**
-   * Getter for the lazily initialized wildcard instances.
+   * Returns the wildcard instance for the specified flag.
    * @param dotAll match-all flag
    * @return instance
    */
   public static Wildcard get(final boolean dotAll) {
     return dotAll ? ALL : NOLF;
+  }
+
+  @Override
+  int minLength() {
+    return 1;
   }
 
   @Override

@@ -39,9 +39,7 @@ public final class BaseXButton extends JButton {
       else dialog.action(e.getSource());
     });
     addKeyListener((KeyPressedListener) e -> {
-      if(BaseXKeys.ESCAPE.is(e)) {
-        dialog.cancel();
-      } else if(BaseXKeys.NEXTCHAR.is(e) || BaseXKeys.NEXTLINE.is(e)) {
+      if(BaseXKeys.NEXTCHAR.is(e) || BaseXKeys.NEXTLINE.is(e)) {
         transferFocus();
       } else if(BaseXKeys.PREVCHAR.is(e) || BaseXKeys.PREVLINE.is(e)) {
         transferFocusBackward();

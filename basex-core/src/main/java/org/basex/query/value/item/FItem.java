@@ -12,7 +12,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -20,7 +19,7 @@ import org.basex.util.*;
 
 /**
  * Abstract super class for function items.
- * This class is inherited by {@link XQMap}, {@link Array}, and {@link FuncItem}.
+ * This class is inherited by {@link XQStruct}, {@link FuncItem} and {@link XQJava}.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -122,7 +121,7 @@ public abstract class FItem extends Item implements XQFunction {
    * @return function body
    * @throws QueryException query exception
    */
-  public final Expr funcBody(final VarScope vs, final Expr[] args, final SeqType declType,
+  private Expr funcBody(final VarScope vs, final Expr[] args, final SeqType declType,
       final CompileContext cc, final InputInfo ii) throws QueryException {
 
     try {

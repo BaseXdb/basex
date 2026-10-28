@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -120,11 +121,11 @@ public abstract class KeyedFilter<C> extends Filter {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     try {
-      final int vs = (int) value.size();
-      for(int p = 0; p < vs; p++) {
+      int p = 0;
+      for(final Item item : value) {
         qc.checkStop();
-        qf.value = value.itemAt(p);
-        if(!keys.test(p, kx.atomIter(qc, info))) return false;
+        qf.value = item;
+        if(!keys.test(p++, kx.atomIter(qc, info))) return false;
       }
     } finally {
       qf.value = qv;

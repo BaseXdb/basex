@@ -124,9 +124,8 @@ public final class List extends Arr {
       final Expr expr = e < el ? exprs[e] : null;
       long mn = Long.MIN_VALUE, mx = 0;
       if(expr instanceof final Itr itr && itr.type == BasicType.INTEGER) {
-        final long l = itr.itr();
-        mn = l;
-        mx = l;
+        mn = itr.itr();
+        mx = mn;
       } else if(expr instanceof final RangeSeq rs && rs.ascending()) {
         mn = rs.min();
         mx = rs.max();
@@ -241,10 +240,10 @@ public final class List extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E[A, B] → E[A | B]
       expr = toUnion(cc);
-    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET)) {
+    } else if(mode.deduplicating()) {
       // (A, B) = 'X' → (A | B) = 'X'
       if(mode == Simplify.SET) expr = toUnion(cc);
       if(expr != this) return cc.simplify(this, expr, mode);

@@ -88,7 +88,7 @@ public final class FileReadTextLines extends FileReadFn {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-   final Long offset = toLongOrNull(arg(3), qc);
+    final Long offset = toLongOrNull(arg(3), qc);
     final Long length = toLongOrNull(arg(4), qc);
 
     final long off = offset != null ? offset : 1;

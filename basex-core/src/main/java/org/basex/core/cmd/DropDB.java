@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
@@ -37,7 +38,7 @@ public final class DropDB extends ACreate {
     }
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.databases.list(context.user(), pattern);
+    final StringList dbs = context.databases.list(context.user(), Perm.ADMIN, pattern);
     if(dbs.isEmpty()) return info(NO_DB_DROPPED);
 
     // loop through all databases

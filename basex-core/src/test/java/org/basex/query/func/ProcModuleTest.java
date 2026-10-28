@@ -167,7 +167,7 @@ public final class ProcModuleTest extends SandboxTest {
 
     // the process is terminated when the timeout is exceeded
     error(_PROC_SYSTEM.args("java", args, " { 'timeout': 1 }"), PROC_TIMEOUT);
-    Performance.sleep(1500);
+    Performance.sleep(1000);
     assertFalse(file.exists());
   }
 

@@ -46,8 +46,6 @@ public final class QueryJobSpec {
     this.resolver = scheduled(options) ? null : resolver;
     query = content.toString();
     simple = content.url().isEmpty();
-    function = null;
-    args = null;
   }
 
   /**

@@ -18,8 +18,13 @@ import org.junit.jupiter.params.provider.MethodSource;
  * @author Christian Gruen
  */
 public final class UpdIndexTest extends SandboxTest {
+  /** Number of steps. */
+  private static final int STEPS = 10;
+  /** Maximum number of entries. */
+  private static final int MAX = 2000 / STEPS;
+
   /**
-   * Test parameters.
+   * Test parameters: incremental index update flag, main memory flag, full-text index flag.
    * @return parameters
    */
   public static Stream<Arguments> params() {
@@ -32,18 +37,13 @@ public final class UpdIndexTest extends SandboxTest {
     );
   }
 
-  /** Number of steps. */
-  private static final int STEPS = 10;
-  /** Maximum number of entries. */
-  private static final int MAX = 2000 / STEPS;
-
   /**
    * Initializes the test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
    * @param ftindex full-text index flag.
    */
-  private void init(final boolean updindex, final boolean mainmem, final boolean ftindex) {
+  private static void init(final boolean updindex, final boolean mainmem, final boolean ftindex) {
     set(MainOptions.UPDINDEX, updindex);
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.TOKENINDEX, true);

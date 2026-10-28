@@ -59,10 +59,7 @@ public interface ClientInfo {
 
     // check for authenticated user
     final User user = ctx.user();
-    if(user != null) return user.name();
-
-    // user is unknown
-    return null;
+    return user != null ? user.name() : null;
   }
 
   /**

@@ -100,7 +100,7 @@ public final class JobPool {
   /**
    * Wakes threads that wait for a job or task to complete.
    */
-  public void notifyChange() {
+  void notifyChange() {
     synchronized(monitor) {
       monitor.notifyAll();
     }
@@ -163,7 +163,7 @@ public final class JobPool {
    * Discards a result after the timeout.
    * @param job job
    */
-  public void scheduleResult(final Job job) {
+  void scheduleResult(final Job job) {
     schedule(() -> results.remove(job.jc().id()), timeout);
   }
 

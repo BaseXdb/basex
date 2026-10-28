@@ -23,15 +23,13 @@ public final class FnExactlyOne extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // if possible, retrieve single item
     final Expr input = arg(0);
-    Item item;
     if(input.seqType().zeroOrOne()) {
-      item = input.item(qc, info);
+      final Item item = input.item(qc, info);
       if(item != Empty.VALUE) return item;
     } else {
       final Iter iter = input.iter(qc);
-      item = iter.next();
-      if(item != null && iter.next() != null) item = null;
-      if(item != null) return item;
+      final Item item = iter.next();
+      if(item != null && iter.next() == null) return item;
     }
     throw EXACTLYONE.get(info);
   }

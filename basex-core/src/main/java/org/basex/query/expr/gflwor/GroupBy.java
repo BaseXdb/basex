@@ -142,7 +142,6 @@ public final class GroupBy extends Clause {
           // find the group for this key
           final Group fst;
           Group grp = null;
-          // no collations, so we can use hashing
           for(Group g = fst = map.get(hash); g != null; g = g.next) {
             if(eq(key, g.key, deeps)) {
               grp = g;
@@ -154,8 +153,7 @@ public final class GroupBy extends Clause {
           if(grp == null) {
             // new group, add it to the list
             final ValueBuilder[] ngs = new ValueBuilder[pl];
-            final int nl = ngs.length;
-            for(int n = 0; n < nl; n++) ngs[n] = new ValueBuilder(qc);
+            for(int n = 0; n < pl; n++) ngs[n] = new ValueBuilder(qc);
             grp = new Group(key, ngs);
             grps.add(grp);
 
@@ -170,9 +168,7 @@ public final class GroupBy extends Clause {
           }
 
           // add values of non-grouping variables to the group
-          for(int g = 0; g < pl; g++) {
-            grp.ngv[g].add(preExpr[g].value(qc));
-          }
+          for(int g = 0; g < pl; g++) grp.ngv[g].add(preExpr[g].value(qc));
         }
 
         // we're finished, copy the array so the list can be garbage-collected
@@ -314,8 +310,8 @@ public final class GroupBy extends Clause {
   GroupSpec group() {
     if(specs.length == 1 && post.length == 0) {
       final GroupSpec spec = specs[0];
-      final SeqType st = spec.expr.seqType();
-      if(spec.coll == null && spec.var.declType == null && st.atomOcc() == Occ.EXACTLY_ONE) {
+      if(spec.coll == null && spec.var.declType == null &&
+          spec.expr.seqType().atomOcc() == Occ.EXACTLY_ONE) {
         return spec;
       }
     }

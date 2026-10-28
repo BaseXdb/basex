@@ -1,6 +1,7 @@
 package org.basex.util.list;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -27,16 +28,6 @@ public final class IntList extends ElementList {
    */
   public IntList(final long capacity) {
     list = new int[Array.initialCapacity(capacity)];
-  }
-
-  /**
-   * Constructor, specifying a resize factor. Smaller values are more memory-saving,
-   * while larger values will provide better performance.
-   * @param factor resize factor
-   */
-  public IntList(final double factor) {
-    this();
-    this.factor = (byte) Math.max(10, (byte) (factor * 10));
   }
 
   /**
@@ -154,20 +145,6 @@ public final class IntList extends ElementList {
   }
 
   /**
-   * Removes all occurrences of the specified element from the list.
-   * @param element element to be removed
-   */
-  public void removeAll(final int element) {
-    final int[] lst = list;
-    final int s = size;
-    int ns = 0;
-    for(int i = 0; i < s; i++) {
-      if(lst[i] != element) lst[ns++] = lst[i];
-    }
-    size = ns;
-  }
-
-  /**
    * Removes the element at the specified position.
    * @param index index of the element to remove
    * @return removed element
@@ -281,6 +258,89 @@ public final class IntList extends ElementList {
   public IntList sort() {
     Arrays.sort(list, 0, size);
     return this;
+  }
+
+  /**
+   * Reverses the order of the elements.
+   * @return self reference
+   */
+  public IntList reverse() {
+    final int[] lst = list;
+    for(int l = 0, r = size - 1; l < r; l++, r--) {
+      final int tmp = lst[l];
+      lst[l] = lst[r];
+      lst[r] = tmp;
+    }
+    return this;
+  }
+
+  /**
+   * Stably sorts the data with the specified comparator.
+   * @param comparator comparator
+   */
+  public void sort(final IntBinaryOperator comparator) {
+    final int s = size, run = 32;
+    int[] lst = list;
+    // strictly descending order: reverse data (equal values must not be swapped)
+    if(descending(comparator)) {
+      reverse();
+      return;
+    }
+
+    // binary insertion sort for small runs
+    for(int r = 0; r < s; r += run) {
+      final int e = Math.min(r + run, s);
+      for(int i = r + 1; i < e; i++) {
+        final int v = lst[i];
+        if(comparator.applyAsInt(lst[i - 1], v) <= 0) continue;
+        int lo = r, hi = i - 1;
+        while(lo < hi) {
+          final int mid = lo + hi >>> 1;
+          if(comparator.applyAsInt(v, lst[mid]) < 0) hi = mid;
+          else lo = mid + 1;
+        }
+        System.arraycopy(lst, lo, lst, lo + 1, i - lo);
+        lst[lo] = v;
+      }
+    }
+    // skip merging if all runs are ordered
+    int r = run;
+    while(r < s && comparator.applyAsInt(lst[r - 1], lst[r]) <= 0) r += run;
+    if(r >= s) return;
+
+    // merge runs; ordered neighbors are copied
+    int[] tmp = new int[s];
+    for(int w = run; w < s; w <<= 1) {
+      for(int l = 0; l < s; l += w << 1) {
+        final int m = Math.min(l + w, s), e = Math.min(l + (w << 1), s);
+        if(m == e || comparator.applyAsInt(lst[m - 1], lst[m]) <= 0) {
+          System.arraycopy(lst, l, tmp, l, e - l);
+        } else {
+          int a = l, b = m, t = l;
+          while(a < m && b < e) {
+            tmp[t++] = comparator.applyAsInt(lst[a], lst[b]) <= 0 ? lst[a++] : lst[b++];
+          }
+          System.arraycopy(lst, a, tmp, t, m - a);
+          System.arraycopy(lst, b, tmp, t + m - a, e - b);
+        }
+      }
+      final int[] swap = lst;
+      lst = tmp;
+      tmp = swap;
+    }
+    list = lst;
+  }
+
+  /**
+   * Checks if the data is in strictly descending order.
+   * @param comparator comparator
+   * @return result of check
+   */
+  private boolean descending(final IntBinaryOperator comparator) {
+    final int s = size;
+    int d = 1;
+    while(d < s && comparator.applyAsInt(list[d - 1], list[d]) > 0) d++;
+    return d > 1 && d == s;
   }
 
   /**
@@ -402,7 +462,7 @@ public final class IntList extends ElementList {
     if(length < 7) {
       for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
-          final double h = values[j - 1] - values[j];
+          final int h = Double.compare(values[j - 1], values[j]);
           if(asc ? h < 0 : h > 0) break;
           swap(j, j - 1, values);
         }
@@ -427,13 +487,13 @@ public final class IntList extends ElementList {
     int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final double h = values[b] - v;
+        final int h = Double.compare(values[b], v);
         if(asc ? h > 0 : h < 0) break;
         if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final double h = values[c] - v;
+        final int h = Double.compare(values[c], v);
         if(asc ? h < 0 : h > 0) break;
         if(h == 0) swap(c, d--, values);
         --c;
@@ -581,8 +641,7 @@ public final class IntList extends ElementList {
    * @return result
    */
   private static int cmpNum(final byte[] value1, final byte[] value2) {
-    final double n = Token.toDouble(value1) - Token.toDouble(value2);
-    return n > 0 ? 1 : n < 0 ? -1 : 0;
+    return Double.compare(Token.toDouble(value1), Token.toDouble(value2));
   }
 
   /**

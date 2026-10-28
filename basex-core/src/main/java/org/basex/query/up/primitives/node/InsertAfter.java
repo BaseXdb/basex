@@ -1,11 +1,9 @@
 package org.basex.query.up.primitives.node;
 
 import org.basex.data.*;
-import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -27,19 +25,9 @@ public final class InsertAfter extends NodeCopy {
   }
 
   @Override
-  public void merge(final Update update) {
-    final GNodeList newInsert = ((NodeCopy) update).nodes;
-    for(final GNode node : newInsert) nodes.add(node);
-  }
-
-  @Override
   public void addAtomics(final AtomicUpdateCache auc) {
     final int k = data.kind(pre);
     final int s = data.size(pre, k);
     auc.addInsert(pre + s, data.parent(pre, k), insseq);
-  }
-
-  @Override
-  public void update(final NamePool pool) {
   }
 }

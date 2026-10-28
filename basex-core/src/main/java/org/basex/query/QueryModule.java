@@ -33,9 +33,9 @@ import org.basex.query.iter.*;
  * connections, resources, etc. that eventually need to be closed.
  *
  * <p>Please visit our documentation to find more details on
- * <a href="https://docs.basex.org/wiki/Packaging">Packaging</a>,
- * <a href="https://docs.basex.org/wiki/Java_Bindings">Java Bindings</a> and
- * <a href="https://docs.basex.org/wiki/User_Management">User Management</a>.
+ * <a href="https://docs.basex.org/main/Repository#packaging">Packaging</a>,
+ * <a href="https://docs.basex.org/main/Java_Bindings">Java Bindings</a> and
+ * <a href="https://docs.basex.org/main/User_Management">User Management</a>.
  * The XQuery 3.0 specification gives more insight into
  * <a href="https://www.w3.org/TR/xpath-functions-30/#properties-of-functions">function
  * properties</a>.</p>
@@ -54,8 +54,6 @@ public abstract class QueryModule {
     READ,
     /** Write permissions. */
     WRITE,
-    /** Create permissions. */
-    CREATE,
     /** Admin permissions. */
     ADMIN
   }

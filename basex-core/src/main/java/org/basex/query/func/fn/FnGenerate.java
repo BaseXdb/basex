@@ -26,9 +26,14 @@ public final class FnGenerate extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        final Expr expr = item == null ? arg(0) : invoke(step, args.set(0, item).inc(), qc);
-        item = expr.item(qc, info);
-        return item != Empty.VALUE ? item : null;
+        if(item == null) {
+          item = arg(0).item(qc, info);
+          if(item == Empty.VALUE) throw argTypeError(item, BasicType.ITEM, arg(0));
+        } else {
+          item = invoke(step, args.set(0, item).inc(), qc).item(qc, info);
+          if(item == Empty.VALUE) return null;
+        }
+        return item;
       }
     };
   }
@@ -37,8 +42,6 @@ public final class FnGenerate extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr init = arg(0), step = arg(1);
     SeqType st = init.seqType();
-    if(st.zero()) return init;
-
     if((step instanceof FuncItem || step instanceof Closure) && st.one()) {
       SeqType ost;
       do {
@@ -57,7 +60,7 @@ public final class FnGenerate extends StandardFunc {
     final Expr init = arg(0), step = arg(1);
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
+    if(mode.deduplicating() ||
         mode == Simplify.PREDICATE && seqType().instanceOf(Types.XNODE_ZM)) {
       // 'x' = generate('y', fn { 'y' }) → 'x' = 'y'
       // distinct-values(generate(1, identity#1)) → distinct-values(1)

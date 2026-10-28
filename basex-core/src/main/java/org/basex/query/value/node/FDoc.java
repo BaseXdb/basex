@@ -2,7 +2,6 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.Arrays;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -129,12 +128,6 @@ public final class FDoc extends FNode {
   @Override
   public byte[] xdmInfo() {
     return new ByteList().add(typeId().asByte()).add(uri).add(0).finish();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FDoc f && Arrays.equals(children, f.children) &&
-        Token.eq(uri, f.uri) && docUri == f.docUri && super.equals(obj);
   }
 
   @Override

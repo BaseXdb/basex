@@ -37,16 +37,4 @@ public enum Method {
   Method(final boolean body) {
     this.body = body;
   }
-
-  /**
-   * Returns an enum for the specified string.
-   * @param name method name
-   * @return enum or {@code null}
-   */
-  public static Method get(final String name) {
-    for(final Method method : values()) {
-      if(method.name().equals(name)) return method;
-    }
-    return null;
-  }
 }

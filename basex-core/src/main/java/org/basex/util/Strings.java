@@ -238,10 +238,8 @@ public final class Strings {
    * @return capitalized string
    */
   public static String capitalize(final String string) {
-    final StringBuilder sb = new StringBuilder();
-    if(!string.isEmpty())
-      sb.append(Character.toUpperCase(string.charAt(0))).append(string.substring(1));
-    return sb.toString();
+    return string.isEmpty() ? string :
+      Character.toUpperCase(string.charAt(0)) + string.substring(1);
   }
 
   /**
@@ -261,7 +259,7 @@ public final class Strings {
    * @return result of check
    */
   public static boolean startsWith(final String string, final char ch) {
-    return string.indexOf(ch) == 0;
+    return !string.isEmpty() && string.charAt(0) == ch;
   }
 
   /**
@@ -345,7 +343,7 @@ public final class Strings {
 
   /**
    * Converts a URI to a directory path.
-   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * See https://docs.basex.org/main/Java_Bindings#uri_rewriting for details.
    * @param uri namespace URI
    * @return converted path
    */

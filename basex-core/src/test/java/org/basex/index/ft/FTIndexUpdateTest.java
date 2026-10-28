@@ -553,7 +553,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
-   * The index is dropped if the lexer cannot be created.
+   * Updates use the stopwords stored in the database.
    * @throws IOException I/O exception
    */
   @Test public void stopwords() throws IOException {
@@ -564,11 +564,11 @@ public final class FTIndexUpdateTest extends SandboxTest {
     search("one");
     search("two", "one two");
     assertTrue(sw.delete());
-    // the update succeeds, the index is dropped
-    query("replace value of node " + _DB_GET.args(NAME) + "//a with 'three'");
-    ftindex(false);
-    query(_DB_GET.args(NAME) + "//a[text() contains text 'three']/string()", "three");
-    assertEquals(0, segments());
+    // the update succeeds, the index is kept
+    query("replace value of node " + _DB_GET.args(NAME) + "//a with 'one three'");
+    ftindex(true);
+    search("one");
+    search("three", "one three");
   }
 
   /**

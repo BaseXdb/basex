@@ -23,7 +23,11 @@ function dba:create() {
   utils:dispatch($dba:CAT, fn($args) { {
     (: a supplied id selects the new job; a generated one is not known before it is started :)
     'params': { 'job': $args?id }[$args?id],
-    'info'  : 'Job was started.',
+    'info'  : switch () {
+      case $args?service = 'true' return 'Service was registered.'
+      case exists(($args?start, $args?cron)[.]) return 'Job was scheduled.'
+      default return 'Job was started.'
+    },
     'run'   : %updating fn() { dba:start-job($args) }
   } })
 };
@@ -97,8 +101,8 @@ declare %private function dba:start-job(
   (: the scheduling options are only supplied if they were filled in: an empty string is no
      valid start time, interval or cron expression :)
   let $service := $args?service = 'true'
-  let $options := map:merge((
-    { 'base-uri': dba:base-uri() },
+  let $options := {
+    'base-uri': dba:base-uri(),
     (: a job of the DBA is bound by the same limits as its other queries; a service outlives
        the session that registers it, and must not carry its restrictions :)
     config:limits()[not($service)],
@@ -107,7 +111,7 @@ declare %private function dba:start-job(
     for $name in ('id', 'start', 'interval', 'cron', 'end')
     for $value in $args?$name[.]
     return { $name: $value }
-  ))
+  }
   return void(job:eval($args?query, (), $options))
 };
 

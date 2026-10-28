@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -54,7 +55,7 @@ public final class CreateBackup extends ABackup {
 
     // retrieve all databases
     final StringList names = pattern.isEmpty() ? new StringList("") :
-      context.databases.list(context.user(), pattern);
+      context.databases.list(context.user(), Perm.ADMIN, pattern);
     if(names.isEmpty()) return error(DB_NOT_FOUND_X, pattern);
 
     // loop through all databases

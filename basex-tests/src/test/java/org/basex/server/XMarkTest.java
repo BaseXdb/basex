@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import static org.basex.core.Text.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.*;
@@ -114,7 +115,7 @@ public final class XMarkTest extends SandboxTest {
     + "</na> </result>"
   };
 
-  /** Server flag. */
+  /** Server instance ({@code null} if a server was already running). */
   private static BaseXServer server;
 
   /**
@@ -123,13 +124,12 @@ public final class XMarkTest extends SandboxTest {
    */
   @BeforeAll public static void init() throws Exception {
     // only start server if it is not already running
-    if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
-      server = createServer();
+    if(!BaseXServer.ping(S_LOCALHOST, DB_PORT)) server = createServer();
 
     try(ClientSession cs = createClient(UserText.ADMIN, NAME)) {
       cs.execute("CREATE DB " + DB + " " + DBFILE);
-      cs.execute("CREATE USER xmark xmark");
-      cs.execute("GRANT read ON " + DB + " TO xmark");
+      cs.execute(new CreateUser(USER, USER));
+      cs.execute(new Grant("read", USER, DB));
       // report what is measured: the runtimes are meaningless without the input size
       Util.println("Input: " + DBFILE);
       Util.println("Size: " + cs.execute("XQUERY db:property('" + DB + "', 'size')") + " bytes, " +
@@ -146,8 +146,7 @@ public final class XMarkTest extends SandboxTest {
       cs.execute("DROP DB " + DB);
       cs.execute("DROP USER " + USER);
     } finally {
-      // only stop server if it has not been running before starting the tests
-      if(server != null) server.stop();
+      stopServer(server);
     }
   }
 

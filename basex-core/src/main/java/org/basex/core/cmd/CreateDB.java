@@ -45,6 +45,8 @@ public final class CreateDB extends ACreate {
   protected boolean run() {
     final String name = args[0];
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
+    // check local permissions
+    if(!create(name)) return error(PERM_REQUIRED_X, Perm.ADMIN);
 
     // choose parser and input
     IO source;
@@ -160,7 +162,7 @@ public final class CreateDB extends ACreate {
       final MainOptions options, final boolean mainmem) throws IOException {
 
     // check permissions
-    if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
+    if(!ctx.user().has(Perm.ADMIN)) throw new BaseXException(PERM_REQUIRED_X, Perm.ADMIN);
 
     // main-memory instances are not shared and can be created in parallel
     if(mainmem) return index(MemBuilder.build(name, parser), ctx);

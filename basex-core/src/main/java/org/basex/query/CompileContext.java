@@ -135,6 +135,30 @@ public final class CompileContext {
     public boolean atomizing() {
       return oneOf(DATA, STRING, NUMBER);
     }
+
+    /**
+     * Indicates if the value is converted to a string.
+     * @return result of check
+     */
+    public boolean stringifying() {
+      return oneOf(STRING, STRING_VALUE);
+    }
+
+    /**
+     * Indicates if duplicates are irrelevant.
+     * @return result of check
+     */
+    public boolean deduplicating() {
+      return oneOf(DISTINCT, SET);
+    }
+
+    /**
+     * Indicates if the order of the results is irrelevant.
+     * @return result of check
+     */
+    public boolean unordered() {
+      return oneOf(SET, COUNT, EXISTENCE);
+    }
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */

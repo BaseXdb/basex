@@ -25,7 +25,7 @@ public final class Part1 extends Main {
     // Connect and disconnect
     info("Connect and disconnect");
 
-    // Default Username and Password
+    // Username and password (adjust the credentials to those of your server)
     XQDataSource xqs = new BaseXXQDataSource();
     XQConnection conn = xqs.getConnection("admin", "admin");
     info("Connected.");

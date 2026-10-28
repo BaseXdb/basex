@@ -160,10 +160,7 @@ public abstract class Filter extends Preds {
       }
 
       // (1 to 10)[$boolean] → if($boolean) then (1 to 10) else ()
-      if(toIf) {
-        final Expr iff = new If(info, first, root).optimize(cc);
-        return cc.replaceWith(this, iff);
-      }
+      if(toIf) return cc.replaceWith(this, new If(info, first, root).optimize(cc));
 
       // unroll filters with few items: (1, 2)[. = 1] → 1[. = 1], 2[. = 1]
       final ExprList unroll = cc.unroll(root, false);
@@ -411,10 +408,10 @@ public abstract class Filter extends Preds {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.conditional()) {
       // E[a[. = 'x']] → E[a = 'x']
       expr = flattenEbv(root, true, cc);
-    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) && !mayBePositional()) {
+    } else if(mode.deduplicating() && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
     } else if(mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && exprs.length == 1 &&
@@ -424,6 +421,7 @@ public abstract class Filter extends Preds {
     }
     return cc.simplify(this, expr, mode);
   }
+
   @Override
   public final boolean ddo() {
     return root.ddo();

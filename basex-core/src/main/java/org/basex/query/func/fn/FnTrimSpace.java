@@ -27,7 +27,7 @@ public final class FnTrimSpace extends ContextFn {
 
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item item = contextArg(qc).atomItem(qc, info);
+    final Item item = atomArg(qc);
     final byte[] value = item.isEmpty() ? EMPTY : item.string(info);
     final Side side = options(1, TrimOptions::new, qc).get(TrimOptions.SIDE);
 
@@ -39,6 +39,11 @@ public final class FnTrimSpace extends ContextFn {
       while(e > s && ws(value[e - 1])) e--;
     }
     return Str.get(substring(value, s, e));
+  }
+
+  @Override
+  protected boolean stringContext() {
+    return true;
   }
 
   @Override
@@ -64,7 +69,7 @@ public final class FnTrimSpace extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && arg(1) instanceof Value) {
+    if(mode.conditional() && arg(1) instanceof Value) {
       // $node[trim-space(.)] → $node[normalize-space(.)]
       expr = cc.function(Function.NORMALIZE_SPACE, info, arg(0));
     }

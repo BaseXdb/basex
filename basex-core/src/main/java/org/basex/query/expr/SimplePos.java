@@ -137,9 +137,10 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public Expr invert(final CompileContext cc) throws QueryException {
     // not(pos: $p) → position() != $p, not(pos: 1, $p) → position() > $p
-    if(exprs[0].seqType().one()) {
+    if(Checks.all(exprs, expr -> expr.seqType().one())) {
       final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
       if(exact()) return new CmpG(info, pos.get(), exprs[0], CmpOp.NE).optimize(cc);
+      if(Cmp.mayBeNaN(exprs)) return null;
       if(exprs[0] == Itr.ONE) return new CmpG(info, pos.get(), exprs[1], CmpOp.GT).optimize(cc);
       if(exprs[1] == Itr.MAX) return new CmpG(info, pos.get(), exprs[0], CmpOp.LT).optimize(cc);
     }

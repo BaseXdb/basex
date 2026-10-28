@@ -75,9 +75,6 @@ public final class IntMap extends IntSet {
 
   @Override
   public String toString() {
-    final List<Object> k = new ArrayList<>(), v = new ArrayList<>();
-    for(final int key : keys) k.add(key);
-    for(final int value : values) v.add(value);
-    return toString(k.toArray(), v.toArray());
+    return toString(Arrays.stream(keys).boxed().toArray(), Arrays.stream(values).boxed().toArray());
   }
 }

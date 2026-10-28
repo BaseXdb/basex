@@ -28,7 +28,7 @@ abstract class BinFn extends StandardFunc {
   private static final byte[][] LITTLE = tokens("least-significant-first", "little-endian", "LE");
 
   /**
-   * Unpacks a double.
+   * Unpacks a floating-point number.
    * @param qc query context
    * @param len length of entry
    * @return result
@@ -49,7 +49,7 @@ abstract class BinFn extends StandardFunc {
   }
 
   /**
-   * Unpacks an unsigned integer.
+   * Unpacks an integer.
    * @param qc query context
    * @param signed signed flag
    * @return result
@@ -66,9 +66,7 @@ abstract class BinFn extends StandardFunc {
     final int o = bounds[0], l = bounds[1];
     if(l == 0) return Itr.ZERO;
 
-    final byte[] result = new byte[l];
-    ByteBuffer.wrap(bytes, o, l).order(order).get(result);
-
+    final byte[] result = Arrays.copyOfRange(bytes, o, o + l);
     if(order == ByteOrder.LITTLE_ENDIAN) {
       for(int i = 0, j = l - 1; i < j; i++, j--) {
         final byte tmp = result[i];
@@ -167,7 +165,7 @@ abstract class BinFn extends StandardFunc {
     }
     final int sz;
     if(length != null) {
-      if(length < 0) throw BIN_NS_X.get(info, offset);
+      if(length < 0) throw BIN_NS_X.get(info, length);
       if(length > size - of) {
         throw BIN_IOOR_X_X.get(info, BigInteger.valueOf(of).add(BigInteger.valueOf(length)), size);
       }
@@ -177,7 +175,6 @@ abstract class BinFn extends StandardFunc {
     }
     return new int[] { of, sz };
   }
-
 
   /**
    * Returns digits in a string to be converted to a byte array.

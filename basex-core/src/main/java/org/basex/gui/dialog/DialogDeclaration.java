@@ -45,6 +45,8 @@ public final class DialogDeclaration extends BaseXDialog {
   private boolean jumping;
   /** Last filter input. */
   private String last;
+  /** Caret position before the dialog was opened. */
+  private int start;
 
   /**
    * Default constructor.
@@ -77,7 +79,7 @@ public final class DialogDeclaration extends BaseXDialog {
       final int index = list.locationToIndex(e.getPoint());
       if(index == -1) return;
       list.setSelectedIndex(index);
-      if(e.getClickCount() == 2) close();
+      if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) close();
     });
     list.addListSelectionListener(e -> {
       final Declaration declaration = declaration();
@@ -136,6 +138,13 @@ public final class DialogDeclaration extends BaseXDialog {
   }
 
   @Override
+  public void cancel() {
+    // return to the original caret position
+    if(jumping) jump.accept(start);
+    super.cancel();
+  }
+
+  @Override
   public void action(final Object source) {
     final String text = filter.getText();
     if(!text.equals(last)) {
@@ -154,6 +163,7 @@ public final class DialogDeclaration extends BaseXDialog {
   private void init(final List<Declaration> decls, final int pos, final IntConsumer consumer) {
     // the preselected declaration is not jumped to: the caret is already there
     jumping = false;
+    start = pos;
     declarations = decls;
     jump = consumer;
     last = "";

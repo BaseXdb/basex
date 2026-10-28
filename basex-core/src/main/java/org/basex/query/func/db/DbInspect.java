@@ -25,7 +25,7 @@ public final class DbInspect extends DbAccessFn {
     final ArrayList<Issue> issues = inspection.issues();
 
     final RecordType type = Records.INSPECTION_ISSUE.get();
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, issues.size());
     for(final Issue issue : issues) {
       vb.add(XQMap.get(type, Str.get(issue.check().toString()), Itr.get(issue.count()),
           issue.first() == -1 ? Empty.VALUE : Itr.get(issue.first())));

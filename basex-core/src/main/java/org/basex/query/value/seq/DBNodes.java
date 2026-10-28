@@ -105,7 +105,7 @@ public final class DBNodes extends DBNodeSeq {
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
    * @param pre PRE value
-   * @return position, or {@code -1}
+   * @return position, or a negative value if the PRE value was not found
    */
   public int find(final int pre) {
     return Arrays.binarySearch(sorted(), pre);
@@ -124,7 +124,7 @@ public final class DBNodes extends DBNodeSeq {
 
   /**
    * Merges the specified array with the existing PRE nodes.
-   * @param pre PRE value
+   * @param pre PRE values
    */
   public void union(final int[] pre) {
     pres = union(pres, pre);

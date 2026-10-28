@@ -211,7 +211,7 @@ public abstract class JavaCall extends Arr {
   final QueryException executionError(final Throwable th, final Object... args) {
     final Throwable root = Util.rootException(th);
     return root instanceof final QueryException qe ? qe.info(info) :
-      JAVAEXEC_X_X_X.get(info, root, name(), JavaCall.argTypes(args));
+      JAVAEXEC_X_X_X.get(info, root, name(), argTypes(args));
   }
 
   // STATIC METHODS ===============================================================================
@@ -282,7 +282,7 @@ public abstract class JavaCall extends Arr {
         // string array
         if(object instanceof final String[] values) {
           final TokenList list = new TokenList(values.length);
-          for(final String string : values) list.add(string);
+          for(final String string : values) list.add(Str.token(string, info));
           return StrSeq.get(list);
         }
         // any other array (including nested ones)
@@ -309,7 +309,7 @@ public abstract class JavaCall extends Arr {
           }
           vb.add(mb.map());
         } else {
-          vb.add(Str.get(object.toString()));
+          vb.add(Str.get(object.toString(), info));
         }
         return vb.value();
       }
@@ -380,8 +380,8 @@ public abstract class JavaCall extends Arr {
           clazz = modules.findClass(className);
         } catch(final ClassNotFoundException ignore) {
           // class not found
-        } catch(final Throwable th) {
-          throw JAVAINIT_X_X.get(info, Util.className(th), th);
+        } catch(final LinkageError ex) {
+          throw JAVAINIT_X_X.get(info, Util.className(ex), ex);
         }
 
         if(clazz == null) {

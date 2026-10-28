@@ -1,5 +1,6 @@
 package org.basex.http.ws;
 
+import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.*;
@@ -22,6 +23,14 @@ public final class WsPoolTest extends WsTest {
     for(final byte[] id : WsPool.ids().finish()) {
       WsPool.remove(new String(id));
     }
+  }
+
+  /**
+   * Empty messages are rejected.
+   */
+  @Test public void emptyMessage() {
+    error("ws:emit(())", INVTYPE_X);
+    error("ws:send((), 'x')", INVTYPE_X);
   }
 
   /**

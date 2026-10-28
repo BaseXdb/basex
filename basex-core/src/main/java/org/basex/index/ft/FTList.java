@@ -110,8 +110,6 @@ final class FTList implements SegmentReader {
       ntl = ctl + 1;
       while(tp[ntl] == -1) ++ntl;
     }
-    if(ctl == tp.length) return EMPTY;
-
     final byte[] t = str.readBytes(ptok, ctl);
     // skip pointer
     size = str.read4(str.cursor() + 5);

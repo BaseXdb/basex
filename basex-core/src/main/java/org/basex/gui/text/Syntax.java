@@ -4,7 +4,9 @@ import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.function.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -315,6 +317,110 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the declaration with the specified name.
+   * @param text text
+   * @param name name of the function or variable (variables are prefixed with a dollar sign)
+   * @param local compare local names
+   * @return declaration, or {@code null} if it is not found
+   */
+  final Declaration declaration(final byte[] text, final String name, final boolean local) {
+    for(final Declaration declaration : declarations(text)) {
+      if((local ? declaration.local() : declaration.name()).equals(name)) return declaration;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the declarations of the modules that are imported by the specified text.
+   * @param text text
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return declarations, with the namespace prefixes of the imports
+   */
+  @SuppressWarnings("unused")
+  ArrayList<Declaration> imported(final byte[] text,
+      final BiFunction<String, String, IOFile> modules) {
+    return new ArrayList<>();
+  }
+
+  /**
+   * Returns the signature of a built-in, declared or imported function.
+   * @param text text
+   * @param name function name
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return signature, or {@code null} if the function is unknown
+   */
+  final Signature signature(final byte[] text, final String name,
+      final BiFunction<String, String, IOFile> modules) {
+    // built-in functions take precedence; declarations are merged from the matching arities
+    final Signature signature = signature(name);
+    if(signature != null) return signature;
+    final ArrayList<Declaration> declarations = declarations(text);
+    declarations.addAll(imported(text, modules));
+    return signature(merge(declarations), name);
+  }
+
+  /**
+   * Returns the signature of the first declared function with the specified name.
+   * @param declarations declarations
+   * @param name function name
+   * @return signature, or {@code null} if the function is not declared
+   */
+  static Signature signature(final ArrayList<Declaration> declarations, final String name) {
+    for(final Declaration declaration : declarations) {
+      if(declaration.name().equals(name)) return Signature.get(declaration.args());
+    }
+    return null;
+  }
+
+  /**
+   * Merges the declarations of functions with the same name if their parameter names match.
+   * @param declarations declarations
+   * @return merged declarations
+   */
+  static ArrayList<Declaration> merge(final ArrayList<Declaration> declarations) {
+    final ArrayList<Declaration> list = new ArrayList<>();
+    next:
+    for(final Declaration declaration : declarations) {
+      final String name = declaration.name();
+      for(int d = list.size() - 1; d >= 0 && name.indexOf('$') == -1; d--) {
+        final Declaration old = list.get(d);
+        if(!old.name().equals(name)) continue;
+        final Signature merged = Signature.get(old.args()).merge(Signature.get(declaration.args()));
+        if(merged != null) {
+          list.set(d, new Declaration(name, merged.args(), old.pos(), old.line()));
+          continue next;
+        }
+      }
+      list.add(declaration);
+    }
+    return list;
+  }
+
+  /**
+   * Returns the definition of the function or variable referenced at the specified position.
+   * @param text text
+   * @param pos position
+   * @return definition (possibly not found), or {@code null} if no name is referenced
+   */
+  @SuppressWarnings("unused")
+  Definition definition(final byte[] text, final int pos) {
+    return null;
+  }
+
+  /**
+   * Returns the outline of a referenced function or variable.
+   * @param text text
+   * @param definition definition of the referenced name
+   * @param modules resolver for imported modules (URI, optional location)
+   * @return signature of a function, binding of a variable, or {@code null}
+   */
+  @SuppressWarnings("unused")
+  String outline(final byte[] text, final Definition definition,
+      final BiFunction<String, String, IOFile> modules) {
+    return null;
+  }
+
+  /**
    * Indicates if code completions can be proposed at the specified position.
    * @param text text
    * @param caret caret position
@@ -363,10 +469,12 @@ abstract class Syntax {
    * Returns the code completion candidates for the specified text.
    * @param text text
    * @param pos start position of the completed string
+   * @param modules resolver for imported modules (URI, optional location)
    * @return candidates, ordered by relevance
    */
   @SuppressWarnings("unused")
-  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
+      final BiFunction<String, String, IOFile> modules) {
     return new ArrayList<>();
   }
 

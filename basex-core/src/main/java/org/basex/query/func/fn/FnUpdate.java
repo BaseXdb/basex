@@ -165,7 +165,7 @@ public final class FnUpdate extends StandardFunc {
   private GNode rebuild(final GNode node, final FBuilder builder, final Value attributes,
       final Value children, final QueryContext qc) throws QueryException {
 
-    if(node instanceof final JNode jnode) return jcopy(jnode, jvalue(jnode, children, qc));
+    if(node instanceof final JNode jnode) return new JNode(jnode.key, jvalue(jnode, children, qc));
     if(builder == null) return copy(node, qc);
 
     final QNmSet names = new QNmSet();
@@ -213,7 +213,7 @@ public final class FnUpdate extends StandardFunc {
   private GNode withValue(final GNode node, final Item value, final QueryContext qc)
       throws QueryException {
 
-    if(node instanceof final JNode jnode) return jcopy(jnode, value);
+    if(node instanceof final JNode jnode) return new JNode(jnode.key, value);
 
     final byte[] string = value.string(info);
     final XNode xnode = (XNode) node;
@@ -246,16 +246,6 @@ public final class FnUpdate extends StandardFunc {
         (map ? jnode.container() instanceof XQMap : jnode.container() instanceof XQArray)))
       return jnode;
     throw UPREPLACE_X_X.get(info, name, item.seqType());
-  }
-
-  /**
-   * Returns a parentless JNode with the same key as the specified node.
-   * @param node node
-   * @param value new value
-   * @return resulting node
-   */
-  private static JNode jcopy(final JNode node, final Value value) {
-    return new JNode(node.key, value);
   }
 
   /**

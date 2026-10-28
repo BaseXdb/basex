@@ -189,7 +189,7 @@
       <plugin>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-maven-plugin</artifactId>
-        <version>${jettyVersion}</version>
+        <version>${jetty.version}</version>
         <configuration>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8081</stopPort>

@@ -98,6 +98,14 @@ public final class WebPathMatcherTest {
 
   /** Test.
    * @throws Exception exception */
+  @Test public void testParseVariablesBeyondEightSegments() throws Exception {
+    testParse(
+            "/a/b/c/d/e/f/g/{$x}/{$y}",
+            "/a/b/c/d/e/f/g/([^/]+?)/([^/]+?)", 9, valueOf(0x180), new QNm("x"), new QNm("y"));
+  }
+
+  /** Test.
+   * @throws Exception exception */
   @Test public void testValuesNoMatch() throws Exception {
     testValues("/a1{$p=(/.*)?}", "/a1b/c", "p", null);
   }

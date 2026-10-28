@@ -30,10 +30,8 @@ public final class FnExists extends FnEmpty {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     final Expr input = arg(0);
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // if(exists($nodes)) → if($nodes)
-      if(input.seqType().type instanceof NodeType) expr = input;
-    }
+    // if(exists($nodes)) → if($nodes)
+    if(mode.conditional() && input.seqType().type instanceof NodeType) expr = input;
     return cc.simplify(this, expr, mode);
   }
 }

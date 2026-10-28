@@ -5,7 +5,6 @@ import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -29,14 +28,7 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public void update(final NamePool pool) {
-    if(insseq == null) return;
-    add(pool);
-  }
-
-  @Override
-  public void merge(final Update update) {
-    final GNodeList newInsert = ((NodeCopy) update).nodes;
-    for(final GNode node : newInsert) nodes.add(node);
+    if(insseq != null) add(pool);
   }
 
   @Override

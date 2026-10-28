@@ -155,7 +155,7 @@ public abstract class Command extends Job {
    */
   @SuppressWarnings("unused")
   public boolean updating(final Context ctx) {
-    return perm == Perm.CREATE || perm == Perm.WRITE;
+    return perm == Perm.WRITE;
   }
 
   /**
@@ -204,6 +204,8 @@ public abstract class Command extends Job {
     // check permissions
     if(!ctx.user().has(perm, data != null && !data.inMemory() ? data.meta.name : null))
       return error(PERM_REQUIRED_X, perm);
+    // external entities, XIncludes and catalogs require ADMIN permission
+    ctx.options.allowExternal(ctx.user().has(Perm.ADMIN));
 
     init(ctx, os);
     try {
@@ -217,7 +219,7 @@ public abstract class Command extends Job {
       // out of memory
       Performance.gc(2);
       Util.debug(ex);
-      return error(OUT_OF_MEM + (perm == Perm.CREATE ? H_OUT_OF_MEM : ""));
+      return error(OUT_OF_MEM + H_OUT_OF_MEM);
     } catch(final Throwable ex) {
       // any other unexpected error
       return error(Util.bug(ex) + Prop.NL + info);
@@ -307,6 +309,18 @@ public abstract class Command extends Job {
   }
 
   /**
+   * Checks if the current user has ADMIN permission for all specified databases.
+   * @param dbs names of databases
+   * @return result of check
+   */
+  protected final boolean create(final String... dbs) {
+    for(final String db : dbs) {
+      if(!context.user().has(Perm.ADMIN, db)) return false;
+    }
+    return true;
+  }
+
+  /**
    * Adds information on command execution.
    * @param str information to be added
    * @param ext extended info
@@ -341,7 +355,7 @@ public abstract class Command extends Job {
       if(db.isEmpty() || db.matches(".*[?*,].*")) {
         list.addGlobal();
       } else {
-        list.add(args[index]);
+        list.add(db);
       }
     }
   }

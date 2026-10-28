@@ -1,8 +1,9 @@
 package org.basex.util.options;
 
+import java.util.*;
+
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Option containing an enumeration value.
@@ -93,9 +94,6 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
    * @return enumeration
    */
   public String[] strings() {
-    final V[] values = values();
-    final StringList sl = new StringList(values.length);
-    for(final V v : values) sl.add(v.toString());
-    return sl.finish();
+    return Arrays.stream(values()).map(Enum::toString).toArray(String[]::new);
   }
 }

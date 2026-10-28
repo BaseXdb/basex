@@ -22,10 +22,16 @@ public final class FnFunctionAnnotations extends StandardFunc {
 
     final AnnList anns = function.annotations();
     if(anns.isEmpty()) return Empty.VALUE;
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, anns.size());
     for(final Ann ann : anns) {
       vb.add(XQMap.get(ann.name(), ann.value()));
     }
     return vb.value();
+  }
+
+  @Override
+  public int hofOffsets() {
+    // the function is inspected, not invoked
+    return 0;
   }
 }

@@ -156,6 +156,11 @@ public final class JavaFunctionTest extends SandboxTest {
 
     error("import module namespace StringBuilder = 'java:java.lang.StringBuilder'; " +
         "StringBuilder:append('x')", JAVAMULTIPLE_X_X);
+
+    // DOM parameter types: exact match for elements
+    final String ns = "declare namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(ns + "n:ambiguous3(n:new(), <a/>)", "element a");
+    query(ns + "n:ambiguous3(n:new(), text { 'a' })", "node a");
   }
 
   /** Pass on empty sequences. */
@@ -190,6 +195,13 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void errors() {
     final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
     error(mod + "n:null-array()", JAVANULL);
+
+    final String decode = "Q{java.net.URLDecoder}decode('a%00b,c', 'UTF-8')";
+    final String wrapped = "(# db:wrapjava all #) { " + decode + " }";
+    error(decode, INVCODE_X);
+    error("Q{String}split(" + wrapped + ", ',')", INVCODE_X);
+    error("(# db:wrapjava none #) { Q{java.util.Optional}of(" + wrapped + ") }", INVCODE_X);
+    error("string(" + wrapped + ")", INVCODE_X);
   }
 
   /** Instance errors. */
@@ -365,6 +377,7 @@ public final class JavaFunctionTest extends SandboxTest {
     query(mod + "n:comment()", "<!--c-->");
     query(mod + "n:element()", "<e/>");
     query(mod + "n:attribute()", "a=\"\"");
+    query(mod + "n:ns-attribute() ! namespace-uri()", "u");
     // namespaces declared by DOM ancestors are in scope
     query(mod + "in-scope-prefixes(n:nested()) => sort()", "p\nxml");
     query(mod + "string(resolve-QName(string(n:nested()), n:nested()))", "p:c");

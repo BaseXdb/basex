@@ -1,6 +1,7 @@
 package org.basex.query.value.seq;
 
 import java.io.*;
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
@@ -105,7 +106,7 @@ public final class StrSeq extends NativeSeq {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof final StrSeq seq ? type == seq.type &&
-        Array.equals(values, seq.values) : super.equals(obj));
+        Arrays.deepEquals(values, seq.values) : super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

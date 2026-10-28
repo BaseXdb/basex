@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
@@ -139,12 +138,7 @@ public final class Updates {
     if(target instanceof final DBNode node) return node;
 
     // determine highest ancestor node
-    GNode tmp = target;
-    final BasicNodeIter iter = target.ancestorIter(false);
-    for(GNode n; (n = iter.next()) != null;) {
-      tmp = n;
-    }
-    final XNode root = (XNode) tmp;
+    final XNode root = target.root();
 
     // see if this ancestor has already been added to the pending update list
     // if data instance does not exist, create mapping between fragment ID and data reference

@@ -68,9 +68,7 @@ public final class StringList extends ObjectList<String, StringList> {
    * @return self reference
    */
   public StringList sort(final boolean cs, final boolean asc) {
-    final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
-    return this;
+    return sort(cs ? null : String.CASE_INSENSITIVE_ORDER, asc);
   }
 
   @Override

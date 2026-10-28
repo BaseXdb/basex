@@ -123,14 +123,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
     // merge middle digits
     if(tree.isEmpty()) {
       final int k = inLeft + inRight;
-      final Item[] temp = new Item[k];
-      final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
-      if(k <= m) {
-        Array.copyToStart(items, l, k, temp);
-      } else {
-        Array.copyToStart(items, l, m, temp);
-        Array.copyFromStart(items, k - m, temp, m);
-      }
+      final Item[] temp = items(mid - inLeft, k);
 
       inLeft = inRight = 0;
       tree.append(midTree);
@@ -173,7 +166,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
 
   @Override
   public Seq value(final Type type) {
-    // small int sequence, fill directly
+    // small sequence, fill directly
     final int n = inLeft + inRight, start = (mid - inLeft + CAP) % CAP;
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);
 

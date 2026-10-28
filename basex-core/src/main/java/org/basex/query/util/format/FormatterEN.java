@@ -113,8 +113,8 @@ final class FormatterEN extends Formatter {
    * @param numType numeral type
    */
   private static void word(final TokenBuilder tb, final long number, final NumeralType numType) {
-    if(number == 0 && !tb.isEmpty()) {
-    } else if(number < 20) {
+    if(number == 0 && !tb.isEmpty()) return;
+    if(number < 20) {
       tb.add((numType == ORDINAL ? ORDINALS : WORDS)[(int) number]);
     } else if(number < 100) {
       final int r = (int) (number % 10);
