@@ -147,13 +147,20 @@ declare
   %rest:POST
   %rest:path('/dba/workspace/delete')
 function dba:delete() {
-  utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'file', 'deleted'),
-    'run' : %updating fn() {
-      let $dir := config:files-dir($args?dir)
-      return $args?name ! file:delete(utils:safe-path($dir, .))
+  utils:dispatch($dba:CAT, fn($args) {
+    let $paths := $args?name ! utils:file-path($args?dir, .)
+    (: the message names what was deleted: files, directories, or entries of both kinds :)
+    let $dirs := count($paths[file:is-dir(.)])
+    let $noun := switch () {
+      case $dirs = 0 return 'file'
+      case $dirs = count($paths) return 'directory'
+      default return 'entry'
     }
-  } })
+    return {
+      'info': utils:info($args?name, $noun, 'deleted'),
+      'run' : %updating fn() { $paths ! file:delete(.) }
+    }
+  })
 };
 
 (:~

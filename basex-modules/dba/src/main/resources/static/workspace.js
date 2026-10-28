@@ -523,22 +523,33 @@ async function loadTab(t) {
     t.saved = editorValue();
     t.edited = false;
     showTab();
-    setText("", "");
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
-    const draft = stored(draftKey(t));
-    if(draft !== null && draft !== t.saved) {
-      writing(() => _editor.setValue(draft));
-      // the document differs from the file: mark it
-      t.edited = true;
-      showTab();
-    }
+    applyDraft(t);
     storeTabs();
   } catch(response) {
-    // the file is gone or unreadable: drop its tab, so it is not requested again. The tab is
-    // unedited, so closing it asks nothing; its message is awaited, then replaced by the error
-    await closeTab(_tabs.indexOf(t));
+    // the file is gone or unreadable. An unsaved draft stays in its tab, and can be saved again;
+    // a tab without one is dropped, so it is not requested again. The tab is unedited, so
+    // closing it asks nothing; its message is awaited, then replaced by the error
+    t.saved = "";
+    if(t === tab() && applyDraft(t)) storeTabs();
+    else await closeTab(_tabs.indexOf(t));
     showError(response, t.name);
   }
+}
+
+/**
+ * Shows the unsaved draft of the active document if it differs from the saved text.
+ * @param {object} t tab
+ * @returns {boolean} whether a draft was applied
+ */
+function applyDraft(t) {
+  const draft = stored(draftKey(t));
+  if(draft === null || draft === t.saved) return false;
+  writing(() => _editor.setValue(draft));
+  // the document differs from the file: mark it
+  t.edited = true;
+  showTab();
+  return true;
 }
 
 /**
@@ -576,8 +587,18 @@ async function saveFile(saveAs) {
   const text = editorValue();
   // the document is renamed below: its draft is dropped under both keys
   const key = draftKey(t);
+  // the file of the document is replaced; any other one only if the user agrees
+  let replace = dir === t.dir && name === t.name;
   try {
-    await request(`editor-save?${new URLSearchParams({ name, dir })}`, text);
+    const save = () => request(`editor-save?${new URLSearchParams({ name, dir, replace })}`, text);
+    try {
+      await save();
+    } catch(response) {
+      if(response.status !== 409) throw response;
+      if(!await confirmDialog(`Replace “${name}”?`, "Replace")) return false;
+      replace = true;
+      await save();
+    }
     Object.assign(t, { dir, name, saved: text, edited: false });
     store(key, null);
     store(draftKey(t), null);
@@ -623,14 +644,6 @@ function saveDraft() {
 }
 
 /**
- * Asks for a name and creates a directory.
- * @returns {Promise} promise
- */
-function createDir() {
-  return promptSubmit("dir-name", "Name of the new directory:", "Create", "");
-}
-
-/**
  * Refreshes the editor buttons.
  */
 function checkButtons() {
@@ -639,6 +652,34 @@ function checkButtons() {
   setDisabled("save", !(tab() && tabModified(tab())));
   setDisabled("saveas", !editorValue());
 }
+
+/** An upload that replaces files of the listed directory asks first, as Save as does. The check
+    runs before the form announces the upload, and the confirmed form is submitted again. */
+document.addEventListener("submit", event => {
+  const form = event.target;
+  if(form.getAttribute("action") !== "workspace/upload") return;
+  if(form.dataset.confirmed) {
+    delete form.dataset.confirmed;
+    return;
+  }
+  const listed = new Set([ ...document.querySelectorAll("#files-panel input[name=name]") ].
+    map(input => input.value));
+  const upload = document.getElementById("upload");
+  const taken = [ ...upload.files ].filter(file => listed.has(file.name));
+  if(!taken.length) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const message = taken.length === 1 ? `Replace “${taken[0].name}”?` :
+    `Replace ${plural(taken.length, "file")}?`;
+  confirmDialog(message, "Replace").then(ok => {
+    if(ok) {
+      form.dataset.confirmed = "true";
+      form.requestSubmit();
+    } else {
+      upload.value = "";
+    }
+  });
+}, true);
 
 /** The queries of the view run on the endpoint that also serves its file panel; the job of a
     query that is given up is gone with it. */
@@ -691,9 +732,10 @@ function workspaceKeys(event) {
   if(dialogOpen()) return;
   const key = event.key.toLowerCase();
   const ctrl = event.ctrlKey || event.metaKey;
-  // Alt is the key of all actions of the view; Ctrl+S and Ctrl+Enter are known from elsewhere
+  // Alt is the key of all actions of the view; Ctrl+S is the shortcut of every page (see
+  // shortcuts), Ctrl+Shift+S and Ctrl+Enter are known from elsewhere
   let action;
-  if((ctrl || event.altKey) && !(ctrl && event.altKey) && key === "s") {
+  if((event.altKey ? !ctrl : ctrl && event.shiftKey) && key === "s") {
     // the browser must not offer to save the page, whether or not there is anything to save
     action = () => document.getElementById(event.shiftKey ? "saveas" : "save").click();
   } else if(event.altKey && !ctrl && key === "enter") {
@@ -714,7 +756,7 @@ function workspaceKeys(event) {
 /** The shortcuts of the view, as the overview of the shortcuts lists them. */
 _editor_shortcuts.push(
   [ "Alt+Enter", "Run the query (also Ctrl+Enter)" ],
-  [ "Alt+S", "Save (also Ctrl+S)" ],
+  [ "Alt+S", "Save" ],
   [ "Alt+Shift+S", "Save as… (also Ctrl+Shift+S)" ],
   [ "Alt+N", "Open an empty tab" ],
   [ "Alt+W", "Close the tab" ],

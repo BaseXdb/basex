@@ -58,7 +58,7 @@ declare function panels:stores(
           'modified': $info?modified
         }
       let $buttons := (
-        <button type='button' onclick='newStore()' title='Create a new store'>New…</button>,
+        <button type='button' onclick='showDialog("create")' title='Create a new store'>New…</button>,
         form:button('stores/delete', 'Delete', ('CHECK', 'CONFIRM'),
           title := 'Delete the selected stores, in memory and on disk'),
         form:button('stores/clear', 'Delete All', 'CONFIRM',
@@ -82,6 +82,26 @@ declare function panels:stores(
 };
 
 (:~
+ : Returns the longest part of a path that leads to a value with children.
+ : @param  $root  value of the entry
+ : @param  $path  path; its first step is the key of the entry
+ : @return path of the level (empty for the store itself)
+ :)
+declare %private function panels:level(
+  $root  as item()*,
+  $path  as item()*
+) as item()* {
+  if (exists($path)) {
+    let $value := panels:resolve($root, tail($path))
+    return if ($value instance of (map(*) | array(*)) or count($value) > 1) then (
+      $path
+    ) else (
+      panels:level($root, trunk($path))
+    )
+  }
+};
+
+(:~
  : Creates the contents of the entries panel: the children of the level the path leads to.
  : @param  $name      selected store
  : @param  $path      path of the level; its first step is the key of an entry
@@ -99,11 +119,10 @@ declare function panels:entries(
 ) as element()+ {
   let $key := head($path)
   let $root := if ($key) { store:get($key, $name) }
-  (: a path that does not resolve any more is given up; the client adopts the one that is
-     rendered, which is why it is stated in the markup :)
-  let $resolved := panels:resolve($root, tail($path))
-  let $steps := if (exists($resolved)) then $path else if (exists($root)) { $key }
-  let $value := $resolved otherwise $root
+  (: a path that does not lead to a level any more is given up for the closest one that does;
+     the client adopts the one that is rendered, which is why it is stated in the markup :)
+  let $steps := panels:level($root, $path)
+  let $value := if (exists($steps)) { panels:resolve($root, tail($steps)) }
   let $text := panels:path($steps)
   let $positional := $value instance of array(*) or count($value) > 1
   (: the level opens by what its children are named or numbered by :)
@@ -129,8 +148,8 @@ declare function panels:entries(
       {
         let $headers := (
           (: a position is ordered by its value, not as the string it is labelled by :)
-          { 'key': 'label', 'label': 'Key', 'width': '40%',
-            'sort': 'number'[$positional] },
+          { 'key': 'label', 'label': if ($positional) then 'Position' else 'Key',
+            'width': '40%', 'sort': 'number'[$positional] },
           { 'key': 'value', 'label': 'Value', 'width': '33%' },
           { 'key': 'type', 'label': 'Type', 'width': '19%' }
         )
@@ -157,6 +176,8 @@ declare function panels:entries(
           (: the checkbox submits the step: the label of a key that is neither a string nor
              an integer is not what addresses it :)
           'select': 'step',
+          (: the children are named as the cell of their parent counts them :)
+          'noun': panels:noun($value),
           (: what can be done with the level stays in view while its children scroll; the path
              that leads to it is stated below what acts on it :)
           'sticky': <h2>Store: { utils:label($name) }</h2>,
@@ -218,6 +239,22 @@ declare %private function panels:buttons(
 };
 
 (:~
+ : Creates the dialog that creates a store with its first entry.
+ : @return dialog
+ :)
+declare function panels:create-dialog() as element(dialog) {
+  (: a store is its entries: an empty one does not exist, so the first entry is asked for :)
+  form:dialog('create', 'New Store', 'Create', 'stores/add', false(), (
+    <input type='hidden' name='path' value=''/>,
+    <input type='hidden' name='index' value='false'/>,
+    form:field('Name:', <input type='text' name='name' autofocus='' required=''/>, 'stacked'),
+    form:field('Key:', <input type='text' name='step' placeholder="'key'" required=''/>,
+      'stacked'),
+    form:editor-field('Value:', 'value', 'create-value')
+  ))
+};
+
+(:~
  : Creates the dialog that adds a child to the level.
  : @param  $name   selected store
  : @param  $path   path of the level
@@ -261,8 +298,13 @@ declare function panels:value(
   let $root := if ($key) { store:get($key, $name) }
   let $value := panels:resolve($root, tail($path))
   return if (empty($value)) then (
-    (: the store itself has no value, and a path that is gone leads to none :)
-    { 'exists': false(), 'text': '', 'editable': false() }
+    (: a child that is there may hold nothing; the store itself has no value, and a path that
+       is gone leads to none :)
+    if (panels:holds-empty($root, tail($path))) then (
+      utils:editable('()', 'the value is an empty sequence')
+    ) else (
+      { 'exists': false(), 'text': '', 'editable': false() }
+    )
   ) else (
     (: the value is written as the expression that yields it again, so that what is edited here
        can be stored again :)
@@ -368,6 +410,28 @@ declare %private function panels:key(
 };
 
 (:~
+ : Indicates whether the last step of a path leads to a child that is there, but empty.
+ : @param  $root   value of the entry
+ : @param  $steps  steps into the value
+ : @return result of check
+ :)
+declare %private function panels:holds-empty(
+  $root   as item()*,
+  $steps  as item()*
+) as xs:boolean {
+  exists($steps) and (
+    let $parent := panels:resolve($root, trunk($steps))
+    let $step := foot($steps)
+    return switch () {
+      case $parent instance of map(*) return map:contains($parent, panels:key($parent, $step))
+      case $parent instance of array(*) return
+        $step instance of xs:integer and $step = 1 to array:size($parent)
+      default return false()
+    }
+  )
+};
+
+(:~
  : Returns the children of a value, in entry order.
  : @param  $value  value of the level
  : @return label, step and value of every child
@@ -408,7 +472,7 @@ declare function panels:remove(
     (: an item is dropped; a level that is left with a single one is that item :)
     $value[not(position() = ($steps ! xs:integer(.)))]
   ) else (
-    error((), 'Value cannot be descended into: ' || type-of($value))
+    error((), `Value cannot be descended into: { type-of($value) }.`)
   )
 };
 
@@ -582,9 +646,24 @@ declare function panels:replace(
         error((), `No such index: { $step }.`)
       )
     ) else (
-      error((), 'Value cannot be descended into: ' || type-of($value))
+      error((), `Value cannot be descended into: { type-of($value) }.`)
     )
   )
+};
+
+(:~
+ : Returns what the children of a value are called.
+ : @param  $value  value
+ : @return noun (singular form)
+ :)
+declare %private function panels:noun(
+  $value  as item()*
+) as xs:string {
+  switch () {
+    case count($value) > 1 return 'item'
+    case $value instance of array(*) return 'member'
+    default return 'entry'
+  }
 };
 
 (:~

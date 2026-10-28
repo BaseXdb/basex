@@ -316,7 +316,7 @@ declare %private function panels:job-details(
       }</div>
     </div>,
     <div class='buttons'>{
-      form:button('jobs/remove', 'Remove',
+      form:button('jobs/remove', 'Remove', 'CONFIRM',
         title := 'Stop the job and discard its result')[$registered],
       (: reading a result closes the job: the action gives it up, and the page it leads to
          fetches the file :)
@@ -324,7 +324,7 @@ declare %private function panels:job-details(
         title := 'Download the result; the job is removed then')[$output],
       form:button('jobs/replace', 'Save',
         title := 'Save the edited query and restart the service')[$persisted],
-      form:button('jobs/unregister', 'Unregister',
+      form:button('jobs/unregister', 'Unregister', 'CONFIRM',
         title := 'Stop the service and unregister it, ' ||
           'so that it no longer starts with the server')[$persisted],
       panels:close-button()
@@ -365,9 +365,22 @@ declare %private function panels:job-information(
   table:pairs(
     for $value in $entry/@*
     for $name in name($value)[. != 'id']
+    let $string := string($value)
+    (: values are formatted as in the lists, with the exact value as tooltip :)
     return <tr>
       <td><b>{ utils:capitalize($name) }</b></td>
-      <td>{ string($value) }</td>
+      <td>{
+        switch () {
+          case $name = 'duration' and $string castable as xs:dayTimeDuration return
+            <span title='{ $string }'>{
+              html:duration(duration-to-seconds(xs:dayTimeDuration($string)))
+            }</span>
+          case $name = ('start', 'end', 'time') and $string castable as xs:dateTime return
+            html:time(xs:dateTime($string))
+          case $name = 'address' return html:address($string)
+          default return $string
+        }
+      }</td>
     </tr>
   )
 };
@@ -696,8 +709,7 @@ declare function panels:attribute-dialog(
     )),
     (: filled in by the client if the value it fetched cannot be shown :)
     <div id='{ $kind }-note' class='note'/>
-  ), <button formaction='{ $actions }/delete'
-                 title='Delete the attribute'>Delete</button>)
+  ), form:button($actions || '/delete', 'Delete', 'CONFIRM', title := 'Delete the attribute'))
 };
 
 (:~

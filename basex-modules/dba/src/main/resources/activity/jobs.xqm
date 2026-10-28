@@ -23,7 +23,11 @@ function dba:create() {
   utils:dispatch($dba:CAT, fn($args) { {
     (: a supplied id selects the new job; a generated one is not known before it is started :)
     'params': { 'job': $args?id }[$args?id],
-    'info'  : 'Job was started.',
+    'info'  : switch () {
+      case $args?service = 'true' return 'Service was registered.'
+      case exists(($args?start, $args?cron)[.]) return 'Job was scheduled.'
+      default return 'Job was started.'
+    },
     'run'   : %updating fn() { dba:start-job($args) }
   } })
 };

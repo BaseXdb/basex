@@ -92,8 +92,10 @@ declare function panels:databases(
             title := 'Delete the selected databases permanently'),
           form:button('databases/backups-create', 'Back Up', 'CHECK',
             title := 'Write a zipped backup of each selected database'),
+          (: only databases with a backup can be restored: their row links to it :)
           form:button('databases/backups-restore', 'Restore', ('CHECK', 'CONFIRM'),
-            title := 'Restore each selected database from its latest backup'),
+            title := 'Restore each selected database from its latest backup',
+            require := 'a[href*="backups-panel"]'),
           <button type='button' onclick='openDialog("storage")'
                   title='Show the backups of the users, services, and stores, and the stored data'>{
             'Storage…'
@@ -161,13 +163,17 @@ declare function panels:database(
   if (not($name)) then (
     (: nothing is selected: the panel is not shown, so it needs no placeholder :)
   ) else if (not(db:exists($name))) then (
-    (: the name is only known from the backups of the dropped database :)
     <h2>Database: { $name }</h2>,
-    <div class='note'>The database does not exist; one of its backups can be restored.</div>,
-    <div class='buttons'>
-      <button type='button' onclick='openDialog("properties", "backups-panel")'
-              title='Show the backups of the database'>Backups…</button>
-    </div>
+    (: the name is known from the backups of a dropped database, or from a failed request :)
+    if (exists(db:backups($name))) then (
+      <div class='note'>The database does not exist; one of its backups can be restored.</div>,
+      <div class='buttons'>
+        <button type='button' onclick='openDialog("properties", "backups-panel")'
+                title='Show the backups of the database'>Backups…</button>
+      </div>
+    ) else (
+      <div class='note'>The database does not exist.</div>
+    )
   ) else (
     panels:resource-list($name, $sort, $page, $resource, $dir, $filter),
     panels:add-dialog($name),
@@ -204,8 +210,15 @@ declare %private function panels:resource-list(
         (: the values of a known format get the width they need; the name takes the rest :)
         { 'key': 'name', 'label': 'Name' },
         { 'key': 'type', 'label': 'Type', 'width': 'calc(6ch + 0.5rem)' },
+        (: an XML document is measured in nodes, any other resource in bytes: the tooltip
+           states which :)
         { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc',
-          'width': 'calc(9ch + 0.5rem)' },
+          'width': 'calc(9ch + 0.5rem)', 'link': fn($entry, $size) {
+            let $number := xs:integer($size)
+            return <span title='{
+              if ($entry?type = 'xml') then utils:count($number, 'node') else prof:human($number)
+            }'>{ $size }</span>
+          } },
         { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
           'width': 'calc(11ch + 0.5rem)' }
       )
@@ -604,9 +617,9 @@ declare %private variable $panels:PREVIEW := 200;
    the others are listed and filtered :)
 declare %private variable $panels:INDEXES := (
   { 'name': 'element-name', 'label': 'Element Names',
-    'entries': fn($db, $prefix) { index:element-names($db)[starts-with(., $prefix)] } },
+    'entries': fn($db, $prefix) { sort(index:element-names($db)[starts-with(., $prefix)]) } },
   { 'name': 'attribute-name', 'label': 'Attribute Names',
-    'entries': fn($db, $prefix) { index:attribute-names($db)[starts-with(., $prefix)] } },
+    'entries': fn($db, $prefix) { sort(index:attribute-names($db)[starts-with(., $prefix)]) } },
   { 'name': 'text', 'label': 'Texts', 'option': 'textindex',
     'entries': index:texts#2 },
   { 'name': 'attribute', 'label': 'Attributes', 'option': 'attrindex',
@@ -801,7 +814,10 @@ declare function panels:resource(
     (: while a database is shown, the panel keeps its place, whatever is selected :)
     case boolean($name) return (
       <h2>Resource</h2>,
-      <div class='note'>Choose a resource of the database.</div>
+      (: a resource that is named, but gone, was dropped or renamed meanwhile :)
+      <div class='note'>{
+        if ($resource) then 'The resource does not exist.' else 'Choose a resource of the database.'
+      }</div>
     )
     default return ()
   }

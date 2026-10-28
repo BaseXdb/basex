@@ -10,6 +10,9 @@ import module namespace config = 'dba/lib/config' at 'config.xqm';
 (:~ WebSocket attribute: id of the job that runs for the current connection. :)
 declare variable $utils:JOB := 'dba-job';
 
+(:~ Request parameters that state what a page shows; see utils:dispatch. :)
+declare %private variable $utils:SELECTION := ('name', 'path', 'resource', 'dir');
+
 (:~ Regular expression for XQuery files; matches the suffixes of IO.XQSUFFIXES. :)
 declare variable $utils:XQUERY-REGEX := '\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$';
 
@@ -20,6 +23,8 @@ declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\
 declare record utils:action(
   run     as %updating fn() as item()*,
   params  as map(*)?,
+  (: parameters of the page if the action fails; by default, the ones it succeeds with :)
+  failed  as map(*)?,
   info    as xs:string?
 );
 
@@ -52,12 +57,19 @@ declare function utils:query-parse(
 (:~
  : Evaluates a query, considering the configured limits.
  : @param  $query  query string
+ : @param  $noun   what the query supplies, as named in the error for a missing one
  : @return result
  :)
 declare function utils:evaluate(
-  $query  as xs:string?
+  $query  as xs:string?,
+  $noun   as xs:string := 'value'
 ) as item()* {
-  xquery:eval($query, (), { config:limits(), 'pass': true() })
+  (: an empty sequence is supplied as (); an empty field was left out :)
+  if (normalize-space($query)) then (
+    xquery:eval($query, (), { config:limits(), 'pass': true() })
+  ) else (
+    error((), `No { $noun } was supplied.`)
+  )
 };
 
 (:~
@@ -418,7 +430,10 @@ declare function utils:safe-path(
 ) as xs:string {
   (: guards file access against path traversal, independent of the servlet container: a path
      that escapes the base is a bad request, never a file :)
-  let $base := file:resolve-path($dir)
+  (: the base ends with a separator: a name is resolved within it, even if it does not exist,
+     and a sibling whose name starts with the same characters is not taken for a part of it :)
+  let $sep := file:dir-separator()
+  let $base := file:resolve-path($dir) ! (if (ends-with(., $sep)) then . else . || $sep)
   let $path := file:resolve-path($name, $base)
   return if (starts-with($path, $base)) then (
     $path
@@ -636,14 +651,19 @@ declare %updating function utils:dispatch(
      so a request that touches no database must not reach the actions of others :)
   (: an action can fail before it runs: a parameter that is evaluated is reported like the
      update it was meant for, not as a server error :)
+  let $args := request:parameter-map()
   let $target := try {
-    $action(request:parameter-map())
+    $action($args)
   } catch * {
     $err:description
   }
   (: an info message is shown if the action succeeds, the error description if it fails :)
   return if ($target instance of xs:string) then (
-    utils:redirect($page, {}, { 'error': $target })
+    (: what was selected when the request was sent stays selected :)
+    let $selection := map:filter($args, fn($key, $value) {
+      $key = $utils:SELECTION and count($value) = 1 and $value != ''
+    })
+    return utils:redirect($page, $selection, { 'error': $target })
   ) else (
     let $params := $target?params otherwise {}
     let $run := $target?run
@@ -651,7 +671,7 @@ declare %updating function utils:dispatch(
       updating $run(),
       utils:redirect($page, $params, { 'info': $target?info }[$target?info])
     } catch * {
-      utils:redirect($page, $params, { 'error': $err:description })
+      utils:redirect($page, $target?failed otherwise $params, { 'error': $err:description })
     }
   )
 };

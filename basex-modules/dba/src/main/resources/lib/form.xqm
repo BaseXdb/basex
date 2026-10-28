@@ -75,19 +75,22 @@ declare function form:select(
  : @param  $label    label
  : @param  $options  options: 'CONFIRM' (ask before the action is run), 'CHECK' (consider checkboxes)
  : @param  $title    tooltip
+ : @param  $require  selector of what one of the checked rows must contain (can be empty)
  : @return button
  :)
 declare function form:button(
   $action   as xs:string,
   $label    as xs:string,
   $options  as enum('CONFIRM', 'CHECK')* := (),
-  $title    as xs:string? := ()
+  $title    as xs:string? := (),
+  $require  as xs:string? := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action },
     $title ! attribute title { . },
     attribute onclick { `return confirmAction(this, "{ $label }");` }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
+    $require ! attribute data-require { . },
     $label
   }</button>
 };

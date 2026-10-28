@@ -34,8 +34,9 @@ function dba:databases(
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show; changing
      it refreshes the panels over the connection the view opens for its queries :)
-  (: a database is always open: the first one if the address names none :)
-  let $name := $name[.] otherwise head(db:list())
+  (: a database is always open: the first one if the address names none or an invalid one :)
+  let $name := $name[. and exists(try { db:exists(.) } catch db:name { })]
+    otherwise head(db:list())
   (: a link that names a resource alone opens the level that holds it; the client derives the
      directory in the same way :)
   let $dir := $dir[.] otherwise replace($resource, '[^/]+$', '')
@@ -73,7 +74,7 @@ function dba:databases(
  : Downloads a resource.
  : @param  $name      database
  : @param  $resource  resource
- : @return rest response and file content
+ : @return rest response and file content, or redirection
  :)
 declare
   %rest:POST
@@ -88,7 +89,8 @@ function dba:db-download(
     utils:attachment($resource, panels:resource-value($name, $resource),
       db:content-type($name, $resource))
   } catch * {
-    web:error(404, $err:description)
+    utils:outcome($dba:CAT, { 'name': $name, 'resource': $resource },
+      { 'error': 'Download failed: ' || $err:description })
   }
 };
 
@@ -214,7 +216,7 @@ function dba:create() {
             (
               for value $content in $files
               return if ($args?binary) then $content else fetch:binary-doc($content),
-              $input
+              $input ! dba:input(.)
             ),
             (map:keys($files), $input ! ''), {
               form:index-map($args),
@@ -251,8 +253,9 @@ declare
   %rest:path('/dba/databases/optimize')
 function dba:optimize() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'database', 'optimized'),
-    'run' : %updating fn() { $args?name ! db:optimize(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'database', 'optimized'),
+    'run'   : %updating fn() { $args?name ! db:optimize(.) }
   } })
 };
 
@@ -315,8 +318,9 @@ declare
   %rest:path('/dba/databases/backups-create')
 function dba:backups-create() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'database', 'backed up'),
-    'run' : %updating fn() { $args?name ! db:create-backup(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'database', 'backed up'),
+    'run'   : %updating fn() { $args?name ! db:create-backup(.) }
   } })
 };
 
@@ -330,8 +334,9 @@ declare
   %rest:path('/dba/databases/backups-restore')
 function dba:backups-restore() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'backup', 'restored'),
-    'run' : %updating fn() { $args?name ! db:restore(.) }
+    'params': dba:selected($args),
+    'info'  : utils:info($args?name, 'backup', 'restored'),
+    'run'   : %updating fn() { $args?name ! db:restore(.) }
   } })
 };
 
@@ -420,16 +425,17 @@ function dba:backup-upload() {
       'run'   : %updating fn() {
         for key $file value $content in $files
         let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
-        let $entries := archive:entries($content) ! data()
+        (: a file that is no archive has no entries, and is rejected like an invalid one :)
+        let $entries := try { archive:entries($content) ! data() } catch archive:* { }
         (: reject backups with invalid content :)
-        let $valid := if ($db) then (
+        let $valid := exists($entries) and (if ($db) then (
           $entries = $db || '/inf.basex' and
           (every $entry in $entries satisfies starts-with($entry, $db || '/'))
         ) else (
           every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
-        )
+        ))
         return if (not($valid)) then (
-          error((), 'Invalid backup file: ' || $file)
+          error((), `Invalid backup file: “{ $file }”.`)
         ) else if ($name and $db != $name) {
           (: reject the backup of another database: it would be invisible in the panel it was
              uploaded from. Without a selected database there is nothing to contradict, and a
@@ -482,7 +488,7 @@ function dba:put() {
             ),
             (: a directory or an archive is expanded, and the paths it contains are kept
                below the target; what is stored there already is replaced :)
-            $input ! db:put($args?name, ., $target, $options)
+            $input ! db:put($args?name, dba:input(.), $target, $options)
           )
         )
       }
@@ -543,24 +549,19 @@ declare
   %rest:POST
   %rest:path('/dba/databases/resource-rename')
 function dba:resource-rename() {
-  utils:dispatch($dba:CAT, fn($args) {
-    let $exists := db:exists($args?name, $args?target)
-    return {
-      (: a rename that fails leaves the resource where it is, and selected :)
-      'params': {
-        'name': $args?name,
-        'resource': if ($exists) then $args?resource else $args?target
-      },
-      'info'  : utils:info($args?resource, 'resource', 'renamed'),
-      'run'   : %updating fn() {
-        if ($exists) then (
-          error((), 'Resource already exists.')
-        ) else (
-          db:rename($args?name, $args?resource, $args?target)
-        )
-      }
+  utils:dispatch($dba:CAT, fn($args) { {
+    (: a rename that fails leaves the resource where it is, and selected :)
+    'params': { 'name': $args?name, 'resource': $args?target },
+    'failed': { 'name': $args?name, 'resource': $args?resource },
+    'info'  : utils:info($args?resource, 'resource', 'renamed'),
+    'run'   : %updating fn() {
+      if (db:exists($args?name, $args?target)) then (
+        error((), 'Resource already exists.')
+      ) else (
+        db:rename($args?name, $args?resource, $args?target)
+      )
     }
-  })
+  } })
 };
 
 (:~
@@ -601,18 +602,17 @@ declare %private function dba:rename-database(
   $update  as %updating fn(*),
   $select  as xs:boolean
 ) as utils:action {
-  (: both take a new name and reject one that is assigned already :)
-  (: the name that was offered for editing is the current one: keeping it is no conflict :)
-  let $exists := $args?newname != $args?name and db:exists($args?newname)
-  return {
-    (: an operation that fails leaves the database it was started from selected :)
-    'params': { 'name': if ($select and not($exists)) then $args?newname else $args?name },
+  (: both take a new name and reject one that is assigned already. An operation that fails
+     leaves the database it was started from selected :)
+  {
+    'params': { 'name': if ($select) then $args?newname else $args?name },
+    'failed': { 'name': $args?name },
     'info'  : `Database “{ $args?name }” was { $action } to “{ $args?newname }”.`,
     'run'   : %updating fn() {
-      if ($exists) then (
-        error((), 'Database already exists.')
-      ) else if ($args?name != $args?newname) {
-        updating $update($args?name, $args?newname)
+      (: the name that was offered for editing is the current one: keeping it is no conflict :)
+      if ($args?newname != $args?name) {
+        if (db:exists($args?newname)) then error((), 'Database already exists.')
+        else updating $update($args?name, $args?newname)
       }
     }
   }
@@ -642,6 +642,33 @@ declare %private function dba:index(
       )
     }
   }
+};
+
+(:~
+ : Returns the parameters that keep a database selected that a list action was run on.
+ : @param  $args  request parameters
+ : @return query parameters; empty if several databases were chosen
+ :)
+declare %private function dba:selected(
+  $args  as map(*)
+) as map(*)? {
+  { 'name': $args?name }[count($args?name) = 1]
+};
+
+(:~
+ : Checks the input of a dialog that adds resources: an existing file or directory, or a URL.
+ : @param  $input  input
+ : @return input
+ :)
+declare %private function dba:input(
+  $input  as xs:string
+) as xs:string {
+  if (matches($input, '^[a-z][a-z0-9+.-]+://', 'i') or
+    (try { file:exists($input) } catch file:invalid-path { false() })) then (
+    $input
+  ) else (
+    error((), `No file, directory, archive or URL: “{ $input }”.`)
+  )
 };
 
 (:~

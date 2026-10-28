@@ -448,6 +448,14 @@ _editor_run = () => queryResource(true);
 _editor_shortcuts.push([ "Ctrl+Enter", "Run the query of the resource" ]);
 _indent_changed = () => queryResource(true);
 
+/** A database that is dropped takes the fields that were remembered for it along: one that is
+    created again under its name starts afresh. */
+document.addEventListener("submit", event => {
+  if(!event.submitter?.formAction.endsWith("/databases/drop")) return;
+  forgetFields([ ...event.target.querySelectorAll("input[name=name]:checked") ].
+    map(input => input.value));
+});
+
 /** The sort and page links of the list panels are followed in place. */
 followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
   "backups-panel": refreshBackups, "general-backups-panel": refreshGeneralBackups,

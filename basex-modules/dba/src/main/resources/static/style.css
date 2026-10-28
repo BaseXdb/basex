@@ -1222,8 +1222,9 @@ dialog.tabbed > .tabs {
   margin-bottom: var(--space);
   border-bottom: var(--line) solid var(--border);
 }
-/* the controls of a list belong to the list, not to the row that closes the dialog */
-dialog.tabbed > [role=tabpanel] .buttons {
+/* the controls of a list belong to the list, not to the row that closes the dialog; a dialog
+   that a tab opens keeps its own row */
+dialog.tabbed > [role=tabpanel] .buttons:not(dialog dialog .buttons) {
   justify-content: flex-start;
   margin-top: 0;
   margin-bottom: var(--space);

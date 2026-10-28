@@ -152,6 +152,18 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The New buttons of the rendered pages open dialogs with headings.
+     * @throws IOException I/O exception
+     */
+    @Test public void newDialogs() throws IOException {
+      for(final String[] page : new String[][] { { "databases", "Database" }, { "users", "User" },
+          { "stores", "Store" }, { "activity", "Job" } }) {
+        assertTrue(get(page[0]).contains("<h2>New " + page[1] + "</h2>"),
+            page[0] + ": no dialog with a heading");
+      }
+    }
+
+    /**
      * Serves a static resource from the file system, and rejects an unknown one.
      * @throws IOException I/O exception
      */
@@ -324,6 +336,16 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * An invalid name is reported, and the page it is redirected to is served.
+     * @throws IOException I/O exception
+     */
+    @Test public void invalidName() throws IOException {
+      assertTrue(post("databases/create", Map.of("name", "bad name")).contains("Invalid name"),
+          "invalid name not reported");
+      assertTrue(get("databases?name=bad%20name").contains("<html"), "page not served");
+    }
+
+    /**
      * The index options of the create dialog reach the new database: the properties dialog
      * offers what the database really has, which is not what the create dialog defaults to.
      * @throws IOException I/O exception
@@ -401,6 +423,24 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * An input that is neither a file nor a URL is reported as such.
+     * @throws Exception exception
+     */
+    @Test public void unknownInput() throws Exception {
+      assertTrue(post("databases/create", Map.of("name", DB, "input", "<a/>")).
+          contains("No file, directory, archive or URL"), "unknown input not reported");
+    }
+
+    /**
+     * Restore is only offered for databases with a backup.
+     * @throws Exception exception
+     */
+    @Test public void restoreRequiresBackup() throws Exception {
+      assertTrue(get("databases").contains("data-require=\"a[href*=&quot;backups-panel&quot;]\""),
+          "restore does not require a backup");
+    }
+
+    /**
      * The parser of the create dialog is applied to the input.
      * @throws Exception exception
      */
@@ -452,8 +492,7 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void firstDatabase() throws IOException {
-      create();
-      post("databases/create", Map.of("name", OTHER));
+      createBoth();
       final String page = get("databases");
       assertTrue(page.contains("Database: " + DB + "<"), "first database not opened");
       assertFalse(page.contains("class=\"dismiss\""), "panel can be closed");
@@ -477,11 +516,59 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void renameToExistingName() throws IOException {
-      create();
-      post("databases/create", Map.of("name", OTHER));
+      createBoth();
       final String page = post("databases/rename", Map.of("name", DB, "newname", OTHER));
       assertTrue(page.contains("Database already exists."), "duplicate name not rejected");
       assertTrue(page.contains(">" + DB + "</a>"), "selection did not stay on the database");
+    }
+
+    /**
+     * An invalid name is rejected, and the selection stays on the database.
+     * @throws IOException I/O exception
+     */
+    @Test public void renameToInvalidName() throws IOException {
+      // the second database is renamed: the first one is what is opened without a selection
+      createBoth();
+      final String page = post("databases/rename", Map.of("name", OTHER, "newname", "bad name"));
+      assertTrue(page.contains("Invalid name"), "invalid name not rejected");
+      assertTrue(page.contains("Database: " + OTHER + "<"),
+          "selection did not stay on the database");
+    }
+
+    /**
+     * A database that is backed up from the list stays selected.
+     * @throws Exception exception
+     */
+    @Test public void backUpKeepsSelection() throws Exception {
+      createBoth();
+      try {
+        assertTrue(post("databases/backups-create", Map.of("name", OTHER)).
+            contains("Database: " + OTHER + "<"), "selection did not stay on the database");
+      } finally {
+        execute("db:backups('" + OTHER + "') ! db:drop-backup(.)");
+      }
+    }
+
+    /**
+     * An invalid option is rejected, and the selection stays on the database.
+     * @throws IOException I/O exception
+     */
+    @Test public void optimizeWithInvalidOption() throws IOException {
+      createBoth();
+      final String page = post("databases/optimize-db", Map.of("name", OTHER, "lang", "xx"));
+      assertTrue(page.contains("Unknown language"), "invalid language not rejected");
+      assertTrue(page.contains("Database: " + OTHER + "<"),
+          "selection did not stay on the database");
+    }
+
+    /**
+     * A database without backups is not offered for restoring.
+     * @throws IOException I/O exception
+     */
+    @Test public void missingWithoutBackups() throws IOException {
+      final String page = get("databases?name=" + DB);
+      assertTrue(page.contains("The database does not exist.<"), "missing database not reported");
+      assertFalse(page.contains("Backups…</button>"), "backups are offered");
     }
 
     /**
@@ -626,6 +713,15 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * Creates the test database and the one that follows it in the list.
+     * @throws IOException I/O exception
+     */
+    private static void createBoth() throws IOException {
+      create();
+      post("databases/create", Map.of("name", OTHER));
+    }
+
+    /**
      * Returns the markup of a dialog of a page.
      * @param page page
      * @param id id of the dialog, without its suffix
@@ -699,6 +795,15 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * A resource that is gone is reported as such.
+     * @throws Exception exception
+     */
+    @Test public void missingResource() throws Exception {
+      final String page = get("databases?name=" + DB + "&resource=gone.xml");
+      assertTrue(page.contains("The resource does not exist."), "missing resource not reported");
+    }
+
+    /**
      * A document that is not XML is shown read-only, with the reason.
      * @throws Exception exception
      */
@@ -742,6 +847,17 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * An invalid path is rejected, and the selection stays on the edited resource.
+     * @throws Exception exception
+     */
+    @Test public void renameToInvalidPath() throws Exception {
+      final String page = post("databases/resource-rename",
+          Map.of("name", DB, "resource", RESOURCE, "target", "dir/"));
+      assertTrue(page.contains("Invalid path"), "invalid path not rejected");
+      assertTrue(page.contains("Resource: " + RESOURCE), "selection did not stay on the resource");
+    }
+
+    /**
      * Deletes a resource.
      * @throws Exception exception
      */
@@ -764,12 +880,12 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * A resource that does not exist is not offered for download.
+     * A resource that does not exist is not offered for download, and the failure is reported.
      * @throws Exception exception
      */
     @Test public void downloadUnknown() throws Exception {
-      send(404, "POST", "db-download", "name=" + DB + "&resource=no-such-resource",
-          "application/x-www-form-urlencoded");
+      assertTrue(post("db-download", Map.of("name", DB, "resource", "no-such-resource")).
+          contains("Download failed"), "failed download not reported");
     }
 
     /**
@@ -820,6 +936,20 @@ public final class DBATest extends WebappTest {
       assertTrue(message.contains("\"id\":\"properties-dialog\""), "dialog not pushed: " + message);
       assertTrue(message.contains("Properties: " + DB), "database not named: " + message);
       assertTrue(message.contains("options-form"), "options missing: " + message);
+    }
+
+    /**
+     * The element names of the index tab are listed in the order that their column states.
+     * @throws Exception exception
+     */
+    @Test public void sortedNames() throws Exception {
+      execute("db:put('" + DB + "', <z><a/></z>, 'other.xml')");
+      sendMessage("{ \"type\": \"index\", \"name\": \"" + DB + "\", \"index\": \"element-name\" }");
+      final String message = pollMessage();
+      final Matcher m = Pattern.compile("<td>([a-z])<\\\\/td>").matcher(message);
+      final StringBuilder names = new StringBuilder();
+      while(m.find()) names.append(m.group(1));
+      assertEquals("axyz", names.toString(), "names not sorted: " + message);
     }
 
     /**
@@ -983,6 +1113,16 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * An invalid name is reported, and the page it is redirected to is served.
+     * @throws IOException I/O exception
+     */
+    @Test public void invalidName() throws IOException {
+      assertTrue(post("users/create", Map.of("name", "bad name", "pw", "secret", "perm", "read")).
+          contains("Invalid username"), "invalid name not reported");
+      assertTrue(get("users?name=bad%20name").contains("User: admin"), "first user not opened");
+    }
+
+    /**
      * The first user is opened if none is named; the user panel is only shown for a user that
      * exists.
      * @throws IOException I/O exception
@@ -1017,6 +1157,17 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * An invalid name is rejected, and the panel keeps showing the edited user.
+     * @throws IOException I/O exception
+     */
+    @Test public void updateToInvalidName() throws IOException {
+      create("read");
+      final String page = update(USER, "bad name", "read");
+      assertTrue(page.contains("Invalid username"), "invalid name not rejected");
+      assertTrue(page.contains("User: " + USER), "selection did not stay on the edited user");
+    }
+
+    /**
      * The password is not carried back into the address, the history and the log.
      * @throws IOException I/O exception
      */
@@ -1041,7 +1192,7 @@ public final class DBATest extends WebappTest {
       assertTrue(page.contains("<code>unit*</code>"), "pattern not listed in the user form");
       assertTrue(page.contains("read +1"), "pattern not counted in the user list");
       assertTrue(post("users/pattern-drop", Map.of("name", USER, "pattern", "unit*")).
-          contains("was deleted"), "pattern not dropped");
+          contains("was dropped"), "pattern not dropped");
     }
 
     /**
@@ -1112,6 +1263,33 @@ public final class DBATest extends WebappTest {
   }
 
   /**
+   * Tests for the editor of the workspace.
+   */
+  @Nested final class Editor {
+    /** Test file. */
+    private static final String FILE = "dba-junit-save.xq";
+
+    /**
+     * Deletes the test file after each test.
+     * @throws Exception exception
+     */
+    @AfterEach public void cleanup() throws Exception {
+      post("workspace/delete", Map.of("name", FILE));
+    }
+
+    /**
+     * An existing file is only replaced if this is requested.
+     * @throws Exception exception
+     */
+    @Test public void replace() throws Exception {
+      final String path = "editor-save?name=" + FILE + "&replace=";
+      send(200, "POST", path + "false", "1", "text/plain");
+      send(409, "POST", path + "false", "2", "text/plain");
+      send(200, "POST", path + "true", "3", "text/plain");
+    }
+  }
+
+  /**
    * Tests for the DBA settings page.
    */
   @Nested final class Settings {
@@ -1144,6 +1322,21 @@ public final class DBATest extends WebappTest {
       assertTrue(save(Map.of("timeout", "7")).contains("Settings were saved."),
           "settings not saved");
       assertTrue(get("settings").contains("value=\"7\""), "changed value not persisted");
+    }
+
+    /**
+     * An invalid value is rejected, and the saved settings are kept.
+     * @throws IOException I/O exception
+     */
+    @Test public void invalidValue() throws IOException {
+      save(Map.of("timeout", "7"));
+      assertFalse(save(Map.of("memory", "")).contains("Settings were saved."),
+          "empty value saved");
+      assertFalse(save(Map.of("memory", "-1")).contains("Settings were saved."),
+          "negative value saved");
+      assertFalse(save(Map.of("interval", "0")).contains("Settings were saved."),
+          "interval out of range saved");
+      assertTrue(get("settings").contains("value=\"7\""), "saved settings were reset");
     }
 
     /**
@@ -1188,6 +1381,16 @@ public final class DBATest extends WebappTest {
      */
     @BeforeEach public void open() throws Exception {
       connect("/logs");
+    }
+
+    /**
+     * A download of logs that do not exist is reported, and a path outside the logs rejected.
+     * @throws Exception exception
+     */
+    @Test public void download() throws Exception {
+      assertTrue(post("logs-download", Map.of("name", "2000-01-01")).
+          contains("No log was selected."), "missing log not reported");
+      send(400, "POST", "logs-download", "name=..%2F..%2Fx", FORM);
     }
 
     /**
@@ -1454,6 +1657,20 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * A new job is reported by what was done with it: registered, scheduled, or started.
+     * @throws Exception exception
+     */
+    @Test public void createMessages() throws Exception {
+      assertTrue(post("jobs/create", Map.of("query", "1", "id", ID, "start", "PT1H",
+          "service", "true")).contains("Service was registered."), "service not reported");
+      services().unregister(ID);
+      discard("job:remove('" + ID + "')");
+      assertTrue(post("jobs/create", Map.of("query", "1", "id", ID, "start", "PT1H")).
+          contains("Job was scheduled."), "scheduled job not reported");
+      discard("job:remove('" + ID + "')");
+    }
+
+    /**
      * A service is unregistered via the jobs panel.
      * @throws IOException I/O exception
      */
@@ -1706,6 +1923,15 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * A page with an invalid store name opens the default store.
+     * @throws IOException I/O exception
+     */
+    @Test public void invalidName() throws IOException {
+      assertTrue(get("stores?name=bad%20name").contains("Store: (default)"),
+          "default store not opened");
+    }
+
+    /**
      * An entry is added to a store and removed again.
      * @throws IOException I/O exception
      */
@@ -1749,6 +1975,44 @@ public final class DBATest extends WebappTest {
       final String value = value("map.abcde");
       assertTrue(value.contains("\\\"text\\\""), "value not shown in the editor");
       assertFalse(value.contains("Read-only"), "value reported as read-only");
+    }
+
+    /**
+     * An invalid key is rejected, and the selection stays on the level of the store.
+     * @throws IOException I/O exception
+     */
+    @Test public void invalidKeyKeepsLevel() throws IOException {
+      add("", false, "'map'", "{ 'a': 1 }");
+      final String page = add("map", false, "1 +", "2");
+      assertTrue(page.contains("Expecting expression"), "invalid key not rejected");
+      assertTrue(page.contains("data-path=\"map\""), "selection did not stay on the level");
+    }
+
+    /**
+     * An empty value is shown as such; a missing one is reported by the noun it lacks; the
+     * members of an array are named by their position.
+     * @throws Exception exception
+     */
+    @Test public void emptyValues() throws Exception {
+      add("", false, "'map'", "{ 'none': (), 'list': [ 1 ] }");
+      assertTrue(value("map.none").contains("empty sequence"), "empty value not shown");
+      assertTrue(add("", false, " ", "1").contains("No key was supplied."),
+          "missing key not reported");
+      assertTrue(add("map", false, "'x'", " ").contains("No value was supplied."),
+          "missing value not reported");
+      final String level = get("stores?name=" + STORE + "&path=map.list");
+      assertTrue(level.contains(">Position<") && level.contains("1 Member"),
+          "members not named as such");
+    }
+
+    /**
+     * A path that leads to a value without children lists the closest level that has some.
+     * @throws IOException I/O exception
+     */
+    @Test public void scalarLevel() throws IOException {
+      add("", false, "'map'", "{ 'a': 1 }");
+      assertTrue(get("stores?name=" + STORE + "&path=map.a").contains("data-path=\"map\""),
+          "parent level not listed");
     }
 
     /**

@@ -38,6 +38,9 @@ function logEntries(key) {
   const state = JSON.stringify([ input, ignore, dates, typed ]);
   if(reset && _logInput === state) return;
   _logInput = state;
+  // what a previous search reported is outdated; the message of the page and a live refresh
+  // leave the status line alone
+  if(key) setText("", "");
   // a new search or filter starts at the top
   if(reset) _toTop.add("output");
 
@@ -77,7 +80,6 @@ function logEntries(key) {
  * @param {string} text HTML table
  */
 function showLogEntries(text) {
-  setText("", "");
   const output = document.getElementById("output");
   // the filter fields belong to the replaced table: the one that was typed into keeps the
   // focus and the caret

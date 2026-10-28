@@ -364,7 +364,11 @@ declare function dba:entries(
     <div class='note warn'>{
       `The search was stopped after { $max - 1 } entries. Choose fewer files, or narrow the search.`
     }</div>[$several and count($shown) = $max],
-    table:create($dba:COLUMNS, $shown, (), $params, $options)
+    (: the time of an entry from one of several files is preceded by its date :)
+    let $columns := if ($several) then (
+      map:put(head($dba:COLUMNS), 'width', 'calc(23ch + 0.5rem)'), tail($dba:COLUMNS)
+    ) else $dba:COLUMNS
+    return table:create($columns, $shown, (), $params, $options)
   }</div>
 };
 

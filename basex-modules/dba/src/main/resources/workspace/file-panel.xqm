@@ -64,7 +64,7 @@ declare function panel:files(
           )
         },
         'date': $modified,
-        'size': $size
+        'size': $size[not($is-dir)]
       }
     )
     (: the chooser shares the block of the buttons, so that one block can be pinned; the
@@ -75,7 +75,7 @@ declare function panel:files(
         <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
           attribute disabled { }[not($parent)], '..'
         }</button>,
-        <button type='button' onclick='createDir()' title='Create a new directory'>New…</button>,
+        <button type='button' onclick='showDialog("dir")' title='Create a new directory'>New…</button>,
         form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM'),
           title := 'Delete the selected files and empty directories'),
         form:button('files-download', 'Download', 'CHECK',
@@ -101,7 +101,9 @@ declare function panel:files(
       <input type='hidden' name='dir' value='{ $dir }'/>),
 
     (: the New button asks for a directory name and submits it :)
-    form:prompt('dir-name', 'name', 'workspace/dir-create',
-      <input type='hidden' name='dir' value='{ $dir }'/>)
+    form:dialog('dir', 'New Directory', 'Create', 'workspace/dir-create', false(), (
+      <input type='hidden' name='dir' value='{ $dir }'/>,
+      form:field('Name:', <input type='text' name='name' autofocus='' required=''/>)
+    ))
   )
 };

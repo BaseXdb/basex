@@ -178,6 +178,21 @@ function clearField(id, scope) {
 }
 
 /**
+ * Forgets what was typed into the text fields of the current page for the given scopes.
+ * @param {string[]} scopes what the fields apply to, e.g. databases
+ */
+function forgetFields(scopes) {
+  const prefix = pageKey(FIELD_KEY) + "/";
+  try {
+    for(const key of Object.keys(localStorage)) {
+      if(key.startsWith(prefix) && scopes.includes(key.slice(key.lastIndexOf("/") + 1))) {
+        store(key, null);
+      }
+    }
+  } catch { /* storage disabled: nothing was remembered */ }
+}
+
+/**
  * Fills an empty text field of the current page with what was typed into it before.
  * @param {string} id id of the field
  * @param {string} scope what the field applies to (can be empty)
@@ -316,13 +331,15 @@ function buttons(source) {
   for(const form of (source ? [ source.closest("form") ] : document.querySelectorAll("form"))) {
     // refresh the header checkbox: it is ticked once every shown entry is
     const shown = entries(form);
-    const checked = shown.filter(input => input.checked).length;
+    const ticked = shown.filter(input => input.checked);
     const header = [ ...selection(form) ].find(input => !input.name && rowVisible(input));
-    if(header) header.checked = checked > 0 && checked === shown.length;
+    if(header) header.checked = ticked.length > 0 && ticked.length === shown.length;
 
-    // check button states
+    // check button states; a button that needs something of the ticked rows names it
     for(const button of form.querySelectorAll("button")) {
-      if(button.dataset.check) button.disabled = !checked;
+      const require = button.dataset.require;
+      if(button.dataset.check) button.disabled = !ticked.length ||
+        require && !ticked.some(input => input.closest("tr").querySelector(require));
     }
   }
 }
@@ -401,14 +418,15 @@ function confirmAction(button, action) {
     return true;
   }
   // ticked rows are counted and named by the summary of their table, as a long list of paths
-  // would bury the number; any other action is described by the tooltip of its button
+  // would bury the number; any other action is described by the tooltip of its button, without
+  // the keys that hintShortcuts lists at its end
   const form = button.form;
   const count = button.dataset.check ? entries(form).filter(input => input.checked).length : 0;
   const summary = form.querySelector("h3[data-plural]")?.dataset;
   const nouns = summary ? [ summary.singular, summary.plural ] : [ "entry", "entries" ];
   const message = count
     ? `${action} ${plural(count, ...nouns.map(noun => noun.toLowerCase()))}?`
-    : `${button.title || action}?`;
+    : `${(button.dataset.action ?? button.title) || action}?`;
   confirmDialog(message, action).then(ok => {
     if(ok) {
       button.dataset.confirmed = "true";
@@ -513,6 +531,15 @@ function socket(path) {
   }
   return _sockets[path];
 }
+
+// a page in the back/forward cache would keep its connections open, and is loaded again when
+// it is shown, as its requests were dropped
+window.addEventListener("pagehide", () => {
+  for(const open of Object.values(_sockets)) {
+    open.then(ws => { ws.onclose = null; ws.close(); }, () => {});
+  }
+});
+window.addEventListener("pageshow", event => { if(event.persisted) location.reload(); });
 
 /**
  * Sends a message to a WebSocket endpoint.
@@ -764,14 +791,17 @@ function hintShortcuts(root) {
     // the keys a title names are listed in parentheses at its end
     const keys = title.match(/\(([^)]*)\)$/)?.[1].split(", ") ?? [ title ];
     if(keys.includes(key)) return;
+    // what the control does is kept without the keys, for the messages that name it
+    control.dataset.action ??= title;
     control.title = title.endsWith(")") ? `${title.slice(0, -1)}, ${key})` :
       title ? `${title} (${key})` : key;
   };
   // the controls are the ones that the shortcuts click; see shortcuts
   const controls = [ root, ...root.querySelectorAll("button, #live") ];
+  const create = newButton();
   for(const button of controls.filter(c => c.matches(".content button"))) {
     const text = button.textContent.trim();
-    if(button === pageButton(label => label.startsWith("New"))) hint(button, "N");
+    if(button === create) hint(button, "N");
     else if(text === "..") hint(button, "Backspace");
     else if(dropButton(button)) hint(button, "Del");
   }
@@ -798,6 +828,11 @@ new MutationObserver(mutations => {
   if(_row && !_row.isConnected) {
     _row = _rowKey && document.querySelector(`.content ${_rowKey}`);
     _row?.classList.add("current");
+  }
+  // so is a table that was worked with, e.g. when a directory was entered
+  if(_rowTable && !_rowTable.isConnected) {
+    const block = _rowPanel && document.getElementById(_rowPanel);
+    _rowTable = rowTables().find(table => block?.contains(table)) ?? null;
   }
 }).observe(document.documentElement, { childList: true, subtree: true });
 
@@ -1023,7 +1058,7 @@ function runLive(action) {
 document.addEventListener("pointerover", event => {
   const table = event.target.closest(".content table");
   _overTable = table !== null;
-  if(table) _rowTable = table;
+  if(table) useTable(table);
   // a button released outside the window reports no 'pointerup'
   _pressed = event.buttons !== 0;
 });
@@ -1207,6 +1242,14 @@ function shortcuts(event) {
     return;
   }
   const target = event.target;
+  // Ctrl+S saves what is edited, wherever the focus is; the browser must not offer to save the
+  // page
+  if((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey &&
+     event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    saveButton(target)?.click();
+    return;
+  }
   // a single-line field has no use for the arrow keys: they leave it for the rows of its table,
   // or of the table of its panel
   if((event.key === "ArrowDown" || event.key === "ArrowUp") && !dialogOpen() &&
@@ -1218,7 +1261,7 @@ function shortcuts(event) {
       event.preventDefault();
       target.blur();
       if(_row?.closest("table") !== table) selectRow(null);
-      _rowTable = table;
+      useTable(table);
       moveRow(event.key === "ArrowDown" ? 1 : -1);
     }
     return;
@@ -1245,7 +1288,7 @@ function shortcuts(event) {
   if(event.key === "g") {
     _go = Date.now();
   } else if(event.key === "n") {
-    pageButton(text => text.startsWith("New"))?.click();
+    newButton()?.click();
   } else if(event.key === "Delete") {
     dropRows();
   } else if(event.key === "Backspace" && !control) {
@@ -1315,6 +1358,40 @@ function pageButton(accept) {
 }
 
 /**
+ * Returns the button of the page that creates a new entry.
+ * @returns {HTMLElement} button (can be null)
+ */
+function newButton() {
+  return pageButton(text => text.startsWith("New"));
+}
+
+/**
+ * Returns the visible Save buttons below an element, enabled or not.
+ * @param {ParentNode} root element or document
+ * @returns {HTMLElement[]} buttons
+ */
+function saveButtons(root) {
+  return [ ...root.querySelectorAll("button") ].filter(button =>
+    button.offsetParent && button.textContent.trim() === "Save");
+}
+
+/**
+ * Returns the Save button that Ctrl+S clicks: the one of the open dialog, else the one of the
+ * panel that holds the focus, else the first one of the page.
+ * @param {HTMLElement} target element that has the focus
+ * @returns {HTMLElement} enabled button (can be null)
+ */
+function saveButton(target) {
+  // an open dialog is all that can be saved; a panel with a Save button of its own saves
+  // nothing else, even while there is nothing to save
+  const dialogs = document.querySelectorAll("dialog[open]");
+  const panel = dialogs[dialogs.length - 1] ?? target.closest?.(".panel");
+  const own = panel ? saveButtons(panel) : [];
+  return (own.length || dialogs.length ? own : saveButtons(document)).
+    find(button => !button.disabled) ?? null;
+}
+
+/**
  * Indicates whether a button drops or deletes the ticked rows of its table.
  * @param {HTMLElement} button button
  * @returns {boolean} result of check
@@ -1349,6 +1426,9 @@ let _rowKey = null;
 
 /** Table that the pointer was last over: the arrow keys move through its rows. */
 let _rowTable = null;
+
+/** Id of the panel of the table that was last worked with. */
+let _rowPanel = null;
 
 /**
  * Chooses a table row, or none.
@@ -1387,6 +1467,15 @@ function rowTable() {
   return document.activeElement?.closest(".content table") ||
     (_row?.isConnected && _row.closest("table")) || (_rowTable?.isConnected && _rowTable) ||
     rowTables().sort((a, b) => b.offsetWidth - a.offsetWidth)[0];
+}
+
+/**
+ * Makes a table the one that is worked with, and remembers the block that holds it.
+ * @param {HTMLElement} table table
+ */
+function useTable(table) {
+  _rowTable = table;
+  _rowPanel = table.closest("[id]")?.id ?? null;
 }
 
 /**
@@ -1436,12 +1525,13 @@ function moveTable(step) {
   const tables = rowTables(), index = tables.indexOf(rowTable());
   const table = tables[Math.min(Math.max(index + step, 0), tables.length - 1)];
   if(table) {
-    _rowTable = table;
+    useTable(table);
     selectRow(tableRows(table)[0] ?? null);
   }
 }
 
-/** Shortcuts of the page, as [ key, description ] pairs. */
+/** Shortcuts of the page, as [ key, description, test ] entries; a shortcut with a test is only
+    listed if the page offers what it works on. */
 const PAGE_SHORTCUTS = [
   [ "G L/A/D/S/U/W/X", "Go to a view (X: Settings)" ],
   [ "/", "Search or filter" ],
@@ -1449,8 +1539,9 @@ const PAGE_SHORTCUTS = [
   [ "Space", "Tick the chosen row" ],
   [ "Del", "Drop or delete the ticked rows, or the chosen one" ],
   [ "Backspace", "Go up one level" ],
-  [ "N", "Create a new entry" ],
-  [ "L", "Switch the live view on or off" ],
+  [ "N", "Create a new entry", newButton ],
+  [ "L", "Switch the live view on or off", () => document.getElementById("live") ],
+  [ "Ctrl+S", "Save the changes", () => saveButtons(document).length ],
   [ "Esc", "Close, clear the message" ],
   [ "?", "Show these shortcuts" ]
 ];
@@ -1473,7 +1564,8 @@ function showShortcuts() {
   document.getElementById("shortcuts")?.remove();
   const dialog = document.createElement("dialog");
   dialog.id = "shortcuts";
-  const column = (title, shortcuts) => `<div><h3>${title}</h3>` + shortcuts.map(([ key, text ]) =>
+  const column = (title, shortcuts) => `<div><h3>${title}</h3>` + shortcuts.
+    filter(([ , , test ]) => !test || test()).map(([ key, text ]) =>
     `<div class='field'><span><kbd>${key}</kbd></span><div>${text}</div></div>`).join("") + "</div>";
   // laid out like the other dialogs: a heading, a field per shortcut, and a button that closes.
   // The editor is a page of its own, which is created after the page in some views

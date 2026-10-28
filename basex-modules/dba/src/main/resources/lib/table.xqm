@@ -50,7 +50,7 @@ declare %private variable $table:TYPES := {
   'percent' : { 'order': 'number',
                 'format': fn($v) { ($v ! format-number(number(.), '0%')) otherwise $table:NONE } },
   'bytes'   : { 'order': 'number',
-                'format': fn($v) { prof:human(xs:integer($v) otherwise 0) } },
+                'format': fn($v) { ($v ! prof:human(xs:integer(.))) otherwise $table:NONE } },
   'duration': { 'order': 'number',
                 'format': fn($v) { $v ! html:duration(xs:decimal(.)) } },
   'dateTime': { 'order': 'date',

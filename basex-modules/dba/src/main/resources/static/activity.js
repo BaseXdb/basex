@@ -276,8 +276,10 @@ async function showCacheEntry() {
  * Removes the selected entries of the cache dialog, which stays open.
  */
 async function removeCacheEntries() {
+  const keys = cacheKeys();
+  if(!await confirmDialog(`Remove ${plural(keys.length, "entry", "entries")}?`, "Remove")) return;
   const params = new URLSearchParams({ name: document.getElementById("cache-name").value });
-  for(const key of cacheKeys()) params.append("key", key);
+  for(const key of keys) params.append("key", key);
   try {
     setText(await request(`cache-remove?${params}`), "info");
   } catch(response) {

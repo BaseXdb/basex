@@ -145,7 +145,7 @@ declare %private function panels:local-permissions(
     return <div>{
       <code>{ string($db/@pattern) }</code>, ' → ', string($db/@permission), ' ',
       <button class='link' formaction='users/pattern-drop' name='pattern'
-              value='{ $db/@pattern }' title='Drop the database permission'
+              value='{ $db/@pattern }' title='Drop the permission for “{ $db/@pattern }”'
               onclick='return confirmAction(this, "Drop")'>✕</button>
     }</div>,
     <a href='#' onclick='addPattern(); return false;'
