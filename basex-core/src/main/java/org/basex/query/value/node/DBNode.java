@@ -240,6 +240,11 @@ public class DBNode extends XNode {
   }
 
   @Override
+  public final int hashCode() {
+    return 31 * System.identityHashCode(data) + pre;
+  }
+
+  @Override
   public final int compare(final GNode node) {
     if(this == node) return 0;
     if(node instanceof final DBNode dbnode && root == dbnode.root) {
@@ -558,11 +563,6 @@ public class DBNode extends XNode {
   @Override
   public final BXNode toJava() throws QueryException {
     return BXNode.get(copy(new MainOptions(), null));
-  }
-
-  @Override
-  public final boolean equals(final Object obj) {
-    return obj instanceof final DBNode dbnode && is(dbnode);
   }
 
   @Override

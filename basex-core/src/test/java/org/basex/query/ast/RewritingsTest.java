@@ -2302,6 +2302,17 @@ public final class RewritingsTest extends SandboxTest {
     error("xs:QName('x') = xs:untypedAtomic('')", FUNCCAST_X_X_X);
     error("xs:untypedAtomic('') = xs:QName('x')", FUNCCAST_X_X_X);
     query("xs:untypedAtomic(' x ') = xs:QName('x')", true);
+
+    query("<x xmlns:p='urn:p'>{ xs:untypedAtomic('p:a') = QName('urn:p', 'a') }</x>",
+        "<x xmlns:p=\"urn:p\">true</x>");
+    query("<x xmlns:p='urn:p'>{ QName('urn:p', 'a') = <a>p:a</a> }</x>",
+        "<x xmlns:p=\"urn:p\">true</x>");
+    query("data(<x xmlns:p='urn:p'>{ QName('urn:p', 'a') = <a>p:a</a> }</x>)", true);
+    query("let $s := 'p:a' return "
+        + "<x xmlns:p='urn:p'>{ namespace-uri-from-QName(xs:QName($s)) }</x>",
+        "<x xmlns:p=\"urn:p\">urn:p</x>");
+    query("let $n := 'p:b' return <x xmlns:p='urn:p'>{ element { $n } {} }</x>",
+        "<x xmlns:p=\"urn:p\"><p:b/></x>");
   }
 
   /** Bug of operation on non-existing attribute. */
@@ -3004,5 +3015,15 @@ public final class RewritingsTest extends SandboxTest {
     query("declare function local:f($s as xs:string*) {"
         + "  string-join(for $i in 1 to count($s) let $v := $s[$i] return $v || $i || $v)"
         + "}; let $a := ['a', 'b'] return local:f($a?*)", "a1ab2b");
+  }
+
+  /** Inlined constructed nodes: equal structure must not imply identity. */
+  @Test public void nodeIdentity() {
+    final String f = "declare variable $a := <a/>; declare variable $b := <a/>; " +
+        "declare %basex:inline(0) function local:f($c) { $c }; ";
+    query(f + "count($a except $b)", 1);
+    query(f + "count($a union $b)", 2);
+    query(f + "count(($a, $b) except $a)", 1);
+    query(f + "(if(local:f(false())) { $a } else { $b }) is $b", true);
   }
 }

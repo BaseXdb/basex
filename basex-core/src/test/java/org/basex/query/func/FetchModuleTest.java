@@ -38,6 +38,12 @@ public final class FetchModuleTest extends SandboxTest {
     final String xml = "<x>Ä</x>";
     final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
     query(func.args(_BIN_ENCODE_STRING.args(" '" + data + '\'', encoding)), xml);
+
+    // error messages without empty resource name
+    for(final boolean intparse : new boolean[] { false, true }) {
+      query("try { " + func.args(_BIN_ENCODE_STRING.args("<x>"), " { 'intparse': " + intparse +
+          "() }") + " } catch * { starts-with($err:description, 'Line 1:') }", true);
+    }
   }
 
   /** Test method. */

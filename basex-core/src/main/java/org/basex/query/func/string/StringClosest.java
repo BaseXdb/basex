@@ -100,8 +100,8 @@ public final class StringClosest extends StringFn {
     final int[] order = Array.createOrder(size,
         (o1, o2) -> Double.compare(similarities.get(o2), similarities.get(o1)));
 
-    final ValueBuilder vb = new ValueBuilder(qc);
     final int max = limit > 0 ? Math.min(limit, size) : size;
+    final ValueBuilder vb = new ValueBuilder(qc, max);
     for(int o = 0; o < max; o++) {
       final int p = order[o];
       vb.add(new MapBuilder().put(VALUE, Str.get(values.get(p))).

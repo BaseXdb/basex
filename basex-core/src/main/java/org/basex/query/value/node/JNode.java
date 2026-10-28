@@ -150,6 +150,15 @@ public final class JNode extends GNode {
   }
 
   @Override
+  public int hashCode() {
+    // equal nodes share the ancestor chain up to the root
+    int h = 0;
+    JNode n = this;
+    for(; n.parent != null; n = n.parent) h = 31 * h + n.index;
+    return 31 * h + n.id;
+  }
+
+  @Override
   public int compare(final GNode node) {
     if(this == node) return 0;
     if(!(node instanceof final JNode jnode)) return 1;
@@ -351,11 +360,6 @@ public final class JNode extends GNode {
   @Override
   public Object toJava() throws QueryException {
     return value.toJava();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final JNode jnode && is(jnode);
   }
 
   @Override

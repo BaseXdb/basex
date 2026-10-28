@@ -68,12 +68,6 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FTxt ftxt && Token.eq(value, ftxt.value) &&
-        super.equals(obj);
-  }
-
-  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), value);
   }

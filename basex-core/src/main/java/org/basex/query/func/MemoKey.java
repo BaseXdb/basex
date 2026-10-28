@@ -31,20 +31,9 @@ public final class MemoKey {
     int h = System.identityHashCode(func);
     for(final Value arg : args) {
       h = 31 * h + (int) arg.size();
-      for(final Item item : arg) h = 31 * h + hash(item);
+      for(final Item item : arg) h = 31 * h + item.hashCode();
     }
     hash = h;
-  }
-
-  /**
-   * Computes the hash code of an item.
-   * @param item item
-   * @return hash code
-   */
-  private static int hash(final Item item) {
-    return item instanceof final DBNode node ?
-      31 * System.identityHashCode(node.data()) + node.pre() :
-      item instanceof final JNode node ? node.root().id : item.hashCode();
   }
 
   /**

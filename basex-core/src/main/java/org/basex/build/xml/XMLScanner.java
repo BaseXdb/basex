@@ -1130,9 +1130,7 @@ final class XMLScanner extends Job {
 
   @Override
   public String detailedInfo() {
-    final String path = input.io().path();
-    return path.isEmpty() ? Util.info(LINE_X, input.line()) :
-        Util.info(SCANPOS_X_X, path, input.line());
+    return input.io().position(input.line());
   }
 
   @Override

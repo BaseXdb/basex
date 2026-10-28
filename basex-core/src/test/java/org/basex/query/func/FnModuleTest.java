@@ -2245,6 +2245,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void forEachPair() {
     final Function func = FOR_EACH_PAIR;
 
+    // structurally equal nodes must keep their identity
+    query("let $x := (<a/>, <a/>) let $y := (<a/>, <a/>) return count(($x, $y) except " +
+        func.args(" $x", " $y", " fn($a, $b) { $a, $b }") + ')', 0);
+
     query("(0, concat#2)[. instance of function(*)] ! " +
         func.args("A", "B", " ."), "AB");
 
@@ -5103,6 +5107,10 @@ return
     query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
     query(func.args(" <a/>", 2), "<a/>\n<a/>");
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
+    // structurally equal nodes must not be merged
+    query("declare %basex:inline(0) function local:f($a, $b) { $a, $b };" +
+        "let $a := (<a/>, <a/>) return local:f(" + func.args(" $a[1]", 2) + ", $a[2])[3] is $a[2]",
+        true);
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
     error(func.args(" <a/>", -1), INVTYPE_X);

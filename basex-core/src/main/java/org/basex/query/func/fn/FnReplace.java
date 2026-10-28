@@ -156,7 +156,7 @@ public final class FnReplace extends RegExFn {
       final QueryContext qc) throws QueryException {
     final int gc = regExpr.groupCount(matcher);
     if(names == null) {
-      final ValueBuilder vb = new ValueBuilder(qc);
+      final ValueBuilder vb = new ValueBuilder(qc, gc);
       for(int g = 1; g <= gc; g++) {
         final String group = matcher.group(regExpr.group(g));
         vb.add(group == null ? Atm.EMPTY : Atm.get(group));

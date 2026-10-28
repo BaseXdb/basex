@@ -64,12 +64,6 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FNSpace f && Token.eq(name, f.name) &&
-        Token.eq(value, f.value) && super.equals(obj);
-  }
-
-  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name, VALUEE, value));
   }

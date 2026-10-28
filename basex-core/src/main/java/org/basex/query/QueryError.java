@@ -654,7 +654,7 @@ public enum QueryError {
   /** Error code. */
   SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
-  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted (check the function options): %."),
+  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted: %."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),

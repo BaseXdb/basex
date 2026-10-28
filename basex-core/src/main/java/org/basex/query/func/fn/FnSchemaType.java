@@ -41,7 +41,7 @@ public class FnSchemaType extends StandardFunc {
   protected static Value annotate(final QueryContext qc, final InputInfo info, final Type... types)
       throws QueryException {
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, types.length);
     for(final Type type : types) {
       final QNm name;
       final BasicType baseType;

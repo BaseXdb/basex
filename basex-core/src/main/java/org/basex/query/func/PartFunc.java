@@ -151,8 +151,9 @@ public final class PartFunc extends Arr {
    * @throws QueryException query exception
    */
   private Value value(final QueryContext qc, final CompileContext cc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : body().value(qc)) vb.add(funcItem(toFunction(item, qc), qc, cc));
+    final Value value = body().value(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size());
+    for(final Item item : value) vb.add(funcItem(toFunction(item, qc), qc, cc));
     return vb.value(this);
   }
 

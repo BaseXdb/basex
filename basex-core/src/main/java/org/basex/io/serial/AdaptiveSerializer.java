@@ -216,16 +216,17 @@ public class AdaptiveSerializer extends OutputSerializer {
     for(final Value value : array.members()) {
       if(c++ > 0) printChar(',');
       if(indent) printChar(' ');
-      final long vs = value.size();
-      if(vs != 1) printChar('(');
-      for(long i = 0; i < vs; i++) {
-        if(i > 0) {
+      final boolean par = value.size() != 1;
+      if(par) printChar('(');
+      int cc = 0;
+      for(final Item item : value) {
+        if(cc++ > 0) {
           printChar(',');
           if(indent) printChar(' ');
         }
-        super.item(value.itemAt(i));
+        super.item(item);
       }
-      if(vs != 1) printChar(')');
+      if(par) printChar(')');
     }
     if(c > 0 && indent) printChar(' ');
     --depth;

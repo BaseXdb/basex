@@ -32,7 +32,7 @@ public final class Removed {
     FUNCTIONS.put("convert:string-to-hex", "bin:encode-string");
     FUNCTIONS.put("convert:integer-to-dayTime", "fn:seconds");
     FUNCTIONS.put("convert:dayTime-to-integer", "fn:duration-to-seconds");
-    FUNCTIONS.put("string:format", "fn:pad-string or string templates");
+    FUNCTIONS.put("string:format", "fn:pad-string and fn:format-...");
     FUNCTIONS.put("web:forward", "job:execute");
     PREFIXES.put("hof", "the standard functions");
 

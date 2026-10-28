@@ -340,6 +340,15 @@ public abstract class IO {
   }
 
   /**
+   * Returns a position string for a line of the resource.
+   * @param line line number
+   * @return position string
+   */
+  public final String position(final int line) {
+    return pth.isEmpty() ? Util.info(Text.LINE_X, line) : Util.info(Text.SCANPOS_X_X, pth, line);
+  }
+
+  /**
    * Returns the directory path (all characters up to the last slash).
    * No check will be performed if the directory exists.
    * @return directory path

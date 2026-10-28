@@ -280,7 +280,7 @@ public final class QNm extends Item {
     } else if(item.type.isUntyped() && sc != null) {
       final byte[] nm = trim(item.string(ii));
       if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
-      qnm = new QNm(nm, sc); // TODO: dynamic namespaces are needed here!
+      qnm = qc != null ? new QNm(nm, qc, sc) : new QNm(nm, sc);
       if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
       throw compareError(this, item, ii);

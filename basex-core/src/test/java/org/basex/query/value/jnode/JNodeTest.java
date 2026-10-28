@@ -144,6 +144,11 @@ public final class JNodeTest extends SandboxTest {
     assertFalse(emptyNode.is(rootNode));
     assertFalse(rootNode.is(emptyNode));
 
+    // separately created nodes: equal nodes have equal hash codes
+    final JNode ayzNode2 = new JNode(new JNode(new JNode(rootNode, 0), 1), 0);
+    assertEquals(ayzNode, ayzNode2);
+    assertEquals(ayzNode.hashCode(), ayzNode2.hashCode());
+
     query(JTREE_STRING + " ! (a is a)", true);
     query(JTREE_STRING + " ! (a is b)", false);
     query(JTREE_STRING + "/a ! (. is .)", true);

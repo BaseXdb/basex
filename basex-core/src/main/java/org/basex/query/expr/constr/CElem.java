@@ -61,6 +61,16 @@ public final class CElem extends CName {
   }
 
   @Override
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final int s = addNS(ic.cc.qc);
+    try {
+      return super.inline(ic);
+    } finally {
+      ic.cc.qc.ns.size(s);
+    }
+  }
+
+  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
@@ -123,6 +133,13 @@ public final class CElem extends CName {
     }
 
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // namespaces may be required by the content: data(<x xmlns:p='p'>{ xs:QName('p:a') }</x>)
+    return nspaces.isEmpty() || exprs.length == 1 && exprs[0] instanceof Value ?
+      super.simplifyFor(mode, cc) : simplify(mode, cc);
   }
 
   @Override

@@ -29,7 +29,7 @@ public class FnSlice extends StandardFunc {
     if(slice.reverse) input = input.reverse(qc);
     if(slice.step == 1) return input.subsequence(slice.start - 1, slice.length, qc);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, slice.length);
     for(long i = 0; i < slice.length; i++) vb.add(input.itemAt(slice.start - 1 + i * slice.step));
     return vb.value();
   }

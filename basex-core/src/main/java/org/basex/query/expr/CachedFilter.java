@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -55,15 +54,13 @@ public class CachedFilter extends Filter {
    */
   final Value eval(final Value value, final Expr expr, final QueryContext qc, final QueryFocus qf)
       throws QueryException {
-    final long vs = value.size();
-    qf.size = vs;
+    qf.size = value.size();
     final ValueBuilder vb = new ValueBuilder(qc);
-    final BasicIter<Item> iter = value.iter();
-    for(long p = 1; p <= vs; p++) {
+    long p = 0;
+    for(final Item item : value) {
       qc.checkStop();
-      final Item item = iter.next();
       qf.value = item;
-      qf.pos = p;
+      qf.pos = ++p;
       if(expr.predicate(qc, info, p)) vb.add(item);
     }
     return vb.value();

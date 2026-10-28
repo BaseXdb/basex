@@ -61,7 +61,7 @@ public final class TransformWith extends Copy {
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     qc.focus = qf;
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size());
     try {
       for(final Item item : value) {
         if(!(item instanceof final XNode node)) throw UPSOURCE_X.get(info, item);

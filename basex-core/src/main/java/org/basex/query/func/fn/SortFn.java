@@ -249,9 +249,10 @@ public abstract class SortFn extends StandardFunc {
     for(Item item; (item = qc.next(input)) != null;) {
       top.add(new Entry(item, new SortKey[defs.keys.length]));
     }
-    final ItemList items = new ItemList();
-    for(final Entry entry : top.finish()) items.add(entry.item);
-    return items.value(this);
+    final List<Entry> entries = top.finish();
+    final ValueBuilder vb = new ValueBuilder(qc, entries.size());
+    for(final Entry entry : entries) vb.add(entry.item);
+    return vb.value(this);
   }
 
   /**

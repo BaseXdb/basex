@@ -80,6 +80,14 @@ public abstract class GNode extends Item {
    */
   public abstract boolean is(GNode node);
 
+  @Override
+  public final boolean equals(final Object obj) {
+    return obj instanceof final GNode node && is(node);
+  }
+
+  @Override
+  public abstract int hashCode();
+
   /**
    * Checks the document order of two nodes.
    * @param node node to be compared

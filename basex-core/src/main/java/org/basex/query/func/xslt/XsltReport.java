@@ -80,7 +80,7 @@ final class XsltReport {
    * @throws QueryException query exception
    */
   void addMessage() throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, messages.size());
     for(final String message : messages) {
       final Value value = convert(new IOContent(message), false);
       final ArrayBuilder ab = new ArrayBuilder(qc, value.size());

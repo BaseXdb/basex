@@ -59,9 +59,7 @@ public final class FTContains extends Single {
       for(Item input; (input = qc.next(iter)) != null;) {
         // arrays are atomized, as in the optimized expression
         final Value values = input instanceof XQArray ? input.atomValue(qc, info) : input;
-        final long vs = values.size();
-        for(long v = 0; v < vs; v++) {
-          final Item item = values.itemAt(v);
+        for(final Item item : values) {
           lexer.init(item.string(info));
           final FTNode it = ftexpr.value(qc);
           final FTMatches all = it.matches();

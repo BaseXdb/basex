@@ -70,12 +70,6 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final FPI f && name.eq(f.name) &&
-        Token.eq(value, f.value) && super.equals(obj);
-  }
-
-  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string(), VALUEE, value));
   }
