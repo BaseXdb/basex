@@ -29,7 +29,6 @@ public final class FnBuildUri extends FnParseUri {
     if(!scheme.isEmpty()) {
       uri.add(scheme);
       uri.add(hrrchcl ? "://" : ":");
-      if(scheme.equals(FILE) && options.get(UriOptions.UNC_PATH)) uri.add("//");
     }
 
     String userinfo = get(parts, USERINFO, qc);
