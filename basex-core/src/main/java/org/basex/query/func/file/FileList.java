@@ -61,27 +61,13 @@ public class FileList extends FileFn {
     final ArrayList<Path> dirs = new ArrayList<>(), files = new ArrayList<>();
     final HashSet<Path> links = new HashSet<>();
     try {
-      // depth 1: the attributes are taken from the directory listing
-      Files.walkFileTree(root, Set.of(), 1, new SimpleFileVisitor<>() {
-        @Override
-        public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs)
-            throws IOException {
-          if(path.equals(root)) throw new NotDirectoryException(path.toString());
-          qc.checkStop();
-          final boolean dir = attrs.isDirectory() ||
-              attrs.isSymbolicLink() && Files.isDirectory(path);
-          if(dir && IOFile.isLink(attrs)) links.add(path);
-          (dir ? dirs : files).add(path);
-          return FileVisitResult.CONTINUE;
-        }
-        @Override
-        public FileVisitResult visitFileFailed(final Path path, final IOException ex)
-            throws IOException {
-          if(path.equals(root)) throw ex;
-          files.add(path);
-          return FileVisitResult.CONTINUE;
-        }
-      });
+      try {
+        collect(root, root, dirs, files, links, qc);
+      } catch(final NotDirectoryException ex) {
+        // root is a link to a directory: list the target, report paths below the link
+        if(!Files.isDirectory(root)) throw ex;
+        collect(root.toRealPath(), root, dirs, files, links, qc);
+      }
     } catch(final IOException ex) {
       // skip entries that cannot be accessed; throw exception only on root level
       if(top) throw ex;
@@ -105,6 +91,42 @@ public class FileList extends FileFn {
     for(final Path child : files) {
       add(child, false, pattern, filter, filterArgs, index, list, qc);
     }
+  }
+
+  /**
+   * Collects the entries of a directory, using the attributes of the directory listing.
+   * @param dir directory to be listed
+   * @param root path under which the entries are reported
+   * @param dirs directories
+   * @param files files
+   * @param links links to directories
+   * @param qc query context
+   * @throws IOException I/O exception
+   */
+  private static void collect(final Path dir, final Path root, final ArrayList<Path> dirs,
+      final ArrayList<Path> files, final HashSet<Path> links, final QueryContext qc)
+      throws IOException {
+    Files.walkFileTree(dir, Set.of(), 1, new SimpleFileVisitor<>() {
+      @Override
+      public FileVisitResult visitFile(final Path entry, final BasicFileAttributes attrs)
+          throws IOException {
+        if(entry.equals(dir)) throw new NotDirectoryException(root.toString());
+        qc.checkStop();
+        final Path path = dir == root ? entry : root.resolve(entry.getFileName());
+        final boolean isDir = attrs.isDirectory() ||
+            attrs.isSymbolicLink() && Files.isDirectory(entry);
+        if(isDir && IOFile.isLink(attrs)) links.add(path);
+        (isDir ? dirs : files).add(path);
+        return FileVisitResult.CONTINUE;
+      }
+      @Override
+      public FileVisitResult visitFileFailed(final Path entry, final IOException ex)
+          throws IOException {
+        if(entry.equals(dir)) throw ex;
+        files.add(dir == root ? entry : root.resolve(entry.getFileName()));
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 
   /**

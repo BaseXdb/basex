@@ -126,6 +126,22 @@ public final class FileModuleTest extends SandboxTest {
     contains(func.args(PATH), NAME);
   }
 
+  /** Lists a directory that is referenced by a symbolic link. */
+  @Test public void listLink() {
+    query(_FILE_CREATE_DIR.args(PATH1));
+    query(_FILE_WRITE.args(PATH3, "abcd"));
+    try {
+      Files.createSymbolicLink(Paths.get(PATH2), Paths.get(PATH1));
+    } catch(final IOException | UnsupportedOperationException ex) {
+      // Windows: symbolic links require privileges
+      Assumptions.abort(ex.getMessage());
+    }
+    final String file = Paths.get(PATH2, "x").toString();
+    query(_FILE_LIST.args(PATH2), "x");
+    query(_FILE_CHILDREN.args(PATH2), file);
+    query(_FILE_DESCENDANTS.args(PATH2), file);
+  }
+
   /** Test method. */
   @Test public void copy() {
     final Function func = _FILE_COPY;
