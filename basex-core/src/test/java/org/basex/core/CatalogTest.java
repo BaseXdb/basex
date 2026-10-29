@@ -116,6 +116,22 @@ public final class CatalogTest extends SandboxTest {
         "<doc>\uFFFD</doc>");
     // untrusted calls ignore the catalog
     error(func.args("http://doc.xml"), EXTERNALRESOURCE_X);
+    error(func.args("urn:x:unknown"), WHICHRES_X);
+  }
+
+  /** Test method.*/
+  @Test public void moduleImport() {
+    set(MainOptions.CATALOG, CATALOG);
+    final String imprt = "import module namespace m = 'urn:x:module' at ";
+    query(imprt + "'urn:x:module'; m:f()", "module");
+    query(imprt + "'CAT1:/module.xqm'; m:f()", "module");
+    error(imprt + "'urn:x:unknown'; m:f()", WHICHMODFILE_X);
+    query(LOAD_XQUERY_MODULE.args("urn:x:module", " { 'location-hints': 'urn:x:module' }") +
+        "?functions?*?*()", "module");
+    error(LOAD_XQUERY_MODULE.args("urn:x:module", " { 'location-hints': 'urn:x:unknown' }"),
+        WHICHMODFILE_X);
+    error(_XQUERY_EVAL.args(" \"" + imprt + "'urn:x:unknown'; m:f()\"",
+        " {}", " { 'base-uri': '' }"), WHICHMODFILE_X);
   }
 
   /** Test method.*/

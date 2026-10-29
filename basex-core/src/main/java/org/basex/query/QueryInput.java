@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class QueryInput {
   /** Original input string (resource URI, database path or XML string). */
   public final String original;
-  /** Input reference. */
+  /** Input reference ({@code null} if the input cannot be resolved). */
   public final IO io;
 
   /** Database name (if {@code null}, no name could be extracted from original path). */
@@ -28,7 +28,7 @@ public final class QueryInput {
    */
   public QueryInput(final String original, final StaticContext sc) {
     this.original = original;
-    io = sc.resolve(original);
+    io = sc.location(original, null);
 
     // check if the specified input string can be rewritten to a database name and path
     String name = Strings.startsWith(original, '/') ? original.substring(1) : original, path = "";

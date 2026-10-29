@@ -317,7 +317,7 @@ public final class IOUrl extends IO {
     if(u < 2 || u + 1 == url.length()) return -1;
     for(int c = 0; c < u; c++) {
       final char ch = url.charAt(c);
-      if(!(ch >= 'a' && ch <= 'z' || Strings.contains("+-._", ch))) return -1;
+      if(!(Token.letter(ch) || c > 0 && Token.digit(ch) || Strings.contains("+-.", ch))) return -1;
     }
     return u;
   }
@@ -327,8 +327,8 @@ public final class IOUrl extends IO {
    * @param url url to be tested
    * @return result of check
    */
-  static boolean isFileURL(final String url) {
-    return url.startsWith(FILEPREF);
+  public static boolean isFileURL(final String url) {
+    return url.regionMatches(true, 0, FILEPREF, 0, FILEPREF.length());
   }
 
   /**
@@ -337,7 +337,7 @@ public final class IOUrl extends IO {
    * @return result of check
    */
   static boolean isJarURL(final String url) {
-    return url.startsWith(JARPREF);
+    return url.regionMatches(true, 0, JARPREF, 0, JARPREF.length());
   }
 
   /**

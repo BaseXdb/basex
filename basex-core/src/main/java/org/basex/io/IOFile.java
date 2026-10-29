@@ -100,7 +100,7 @@ public final class IOFile extends IO {
    */
   static String toPath(final String uri) {
     // fast path: file:/path or file:///path without characters that need to be decoded
-    final int ul = uri.length(), p = uri.startsWith("file:///") ? 7 : 5;
+    final int ul = uri.length(), p = uri.regionMatches(true, 0, "file:///", 0, 8) ? 7 : 5;
     if(!uri.startsWith("//", p)) {
       int u = p;
       while(u < ul && plain(uri.charAt(u))) u++;
@@ -111,7 +111,7 @@ public final class IOFile extends IO {
     } catch(final Exception ex) {
       Util.debug(ex);
       // workaround for URIs with invalid characters
-      return uri.replaceAll("^" + FILEPREF + '*', "/").replaceFirst("^/([A-Za-z]:)", "$1");
+      return uri.replaceAll("(?i)^" + FILEPREF + '*', "/").replaceFirst("^/([A-Za-z]:)", "$1");
     }
   }
 

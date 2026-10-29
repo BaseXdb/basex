@@ -37,6 +37,11 @@ public final class IOTest {
     assertInstanceOf(IOContent.class, IO.get("mailto:a@b.c"));
     assertInstanceOf(IOUrl.class, IO.get("http://a/b"));
     assertInstanceOf(IOFile.class, IO.get("file:///a/b"));
+    assertInstanceOf(IOUrl.class, IO.get("cat1:/a.xqm"));
+    assertInstanceOf(IOUrl.class, IO.get("c0at:/a.xqm"));
+    assertInstanceOf(IOUrl.class, IO.get("CAT1:/a.xqm"));
+    assertInstanceOf(IOFile.class, IO.get("FILE:///a/b"));
+    assertInstanceOf(IOFile.class, IO.get("File:/a/b"));
   }
 
   /** File to URL conversions. */

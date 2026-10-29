@@ -288,7 +288,7 @@ public final class QueryResources {
       case CollectionOptions.DATABASE -> withdb && qi.dbName != null &&
         context.soptions.dbExists(qi.dbName);
       case CollectionOptions.DIRECTORY -> qi.io instanceof IOFile && qi.io.isDir();
-      case CollectionOptions.ARCHIVE -> qi.io.isArchive();
+      case CollectionOptions.ARCHIVE -> qi.io != null && qi.io.isArchive();
       default -> false;
     }) throw COLLFORM_X_X.get(info, form, qi.original);
 
@@ -366,7 +366,7 @@ public final class QueryResources {
       }
 
       // check currently opened collections (required for tests)
-      final String path = qi.io.path();
+      final String path = qi.io != null ? qi.io.path() : null;
       final int cs = colls.size();
       for(int c = 0; c < cs; c++) {
         if(IO.equals(collNames.get(c), path)) return colls.get(c);
@@ -604,7 +604,8 @@ public final class QueryResources {
       if(withdb || mainmem) {
         // compare input path
         final String original = data.meta.original;
-        if(!original.isEmpty() && original(data).eq(qi.io) && key.equals(data.meta.docOpts)) {
+        if(!original.isEmpty() && qi.io != null && original(data).eq(qi.io) &&
+            key.equals(data.meta.docOpts)) {
           checkTrusted(qi.io, qi.original, qc, info);
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
@@ -740,6 +741,7 @@ public final class QueryResources {
       final boolean single, final boolean allowExternal) throws QueryException {
 
     final IO io = input.io;
+    if(io == null) throw WHICHRES_X.get(info, input.original);
     checkAccess(io, input.original, qc, info);
 
     // check if input points to a single file

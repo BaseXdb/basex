@@ -631,7 +631,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Path toRawPath(final String path) throws QueryException {
     try {
-      return path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
+      return IOUrl.isFileURL(path) ? Paths.get(new URI(path)) : Paths.get(path);
     } catch(final IllegalArgumentException | URISyntaxException ex) {
       throw FILE_INVALID_PATH_X.get(info, path).cause(ex);
     }
@@ -656,7 +656,8 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final String uri, final boolean content) throws QueryException {
-    final IO io = sc().resolve(uri);
+    final IO io = sc().location(uri, null);
+    if(io == null) throw RESURI_X.get(info, uri);
     if(io instanceof IOContent && io.path().isEmpty()) {
       if(!content) throw RESURI_X.get(info, uri);
     } else {

@@ -187,11 +187,32 @@ public final class StaticContext {
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
-    if(resolver != null) {
-      final IO io = resolver.resolve(path, uri, baseURI);
-      if(io != null) return io;
-    }
-    return resolveDefault(path);
+    final IO io = resolveCustom(path, uri);
+    return io != null ? io : resolveDefault(path);
+  }
+
+  /**
+   * Returns an IO reference for the specified resource location.
+   * @param path location
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
+   * @return io reference, or {@code null} if the location cannot be resolved
+   */
+  public IO location(final String path, final String uri) {
+    final IO io = resolveCustom(path, uri);
+    if(io != null) return io;
+    // strings that are neither locations nor XML fragments cannot be resolved
+    final IO dflt = resolveDefault(path);
+    return dflt instanceof IOContent && !IO.isXml(path.trim()) ? null : dflt;
+  }
+
+  /**
+   * Resolves the specified path with the custom URI resolver.
+   * @param path file path
+   * @param uri module namespace (can be {@code null})
+   * @return io reference, or {@code null} if no custom resolver exists or applies
+   */
+  private IO resolveCustom(final String path, final String uri) {
+    return resolver != null ? resolver.resolve(path, uri, baseURI) : null;
   }
 
   /**
@@ -201,12 +222,10 @@ public final class StaticContext {
    */
   private IO resolveDefault(final String path) {
     final IO base = baseIO();
-    if(base == null) return IO.get(path);
-
     // try to resolve the path against the XML catalog resolver
     if(uriResolver != null) {
       try {
-        final Source s = uriResolver.resolve(path, base.path());
+        final Source s = uriResolver.resolve(path, base != null ? base.path() : null);
         final InputSource is = s instanceof final SAXSource ss ? ss.getInputSource() : null;
         final String id = is != null ? is.getSystemId() : null;
         if(id != null) return IO.get(id);
@@ -214,7 +233,7 @@ public final class StaticContext {
         Util.debug(ex);
       }
     }
-    return base.merge(path);
+    return base != null ? base.merge(path) : IO.get(path);
   }
 
   /**

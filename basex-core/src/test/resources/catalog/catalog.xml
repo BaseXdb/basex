@@ -7,4 +7,6 @@
   <system systemId='http://import-xsl.xml' uri='import-xsl.xml' />
   <uri name='http://import-xsl.xml' uri='import-xsl.xml' />
   <uri name='http://doc.xml' uri='doc.xml' />
+  <uri name='urn:x:module' uri='module.xqm' />
+  <rewriteURI uriStartString='CAT1:/' rewritePrefix='./' />
 </catalog>

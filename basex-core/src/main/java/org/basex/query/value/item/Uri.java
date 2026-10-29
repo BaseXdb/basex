@@ -78,8 +78,9 @@ public final class Uri extends AStr {
   public Uri resolve(final Uri add) {
     if(add.value.length == 0) return this;
     String uri = UriParser.resolve(Token.string(value), Token.string(add.value));
-    if(uri.startsWith(IO.FILEPREF))
-      uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
+    final int fl = IO.FILEPREF.length();
+    if(IOUrl.isFileURL(uri) && uri.length() > fl && uri.charAt(fl) != '/')
+      uri = IO.FILEPREF + "//" + uri.substring(fl);
     return get(Token.token(uri), false);
   }
 

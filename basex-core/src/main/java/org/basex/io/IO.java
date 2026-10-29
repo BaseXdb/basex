@@ -147,12 +147,21 @@ public abstract class IO {
   public static IO get(final String location) {
     if(location == null) return new IOContent("");
     final String s = location.trim();
-    return s.indexOf('<') == 0 ? new IOContent(s) :
+    return isXml(s)            ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOFile.toPath(s)) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
            IOUrl.isOpaque(s)   ? new IOContent(s) :
            IOFile.isValid(s)   ? new IOFile(s) :
            new IOContent(s);
+  }
+
+  /**
+   * Checks if the specified location string is an XML fragment.
+   * @param location location
+   * @return result of check
+   */
+  public static boolean isXml(final String location) {
+    return Strings.startsWith(location, '<');
   }
 
   /**

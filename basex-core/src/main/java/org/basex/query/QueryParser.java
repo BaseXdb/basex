@@ -943,11 +943,7 @@ public class QueryParser extends InputParser {
   private boolean addLocations(final TokenList list) throws QueryException {
     final boolean add = wsConsume(AT);
     if(add) {
-      do {
-        final byte[] uri = uriLiteral();
-        if(IO.get(string(uri)) instanceof IOContent) throw error(INVURI_X, uri);
-        list.add(uri);
-      } while(wsConsume(","));
+      do list.add(uriLiteral()); while(wsConsume(","));
     }
     return add;
   }
@@ -1016,7 +1012,8 @@ public class QueryParser extends InputParser {
   public final void module(final String pth, final String uri, final InputInfo info)
       throws QueryException {
 
-    final IO io = sc.resolve(pth, uri);
+    final IO io = sc.location(pth, uri);
+    if(io == null) throw error(WHICHMODFILE_X, info, pth);
     final byte[] tPath = token(modulePath(io));
 
     // check if module has already been parsed

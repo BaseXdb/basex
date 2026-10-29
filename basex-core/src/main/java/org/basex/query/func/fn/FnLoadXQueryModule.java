@@ -68,6 +68,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     if(cont != null && !cont.isEmpty()) {
       srcs.add(new IOContent(cont));
     } else {
+      final String uri = Token.string(modUri);
       final StringList locs = new StringList();
       for(final Item hint : hints) locs.add(toString(hint));
       // modules pre-declared by the caller or installed in the repository require no permissions
@@ -77,14 +78,14 @@ public final class FnLoadXQueryModule extends StandardFunc {
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
         } else {
-          final IOFile file = ModuleLoader.file(qc.context.soptions.repoPath(),
-            Token.string(modUri));
+          final IOFile file = ModuleLoader.file(qc.context.soptions.repoPath(), uri);
           if(file != null) locs.add(file.path());
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) {
-        final IO src = info.sc().resolve(loc, info.path());
+        final IO src = info.sc().location(loc, uri);
+        if(src == null) throw WHICHMODFILE_X.get(info, loc);
         if(src.isExternal() && !provided) checkPerm(qc, Perm.ADMIN);
         srcs.add(src);
       }
