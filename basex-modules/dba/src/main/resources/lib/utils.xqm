@@ -34,7 +34,8 @@ declare record utils:editor(
   text      as xs:string,
   editable  as xs:boolean,
   note      as xs:string?,
-  xml       as xs:boolean?
+  xml       as xs:boolean?,
+  image     as xs:boolean?
 );
 
 (:~
@@ -84,7 +85,7 @@ declare function utils:expression(
   let $max := config:get($config:MAXCHARS)
   (: what holds further values is laid out over several lines :)
   let $serialized := serialize($value, {
-    'method': 'adaptive', 'expression': true(), 'indent': true(), 'limit': $max * 2 + 1
+    'method': 'adaptive', 'typed': true(), 'indent': true(), 'limit': $max * 2 + 1
   })
   (: a single item is an expression of its own: the parentheses that the expression method puts
      around every sequence are dropped for it. A truncated text has lost its closing one, and is
@@ -209,7 +210,8 @@ declare function utils:ws-editor(
     'id'      : $id,
     'html'    : utils:html($contents),
     'text'    : $value?text,
-    'editable': $value?editable
+    'editable': $value?editable,
+    'note'    : $value?note
   })
 };
 
@@ -517,6 +519,24 @@ declare function utils:attachment(
     (: the name is encoded: a resource path may contain spaces, commas and characters outside
        ASCII, all of which a bare name would truncate or misrepresent :)
     { 'Content-Disposition': "attachment; filename*=UTF-8''" || encode-for-uri($name) }
+  ),
+  $data
+};
+
+(:~
+ : Returns data that the browser shows in place, such as the image of a preview.
+ : @param  $data  data
+ : @param  $type  media type
+ : @return rest response and data
+ :)
+declare function utils:inline(
+  $data  as item()*,
+  $type  as xs:string
+) as item()+ {
+  web:response-header(
+    { 'media-type': $type },
+    (: the data may change under the same address, and an opened SVG must not run scripts :)
+    { 'Cache-Control': 'no-store', 'Content-Security-Policy': 'sandbox' }
   ),
   $data
 };

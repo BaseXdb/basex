@@ -1,3 +1,10 @@
+/* Windows 11: the variable system font with its full weight range, which system-ui does not offer */
+@font-face {
+  font-family: "Segoe UI Variable";
+  src: local("Segoe UI Variable Text");
+  font-weight: 300 700;
+}
+
 :root {
   /* let native controls (buttons, scrollbars) follow the OS light/dark scheme */
   color-scheme: light dark;
@@ -8,8 +15,13 @@
   --space: .8rem;
   /* every line of the interface: rules, dividers, and the borders of controls */
   --line: .7px;
+  /* the face of text: the system font of each platform */
+  --sans: "Segoe UI Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", "Noto Sans", Arial, sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji";
   /* the face of code, wherever it is shown */
-  --mono: SFMono-Regular, Consolas, Menlo, monospace;
+  --mono: ui-monospace, "Cascadia Mono", SFMono-Regular, Menlo, Consolas,
+          "Liberation Mono", monospace;
   --radius: 3px;
 
   --bg: #fff;
@@ -60,8 +72,9 @@
 }
 
 body {
-  font-family: Calibri, Helvetica, sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
+  line-height: 1.5;
   /* no top margin: the sticky header supplies its own top spacing (via padding),
      so it starts flush at the viewport top and pins without any travel */
   margin: 0 var(--gap) var(--gap) var(--gap);
@@ -96,8 +109,18 @@ p {
   margin: 0 0 var(--space) 0;
 }
 
+/* a wrapped heading stays together */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+}
+
+/* between semibold and bold: Segoe UI Semibold is too light, Bold too heavy */
+h1, h2, h3, h4, h5, h6, th, b, strong, dt {
+  font-weight: 650;
+}
+
 h1 {
-  font-size: 220%;
+  font-size: 200%;
   color: var(--accent-strong);
   margin: -2px 0 0 0;
 }
@@ -109,7 +132,7 @@ h2 {
 }
 
 h3 {
-  font-size: 120%;
+  font-size: 130%;
   color: var(--muted);
   /* the top margin also separates a heading from the block above it */
   margin: var(--space) 0 .3rem 0;
@@ -159,7 +182,6 @@ dl {
 
 dt {
   margin: var(--space) 0;
-  font-weight: bold;
 }
 
 a {
@@ -188,7 +210,7 @@ b {
 /* code, however much of it there is */
 code, pre {
   font-family: var(--mono);
-  font-size: 90%;
+  font-size: 0.875em;
   border: var(--line) solid var(--border-light);
   border-radius: var(--radius);
 }
@@ -207,7 +229,7 @@ pre {
 textarea {
   font-family: var(--mono);
   width: 100%;
-  resize: vertical;
+  resize: none;
   background-color: var(--bg);
   color: var(--fg);
 }
@@ -434,7 +456,7 @@ body:has(.content.fill) main {
 
 /* the root of a breadcrumb: bold, and a link like the others */
 a.root {
-  font-weight: bold;
+  font-weight: 650;
 }
 
 /* page header: pinned to the top while scrolling */
@@ -478,8 +500,6 @@ header {
   display: flex;
   align-items: baseline;
   column-gap: 1.5rem;
-  /* fixed height so the status glyph (fallback font) can't shift the layout */
-  line-height: 1.4;
 }
 
 .header-nav ul {
@@ -499,7 +519,7 @@ header {
 
 /* the entry of the current view, marked by the same attribute the client is given */
 .header-nav a[aria-current] {
-  font-weight: bold;
+  font-weight: 650;
   color: var(--accent-strong);
 }
 
@@ -514,7 +534,7 @@ header {
 
 /* the user whose conversation is on display (like the selected entry in the DBA) */
 a.selected {
-  font-weight: bold;
+  font-weight: 650;
   color: var(--accent-strong);
 }
 

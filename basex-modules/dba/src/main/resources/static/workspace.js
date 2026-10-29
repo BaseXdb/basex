@@ -332,6 +332,7 @@ function runQuery() {
   setDisabled("stop", true);
   setText("", "");
   setRunInfo("");
+  hidePreview();
 
   sendRequest(WORKSPACE_WS, {
     type: "run",
@@ -357,6 +358,36 @@ function showResult(json) {
     items === undefined ? "Result" : `Result (${plural(items, "item")})`;
   setRunInfo(json.time ? `Runtime: ${json.time}` : "");
   showInfo(json.info);
+}
+
+/**
+ * Shows an image in the result panel, or a note if it cannot be displayed.
+ * @param {object} t tab of the file
+ */
+function showPreview(t) {
+  const preview = document.getElementById("output-preview");
+  _output.setValue("");
+  preview.onerror = () => {
+    hidePreview();
+    _output.setValue(`${t.name}: no preview available.`);
+  };
+  preview.alt = t.name;
+  preview.src = `file-raw?${new URLSearchParams({ name: t.name, dir: t.dir })}`;
+  preview.hidden = false;
+  document.getElementById("output-hint").hidden = true;
+  document.getElementById("result-label").textContent = `Preview: ${t.name}`;
+  setRunInfo("");
+}
+
+/**
+ * Hides the preview of a file, and gives the result panel back to the query results.
+ */
+function hidePreview() {
+  const preview = document.getElementById("output-preview");
+  preview.onerror = null;
+  preview.removeAttribute("src");
+  preview.hidden = true;
+  document.getElementById("result-label").textContent = "Result";
 }
 
 /**
@@ -533,7 +564,9 @@ async function loadTab(t) {
     t.saved = "";
     if(t === tab() && applyDraft(t)) storeTabs();
     else await closeTab(_tabs.indexOf(t));
-    showError(response, t.name);
+    // an image is previewed instead
+    if(response.status === 415) showPreview(t);
+    else showError(response, t.name);
   }
 }
 

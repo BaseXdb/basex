@@ -96,7 +96,7 @@ function dba:logs(
       { 'label': 'Logs' }
     )
   ) => html:wrap({
-    'header': $dba:CAT, 'divided': true(), 'columns': ('1fr', '200px'),
+    'header': $dba:CAT, 'divided': true(), 'columns': ('1fr', '14rem'),
     (: the panels fill the viewport and scroll on their own, so their heads can be pinned :)
     'rows': '1fr',
     'scripts': 'logs', 'init': 'initLogs();'[$date]

@@ -48,12 +48,18 @@ function dba:databases(
   return (
     html:panel(panels:databases('', 1, $name), { 'id': 'databases-panel', 'label': 'Databases' }),
     html:panel($database, { 'id': 'database-panel', 'label': 'Database' }),
-    (: the editor is created once and outlives the panel above it, which is redrawn :)
+    (: the editor and the note below it are created once and outlive the panel above them,
+       which is redrawn; the client writes to the note as well :)
     html:panel(panels:resource($name, $resource, $document), {
       'id'   : 'resource-panel',
       'label': 'Resource',
       'pane' : false(),
-      'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
+      'extra': (
+        <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>,
+        <div id='note' class='note ellipsis{ ' warn'[$document?note] }' title='{ $document?note }'>{
+          $document?note
+        }</div>
+      )
     }),
     (: no steps of the work: what concerns a database as a whole, and the storage, are opened
        when asked for; see initDatabases :)
@@ -92,6 +98,24 @@ function dba:db-download(
     utils:outcome($dba:CAT, { 'name': $name, 'resource': $resource },
       { 'error': 'Download failed: ' || $err:description })
   }
+};
+
+(:~
+ : Returns the raw content of a binary resource, for previewing it.
+ : @param  $name      database
+ : @param  $resource  resource
+ : @return rest response and binary data
+ :)
+declare
+  %rest:GET
+  %rest:path('/dba/db-raw')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
+function dba:db-raw(
+  $name      as xs:string,
+  $resource  as xs:string
+) as item()+ {
+  utils:inline(db:get-binary($name, $resource), db:content-type($name, $resource))
 };
 
 (:~

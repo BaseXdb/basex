@@ -39,9 +39,11 @@ function dba:login(
         {
           for key $key value $value in html:parameters()
           return <input type='hidden' name='{ $key }' value='{ $value }'/>,
-          form:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''/>),
+          (: unlike all other fields, the credentials are offered by the browser :)
+          form:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''
+                                     autocomplete='username'/>),
           form:field('Password:', (
-            <input type='password' name='_pass'/>,
+            <input type='password' name='_pass' autocomplete='current-password'/>,
             ' ',
             form:button('login', 'Log In')
           ))

@@ -109,10 +109,9 @@ declare function panels:user(
             form:field('Name:',
               <input type='text' name='newname' value='{ $newname otherwise $name }'/>)
           },
-          form:field('Password:', (
-            <input type='password' name='pw' autocomplete='new-password'/>,
-            <div class='note'>…only changed if a new one is entered</div>
-          ))
+          form:field('Password:',
+            <input type='password' name='pw' autocomplete='new-password'
+                   placeholder='unchanged'/>)
         }</div>,
         if (not($admin)) {
           <div>{

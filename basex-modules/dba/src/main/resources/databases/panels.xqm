@@ -42,10 +42,10 @@ declare function panels:databases(
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
             'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-            'width': 'calc(11ch + 0.5rem)' },
+            'width': 'calc(10ch + 0.5rem)' },
           (: what Restore falls back to, and where a backup that was just written shows up :)
           { 'key': 'backup', 'label': 'Backup', 'type': 'dateTime', 'order': 'desc',
-            'width': 'calc(11ch + 0.5rem)', 'link': fn($entry, $date) {
+            'width': 'calc(10ch + 0.5rem)', 'link': fn($entry, $date) {
               html:action($date, 'showBackups', { 'name': $entry?db }, {
                 'href': web:create-url($panels:CAT,
                   { 'name': $entry?db, 'show': 'properties', 'tab': 'backups-panel' })
@@ -757,7 +757,7 @@ declare %private function panels:entry(
 
 (:~
  : Creates the contents of the resource panel: the actions that apply to the shown document,
- : the reason why it cannot be edited, and the field for querying it.
+ : and the field for querying it.
  : @param  $name      selected database
  : @param  $resource  selected resource
  : @param  $document  document properties, as returned by panels:document
@@ -792,8 +792,11 @@ declare function panels:resource(
             }</label>
           }</div>
         }</form>,
-        (: the line is reserved: the client writes to it as well :)
-        <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
+        (: an image takes the place of the editor :)
+        if ($document?image) {
+          <img class='preview' alt='{ $resource }'
+               src='{ web:create-url('db-raw', { 'name': $name, 'resource': $resource }) }'/>
+        },
         (: the query runs while it is typed; a slow one can be stopped :)
         if ($document?xml) {
           <div class='query-row'>{
@@ -827,8 +830,8 @@ declare function panels:resource(
  : Returns the document that is shown in the editor, and what can be done with it.
  : @param  $name      selected database
  : @param  $resource  selected resource
- : @return properties: whether the resource exists, is XML and can be edited, the reason why
- :         it cannot be edited, and its text
+ : @return properties: whether the resource exists, is XML or an image and can be edited, the
+ :         reason why it cannot be edited, and its text
  :)
 declare function panels:document(
   $name      as xs:string?,
@@ -837,25 +840,35 @@ declare function panels:document(
   if (not($name and $resource and db:exists($name, $resource))) then (
     { 'exists': false(), 'text': '', 'editable': false() }
   ) else (
-    (: the value is serialized with a bounded limit: db:list-details/@size counts nodes, not
-       characters, so the length of the shown text is only known once the text is there :)
-    let $xml := db:type($name, $resource) = 'xml'
+    let $type := db:type($name, $resource)
+    let $xml := $type = 'xml'
     let $max := config:get($config:MAXCHARS)
     let $value := panels:resource-value($name, $resource)
-    let $text := serialize($value, {
-      'method': if ($xml) then 'xml' else 'basex',
-      'limit': $max * 2 + 1
-    })
-    let $truncated := string-length($text) > $max
-    (: what speaks against editing; the note the client extends for query results is the one
-       that utils:editable composes from it :)
-    return utils:editable(
-      substring($text, 1, $max),
-      (
-        'no XML document'[not($xml)],
-        'truncated, download for full text'[$truncated]
-      )
-    ) but with { 'xml': $xml }
+    let $text := if ($type = 'binary') then (
+      (: binary data is shown as text if it can be decoded, as an image, or not at all; data
+         that is too large to be shown in full is not decoded :)
+      if (xs:integer(db:list-details($name, $resource)/@size) <= $max * 4) {
+        try { bin:decode-string($value) } catch * { () }
+      }
+    ) else (
+      (: the value is serialized with a bounded limit: db:list-details/@size counts nodes, not
+         characters, so the length of the shown text is only known once the text is there :)
+      serialize($value, { 'method': if ($xml) then 'xml' else 'basex', 'limit': $max * 2 + 1 })
+    )
+    return if (empty($text) and starts-with(db:content-type($name, $resource), 'image/')) then (
+      (: an image is not shown in the editor, so nothing needs to be said about editing it :)
+      { 'exists': true(), 'text': '', 'editable': false(), 'image': true() }
+    ) else (
+      (: what speaks against editing; the client shows the note that utils:editable composes
+         from it whenever it has nothing more specific to say :)
+      utils:editable(
+        substring($text, 1, $max),
+        (
+          if (empty($text)) then 'binary data' else 'no XML document'[not($xml)],
+          'truncated, download for full text'[string-length($text) > $max]
+        )
+      ) but with { 'xml': $xml }
+    )
   )
 };
 
@@ -949,7 +962,7 @@ declare %private function panels:backup-section(
             (: the name is the download: a column that repeats it as a link adds nothing :)
             'backup': fn() {
               html:link(substring-after($backup, $name || '-'),
-                `backup/{ encode-for-uri($backup) }.zip`)
+                `backup/{ encode-for-uri($backup) }.zip`, title := 'Download the backup')
             },
             'size': $backup/@size,
             'comment': $backup/@comment

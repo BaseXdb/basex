@@ -94,7 +94,8 @@ public final class StrLazy extends AStr implements Lazy {
       value = get(false, ii).content();
       contents = null;
     } catch(final IOException ex) {
-      throw error.get(ii, IOUrl.stripUserInfo(input.toString())).cause(ex);
+      final String path = IOUrl.stripUserInfo(input.toString());
+      throw error.get(ii, path + ": " + Util.message(ex)).cause(ex);
     }
   }
 

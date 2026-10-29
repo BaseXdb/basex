@@ -13,7 +13,7 @@ let _dir = "";
 /** Whether the shown document can be edited. */
 let _editable = false;
 
-/** Server-rendered read-only reason ([ message, class ]). */
+/** Server-rendered read-only reason (empty if there is none). */
 let _note;
 
 /** Cached raw document; undefined if it must be requested again. */
@@ -275,6 +275,8 @@ function refreshResource() {
  */
 function showResource(json) {
   fillPanel("resource-panel", json.html);
+  // the note outlives the panel, as the editor does
+  showNote("note", json.note);
   // the 'Indent' preference belongs to the editor, and outlives the panel that shows it
   restoreIndent();
   initDocument(json.editable, json.text);
@@ -291,8 +293,7 @@ function initDocument(editable, text) {
   if(text !== undefined) _editor.setValue(text);
   // the editor normalizes line endings: what it holds is the baseline, not what was sent
   _saved = editorValue();
-  const note = document.getElementById("note");
-  _note = note ? [ note.textContent, note.className ] : undefined;
+  _note = document.getElementById("note").textContent;
 
   // the query field is rendered empty: what was typed for the database is run again
   if(restoreField("input", _db) || document.getElementById("input") && indentOn()) {
@@ -329,7 +330,7 @@ function queryResource(enforce, keep) {
   // block edits until the result has been received; a query result is read-only
   setEditable("save-resource", false);
   if(input && _editable) {
-    showResourceNote("Read-only: query result; clear the query to edit.");
+    showResourceNote("Query results are read-only. Clear the query to edit the document.");
   }
 
   sendRequest(DB_WS, {
@@ -368,11 +369,11 @@ function showDocument(text) {
 }
 
 /**
- * Shows a note below the resource toolbar.
+ * Shows a note below the editor.
  * @param {string} message message; if omitted, the server-rendered reason is restored
  */
 function showResourceNote(message) {
-  showNote("note", message, _note);
+  showNote("note", message || _note);
 }
 
 /**

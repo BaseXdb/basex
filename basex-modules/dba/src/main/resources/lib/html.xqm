@@ -303,14 +303,19 @@ declare function html:heading(
  : @param  $text    link text
  : @param  $href    link reference
  : @param  $params  query parameters
+ : @param  $title   tooltip
  : @return link
  :)
 declare function html:link(
   $text    as xs:string,
   $href    as xs:string,
-  $params  as map(*)* := {}
+  $params  as map(*)* := {},
+  $title   as xs:string? := ()
 ) as element(a) {
-  <a href='{ web:create-url($href, map:merge($params)) }'>{ $text }</a>
+  <a href='{ web:create-url($href, map:merge($params)) }'>{
+    $title ! attribute title { . },
+    $text
+  }</a>
 };
 
 (:~
@@ -399,7 +404,7 @@ declare function html:short-date(
   ) else (
     '[Y0000]-[M00]-[D00]'
   )
-  return <span title='{ html:exact($date) }'>{
+  return <span class='nowrap' title='{ html:exact($date) }'>{
     format-dateTime($adjusted, $picture)
   }</span>
 };
@@ -419,7 +424,9 @@ declare function html:time(
   ) else (
     '[Y0000]-[M00]-[D00]'
   )
-  return <span title='{ html:exact($date) }'>{ format-dateTime($adjusted, $picture) }</span>
+  return <span class='nowrap' title='{ html:exact($date) }'>{
+    format-dateTime($adjusted, $picture)
+  }</span>
 };
 
 (:~

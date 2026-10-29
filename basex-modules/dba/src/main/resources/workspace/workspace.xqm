@@ -67,6 +67,7 @@ function dba:workspace() as element(html) {
           id='query-info' onchange='queryInfoChanged()'/> Query Info</label>
       </div>
       <textarea id='output' readonly='' spellcheck='false'/>
+      <img id='output-preview' class='preview' alt='' hidden=''/>
       <div id='output-hint' class='hint'>Ctrl-Enter to run</div>
       <div class='resizer-row' id='info-resizer' data-split='0' hidden=''/>
     </div>,

@@ -29,6 +29,20 @@ declare %private variable $panels:STATES := {
   'registered': 'Registered as service; it is scheduled when the server starts'
 };
 
+(:~ Columns of the jobs table. :)
+declare %private variable $panels:JOB-HEADERS := (
+  (: the id and values of a known format get the width they need; the path takes the rest :)
+  { 'key': 'job', 'label': 'ID', 'width': 'calc(16ch + 0.5rem)' },
+  { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
+  { 'key': 'type', 'label': 'Type', 'width': 'calc(7ch + 0.5rem)' },
+  { 'key': 'path', 'label': 'Path' },
+  { 'key': 'duration', 'label': 'Dur.', 'type': 'duration', 'order': 'desc',
+    'width': 'calc(7ch + 0.5rem)' },
+  { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
+  { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
+    'width': 'calc(10ch + 0.5rem)' }
+);
+
 (:~
  : Indicates whether a job was started by the DBA itself.
  : @param  $job  job details
@@ -70,18 +84,6 @@ declare function panels:jobs(
   return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     <h2>Jobs</h2>
     {
-      (: the values of a known format get the width they need; the id takes the rest :)
-      let $headers := (
-        { 'key': 'job', 'label': 'ID' },
-        { 'key': 'type', 'label': 'Type', 'width': 'calc(10ch + 0.5rem)' },
-        { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
-        { 'key': 'path', 'label': 'Path', 'width': 'calc(12ch + 0.5rem)' },
-        { 'key': 'duration', 'label': 'Duration', 'type': 'duration', 'order': 'desc',
-          'width': 'calc(11ch + 0.5rem)' },
-        { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
-        { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
-          'width': 'calc(10ch + 0.5rem)' }
-      )
       let $services := job:services()
       (: the job that renders this table is of no interest :)
       let $jobs := job:list-details()[not(@id = job:current())]
@@ -138,7 +140,7 @@ declare function panels:jobs(
       )
       let $options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'select': 'id',
         'noun': 'job', 'empty': 'No jobs are running or scheduled.' }
-      return table:create($headers, $entries, $buttons, options := $options)
+      return table:create($panels:JOB-HEADERS, $entries, $buttons, options := $options)
     }
   </form>
 };
@@ -362,9 +364,12 @@ declare function panels:job-done(
 declare %private function panels:job-information(
   $entry  as element()
 ) as element(table) {
-  table:pairs(
-    for $value in $entry/@*
-    for $name in name($value)[. != 'id']
+  (: the columns of the jobs table come first, in the same order :)
+  let $first := $panels:JOB-HEADERS?key
+  let $attrs := $entry/@*[name() != 'id']
+  return table:pairs(
+    for $value in (for $key in $first return $attrs[name() = $key], $attrs[not(name() = $first)])
+    let $name := name($value)
     let $string := string($value)
     (: values are formatted as in the lists, with the exact value as tooltip :)
     return <tr>

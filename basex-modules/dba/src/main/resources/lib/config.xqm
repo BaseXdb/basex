@@ -23,7 +23,7 @@ declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'admin');
 (:~ Views, in the order in which the navigation offers them. :)
 (: a view is named by the path of its page, which is also the label of its entry :)
 declare variable $config:VIEWS := (
-  'logs', 'activity', 'databases', 'stores', 'users', 'workspace', 'settings'
+  'logs', 'activity', 'workspace', 'databases', 'stores', 'users', 'settings'
 );
 
 (:~ Number of entries that a table shows at once. :)

@@ -33,7 +33,7 @@ public interface WebText {
   String AUTHORIZATION = "authorization";
 
   /** WebSocket string. */
-  String WEBSOCKET = "WebSocket";
+  String WEBSOCKET = "WS";
   /** RESTXQ string. */
   String RESTXQ = "RESTXQ";
   /** XHTML namespace. */

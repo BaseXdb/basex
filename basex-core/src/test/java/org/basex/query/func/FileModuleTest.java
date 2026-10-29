@@ -539,6 +539,9 @@ public final class FileModuleTest extends SandboxTest {
     assertEquals(3, query(func.args(PATH1, "CP1252")).length());
     query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('00')"));
     error(func.args(PATH1), FILE_IO_ERROR_X);
+    query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('89')"));
+    query("try { " + func.args(PATH1) + " } catch * " +
+        "{ ends-with($err:description, 'encoding: 89') }", true);
 
     // newline normalization
     query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('610D0A620D63')"));

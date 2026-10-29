@@ -21,7 +21,34 @@ function dba:editor-open(
   $name  as xs:string,
   $dir   as xs:string?
 ) as xs:string {
-  file:read-text(utils:file-path($dir, $name))
+  try {
+    file:read-text(utils:file-path($dir, $name))
+  } catch file:io-error {
+    (: the client previews an image; any other error is reported :)
+    if (starts-with(web:content-type($name), 'image/')) then (
+      web:error(415, $err:description)
+    ) else (
+      error($err:code, $err:description, $err:value)
+    )
+  }
+};
+
+(:~
+ : Returns the raw content of a file, for previewing it.
+ : @param  $name  name of file
+ : @param  $dir   directory of the file panel
+ : @return rest response and binary data
+ :)
+declare
+  %rest:GET
+  %rest:path('/dba/file-raw')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('dir',  '{$dir}')
+function dba:file-raw(
+  $name  as xs:string,
+  $dir   as xs:string?
+) as item()+ {
+  utils:inline(file:read-binary(utils:file-path($dir, $name)), web:content-type($name))
 };
 
 (:~

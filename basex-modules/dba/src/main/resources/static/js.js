@@ -809,16 +809,26 @@ function hintShortcuts(root) {
   if(live) hint(live, "L");
 }
 
-/** Watches the links, heads and controls with shortcuts that a page or a panel brings along. */
+/**
+ * Returns the elements of a block that match a selector, including the block itself.
+ * @param {Element} block block
+ * @param {string} selector selector
+ * @returns {Iterable<Element>} elements
+ */
+function matching(block, selector) {
+  return block.matches(selector) ? [ block ] : block.querySelectorAll(selector);
+}
+
+/** Watches the links, heads, fields and controls with shortcuts that a page or a panel brings
+    along. */
 new MutationObserver(mutations => {
-  const added = (node, selector) => node.matches(selector) ? [ node ] :
-    node.querySelectorAll(selector);
   for(const mutation of mutations) {
     for(const node of mutation.addedNodes) {
       if(node.nodeType !== Node.ELEMENT_NODE) continue;
-      for(const block of added(node, ".more")) loadMore(block);
+      for(const block of matching(node, ".more")) loadMore(block);
       hintShortcuts(node);
-      const heads = added(node, ".sticky");
+      noHistory(node);
+      const heads = matching(node, ".sticky");
       for(const head of heads) _stickyObserver.observe(head);
       // a hidden page reports no sizes, so the new heads are measured at once
       if(heads.length) pinHeads();
@@ -921,12 +931,14 @@ async function promptSubmit(id, label, submit, value, action) {
  * Writes the note that says what can be done with what is shown, and why. A note that reports
  * something the user did not ask for is marked as a warning.
  * @param {string} id id of the note element
- * @param {string} message message; if empty, the fallback is restored
- * @param {Array} fallback text and class to fall back to ([ message, class ])
+ * @param {string} message message (can be empty)
  */
-function showNote(id, message, fallback = [ "", "note" ]) {
+function showNote(id, message) {
   const note = document.getElementById(id);
-  if(note) [ note.textContent, note.className ] = message ? [ message, "note warn" ] : fallback;
+  if(!note) return;
+  note.classList.toggle("warn", Boolean(message));
+  // a note that is cut off to a single line is read in full from its title
+  note.textContent = note.title = message ?? "";
 }
 
 /**
@@ -1731,6 +1743,16 @@ function ready() {
   document.getElementById("info")?.addEventListener("click", jumpToError);
   initDialogInfo();
   initLive();
+  noHistory(document.body);
+}
+
+/**
+ * Turns off the input history of the browser for the fields of a block; a field that states a
+ * value of its own keeps it.
+ * @param {Element} block block
+ */
+function noHistory(block) {
+  for(const input of matching(block, "input:not([autocomplete])")) input.autocomplete = "off";
 }
 
 /**
