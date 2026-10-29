@@ -268,13 +268,17 @@ async function closeTab(index) {
 }
 
 /**
- * Opens the job view of the running query in a browser tab of its own. Repeated clicks reuse
- * that tab; a click with Ctrl or Cmd opens another one.
+ * Shows the details of the running query over the view; a click with Ctrl or Cmd opens them in
+ * the activity view, in a browser tab of its own.
  * @param {Event} event click event
  */
 function openJob(event) {
-  const target = event.ctrlKey || event.metaKey ? "_blank" : "activity";
-  if(_job) window.open(`activity?job=${encodeURIComponent(_job)}`, target);
+  if(!_job) return;
+  if(event.ctrlKey || event.metaKey) {
+    window.open(`activity?job=${encodeURIComponent(_job)}`, "_blank");
+  } else {
+    selectJob(_job);
+  }
 }
 
 /**
@@ -737,9 +741,12 @@ _editor_changed = () => {
 followPanelLinks({ "files-panel": sort => refreshFiles(sort) });
 
 /** The chooser of a file panel that has just arrived shows the directory the server resolved:
-    that is the one that is remembered. */
+    that is the one that is remembered. A file whose job is running offers to stop it until the
+    job has ended: the panel is asked for again until then, as a live view would be. */
 _panel_filled["files-panel"] = () => {
   store(DIR_KEY, document.getElementById("dir").value);
+  scheduleLive(() => refreshFiles(),
+    document.querySelector("#files-panel button.stop") !== null);
 };
 
 /** The file panel is filled by showMessage; what is left is the job of a query and its
@@ -803,6 +810,9 @@ _editor_shortcuts.push(
  */
 function initWorkspace() {
   loadCodeMirror("xquery", true, "fill");
+  // the details of a job arrive with the page; a running job is asked for again
+  initJobDetails();
+  watchJob();
   document.addEventListener("keydown", workspaceKeys);
 
   // opened before the resizers are set up: they measure the rows of the grid

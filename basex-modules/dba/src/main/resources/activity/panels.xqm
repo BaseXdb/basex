@@ -15,25 +15,32 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 declare %private variable $panels:PREVIEW := 100;
 (:~ Time after which a session without connections and jobs is regarded as idle. :)
 declare %private variable $panels:IDLE := xs:dayTimeDuration('PT5M');
+(:~ Maximum number of attributes that are shown for a session or connection. :)
+declare %private variable $panels:ATTRIBUTES := 5;
+(:~ Session attributes that the server takes the client name from, by precedence. :)
+declare %private variable $panels:CLIENT := ('id', $config:SESSION-KEY);
 
-(:~ What the states of a job mean. :)
+(:~ What the states of a job mean, in the order they are sorted by. :)
 declare %private variable $panels:STATES := {
-  'scheduled' : 'Waiting for the time at which it starts',
-  'queued'    : 'Waiting for locks held by other jobs',
   'running'   : 'Being evaluated',
+  'queued'    : 'Waiting for locks held by other jobs',
+  'scheduled' : 'Waiting for the time at which it starts',
+  'registered': 'Registered as service; it is scheduled when the server starts',
   'cached'    : 'Finished; the result is kept until it is fetched',
-  'finished'  : 'Finished; it is listed for 30 seconds',
-  'stopped'   : 'Stopped; it will be discarded',
   'timeout'   : 'Stopped because the timeout was exceeded',
   'memory'    : 'Stopped because the memory limit was exceeded',
-  'registered': 'Registered as service; it is scheduled when the server starts'
+  'stopped'   : 'Stopped; it will be discarded',
+  'finished'  : 'Finished; it is listed for 30 seconds'
 };
+
 
 (:~ Columns of the jobs table. :)
 declare %private variable $panels:JOB-HEADERS := (
   (: the id and values of a known format get the width they need; the path takes the rest :)
   { 'key': 'job', 'label': 'ID', 'width': 'calc(16ch + 0.5rem)' },
-  { 'key': 'state', 'label': 'State', 'width': 'calc(10ch + 0.5rem)' },
+  (: states are sorted by their rank and shown with their meaning :)
+  { 'key': 'state', 'label': 'State', 'sort': 'number', 'width': 'calc(10ch + 0.5rem)',
+    'link': fn($entry, $value) { $entry?state-cell() } },
   { 'key': 'type', 'label': 'Type', 'width': 'calc(7ch + 0.5rem)' },
   { 'key': 'path', 'label': 'Path' },
   { 'key': 'duration', 'label': 'Dur.', 'type': 'duration', 'order': 'desc',
@@ -71,13 +78,13 @@ declare %private function panels:dba-path(
  : Creates the contents of the jobs panel.
  : @param  $sort  table sort key; empty string for the newest jobs first
  : @param  $page  number of shown pages
- : @param  $dba   whether the jobs of the DBA itself are listed as well
+ : @param  $finished  whether finished jobs are listed as well
  : @return panel contents
  :)
 declare function panels:jobs(
-  $sort  as xs:string := '',
-  $page  as xs:integer := 1,
-  $dba   as xs:boolean := false()
+  $sort      as xs:string := '',
+  $page      as xs:integer := 1,
+  $finished  as xs:boolean := false()
 ) as element()+ {
   let $presort := 'time'
   let $sort := $sort[.] otherwise $presort
@@ -87,9 +94,9 @@ declare function panels:jobs(
       let $services := job:services()
       (: the job that renders this table is of no interest :)
       let $jobs := job:list-details()[not(@id = job:current())]
-      (: the queries that are run in the DBA itself are only listed on demand :)
-      let $dba-jobs := $jobs[panels:dba-job(.)]
-      let $hidden := $dba-jobs[not($dba)]
+      (: finished jobs are only listed on demand, and never if the DBA itself ran them :)
+      let $done := $jobs[@state = 'finished'][not(panels:dba-job(.))]
+      let $hidden := $jobs[@state = 'finished'] except $done[$finished]
       let $entries := (
         for $details in $jobs except $hidden
         let $id := $details/@id
@@ -101,7 +108,8 @@ declare function panels:jobs(
           'id': $id,
           'job': panels:job-link($id),
           'type': string($details/@type),
-          'state': panels:job-state($details/@state, $details/@start),
+          'state': panels:state-rank($details/@state),
+          'state-cell': panels:job-state($details/@state, $details/@start),
           'path': string($details/@path),
           'duration': $sec,
           (: the address of the client is rarely of interest; the session that the job was
@@ -116,7 +124,8 @@ declare function panels:jobs(
         return {
           'id': $id,
           'job': panels:job-link($id),
-          'state': panels:job-state('registered')
+          'state': panels:state-rank('registered'),
+          'state-cell': panels:job-state('registered')
         }
       )
       let $buttons := (
@@ -131,11 +140,11 @@ declare function panels:jobs(
           <input type='checkbox' id='live' data-live='activity' checked=''
                  onchange='liveChanged()'/>, ' Live'
         }</label>,
-        (: the state is kept by the client, which states it with every refresh :)
-        <label title='Show the queries that are run in the DBA itself'>{
-          <input type='checkbox' id='dba-jobs' onchange='dbaJobsChanged()'>{
-            attribute checked { }[$dba]
-          }</input>, ` DBA jobs ({ count($dba-jobs) })`
+        (: remembered by the client, which states it with every refresh :)
+        <label title='Show the jobs that have finished'>{
+          <input type='checkbox' id='finished' onchange='filterChanged(this)'>{
+            attribute checked { }[$finished]
+          }</input>, ` Finished ({ count($done) })`
         }</label>
       )
       let $options := { 'sort': $sort, 'presort': $presort, 'page': $page, 'select': 'id',
@@ -156,6 +165,46 @@ declare %private function panels:job-link(
   (: the details are opened in place; the address names them, so the link can be bookmarked :)
   fn() {
     html:action($id, 'selectJob', { 'job': $id }, { 'href': '?job=' || $id, 'class': 'nowrap' })
+  }
+};
+
+(:~
+ : Creates the dialog with the details of a job.
+ : @param  $job   job id (can be empty)
+ : @param  $page  page the dialog is opened on, which its actions return to
+ : @return dialog
+ :)
+declare function panels:details-dialog(
+  $job   as xs:string?,
+  $page  as xs:string
+) as element(dialog) {
+  (: a job that is selected later is filled in by the client. A job that is done does not change
+     any more: the client stops asking for it :)
+  <dialog id='details-dialog'>
+    <form method='post' autocomplete='off' id='job-details'
+          data-done='{ panels:job-done($job) }'>{
+      panels:job-view($job)
+    }</form>
+    { (: the details replace the contents of the form, so the page is submitted from outside :) }
+    <input type='hidden' name='page' value='{ $page }' form='job-details'/>
+    { form:dialog-info() }
+  </dialog>
+};
+
+(:~
+ : Creates the form that downloads the result of a job.
+ : @param  $job  job id (can be empty)
+ : @return form, or empty sequence if no result is downloaded
+ :)
+declare function panels:download-form(
+  $job  as xs:string?
+) as element(form)? {
+  (: submitted as soon as the page is there, and the request that fetches the file is what
+     consumes the job :)
+  if ($job) {
+    <form id='download-form' method='post' action='job-result'>
+      <input type='hidden' name='id' value='{ $job }'/>
+    </form>
   }
 };
 
@@ -196,6 +245,17 @@ declare %private function panels:job-state(
     }
   }
 };
+(:~
+ : Returns the rank by which the state of a job is sorted.
+ : @param  $state  state
+ : @return rank
+ :)
+declare %private function panels:state-rank(
+  $state  as xs:string
+) as xs:integer {
+  index-of(map:keys($panels:STATES), $state)
+};
+
 (:~
  : Creates the user of a job, with the address of its client as tooltip.
  : @param  $details  job details
@@ -306,7 +366,7 @@ declare %private function panels:job-details(
       <div class='job-texts'>{
         if ($output) {
           <h3>Result</h3>,
-          <textarea id='output' readonly='' spellcheck='false'>{ $output }</textarea>
+          <textarea id='job-output' readonly='' spellcheck='false'>{ $output }</textarea>
         },
         (: a stored definition can be replaced; a job string is only shown, highlighted as well :)
         <h3>{ if ($persisted) then 'Query' else 'Job String' }</h3>,
@@ -393,24 +453,25 @@ declare %private function panels:job-information(
 (:~
  : Creates the contents of the clients panel: the web sessions of the server, each followed by
  : the WebSocket connections and the jobs that were opened in it.
- : @param  $sort    table sort key; empty string for the newest sessions first
- : @param  $socket  id of the connection of the requesting view (empty if unknown)
- : @param  $idle    whether the idle sessions are listed as well
- : @param  $dba     whether the jobs of the DBA itself are listed as well
+ : @param  $sort        table sort key; empty string for the newest sessions first
+ : @param  $socket      id of the connection of the requesting view (empty if unknown)
+ : @param  $idle        whether the idle sessions are listed as well
+ : @param  $websockets  whether the WebSocket connections are listed
  : @return panel contents
  :)
 declare function panels:clients(
-  $sort    as xs:string := '',
-  $socket  as xs:string? := (),
-  $idle    as xs:boolean := false(),
-  $dba     as xs:boolean := false()
+  $sort        as xs:string := '',
+  $socket      as xs:string? := (),
+  $idle        as xs:boolean := false(),
+  $websockets  as xs:boolean := false()
 ) as element(form) {
   let $current := session:id()
   let $sessions := sessions:list-details()
   let $sockets := ws:list-details()
   let $jobs := job:list-details()[not(@id = job:current())]
-  (: the queries of the DBA are listed as they are in the jobs panel :)
-  let $listed-jobs := $jobs[$dba or not(panels:dba-job(.))]
+  (: finished queries of the DBA itself are of no interest, as in the jobs panel :)
+  let $listed-jobs := $jobs[not(@state = 'finished' and panels:dba-job(.))]
+  let $listed-sockets := $sockets[$websockets]
   let $registered := job:list()
   (: a session without connections and jobs that has not been accessed for a while is idle; the
      session of this view never is :)
@@ -443,10 +504,10 @@ declare function panels:clients(
   let $groups := (
     for $session in $ordered
     let $id := string($session/@id)
-    return panels:session-rows($session, $id = $current,
-      $sockets[@session = $id], $listed-jobs[@session = $id], $socket, $registered),
+    return panels:session-rows($session, $id = $current, $listed-sockets[@session = $id],
+      $listed-jobs[@session = $id], $socket, $registered),
     (: connections that were opened without a session, or whose session is gone :)
-    let $orphans := $sockets[not(@session = $sessions/@id)]
+    let $orphans := $listed-sockets[not(@session = $sessions/@id)]
     where exists($orphans)
     return <tbody>{
       <tr class='group'>
@@ -461,12 +522,17 @@ declare function panels:clients(
       form:button('clients/close', 'Close', ('CHECK', 'CONFIRM'),
         title := 'Close the selected sessions and connections; ' ||
           'a closed session logs its users out'),
-      (: the state is kept by the client, which states it with every refresh :)
+      (: both are remembered by the client, which states them with every refresh :)
+      <label title='Show the WebSocket connections below their sessions'>{
+        <input type='checkbox' id='websockets' onchange='filterChanged(this)'>{
+          attribute checked { }[$websockets]
+        }</input>, ` WebSockets ({ count($sockets) })`
+      }</label>,
       <label title='{ 'Show the sessions without connections and jobs that were not ' ||
                       'accessed for 5 minutes' }'>{
-        <input type='checkbox' id='idle' onchange='idleChanged()'>{
+        <input type='checkbox' id='idle' onchange='filterChanged(this)'>{
           attribute checked { }[$idle]
-        }</input>, ` Show idle ({ count($idle-ids) })`
+        }</input>, ` Idle ({ count($idle-ids) })`
       }</label>
     }</div>
     <h3>{
@@ -492,11 +558,11 @@ declare function panels:clients(
                   <input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>, ' ',
                   $label('id')
                 }</th>
-                <th>Attributes</th>
                 <th>{ $state('created'), $label('created') }</th>
                 <th>{ $state('accessed'), $label('accessed') }</th>
                 <th title='{ 'A session that is not accessed again is discarded at this ' ||
                   'time' }'>{ $state('expires'), $label('expires') }</th>
+                <th class='attributes'>Attributes</th>
               </tr>
             </thead>
             { $groups }
@@ -526,34 +592,50 @@ declare %private function panels:session-rows(
   $registered  as xs:string*
 ) as element(tbody)? {
   let $id := string($session/@id)
-  (: a session can be gone before it is read: it is skipped, rather than failing the panel. The
-     attributes are wrapped in an array, so that the loop runs once :)
-  for $attributes in try {
-    [ panels:attributes('session', $id,
-      map:build(sessions:names($id), value := fn($name) {
+  (: a session can be gone before it is read: it is skipped, rather than failing the panel. What
+     is read is wrapped in a map, so that the loop runs once :)
+  for $read in try {
+    {
+      'attributes': panels:attributes('session', $id, sessions:names($id), fn($name) {
         utils:preview(sessions:get($id, $name), $panels:PREVIEW)
-      })) ]
+      }),
+      'user': ($panels:CLIENT ! sessions:get($id, .))[. instance of xs:anyAtomicType][1]
+        ! string()
+    }
   } catch sessions:not-found { }
+  let $user := $read?user
+  (: finished jobs are summarized: they are listed in the jobs panel :)
+  let $finished := $jobs[@state = 'finished']
   return <tbody>{
     <tr class='group' id='{ $id }'>
-      <th scope='rowgroup'>
+      <th scope='rowgroup' class='client'>
         <input type='checkbox' name='session' value='{ $id }' onclick='buttons(this)'
                aria-label='Select session { $id }'/>
-        <b>Session</b>{ ' ' }
-        { panels:id($id) }
+        {
+          (: the id only names a session that has no user :)
+          if ($user) then <b title='{ $user }, { $id }'>{ $user }</b>
+          else (<b>Session</b>, ' ', panels:id($id))
+        }
         { html:marker('you')[$you] }
       </th>
-      <td>{ $attributes?* }</td>
       <td>{ html:time($session/@created) }</td>
       <td>{ html:time($session/@accessed) }</td>
       <td>{ html:time($session/@expires) }</td>
+      <td class='attributes'>{ $read?attributes }</td>
     </tr>,
     for $ws in $sockets
     order by $ws/@created
     return panels:socket-row($ws, $socket, $registered),
-    for $job in $jobs
+    for $job in $jobs except $finished
     order by $job/@start
-    return panels:job-row($job)
+    return panels:job-row($job),
+    if (exists($finished)) {
+      <tr class='child'>
+        <td colspan='5' title='{ string-join($finished/@id, ', ') }'>{
+          `{ count($finished) } finished { utils:plural(count($finished), 'job') }`
+        }</td>
+      </tr>
+    }
   }</tbody>
 };
 
@@ -573,19 +655,18 @@ declare %private function panels:socket-row(
   let $path := string($ws/@path)
   let $dba := panels:dba-path($path)
   for $attributes in try {
-    [ panels:attributes('websocket', $id,
-      map:build(sort(ws:names($id), '?lang=en'), value := fn($name) {
-        let $value := ws:get($id, $name)
-        (: the jobs that the DBA runs for a connection link to their details :)
-        return if ($dba and $name = $utils:JOB) then panels:dba-jobs($value, $registered)
-        else utils:preview($value, $panels:PREVIEW)
-      })) ]
+    [ panels:attributes('websocket', $id, ws:names($id), fn($name) {
+      let $value := ws:get($id, $name)
+      (: the jobs that the DBA runs for a connection link to their details :)
+      return if ($dba and $name = $utils:JOB) then panels:dba-jobs($value, $registered)
+      else utils:preview($value, $panels:PREVIEW)
+    }) ]
   } catch ws:not-found { }
   (: the connection is named by its path, a view of the DBA by its name :)
   let $label := if ($dba) then 'DBA: ' || utils:capitalize(replace($path, '^/?dba/?', ''))
     else $path
   return <tr class='child' id='{ $id }'>
-    <td>
+    <td class='client'>
       <input type='checkbox' name='websocket' value='{ $id }' onclick='buttons(this)'
              aria-label='Select connection { $label }'/>
       <span class='nowrap' title='{ string-join(($id, $ws/@user,
@@ -593,10 +674,10 @@ declare %private function panels:socket-row(
       { html:marker('this tab')[$id = $socket] }
       { html:marker(string($ws/@user))[not($ws/@session)] }
     </td>
-    <td>{ $attributes?* }</td>
     <td>{ html:time($ws/@created) }</td>
     <td>{ html:time($ws/@accessed) }</td>
     <td/>
+    <td class='attributes'>{ $attributes?* }</td>
   </tr>
 };
 
@@ -609,10 +690,13 @@ declare %private function panels:job-row(
   $job  as element(job)
 ) as element(tr) {
   <tr class='child'>
-    <td>
+    <td class='client'>
       Job { panels:job-link($job/@id)() }
     </td>
-    <td>{
+    <td>{ ($job/@start otherwise $job/@time) ! html:time(.) }</td>
+    <td/>
+    <td/>
+    <td class='attributes'>{
       panels:job-state($job/@state)(),
       (: what is locked is only stated if there is anything :)
       for $lock in (
@@ -621,37 +705,47 @@ declare %private function panels:job-row(
       )
       return (html:symbol(' · ', ', '), $lock)
     }</td>
-    <td>{ ($job/@start otherwise $job/@time) ! html:time(.) }</td>
-    <td/>
-    <td/>
   </tr>
 };
 
 (:~
  : Creates the attributes of a session or connection: each name links to the dialog that edits it.
- : @param  $kind    what holds the attributes ('session', 'websocket')
- : @param  $id      id of the session or connection
- : @param  $values  previews of the attribute values: strings or nodes
+ : @param  $kind     what holds the attributes ('session', 'websocket')
+ : @param  $id       id of the session or connection
+ : @param  $names    attribute names
+ : @param  $preview  returns the preview of an attribute value: strings or nodes
  : @return attributes
  :)
 declare %private function panels:attributes(
-  $kind    as xs:string,
-  $id      as xs:string,
-  $values  as map(xs:string, item()*)
+  $kind     as xs:string,
+  $id       as xs:string,
+  $names    as xs:string*,
+  $preview  as fn(xs:string) as item()*
 ) as item()+ {
-  (
-    for $name at $pos in map:keys($values)
-    return (
-      html:symbol(' · ', ', ')[$pos > 1],
+  (: the attributes that name the client come first :)
+  let $sorted := sort($names, (), fn($name) {
+    index-of($panels:CLIENT, $name) otherwise 3, $name
+  })
+  let $more := count($sorted) - $panels:ATTRIBUTES
+  return (
+    (: one attribute per line, clipped where it does not fit, with the full value as tooltip :)
+    for $name in subsequence($sorted, 1, $panels:ATTRIBUTES)
+    let $value := $preview($name)
+    return <div class='ellipsis'>{
+      attribute title { `{ $name }: { string-join($value) }` }[
+        $value instance of xs:anyAtomicType*],
       (: three values, so the call is handed the whole dataset :)
       html:action($name, 'editAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
         { 'title': 'Edit or delete the attribute' }),
       text { ': ' },
-      for $value in $values?$name
-      return if ($value instance of node()) then $value
-        else if (string-length($value) > 20 and not(contains($value, ' '))) then panels:id($value)
-        else text { $value }
-    )
+      for $item in $value
+      return if ($item instance of node()) then $item
+        else if (string-length($item) > 20 and not(contains($item, ' '))) then panels:id($item)
+        else text { $item }
+    }</div>,
+    if ($more > 0) {
+      <div class='note ellipsis'>{ `… { $more } more { utils:plural($more, 'attribute') }` }</div>
+    }
   ) otherwise $table:NONE
 };
 

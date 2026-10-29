@@ -7,24 +7,20 @@ const _added = new Map();
 
 /** The panels of the view, all of them sorted lists, by the block they are filled into. */
 const LISTS = [ "jobs-panel", "clients-panel", "caches-panel", "db-panel" ];
-/** Whether the clients panel lists the idle sessions. */
-let _idle = false;
-/** Whether the jobs of the DBA itself are listed. */
-let _dbaJobs = false;
+/** localStorage key prefix for the checkboxes that choose what the lists show. */
+const FILTER_KEY = "dba-activity-";
+/** Whether the checkboxes are ticked, by their ids: the WebSocket connections and the idle
+    sessions in the clients panel, the finished jobs in the jobs panel. */
+const _listFilters = Object.fromEntries([ "websockets", "idle", "finished" ].map(
+  id => [ id, stored(FILTER_KEY + id) === "yes" ]));
 
 /**
- * Lists the idle sessions, or stops listing them.
+ * Applies a checkbox that chooses what the lists show; the choice is remembered.
+ * @param {HTMLInputElement} box checkbox
  */
-function idleChanged() {
-  _idle = document.getElementById("idle").checked;
-  refreshActivity(true);
-}
-
-/**
- * Lists the jobs of the DBA itself, or stops listing them.
- */
-function dbaJobsChanged() {
-  _dbaJobs = document.getElementById("dba-jobs").checked;
+function filterChanged(box) {
+  _listFilters[box.id] = box.checked;
+  store(FILTER_KEY + box.id, box.checked ? "yes" : null);
   refreshActivity(true);
 }
 
@@ -65,7 +61,6 @@ async function refreshActivity(force) {
   // a single chain: a request that is started while one is pending replaces it
   clearTimeout(_live);
   if(!force && !liveOn()) return;
-  const params = new URLSearchParams(window.location.search);
   // a job that is done does not change any more, and is not requested again
   const done = document.getElementById("job-details")?.dataset.done === "true";
   const message = {
@@ -77,9 +72,10 @@ async function refreshActivity(force) {
     // a folded panel is not rendered; it is asked for once it is opened
     open: LISTS.filter(id => !document.getElementById(id)?.closest(".panel")
       .classList.contains("collapsed")),
-    idle: _idle,
-    dba: _dbaJobs,
-    job: done ? "" : params.get("job") ?? ""
+    idle: _listFilters.idle,
+    websockets: _listFilters.websockets,
+    finished: _listFilters.finished,
+    job: done ? "" : jobParam() ?? ""
   };
   // no connection: retry, rather than leaving the panels frozen for good
   if(!await sendMessage("/activity", message)) scheduleLive(refreshActivity);
@@ -129,31 +125,11 @@ function showActivity(json) {
         }
       }
     }
-    // a running job's details are updated as well; the final ones are applied once, together with
-    // the editor for its result, and are then left alone
-    const details = document.getElementById("job-details");
-    if(details && json.job && details.dataset.done !== "true") {
-      const template = document.createElement("template");
-      template.innerHTML = json.job;
-      const facts = details.querySelector(".job-facts");
-      const update = template.content.querySelector(".job-facts");
-      if(facts && update && !json.done) {
-        // the string of a running job does not change: only its facts are replaced, and the
-        // editor of the string is kept
-        facts.replaceWith(update);
-      } else {
-        details.replaceChildren(template.content);
-        // the query of a service is edited, a job string is only highlighted
-        loadCodeMirror("xquery", [ "job-string" ]);
-      }
-      details.dataset.done = json.done;
-      buttons();
-      markTruncated(details);
-    }
+    showJobDetails(json);
 
     // the checkboxes are rendered with the state they were asked for, which can be older than
     // the one they were given since
-    for(const [ id, checked ] of [ [ "live", wasLive ], [ "idle", _idle ], [ "dba-jobs", _dbaJobs ] ]) {
+    for(const [ id, checked ] of [ [ "live", wasLive ], ...Object.entries(_listFilters) ]) {
       const box = document.getElementById(id);
       if(box) box.checked = checked;
     }
@@ -161,8 +137,10 @@ function showActivity(json) {
   scheduleLive(refreshActivity, wasLive);
 }
 
-/** The activity view keeps its panels up to date over its own connection. */
+/** The activity view keeps its panels up to date over its own connection, and the details of a
+    job along with them. */
 _handlers["/activity"] = showActivity;
+_requestJob = () => refreshActivity(true);
 _live_actions.activity = refreshActivity;
 /** A panel that is opened was not refreshed while it was folded: it is asked for at once. */
 _panel_opened = () => refreshActivity(true);
@@ -186,9 +164,11 @@ async function editAttribute({ kind, id, name }) {
   document.getElementById(`${kind}-id`).value = id;
   document.getElementById(`${kind}-text`).textContent = id;
   document.getElementById(`${kind}-name`).value = name;
-  // the value is fetched before the dialog opens: it is what the user edits
-  showValue(kind, await requestJson(`${kind}-value`, { id, name }, name));
+  // the value is inserted once the dialog is open: a hidden editor that is shown is measured
+  // line by line, which freezes the page for a large value
+  showValue(kind, { text: "", note: "" });
   showDialog(kind);
+  showValue(kind, await requestJson(`${kind}-value`, { id, name }, name));
 }
 
 /**
@@ -289,59 +269,15 @@ async function removeCacheEntries() {
 }
 
 /**
- * Shows the details of a job in place; the address names the job, as a step of its own.
- * @param {string} job job id
- */
-function selectJob(job) {
-  pushParams({ job });
-  showJob();
-}
-
-/**
- * Opens the details of the job that the address names, or closes them if it names none. The
- * details are filled in by the refresh, which is asked for at once.
- */
-function showJob() {
-  const dialog = document.getElementById("details-dialog");
-  const job = new URLSearchParams(window.location.search).get("job");
-  if(!job) {
-    dialog.close();
-    return;
-  }
-  // the heading is what is known before the details arrive
-  const details = document.getElementById("job-details");
-  const heading = document.createElement("h2");
-  heading.textContent = `Job: ${job}`;
-  details.replaceChildren(heading);
-  details.dataset.done = "false";
-  if(!dialog.open) dialog.showModal();
-  refreshActivity(true);
-}
-
-/**
  * Prepares the activity view: the result of a shown job, and the refresh if it was left on.
  */
 function initActivity() {
-  // the details of a job are opened first: the editors in them are measured when they are shown
-  const dialog = document.getElementById("details-dialog");
-  if(new URLSearchParams(window.location.search).get("job")) dialog.showModal();
-  // a closed job is no longer asked for, and a reload does not open it again
-  dialog.addEventListener("close", () => hideParams("job"));
-  // the back button steps through the jobs that were opened
-  initSelection(() => {}, showJob);
+  initJobDetails();
 
-  // the query of the dialog and the definition of a service are edited, a result is only shown
-  loadCodeMirror("xquery", [ "job-query", "job-string", "session-value", "websocket-value",
-    "cache-value" ]);
+  // the query of a new job and the values of the dialogs; the details of a job load their own
+  loadCodeMirror("xquery", [ "job-query", "session-value", "websocket-value", "cache-value" ]);
 
-  // the download of a result that the view has already given up; the browser keeps the page
-  const download = document.getElementById("download-form");
-  if(download) {
-    download.submit();
-    // a reload must not ask for a result that is gone by then
-    hideParams("download");
-  }
-
-  // refreshActivity checks the 'Live' state itself
-  refreshActivity();
+  // refreshActivity checks the 'Live' state itself; the page is rendered with no checkbox
+  // ticked, so it is replaced at once if one of them was
+  refreshActivity(Object.values(_listFilters).some(Boolean));
 }

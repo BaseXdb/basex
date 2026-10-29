@@ -9,6 +9,7 @@ import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
+import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 
 (:~ Page the deep links of the panel refer to. :)
 declare %private variable $panel:CAT := 'workspace';
@@ -30,17 +31,22 @@ declare function panel:files(
   return (
     <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     <input type='hidden' name='dir' value='{ $dir }'/>,
+    (: a job that is stopped returns to the workspace :)
+    <input type='hidden' name='page' value='{ $panel:CAT }'/>,
     let $headers := (
       { 'key': 'name', 'label': 'Name' },
-      (: the size never grows beyond four digits and a unit, the short date beyond 11 characters;
-         the name takes the rest :)
+      (: the size never grows beyond four digits and a unit, the short date beyond eight digits
+         and three narrow separators; the name takes the rest :)
       { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
         'width': 'calc(9ch + 0.5rem)' },
       { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-        'width': 'calc(11ch + 0.5rem)' }
+        'width': 'calc(9.5ch + 0.5rem)' },
+      { 'key': 'run', 'label': '', 'width': 'calc(2ch + 1rem)' }
     )
     let $entries := (
       let $limit := config:get($config:MAXCHARS)
+      (: the jobs that have not ended yet; the job of a file is named by its path :)
+      let $running := job:list()[not(job:finished(.))]
       for $file in file:children($dir)
       let $is-dir := file:is-dir($file)
       let $name := file:name($file)
@@ -64,7 +70,20 @@ declare function panel:files(
           )
         },
         'date': $modified,
-        'size': $size[not($is-dir)]
+        'size': $size[not($is-dir)],
+        (: a query file is run as job, whose details are shown then; a running job is stopped :)
+        'run': fn() {
+          switch () {
+            case $is-dir or not(matches($name, $utils:XQUERY-REGEX, 'i')) return ()
+            case $file = $running return
+              <button class='run stop' formaction='jobs/remove' name='id' value='{ $file }'
+                      title='Stop the job' aria-label='Stop { $name }'>□</button>
+            default return
+              <button class='run' formaction='workspace/run' name='run' value='{ $name }'
+                      title='Run the query as job and show its details'
+                      aria-label='Run { $name }'>▷</button>
+          }
+        }
       }
     )
     (: the chooser shares the block of the buttons, so that one block can be pinned; the

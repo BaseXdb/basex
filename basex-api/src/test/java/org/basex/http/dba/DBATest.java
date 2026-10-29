@@ -1781,7 +1781,7 @@ public final class DBATest extends WebappTest {
       final String page = get("activity");
       assertTrue(page.contains("value=\"" + id + "\""),
           "session that holds no attribute is not listed");
-      assertTrue(page.contains("Show idle (0)"), "session in use is counted as idle");
+      assertTrue(page.contains("Idle (0)"), "session in use is counted as idle");
       assertTrue(post("clients/close", Map.of("session", id)).
           contains("Client “" + id + "” was closed."), "session not closed");
       assertFalse(sessions().contains(id), "closed session still listed");

@@ -42,7 +42,15 @@ declare
 function dba:download() as element(rest:response) {
   (: the file is fetched by the page this leads to: reading a result closes the job, so the
      view must not keep showing it :)
-  utils:outcome($dba:CAT, { 'download': request:parameter('id') }, ())
+  utils:outcome(dba:page(), { 'download': request:parameter('id') }, ())
+};
+
+(:~
+ : Returns the page that a job action was requested on.
+ : @return page
+ :)
+declare %private function dba:page() as xs:string {
+  request:parameter('page')[. = $config:VIEWS] otherwise $dba:CAT
 };
 
 (:~
@@ -54,7 +62,7 @@ declare
   %rest:POST
   %rest:path('/dba/jobs/replace')
 function dba:replace() {
-  utils:dispatch($dba:CAT, fn($args) { {
+  utils:dispatch(dba:page(), fn($args) { {
     'params': { 'job': $args?id },
     'info'  : utils:info($args?id, 'service', 'saved'),
     'run'   : %updating fn() { dba:replace-service($args?id, $args?query) }
@@ -70,7 +78,7 @@ declare
   %rest:POST
   %rest:path('/dba/jobs/remove')
 function dba:remove() {
-  utils:dispatch($dba:CAT, fn($args) { {
+  utils:dispatch(dba:page(), fn($args) { {
     'info': utils:info($args?id, 'job', 'removed'),
     'run' : %updating fn() { $args?id ! job:remove(.) }
   } })
@@ -85,7 +93,7 @@ declare
   %rest:POST
   %rest:path('/dba/jobs/unregister')
 function dba:unregister() {
-  utils:dispatch($dba:CAT, fn($args) { {
+  utils:dispatch(dba:page(), fn($args) { {
     'info': utils:info($args?id, 'service', 'unregistered'),
     'run' : %updating fn() { $args?id ! job:remove(., { 'service': true() }) }
   } })
@@ -190,7 +198,8 @@ declare %private function dba:result(
   $ok      as xs:boolean,
   $result  as item()*
 ) as item()+ {
-  (: whatever a query returned: it is served as bytes, not as what its name suggests :)
-  utils:attachment($id || (if ($ok) then '.txt' else '.log'), $result,
+  (: whatever a query returned: it is served as bytes, not as what its name suggests. The job of
+     a query file is named by its path, of which the file name is kept :)
+  utils:attachment(replace($id, '^.*[/\\]', '') || (if ($ok) then '.txt' else '.log'), $result,
     'application/octet-stream')
 };

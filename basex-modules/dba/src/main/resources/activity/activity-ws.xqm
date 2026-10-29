@@ -27,14 +27,15 @@ function dba:ws-message(
   let $sort := fn($id) { string($json?sorts?($id)) }
   (: the number of shown pages of a list, by the block it is filled into :)
   let $page := fn($id) { xs:integer($json?pages?($id) otherwise 1) }
-  (: the queries of the DBA itself are only listed on demand :)
-  let $dba := $json?dba = true()
   (: every panel is named by the block it is filled into :)
   let $panels := {
-    'jobs-panel'   : fn() { panels:jobs($sort('jobs-panel'), $page('jobs-panel'), $dba) },
+    'jobs-panel'   : fn() {
+      panels:jobs($sort('jobs-panel'), $page('jobs-panel'), $json?finished = true())
+    },
     (: the connection of this view is pointed out in the list of clients :)
     'clients-panel': fn() {
-      panels:clients($sort('clients-panel'), ws:id(), $json?idle = true(), $dba)
+      panels:clients($sort('clients-panel'), ws:id(), $json?idle = true(),
+        $json?websockets = true())
     },
     'db-panel'     : fn() { panels:db-sessions($sort('db-panel'), $page('db-panel')) },
     'caches-panel' : fn() { panels:caches($sort('caches-panel'), $page('caches-panel')) }

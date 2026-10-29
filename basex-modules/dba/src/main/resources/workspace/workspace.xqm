@@ -8,19 +8,27 @@ module namespace dba = 'dba/workspace';
 import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
+import module namespace panels = 'dba/lib/panels' at '../activity/panels.xqm';
 
 (:~ Top category. :)
 declare variable $dba:CAT := 'workspace';
 
 (:~
  : Workspace: file panel, editor and query results in a single view.
+ : @param  $job       job whose details are shown
+ : @param  $download  job whose result is to be downloaded
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/workspace')
+  %rest:query-param('job',      '{$job}')
+  %rest:query-param('download', '{$download}')
   %output:method('html')
-function dba:workspace() as element(html) {
+function dba:workspace(
+  $job       as xs:string?,
+  $download  as xs:string?
+) as element(html) {
   (: the directory of the file panel and the open documents are remembered by the client,
      which requests what it needs :)
   (
@@ -40,7 +48,7 @@ function dba:workspace() as element(html) {
           <button id='run' onclick='runQuery()' title='Run the query (Alt+Enter, Ctrl+Enter)'>Run</button>
           <button id='stop' onclick='stopQuery()' disabled='' title='Stop the running query'>Stop</button>
           <button type='button' id='job' onclick='openJob(event)' disabled=''
-                  title='Show the running query in the Activity view (Ctrl: new tab)'>Job</button>
+                  title='Show the details of the running query (Ctrl: Activity view in a new tab)'>Job</button>
         </div>
         <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
       </form>
@@ -79,12 +87,15 @@ function dba:workspace() as element(html) {
         <output id='run-info'/>
       </div>
       <div id='info-panel' class='pane'/>
-    </div>
+    </div>,
+    (: the details of a job that is run here are opened over the workspace :)
+    panels:details-dialog($job, $dba:CAT),
+    panels:download-form($download)
   ) => html:wrap({
     'header' : $dba:CAT,
     'columns': ('25fr', '38fr', '37fr'),
     'rows'   : ('auto', '1fr', '1fr'),
-    'scripts': ('cm6', 'editor', 'workspace'),
+    'scripts': ('cm6', 'editor', 'job', 'workspace'),
     'init'   : 'initWorkspace();'
   })
 };
@@ -120,6 +131,34 @@ function dba:files-download(
   } catch * {
     utils:outcome($dba:CAT, {}, { 'error': 'Download failed: ' || $err:description })
   }
+};
+
+(:~
+ : Runs a query file as job and shows its details.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/workspace/run')
+function dba:run() {
+  utils:dispatch($dba:CAT, fn($args) {
+    (: a file is run by one job at a time, which is named by its path :)
+    let $id := utils:file-path($args?dir, $args?run)
+    return {
+      'params': { 'job': $id },
+      (: a job that was not started is not shown :)
+      'failed': {},
+      'run'   : %updating fn() {
+        (: the result of an earlier run is discarded :)
+        if (job:list-details($id)/@state = 'cached') { job:remove($id) },
+        (: the result is cached: it can be read in the details of the job :)
+        void(job:eval(file:read-text($id), (), {
+          config:limits(), 'cache': true(), 'base-uri': file:path-to-uri($id), 'id': $id
+        }))
+      }
+    }
+  })
 };
 
 (:~

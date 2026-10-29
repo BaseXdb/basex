@@ -207,8 +207,27 @@ table.clients tbody th {
 table.clients tr.child > td:first-child {
   padding-left: 1.5rem;
 }
+/* the attributes take the width that the other columns leave, and are clipped to it */
+table.clients {
+  width: 100%;
+  table-layout: auto;
+}
+table.clients .attributes {
+  width: 100%;
+  max-width: 0;
+  /* below that, the table is scrolled: an attribute must remain legible */
+  min-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 table.clients :is(td, th):first-child {
   white-space: nowrap;
+}
+/* a long user name or path is clipped; the full label is shown as tooltip */
+table.clients .client {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 tbody tr:has(> :is(td, th) input[type=checkbox]:checked) {
   background-color: var(--row-selected);
@@ -370,6 +389,15 @@ button.link {
   color: var(--accent);
   cursor: pointer;
 }
+/* a symbol that runs a query: small, and with the face of the folding chevron */
+button.run {
+  padding: 0 .2rem;
+  font-size: 80%;
+}
+/* the square is drawn at half the height of the triangle */
+button.run.stop {
+  font-size: 125%;
+}
 
 b {
   color: var(--strong);
@@ -440,13 +468,13 @@ select:not([multiple], [size]) {
 
 /* buttons, and the one of a file chooser, share the flat face of the code buttons on
    docs.basex.org; the link-like, the folding and the tab buttons bring their own */
-button:not(.link, .collapse, .tab), input[type=file]::file-selector-button {
+button:not(.link, .run, .collapse, .tab), input[type=file]::file-selector-button {
   background-color: var(--shade);
   color: var(--fg);
   font: inherit;
   cursor: pointer;
 }
-button:not(.link, .collapse, .tab):hover:not(:disabled),
+button:not(.link, .run, .collapse, .tab):hover:not(:disabled),
 input[type=file]::file-selector-button:hover {
   background-color: var(--shade-hover);
 }
@@ -553,7 +581,7 @@ table.fixed td.expanded {
   overflow-wrap: anywhere;
 }
 /* a row that a refresh added fades in: what happened is seen without comparing tables */
-tr.added > td {
+tr.added > :is(td, th) {
   /* the delay is negative if the row was replaced while it faded in (see ADDED_MS) */
   animation: added 3s ease-out var(--added-delay, 0s);
 }
@@ -908,6 +936,10 @@ dialog {
   max-height: 85vh;
   box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
 }
+/* an editor must not size its dialog: measuring a large text for the width freezes the page */
+dialog:has(.cm-editor) {
+  width: 100%;
+}
 /* the title of a dialog is underlined like the headings on docs.basex.org */
 dialog h2 {
   padding-bottom: .2rem;
@@ -1031,10 +1063,10 @@ body:has(.content.fill) main {
   border-radius: var(--radius);
 }
 
-/* the details of a job are opened over the panels, and grow with their texts up to the maximum
-   height of a dialog */
+/* the details of a job are opened over the panels, with a size that does not change with them */
 #details-dialog[open] {
   width: min(90vw, 60rem);
+  height: 85vh;
   max-width: none;
   display: flex;
   flex-direction: column;
@@ -1067,13 +1099,11 @@ body:has(.content.fill) main {
 .job-texts > * {
   flex-shrink: 0;
 }
-/* a text is at least as high as its lines and the facts beside it, and scrolls when the dialog has
-   reached its maximum. The dialog lies in a filled content area, whose rule for text areas is
-   outweighed by the id */
+/* each text gets an equal share, and scrolls. The dialog lies in a filled content area, whose
+   rule for text areas is outweighed by the id */
 #details-dialog .job-texts > :is(.cm-editor, textarea) {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   height: auto;
-  field-sizing: content;
   min-height: 4lh;
 }
 .job-columns h3:first-child {
@@ -1275,12 +1305,15 @@ button.collapse {
   /* the pinned head of a list is raised, and would otherwise be painted over the button */
   z-index: 2;
   padding: 0 .2rem .1rem;
+  font-size: 130%;
+}
+/* a symbol that acts on what it sits in: muted, and marked when pointed at */
+:is(button.collapse, button.run) {
   border: none;
   border-radius: var(--radius);
   background: none;
   color: var(--muted);
   font-family: inherit;
-  font-size: 130%;
   line-height: 1;
   cursor: pointer;
 }
@@ -1293,7 +1326,7 @@ button.collapse {
 .content.divided > .panel.no-scrollbar:has(+ .panel) > button.collapse {
   right: calc(.5rem - var(--gap));
 }
-button.collapse:hover {
+:is(button.collapse, button.run):hover {
   color: var(--accent);
   background-color: var(--shade-hover);
 }

@@ -80,6 +80,16 @@ function setEditorText(id, text) {
 }
 
 /**
+ * Indicates whether text areas are turned into CodeMirror editors.
+ * @returns {boolean} result of check
+ */
+function codeMirrorUsed() {
+  // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
+  // Without it, or on Android, fall back to plain textareas
+  return !!window.CM6 && !/android/i.test(navigator.userAgent);
+}
+
+/**
  * Loads the CodeMirror editor extension.
  * @param {string} language language of the editors (for syntax highlighting)
  * @param {boolean|Array} edit text areas that become editors: true for the one called 'editor',
@@ -90,9 +100,7 @@ function setEditorText(id, text) {
  *          they are sized by the rows their text areas asked for
  */
 function loadCodeMirror(language, edit, resize) {
-  // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
-  // Without it, or on Android, fall back to plain textareas
-  const useCM = !!window.CM6 && !/android/i.test(navigator.userAgent);
+  const useCM = codeMirrorUsed();
   // the text areas this call turned into editors: no other one is sized by it
   const loaded = [];
   if(edit) {

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/activity';
 
-import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/panels' at 'panels.xqm';
 
@@ -45,29 +44,16 @@ function dba:activity(
     panels:attribute-dialog('session', 'Session:', 'sessions'),
     panels:attribute-dialog('websocket', 'WebSocket:', 'websockets'),
     panels:cache-dialog(),
-    (: the details of a job are opened over the panels, which are refreshed behind them; a job
-       that is selected later is filled in by the refresh. A job that is done does not change
-       any more: the client stops asking for it :)
-    <dialog id='details-dialog'>
-      <form method='post' autocomplete='off' id='job-details'
-            data-done='{ panels:job-done($job) }'>{
-        panels:job-view($job)
-      }</form>
-      { form:dialog-info() }
-    </dialog>,
-    (: the result of a job that was closed: submitted as soon as the page is there, and the
-       request that fetches the file is what consumes the job :)
-    if ($download) {
-      <form id='download-form' method='post' action='job-result'>
-        <input type='hidden' name='id' value='{ $download }'/>
-      </form>
-    }
+    (: the details of a job are opened over the panels, which are refreshed behind them :)
+    panels:details-dialog($job, $dba:CAT),
+    (: the result of a job that was closed :)
+    panels:download-form($download)
   ) => html:wrap({
     (: no widths: the panels share the page in equal parts, and each scrolls on its own :)
     'header' : $dba:CAT,
     'divided': true(),
     'rows'   : '1fr',
-    'scripts': ('cm6', 'editor', 'activity'),
+    'scripts': ('cm6', 'editor', 'job', 'activity'),
     'init'   : 'initActivity();'
   })
 };
