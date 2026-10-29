@@ -97,10 +97,6 @@ public interface WebText {
   /** QName. */
   QNm Q_STATUS = new QNm("status");
   /** QName. */
-  QNm Q_REASON = new QNm("reason");
-  /** QName. */
-  QNm Q_MESSAGE = new QNm("message");
-  /** QName. */
   QNm Q_NAME = new QNm("name");
   /** QName. */
   QNm Q_VALUE = new QNm("value");

@@ -188,14 +188,8 @@ public final class RestXqResponse extends WebResponse {
     for(final GNode node : response.childIter()) {
       // process http:response element
       if(T_HTTP_RESPONSE.matches(node)) {
-        // check status and reason
-        byte[] sta = null;
-        for(final GNode a : node.attributeIter()) {
-          final QNm qnm = a.qname();
-          if(qnm.eq(Q_STATUS)) sta = a.string();
-          else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)); // ignored
-          else throw func.error(UNEXP_NODE_X, a);
-        }
+        // check status (other attributes are ignored)
+        final byte[] sta = ((XNode) node).attribute(Q_STATUS);
         if(sta != null) {
           // the status code is validated as in web:error
           final int code = toInt(sta);

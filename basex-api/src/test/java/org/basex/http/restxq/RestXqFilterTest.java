@@ -150,6 +150,8 @@ public final class RestXqFilterTest extends RestXqTest {
         "<R:response><http:response status='200'/></R:response> };", "");
     get("OK", "declare %R:path('') function m:f() { " +
         "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};", "");
+    get(200, "declare %R:path('') function m:f() { " +
+        "<R:response><http:response stat='404' href='x' version='1.1'/></R:response> };", "");
   }
 
   /**
@@ -163,8 +165,6 @@ public final class RestXqFilterTest extends RestXqTest {
         "<R:response>X</R:response> };", "");
     get(500, "declare %R:path('') function m:f() { " +
         "<R:response><X/></R:response> };", "");
-    get(500, "declare %R:path('') function m:f() { " +
-        "<R:response><http:response stat='200'/></R:response> };", "");
     get(500, "declare %R:path('') function m:f() { " +
         "<R:response><http:response>X</http:response></R:response> };", "");
   }
