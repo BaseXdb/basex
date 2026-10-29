@@ -28,7 +28,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   /** Nesting depth (0 = top level). */
   protected int depth;
   /** Serialize values as XQuery expressions. */
-  protected final boolean expression;
+  protected final boolean typed;
 
   /**
    * Constructor, specifying serialization options.
@@ -55,8 +55,8 @@ public class AdaptiveSerializer extends OutputSerializer {
     this.os = os;
 
     if(omit) sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
-    expression = sopts.yes(EXPRESSION);
-    if(itemsep == null) itemsep = Token.token(expression ? ", " : "\n");
+    typed = sopts.yes(TYPED);
+    if(itemsep == null) itemsep = Token.token(typed ? ", " : "\n");
   }
 
   @Override
@@ -67,14 +67,14 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected final void item(final Item item) throws IOException {
-    if(expression && !more) printChar('(');
+    if(typed && !more) printChar('(');
     separate();
     super.item(item);
   }
 
   @Override
   public void close() throws IOException {
-    if(expression) {
+    if(typed) {
       if(!more) printChar('(');
       printChar(')');
     }
@@ -112,7 +112,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected final void node(final XNode node) throws IOException {
     final Kind kind = node.kind();
-    if(expression && (kind == Kind.ATTRIBUTE || kind == Kind.TEXT || kind == Kind.DOCUMENT)) {
+    if(typed && (kind == Kind.ATTRIBUTE || kind == Kind.TEXT || kind == Kind.DOCUMENT)) {
       if(kind == Kind.ATTRIBUTE) {
         printChars(Token.token("attribute "));
         printChars(node.name());
@@ -143,7 +143,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     final Type type = item.type;
     try {
       byte[] literal = null;
-      if(item instanceof final ANum num) literal = expression ? num.literal() : num.jsonString();
+      if(item instanceof final ANum num) literal = typed ? num.literal() : num.jsonString();
       if(type == QNAME) {
         printChar('#');
         printChars(((QNm) item).prefixId());
@@ -183,7 +183,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @return constructor type or {@code null}
    */
   protected Type constructor(final Type type) {
-    if(expression) return type.oneOf(STRING, BOOLEAN, INTEGER) ? null : type;
+    if(typed) return type.oneOf(STRING, BOOLEAN, INTEGER) ? null : type;
     return type.isStringOrUntyped() ? null : type.instanceOf(DURATION) ? DURATION : type;
   }
 

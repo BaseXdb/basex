@@ -436,9 +436,9 @@ public final class SerializerTest extends SandboxTest {
     assertEquals("application/jsonl", sopts.mediaType().toString());
   }
 
-  /** Test: expression. */
-  @Test public void expression() {
-    final String option = METHOD.arg("adaptive") + EXPRESSION.arg("yes");
+  /** Test: typed. */
+  @Test public void typed() {
+    final String option = METHOD.arg("adaptive") + TYPED.arg("yes");
     // a sequence is parenthesized, whatever its size
     query(option + "()", "()");
     query(option + "1", "(1)");
@@ -467,8 +467,8 @@ public final class SerializerTest extends SandboxTest {
     query(option + "text { 'v' }", "(text { \"v\" })");
     query(option + "document { <a/> }", "(document { <a/> })");
     // the project-specific relaxations of the basex method would not be parsed again
-    query(METHOD.arg("basex") + EXPRESSION.arg("yes") + "true()", "(true())");
-    query(METHOD.arg("basex") + EXPRESSION.arg("yes") + "xs:date('2026-01-01')",
+    query(METHOD.arg("basex") + TYPED.arg("yes") + "true()", "(true())");
+    query(METHOD.arg("basex") + TYPED.arg("yes") + "xs:date('2026-01-01')",
         "(xs:date(\"2026-01-01\"))");
 
     // every value is yielded again by the expression it was serialized to
@@ -482,7 +482,7 @@ public final class SerializerTest extends SandboxTest {
         "processing-instruction p { 'i' }", "document { <a/> }", "{ 'a': [ 1, 2 ] }",
         "[ 1, 'two' ]", "()", "(1, 'two', <three/>)" }) {
       query("let $value := " + value +
-          " let $text := serialize($value, { 'method': 'adaptive', 'expression': true() })" +
+          " let $text := serialize($value, { 'method': 'adaptive', 'typed': true() })" +
           " let $again := xquery:eval($text)" +
           " return deep-equal($again, $value) and type-of($again) eq type-of($value)", true);
     }

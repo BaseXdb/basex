@@ -72,8 +72,6 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_EXPRESSION("expression(value)", params(STRING), OUTPUT_URI),
-  /** XQuery annotation. */
   _OUTPUT_HTML_VERSION("html-version(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", params(STRING), OUTPUT_URI),
@@ -109,6 +107,8 @@ public enum Annotation {
   _OUTPUT_STANDALONE("standalone(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_TYPED("typed(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
