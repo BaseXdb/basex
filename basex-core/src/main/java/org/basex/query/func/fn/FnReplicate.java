@@ -189,6 +189,7 @@ public final class FnReplicate extends StandardFunc {
     final long count = arg(1) instanceof final Itr itr ? itr.itr() : -1;
     if(count > 0 && (singleEval(true) || !input.has(Flag.NDT))) {
       // distinct-values(replicate(NODES, 2)) → distinct-values(NODES)
+      // exists(replicate(E, 2)) → exists(E)
       // VALUE[replicate(NODES, 2)] → VALUE[NODES]
       if(mode.oneOf(Simplify.DISTINCT, Simplify.SET, Simplify.EXISTENCE) ||
           mode == Simplify.PREDICATE && input.seqType().instanceOf(Types.XNODE_ZM)) {

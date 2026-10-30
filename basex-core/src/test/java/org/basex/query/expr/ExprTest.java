@@ -840,7 +840,7 @@ public final class ExprTest extends SandboxTest {
     check("(<a/>, <b/>)[last()]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[last()]",
-        "<b/>", count(FOOT, 1));
+        "<b/>", root(Otherwise.class));
     check("(<a/>, <b/>)[position() > 1 and position() < 3]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",

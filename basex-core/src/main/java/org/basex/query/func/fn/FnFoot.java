@@ -2,10 +2,15 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -67,14 +72,24 @@ public final class FnFoot extends StandardFunc {
     if(REPLICATE.is(input) && input.arg(1) instanceof Itr)
       return cc.function(FOOT, info, input.arg(0));
 
-    // foot((1, 2)) → 2
-    // foot((1, (2 to 3))) → foot(2 to 3)
+    // rewrite list to its arguments or to elvis operator
     if(input instanceof List) {
       final Expr[] args = input.args();
-      final Expr last = args[args.length - 1];
+      final int al = args.length;
+      final Expr last = args[al - 1];
       final SeqType stl = last.seqType();
+      // foot((1, 2)) → 2
       if(stl.one()) return last;
+      // foot((1, (2 to 3))) → foot(2 to 3)
       if(stl.oneOrMore()) return cc.function(FOOT, info, last);
+      // the elvis operator evaluates the operands in reverse order
+      if(stl.zeroOrOne() && (al == 2 || args[al - 2].seqType().occ != Occ.ZERO_OR_ONE) &&
+          !input.has(Flag.NDT)) {
+        // foot((1, $a[.]))        → $a[.] otherwise 1
+        // foot((1, $a[.], $b[.])) → (will not be rewritten)
+        final Expr dflt = List.get(cc, info, Arrays.copyOf(args, al - 1));
+        return new Otherwise(info, last, cc.function(FOOT, info, dflt)).optimize(cc);
+      }
     }
     // foot(root[test]) → head(reverse(root)[test])
     if(input instanceof final IterFilter filter) {
@@ -84,5 +99,12 @@ public final class FnFoot extends StandardFunc {
 
     exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE)).data(input);
     return embed(cc, false);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // exists(foot(E)) → exists(E)
+    final Expr expr = mode == Simplify.EXISTENCE && !arg(0).has(Flag.NDT) ? arg(0) : this;
+    return cc.simplify(this, expr, mode);
   }
 }

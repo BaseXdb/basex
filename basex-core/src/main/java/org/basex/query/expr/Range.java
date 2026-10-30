@@ -74,7 +74,7 @@ public final class Range extends Arr {
    * Indicates if the range operands are known to return single integers.
    * @return result of check
    */
-  boolean integers() {
+  public boolean integers() {
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
     return st1.instanceOf(Types.INTEGER_O) && st2.instanceOf(Types.INTEGER_O);
   }

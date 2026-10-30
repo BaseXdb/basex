@@ -42,14 +42,22 @@ public final class FnGenerate extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr init = arg(0), step = arg(1);
     SeqType st = init.seqType();
-    if((step instanceof FuncItem || step instanceof Closure) && st.one()) {
-      SeqType ost;
-      do {
-        final SeqType[] types = { st, Types.INTEGER_O };
-        arg(1, arg -> step.refineFunc(cc, types));
-        ost = st;
-        st = st.union(arg(1).funcType().refinedType);
-      } while(!st.eq(ost));
+    if(!st.zero()) {
+      // the step function is only called with single items
+      st = st.with(Occ.EXACTLY_ONE);
+      if(step instanceof FuncItem || step instanceof Closure) {
+        SeqType ost;
+        do {
+          final SeqType[] types = { st, Types.INTEGER_O };
+          arg(1, arg -> step.refineFunc(cc, types));
+          ost = st;
+          final SeqType rt = arg(1).funcType().refinedType;
+          if(!rt.zero()) st = st.union(rt.with(Occ.EXACTLY_ONE));
+        } while(!st.eq(ost));
+      } else {
+        final FuncType ft = step.funcType();
+        st = ft != null ? st.union(ft.declType) : Types.ITEM_O;
+      }
       exprType.assign(st.with(Occ.ONE_OR_MORE));
     }
     return this;

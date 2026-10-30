@@ -54,19 +54,27 @@ public class FnSlice extends StandardFunc {
         }
       }
       // input size is unknown: exact range cannot be computed, check original properties
-      final long start = longArg(1, 1, cc.qc), end = longArg(2, Long.MAX_VALUE, cc.qc);
-      if(longArg(3, 1, cc.qc) == 1) {
-        if(end == Long.MAX_VALUE) {
+      // (absent, empty and zero values are equivalent)
+      final long start = longArg(1, 0, cc.qc), end = longArg(2, 0, cc.qc);
+      final long step = longArg(3, 0, cc.qc);
+      if(step == 0 || step == 1) {
+        if(end == 0) {
           // slice(E, -1) → foot(E)
           if(start == -1) return cc.function(FOOT, info, input);
           // slice(E, 1) → E
           if(start == 0 || start == 1) return input;
           // no rewritings possible for greater start values (slice always returns last item)
-        } else if(start > 0 && start <= end) {
+        } else if(start >= 0 && start <= end) {
           // slice(E, 2, 4) → util:range(E, 2, 4)
-          return cc.function(_UTIL_RANGE, info, input, Itr.get(start), Itr.get(end));
+          return cc.function(_UTIL_RANGE, info, input, Itr.get(Math.max(start, 1)), Itr.get(end));
         }
       }
+      // descending order: the step is -1, regardless of the input size
+      // slice(E, (), (), -1) → reverse(E)
+      if(step == -1 && start == 0 && end == 0) return cc.function(REVERSE, info, input);
+      // slice(E, 4, 2) → reverse(util:range(E, 2, 4))
+      if((step == 0 || step == -1) && end > 0 && start >= end) return cc.function(REVERSE, info,
+          cc.function(_UTIL_RANGE, info, input, Itr.get(end), Itr.get(start)));
     }
 
     exprType.assign(st.union(Occ.ZERO)).data(input);

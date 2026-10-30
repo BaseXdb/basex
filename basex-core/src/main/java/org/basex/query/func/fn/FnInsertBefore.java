@@ -1,9 +1,12 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -90,5 +93,13 @@ public final class FnInsertBefore extends StandardFunc {
     exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz).data(input, insert);
 
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // count(insert-before($seq, $pos, $ins)) → count(($seq, $ins))
+    final Expr expr = mode.unordered() && !arg(1).has(Flag.NDT) ?
+      List.get(cc, info, arg(0), arg(2)) : this;
+    return cc.simplify(this, expr, mode);
   }
 }

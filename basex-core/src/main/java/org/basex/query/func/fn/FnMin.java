@@ -84,7 +84,7 @@ public class FnMin extends StandardFunc {
     if(arg(0).seqType().type.isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
-    // min(distinct-values($values)) → min($values)
+    // min(distinct-values($values)) → min($values), max(sort($values)) → max($values)
     arg(0, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
@@ -101,14 +101,6 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
-    // min(reverse($values)) → min($values), max(sort($values)) → max($values)
-    final Expr reordered = reordered(arg(0));
-    if(reordered != null) {
-      final Expr[] args = exprs.clone();
-      args[0] = reordered;
-      return cc.function(min ? Function.MIN : Function.MAX, info, args);
-    }
-
     final Expr expr = optFirst();
     if(expr != this) return expr;
 

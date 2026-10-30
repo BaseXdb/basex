@@ -59,6 +59,13 @@ public final class If extends Arr {
   }
 
   @Override
+  public Expr mapBranches(final QueryFunction<Expr, Expr> func, final CompileContext cc)
+      throws QueryException {
+    // F(if(C) then A else B) → if(C) then F(A) else F(B)
+    return new If(info, cond, func.apply(exprs[0]), func.apply(exprs[1])).optimize(cc);
+  }
+
+  @Override
   public boolean navigational() {
     // an empty branch is equivalent to an omitted 'else' branch
     return Checks.all(exprs, expr -> expr == Empty.VALUE || expr.navigational());

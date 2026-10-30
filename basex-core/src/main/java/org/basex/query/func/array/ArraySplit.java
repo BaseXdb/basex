@@ -1,8 +1,11 @@
 package org.basex.query.func.array;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -46,5 +49,13 @@ public final class ArraySplit extends ArrayFn {
       exprType.assign(at.seqType(Occ.ZERO_OR_MORE), array.structSize());
     }
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // count/exists(array:split(E)) → count/exists(array:members(E))
+    final Expr expr = mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) ?
+      cc.function(_ARRAY_MEMBERS, info, exprs) : this;
+    return cc.simplify(this, expr, mode);
   }
 }

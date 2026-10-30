@@ -6,12 +6,14 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -93,6 +95,13 @@ public final class UtilCountWithin extends StandardFunc {
         if(min < 1 && max <= 1) return Bln.TRUE;
         if(min >= 2) return Bln.FALSE;
       }
+      // util:count-within(tail(E), 2) → util:count-within(E, 3)
+      // util:count-within(subsequence(E, 3, 2), 3) → false()
+      final SeqRange r = SeqRange.get(input, cc);
+      if(r != null) {
+        final long[] mm = r.inputSize(min, max);
+        return mm != null ? function(input.arg(0), mm[0], mm[1], info, cc) : Bln.FALSE;
+      }
     }
     return embed(cc, true);
   }
@@ -111,11 +120,26 @@ public final class UtilCountWithin extends StandardFunc {
     if(cmm != null && arg(0).equals(expr.arg(0)) && (!or || mm[1] >= cmm[0] && mm[0] <= cmm[1])) {
       final long mn = or ? Math.min(mm[0], cmm[0]) : Math.max(mm[0], cmm[0]);
       final long mx = or ? Math.max(mm[1], cmm[1]) : Math.min(mm[1], cmm[1]);
-      final ExprList args = new ExprList(3).add(arg(0)).add(Itr.get(mn));
-      if(mx < Long.MAX_VALUE) args.add(Itr.get(mx));
-      return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
+      return function(arg(0), mn, mx, info, cc);
     }
     return null;
+  }
+
+  /**
+   * Creates a function call for the specified input and bounds.
+   * @param input input expression
+   * @param min minimum number of items
+   * @param max maximum number of items ({@link Long#MAX_VALUE} for no limit)
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return function call
+   * @throws QueryException query exception
+   */
+  public static Expr function(final Expr input, final long min, final long max,
+      final InputInfo info, final CompileContext cc) throws QueryException {
+    final ExprList args = new ExprList(3).add(input).add(Itr.get(min));
+    if(max < Long.MAX_VALUE) args.add(Itr.get(max));
+    return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
   }
 
   /**

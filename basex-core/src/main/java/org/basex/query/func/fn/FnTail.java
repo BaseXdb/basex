@@ -80,14 +80,9 @@ public final class FnTail extends StandardFunc {
     if(size == 2) return cc.function(FOOT, info, input);
 
     // tail(tail(E)) → subsequence(E, 3)
-    if(TAIL.is(input))
-      return cc.function(SUBSEQUENCE, info, input.arg(0), Itr.get(3));
     // tail(subsequence(E, pos, length)) → subsequence(E, pos + 1, length - 1)
-    if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
-      final SeqRange r = SeqRange.get(input, cc);
-      if(r != null && r.start < Long.MAX_VALUE - 1) return cc.function(SUBSEQUENCE, info,
-          input.arg(0), Itr.get(r.start + 2), Itr.get(r.length - 1));
-    }
+    final SeqRange r = SeqRange.get(input, cc);
+    if(r != null) return r.sub(new SeqRange(1, Long.MAX_VALUE)).function(input.arg(0), info, cc);
     // tail(replicate(I, count)) → replicate(I, count - 1)
     if(REPLICATE.is(input)) {
       final Expr[] args = input.args().clone();

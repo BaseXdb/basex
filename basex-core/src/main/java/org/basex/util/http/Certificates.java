@@ -42,7 +42,6 @@ public final class Certificates {
    * @throws QueryException query exception
    */
   public static Stores parse(final XQMap certificates, final InputInfo info) throws QueryException {
-
     final XQMap trust = map(certificates, "trust"), client = map(certificates, "client");
     return new Stores(path(trust, info), RequestOptions.string(trust, "keystore-password", info),
       path(client, info), RequestOptions.string(client, "keystore-password", info),

@@ -266,7 +266,12 @@ public final class List extends Arr {
       }
     } else {
       final Expr[] ex = simplifyAll(mode, cc);
-      if(ex != exprs) expr = List.get(cc, info, ex);
+      if(ex != exprs) {
+        expr = List.get(cc, info, ex);
+      } else if(mode == Simplify.EXISTENCE) {
+        // exists((A, B)) → exists(A | B)
+        expr = toUnion(cc);
+      }
     }
     return cc.simplify(this, expr, mode);
   }

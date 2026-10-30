@@ -1,6 +1,9 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.map.*;
@@ -32,5 +35,13 @@ public final class MapEntries extends MapFn {
       exprType.assign(MapType.get(mt).seqType(Occ.ZERO_OR_MORE), map.structSize());
     }
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // count/exists(map:entries(E)) → count/exists(map:keys(E))
+    final Expr expr = mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) ?
+      cc.function(_MAP_KEYS, info, exprs) : this;
+    return cc.simplify(this, expr, mode);
   }
 }

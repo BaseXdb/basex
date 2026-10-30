@@ -22,8 +22,8 @@ public class FnContainsSubsequence extends StandardFunc {
 
   @Override
   protected final boolean ebv(final QueryContext qc) throws QueryException {
-    final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
+    final Value input = input(subsequence.size(), qc);
     final FItem compare = toFunctionOrNull(arg(2), 2, qc);
 
     final QueryBiFunction<Item, Item, Boolean> cmp;
@@ -40,6 +40,18 @@ public class FnContainsSubsequence extends StandardFunc {
       };
     }
     return match(input, subsequence, cmp);
+  }
+
+  /**
+   * Returns the input sequence.
+   * @param size size of the subsequence
+   * @param qc query context
+   * @return input
+   * @throws QueryException query exception
+   */
+  Value input(@SuppressWarnings("unused") final long size, final QueryContext qc)
+      throws QueryException {
+    return arg(0).value(qc);
   }
 
   /**

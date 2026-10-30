@@ -844,9 +844,13 @@ public final class FnModuleTest extends SandboxTest {
         + "let $t := ($s, 1) return (" + func.args(" $t") + ", " + func.args(" $t") + ")",
         MAX_SIZE_X_X);
 
-    // count(array:members(E)) → array:size(E)
-    check(func.args(" " + _ARRAY_MEMBERS.args(" array { tokenize(" + wrap("a b") + ") }")), 2,
+    final String tokens = " tokenize(" + wrap("a b") + ")", array = " array {" + tokens + " }";
+    check(func.args(" " + _ARRAY_MEMBERS.args(array)), 2,
         exists(_ARRAY_SIZE), empty(_ARRAY_MEMBERS));
+    check(func.args(" " + _ARRAY_SPLIT.args(array)), 2,
+        exists(_ARRAY_SIZE), empty(_ARRAY_SPLIT));
+    check(func.args(" " + _MAP_ENTRIES.args(" " + _MAP_MERGE.args(tokens + " ! " +
+        _MAP_ENTRY.args(" .", 1)))), 2, exists(_MAP_SIZE), empty(_MAP_ENTRIES));
 
     query(func.args(" (1 to 100_000_000) ! string()"), 100000000);
     query(func.args(" for $i in 1 to 100_000_000 return string('x')"), 100000000);
@@ -1357,6 +1361,8 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = DISTINCT_ORDERED_NODES;
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
+    check("let $a := <a/> return " + func.args(" ($a, $a)"), "<a/>",
+        empty(func), empty(Union.class));
 
     check(func.args(REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
         empty(REPLICATE));
@@ -2207,6 +2213,13 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, 1 to 2)"), 2, root(Itr.class));
+    check(func.args(" (<a/>, <b/>[. = ''])"), "<b/>", root(Otherwise.class));
+    check(func.args(" (<a/>, <b/>, <c/>[. = 'x'])"), "<b/>", root(Otherwise.class));
+    check(func.args(" (<a/>[. = ''], <b/>[. = 'x'])"), "<a/>", root(Otherwise.class));
+    check(func.args(" (<a/>[. = ''], <b/>[. = ''], <c/>[. = ''])"), "<c/>",
+        empty(Otherwise.class));
+    check(func.args(" (<a/>, " + VOID.args(" <b/>") + ", <c/>[. = 'x'])"), "<a/>",
+        empty(Otherwise.class));
   }
 
   /** Test method. */
@@ -2527,6 +2540,19 @@ public final class FnModuleTest extends SandboxTest {
     query("'" + init + "' = " + func.args(init, step), true);
     query("'x'[. = " + func.args(init, step) + ']', "x");
 
+    check("head(" + func.args(init, " fn { . || 'x' }") + ")", init, empty(func));
+    // step function with unknown body: result is never empty
+    final String opaque = "let $f := (fn { . || 'x' }, fn { () })[xs:integer(" + wrap(1) + ")] "
+        + "return ";
+    check(opaque + EXISTS.args(func.args(init, " $f")), true, type(func, "item()+"));
+    check(opaque + "head(" + func.args(init, " $f") + ")", init, empty(func));
+
+    // refine types: the step function is only called with single items
+    final String int1 = " head(xs:integer(" + wrap(1) + "))";
+    final String int0 = " head(xs:integer(" + wrap(1) + ")[. = 0])";
+    check(func.args(int1, " fn { if(. < 3) { . + 1 } }"), "1\n2\n3", type(func, "xs:integer+"));
+    error(func.args(int0, " fn { if(. < 3) { . + 1 } }"), INVTYPE_X);
+
     // closure
     check("for $a in (1 to 2)[. > 0] return subsequence(" +
         func.args(1, " fn($x) { (1 to 100)[$a + $x] }") + ", 1, 5)",
@@ -2570,11 +2596,20 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void emptyExists() {
     final String seq = " tokenize(" + wrap("a b c") + ", ' ')";
 
-    // exists(map:keys(E)) → map:size(E) > 0, empty(array:members(E)) → array:size(E) = 0
     check(EXISTS.args(" " + _MAP_KEYS.args(" " + _MAP_MERGE.args(seq + " !" +
         _MAP_ENTRY.args(" .", 1)))), true, exists(_MAP_SIZE), empty(_MAP_KEYS));
     check(EMPTY.args(" " + _ARRAY_MEMBERS.args(" array {" + seq + " }")), false,
         exists(_ARRAY_SIZE), empty(_ARRAY_MEMBERS));
+    check(EXISTS.args(" " + _MAP_ENTRIES.args(" " + _MAP_MERGE.args(seq + " !" +
+        _MAP_ENTRY.args(" .", 1)))), true, exists(_MAP_SIZE), empty(_MAP_ENTRIES));
+    check(EMPTY.args(" " + _ARRAY_SPLIT.args(" array {" + seq + " }")), false,
+        exists(_ARRAY_SIZE), empty(_ARRAY_SPLIT));
+
+    final String max = " xs:integer(" + wrap(3) + ")";
+    check(EXISTS.args(" 1 to" + max), true, empty(Range.class), empty(EXISTS));
+    check(EMPTY.args(" 1 to" + max), false, empty(Range.class), empty(EMPTY));
+    check(EXISTS.args(" 4 to" + max), false, empty(Range.class), empty(EXISTS));
+    check(EMPTY.args(" 4 to" + max), true, empty(Range.class), empty(EMPTY));
 
     check(EXISTS.args(HEAD.args(seq)), true, root(EXISTS), empty(HEAD));
     check(EMPTY.args(HEAD.args(seq)), false, root(EMPTY), empty(HEAD));
@@ -2595,6 +2630,14 @@ public final class FnModuleTest extends SandboxTest {
     check(EMPTY.args(ITEMS_AT.args(seq, 4)), true, root(_UTIL_COUNT_WITHIN), empty(ITEMS_AT));
     check(EXISTS.args(DISTINCT_VALUES.args(seq)), true, root(EXISTS), empty(DISTINCT_VALUES));
     check(EMPTY.args(DISTINCT_VALUES.args(seq)), false, root(EMPTY), empty(DISTINCT_VALUES));
+    check(EXISTS.args(REPLICATE.args(seq, 2)), true, root(EXISTS), empty(REPLICATE));
+
+    final String doc = " " + PARSE_XML.args(wrap("<a><b/><b/></a>"));
+    check(EXISTS.args(doc + "//b[last()]"), true, root(EXISTS), empty(LAST));
+    check(EMPTY.args(" (" + doc + "//b[last()]," + doc + "//c)"), false, root(EMPTY),
+        empty(List.class), exists(Union.class), empty(LAST));
+    check(EXISTS.args(" (" + DISTINCT_VALUES.args(seq) + "," + seq + ")"), true,
+        empty(DISTINCT_VALUES));
 
     final String one = " tokenize(" + wrap("a") + ", ' ')";
     check(EXISTS.args(TAIL.args(one)), false, root(_UTIL_COUNT_WITHIN));
@@ -2606,9 +2649,9 @@ public final class FnModuleTest extends SandboxTest {
     check(EMPTY.args(DISTINCT_VALUES.args(" (1 to 3)[. > " + wrap(0) + "] ! [ ]")), true,
         exists(DISTINCT_VALUES));
 
-    // head is rewritten even for nondeterministic input; other functions are kept
+    // nondeterministic input is not rewritten
     final String ndt = " (1 to 3) ! (if(. = 3) then error() else .)";
-    check(EXISTS.args(HEAD.args(ndt)), true, empty(HEAD));
+    check(EXISTS.args(HEAD.args(ndt)), true, exists(HEAD));
     check(EXISTS.args(TAIL.args(ndt)), true, exists(TAIL));
     check(EXISTS.args(TRUNK.args(ndt)), true, exists(TRUNK));
     error(EXISTS.args(FOOT.args(ndt)), FUNERR1);
@@ -2963,6 +3006,13 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void insertBefore() {
     final Function func = INSERT_BEFORE;
     query(func.args(1, 1, 1), "1\n1");
+
+    // order is irrelevant
+    final String s = " tokenize(" + wrap("a b") + ")", i = " tokenize(" + wrap("c d") + ")";
+    check(COUNT.args(func.args(s, " xs:integer(" + wrap(2) + ")", i)), 4, empty(func));
+    check(EXISTS.args(func.args(s, " xs:integer(" + wrap(2) + ")", i)), true, empty(func));
+    check(HEAD.args(func.args(s, 2, i)), "a", empty(func));
+    check(HEAD.args(func.args(s + "[. = 'x']", 2, i)), "c", empty(func));
     // repeated sequences: insert position must be respected
     query("string-join(" + func.args(" replicate(('a', 'b'), 3)", 2, " ('a', 'b')") + ')',
         "aabbabab");
@@ -3128,6 +3178,18 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()", " ()"), "");
     query(func.args(" ()", 1), "");
     query(func.args(1, " ()"), "");
+
+    // merge with subsequence functions
+    final String toks = " tokenize(" + wrap("a b c d e") + ")";
+    check(func.args(SUBSEQUENCE.args(toks, 2, 3), 2), "c", empty(SUBSEQUENCE), exists(func));
+    check(func.args(_UTIL_RANGE.args(toks, 3, 5), 2), "d", empty(_UTIL_RANGE), exists(func));
+    check(func.args(SUBSEQUENCE.args(toks, 2, 2), 3), "", empty());
+    check(func.args(func.args(toks, " (2, 3, 4)"), 2), "c", count(func, 1));
+
+    // unbounded input: only the items up to the largest position are retrieved
+    final String gen = " " + GENERATE.args(1, " fn { . + 1 }");
+    query(func.args(gen, " (4, 2)"), "4\n2");
+    query(func.args(gen, " (" + wrap(1) + " to 3)"), "1\n2\n3");
     query(func.args(1, 1), 1);
     query(func.args(1, -1), "");
     query(func.args(1, 0), "");
@@ -4830,6 +4892,13 @@ return
     check(func.args(" (1, 2, 3)", REPLICATE.args(" random:integer(1) + 1", 3)), "2\n3",
         empty(REPLICATE));
 
+    // first item is retained
+    final String s = " tokenize(" + wrap("a b") + ")";
+    check(EXISTS.args(func.args(s, 2)), true, empty(func));
+    check(EMPTY.args(func.args(s + "[. = 'b']", 2)), false, empty(func));
+    check(HEAD.args(func.args(s, 2)), "a", empty(func));
+    check(EXISTS.args(func.args(s + "[. = 'b']", 1)), false, root(_UTIL_COUNT_WITHIN));
+
     // static rewrites
     query(func.args(" ()", 1), "");
     query(func.args("A", 1), "");
@@ -5617,6 +5686,19 @@ return
   @Test public void slice() {
     final Function func = SLICE;
 
+    // descending order, unknown input size
+    for(final String[] t : new String[][] {
+      { "", "" }, { "a", "a" }, { "a b", "b\na" }, { "a b c d e", "e\nd\nc\nb\na" } }) {
+      final String toks = " tokenize(" + wrap(t[0]) + ")";
+      check(func.args(toks, " ()", " ()", -1), t[1], empty(func), exists(REVERSE));
+    }
+    final String toks = " tokenize(" + wrap("a b c d e") + ")";
+    check(func.args(toks, 4, 2), "d\nc\nb", empty(func), exists(_UTIL_RANGE));
+    check(func.args(toks, 4, 2, -1), "d\nc\nb", empty(func), exists(_UTIL_RANGE));
+    check(func.args(toks, 7, 4), "e\nd", empty(func), exists(_UTIL_RANGE));
+    check(func.args(" tokenize(" + wrap("a b") + ")", 4, 2), "b", empty(func));
+    check(func.args(toks, 2, 2, -1), "b", empty(func));
+
     String in = "() =>";
     check(in + func.args(+0), "", empty());
     check(in + func.args(+1, +2, +3), "", empty());
@@ -5673,7 +5755,7 @@ return
     check(in + func.args(+1, +2), "a\nb", root(_UTIL_RANGE));
     check(in + func.args(+2, +5), "b", root(_UTIL_RANGE));
     check(in + func.args(+3, +4), "", root(_UTIL_RANGE));
-    check(in + func.args(+5, +2), "b", root(SLICE));
+    check(in + func.args(+5, +2), "b", root(REVERSE), empty(SLICE));
     check(in + func.args(+1, +2, +2), "a", root(SLICE));
 
     in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'b'] =>";
@@ -5938,6 +6020,23 @@ return
   }
 
   /** Test method. */
+  @Test public void startsWithSubsequence() {
+    final Function func = STARTS_WITH_SUBSEQUENCE;
+
+    query(func.args(" ()", " ()"), true);
+    query(func.args(" (1 to 5)", " ()"), true);
+    query(func.args(" (1 to 5)", " (1, 2)"), true);
+    query(func.args(" (1 to 5)", " (2, 3)"), false);
+    query(func.args(" (1 to 2)", " (1 to 3)"), false);
+    query(func.args(" (1 to 5) ! string()", " ('1', '2')"), true);
+
+    // unbounded input: only the leading items are retrieved
+    final String gen = " " + GENERATE.args(1, " fn { . + 1 }");
+    query(func.args(gen, " (1, 2)"), true);
+    query(func.args(gen, " (1, 3)"), false);
+  }
+
+  /** Test method. */
   @Test public void staticBaseUri() {
     final Function func = STATIC_BASE_URI;
     query("declare base-uri 'a/'; ends-with(" + func.args() + ", '/')", true);
@@ -6115,6 +6214,16 @@ return
         empty(func), empty(TRUNK));
     check(opaque + '(' + func.args(" $o", 3, " count($o) + 1") + ')', "c\nd\ne", exists(func));
     check(opaque + '(' + func.args(" $o", " count($o)", 0) + ')', "", empty());
+
+    // merge nested calls
+    check(opaque + func.args(" " + func.args(" $o", 2, 3), 2, 5), "c\nd", count(func, 1));
+    check(opaque + func.args(" " + func.args(" $o", 2), 2, 2), "c\nd", count(func, 1));
+    check(opaque + func.args(" " + func.args(" $o", 2, 3), 2), "c\nd", count(func, 1));
+    check(opaque + func.args(" " + _UTIL_RANGE.args(" $o", 2, 4), 2, 2), "c\nd",
+        count(func, 1), empty(_UTIL_RANGE));
+    check(opaque + func.args(" " + func.args(" $o", 2, 3), 4), "", empty(func));
+    check(opaque + func.args(" " + func.args(" $o", 4), 2, 5), "e", count(func, 1));
+    check(opaque + func.args(" " + TAIL.args(" $o"), 2, 2), "c\nd", count(func, 1), empty(TAIL));
 
     // static rewrites
     query(func.args(" ()", 0), "");

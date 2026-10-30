@@ -2246,7 +2246,7 @@ public final class RewritingsTest extends SandboxTest {
         exists(IterPath.class), exists(SingleIterPath.class));
 
     // GH-2215: Unexpected exception, mapping double attributes
-    check("boolean((<a/> ! (a, b)))", false, exists(Pipeline.class));
+    check("boolean((<a/> ! (a, b)))", false, exists(IterPath.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 
@@ -3025,5 +3025,30 @@ public final class RewritingsTest extends SandboxTest {
     query(f + "count($a union $b)", 2);
     query(f + "count(($a, $b) except $a)", 1);
     query(f + "(if(local:f(false())) { $a } else { $b }) is $b", true);
+  }
+
+  /** Positional functions on conditional expressions: evaluate them in the branches. */
+  @Test public void positionalBranches() {
+    final String n = "let $n := random:integer(1) + 2 return ";
+    check(n + "(if(random:integer(1) = 0) then sort((3, 1, 4)) else (5 to 9))[position() <= $n]",
+        "1\n3", count(_UTIL_RANGE, 2), count(If.class, 1));
+    check(n + "(switch(random:integer(1)) case 0 return (1 to 5) case 1 return (2 to 6) "
+        + "default return ())[position() <= $n]", "1\n2",
+        count(_UTIL_RANGE, 2), count(Switch.class, 1));
+    check("(typeswitch(<a/>[random:integer(1) = 0]) case element(a) return (1 to 5) "
+        + "case element(b) return 6 default return ()) => count()", 5,
+        empty(COUNT), root(Typeswitch.class));
+    check("head(if(random:integer(1) = 0) then (3 to 6) else error())", 3, root(If.class));
+    check("count(if(random:integer(1) = 0) then sort((3, 1, 2)) else (1 to 5))", 3,
+        empty(COUNT), empty(SORT), root(If.class));
+
+    // top-k sorting: the range is moved into the simple map
+    check(n + "(if(random:integer(1) = 0) then sort-by((5, 2, 7, 1) ! { 'v': . }, { 'key': "
+        + "fn { ?v } }) ! ?v else (8, 9))[position() <= $n]", "1\n2",
+        count(_UTIL_RANGE, 2), exists("If/DualMap/UtilRange/FnSort"));
+
+    // expensive arguments are not duplicated
+    check("subsequence(if(random:integer(1) = 0) then (1 to 5) else (6 to 9), "
+        + "random:integer(1) + 2)", "2\n3\n4\n5", root(SUBSEQUENCE));
   }
 }

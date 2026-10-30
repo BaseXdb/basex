@@ -671,6 +671,19 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Applies a function to the return expressions of all branches of this expression.
+   * @param func function to apply to each branch
+   * @param cc compilation context
+   * @return resulting expression or {@code null}
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr mapBranches(final QueryFunction<Expr, Expr> func, final CompileContext cc)
+      throws QueryException {
+    return null;
+  }
+
+  /**
    * Returns the input info of this expression, or the supplied reference as fallback.
    * @param info fallback reference
    * @return info or {@code null}

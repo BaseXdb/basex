@@ -345,7 +345,6 @@ public class CmpG extends Cmp {
 
   @Override
   public boolean noMatches(final ArrayList<PathNode> nodes, final Data data) throws QueryException {
-
     final Expr expr2 = exprs[1];
     if(!byCodepoint(CmpOp.EQ) || !(expr2 instanceof final Value value) ||
         !value.seqType().type.isStringOrUntyped()) return false;

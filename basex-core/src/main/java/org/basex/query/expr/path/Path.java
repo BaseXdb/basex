@@ -229,11 +229,11 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.conditional()) {
-      // drop irrelevant predicate: if(a[1]) → if(a)
+    if(mode.conditional() || mode == Simplify.EXISTENCE) {
+      // drop irrelevant predicate: if(a[1]) → if(a), exists(a[last()]) → exists(a)
       expr = dropPredicate(cc);
       // merge nested predicates: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
-      if(expr == this) expr = flattenEbv(true, cc);
+      if(expr == this && mode.conditional()) expr = flattenEbv(true, cc);
     }
     if(expr == this && this instanceof final CachedPath cp &&
         (mode.conditional() || mode.unordered()) && axisDistinct(cc)) {
@@ -330,7 +330,7 @@ public abstract class Path extends ParseExpr {
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  public final Expr dropPredicate(final CompileContext cc) throws QueryException {
+  private Expr dropPredicate(final CompileContext cc) throws QueryException {
     return steps[steps.length - 1] instanceof final Preds preds && preds.keepsResults() ?
       removePredicate(cc) : this;
   }

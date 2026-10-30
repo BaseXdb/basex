@@ -213,7 +213,6 @@ public final class FTToken {
 
   /** Codepoint mappings (basic). */
   private static final char[][] NC0000 = {
-
     // Western characters
     { '\u00C0', 'A'}, { '\u00C1', 'A'}, { '\u00C2', 'A'}, { '\u00C3', 'A'}, { '\u00C4', 'A'},
     { '\u00C5', 'A'}, { '\u00C6', 'A'}, { '\u00C7', 'C'}, { '\u00C8', 'E'}, { '\u00C9', 'E'},

@@ -85,13 +85,29 @@ public final class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter evalIter(final QueryContext qc) throws QueryException {
-    final Value input = arg(0).value(qc);
-    if(input.isEmpty()) return Empty.ITER;
     final Expr at = arg(1);
-    final Iter iter = at.atomIter(qc, info);
+    Value value = arg(0).eagerValue(qc);
+    final Iter iter;
+    if(value != null) {
+      if(value.isEmpty()) return Empty.ITER;
+      iter = at.atomIter(qc, info);
+    } else {
+      // only retrieve the input items up to the largest position (the input may be unbounded)
+      final Value positions = guarded(() -> at.atomValue(qc, info), Empty.VALUE, qc);
+      final long max = guarded(() -> {
+        if(positions instanceof final RangeSeq rs) return rs.max();
+        long m = 0;
+        for(final Item item : positions) m = Math.max(m, Pos.position(toNumber(item, at)));
+        return m;
+      }, 0L, qc);
+      value = FnSubsequence.prefix(arg(0), max, qc);
+      if(value.isEmpty()) return Empty.ITER;
+      iter = positions.iter();
+    }
     // hidden option, indicates whether the positions are sorted
     final boolean sorted = toBooleanOrFalse(arg(2), qc);
 
+    final Value input = value;
     return new Iter() {
       final long size = input.size();
 
@@ -144,8 +160,9 @@ public final class FnItemsAt extends StandardFunc {
         if(l == 0) return cc.function(HEAD, info, input);
 
         // items-at(tail(E), pos) → items-at(E, pos + 1)
-        if(TAIL.is(input))
-          return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(l + 2));
+        // items-at(subsequence(E, 3, 5), 2) → items-at(E, 4)
+        final SeqRange r = SeqRange.get(input, cc);
+        if(r != null) return r.sub(new SeqRange(l, l + 1)).function(input.arg(0), info, cc);
         // items-at(replicate(I, count), pos) → I
         if(REPLICATE.is(input)) {
           // static integer will always be greater than 1
@@ -191,11 +208,8 @@ public final class FnItemsAt extends StandardFunc {
       return expr;
     }
     // items-at(E, S to E) → util:range(E, S, E)
-    if(at instanceof Range) {
-      final Expr arg1 = at.arg(0), arg2 = at.arg(1);
-      if(arg1.seqType().instanceOf(Types.INTEGER_O) && arg2.seqType().instanceOf(Types.INTEGER_O)) {
-        return cc.function(_UTIL_RANGE, info, input, arg1, arg2);
-      }
+    if(at instanceof final Range range && range.integers()) {
+      return cc.function(_UTIL_RANGE, info, input, range.arg(0), range.arg(1));
     }
     // items-at(E, reverse(P)) → reverse(items-at(E, P))
     if(REVERSE.is(at))

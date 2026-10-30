@@ -319,7 +319,6 @@ public abstract class Formatter extends FormatUtil {
    * @throws QueryException query exception
    */
   private static int calendar(final byte[] calendar, final InputInfo info) throws QueryException {
-
     final QNm qnm;
     try {
       qnm = QNm.parse(trim(calendar), null, info.sc());

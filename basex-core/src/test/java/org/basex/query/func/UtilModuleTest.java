@@ -44,6 +44,15 @@ public final class UtilModuleTest extends SandboxTest {
     check(func.args(one, 0, 1), true, root(Bln.class));
     check(func.args(one, 2), false, root(Bln.class));
 
+    // merge with subsequence functions
+    final String toks = " tokenize(" + wrap("a b c d e") + ")";
+    check(func.args(TAIL.args(toks), 2), true, empty(TAIL), root(func));
+    check(func.args(TRUNK.args(toks), 5), false, empty(TRUNK), root(func));
+    check(func.args(SUBSEQUENCE.args(toks, 2, 3), 3, 3), true, empty(SUBSEQUENCE), root(func));
+    check(func.args(SUBSEQUENCE.args(toks, 4, 3), 3), false, empty(SUBSEQUENCE), root(func));
+    check(func.args(SUBSEQUENCE.args(toks, 3, 2), 3), false, root(Bln.class));
+    check("count(" + TRUNK.args(toks) + ") = 4", true, empty(TRUNK), root(func));
+
     // minimum
     query(func.args(" ()", -1), true);
     query(func.args(" ()", 0), true);

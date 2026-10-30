@@ -393,6 +393,9 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Expr embed(final CompileContext cc, final boolean skip) throws QueryException {
+    final QueryFunction<Expr, Expr> call = input -> definition.get(info,
+        new ExprList().add(args()).set(0, input).finish()).optimize(cc);
+
     // head($nodes ! name()) → head($nodes) ! name()
     // foot((1 to 8) ! <_>{ . }</_>) → foot((1 to 8)) ! <_>{ . }</_>
     // do not rewrite positional access: foot($nodes ! position())
@@ -401,10 +404,19 @@ public abstract class StandardFunc extends Arr {
       final Expr[] ops = arg(0).args();
       if(Checks.all(ops, op ->
           op == ops[0] || op.seqType().one() && !op.has(Flag.POS, Flag.NDT))) {
-        final Expr[] args = new ExprList().add(args()).set(0, ops[0]).finish();
-        final Expr fn = definition.get(info, args).optimize(cc);
+        final Expr fn = call.apply(ops[0]);
         return skip ? fn : SimpleMap.get(cc, info, new ExprList(ops.clone()).set(0, fn).finish());
       }
+    }
+    // util:range(if(C) then A else B, 1, $n)
+    // → if(C) then util:range(A, 1, $n) else util:range(B, 1, $n)
+    // count(switch($s) case 'a' return A default return B)
+    // → switch($s) case 'a' return count(A) default return count(B)
+    // do not duplicate expensive arguments: subsequence(if(C) then A else B, f($x))
+    if(Checks.all(args(), arg -> arg == arg(0) ||
+        arg instanceof Value || arg instanceof VarRef || arg instanceof ContextValue)) {
+      final Expr mapped = arg(0).mapBranches(call, cc);
+      if(mapped != null) return mapped;
     }
     return this;
   }

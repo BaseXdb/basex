@@ -143,6 +143,14 @@ public final class FnRemove extends StandardFunc {
   }
 
   @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // exists(remove($seq, 2)) → exists($seq) (the first item is retained)
+    final Expr expr = mode == Simplify.EXISTENCE && arg(1) instanceof final Itr itr &&
+      itr.itr() != 1 ? arg(0) : this;
+    return cc.simplify(this, expr, mode);
+  }
+
+  @Override
   public boolean ddo() {
     return arg(0).ddo();
   }

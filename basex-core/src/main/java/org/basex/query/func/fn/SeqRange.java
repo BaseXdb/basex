@@ -1,7 +1,10 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -35,8 +38,59 @@ public final class SeqRange {
    * @throws QueryException query exception
    */
   public static SeqRange get(final Expr expr, final CompileContext cc) throws QueryException {
-    // check if expression is fn:subsequence or util:range
-    return expr instanceof final FnSubsequence sub ? sub.range(cc) : null;
+    // check if expression is fn:subsequence, util:range, fn:tail, fn:trunk or fn:items-at
+    if(expr instanceof final FnSubsequence sub) return sub.range(cc);
+    if(TAIL.is(expr)) return new SeqRange(1, Long.MAX_VALUE);
+    final long size = expr.size();
+    if(TRUNK.is(expr) && size != -1) return new SeqRange(0, size);
+    if(ITEMS_AT.is(expr) && expr.arg(1) instanceof final Itr itr && itr.itr() > 0) {
+      return new SeqRange(itr.itr() - 1, itr.itr());
+    }
+    return null;
+  }
+
+  /**
+   * Returns a range that is located within this range.
+   * @param sub range, relative to this range
+   * @return new range
+   */
+  SeqRange sub(final SeqRange sub) {
+    if(sub.start >= length) return new SeqRange(start, start);
+    final long s = start + sub.start;
+    return new SeqRange(s, s + Math.min(sub.length, length - sub.start));
+  }
+
+  /**
+   * Returns the input sizes for which the size of this range is within the specified bounds.
+   * @param min minimum size of the range
+   * @param max maximum size of the range
+   * @return minimum and maximum input size, or {@code null} if no input size qualifies
+   */
+  public long[] inputSize(final long min, final long max) {
+    if(min > length || max < 0) return null;
+    return new long[] { min <= 0 ? 0 : start + min, max >= length ? Long.MAX_VALUE : start + max };
+  }
+
+  /**
+   * Returns a function call that returns this range of the specified input.
+   * @param input input expression
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return function call
+   * @throws QueryException query exception
+   */
+  Expr function(final Expr input, final InputInfo info, final CompileContext cc)
+      throws QueryException {
+    final Expr pos = Itr.get(start + 1);
+    if(end == Long.MAX_VALUE) {
+      return start == 1 ? cc.function(TAIL, info, input) :
+        cc.function(SUBSEQUENCE, info, input, pos);
+    }
+    if(length == 1) {
+      return start == 0 ? cc.function(HEAD, info, input) :
+        cc.function(ITEMS_AT, info, input, pos);
+    }
+    return cc.function(SUBSEQUENCE, info, input, pos, Itr.get(length));
   }
 
   /**

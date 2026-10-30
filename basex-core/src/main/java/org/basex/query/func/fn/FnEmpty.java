@@ -7,6 +7,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -51,29 +52,7 @@ public class FnEmpty extends StandardFunc {
       if(st.oneOrMore()) return Bln.get(exists);
     }
 
-    // static integer will always be greater than 1: exists(replicate(E, 2)) → exists(E)
-    if(REPLICATE.is(input) && input.arg(1) instanceof Itr) {
-      input = input.arg(0);
-    }
-    // exists(head(E)) → exists(E), empty(head(E)) → empty(E)
-    if(HEAD.is(input)) {
-      input = input.arg(0);
-    }
-    // exists(foot(E)) → exists(E), empty(foot(E)) → empty(E)
-    if(FOOT.is(input) && !input.has(Flag.NDT)) {
-      input = input.arg(0);
-    }
-    // exists(E/step[1]) → exists(E/step), empty(E/step[last()]) → empty(E/step)
-    if(input instanceof final Path path) {
-      input = path.dropPredicate(cc);
-    }
-    // rewrite list to union expression:  exists((nodes1, nodes2)) → exists(nodes1 | nodes2)
-    if(input instanceof List && input.seqType().type instanceof NodeType) {
-      input = new Union(info, input.args()).optimize(cc);
-    }
-    if(input != arg(0)) return cc.function(exists ? EXISTS : EMPTY, info, input);
-
-    // replace optimized expression by boolean function
+    // rewrite to boolean function
     if(input instanceof final Filter filter) {
       // rewrite filter:  exists($a[text() = string]) → $a/text() = string
       input = filter.flattenEbv(filter.root, false, cc);
@@ -94,47 +73,26 @@ public class FnEmpty extends StandardFunc {
     if(input != arg(0)) return cc.function(exists ? BOOLEAN : NOT, info, input);
 
     // exists(map:keys(E)) → map:size(E) > 0
-    // empty(util:array-members(E)) → array:size(E) = 0
+    // empty(array:members(E)) → array:size(E) = 0
     final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
       return new CmpG(info, input, Itr.ZERO, exists ? CmpOp.NE : CmpOp.EQ).optimize(cc);
     }
+    // exists($a to $b) → $a <= $b, empty($a to $b) → $a > $b
+    if(input instanceof final Range range && range.integers()) {
+      return new CmpG(info, range.arg(0), range.arg(1), exists ? CmpOp.LE : CmpOp.GT).optimize(cc);
+    }
 
     // exists(tail(E)) → util:count-within(E, 2), empty(tail(E)) → util:count-within(E, 0, 1)
-    // exists(trunk(E)) → util:count-within(E, 2), empty(trunk(E)) → util:count-within(E, 0, 1)
-    if((TAIL.is(input) || TRUNK.is(input)) && !input.has(Flag.NDT)) {
-      return countWithin(input.arg(0), 1, cc);
-    }
     // exists(subsequence(E, pos)) → util:count-within(E, pos)
-    // empty(subsequence(E, pos)) → util:count-within(E, 0, pos - 1)
-    if((SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) && !input.has(Flag.NDT)) {
-      final SeqRange range = SeqRange.get(input, cc);
-      if(range != null && range.length > 0) return countWithin(input.arg(0), range.start, cc);
-    }
-    // exists(items-at(E, pos)) → util:count-within(E, pos)
     // empty(items-at(E, pos)) → util:count-within(E, 0, pos - 1)
-    // static position will always be greater than 1
-    if(ITEMS_AT.is(input) && !input.has(Flag.NDT) && input.arg(1) instanceof final Itr pos) {
-      return countWithin(input.arg(0), pos.itr() - 1, cc);
+    final SeqRange range = SeqRange.get(input, cc);
+    if(range != null && range.length > 0 && !input.has(Flag.NDT)) {
+      final long[] mm = range.inputSize(exists ? 1 : 0, exists ? Long.MAX_VALUE : 0);
+      return UtilCountWithin.function(input.arg(0), mm[0], mm[1], info, cc);
     }
-
     return embed(cc, true);
-  }
-
-  /**
-   * Rewrites the function call to a range check on the unwrapped input expression.
-   * @param input input expression
-   * @param skipped number of items skipped by the original expression
-   * @param cc compilation context
-   * @return function
-   * @throws QueryException query exception
-   */
-  private Expr countWithin(final Expr input, final long skipped, final CompileContext cc)
-      throws QueryException {
-    return this instanceof FnExists ?
-      cc.function(_UTIL_COUNT_WITHIN, info, input, Itr.get(skipped + 1)) :
-      cc.function(_UTIL_COUNT_WITHIN, info, input, Itr.ZERO, Itr.get(skipped));
   }
 
   @Override

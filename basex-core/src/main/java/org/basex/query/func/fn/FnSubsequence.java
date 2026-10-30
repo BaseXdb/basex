@@ -93,10 +93,21 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = guarded(() -> range(qc), EMPTY, qc);
     if(sr == EMPTY) return Empty.VALUE;
 
-    // return iterator if all results are returned, or if iterator yields no items
+    // return complete input or requested range
     final Expr input = arg(0);
-    if(sr == ALL) return input.value(qc);
+    return sr == ALL ? input.value(qc) : value(input, sr, qc);
+  }
 
+  /**
+   * Returns the specified range of the input.
+   * @param input input
+   * @param sr range
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  private static Value value(final Expr input, final SeqRange sr, final QueryContext qc)
+      throws QueryException {
     // value-based input: return subsequence
     Value value = input.eagerValue(qc);
     if(value != null) {
@@ -115,11 +126,11 @@ public class FnSubsequence extends StandardFunc {
 
     // size is known: collect by position
     if(size != -1) {
-      if(sr.length == size) return iter.value(qc, this);
+      if(sr.length == size) return iter.value(qc, input);
 
       final ValueBuilder vb = new ValueBuilder(qc, sr.length);
       for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));
-      return vb.value(this);
+      return vb.value(input);
     }
     // otherwise, collect via iterator
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -127,7 +138,7 @@ public class FnSubsequence extends StandardFunc {
     for(Item item; c < sr.end && (item = qc.next(iter)) != null; c++) {
       if(c >= sr.start) vb.add(item);
     }
-    return vb.value(this);
+    return vb.value(input);
   }
 
   /**
@@ -146,6 +157,23 @@ public class FnSubsequence extends StandardFunc {
       if(input instanceof final GFLWOR gflwor) return gflwor.iter((int) limit, qc);
     }
     return input.iter(qc);
+  }
+
+  /**
+   * Returns a value with the leading items of the input.
+   * @param input input
+   * @param limit maximum number of items
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  static Value prefix(final Expr input, final long limit, final QueryContext qc)
+      throws QueryException {
+    if(limit <= 0) return Empty.VALUE;
+    // statically known size within limit: use the specialized evaluation of the input
+    final long size = input.size();
+    return size != -1 && size <= limit ? input.value(qc) :
+      value(input, new SeqRange(0, limit), qc);
   }
 
   @Override
@@ -263,6 +291,9 @@ public class FnSubsequence extends StandardFunc {
       if(sr == ALL) return input;
       // ignore standard limitation for large values to speed up evaluation of result
       if(input instanceof Value) return value(cc.qc);
+      // subsequence(subsequence(E, 2, 5), 2, 2) → subsequence(E, 3, 2)
+      final SeqRange inner = SeqRange.get(input, cc);
+      if(inner != null) return inner.sub(sr).function(input.arg(0), info, cc);
 
       // check if result size is statically known
       final long size = sr.adjust(input.size());
@@ -314,8 +345,7 @@ public class FnSubsequence extends StandardFunc {
           final boolean exact = a == sr.start, one = args[a].seqType().one();
           if(a > 0 && (exact || !one)) {
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-            return cc.function(SUBSEQUENCE, info, list, Itr.get(sr.start - a + 1),
-                Itr.get(sr.length));
+            return new SeqRange(sr.start - a, sr.end - a).function(list, info, cc);
           }
           if(!one) break;
         }

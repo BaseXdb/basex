@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -36,7 +37,7 @@ public final class FnTrunk extends StandardFunc {
 
     // return optimized iterator if result size is known
     if(size != -1) return new Iter() {
-      int c;
+      long c;
 
       @Override
       public Item next() throws QueryException {
@@ -96,16 +97,10 @@ public final class FnTrunk extends StandardFunc {
     if(size == 2) return cc.function(HEAD, info, input);
 
     if(size != -1) {
-      // trunk(trunk(E)) → subsequence(E, 1, size - 2)
-      if(TRUNK.is(input)) {
-        return cc.function(SUBSEQUENCE, info, input.arg(0), Itr.ONE, Itr.get(size - 1));
-      }
+      // trunk(trunk(E)) → subsequence(E, 1, size - 1)
       // trunk(subsequence(E, pos, length)) → subsequence(E, pos, length - 1)
-      if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
-        final SeqRange r = SeqRange.get(input, cc);
-        if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
-            Itr.get(r.start + 1), Itr.get(size - 1));
-      }
+      final SeqRange r = SeqRange.get(input, cc);
+      if(r != null) return r.sub(new SeqRange(0, size - 1)).function(input.arg(0), info, cc);
     }
     // trunk(replicate(I, count)) → replicate(I, count - 1)
     if(REPLICATE.is(input)) {
@@ -128,6 +123,14 @@ public final class FnTrunk extends StandardFunc {
 
     exprType.assign(st.union(Occ.ZERO), size - 1).data(input);
     return embed(cc, false);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // count/exists(trunk(E)) → count/exists(tail(E))
+    final Expr expr = mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) ?
+      cc.function(TAIL, info, exprs) : this;
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

@@ -41,6 +41,13 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
   abstract Expr branch(G group);
 
   /**
+   * Assigns a new return expression to a group.
+   * @param group group
+   * @param expr return expression
+   */
+  abstract void branch(G group, Expr expr);
+
+  /**
    * Returns the return expressions of all groups.
    * @return expressions
    */
@@ -120,6 +127,18 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
       changed |= group.inlineTypeCheck(tc, cc) != null;
     }
     return changed ? optimize(cc) : this;
+  }
+
+  @Override
+  public final Expr mapBranches(final QueryFunction<Expr, Expr> func, final CompileContext cc)
+      throws QueryException {
+    // F((type)switch(C) case X return A default return B) →
+    //   (type)switch(C) case X return F(A) default return F(B)
+    for(final G group : groups) {
+      branch(group, func.apply(branch(group)));
+      group.optimize(cc);
+    }
+    return optimize(cc);
   }
 
   @Override

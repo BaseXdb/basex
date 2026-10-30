@@ -12,6 +12,12 @@ import org.basex.query.value.item.*;
  */
 public final class FnStartsWithSubsequence extends FnContainsSubsequence {
   @Override
+  Value input(final long size, final QueryContext qc) throws QueryException {
+    // only retrieve the leading items (the input may be unbounded)
+    return FnSubsequence.prefix(arg(0), size, qc);
+  }
+
+  @Override
   boolean match(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 

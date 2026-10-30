@@ -43,6 +43,11 @@ public final class Switch extends ASwitch<SwitchGroup> {
   }
 
   @Override
+  void branch(final SwitchGroup group, final Expr expr) {
+    group.exprs[0] = expr;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     for(final SwitchGroup group : groups) group.checkUp();
