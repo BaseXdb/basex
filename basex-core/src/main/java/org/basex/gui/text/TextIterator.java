@@ -71,7 +71,7 @@ final class TextIterator {
     start = et.start();
     end = et.end();
     errPos = et.error();
-    searchResults = et.searchResults();
+    searchResults = et.search.results();
     name = et.occurrence();
     editor = et;
   }

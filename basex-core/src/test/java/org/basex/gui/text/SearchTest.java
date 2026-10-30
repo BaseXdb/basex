@@ -136,13 +136,13 @@ public final class SearchTest {
     st.add(0); st.add(4); st.add(5);
     en.add(3); en.add(4); en.add(8);
     final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
-    ed.searchResults(new IntList[] { st, en }, null);
+    ed.search.results(new IntList[] { st, en }, null);
     ed.pos(0);
     ed.jump(SearchBar.SearchDir.CURRENT, false);
     final IntList visited = new IntList();
     for(int i = 0; i < 4; i++) {
       ed.jump(SearchBar.SearchDir.FORWARD, true);
-      visited.add(ed.searchIndex());
+      visited.add(ed.search.index());
     }
     // first F3 selects the current hit (0), then advances past the zero-width hit, then wraps
     assertArrayEquals(new int[] { 0, 1, 2, 0 }, visited.finish());
@@ -157,11 +157,11 @@ public final class SearchTest {
       en.add(i + 1);
     }
     final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
-    ed.searchResults(new IntList[] { st, en }, null);
+    ed.search.results(new IntList[] { st, en }, null);
     // caret behind the first, just replaced hit
     ed.pos(1);
     ed.jump(SearchBar.SearchDir.CURRENT, true);
-    assertEquals(1, ed.searchIndex());
+    assertEquals(1, ed.search.index());
   }
 
   /** Replace Next targets the hit at the caret, not the hit that was jumped to last. */
@@ -171,23 +171,23 @@ public final class SearchTest {
     st.add(2); st.add(10);
     en.add(5); en.add(13);
     final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
-    ed.searchResults(new IntList[] { st, en }, null);
+    ed.search.results(new IntList[] { st, en }, null);
 
     // caret before, at the start of, and inside the first hit
     for(final int p : new int[] { 0, 2, 3 }) {
       ed.pos(p);
-      assertEquals(0, ed.caretHit());
+      assertEquals(0, ed.search.caretHit());
     }
     // caret at the end of the first hit: the second one is current
     ed.pos(5);
-    assertEquals(1, ed.caretHit());
+    assertEquals(1, ed.search.caretHit());
     // caret behind the last hit: wrap to the first one
     ed.pos(13);
-    assertEquals(0, ed.caretHit());
+    assertEquals(0, ed.search.caretHit());
 
     // no hits
-    ed.searchResults(new IntList[] { new IntList(), new IntList() }, null);
-    assertEquals(-1, ed.caretHit());
+    ed.search.results(new IntList[] { new IntList(), new IntList() }, null);
+    assertEquals(-1, ed.search.caretHit());
   }
 
   /** Replace All is restricted to a selection, unless the selection is one of the hits. */
@@ -454,7 +454,7 @@ public final class SearchTest {
       st.add(p);
       en.add(p + 1);
     }
-    ed.searchResults(new IntList[] { st, en }, literal("a", true));
+    ed.search.results(new IntList[] { st, en }, literal("a", true));
     if(select != null) ed.select(select[0], select[1]);
     return ed;
   }

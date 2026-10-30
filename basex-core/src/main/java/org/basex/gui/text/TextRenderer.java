@@ -523,7 +523,7 @@ final class TextRenderer extends BaseXBack {
    * The hits are mapped to the document-space y of their line, the axis of the slider.
    */
   void marks() {
-    final IntList starts = text.searchResults()[0], ys = new IntList();
+    final IntList starts = text.search.results()[0], ys = new IntList();
     // a stale line cache yields no positions; the next layout will assign them
     if(cache.valid(text.size(), cacheWidth())) {
       final int ss = starts.size(), cs = cache.size();

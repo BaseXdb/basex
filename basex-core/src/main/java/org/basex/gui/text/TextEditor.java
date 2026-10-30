@@ -6,9 +6,6 @@ import java.text.*;
 import java.util.*;
 import java.util.function.*;
 
-import javax.swing.*;
-import javax.swing.Timer;
-
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
@@ -28,30 +25,10 @@ public final class TextEditor {
     /** Title case. */ TITLE
   }
 
-  /** Delay before a text change triggers a new search (ms). */
-  private static final int SEARCH_DELAY = 100;
-
+  /** Search. */
+  final TextSearch search = new TextSearch(this);
   /** Editor options. */
   private final EditorOptions opts;
-  /** Collapses the searches of consecutive text changes into a single one. */
-  private final Timer searchTimer;
-
-  /** Start and end positions of search terms (initially empty). */
-  private IntList[] searchResults = { new IntList(), new IntList() };
-  /** Index of the current search hit ({@code -1} if none). */
-  private int searchHit = -1;
-  /** Indicates whether the current search hit was reached by a selecting jump. */
-  private boolean searchSelected;
-  /** Context of the current search results (can be {@code null}). */
-  private SearchContext searchContext;
-  /** Context of the most recently started search (can be {@code null}). */
-  private SearchContext searchRequest;
-  /** Search thread (can be {@code null}). */
-  private Thread searchThread;
-  /** Id of the most recent search. */
-  private long searchId;
-  /** Result of the last decoding (accessed by the search thread and the event dispatch thread). */
-  private volatile Decoded decoded;
 
   /** Start position of a text selection ({@code -1} if no text is selected). */
   private int start = -1;
@@ -148,10 +125,6 @@ public final class TextEditor {
    */
   TextEditor(final EditorOptions opts) {
     this.opts = opts;
-    searchTimer = new Timer(SEARCH_DELAY, e -> {
-      if(searchRequest != null) startSearch(searchRequest, false);
-    });
-    searchTimer.setRepeats(false);
   }
 
   /**
@@ -167,102 +140,9 @@ public final class TextEditor {
     lines = -1;
     resetSelection();
     carets.clear();
-    // repeat the last requested search, but not before the changes have come to a rest
-    if(searchRequest != null) searchTimer.restart();
+    search.textChanged();
     if(pos > tl) pos = tl;
     return true;
-  }
-
-  /**
-   * A decoded text and the byte array it was decoded from (compared by identity).
-   * @param text text
-   * @param string decoded text
-   */
-  private record Decoded(byte[] text, String string) { }
-
-  /**
-   * Returns the specified text as string; the result of the last call is cached.
-   * Two threads may decode the same text at once, but none of them is ever blocked.
-   * @param txt text
-   * @return decoded text
-   */
-  private String decode(final byte[] txt) {
-    final Decoded dec = decoded;
-    if(dec != null && dec.text() == txt) return dec.string();
-    final String str = string(txt);
-    decoded = new Decoded(txt, str);
-    return str;
-  }
-
-  /**
-   * Sets a new search context and searches at once.
-   * @param sc search context (can be {@code null})
-   * @param jump jump to next search result
-   */
-  void search(final SearchContext sc, final boolean jump) {
-    searchTimer.stop();
-    if(sc != null) startSearch(sc, jump);
-  }
-
-  /**
-   * Starts a search. It runs in a separate thread; its results are adopted, and accessed,
-   * in the event dispatch thread.
-   * @param sc search context
-   * @param jump jump to next search result
-   */
-  private void startSearch(final SearchContext sc, final boolean jump) {
-    searchRequest = sc;
-    // interrupt old search thread
-    final Thread old = searchThread;
-    if(old != null) old.interrupt();
-
-    // start new search on a snapshot of the current text
-    final byte[] txt = text;
-    final long id = ++searchId;
-    final Thread t = new Thread(() -> {
-      try {
-        final IntList[] results = sc.search(txt, decode(txt));
-        SwingUtilities.invokeLater(() -> {
-          // discard the results of a search that has been superseded
-          if(id != searchId) return;
-          searchResults(results, sc);
-          if(sc.bar != null) sc.bar.refresh(this, sc, jump);
-        });
-      } catch(final Exception ex) {
-        // search was interrupted, or failed unexpectedly
-        Util.debug(ex);
-      }
-    });
-    t.setDaemon(true);
-    t.start();
-    searchThread = t;
-  }
-
-  /**
-   * Adopts the results of a search.
-   * @param results start and end positions of the hits (must not be modified)
-   * @param sc search context (can be {@code null})
-   */
-  void searchResults(final IntList[] results, final SearchContext sc) {
-    searchResults = results;
-    searchHit = -1;
-    searchContext = sc;
-  }
-
-  /**
-   * Returns the context of the last search.
-   * @return search context (can be {@code null})
-   */
-  SearchContext searchContext() {
-    return searchContext;
-  }
-
-  /**
-   * Returns the start and end positions of the search hits.
-   * @return positions (must not be modified)
-   */
-  IntList[] searchResults() {
-    return searchResults;
   }
 
   /**
@@ -297,7 +177,7 @@ public final class TextEditor {
   int[] replace(final ReplaceContext rc) {
     final int[] range = selectionRange();
     rc.caret = pos;
-    final int[] rng = rc.replace(searchContext, text, decode(text), range != null ? range[0] : 0,
+    final int[] rng = search.replace(rc, range != null ? range[0] : 0,
         range != null ? range[1] : size());
     return range != null ? rng : null;
   }
@@ -310,36 +190,7 @@ public final class TextEditor {
   int[] selectionRange() {
     if(!isSelected()) return null;
     final int s = selMin(), e = selMax();
-    final int hit = searchResults[0].sortedIndexOf(s);
-    return hit >= 0 && searchResults[1].get(hit) == e ? null : new int[] { s, e };
-  }
-
-  /**
-   * Replaces the search hit at the caret.
-   * @param rc replace context
-   * @return selection offsets, or {@code null} if there is no hit
-   */
-  int[] replaceHit(final ReplaceContext rc) {
-    final int hit = caretHit();
-    if(hit < 0) return null;
-    searchHit = hit;
-    return rc.replace(searchContext, text, decode(text), searchResults[0].get(hit),
-        searchResults[1].get(hit));
-  }
-
-  /**
-   * Returns the index of the hit that encloses the caret, or of the first hit after it (wrapping).
-   * @return index, or {@code -1} if there are no hits
-   */
-  int caretHit() {
-    final IntList starts = searchResults[0];
-    final int sl = starts.size();
-    if(sl == 0) return -1;
-    final int s = starts.sortedIndexOf(pos);
-    if(s >= 0) return s;
-    final int i = -s - 1;
-    // caret inside the preceding hit; otherwise, next hit, or first one
-    return i > 0 && pos < searchResults[1].get(i - 1) ? i - 1 : i == sl ? 0 : i;
+    return search.isHit(s, e) ? null : new int[] { s, e };
   }
 
   /**
@@ -2420,50 +2271,17 @@ public final class TextEditor {
    * @return new cursor position, or {@code -1}
    */
   int jump(final SearchDir dir, final boolean select) {
-    final int sl = searchResults[0].size();
-    if(sl == 0) {
-      searchHit = -1;
+    final int hit = search.jump(dir, select);
+    if(hit == -1) {
       if(select) resetSelection();
       return -1;
     }
-
-    // a zero-width hit is no selection: treat a hit we jumped to as the current one
-    final boolean current = isSelected() || searchSelected && searchHit >= 0 && searchHit < sl &&
-        searchResults[0].get(searchHit) == pos;
-    // a directional jump off a hit lowers the key: a hit at the caret still lies ahead of it
-    final boolean back = select && !current && dir != SearchDir.CURRENT;
-    int s = searchResults[0].sortedIndexOf(back ? pos - 1 : pos);
-    s = switch(dir) {
-      case CURRENT -> s < 0 ? -s - 1 : s;
-      case FORWARD -> s < 0 ? -s - 1 : s + 1;
-      case BACKWARD -> s < 0 ? -s - 2 : s - 1;
-    };
-    if(s < 0) s = sl - 1;
-    else if(s == sl) s = 0;
-    searchHit = s;
-    searchSelected = select;
-    final int p = searchResults[0].get(s);
+    final int p = search.start(hit);
     if(select) {
-      start = searchResults[1].get(s);
+      start = search.end(hit);
       end = p;
     }
     pos = p;
     return p;
-  }
-
-  /**
-   * Returns the index of the current search hit.
-   * @return index, or {@code -1}
-   */
-  int searchIndex() {
-    return searchHit;
-  }
-
-  /**
-   * Returns the number of search hits.
-   * @return number of hits
-   */
-  int searchSize() {
-    return searchResults[0].size();
   }
 }

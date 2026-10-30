@@ -395,7 +395,7 @@ public final class SearchBar extends BaseXBack {
   private boolean replaceEnabled() {
     if(editor == null || !editor.isEditable() || !isVisible() || !rplc.isEnabled()) return false;
     // reject results of a superseded search: a new one may still be running
-    final SearchContext sc = editor.editor.searchContext();
+    final SearchContext sc = editor.editor.search.context();
     return sc != null && sc.string.equals(find.getText()) && sc.flags.equals(flags());
   }
 
@@ -481,7 +481,7 @@ public final class SearchBar extends BaseXBack {
     if(editor.editor != te) return;
 
     // an empty search string yields no hits, but is no failed search either
-    final boolean hits = te.searchSize() != 0, error = sc.error != null;
+    final boolean hits = te.search.size() != 0, error = sc.error != null;
     prev.setEnabled(hits);
     next.setEnabled(hits);
     rplc.setEnabled(hits);
@@ -525,7 +525,7 @@ public final class SearchBar extends BaseXBack {
    * @return count text
    */
   private String countText() {
-    final int n = editor.editor.searchIndex(), total = editor.editor.searchSize();
+    final int n = editor.editor.search.index(), total = editor.editor.search.size();
     return BaseXLayout.format(n < 0 ? 0 : n + 1) + "\u2009/\u2009" + BaseXLayout.format(total);
   }
 

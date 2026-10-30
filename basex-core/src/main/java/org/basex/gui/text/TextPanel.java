@@ -598,7 +598,7 @@ public class TextPanel extends BaseXPanel {
    * @param jump jump to next hit
    */
   final void search(final SearchContext sc, final boolean jump) {
-    editor.search(sc, jump);
+    editor.search.find(sc, jump);
   }
 
   /**
@@ -621,7 +621,7 @@ public class TextPanel extends BaseXPanel {
    * @return {@code true} if a hit was replaced
    */
   final boolean replaceNext(final ReplaceContext rc) {
-    final int[] select = editor.replaceHit(rc);
+    final int[] select = editor.search.replaceHit(rc);
     if(select == null) return false;
     setText(rc.text);
     setCaret(select[1]);
