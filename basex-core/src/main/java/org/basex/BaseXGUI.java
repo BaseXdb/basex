@@ -101,9 +101,10 @@ public final class BaseXGUI extends Main {
   private static ArrayList<IOFile> filter(final GUI gui, final String[] paths) {
     final ArrayList<IOFile> xqfiles = new ArrayList<>();
     for(final String file : paths) {
-      if(file.endsWith(IO.BASEXSUFFIX)) continue;
-
+      // skip configuration files (.basex, .basexhome, .basexgui, ...)
       final IOFile io = new IOFile(file);
+      if(io.name().startsWith(IO.BASEXSUFFIX)) continue;
+
       if(file.endsWith(IO.XMLSUFFIX) && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
         gui.gopts.setFile(GUIOptions.INPUTPATH, io);
         gui.gopts.set(GUIOptions.DBNAME, io.dbName());
