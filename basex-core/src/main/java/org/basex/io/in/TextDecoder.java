@@ -115,6 +115,9 @@ abstract class TextDecoder {
 
   /** UTF8 Decoder. */
   static final class UTF8 extends TextDecoder {
+    /** Bytes of the current codepoint. */
+    private final byte[] cpBytes = new byte[4];
+
     /** Constructor. */
     UTF8() {
       super(UTF8);
@@ -126,7 +129,7 @@ abstract class TextDecoder {
       if(cp < 0x80) return cp;
       if(cp < 0xC2 || cp > 0xF4) return invalid(false, (byte) cp);
       final int cl = Token.cl((byte) cp);
-      final byte[] bytes = new byte[cl];
+      final byte[] bytes = cpBytes;
       bytes[0] = (byte) cp;
       for(int c = 1; c < cl; c++) {
         cp = ti.readByte();

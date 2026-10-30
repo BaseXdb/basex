@@ -82,8 +82,8 @@ public final class NewlineInput extends TextInput {
   }
 
   @Override
-  int copyText(final TokenBuilder tb) {
-    return next == -2 ? super.copyText(tb) : 0;
+  int copyText(final TokenBuilder tb, final boolean xml) {
+    return next == -2 ? super.copyText(tb, xml) : 0;
   }
 
   /**
@@ -105,6 +105,7 @@ public final class NewlineInput extends TextInput {
   public boolean readLine(final TokenBuilder tb) throws IOException {
     tb.reset();
     while(true) {
+      copyText(tb, false);
       final int ch = read();
       if(ch == -1) return !tb.isEmpty();
       if(ch == '\n') return true;

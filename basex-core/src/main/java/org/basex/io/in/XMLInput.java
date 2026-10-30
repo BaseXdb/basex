@@ -88,7 +88,7 @@ public class XMLInput extends InputStream {
    * @param tb token builder
    */
   public void copyText(final TokenBuilder tb) {
-    if(pp == 0 && ip == 0) column += inputs[0].copyText(tb);
+    if(pp == 0 && ip == 0) column += inputs[0].copyText(tb, true);
   }
 
   /**

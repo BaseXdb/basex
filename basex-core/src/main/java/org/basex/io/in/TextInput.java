@@ -185,16 +185,22 @@ public class TextInput extends BufferInput {
 
   /**
    * Copies buffered ASCII characters to the token builder, up to the next control character
-   * or XML delimiter.
+   * other than tab, or the next XML delimiter.
    * @param tb token builder
+   * @param xml stop at XML delimiters
    * @return number of copied characters
    */
-  int copyText(final TokenBuilder tb) {
+  int copyText(final TokenBuilder tb, final boolean xml) {
     if(!(decoder instanceof TextDecoder.UTF8)) return 0;
     final byte[] buf = array;
     final int s = bpos, e = bsize;
     int p = s;
-    for(byte b; p < e && (b = buf[p]) >= ' ' && b != '<' && b != '&' && b != ']'; p++);
+    if(xml) {
+      for(byte b; p < e && ((b = buf[p]) >= ' ' || b == '\t') && b != '<' && b != '&' && b != ']';
+        p++);
+    } else {
+      for(byte b; p < e && ((b = buf[p]) >= ' ' || b == '\t'); p++);
+    }
     tb.add(buf, s, p);
     bpos = p;
     return p - s;
@@ -216,8 +222,12 @@ public class TextInput extends BufferInput {
   public final TokenBuilder cache() throws IOException {
     try {
       final TokenBuilder tb = new TokenBuilder(Array.initialCapacity(length));
-      for(int ch; (ch = read()) != -1;) tb.add(ch);
-      return tb;
+      while(true) {
+        copyText(tb, false);
+        final int ch = read();
+        if(ch == -1) return tb;
+        tb.add(ch);
+      }
     } finally {
       close();
     }
