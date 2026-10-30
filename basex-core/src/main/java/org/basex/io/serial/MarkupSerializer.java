@@ -498,10 +498,19 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(suppress == null) {
       suppress = new QNmSet();
       for(final QNm name : qnames(SUPPRESS_INDENTATION)) {
-        suppress.add(new QNm(lc(name.string()), name.uri()));
+        suppress.add(comparable(name));
       }
     }
-    return !suppress.isEmpty() && suppress.contains(new QNm(lc(qname.string()), qname.uri()));
+    return !suppress.isEmpty() && suppress.contains(comparable(qname));
+  }
+
+  /**
+   * Returns the form of an element name that is used for comparisons.
+   * @param qname qname
+   * @return qname to compare
+   */
+  QNm comparable(final QNm qname) {
+    return qname;
   }
 
   /**

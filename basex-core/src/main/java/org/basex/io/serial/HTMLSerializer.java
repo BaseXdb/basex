@@ -56,6 +56,12 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
   }
 
   @Override
+  QNm comparable(final QNm qname) {
+    // element names are compared without regard to case
+    return new QNm(lc(qname.string()), qname.uri());
+  }
+
+  @Override
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 

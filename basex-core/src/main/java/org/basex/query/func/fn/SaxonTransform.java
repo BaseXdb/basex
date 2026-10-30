@@ -278,10 +278,15 @@ public final class SaxonTransform {
             compiler.setParameter(qname(entry.key()), value(entry.value()));
           }
         }
-        executable = name != null ?
-          compiler.obtainPackage(name, pversion != null ? pversion : "*").link() :
-          packaged ? compiler.compilePackage(io.streamSource()).link() :
-            compiler.compile(io.streamSource());
+        if(name != null) {
+          final XsltPackage pack = compiler.obtainPackage(name, pversion != null ? pversion : "*");
+          if(pack == null) throw TRANSFORM_OPTIONS_X.get(info, "Unknown package: " + name + '.');
+          executable = pack.link();
+        } else if(packaged) {
+          executable = compiler.compilePackage(io.streamSource()).link();
+        } else {
+          executable = compiler.compile(io.streamSource());
+        }
       } catch(final SaxonApiException ex) {
         throw error(statics, ex);
       }

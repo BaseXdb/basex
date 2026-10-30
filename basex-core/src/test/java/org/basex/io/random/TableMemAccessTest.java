@@ -229,6 +229,16 @@ public final class TableMemAccessTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void deleteTail() {
+    singleAppend(10000);
+    table.delete(9000, 1000);
+    check(9000);
+    table.delete(3000, 6000);
+    check(3000);
+    singleAppend(5000, 3000);
+  }
+
+  /** Test method. */
   @Test public void singleDelete() {
     singleDelete(1);
   }

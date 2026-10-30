@@ -6790,6 +6790,15 @@ return
         + "'initial-template': QName('', 'main'), 'delivery-format': 'raw' }") + "?output",
         System.getProperty("java.version"));
 
+    // Saxon s9api: top-level packages
+    final String pkg = "<xsl:package xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "name='urn:p' package-version='1.0' version='3.0'>"
+        + "<xsl:template name='main' visibility='public'><ok/></xsl:template></xsl:package>";
+    final String init = "'initial-template': QName('', 'main')";
+    query(func.args(" { 'package-text': \"" + pkg + "\", " + init + " }") + "?output", "<ok/>");
+    query(func.args(" { 'package-node': " + pkg + ", " + init + " }") + "?output", "<ok/>");
+    error(func.args(" { 'package-name': 'urn:p', " + init + " }"), TRANSFORM_OPTIONS_X);
+
     // requests that cannot be served by the XSLT processor
     error(func.args(opts + ", 'xslt-version': 99.0 }"), TRANSFORM_PROCESSOR_X);
     // missing and conflicting options

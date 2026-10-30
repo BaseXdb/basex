@@ -61,6 +61,16 @@ public final class SerializerTest extends SandboxTest {
     query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 
+  /** Test: suppress-indentation. */
+  @Test public void suppressIndentation() {
+    final String ser = "serialize(<div><div/></div>, { 'indent': true(), "
+        + "'suppress-indentation': xs:QName(";
+    query(ser + "'div'), 'method': 'xml' }) => contains('&#10;')", false);
+    query(ser + "'DIV'), 'method': 'xml' }) => contains('&#10;')", true);
+    query(ser + "'DIV'), 'method': 'xhtml' }) => contains('&#10;')", true);
+    query(ser + "'DIV'), 'method': 'html' }) => contains('&#10;')", false);
+  }
+
   /** Test: cdata-section-elements. */
   @Test public void cdataSectionElements() {
     final String ser = "serialize(<a>{ $text }</a>, "
