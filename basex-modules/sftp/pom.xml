@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <sshd.version>2.20.0</sshd.version>
+    <sshd.version>2.20.1</sshd.version>
   </properties>
 
   <dependencies>
