@@ -30,13 +30,22 @@ public final class PlotView extends View {
   static final int CAPTIONWHITESPACE = 10;
   /** Rotate factor. */
   private static final double ROTATE = StrictMath.sin(30);
-  /** Plot margin: top, left, bottom, right margin. */
-  private static final int[] MARGIN = new int[4];
+  /** Vertical extent of rotated captions per pixel of text width. */
+  private static final double ROTATE_SIN = Math.abs(StrictMath.sin(ROTATE));
+  /** Horizontal extent of rotated captions per pixel of text width. */
+  private static final double ROTATE_COS = Math.abs(StrictMath.cos(ROTATE));
   /** Maximum length of axis caption text. */
   private static final int MAXL = 11;
   /** Position where over-length text is cut off. */
   private static final int CUTOFF = 10;
 
+  /** Plot margin: top, left, bottom, right margin. */
+  private final int[] margin = new int[4];
+  /** Width of the widest caption on the x and y axis. */
+  private final int[] captionWidth = new int[2];
+
+  /** Panel with the plot controls. */
+  private final BaseXBack controls;
   /** X-axis selector. */
   private final BaseXCombo xCombo;
   /** Y-axis selector. */
@@ -100,7 +109,7 @@ public final class PlotView extends View {
     super(PLOTVIEW, notifier, GUIOptions.SHOWPLOT, true);
     border(5).layout(new BorderLayout());
 
-    final BaseXBack panel = new BaseXBack(false).layout(new BorderLayout());
+    controls = new BaseXBack(false).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(gui, PLOTLOG, false);
@@ -126,7 +135,7 @@ public final class PlotView extends View {
     box.add(dots);
     box.add(Box.createHorizontalGlue());
     box.add(xLog);
-    panel.add(box, BorderLayout.NORTH);
+    controls.add(box, BorderLayout.NORTH);
 
     box = new Box(BoxLayout.X_AXIS);
     xCombo = new BaseXCombo(gui);
@@ -164,8 +173,8 @@ public final class PlotView extends View {
     box.add(new BaseXLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
-    panel.add(box, BorderLayout.SOUTH);
-    add(panel, BorderLayout.SOUTH);
+    controls.add(box, BorderLayout.SOUTH);
+    add(controls, BorderLayout.SOUTH);
 
     new BaseXPopup(this, POPUP);
     selectionBox = new ViewRect();
@@ -213,18 +222,48 @@ public final class PlotView extends View {
    */
   private void createPlotImage() {
     plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics g = plotImg.getGraphics();
+    Graphics g = plotImg.getGraphics();
     BaseXLayout.antiAlias(g);
 
-    // draw axis and grid
+    // draw axis and grid, adapt margins to the widest captions and redraw if necessary
+    captionWidth[0] = 0;
+    captionWidth[1] = 0;
     drawAxis(g, true);
     drawAxis(g, false);
+    if(adaptMargins(g)) {
+      plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
+      g = plotImg.getGraphics();
+      BaseXLayout.antiAlias(g);
+      drawAxis(g, true);
+      drawAxis(g, false);
+      markingChanged = true;
+    }
 
     // draw items
     final int pl = plotData.pres.length;
     for(int p = 0; p < pl; p++) {
       drawItem(g, p, itemImg);
     }
+  }
+
+  /**
+   * Adapts the left and bottom margin to the widest captions.
+   * @param g graphics reference
+   * @return {@code true} if the margins have changed
+   */
+  private boolean adaptMargins(final Graphics g) {
+    g.setFont(font);
+    final int th = g.getFontMetrics().getHeight(), fs = fontSize;
+    final int left = Math.max(captionWidth[1] + fs * 2,
+        (int) (ROTATE_COS * captionWidth[0]) - sizeFactor() + fs);
+    final int bottom = captionImageHeight(th, captionWidth[0]) + fs / 2 +
+        controls.getHeight() + getInsets().bottom;
+    if(left == margin[1] && bottom == margin[2]) return false;
+    margin[1] = left;
+    margin[2] = bottom;
+    plotWidth = getWidth() - (margin[1] + margin[3]);
+    plotHeight = getHeight() - (margin[0] + margin[2]);
+    return true;
   }
 
   @Override
@@ -238,15 +277,15 @@ public final class PlotView extends View {
 
     final int w = getWidth();
     final int h = getHeight();
-    plotWidth = w - (MARGIN[1] + MARGIN[3]);
-    plotHeight = h - (MARGIN[0] + MARGIN[2]);
+    plotWidth = w - (margin[1] + margin[3]);
+    plotHeight = h - (margin[0] + margin[2]);
     final int sz = sizeFactor();
 
     g.setFont(font);
     g.setColor(textColor);
     final Data data = gui.context.data();
     if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
-      BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
+      BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - margin[0]);
       return;
     }
 
@@ -308,7 +347,7 @@ public final class PlotView extends View {
         if(!name.isEmpty() && plotData.xAxis.attrID != id && plotData.yAxis.attrID != id) {
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
-          if(ya < MARGIN[0] + textH && xa < w - lw) {
+          if(ya < margin[0] + textH && xa < w - lw) {
             ya += 2 * textH - gui.gopts.get(GUIOptions.PLOTDOTS);
           }
           if(xa > w - lw)
@@ -585,26 +624,64 @@ public final class PlotView extends View {
     final int w = getWidth();
     final int textH = g.getFontMetrics().getHeight();
     final int fs = fontSize;
-    final int imgW = BaseXLayout.width(g, cap) + fs;
-    final BufferedImage img = createCaptionImage(g, cap, false, imgW);
 
-    // ... after that
-    // the image and the grid line are drawn beside x-/y-axis
-    g.setColor(color(2));
+    // the caption and the grid line are drawn beside x-/y-axis
     if(drawX) {
-      final int y = h - MARGIN[2];
+      final int imgW = captionWidth(g, true, cap) + fs;
+      final BufferedImage img = createCaptionImage(g, cap, false, imgW);
+      final int y = h - margin[2];
       g.drawImage(img, pos - imgW + textH - fs + 3, y, this);
-      g.drawLine(pos, MARGIN[0], pos, y + fs / 2);
-      g.drawLine(pos - 1, MARGIN[0], pos - 1, y + fs / 2);
+      g.setColor(color(2));
+      g.drawLine(pos, margin[0], pos, y + fs / 2);
+      g.drawLine(pos - 1, margin[0], pos - 1, y + fs / 2);
     } else {
-      g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
-      g.drawLine(MARGIN[1] - fs / 2, pos, w - MARGIN[3], pos);
-      g.drawLine(MARGIN[1] - fs / 2, pos + 1, w - MARGIN[3], pos + 1);
+      drawYCaption(g, cap, false, pos);
+      g.setColor(color(2));
+      g.drawLine(margin[1] - fs / 2, pos, w - margin[3], pos);
+      g.drawLine(margin[1] - fs / 2, pos + 1, w - margin[3], pos + 1);
     }
   }
 
   /**
-   * Creates a buffered image for a given string which serves as axis caption.
+   * Returns the width of a caption and records the widest caption of an axis.
+   * @param g graphics reference
+   * @param drawX x/y axis flag
+   * @param caption caption string
+   * @return width
+   */
+  private int captionWidth(final Graphics g, final boolean drawX, final String caption) {
+    final int w = BaseXLayout.width(g, caption), a = drawX ? 0 : 1;
+    captionWidth[a] = Math.max(captionWidth[a], w);
+    return w;
+  }
+
+  /**
+   * Draws a horizontal caption left of the y axis, vertically centered at the given position.
+   * @param g graphics reference
+   * @param caption caption string
+   * @param im intermediate caption (lighter color)
+   * @param pos vertical position
+   */
+  private void drawYCaption(final Graphics g, final String caption, final boolean im,
+      final int pos) {
+    final FontMetrics fm = g.getFontMetrics();
+    final int tw = captionWidth(g, false, caption);
+    g.setColor(im ? color3 : textColor);
+    g.drawString(caption, margin[1] - fontSize - tw, pos + (fm.getAscent() - fm.getDescent()) / 2);
+  }
+
+  /**
+   * Returns the height of a rotated caption image.
+   * @param textH text height
+   * @param textW text width
+   * @return image height
+   */
+  private static int captionImageHeight(final int textH, final int textW) {
+    return textH * 2 + (int) (ROTATE_SIN * textW);
+  }
+
+  /**
+   * Creates a buffered image for a given string which serves as rotated x axis caption.
    * @param g graphics reference
    * @param caption caption string
    * @param im intermediate caption (lighter color)
@@ -617,9 +694,8 @@ public final class PlotView extends View {
     final int textH = g.getFontMetrics().getHeight();
     final int fs = fontSize;
 
-    // caption labels are rotated, for both x- and y-axis. first a buffered
-    // image is created which displays the rotated label ...
-    final int imgH = 160;
+    // the caption is drawn into a buffered image and rotated
+    final int imgH = captionImageHeight(textH, imgW - fs);
     final BufferedImage img = new BufferedImage(imgW, imgH, Transparency.BITMASK);
     final Graphics2D g2d = img.createGraphics();
     BaseXLayout.antiAlias(g2d);
@@ -647,25 +723,25 @@ public final class PlotView extends View {
     final int w = getWidth();
     final int fs = fontSize;
     final int sf = sizeFactor();
-    g.setColor(color(2));
 
     if(cap != null) {
       if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
-      final int textH = g.getFontMetrics().getHeight();
-      final int imgW = BaseXLayout.width(g, cap) + fs;
-      final BufferedImage img = createCaptionImage(g, cap, true, imgW);
-      final int y = h - MARGIN[2];
       if(drawX) {
-        g.drawImage(img, pos - imgW + textH - fs + 3, y - textH / 3, this);
-        g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2]);
+        final int textH = g.getFontMetrics().getHeight();
+        final int imgW = captionWidth(g, true, cap) + fs;
+        final BufferedImage img = createCaptionImage(g, cap, true, imgW);
+        g.drawImage(img, pos - imgW + textH - fs + 3, h - margin[2] - textH / 3, this);
+        g.setColor(color(2));
+        g.drawLine(pos, margin[0], pos, h - margin[2]);
       } else {
-        g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
-        g.drawLine(MARGIN[1], pos, w - MARGIN[3], pos);
+        drawYCaption(g, cap, true, pos);
+        g.setColor(color(2));
+        g.drawLine(margin[1], pos, w - margin[3], pos);
       }
-    } else if(drawX) {
-      g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);
     } else {
-      g.drawLine(MARGIN[1] + sf, pos, w - MARGIN[3], pos);
+      g.setColor(color(2));
+      if(drawX) g.drawLine(pos, margin[0], pos, h - margin[2] - sf);
+      else g.drawLine(margin[1] + sf, pos, w - margin[3], pos);
     }
   }
 
@@ -679,16 +755,16 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
     if(drawX) {
       // items with value -1 lack a value for the specific attribute
-      if(d == -1) return (int) (MARGIN[1] + sz * 0.35d);
+      if(d == -1) return (int) (margin[1] + sz * 0.35d);
       final int width = getWidth();
-      final int xSpace = width - (MARGIN[1] + MARGIN[3]) - sz;
-      return (int) (d * xSpace) + MARGIN[1] + sz;
+      final int xSpace = width - (margin[1] + margin[3]) - sz;
+      return (int) (d * xSpace) + margin[1] + sz;
     }
 
     final int h = getHeight();
-    if(d == -1) return h - MARGIN[2] - sz / 4;
-    final int ySpace = h - (MARGIN[0] + MARGIN[2]) - sz;
-    return ySpace - (int) (d * ySpace) + MARGIN[0];
+    if(d == -1) return h - margin[2] - sz / 4;
+    final int ySpace = h - (margin[0] + margin[2]) - sz;
+    return ySpace - (int) (d * ySpace) + margin[0];
   }
 
   @Override
@@ -742,10 +818,10 @@ public final class PlotView extends View {
     itemImgFocused = itemImage(color4, 2);
     itemImgSub = itemImage(colormark2A, 4);
     final int sz = sizeFactor() / 2;
-    MARGIN[0] = sz + 7;
-    MARGIN[1] = sz * 6;
-    MARGIN[2] = 55 + sz * 7;
-    MARGIN[3] = sz + 3;
+    margin[0] = sz + 7;
+    margin[1] = sz * 6;
+    margin[2] = 55 + sz * 7;
+    margin[3] = sz + 3;
     plotChanged = true;
     markingChanged = true;
     if(plotData == null) return;
@@ -773,9 +849,9 @@ public final class PlotView extends View {
     int focusedPre = gui.context.focused;
     // if mouse pointer is outside the plot, the focused item is set to -1.
     // focus may be refreshed if necessary
-    if(mouseX < MARGIN[1] ||
-        mouseX > getWidth() - MARGIN[3] + size ||
-        mouseY < MARGIN[0] - size || mouseY > getHeight() - MARGIN[2]) {
+    if(mouseX < margin[1] ||
+        mouseX > getWidth() - margin[3] + size ||
+        mouseY < margin[0] - size || mouseY > getHeight() - margin[2]) {
       // focused item already -1, no refresh needed
       if(focusedPre == -1) {
         return false;
@@ -880,10 +956,10 @@ public final class PlotView extends View {
     final int h = getHeight();
     final int w = getWidth();
     final int th = 14;
-    final int lb = MARGIN[1] - th;
-    final int rb = w - MARGIN[3] + th;
-    final int tb = MARGIN[0] - th;
-    final int bb = h - MARGIN[2] + th;
+    final int lb = margin[1] - th;
+    final int rb = w - margin[3] + th;
+    final int tb = margin[0] - th;
+    final int bb = h - margin[2] + th;
     // flag which indicates if mouse pointer is located on the plot inside
     final boolean inBox = mouseY > tb && mouseY < bb &&
       mouseX > lb && mouseX < rb;
