@@ -1,3 +1,48 @@
+VERSION 13.0 (October 30, 2026) ----------------------------------------
+
+  STORAGE
+  - all indexes are kept up to date (UPDINDEX enabled by default)
+  - segmented value indexes, faster OPTIMIZE, parallel table reads
+  - updating queries: read locks for databases that are not updated
+  - db:counts for faceted search, db:inspect for consistency checks
+
+  XQUERY 4.0
+  - JNodes: XPath navigation in JSON, maps and arrays
+  - destructuring, record updates with 'but with', trace clause
+  - new functions: fn:map-to-element, fn:xsd-validator, fn:scan, ...
+  - optional 'local' prefix, prefixed QName literals, new axes
+
+  FULL-TEXT
+  - updatable index, faster fuzzy queries
+  - indexing and highlighting of mixed content (FTMIXED)
+  - thesauri stored and indexed in databases (THESINDEX), SKOS support
+
+  DATA & FORMATS
+  - new map-based HTTP Client with cookie support
+  - JSON Lines, W3 JSON mapping, TAR, Zstandard and XZ archives
+  - canonical XML and XQuery output; fuzzy string matching
+
+  GUI & WEB
+  - faster editor: code completion, multiple cursors, formatting
+  - project-wide search and replace
+  - redesigned DBA, WebDAV as XQuery application
+  - RESTXQ: web archives, HTTP QUERY method; Docker images
+
+  JOBS & EVALUATION
+  - function items instead of query strings (xquery:eval, job:eval)
+  - cron scheduling; timeout, memory and permission options
+  - %basex:memo for memoization, parallel xquery:for-each/reduce
+
+  SECURITY
+  - salted authentication, PBKDF2 hashes (AUTHALGORITHMS), login delays
+  - untrusted code, external resources only with TRUSTEXTERNAL
+  - revised permissions; AES-GCM, RSA, SHA-2 signatures
+
+  PERFORMANCE
+  - on-the-fly indexing of repeatedly filtered sequences (joins)
+  - compact maps, elements and integer sequences
+  - enclosed nodes are no longer copied for serialized results
+
 VERSION 12.4 (May 28, 2025) --------------------------------------------
 
   XQUERY FUNCTIONS

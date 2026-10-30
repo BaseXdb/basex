@@ -16,7 +16,7 @@
 
   <properties>
     <!-- version of all modules -->
-    <revision>13.0-SNAPSHOT</revision>
+    <revision>13.0</revision>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
