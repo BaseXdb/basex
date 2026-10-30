@@ -117,21 +117,9 @@ function dba:files-download(
   $dir    as xs:string?
 ) as item()+ {
   let $dir := config:files-dir($dir)
-  let $paths :=
-    for $name in $names
-    let $path := utils:safe-path($dir, $name)
-    where file:is-file($path)
-    return $path
-  return try {
-    if (empty($paths)) then (
-      utils:outcome($dba:CAT, {}, { 'error': 'No file was selected.' })
-    ) else (
-      (: the archive is named after the current directory :)
-      utils:download($paths, file:name(replace($dir, '[/\\]+$', ''))[.] otherwise 'files')
-    )
-  } catch * {
-    utils:outcome($dba:CAT, {}, { 'error': 'Download failed: ' || $err:description })
-  }
+  (: the archive is named after the current directory :)
+  return utils:download($dba:CAT, $dir, $names, 'file',
+    file:name(replace($dir, '[/\\]+$', ''))[.] otherwise 'files')
 };
 
 (:~

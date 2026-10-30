@@ -154,22 +154,6 @@ declare function utils:preview(
 };
 
 (:~
- : Returns the parameters for serializing a query result.
- : @param  $indent  indent output
- : @return serialization parameters
- :)
-declare function utils:serialize-options(
-  $indent  as xs:boolean
-) as map(*) {
-  (: serialize more characters than requested, because limit represents number of bytes :)
-  {
-    'limit' : config:get($config:MAXCHARS) * 2 + 1,
-    'indent': $indent,
-    'method': 'basex'
-  }
-};
-
-(:~
  : Sends a message to the client of the current WebSocket connection.
  : @param  $message  message
  :)
@@ -180,38 +164,24 @@ declare function utils:ws-send(
 };
 
 (:~
- : Renders a panel and pushes it to the client.
+ : Renders a panel and pushes it to the client, optionally with the value of its editor.
  : @param  $id        id of the panel
  : @param  $contents  panel contents
+ : @param  $value     properties of the editor value: its text, and whether it can be edited
  :)
 declare function utils:ws-panel(
   $id        as xs:string,
-  $contents  as element()*
+  $contents  as element()*,
+  $value     as utils:editor? := ()
 ) as empty-sequence() {
   (: the panel is named by the block it is filled into, so that the client needs no table of
      its own to tell one from another. Empty contents hide the panel, which is why the message
      is sent even then :)
-  utils:ws-send({ 'type': 'panel', 'id': $id, 'html': utils:html($contents) })
-};
-
-(:~
- : Renders a panel and pushes it, together with the value that the editor beside it holds.
- : @param  $id        id of the panel
- : @param  $contents  panel contents
- : @param  $value     properties of the value: its text, and whether it can be edited
- :)
-declare function utils:ws-editor(
-  $id        as xs:string,
-  $contents  as element()*,
-  $value     as utils:editor
-) as empty-sequence() {
   utils:ws-send({
-    'type'    : 'editor',
-    'id'      : $id,
-    'html'    : utils:html($contents),
-    'text'    : $value?text,
-    'editable': $value?editable,
-    'note'    : $value?note
+    'type': if (exists($value)) then 'editor' else 'panel',
+    'id'  : $id,
+    'html': utils:html($contents),
+    $value ! { 'text': ?text, 'editable': ?editable, 'note': ?note }
   })
 };
 
@@ -367,16 +337,24 @@ declare function utils:job-id(
  : Returns the options for running a query as job.
  : @param  $label     label of the job
  : @param  $base-uri  base URI against which the query resolves relative paths
+ : @param  $indent    indent the serialized result
  : @return options
  :)
 declare function utils:job-options(
   $label     as xs:string,
-  $base-uri  as xs:string?
+  $base-uri  as xs:string?,
+  $indent    as xs:boolean
 ) as map(*) {
   {
     config:limits(),
     { 'cache': true(), 'id': utils:job-id($label) },
-    { 'base-uri': $base-uri }[$base-uri]
+    { 'base-uri': $base-uri }[$base-uri],
+    (: serialize more characters than requested, because limit represents number of bytes :)
+    'serializer': {
+      'limit' : config:get($config:MAXCHARS) * 2 + 1,
+      'indent': $indent,
+      'method': 'basex'
+    }
   }
 };
 
@@ -471,34 +449,61 @@ declare function utils:files(
 };
 
 (:~
- : Returns files as a download: a single file as it is, several of them in an archive.
- : @param  $paths    paths of the files
+ : Returns the selected files of a directory as a download; see utils:archive.
+ : @param  $page     page the files belong to
+ : @param  $dir      directory of the files
+ : @param  $names    names of the files
+ : @param  $noun     noun for a single file in the message that none was selected
  : @param  $archive  name of the archive, without suffix
- : @return rest response and binary data
+ : @return rest response and binary data, or redirection
  :)
 declare function utils:download(
-  $paths    as xs:string*,
+  $page     as xs:string,
+  $dir      as xs:string,
+  $names    as xs:string*,
+  $noun     as xs:string,
   $archive  as xs:string
 ) as item()+ {
-  utils:archive($paths ! file:name(.), $paths ! file:read-binary(.), $archive)
+  let $paths :=
+    for $name in $names
+    let $path := utils:safe-path($dir, $name)
+    where file:is-file($path)
+    return $path
+  return utils:archive($page, {}, $noun, $paths ! file:name(.),
+    fn() { $paths ! file:read-binary(.) }, $archive)
 };
 
 (:~
- : Returns named contents as a download: a single one as it is, several of them in an archive.
+ : Returns named contents as a download, or redirects to the page if there are none or it fails.
+ : @param  $page      page the contents belong to
+ : @param  $params    query parameters of the page
+ : @param  $noun      noun for a single entry in the message that none was selected
  : @param  $names     names of the entries
- : @param  $contents  contents of the entries
+ : @param  $contents  function that returns the contents of the entries
  : @param  $archive   name of the archive, without suffix
- : @return rest response and binary data
+ : @return rest response and binary data, or redirection
  :)
 declare function utils:archive(
+  $page      as xs:string,
+  $params    as map(*),
+  $noun      as xs:string,
   $names     as xs:string*,
-  $contents  as item()*,
+  $contents  as fn() as item()*,
   $archive   as xs:string
 ) as item()+ {
-  if (count($names) = 1) then (
-    utils:attachment($names, $contents)
+  if (empty($names)) then (
+    utils:outcome($page, $params, { 'error': `No { $noun } was selected.` })
   ) else (
-    utils:attachment($archive || '.zip', archive:create($names, $contents))
+    (: a single entry is downloaded as it is, several are packed into an archive :)
+    try {
+      if (count($names) = 1) then (
+        utils:attachment($names, $contents())
+      ) else (
+        utils:attachment($archive || '.zip', archive:create($names, $contents()))
+      )
+    } catch * {
+      utils:outcome($page, $params, { 'error': 'Download failed: ' || $err:description })
+    }
   )
 };
 
@@ -645,20 +650,6 @@ declare function utils:outcome(
 };
 
 (:~
- : Reports the outcome of an update operation; see utils:outcome.
- : @param  $page     page the action belongs to
- : @param  $params   query parameters of the target page
- : @param  $message  outcome: an 'info' or an 'error' entry; empty if there is nothing to report
- :)
-declare %private %updating function utils:redirect(
-  $page     as xs:string,
-  $params   as map(*),
-  $message  as map(*)?
-) {
-  update:output(utils:outcome($page, $params, $message))
-};
-
-(:~
  : Runs an action and redirects to the page it belongs to.
  : @param  $page    page the action belongs to
  : @param  $action  function that takes the request parameters and returns the action
@@ -683,15 +674,16 @@ declare %updating function utils:dispatch(
     let $selection := map:filter($args, fn($key, $value) {
       $key = $utils:SELECTION and count($value) = 1 and $value != ''
     })
-    return utils:redirect($page, $selection, { 'error': $target })
+    return update:output(utils:outcome($page, $selection, { 'error': $target }))
   ) else (
     let $params := $target?params otherwise {}
     let $run := $target?run
     return try {
       updating $run(),
-      utils:redirect($page, $params, { 'info': $target?info }[$target?info])
+      update:output(utils:outcome($page, $params, { 'info': $target?info }[$target?info]))
     } catch * {
-      utils:redirect($page, $target?failed otherwise $params, { 'error': $err:description })
+      update:output(utils:outcome($page, $target?failed otherwise $params,
+        { 'error': $err:description }))
     }
   )
 };

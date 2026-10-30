@@ -42,20 +42,13 @@ function addPattern() {
   showDialog("pattern");
 }
 
-/**
- * Requests the users panel.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshUsers(sort, page) {
-  requestPanel(USERS_WS, "users-panel", { type: "users", name: _user }, sort, page);
-}
-
 /** The data of a user is edited as XML, and the panel brings a new text area with it. */
 _panel_filled["user-panel"] = () => loadCodeMirror("xml", [ "editor" ]);
 
 /** The sort links of the user list are followed in place. */
-followPanelLinks({ "users-panel": refreshUsers });
+followPanelLinks({
+  "users-panel": panelRequest(USERS_WS, "users-panel", () => ({ type: "users", name: _user }))
+});
 
 /**
  * Prepares the view. The panels are rendered by the server, which knows the selection from the

@@ -159,9 +159,12 @@ declare function html:wrap(
       </main>
       <hr/>
       <footer><sup>{
-        (: the version is only disclosed to administrators :)
-        if ($user) { `BaseX { Q{org.basex.util.Prop}VERSION() } ·` },
-        'BaseX Team, BSD License'
+        (: the shortcut hint and the version are only shown to administrators :)
+        if ($user) {
+          <span class='shortcuts-hint'>Press <kbd>?</kbd> for keyboard shortcuts</span>,
+          `BaseX { Q{org.basex.util.Prop}VERSION() } ·`
+        },
+        'BSD License'
       }</sup></footer>
       {
         (: what changes while a view refreshes itself is announced to screen readers; it is
@@ -397,16 +400,8 @@ declare function html:exact(
 declare function html:short-date(
   $date  as xs:dateTime
 ) as element(span) {
-  let $adjusted := adjust-dateTime-to-timezone($date)
   (: the year is only shown if it is not the current one; the time only if it is :)
-  let $picture := if (year-from-dateTime($adjusted) = year-from-dateTime(current-dateTime())) then (
-    '[M00]-[D00] [H00]:[m00]'
-  ) else (
-    '[Y0000]-[M00]-[D00]'
-  )
-  return <span class='nowrap' title='{ html:exact($date) }'>{
-    format-dateTime($adjusted, $picture)
-  }</span>
+  html:date($date, '[Y]', '[M00]-[D00] [H00]:[m00]')
 };
 
 (:~
@@ -417,15 +412,27 @@ declare function html:short-date(
 declare function html:time(
   $date  as xs:dateTime
 ) as element(span) {
-  let $adjusted := adjust-dateTime-to-timezone($date)
   (: a value of another day is shown as its date, which would otherwise be lost :)
-  let $picture := if (xs:date($adjusted) = current-date()) then (
-    '[H00]:[m00]:[s00]'
-  ) else (
-    '[Y0000]-[M00]-[D00]'
-  )
+  html:date($date, '[Y]-[M]-[D]', '[H00]:[m00]:[s00]')
+};
+
+(:~
+ : Formats a dateTime value with tooltip: as a recent value, or as its date.
+ : @param  $date     date
+ : @param  $period   picture of the period in which a value is recent
+ : @param  $picture  picture of a recent value
+ : @return element with tooltip
+ :)
+declare %private function html:date(
+  $date     as xs:dateTime,
+  $period   as xs:string,
+  $picture  as xs:string
+) as element(span) {
+  let $adjusted := adjust-dateTime-to-timezone($date)
+  let $recent := format-dateTime($adjusted, $period) =
+    format-dateTime(current-dateTime(), $period)
   return <span class='nowrap' title='{ html:exact($date) }'>{
-    format-dateTime($adjusted, $picture)
+    format-dateTime($adjusted, if ($recent) then $picture else '[Y0000]-[M00]-[D00]')
   }</span>
 };
 

@@ -648,6 +648,17 @@ function requestPanel(path, id, message, sort, page) {
 }
 
 /**
+ * Returns a function that asks the server for a panel; see requestPanel.
+ * @param {string} path path of the endpoint that serves the panel
+ * @param {string} id id of the panel
+ * @param {function} message returns the message identifying the panel
+ * @returns {function} function that takes a sort key and a page
+ */
+function panelRequest(path, id, message) {
+  return (sort, page) => requestPanel(path, id, message(), sort, page);
+}
+
+/**
  * Shows a panel that the server pushed, and tells the page that asked for it. What was typed
  * into a control of the panel is kept: its markup is replaced along with the rest.
  * @param {string} id id of the panel

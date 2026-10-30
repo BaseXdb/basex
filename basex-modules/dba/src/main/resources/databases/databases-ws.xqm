@@ -74,7 +74,7 @@ declare %private function dba:ws-resource(
   $resource  as xs:string?
 ) as empty-sequence() {
   let $document := panels:document($name, $resource)
-  return utils:ws-editor('resource-panel', panels:resource($name, $resource, $document), $document)
+  return utils:ws-panel('resource-panel', panels:resource($name, $resource, $document), $document)
 };
 
 (:~
@@ -102,9 +102,6 @@ declare %private function dba:ws-query(
   ) {
     let $context := head(panels:resource-value($db, $path))
     return xquery:eval($string, { '': $context }, { 'pass': true() })
-  }, [ $name, $resource, $query ], {
-    utils:job-options(`{ $name }/{ $resource }`, ()),
-    'serializer': utils:serialize-options($indent)
-  })
+  }, [ $name, $resource, $query ], utils:job-options(`{ $name }/{ $resource }`, (), $indent))
   return utils:ws-start($id, $run, true())
 };

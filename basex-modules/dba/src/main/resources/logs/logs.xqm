@@ -16,6 +16,12 @@ declare variable $dba:CAT := 'logs';
 (:~ Maximum number of entries that a search over several files collects. :)
 declare variable $dba:MAX-ENTRIES := 10000;
 
+(:~ Types of failed requests: errors, HTTP client and server errors, WebSocket close codes. :)
+(: close codes 1000, 1001 (closed in order) and 1005 (no code) are no failures :)
+declare variable $dba:FAILED := map:build((
+  'ERROR', (400 to 599, 1002 to 1004, 1006 to 1015) ! string()
+));
+
 (:~ Table columns. :)
 declare variable $dba:COLUMNS := (
   (: the values of a known format get the width they need; the text takes the rest :)
@@ -23,7 +29,7 @@ declare variable $dba:COLUMNS := (
   { 'key': 'address', 'label': 'Address', 'width': '11rem' },
   { 'key': 'user', 'label': 'User', 'width': '11rem' },
   { 'key': 'type', 'label': 'Type', 'width': 'calc(8ch + 0.5rem)' },
-  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': 'calc(8ch + 0.5rem)' },
+  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'width': 'calc(8ch + 0.5rem)' },
   { 'key': 'text', 'label': 'Text' }
 );
 
@@ -128,7 +134,7 @@ declare function dba:files(
   )
   let $headers := (
     { 'key': 'name', 'label': 'Name', 'order': 'desc' },
-    { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc' }
+    { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
   )
   let $files :=
     for $file in admin:logs()
@@ -298,12 +304,9 @@ declare function dba:entries(
       return some $string in ($value, $shown) satisfies matches($string, $filters?$key, 'i')
     )
 
-    for $map-results in (
-      let $map := {
-        'user': string($log/@user),
-        'type': string($log/@type),
-        'text': $text
-      }
+    let $type := string($log/@type)
+    for $columns in (
+      let $map := { 'user': string($log/@user), 'type': $type, 'text': $text }
       return if ($input) then dba:searched($map, $terms, $joined-terms) else $map
     )
 
@@ -314,25 +317,23 @@ declare function dba:entries(
     (: two files hold the same times of day: what names an entry, and what is shown for it,
        is prefixed by the file it belongs to :)
     let $prefix := ($date || ' ')[$several]
-    (: a failed request is told apart by its type: an error, an HTTP client or server error, or
-       a WebSocket close code other than 1000, 1001 (closed in order) and 1005 (no code) :)
-    let $type := $map-results?type
-    let $failed := matches($log/@type, '^(ERROR|[45]\d\d|10(0[2-46-9]|1[0-5]))$')
+    (: a single map per entry: hundreds of thousands of them are built for a large log :)
     return {
-      map:remove($map-results, 'type'),
-      {
-        'type': if ($failed) then fn() {
-          <span class='log-failed'>{ if ($type instance of fn(*)) then $type() else $type }</span>
-        } else $type,
-        'id': ($date || 'T')[$several] || $key,
-        'address': fn() { html:address($address) },
-        'ms': xs:decimal($log/@ms),
-        'time': fn() {
-          let $link := <a href='{
-            web:create-url($dba:CAT, { 'name': $date, 'entry': $key }, $key)
-          }'>{ $prefix || $time }</a>
-          return if (not($input) and $key = $entry) then element b { $link } else $link
-        }
+      'user': $columns?user,
+      'text': $columns?text,
+      'type': if (map:contains($dba:FAILED, $type)) then fn() {
+        <span class='log-failed'>{
+          if ($columns?type instance of fn(*)) then $columns?type() else $columns?type
+        }</span>
+      } else $columns?type,
+      'id': ($date || 'T')[$several] || $key,
+      'address': fn() { html:address($address) },
+      'ms': xs:decimal($log/@ms),
+      'time': fn() {
+        let $link := <a href='{
+          web:create-url($dba:CAT, { 'name': $date, 'entry': $key }, $key)
+        }'>{ $prefix || $time }</a>
+        return if (not($input) and $key = $entry) then element b { $link } else $link
       }
     }
   ), 1, $max[$several])

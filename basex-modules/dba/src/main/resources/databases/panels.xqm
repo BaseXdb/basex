@@ -37,14 +37,14 @@ declare function panels:databases(
         let $headers := (
           (: the values of a known format get the width they need; the name takes the rest :)
           { 'key': 'name', 'label': 'Name' },
-          { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
+          { 'key': 'resources', 'label': 'Count', 'type': 'number',
             'width': 'calc(8ch + 0.5rem)' },
-          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+          { 'key': 'size', 'label': 'Size', 'type': 'bytes',
             'width': 'calc(9ch + 0.5rem)' },
-          { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+          { 'key': 'date', 'label': 'Date', 'type': 'dateTime',
             'width': 'calc(10ch + 0.5rem)' },
           (: what Restore falls back to, and where a backup that was just written shows up :)
-          { 'key': 'backup', 'label': 'Backup', 'type': 'dateTime', 'order': 'desc',
+          { 'key': 'backup', 'label': 'Backup', 'type': 'dateTime',
             'width': 'calc(10ch + 0.5rem)', 'link': fn($entry, $date) {
               html:action($date, 'showBackups', { 'name': $entry?db }, {
                 'href': web:create-url($panels:CAT,
@@ -212,14 +212,14 @@ declare %private function panels:resource-list(
         { 'key': 'type', 'label': 'Type', 'width': 'calc(6ch + 0.5rem)' },
         (: an XML document is measured in nodes, any other resource in bytes: the tooltip
            states which :)
-        { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc',
+        { 'key': 'size', 'label': 'Size', 'type': 'number',
           'width': 'calc(9ch + 0.5rem)', 'link': fn($entry, $size) {
             let $number := xs:integer($size)
             return <span title='{
               if ($entry?type = 'xml') then utils:count($number, 'node') else prof:human($number)
             }'>{ $size }</span>
           } },
-        { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+        { 'key': 'date', 'label': 'Date', 'type': 'dateTime',
           'width': 'calc(11ch + 0.5rem)' }
       )
       (: one level of the database, directories first; a level is what a database of many
@@ -699,7 +699,7 @@ declare function panels:index(
         )
         let $headers := (
           { 'key': 'entry', 'label': 'Entry' },
-          { 'key': 'count', 'label': 'Count', 'type': 'number', 'order': 'desc',
+          { 'key': 'count', 'label': 'Count', 'type': 'number',
             'width': 'calc(8ch + 0.5rem)' }
         )
         (: the same head is shown if the list cannot be :)
@@ -952,7 +952,7 @@ declare %private function panels:backup-section(
              comment is free text, and is given whatever is left. The name shares its column
              with the checkbox :)
           { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': 'calc(21ch + 0.5rem)' },
-          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+          { 'key': 'size', 'label': 'Size', 'type': 'bytes',
             'width': 'calc(9ch + 0.5rem)' },
           { 'key': 'comment', 'label': 'Comment' }
         )

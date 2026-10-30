@@ -38,11 +38,11 @@ declare function panels:stores(
       let $headers := (
         (: the values of a known format get the width they need; the name takes the rest :)
         { 'key': 'label', 'label': 'Name' },
-        { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
+        { 'key': 'entries', 'label': 'Count', 'type': 'number',
           'width': 'calc(8ch + 0.5rem)' },
-        { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+        { 'key': 'size', 'label': 'Size', 'type': 'bytes',
           'width': 'calc(9ch + 0.5rem)' },
-        { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+        { 'key': 'modified', 'label': 'Date', 'type': 'dateTime',
           'width': 'calc(11ch + 0.5rem)' }
       )
       let $entries :=

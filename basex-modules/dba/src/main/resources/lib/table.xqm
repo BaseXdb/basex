@@ -179,7 +179,9 @@ declare function table:order(
   let $reversed := starts-with($sort, '-')
   let $key := if ($reversed) then substring($sort, 2) else $sort
   let $column := $headers[?key = $key]
-  return { 'key': $key, 'column': $column, 'desc': ($column?order = 'desc') != $reversed }
+  (: numbers, sizes and dates are mostly looked at from the largest or latest one :)
+  let $order := $column?order otherwise ('desc'[exists($table:TYPES?($column?type))])
+  return { 'key': $key, 'column': $column, 'desc': ($order = 'desc') != $reversed }
 };
 
 (:~
@@ -215,7 +217,8 @@ declare function table:sort(
  :     * 'dateTime', 'time': sorted and output as dates
  :     * otherwise, sorted and output as strings
  :   * 'sort': overrides the type the column is sorted by
- :   * 'order': 'desc' for descending order, otherwise ascending
+ :   * 'order': 'desc' for descending order, 'asc' for ascending order; by default, a column with
+ :     one of the listed types is ordered descending, and other columns ascending
  :   * 'width': fixed column width. If widths are supplied, the table layout gets stable:
  :     overflowing values are truncated and can be expanded via clicks
  :   * 'link': turns the formatted value of an entry into a link, optionally followed by notes;
@@ -258,36 +261,31 @@ declare function table:create(
   let $column := $order?column
   (: entries in their given order may be a slice; their total is then supplied as 'count' :)
   let $presorted := not($sort) or $sort = $options?presort
-  let $sorted-entries := (
-    if ($presorted) then (
-      $entries
-    ) else (
-      let $number := $table:TYPES?($column?sort otherwise $column?type)?order = 'number'
-      (: a cell that a function produces is ordered by the text it produces :)
-      let $value := fn($entry) {
-        let $v := $entry?$key
-        let $v := if ($v instance of fn(*)) then string-join($v()) else $v
-        return if ($number) then $v ! number() else $v
-      }
-      return table:sort($entries, $value, $order?desc)
-    )
-  )
+  let $number := $table:TYPES?($column?sort otherwise $column?type)?order = 'number'
+  (: a cell that a function produces is ordered by the text it produces :)
+  let $value := fn($entry) {
+    let $v := $entry?$key
+    let $v := if ($v instance of fn(*)) then string-join($v()) else $v
+    return if ($number) then $v ! number() else $v
+  }
 
   (: a checkbox submits what identifies its row: a value of its own, or what the row shows :)
   let $select := $options?select
 
   (: show results; 'all' lists every entry, whatever the configured maximum :)
   let $max-option := if ($options?all) then (
-    max((count($sorted-entries), 1))
+    max((count($entries), 1))
   ) else (
     $config:ROWS
   )
   let $count-option := $options?count[$presorted]
   let $page := max(($options?page, 1))
-  let $total := $count-option otherwise count($sorted-entries)
+  let $total := $count-option otherwise count($entries)
   (: the focused entry is shown amid its neighbors, and not after all entries before it :)
   let $offset := max((
-    $options?focus ! index-of($sorted-entries?id, .)[1] - 1 - $max-option idiv 2, 0
+    $options?focus ! index-of(
+      (if ($presorted) then $entries else table:sort($entries, $value, $order?desc))?id, .
+    )[1] - 1 - $max-option idiv 2, 0
   ))
   (: the entries of the shown pages, but not more than a table is meant to hold :)
   let $last := min((
@@ -331,8 +329,12 @@ declare function table:create(
       }</p>
     },
 
-    (: list of results :)
-    let $shown-entries := $sorted-entries[position() > $offset and position() <= $last]
+    (: list of results; the range is applied to the sort, so only the shown entries are sorted :)
+    let $shown-entries := if ($presorted) then (
+      $entries[position() > $offset and position() <= $last]
+    ) else (
+      table:sort($entries, $value, $order?desc)[position() > $offset and position() <= $last]
+    )
     where exists($shown-entries) or exists($options?filters)
     let $fixed := exists($headers?width)
     (: columns without a width keep some room when the fixed ones exceed a narrow screen :)

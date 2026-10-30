@@ -136,18 +136,10 @@ function dba:resources-download(
   (: a level is listed with its directories, and db:list resolves either of them to the
      resources it covers; the same resource may be reached by two of them :)
   let $paths := distinct-values($resources ! db:list($name, .))
-  return try {
-    if (empty($paths)) then (
-      utils:outcome($dba:CAT, { 'name': $name }, { 'error': 'No resource was selected.' })
-    ) else (
-      (: the archive is named after the database, as the one of the file panel is named
-         after its directory :)
-      utils:archive($paths, $paths ! dba:content($name, .), $name)
-    )
-  } catch * {
-    utils:outcome($dba:CAT, { 'name': $name },
-      { 'error': 'Download failed: ' || $err:description })
-  }
+  (: the archive is named after the database, as the one of the file panel is named after its
+     directory :)
+  return utils:archive($dba:CAT, { 'name': $name }, 'resource', $paths,
+    fn() { $paths ! dba:content($name, .) }, $name)
 };
 
 (:~

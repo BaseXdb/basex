@@ -70,25 +70,14 @@ function adoptSelection() {
   _selected = _path.length ? null : (params.get("key") || null);
 }
 
-/**
- * Requests the stores panel.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshStores(sort, page) {
-  requestPanel(STORES_WS, "stores-panel", { type: "stores", name: _store }, sort, page);
-}
+/** Requests the stores panel; see panelRequest. */
+const refreshStores = panelRequest(STORES_WS, "stores-panel",
+  () => ({ type: "stores", name: _store }));
 
-/**
- * Requests the children of the level the path leads to.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshEntries(sort, page) {
-  requestPanel(STORES_WS, "entries-panel",
-    { type: "entries", name: _store, path: pathToString(_path),
-      selected: stepToString(_selected) }, sort, page);
-}
+/** Requests the children of the level the path leads to; see panelRequest. */
+const refreshEntries = panelRequest(STORES_WS, "entries-panel",
+  () => ({ type: "entries", name: _store, path: pathToString(_path),
+    selected: stepToString(_selected) }));
 
 /**
  * Requests the value the path leads to, and with it the text the editor shows.

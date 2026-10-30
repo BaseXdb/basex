@@ -83,8 +83,8 @@ declare %private function dba:ws-run(
   let $base-uri := config:files-dir($dir) || $file
   (: two log entries per run, one before and one after the evaluation :)
   let $options := {
-    utils:job-options($file[.] otherwise 'query', $base-uri),
-    'log': 'DBA editor', 'info': true(), 'serializer': utils:serialize-options($indent)
+    utils:job-options($file[.] otherwise 'query', $base-uri, $indent),
+    'log': 'DBA editor', 'info': true()
   }
   let $id := job:eval($query, (), $options)
   return (

@@ -183,6 +183,10 @@ function selectLog(date) {
   showFirstPage({ name: date });
 }
 
+/** Requests the list of log files; see panelRequest. */
+const refreshFiles = panelRequest("/logs", "list", () => ({ type: "files",
+  date: document.getElementById("date").value, entries: document.getElementById("sort").value }));
+
 /** The sort and page links of the entry table are followed in place: they name what the table
     shows, and the fields that state it are what the next request reads. */
 followPanelLinks({ output: (sort, page) => {
@@ -190,15 +194,6 @@ followPanelLinks({ output: (sort, page) => {
   document.getElementById("page").value = page;
   logEntries();
 }, list: refreshFiles });
-
-/**
- * Requests the list of log files.
- * @param {string} sort sort key; if omitted, the shown order is kept
- */
-function refreshFiles(sort) {
-  requestPanel("/logs", "list", { type: "files", date: document.getElementById("date").value,
-    entries: document.getElementById("sort").value }, sort);
-}
 
 /** The filter of the log files is part of the replaced list, and is applied again. */
 _panel_filled.list = () => {

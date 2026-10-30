@@ -119,6 +119,13 @@ body > hr {
 }
 body > footer {
   text-align: right;
+  position: relative;
+}
+/* the hint at the keyboard shortcuts is moved to the left, on the line of the copyright */
+.shortcuts-hint {
+  position: absolute;
+  left: 0;
+  color: var(--muted);
 }
 
 p {
@@ -676,8 +683,9 @@ header {
   color: var(--muted);
 }
 
-/* the entry of the current view, marked by the same attribute the client is given */
-.header-nav a[aria-current] {
+/* the entry of the current view, marked by the same attribute the client is given, and the
+   database and the resource that the panels to the right of it show */
+.header-nav a[aria-current], a.selected {
   font-weight: 650;
   color: var(--accent-strong);
 }
@@ -976,12 +984,6 @@ dialog button.danger:hover:not(:disabled) {
   background-color: var(--accent);
 }
 
-/* the database and the resource that the panels to the right of it show */
-a.selected {
-  font-weight: 650;
-  color: var(--accent-strong);
-}
-
 /* the files that are open in a tab; unsaved work is marked as in the tab */
 #files-panel a.open {
   font-weight: 650;
@@ -1003,12 +1005,9 @@ a.selected {
   color: var(--muted);
 }
 
-/* the root of a breadcrumb: bold, and a link like the others */
-a.root {
-  font-weight: 650;
-}
-/* stores: the arrow that opens a value as the listed level */
-a.descend {
+/* the root of a breadcrumb, a link like the others; stores: the arrow that opens a value as the
+   listed level */
+a:is(.root, .descend) {
   font-weight: 650;
 }
 
@@ -1074,10 +1073,8 @@ body:has(.content.fill) main {
   overflow: auto;
 }
 /* a pane that ends in an editor, or a block that ends in an image: its blocks are laid out in a
-   column, so that the last one takes the height they leave instead of the pane scrolling. A
-   folded panel lays out nothing — and the rule has to say so, or it would out-specify the
-   'display: none' that folds it */
-.content.fill .panel:not(.collapsed) > :is(.pane.column, :has(> .preview)) {
+   column, so that the last one takes the height they leave instead of the pane scrolling */
+.content.fill .panel > :is(.pane.column, :has(> .preview)) {
   display: flex;
   flex-direction: column;
 }
@@ -1365,11 +1362,9 @@ button.collapse {
   color: var(--accent);
   background-color: var(--shade-hover);
 }
+/* important: CodeMirror arms its editor root with 'display: flex !important', and the column
+   layout of a panel is more specific */
 .panel.collapsed > :not(button.collapse) {
-  display: none;
-}
-/* CodeMirror arms its editor root with 'display: flex !important' */
-.panel.collapsed .cm-editor {
   display: none !important;
 }
 /* a folded panel is a strip of its own height, shaded so that it reads as something to open */
@@ -1404,7 +1399,8 @@ button.collapse .label {
   header {
     position: static;
   }
-  .header-logo {
+  /* the shortcut hint is left out as well: a narrow screen is rarely used with a keyboard */
+  .header-logo, .shortcuts-hint {
     display: none;
   }
   /* the views stay on one line that scrolls sideways, and the status message takes the line

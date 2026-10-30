@@ -11,10 +11,7 @@ declare variable $config:SESSION-KEY := 'dba';
 (:~ DBA directory; the file panel starts here if the client has no directory of its own. :)
 declare variable $config:DBA-DIR := (
   let $dir := db:option('dbpath') || '/.dba'
-  return (
-    if (not(file:exists($dir))) { file:create-dir($dir) },
-    file:path-to-native($dir)
-  )
+  return (file:create-dir($dir), file:path-to-native($dir))
 );
 
 (:~ Permission values. :)
@@ -58,29 +55,25 @@ declare %private variable $config:DEFAULTS := {
 
 (:~ Currently assigned options. :)
 declare %basex:lazy %private variable $config:OPTIONS := (
-  if (file:exists($config:OPTIONS-FILE)) then (
-    try {
-      (: merge defaults with saved options :)
-      let $options := fetch:doc($config:OPTIONS-FILE)/options
-      return {
-        for key $key value $value in $config:DEFAULTS
-        let $option := $options/*[name() = $key]
-        (: a missing or invalid option keeps its default, and leaves the others alone :)
-        return { $key: switch () {
-          case not($option) or exists(config:invalid($key, string($option))) return $value
-          case $value instance of xs:numeric return xs:integer($option)
-          (: the former create permission was merged into the admin permission :)
-          case $key = $config:PERMISSION and $option = 'create' return 'admin'
-          default return string($option)
-        } }
-      }
-    } catch * {
-      (: use defaults if an error occurs while parsing the options :)
-      $config:DEFAULTS
+  try {
+    (: merge defaults with saved options :)
+    let $options := fetch:doc($config:OPTIONS-FILE)/options
+    return {
+      for key $key value $value in $config:DEFAULTS
+      let $option := $options/*[name() = $key]
+      (: a missing or invalid option keeps its default, and leaves the others alone :)
+      return { $key: switch () {
+        case not($option) or exists(config:invalid($key, string($option))) return $value
+        case $value instance of xs:numeric return xs:integer($option)
+        (: the former create permission was merged into the admin permission :)
+        case $key = $config:PERMISSION and $option = 'create' return 'admin'
+        default return string($option)
+      } }
     }
-  ) else (
+  } catch * {
+    (: use defaults if the options are missing, or if they cannot be parsed :)
     $config:DEFAULTS
-  )
+  }
 );
 
 (:~

@@ -37,9 +37,9 @@ declare function panel:files(
       { 'key': 'name', 'label': 'Name' },
       (: the size never grows beyond four digits and a unit, the short date beyond eight digits
          and three narrow separators; the name takes the rest :)
-      { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc',
+      { 'key': 'size', 'label': 'Size', 'type': 'bytes',
         'width': 'calc(9ch + 0.5rem)' },
-      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+      { 'key': 'date', 'label': 'Date', 'type': 'dateTime',
         'width': 'calc(9.5ch + 0.5rem)' },
       { 'key': 'run', 'label': '', 'width': 'calc(2ch + 1rem)' }
     )

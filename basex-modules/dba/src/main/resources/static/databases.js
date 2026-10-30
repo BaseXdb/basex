@@ -168,32 +168,9 @@ function tabKey(dialog, event) {
   tab.focus();
 }
 
-/**
- * Requests the backups block of the properties dialog: the backups of the selected database.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshBackups(sort, page) {
-  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db }, sort, page);
-}
-
-/**
- * Requests the list of the general backups dialog.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshGeneralBackups(sort, page) {
-  requestPanel(DB_WS, "general-backups-panel", { type: "general-backups" }, sort, page);
-}
-
-/**
- * Requests the panel that browses an index of the selected database.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshIndex(sort, page) {
-  requestPanel(DB_WS, "index-panel", { type: "index", name: _db, ...indexState() }, sort, page);
-}
+/** Requests the panel that browses an index of the selected database; see panelRequest. */
+const refreshIndex = panelRequest(DB_WS, "index-panel",
+  () => ({ type: "index", name: _db, ...indexState() }));
 
 /**
  * Returns the index that is browsed in the selected database, and the prefix of its entries.
@@ -231,25 +208,10 @@ function filterIndex() {
   refreshIndex();
 }
 
-/**
- * Requests the databases panel.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshDatabases(sort, page) {
-  requestPanel(DB_WS, "databases-panel", { type: "databases", name: _db }, sort, page);
-}
-
-/**
- * Requests the panel of the selected database.
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function refreshDatabase(sort, page) {
-  requestPanel(DB_WS, "database-panel",
-    { type: "database", name: _db, resource: _resource, dir: _dir,
-      filter: storedField("resource-filter", _db) }, sort, page);
-}
+/** Requests the panel of the selected database; see panelRequest. */
+const refreshDatabase = panelRequest(DB_WS, "database-panel",
+  () => ({ type: "database", name: _db, resource: _resource, dir: _dir,
+    filter: storedField("resource-filter", _db) }));
 
 /**
  * Requests the resources that match the filter.
@@ -458,9 +420,14 @@ document.addEventListener("submit", event => {
 });
 
 /** The sort and page links of the list panels are followed in place. */
-followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
-  "backups-panel": refreshBackups, "general-backups-panel": refreshGeneralBackups,
-  "index-panel": refreshIndex });
+followPanelLinks({
+  "databases-panel": panelRequest(DB_WS, "databases-panel", () => ({ type: "databases", name: _db })),
+  "database-panel": refreshDatabase,
+  "backups-panel": panelRequest(DB_WS, "backups-panel", () => ({ type: "backups", name: _db })),
+  "general-backups-panel": panelRequest(DB_WS, "general-backups-panel",
+    () => ({ type: "general-backups" })),
+  "index-panel": refreshIndex
+});
 
 /** The controls of the list panels keep the focus and the caret while their panel is replaced. */
 _panel_focus["database-panel"] = [ "#resource-filter" ];

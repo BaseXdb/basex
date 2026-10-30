@@ -22,16 +22,7 @@ declare
 function dba:logs-download(
   $names  as xs:string*
 ) as item()+ {
-  let $dir := db:option('dbpath') || '/.logs/'
-  let $paths :=
-    for $name in $names
-    let $path := utils:safe-path($dir, $name || '.log')
-    where file:is-file($path)
-    return $path
-  return if (empty($paths)) then (
-    utils:outcome($dba:CAT, {}, { 'error': 'No log was selected.' })
-  ) else (
-    (: an archive of several logs is named after the first and the last date :)
-    utils:download($paths, string-join(sort($names)[position() = (1, last())], '_'))
-  )
+  (: an archive of several logs is named after the first and the last date :)
+  utils:download($dba:CAT, db:option('dbpath') || '/.logs/', $names ! `{ . }.log`, 'log',
+    string-join(sort($names)[position() = (1, last())], '_'))
 };

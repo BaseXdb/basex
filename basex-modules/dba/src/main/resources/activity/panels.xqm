@@ -43,10 +43,10 @@ declare %private variable $panels:JOB-HEADERS := (
     'link': fn($entry, $value) { $entry?state-cell() } },
   { 'key': 'type', 'label': 'Type', 'width': 'calc(7ch + 0.5rem)' },
   { 'key': 'path', 'label': 'Path' },
-  { 'key': 'duration', 'label': 'Dur.', 'type': 'duration', 'order': 'desc',
+  { 'key': 'duration', 'label': 'Dur.', 'type': 'duration',
     'width': 'calc(7ch + 0.5rem)' },
   { 'key': 'user', 'label': 'User', 'width': 'calc(8ch + 0.5rem)' },
-  { 'key': 'time', 'label': 'Created', 'type': 'time', 'order': 'desc',
+  { 'key': 'time', 'label': 'Created', 'type': 'time',
     'width': 'calc(10ch + 0.5rem)' }
 );
 
@@ -832,12 +832,12 @@ declare function panels:caches(
       let $names := distinct-values(('', sort(cache:list(), '?lang=en')))
       let $headers := (
         { 'key': 'label', 'label': 'Name' },
-        { 'key': 'entries', 'label': 'Size', 'type': 'number', 'order': 'desc' },
-        { 'key': 'max-entries', 'label': 'Max', 'type': 'number', 'order': 'desc' },
+        { 'key': 'entries', 'label': 'Size', 'type': 'number' },
+        { 'key': 'max-entries', 'label': 'Max', 'type': 'number' },
         { 'key': 'lifetime', 'label': 'TTL' },
-        { 'key': 'lookups', 'label': 'Reads', 'type': 'number', 'order': 'desc' },
-        { 'key': 'rate', 'label': 'Hits', 'type': 'percent', 'order': 'desc' },
-        { 'key': 'discarded', 'label': 'Dropped', 'type': 'number', 'order': 'desc' }
+        { 'key': 'lookups', 'label': 'Reads', 'type': 'number' },
+        { 'key': 'rate', 'label': 'Hits', 'type': 'percent' },
+        { 'key': 'discarded', 'label': 'Dropped', 'type': 'number' }
       )
       let $entries :=
         for $cache in $names
