@@ -796,15 +796,18 @@ header {
 #note {
   margin: .2rem 0 0;
 }
-/* a note that warns instead of explaining: the muted color is kept, as it is no error */
+/* a note that warns instead of explaining: the muted color is kept, as it is no error.
+   U+FE0E draws the sign as text, not as an emoji */
 .note.warn::before {
-  content: "\26A0\00a0";
+  content: "\26A0\FE0E\00a0";
 }
 
 /* row of actions above a table or an editor; the gap matches the toolbar of the Workspace view */
 .buttons {
   display: flex;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  align-items: center;
   gap: .4rem;
   margin-bottom: var(--space);
 }
@@ -878,7 +881,14 @@ body .cm-editor.cm-focused {
   object-position: top left;
 }
 
+/* a control that does not fit is scrolled to, not squeezed */
+.buttons > * {
+  flex-shrink: 0;
+}
 /* controls on a line of their own, which does not wrap */
+.buttons:has(> .row) {
+  flex-wrap: wrap;
+}
 .buttons > .row {
   display: flex;
   flex-basis: 100%;
@@ -972,8 +982,33 @@ a.selected {
   color: var(--accent-strong);
 }
 
+/* the files that are open in a tab; unsaved work is marked as in the tab */
+#files-panel a.open {
+  font-weight: 650;
+}
+#files-panel a.modified::after {
+  content: "*";
+}
+/* the name of an entry that is renamed in place takes what its checkbox leaves */
+#files-panel td:has(> input.rename) {
+  display: flex;
+  align-items: center;
+}
+#files-panel input.rename {
+  flex: 1;
+  min-width: 0;
+}
+/* a file that is too large to be opened is listed, but not linked */
+#files-panel .too-large {
+  color: var(--muted);
+}
+
 /* the root of a breadcrumb: bold, and a link like the others */
 a.root {
+  font-weight: 650;
+}
+/* stores: the arrow that opens a value as the listed level */
+a.descend {
   font-weight: 650;
 }
 
@@ -1365,14 +1400,26 @@ button.collapse .label {
   /* shorten the page title */
   .title-full { display: none; }
   .title-short { display: inline; }
-  /* the views wrap over several lines instead of being squeezed onto one, and the status
-     message takes the line below them */
+  /* the header scrolls away with the page, and leaves out the logo */
+  header {
+    position: static;
+  }
+  .header-logo {
+    display: none;
+  }
+  /* the views stay on one line that scrolls sideways, and the status message takes the line
+     below them */
   .header-nav {
     flex-wrap: wrap;
     column-gap: var(--gap);
   }
+  .header-nav nav {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
   .header-nav ul {
-    flex-wrap: wrap;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   #info {
     flex: 1 1 100%;
@@ -1397,8 +1444,15 @@ button.collapse .label {
   body:has(.content.fill) main {
     display: block;
   }
-  .content.fill :is(.cm-editor, textarea) {
+  /* '.panel' outweighs the 'min-height: 0' of the filled layout, whose :is() list is more specific;
+     a long document scrolls inside its editor */
+  .content.fill .panel :is(.cm-editor, textarea):not(dialog *) {
     min-height: 200px;
+    max-height: 70vh;
+  }
+  /* a list scrolls on its own, so that the panel below it is reached without scrolling past it */
+  .content.fill > .panel:has(~ .panel:not(.hidden, .collapsed)) > .pane:not(.column) {
+    max-height: 50vh;
   }
   .content.divided > .panel ~ .panel::before {
     display: none;

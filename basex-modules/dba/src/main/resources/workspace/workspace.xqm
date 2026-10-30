@@ -33,7 +33,14 @@ function dba:workspace(
      which requests what it needs :)
   (
     (: the grid is placed explicitly: the file panel on the left, the toolbar above the editor
-       and the result, and the result beside the editor :)
+       and the result, and the result beside the editor. A narrow screen stacks the panels in
+       source order :)
+    (: the client knows the directory to be shown, and fills the panel :)
+    <div class='panel' data-label='' style='grid-area: 1 / 1 / -1 / 2'>
+      <h2 class='sr-only'>Files</h2>
+      <div id='files-panel' class='pane'/>
+      <div class='resizer' data-split='0'/>
+    </div>,
     <div class='panel' style='grid-area: 1 / 2 / 2 / 4'>
       <form class='toolbar' autocomplete='off' action='javascript:void(0);'>
         <div>
@@ -52,12 +59,6 @@ function dba:workspace(
         </div>
         <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
       </form>
-    </div>,
-    (: the client knows the directory to be shown, and fills the panel :)
-    <div class='panel' data-label='' style='grid-area: 1 / 1 / -1 / 2'>
-      <h2 class='sr-only'>Files</h2>
-      <div id='files-panel' class='pane'/>
-      <div class='resizer' data-split='0'/>
     </div>,
     (: the open documents are known to the client, which draws the strip :)
     <div class='panel' data-label='' style='grid-area: 2 / 2 / -1 / 3'>
@@ -176,6 +177,33 @@ function dba:dir-create() {
       file:create-dir(utils:file-path($args?dir, $args?name))
     }
   } })
+};
+
+(:~
+ : Renames a file or directory.
+ : @param  $name  name of file or directory
+ : @param  $to    new name
+ : @param  $dir   directory of the file panel
+ : @return empty response
+ :)
+declare
+  %rest:POST
+  %rest:path('/dba/workspace/rename')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('to',   '{$to}')
+  %rest:query-param('dir',  '{$dir}')
+function dba:rename(
+  $name  as xs:string,
+  $to    as xs:string,
+  $dir   as xs:string?
+) as xs:string {
+  let $target := utils:file-path($dir, $to)
+  return switch () {
+    (: an entry stays in its directory :)
+    case matches($to, '[/\\]') return web:error(400, `Invalid name: { $to }`)
+    case file:exists($target) return web:error(409, `“{ $to }” already exists.`)
+    default return (file:move(utils:file-path($dir, $name), $target), '')
+  }
 };
 
 (:~

@@ -45,6 +45,9 @@ let _writing = false;
 /** Document whose content is awaited; a response for another one is outdated. */
 let _opening;
 
+/** Document whose file was last scrolled into view in the file panel. */
+let _revealed;
+
 /**
  * Returns the active document.
  * @returns {object} tab
@@ -165,6 +168,30 @@ function renderTabs() {
     });
     return button;
   }));
+  markOpenFiles();
+}
+
+/**
+ * Marks the files of the file panel that are open in a tab, and scrolls the file of the active
+ * document into view once it has been activated.
+ */
+function markOpenFiles() {
+  const dir = filesDir(), active = tab();
+  const open = new Map(_tabs.filter(t => t.name && t.dir === dir).map(t => [ t.name, t ]));
+  let selected;
+  for(const link of document.querySelectorAll("#files-panel a[data-name]")) {
+    const t = open.get(link.dataset.name);
+    link.classList.toggle("open", Boolean(t));
+    link.classList.toggle("modified", Boolean(t && tabModified(t)));
+    link.classList.toggle("selected", Boolean(t) && t === active);
+    if(t && t === active) selected = link;
+  }
+  // a document is revealed once: the panel is refreshed while a job runs, and must not jump
+  const key = active ? active.dir + active.name : "";
+  if(selected && key !== _revealed) {
+    _revealed = key;
+    selected.closest("tr")?.scrollIntoView({ block: "nearest" });
+  }
 }
 
 /**
@@ -313,6 +340,84 @@ function changeDir(dir) {
  */
 function enterDir(name) {
   changeDir(`${filesDir()}/${name}`);
+}
+
+/**
+ * Renames an entry of the file panel in place: the chosen row, or else the single ticked one.
+ */
+function renameEntry() {
+  const panel = document.getElementById("files-panel");
+  const ticked = [ ...panel.querySelectorAll("tbody input[type=checkbox]:checked") ];
+  const row = _row?.isConnected && panel.contains(_row) ? _row :
+    ticked.length === 1 ? ticked[0].closest("tr") : null;
+  const label = row?.querySelector("a[data-name], .too-large");
+  if(!label) {
+    showError("Choose or tick a single entry to rename it.");
+    return;
+  }
+  const name = row.querySelector("input[type=checkbox]").value;
+  const field = document.createElement("input");
+  field.type = "text";
+  field.className = "rename";
+  field.value = name;
+  field.setAttribute("aria-label", `New name of ${name}`);
+  label.replaceWith(field);
+  field.focus();
+  // the name is selected without its suffix, as in a file manager
+  const dot = name.lastIndexOf(".");
+  field.setSelectionRange(0, dot > 0 ? dot : name.length);
+
+  let done = false;
+  const finish = async commit => {
+    if(done) return;
+    done = true;
+    const to = field.value.trim();
+    if(!commit || !to || to === name) {
+      field.replaceWith(label);
+      return;
+    }
+    try {
+      await request(`workspace/rename?${new URLSearchParams({ name, to, dir: filesDir() })}`);
+      renamed(name, to);
+      setText(`“${name}” was renamed to “${to}”.`, "info");
+    } catch(response) {
+      field.replaceWith(label);
+      showError(response);
+    }
+    refreshFiles();
+  };
+  field.addEventListener("keydown", event => {
+    // the keys must neither submit the form nor reach the shortcuts of the page
+    event.stopPropagation();
+    if(event.key === "Enter" || event.key === "Escape") {
+      event.preventDefault();
+      finish(event.key === "Enter");
+    }
+  });
+  field.addEventListener("blur", () => finish(true));
+}
+
+/**
+ * Adopts a renamed entry of the file panel in the open documents and their drafts.
+ * @param {string} name old name
+ * @param {string} to new name
+ */
+function renamed(name, to) {
+  const dir = filesDir(), from = dir + name, sep = dir.slice(-1);
+  for(const t of _tabs) {
+    // a renamed file, or a file below a renamed directory
+    const moved = t.name && t.dir === dir && t.name === name ? { name: to } :
+      t.dir.startsWith(from + sep) ? { dir: dir + to + t.dir.slice(from.length) } : null;
+    if(!moved) continue;
+    const key = draftKey(t), draft = stored(key);
+    Object.assign(t, moved);
+    if(draft !== null) {
+      store(key, null);
+      store(draftKey(t), draft);
+    }
+  }
+  storeTabs();
+  refreshTab();
 }
 
 /**
@@ -718,6 +823,14 @@ document.addEventListener("submit", event => {
   });
 }, true);
 
+/** A double click on a name cell beside its link renames the entry: the link itself opens it. */
+document.addEventListener("dblclick", event => {
+  const cell = event.target.closest?.("#files-panel td");
+  if(!cell?.querySelector("a[data-name], .too-large") || event.target.closest("a, input")) return;
+  selectRow(cell.closest("tr"));
+  renameEntry();
+});
+
 /** The queries of the view run on the endpoint that also serves its file panel; the job of a
     query that is given up is gone with it. */
 _query_path = WORKSPACE_WS;
@@ -745,6 +858,7 @@ followPanelLinks({ "files-panel": sort => refreshFiles(sort) });
     job has ended: the panel is asked for again until then, as a live view would be. */
 _panel_filled["files-panel"] = () => {
   store(DIR_KEY, document.getElementById("dir").value);
+  markOpenFiles();
   scheduleLive(() => refreshFiles(),
     document.querySelector("#files-panel button.stop") !== null);
 };
@@ -786,6 +900,9 @@ function workspaceKeys(event) {
     action = () => closeTab(_tab);
   } else if(event.altKey && !ctrl && (key === "pageup" || key === "pagedown")) {
     action = () => selectTab(_tab + (key === "pagedown" ? 1 : -1));
+  } else if(key === "f2" && !event.altKey && !ctrl &&
+      !event.target.closest?.("input, select, textarea, .cm-editor")) {
+    action = renameEntry;
   }
   if(action) {
     event.preventDefault();
@@ -800,7 +917,8 @@ _editor_shortcuts.push(
   [ "Alt+Shift+S", "Save as… (also Ctrl+Shift+S)" ],
   [ "Alt+N", "Open an empty tab" ],
   [ "Alt+W", "Close the tab" ],
-  [ "Alt+PgUp/PgDn", "Show the previous or next tab" ]
+  [ "Alt+PgUp/PgDn", "Show the previous or next tab" ],
+  [ "F2", "Rename the chosen file or directory" ]
 );
 
 /**

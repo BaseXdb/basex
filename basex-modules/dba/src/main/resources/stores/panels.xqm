@@ -505,8 +505,9 @@ declare %private function panels:open(
   if ($value instance of (map(*) | array(*)) or count($value) > 1) {
     (: the step is named apart from the one that selects a child: the two links sit in the
        same row, and only the label of a child is pointed out as the selected one :)
-    html:action('↘', 'descend', { 'open': $child?step },
-      { 'title': 'Show the entries of this value' })
+    (: U+FE0E: the arrow is drawn as text, not as an emoji :)
+    html:action('↘&#xFE0E;', 'descend', { 'open': $child?step },
+      { 'title': 'Show the entries of this value', 'class': 'descend' })
   }
 };
 

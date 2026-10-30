@@ -66,7 +66,9 @@ declare function panel:files(
             html:action($name, 'openFile', { 'name': $name },
               { 'href': web:create-url($panel:CAT, { 'dir': $dir, 'name': $name }) })
           ) else (
-            $name
+            <span class='too-large' title='Too large to be opened; download it instead'>{
+              $name
+            }</span>
           )
         },
         'date': $modified,
@@ -95,6 +97,8 @@ declare function panel:files(
           attribute disabled { }[not($parent)], '..'
         }</button>,
         <button type='button' onclick='showDialog("dir")' title='Create a new directory'>New…</button>,
+        <button type='button' onclick='renameEntry()' data-check='check'
+                title='Rename the ticked file or directory (F2)'>Rename</button>,
         form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM'),
           title := 'Delete the selected files and empty directories'),
         form:button('files-download', 'Download', 'CHECK',
