@@ -215,6 +215,12 @@ public final class RecordTest extends SandboxTest {
     // a record passed through a map-typed variable is still a record
     query("declare record local:p(x); let $m as map(*) := local:p(1) "
         + "return ($m but with { 'x': 9 })?x", 9);
+    // a narrowing map type does not constrain the declared field types
+    query(a + "let $r as map(xs:string, xs:integer) := local:a(1) "
+        + "return $r but with { 'a': 's' }", "{\"a\":\"s\"}");
+    query(a + "declare function local:f($r as map(xs:string, xs:integer)) { "
+        + "($r but with { 'a': 's' }) ! (?a, . instance of map(xs:string, xs:integer)) }; "
+        + "local:f(local:a(1))", "s\nfalse");
     // updates a record built by a named constructor; unmentioned fields are preserved
     query("declare record local:p(x, y); local:p(1, 2) but with { 'y': 9 }", "{\"x\":1,\"y\":9}");
     query(ab + "(local:ab(1, 2) but with { 'a': 9 })?b", 2);

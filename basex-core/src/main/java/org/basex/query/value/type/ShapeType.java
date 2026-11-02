@@ -547,7 +547,8 @@ public class ShapeType extends MapType {
         if(is == null) return null;
         map.put(key, st.fields.get(key).with(is));
       }
-      return st.with(map);
+      // the declared field types of a labeled record are needed for coercion
+      return st.labeled() ? st : st.with(map);
     }
     if(type instanceof final MapType mt) {
       // record(*) has no fields to narrow, record() includes the empty map
@@ -560,7 +561,7 @@ public class ShapeType extends MapType {
         if(is == null) return null;
         map.put(key, rf.with(is));
       }
-      return with(map);
+      return labeled() ? this : with(map);
     }
     return type instanceof final FuncType ft && callable(ft) ? this : null;
   }
