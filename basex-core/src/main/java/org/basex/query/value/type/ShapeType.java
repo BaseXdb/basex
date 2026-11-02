@@ -249,14 +249,14 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean sameIdentity(final ShapeType sh) {
-    return Objects.equals(name(), sh.name()) && Objects.equals(module(), sh.module());
+    return Objects.equals(name(), sh.name()) && Objects.equals(identity(), sh.identity());
   }
 
   /**
-   * Returns the path of the declaring module of a private record.
-   * @return path (can be {@code null})
+   * Returns the identity of the record declaration.
+   * @return identity (can be {@code null})
    */
-  String module() {
+  Object identity() {
     return null;
   }
 

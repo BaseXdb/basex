@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.function.UnaryOperator;
 
 import org.basex.*;
+import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -256,7 +258,7 @@ public final class RecordTest extends SandboxTest {
     query("let $r as record(x as xs:integer) := { 'x': 1 } "
         + "return $r instance of record(x as xs:decimal)", true);
 
-    // a nominative record type is a subtype of a structural one with the same fields
+    // a labeled record type is a subtype of a simple one with the same fields
     query("declare record local:coord(x, y); local:coord(1, 2) instance of record(x, y)", true);
 
     // function-argument coercion widens a narrower record (a missing field becomes ())
@@ -885,32 +887,34 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "let $r as local:A := local:A(1) return $r instance of local:A", true);
   }
 
-  /** Nominative and structural record types. */
-  @Test public void nominative() {
+  /** Labeled and simple record types. */
+  @Test public void labeled() {
     final String prolog = "declare record local:P(x, y); "
         + "declare record local:Q(x, y); "
         + "declare type local:S as record(x, y); ";
 
-    // a nominative record type is matched by its own instances
+    // a labeled record type is matched by its own instances
     query(prolog + "local:P(1, 2) instance of local:P", true);
     query(prolog + "local:P(1, 2) instance of local:Q", false);
     query(prolog + "let $s as local:S := { 'x': 1, 'y': 2 } return $s instance of local:P", false);
     query(prolog + "typeswitch(local:P(1, 2)) case local:Q return 'Q' case local:P return 'P' "
         + "default return ()", "P");
-    // ...and is a subtype of structural record types with the same fields
+    // ...and is a subtype of simple record types with the same fields
     query(prolog + "local:P(1, 2) instance of local:S", true);
     query(prolog + "local:P(1, 2) instance of record(x, y)", true);
     query(prolog + "local:P(1, 2) instance of record(x, y, z as item()?)", false);
     // coercion re-annotates the record
     query(prolog + "fn($q as local:Q) { $q instance of local:Q }(local:P(1, 2))", true);
 
-    // the type is identified by its name across separately compiled queries
+    // the type is identified by its declaration: records of other queries must be coerced
     query(prolog + _STORE_PUT.args("record", " local:P(1, 2)"));
-    query(prolog + _STORE_GET.args("record") + " instance of local:P", true);
+    query(prolog + _STORE_GET.args("record") + " instance of local:P", false);
+    query(prolog + "(" + _STORE_GET.args("record") + " coerce to local:P) instance of local:P",
+        true);
     query(prolog + _STORE_GET.args("record") + " instance of local:Q", false);
     query(_STORE_CLEAR.args());
 
-    // structural record types are matched by the entries of a record
+    // simple record types are matched by the entries of a record
     query("let $r as record(x as xs:decimal) := { 'x': 1 } "
         + "return $r instance of record(x as xs:integer)", true);
     query("let $r as record(x as xs:decimal) := { 'x': 1.5 } "
@@ -992,7 +996,7 @@ public final class RecordTest extends SandboxTest {
     // the parameters of a function are coerced when it is called
     final String func = "declare %basex:inline(0) function local:f() as item() { "
         + "fn($r as local:AB) { $r?a } }; ";
-    // a structural record type is no subtype of a nominative one
+    // a simple record type is no subtype of a labeled one
     query(prolog + func + "local:f() instance of fn(local:BA) as item()*", false);
     query(prolog + func + "let $f as fn(local:BA) as item()* := local:f() "
         + "return $f(({ 'b': 2, 'a': 1 } coerce to local:BA))", 1);
@@ -1138,7 +1142,7 @@ public final class RecordTest extends SandboxTest {
         + "'BA': 0, 'BB': 0, 'BC': 0, 'BD': 0, 'BE': 0, 'BF': 0, 'BG': <a/> }";
     check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
 
-    // nominative record (runtime evaluation)
+    // labeled record (runtime evaluation)
     check("declare record local:r(AA, AB); (local:r(0, <a/>), local:r(0, <a/>))?AA",
         "0\n0", exists(REPLICATE));
   }
@@ -1187,5 +1191,41 @@ public final class RecordTest extends SandboxTest {
     error("declare record local:s('a'); 1", NONCNAME_X);
     error("declare record local:s(1); 1", NONCNAME_X);
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
+  }
+
+  /**
+   * Records of different declarations have different types.
+   * @throws IOException I/O exception
+   */
+  @Test public void identity() throws IOException {
+    final String r = "declare record r(x, y := 1); ";
+    query(r + _XQUERY_EVAL.args("declare record r(x, y := 2); r(1)") + " instance of r", false);
+    query(r + _XQUERY_EVAL.args("declare record r(y, x); r(1, 2)") + " instance of r", false);
+    query(r + _XQUERY_EVAL.args("declare record r(x, y := 1); r(1)") + " instance of r", false);
+    query(r + _XQUERY_EVAL.args("declare variable $v external; $v", " { 'v': r(1) }")
+        + " instance of r", true);
+    // coercion relabels records of other declarations
+    query(r + "declare function f($r as r) { $r }; f("
+        + _XQUERY_EVAL.args("declare record r(x, y := 2); r(1)") + ")", "{\"x\":1,\"y\":2}");
+    error(r + _XQUERY_EVAL.args("declare record r(x, y := 2); r(1)") + " treat as r",
+        NOTREAT_X_X_X);
+
+    // records of a library module with a location are identified by its path
+    final IOFile lib = new IOFile(sandbox(), "identity.xqm");
+    lib.write("module namespace l = 'l'; declare record l:p(x);");
+    final String imp = "import module namespace l = 'l' at '" + lib.path() + "'; ";
+    query(imp + _XQUERY_EVAL.args(imp + "l:p(1)") + " instance of l:p", true);
+    query(imp + LOAD_XQUERY_MODULE.args("l", " { 'location-hints': '" + lib.path() + "' }")
+        + "?functions?(xs:QName('l:p'))?1(1) instance of l:p", true);
+
+    // inline modules: records with the same name and path are still different
+    final String mod = "module namespace x = \"x\"; declare %private record x:p(a); "
+        + "declare function x:make() { x:p(0) }; "
+        + "declare function x:is($r) { $r instance of x:p };";
+    query("let $load := fn() { "
+        + LOAD_XQUERY_MODULE.args("x", " { 'content': '" + mod + "' }") + "?functions } "
+        + "let $a := $load(), $b := $load() "
+        + "let $is := $a?(QName('x', 'is'))?1, $make := fn($m) { $m?(QName('x', 'make'))?0() } "
+        + "return ($is($make($b)), $is($make($a)))", "false\ntrue");
   }
 }

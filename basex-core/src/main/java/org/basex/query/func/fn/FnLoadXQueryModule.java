@@ -65,7 +65,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final List<IO> srcs = new ArrayList<>();
     final String cont = opt.get(CONTENT);
-    if(cont != null && !cont.isEmpty()) {
+    final boolean inline = cont != null && !cont.isEmpty();
+    if(inline) {
       srcs.add(new IOContent(cont));
     } else {
       final String uri = Token.string(modUri);
@@ -109,6 +110,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final QueryContext mqc = new QueryContext(qc, null);
     mqc.maxPerm = perm;
+    mqc.inlineModule = inline;
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
     final Value ctx = contextValue(options, opt);

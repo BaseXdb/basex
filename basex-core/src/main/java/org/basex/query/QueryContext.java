@@ -99,6 +99,8 @@ public final class QueryContext extends Job implements Closeable {
   public boolean parseResources;
   /** Maximum permission of the parsed code. */
   public Perm maxPerm;
+  /** Indicates if the root library module is supplied as string, without location. */
+  public boolean inlineModule;
   /** Custom URI resolver for parsed modules (can be {@code null}). */
   public UriResolver resolver;
 
@@ -137,8 +139,6 @@ public final class QueryContext extends Job implements Closeable {
   public final TokenObjectMap<LibraryModule> libs = new TokenObjectMap<>();
   /** Pre-declared modules, containing module URI and their file paths (required for test APIs). */
   public final TokenObjectMap<TokenList> modDeclared = new TokenObjectMap<>();
-  /** Stack of module files that are currently parsed. */
-  public final TokenList modStack = new TokenList();
 
   /** Public type declarations of all parsed modules (for resolving cross-module references). */
   public final QNmMap<TypeDecl> namedTypes = new QNmMap<>();

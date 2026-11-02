@@ -26,8 +26,8 @@ public final class RecordType extends ShapeType {
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
-  /** Path of the declaring module of a private record (can be {@code null}). */
-  private final String module;
+  /** Identity of the record declaration (can be {@code null}). */
+  private final Object identity;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
   /** Initializing expressions of this and all nested records (can be {@code null}). */
@@ -40,7 +40,7 @@ public final class RecordType extends ShapeType {
     super(new TokenObjectMap<>(0));
     name = null;
     anns = AnnList.EMPTY;
-    module = null;
+    identity = null;
   }
 
   /**
@@ -48,14 +48,14 @@ public final class RecordType extends ShapeType {
    * @param fields field declarations
    * @param name record name
    * @param anns annotations
-   * @param module path of the declaring module of a private record (can be {@code null})
+   * @param identity identity of the record declaration (can be {@code null})
    */
   public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
-      final String module) {
+      final Object identity) {
     super(fields);
     this.name = name;
     this.anns = anns;
-    this.module = module;
+    this.identity = identity;
   }
 
   @Override
@@ -82,7 +82,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns, module);
+    return new RecordType(map, name, anns, identity);
   }
 
   /**
@@ -110,7 +110,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public ShapeType detach() {
-    return detached() ? this : new RecordType(detachedFields(), name, anns, module);
+    return detached() ? this : new RecordType(detachedFields(), name, anns, identity);
   }
 
   @Override
@@ -119,8 +119,8 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  String module() {
-    return module;
+  Object identity() {
+    return identity;
   }
 
   /**

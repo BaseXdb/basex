@@ -129,6 +129,8 @@ public class QueryParser extends InputParser {
   private Hint hint;
   /** Range error for literal 2^63, which is valid if negated (can be {@code null}). */
   private Expr minInteger;
+  /** Identity of the record declarations of the parsed module. */
+  private Object recordIdentity = new Object();
 
   /**
    * Namespaces of an element constructor.
@@ -235,7 +237,8 @@ public class QueryParser extends InputParser {
 
       final byte[] pth = token(qc.modulePath(sc.baseIO()));
       qc.modParsed.put(pth, uri);
-      qc.modStack.push(pth);
+      // records of modules with a location are identified by their path
+      if(!(root && qc.inlineModule)) recordIdentity = string(pth);
 
       prolog1();
       importModules();
@@ -243,7 +246,6 @@ public class QueryParser extends InputParser {
       finish(null);
       if(root) check(null);
 
-      qc.modStack.pop();
       final LibraryModule lm = new LibraryModule(sc);
       lm.set(funcs, vars, publicTypes, sc.imports, namespaces, options, moduleDoc);
       return lm;
@@ -1020,7 +1022,6 @@ public class QueryParser extends InputParser {
         throw error(WHICHMODFILE_X, info, io).cause(ex);
       }
 
-      qc.modStack.push(tPath);
       final QueryParser qp = new QueryParser(query, io.path(), qc, null);
 
       // check if import and declaration URI match
@@ -1028,7 +1029,6 @@ public class QueryParser extends InputParser {
       qc.libs.put(tPath, lib);
       final byte[] muri = lib.sc.module.uri();
       if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
-      qc.modStack.pop();
     }
 
     // import the module's public types
@@ -1216,10 +1216,8 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck(")");
     }
-    // private records of different library modules are different types
-    final RecordType rt = new RecordType(fields, qn, anns,
-      anns.contains(Annotation.PRIVATE) && sc.module != null ?
-      string(qc.modStack.peek()) : null);
+    // records of different declarations are different types
+    final RecordType rt = new RecordType(fields, qn, anns, recordIdentity);
     // record types may be recursive: references are not followed
     declareType(qn, rt.seqType(), new QNmSet(), anns);
     declareShapeConstructor(rt, ii);
