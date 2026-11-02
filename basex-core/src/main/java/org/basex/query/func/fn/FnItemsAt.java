@@ -2,12 +2,10 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
@@ -16,6 +14,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -48,32 +47,40 @@ public final class FnItemsAt extends StandardFunc {
   private Item evalItem(final QueryContext qc) throws QueryException {
     final Expr at = arg(1);
     final Item pos = guarded(() -> at.atomItem(qc, info), Empty.VALUE, qc);
-    if(!pos.isEmpty()) {
-      // retrieve (possibly invalid) position
-      long l = Pos.position(toNumber(pos, at)) - 1;
-      if(l >= 0) {
-        // retrieve single item
-        final Expr input = arg(0);
-        if(input.seqType().zeroOrOne()) {
-          return l == 0 ? input.item(qc, info) : Empty.VALUE;
-        }
+    if(pos.isEmpty()) return Empty.VALUE;
+    final long l = Pos.position(toNumber(pos, at)) - 1;
+    return l < 0 ? Empty.VALUE : item(arg(0), l, qc, info);
+  }
 
-        // direct access, no iterator required
-        final Value value = input.eagerValue(qc);
-        if(value != null) return l < value.size() ? value.itemAt(l) : Empty.VALUE;
+  /**
+   * Returns the item at the specified position of the input.
+   * @param input input expression
+   * @param pos position (starting from 0)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return item or empty value
+   * @throws QueryException query exception
+   */
+  static Item item(final Expr input, final long pos, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    // single item: skip evaluation for positions beyond the first
+    if(input.seqType().zeroOrOne()) return pos == 0 ? input.item(qc, info) : Empty.VALUE;
 
-        // fast route if the result size is known
-        final Iter iter = FnSubsequence.iter(input, l + 1, qc);
-        final long size = iter.size();
-        if(size >= 0) {
-          return l < size ? iter.get(l) : Empty.VALUE;
-        }
+    // direct access, no iterator required
+    final Value value = input.eagerValue(qc);
+    if(value != null) return pos < value.size() ? value.itemAt(pos) : Empty.VALUE;
 
-        // iterate until specified item is found
-        for(Item item; (item = qc.next(iter)) != null;) {
-          if(l-- == 0) return item;
-        }
-      }
+    // fast route if the result size is known (pointless for the first item)
+    final Iter iter = FnSubsequence.iter(input, pos + 1, qc);
+    if(pos > 0) {
+      final long size = iter.size();
+      if(size >= 0) return pos < size ? iter.get(pos) : Empty.VALUE;
+    }
+
+    // iterate until specified item is found
+    long p = pos;
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(p-- == 0) return item;
     }
     return Empty.VALUE;
   }
@@ -161,8 +168,8 @@ public final class FnItemsAt extends StandardFunc {
 
         // items-at(tail(E), pos) → items-at(E, pos + 1)
         // items-at(subsequence(E, 3, 5), 2) → items-at(E, 4)
-        final SeqRange r = SeqRange.get(input, cc);
-        if(r != null) return r.sub(new SeqRange(l, l + 1)).function(input.arg(0), info, cc);
+        final SeqRange range = new SeqRange(l, l + 1), r = SeqRange.get(input, cc);
+        if(r != null) return r.sub(range).function(input.arg(0), info, cc);
         // items-at(replicate(I, count), pos) → I
         if(REPLICATE.is(input)) {
           // static integer will always be greater than 1
@@ -176,19 +183,9 @@ public final class FnItemsAt extends StandardFunc {
         // items-at((I1, I2, I3), 2) → I2
         // items-at((I, E), 2) → head(E)
         // items-at((I, E1, E2), 3) → items-at((E1, E2), 2)
-        if(input instanceof List) {
-          final Expr[] args = input.args();
-          final int al = args.length;
-          for(int a = 0; a < al; a++) {
-            final boolean exact = a == l, one = args[a].seqType().one();
-            if(exact || !one && a > 0) {
-              if(exact && one) return args[a];
-              final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-              return exact ? cc.function(HEAD, info, list) :
-                cc.function(ITEMS_AT, info, list, Itr.get(l - a + 1));
-            }
-            if(!one) break;
-          }
+        if(input instanceof final List list) {
+          final Expr expr = range.list(list, info, cc);
+          if(expr != null) return expr;
         }
       }
     }

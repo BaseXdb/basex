@@ -3,11 +3,9 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 
 import java.math.*;
-import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
@@ -313,15 +311,10 @@ public class FnSubsequence extends StandardFunc {
         return sr.start == 0 ? input : cc.voidAndReturn(input, Empty.VALUE, info);
       }
 
-      if(sr.length == 1) {
-        // subsequence(E, 1, 1) → head(E)
-        // subsequence(E, pos, 1) → items-at(E, pos)
-        return sr.start == 0 ? cc.function(HEAD, info, input) :
-          cc.function(ITEMS_AT, info, input, Itr.get(sr.start + 1));
-      }
+      // subsequence(E, 1, 1) → head(E), subsequence(E, pos, 1) → items-at(E, pos)
       // subsequence(E, 2) → tail(E)
-      if(sr.end == Long.MAX_VALUE && sr.start == 1)
-        return cc.function(TAIL, info, input);
+      if(sr.length == 1 || sr.end == Long.MAX_VALUE && sr.start == 1)
+        return sr.function(input, info, cc);
       // subsequence(file:read-text-lines(E), pos, length) → file:read-text-lines(E, pos, length)
       if(_FILE_READ_TEXT_LINES.is(input))
         return FileReadTextLines.merge(this, sr.start, sr.length, cc);
@@ -335,20 +328,9 @@ public class FnSubsequence extends StandardFunc {
       }
       // subsequence((I1, I2, I3, I4), 2, 2) → (I2, I3)
       // subsequence((I, E1, E2), 2, 2) → subsequence((E1, E2), 1, 2)
-      if(input instanceof List && sr.start > 0) {
-        final Expr[] args = input.args();
-        if(Checks.all(args, ex -> ex.seqType().one())) {
-          return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) sr.end));
-        }
-        final int al = args.length;
-        for(int a = 0; a < al; a++) {
-          final boolean exact = a == sr.start, one = args[a].seqType().one();
-          if(a > 0 && (exact || !one)) {
-            final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-            return new SeqRange(sr.start - a, sr.end - a).function(list, info, cc);
-          }
-          if(!one) break;
-        }
+      if(input instanceof final List list) {
+        final Expr expr = sr.list(list, info, cc);
+        if(expr != null) return expr;
       }
     } else if(first instanceof final Itr itr) {
       final long start = itr.itr(), count = FnItemsAt.countInputDiff(input, second);

@@ -12,7 +12,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -24,13 +23,7 @@ import org.basex.query.value.type.*;
 public final class FnHead extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // value-based input: return first item
-    final Expr input = arg(0);
-    final Value value = input.eagerValue(qc);
-    if(value != null) return value.isEmpty() ? Empty.VALUE : value.itemAt(0);
-
-    final Item item = FnSubsequence.iter(input, 1, qc).next();
-    return item == null ? Empty.VALUE : item;
+    return FnItemsAt.item(arg(0), 0, qc, info);
   }
 
   @Override

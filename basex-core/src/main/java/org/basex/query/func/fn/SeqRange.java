@@ -2,8 +2,11 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -91,6 +94,27 @@ public final class SeqRange {
         cc.function(ITEMS_AT, info, input, pos);
     }
     return cc.function(SUBSEQUENCE, info, input, pos, Itr.get(length));
+  }
+
+  /**
+   * Returns this range of a list expression, skipping leading operands that yield single items.
+   * @param list list expression
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return rewritten expression or {@code null}
+   * @throws QueryException query exception
+   */
+  Expr list(final List list, final InputInfo info, final CompileContext cc)
+      throws QueryException {
+    final Expr[] args = list.args();
+    final int al = args.length;
+    int o = 0;
+    while(o < al && args[o].seqType().one()) o++;
+    if(end <= o) return List.get(cc, info, Arrays.copyOfRange(args, (int) start, (int) end));
+    final int skip = (int) Math.min(o, start);
+    if(skip == 0) return null;
+    final Expr rest = List.get(cc, info, Arrays.copyOfRange(args, skip, al));
+    return new SeqRange(start - skip, end - skip).function(rest, info, cc);
   }
 
   /**
