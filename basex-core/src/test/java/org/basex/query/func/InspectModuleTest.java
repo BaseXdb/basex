@@ -127,6 +127,9 @@ public final class InspectModuleTest extends SandboxTest {
     // ensure that a module will only be parsed once
     query(VOID.args(func.args(url)), "");
     query(VOID.args(" (" + func.args(url) + ", " + func.args(url) + ')'), "");
+    // module that has already been imported
+    query("import module namespace hello='world' at '" + url + "';"
+        + func.args(url) + "[function-name(.) = QName('world', 'world')]()", "hello world");
 
     error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);

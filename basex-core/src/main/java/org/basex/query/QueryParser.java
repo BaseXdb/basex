@@ -233,7 +233,7 @@ public class QueryParser extends InputParser {
       namespaces.put(prefix, uri);
       wsCheck(";");
 
-      final byte[] pth = token(modulePath(sc.baseIO()));
+      final byte[] pth = token(qc.modulePath(sc.baseIO()));
       qc.modParsed.put(pth, uri);
       qc.modStack.push(pth);
 
@@ -992,17 +992,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Returns the path that identifies a module, resolving capitalization and symbolic links.
-   * @param io module reference (can be {@code null})
-   * @return path
-   */
-  private String modulePath(final IO io) {
-    return io instanceof final IOFile file ?
-      qc.realPaths.computeIfAbsent(file.path(), p -> file.normalize().path()) :
-      io == null ? "" : io.path();
-  }
-
-  /**
    * Parses the specified module, checking function and variable references at the end.
    * @param pth input path
    * @param uri base URI of module
@@ -1014,7 +1003,7 @@ public class QueryParser extends InputParser {
 
     final IO io = sc.location(pth, uri);
     if(io == null) throw error(WHICHMODFILE_X, info, pth);
-    final byte[] tPath = token(modulePath(io));
+    final byte[] tPath = token(qc.modulePath(io));
 
     // check if module has already been parsed
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);

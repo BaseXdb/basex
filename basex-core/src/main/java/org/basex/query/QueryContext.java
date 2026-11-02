@@ -232,6 +232,17 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Returns the path that identifies a module, resolving capitalization and symbolic links.
+   * @param io module reference (can be {@code null})
+   * @return path
+   */
+  public String modulePath(final IO io) {
+    return io instanceof final IOFile file ?
+      realPaths.computeIfAbsent(file.path(), p -> file.normalize().path()) :
+      io == null ? "" : io.path();
+  }
+
+  /**
    * Collects suggestions for completing a path expression.
    * @param query query string
    * @param data data reference
