@@ -10,6 +10,7 @@ import org.basex.io.parse.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -27,6 +28,8 @@ public abstract class JsonConverter extends JsonHandler {
 
   /** Null value. */
   protected Value nullValue = Empty.VALUE;
+  /** Function for converting maps (can be {@code null}). */
+  protected QueryFunction<XQMap, Value> match;
   /** Input info. */
   protected InputInfo info;
   /** Interruptible job. */
@@ -88,6 +91,14 @@ public abstract class JsonConverter extends JsonHandler {
    */
   public final void nullValue(final Value item) {
     nullValue = item;
+  }
+
+  /**
+   * Assigns a function for converting parsed maps.
+   * @param func function
+   */
+  public final void match(final QueryFunction<XQMap, Value> func) {
+    match = func;
   }
 
   /**

@@ -29,6 +29,8 @@ public final class JsonParserOptions extends JsonOptions {
       new EnumOption<>("duplicates", JsonDuplicates.class);
   /** Option: null item (parse-json). */
   public static final ValueOption NULL = new ValueOption("null", ITEM_ZO);
+  /** Option: labeled record types (parse-json). */
+  public static final ValueOption MATCH = new ValueOption("match", QNAME_ZM);
   /** Option: validation (json-to-xml). */
   public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: JSON Lines (custom). */
@@ -89,6 +91,7 @@ public final class JsonParserOptions extends JsonOptions {
     final JsonNumberFormat nf = get(NUMBER_FORMAT);
     if(nf != null && nf != JsonNumberFormat.DOUBLE && !maps) throw unknown(NUMBER_FORMAT, info);
     if(!get(NULL).isEmpty() && !w3) throw unknown(NULL, info);
+    if(!get(MATCH).isEmpty() && !w3) throw unknown(MATCH, info);
     if(unsupportedMapping()) throw unknown(MAPPING, info);
     // maps cannot retain duplicates, XML formats cannot pick the last one
     final JsonDuplicates dupl = get(DUPLICATES);

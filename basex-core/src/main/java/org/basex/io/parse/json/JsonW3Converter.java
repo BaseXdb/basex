@@ -91,8 +91,9 @@ public final class JsonW3Converter extends JsonConverter {
   }
 
   @Override
-  protected void closeObject() {
-    stack.push(maps.pop().map());
+  protected void closeObject() throws QueryException {
+    final XQMap map = maps.pop().map();
+    stack.push(match != null ? match.apply(map) : map);
   }
 
   @Override

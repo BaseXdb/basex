@@ -88,8 +88,6 @@ public class QueryParser extends InputParser {
   private final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
   private final ArrayList<StaticFunc> funcs = new ArrayList<>();
-  /** Declared and imported types. */
-  private final QNmMap<TypeDecl> declaredTypes = new QNmMap<>();
   /** Public types. */
   private final QNmMap<TypeDecl> publicTypes = new QNmMap<>();
   /** References to named types (resolved after all type declarations have been parsed). */
@@ -306,7 +304,7 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     // reject item type declarations of this module that depend on themselves
-    checkTypes(declaredTypes.values());
+    checkTypes(sc.types.values());
     resolveTypeRefs();
   }
 
@@ -343,7 +341,7 @@ public class QueryParser extends InputParser {
    * @return type, or {@code null} if it is unknown
    */
   private SeqType declaredType(final QNm name) {
-    final TypeDecl td = declaredTypes.get(name);
+    final TypeDecl td = sc.types.get(name);
     return td != null ? td.seqType : null;
   }
 
@@ -355,14 +353,9 @@ public class QueryParser extends InputParser {
   private void resolveTypeRefs() throws QueryException {
     for(final QNm nm : typeRefs) {
       final TypeRef ref = typeRefs.get(nm);
-      final SeqType st = declaredType(nm);
-      if(st != null) {
-        ref.resolve(st.type);
-      } else {
-        final RecordType rt = Records.BUILT_IN.get(nm);
-        if(rt != null) ref.resolve(rt);
-        else qc.deferredTypeRefs.add(ref);
-      }
+      final Type type = sc.type(nm);
+      if(type != null) ref.resolve(type);
+      else qc.deferredTypeRefs.add(ref);
     }
     // a resolved map key type must be atomic (an unresolved reference stays an unknown type)
     for(final TypeRef ref : deferredMapKeys) {
@@ -374,14 +367,13 @@ public class QueryParser extends InputParser {
     // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
       final QNm name = ref.name();
-      final SeqType st = declaredType(name);
-      final RecordType rt = st != null ? null : Records.BUILT_IN.get(name);
-      if(st == null && rt == null) {
+      final Type type = sc.type(name);
+      if(type == null) {
         // known schema type that is not simple (xs:anyType, xs:untyped)
         if(BasicType.get(name, true) != null) throw error(WHICHCAST_X, name.prefixId(XML));
         throw error(TYPEUNKNOWN_X, BasicType.similar(name));
       }
-      ref.resolve(st != null ? st.type : rt);
+      ref.resolve(type);
       checkCastTarget(ref, false);
     }
     deferredCastTargets.clear();
@@ -1035,8 +1027,8 @@ public class QueryParser extends InputParser {
     final LibraryModule lib = qc.libs.get(tPath);
     if(lib != null) {
       for(final QNm qn : lib.types) {
-        if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
-        declaredTypes.put(qn, lib.types.get(qn));
+        if(sc.types.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+        sc.types.put(qn, lib.types.get(qn));
       }
     }
   }
@@ -1164,7 +1156,7 @@ public class QueryParser extends InputParser {
   private void typeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME_X);
-    if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+    if(sc.types.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
     // collect referenced type names to detect cyclic or self-referential declarations
@@ -1184,7 +1176,7 @@ public class QueryParser extends InputParser {
   private void labeledRecordTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNS, TYPENAME_X);
-    if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+    if(sc.types.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
     final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
@@ -1233,7 +1225,7 @@ public class QueryParser extends InputParser {
    */
   private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns)
       throws QueryException {
-    final TypeDecl td = new TypeDecl(qn, st, refs, declaredTypes, anns);
+    final TypeDecl td = new TypeDecl(qn, st, refs, sc.types, anns);
     qc.typeDecls.add(td);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !qn.eqUri(sc.module))
@@ -1241,7 +1233,7 @@ public class QueryParser extends InputParser {
       publicTypes.put(qn, td);
       qc.namedTypes.put(qn, td);
     }
-    declaredTypes.put(qn, td);
+    sc.types.put(qn, td);
   }
 
   /**

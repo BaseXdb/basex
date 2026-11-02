@@ -4591,6 +4591,23 @@ return
         " } catch * { $err:description }",
         "'duplicates':'retain' is not supported by the target format.");
     query(func.args(dup), "{\"x\":1}");
+
+    // match objects against labeled record types (qt4cg 2576)
+    final String decl = "declare record P(x as xs:double, y as xs:double);"
+        + "declare record A(x, z as xs:double?); declare record B(x); declare record O(p as B);";
+    final String xy = "'{ \"y\": 2, \"x\": 1 }'";
+    query(decl + func.args(" " + xy, " { 'match': #P }") + " instance of P", true);
+    query(decl + func.args(" " + xy, " { 'match': #P }"), "{\"x\":1,\"y\":2}");
+    query(decl + func.args(" " + xy, " { 'match': (#A, #P) }") + " instance of P", true);
+    query(decl + func.args(" '{ \"y\": 2 }'", " { 'match': #P }") + " instance of P", false);
+    // inner objects are matched first
+    query(decl + func.args(" '{ \"p\": { \"x\": 1 } }'", " { 'match': #O }")
+        + " ! (. instance of O, ?p instance of B)", "true\ntrue");
+    query(decl + func.args(" '{ \"p\": { \"x\": 1 } }'", " { 'match': (#A, #O) }")
+        + " ! (. instance of O, ?p instance of A)", "false\ntrue");
+    query(decl + func.args(" '[{ \"x\": 1 }]'", " { 'match': #B }") + "?1 instance of B", true);
+    error(func.args("{}", " { 'match': #xs:integer }"), OPTION_JSON_X);
+    error(func.args("{}", " { 'match': #P }"), OPTION_JSON_X);
   }
 
   /** Test method. */

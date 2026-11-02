@@ -9,9 +9,12 @@ import javax.xml.transform.sax.*;
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
+import org.basex.query.util.hash.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -28,6 +31,8 @@ import org.xml.sax.*;
 public final class StaticContext {
   /** Decimal formats. */
   public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
+  /** Declared and imported named item types. */
+  public final QNmMap<TypeDecl> types = new QNmMap<>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
   /** Look up documents in databases. */
@@ -253,6 +258,16 @@ public final class StaticContext {
       if(df != null) decFormats.put(id, df);
     }
     return df;
+  }
+
+  /**
+   * Returns a declared, imported or built-in named item type.
+   * @param name type name
+   * @return type, or {@code null} if it is unknown
+   */
+  public Type type(final QNm name) {
+    final TypeDecl td = types.get(name);
+    return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
   }
 
   @Override

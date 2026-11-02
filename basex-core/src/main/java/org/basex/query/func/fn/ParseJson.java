@@ -13,6 +13,8 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -75,8 +77,35 @@ public abstract class ParseJson extends ParseFn {
       converter.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
     }
     if(!elements) converter.nullValue(options.get(JsonParserOptions.NULL));
+    final Value match = options.get(JsonParserOptions.MATCH);
+    if(!match.isEmpty()) {
+      final Type[] types = new Type[(int) match.size()];
+      int t = 0;
+      for(final Item name : match) types[t++] = recordType((QNm) name);
+      final SeqType st = ChoiceItemType.get(types).seqType();
+      converter.match(map -> {
+        try {
+          return st.coerce(map, qc, info);
+        } catch(final QueryException ex) {
+          if(ex.isInitializer()) throw ex;
+          return map;
+        }
+      });
+    }
     final Value value = converter.convert(ti, "", info, qc);
     return elements ? elements(value, jopts, qc) : value;
+  }
+
+  /**
+   * Returns the labeled record type with the specified name.
+   * @param name type name
+   * @return record type
+   * @throws QueryException query exception
+   */
+  private RecordType recordType(final QNm name) throws QueryException {
+    if(sc().type(name) instanceof final RecordType rt && rt.name() != null &&
+        name.eq(rt.name())) return rt;
+    throw OPTION_JSON_X.get(info, Util.info("Unknown labeled record type: %.", name.prefixId()));
   }
 
   /**
