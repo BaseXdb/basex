@@ -88,6 +88,12 @@ public final class TypeCheck extends Single {
       // refine result type:
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(nst.refines(st)) st = nst;
+      // adopt the refined return type of a coerced function:
+      //   CLOSURE coerce to fn(item()*) as item()* → refined return type of CLOSURE
+      else if(st.type instanceof final FuncType ft && ft.argTypes != null &&
+          et.type instanceof final FuncType eft && eft.refinedType.instanceOf(ft.refinedType)) {
+        st = SeqType.get(ft.withRefinedType(eft.refinedType), st.occ);
+      }
       // adopt result size and data reference from input expression
       final Expr dataExpr = type.instanceOf(NodeType.XNODE) ? expr : null;
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
@@ -100,7 +106,8 @@ public final class TypeCheck extends Single {
     }
 
     // skip check if return type is correct
-    if(et.coercible(st)) {
+    //   (E coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()* → inner check
+    if(et.coercible(st) || expr instanceof TypeCheck && et.eq(st)) {
       // (1, 3) coerce to xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;

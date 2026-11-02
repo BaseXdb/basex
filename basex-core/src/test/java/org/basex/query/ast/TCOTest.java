@@ -191,6 +191,19 @@ public final class TCOTest extends SandboxTest {
         101);
   }
 
+  /** Checks if the return type of a coerced callback with typed parameters is preserved. */
+  @Test public void coercedCallback() {
+    check("declare function local:match($seq, $f as fn(item()*, item()*) as item()*) {"
+        + "  if(empty($seq)) then 0 else $f(head($seq), tail($seq))"
+        + "};"
+        + "declare function local:f($seq as xs:integer*) as xs:integer {"
+        + "  local:match($seq, fn($h as xs:integer, $t as xs:integer*) { local:f($t) })"
+        + "};"
+        + "local:f(1 to 100000)", 0,
+        exists(Util.className(DynFuncCall.class) + "[@tailCall eq 'true']")
+    );
+  }
+
   /** Checks if static type xs:error affects tail call optimization. */
   @Test public void typeCheckOnFnError() {
     check("declare function local:sum($result, $values) as xs:integer\n"

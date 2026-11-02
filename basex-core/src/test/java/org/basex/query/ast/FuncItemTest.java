@@ -678,6 +678,14 @@ public final class FuncItemTest extends SandboxTest {
         + "coerce to fn(xs:integer) as item()*)(1000) };"
         + "local:f((identity#1, abs#1)[random:integer(2) + 1])", INVTYPE_X);
 
+    // identical nested coercions are merged
+    check("let $f := (abs#1, 1)[random:integer(2) >= 0][1] "
+        + "return (($f coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()*)(1)",
+        1, count(TypeCheck.class, 1));
+    error("let $f := (abs#1, 1)[random:integer(2) >= 0][1] "
+        + "return (($f coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()*)('a')",
+        INVTYPE_X);
+
     // coercion in variable declarations
     final String e = "let $e := (fn($a) { $a }, 1)[random:integer(2) >= 0][1] return ";
     query(e + "let $x as fn(xs:anyAtomicType) as item()* := "
