@@ -217,8 +217,9 @@ public final class RequestContext implements RequestScope {
    */
   private long maxForm() {
     final ServletContext sc = request.getServletContext();
-    Object value = sc.getAttribute(MAX_FORM);
-    if(value == null) value = sc.getInitParameter(MAX_FORM);
+    // init parameter first: Jetty 12 always answers the attribute with its own default
+    Object value = sc.getInitParameter(MAX_FORM);
+    if(value == null) value = sc.getAttribute(MAX_FORM);
     if(value == null) return MAX_FORM_DEFAULT;
     final long max = Strings.toLong(value.toString());
     if(max == Long.MIN_VALUE) return MAX_FORM_DEFAULT;
