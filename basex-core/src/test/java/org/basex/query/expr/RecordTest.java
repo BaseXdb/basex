@@ -1244,6 +1244,58 @@ public final class RecordTest extends SandboxTest {
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
   }
 
+  /** Integrity constraints. */
+  @Test public void integrityConstraints() {
+    final String r = "declare record local:r(x as xs:integer, y as xs:integer) where ?x le ?y; ";
+    query(r + "local:r(1, 2)?y", 2);
+    error(r + "local:r(2, 1)", RECORDCONSTRAINT_X_X);
+
+    // coercion, cast
+    query(r + "({ 'x': 1, 'y': 1 } coerce to local:r)?x", 1);
+    error(r + "{ 'x': 2, 'y': 1 } coerce to local:r", RECORDCONSTRAINT_X_X);
+    error(r + "declare function local:f($r as local:r) { $r }; local:f({ 'x': 2, 'y': 1 })",
+        RECORDCONSTRAINT_X_X);
+    error(r + "let $r as local:r := map:put(local:r(1, 1), 'x', 2) return $r",
+        RECORDCONSTRAINT_X_X);
+    query(r + "({ 'x': 1, 'y': 2, 'z': 3 } cast as local:r)?y", 2);
+    error(r + "{ 'x': 2, 'y': 1 } cast as local:r", RECORDCONSTRAINT_X_X);
+    query(r + "{ 'x': 2, 'y': 1 } castable as local:r", false);
+    query(r + "{ 'x': 1, 'y': 2 } castable as local:r", true);
+
+    // but with: each result must satisfy the constraint
+    query(r + "(local:r(1, 1) but with { 'x': 2, 'y': 2 })?x", 2);
+    error(r + "local:r(1, 1) but with { 'x': 2 } but with { 'y': 2 }", RECORDCONSTRAINT_X_X);
+    error(r + "for $x in 1 to 2 return local:r(1, 1) but with { 'x': $x }",
+        RECORDCONSTRAINT_X_X);
+    // map:put: only the final result is coerced
+    query(r + "declare function local:f($r as local:r) as local:r { "
+        + "$r => map:put('x', 2) => map:put('y', 2) }; local:f(local:r(1, 1))?x", 2);
+
+    // effective boolean value; errors are passed on
+    query("declare record local:s(a) where ?a; local:s('x')?a", "x");
+    error("declare record local:s(a) where ?a; local:s(())", RECORDCONSTRAINT_X_X);
+    error("declare record local:s(a) where error(); local:s(1)", FUNERR1);
+
+    // the focus is the labeled candidate record: no recursion
+    final String s = "declare record local:s(a as xs:integer*) where local:size(.) le 2; "
+        + "declare function local:size($s as local:s) { count($s?a) }; ";
+    query(s + "local:s((1, 2))?a", "1\n2");
+    error(s + "local:s((1, 2, 3))", RECORDCONSTRAINT_X_X);
+    final String m = "declare record local:m(a as xs:integer*, "
+        + "%static size := fn($m as local:m) { count($m?a) }) where . =?> size() le 2; ";
+    query(m + "local:m((1, 2)) =?> size()", 2);
+    error(m + "local:m((1, 2, 3))", RECORDCONSTRAINT_X_X);
+
+    // global variables
+    query("declare variable $max := 2; declare record local:s(a) where ?a le $max; "
+        + "local:s(2)?a", 2);
+    error("declare variable $v := local:s(1); declare record local:s(a) where $v; $v",
+        CIRCVAR_X);
+
+    // syntax
+    error("declare record local:s(a) where; 1", NOEXPR);
+  }
+
   /**
    * Records of different declarations have different types.
    * @throws IOException I/O exception

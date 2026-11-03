@@ -482,7 +482,7 @@ public abstract class XQMap extends XQStruct {
         values[f] = rf.init(qc);
       }
     }
-    return get(rt, values, qc);
+    return rt.build(values, true, qc, ii);
   }
 
   /**
@@ -628,7 +628,7 @@ public abstract class XQMap extends XQStruct {
       if(cast == null) return null;
       values[f] = cast;
     }
-    return get(rt, values, qc);
+    return rt.build(values, error, qc, info);
   }
 
   @Override

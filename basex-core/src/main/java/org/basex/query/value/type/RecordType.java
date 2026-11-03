@@ -1,5 +1,6 @@
 package org.basex.query.value.type;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -7,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -30,11 +32,13 @@ public final class RecordType extends ShapeType {
   private final AnnList anns;
   /** Identity of the record declaration (can be {@code null}). */
   private final Object identity;
+  /** Integrity constraint: reference to a focus function (can be {@code null}). */
+  private final Expr constraint;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
-  /** Type without initializing expressions (can be {@code null}). */
+  /** Type without initializing expressions and integrity constraint (can be {@code null}). */
   private RecordType detachedType;
-  /** Initializing expressions of this and all nested records (can be {@code null}). */
+  /** Initializers and constraints of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
   /** Storage slots of the fields (can be {@code null}). */
   private volatile int[] slots;
@@ -47,6 +51,7 @@ public final class RecordType extends ShapeType {
     name = null;
     anns = AnnList.EMPTY;
     identity = null;
+    constraint = null;
   }
 
   /**
@@ -55,13 +60,39 @@ public final class RecordType extends ShapeType {
    * @param name record name
    * @param anns annotations
    * @param identity identity of the record declaration (can be {@code null})
+   * @param constraint integrity constraint (can be {@code null})
    */
   public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
-      final Object identity) {
+      final Object identity, final Expr constraint) {
     super(fields);
     this.name = name;
     this.anns = anns;
     this.identity = identity;
+    this.constraint = constraint;
+  }
+
+  /**
+   * Indicates if this type has an integrity constraint.
+   * @return result of check
+   */
+  public boolean constrained() {
+    return constraint != null;
+  }
+
+  @Override
+  public boolean detached() {
+    return constraint == null && super.detached();
+  }
+
+  @Override
+  public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
+      final InputInfo ii) throws QueryException {
+    // the labeled candidate record is the focus of the integrity constraint
+    final XQMap record = XQMap.get(this, values, qc);
+    if(constraint == null ||
+        ((FItem) constraint.item(qc, ii)).invoke(qc, ii, record).ebv(qc, ii)) return record;
+    if(error) throw RECORDCONSTRAINT_X_X.get(ii, this, record);
+    return null;
   }
 
   @Override
@@ -88,7 +119,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns, identity);
+    return new RecordType(map, name, anns, identity, constraint);
   }
 
   /**
@@ -137,7 +168,9 @@ public final class RecordType extends ShapeType {
   @Override
   public ShapeType detach() {
     if(detached()) return this;
-    if(detachedType == null) detachedType = new RecordType(detachedFields(), name, anns, identity);
+    if(detachedType == null) {
+      detachedType = new RecordType(detachedFields(), name, anns, identity, null);
+    }
     return detachedType;
   }
 
@@ -152,8 +185,8 @@ public final class RecordType extends ShapeType {
   }
 
   /**
-   * Returns the initializing expressions of record fields that may be evaluated when values are
-   * coerced or cast to the specified type.
+   * Returns the initializing expressions and integrity constraints of records that may be evaluated
+   * when values are coerced or cast to the specified type.
    * @param type type
    * @return initializing expressions
    */
@@ -171,7 +204,7 @@ public final class RecordType extends ShapeType {
     return in;
   }
 
-  /** Collector of the initializing expressions of record fields that are reachable from a type. */
+  /** Collector of the initializers and constraints of records that are reachable from a type. */
   private static final class Collector {
     /** Initializing expressions (can be {@code null}). */
     private ExprList list;
@@ -181,7 +214,7 @@ public final class RecordType extends ShapeType {
     private boolean complete = true;
 
     /**
-     * Collects the initializing expressions of record fields that are reachable from a type.
+     * Collects the initializers and constraints of records that are reachable from a type.
      * @param type type
      */
     private void collect(final Type type) {
@@ -193,11 +226,9 @@ public final class RecordType extends ShapeType {
         case final ShapeType sh -> {
           if(visited == null) visited = Collections.newSetFromMap(new IdentityHashMap<>());
           if(visited.add(sh)) {
+            if(sh instanceof final RecordType rt && rt.constraint != null) add(rt.constraint);
             for(final ShapeField rf : sh.fields().values()) {
-              if(rf.init() != null) {
-                if(list == null) list = new ExprList();
-                list.add(rf.init());
-              }
+              if(rf.init() != null) add(rf.init());
               collect(rf.seqType().type);
             }
           }
@@ -215,6 +246,15 @@ public final class RecordType extends ShapeType {
         }
         default -> { }
       }
+    }
+
+    /**
+     * Adds an expression.
+     * @param expr expression
+     */
+    private void add(final Expr expr) {
+      if(list == null) list = new ExprList();
+      list.add(expr);
     }
   }
 
@@ -236,8 +276,9 @@ public final class RecordType extends ShapeType {
       if(field.init() != null) param.token(":=").token(field.init());
       params[f++] = param;
     }
-    return qs.token(DECLARE).token(anns).token(RECORD).token(name.prefixId()).params(params).
-        token(';');
+    qs.token(DECLARE).token(anns).token(RECORD).token(name.prefixId()).params(params);
+    if(constraint != null) qs.token(WHERE).token(constraint);
+    return qs.token(';');
   }
 
   @Override

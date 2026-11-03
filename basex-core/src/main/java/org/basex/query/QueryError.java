@@ -1193,6 +1193,8 @@ public enum QueryError {
   /** Error code. */
   RECORDFIELD_X_X(XPTY, 4, "% has no field named %."),
   /** Error code. */
+  RECORDCONSTRAINT_X_X(XPTY, 4, "Integrity constraint of % is violated: %."),
+  /** Error code. */
   INVKEY_X_X(XPTY, 4, "Single key expected for % lookup: %."),
   /** Error code. */
   CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetic not defined for % and %: % % %."),

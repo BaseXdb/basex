@@ -93,7 +93,8 @@ public class ShapeType extends MapType {
       return null;
     }
     // shapes with query-scoped components must not be cached: they would be retained forever
-    if(detached() && (seqType == null || seqType.type.global())) {
+    // (field instead of detached(): derived shapes have no integrity constraint)
+    if(detached && (seqType == null || seqType.type.global())) {
       if(derived == null) derived = new ConcurrentHashMap<>();
       // do not cache shapes that are derived from arbitrarily many field names
       if(derived.size() < MAX_DERIVED) {
@@ -597,17 +598,31 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this shape is free of initializing expressions, i.e. of references to the
-   * query in which it was declared.
+   * Indicates if this shape is free of initializing expressions and integrity constraints, i.e. of
+   * references to the query in which it was declared.
    * @return result of check
    */
-  public final boolean detached() {
+  public boolean detached() {
     return detached;
   }
 
   /**
+   * Builds a map with this type.
+   * @param values field values
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @return map, or {@code null} if an integrity constraint failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
+      final InputInfo ii) throws QueryException {
+    return XQMap.get(this, values);
+  }
+
+  /**
    * Returns a version of this shape that can be attached to a materialized value.
-   * @return shape without initializing expressions
+   * @return shape without initializing expressions and integrity constraints
    */
   public ShapeType detach() {
     return detached() ? this : new ShapeType(detachedFields());

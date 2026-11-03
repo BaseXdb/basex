@@ -35,7 +35,9 @@ public final class ButWith extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // RECORD but with { 'a': A } but with { 'b': B } → RECORD but with { 'a': A, 'b': B }
-    if(exprs[0] instanceof final ButWith bw && disjoint(bw.exprs[1], exprs[1])) {
+    // (the intermediate record must not be subject to an integrity constraint)
+    if(exprs[0] instanceof final ButWith bw && bw.seqType().type instanceof final RecordType rt &&
+        !rt.any() && !rt.constrained() && disjoint(bw.exprs[1], exprs[1])) {
       final Expr update = new CMap(info, new Expr[] { bw.exprs[1], Empty.UNDEFINED, exprs[1],
         Empty.UNDEFINED }).optimize(cc);
       exprs = new Expr[] { bw.exprs[0], update };
@@ -144,7 +146,7 @@ public final class ButWith extends Arr {
       if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
       values[i - 1] = rt.coerce(i, value, qc, info, null);
     });
-    return XQMap.get(rt, values, qc);
+    return rt.build(values, true, qc, info);
   }
 
   @Override

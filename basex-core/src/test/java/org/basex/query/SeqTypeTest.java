@@ -687,7 +687,7 @@ public final class SeqTypeTest {
       // record(b as xs:integer?)
       r6 = new ShapeType(fld6).seqType(),
       // n1 record(a as xs:integer)
-      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null).seqType(),
+      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null, null).seqType(),
       // r8 record(next as r8?, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next as r9?, x, z)
@@ -1020,7 +1020,7 @@ public final class SeqTypeTest {
       // record(b? as xs:integer)
       r6 = new ShapeType(fld6).seqType(),
       // n1 record(a as xs:integer)
-      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null).seqType(),
+      n1 = new RecordType(fld1, new QNm("n1"), AnnList.EMPTY, null, null).seqType(),
       // r8 record(next? as r8, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)

@@ -1208,8 +1208,17 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck(")");
     }
+    // the integrity constraint is a focus function, bound to a variable like a field initializer
+    Expr constraint = null;
+    if(wsConsumeWs(WHERE)) {
+      final InputInfo ci = info();
+      localVars.pushContext(false);
+      final Closure func = focusFunction(AnnList.EMPTY, false);
+      final QNm vn = new QNm(concat(qn.string(), token("?where")), qn.uri());
+      constraint = qc.vars.declareField(new Var(vn, null, qc, ci), func, localVars.popContext());
+    }
     // records of different declarations are different types
-    final RecordType rt = new RecordType(fields, qn, anns, recordIdentity);
+    final RecordType rt = new RecordType(fields, qn, anns, recordIdentity, constraint);
     // record types may be recursive: references are not followed
     declareType(qn, rt.seqType(), new QNmSet(), anns);
     declareShapeConstructor(rt, ii);
@@ -2887,24 +2896,18 @@ public class QueryParser extends InputParser {
       final boolean word = !XMLToken.isNCChar(current());
       final boolean args = wsConsume("("), focus = !args && current('{');
       if(args || focus) {
-        final HashMap<Var, Expr> global = localVars.pushContext(true);
-        Params params;
-        Expr expr;
+        final Closure closure;
         if(args) {
-          params = paramList(false);
-          expr = enclosedExpr();
+          final HashMap<Var, Expr> global = localVars.pushContext(true);
+          final Params params = paramList(false);
+          final Expr expr = enclosedExpr();
+          closure = new Closure(info(), expr, params, anns, localVars.popContext(), global);
         } else {
-          // focus function: register the parameter without making it visible to the body
-          final InputInfo ii = info();
-          final int s = localVars.openScope();
-          params = new Params().add(new QNm("arg"), Types.ITEM_ZM, null, ii).finish(qc, localVars);
-          localVars.closeScope(s);
-          expr = new Pipeline(ii, new VarRef(ii, params.vars()[0]), enclosedExpr());
+          closure = focusFunction(anns, true);
         }
-        final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
           throw error(NOVISALLOWED);
-        return new Closure(info(), expr, params, anns, vs, global);
+        return closure;
       }
       if(word) addHint(EXPECTAFTER_X_X, "'(' or '{'", keyword);
     }
@@ -2913,6 +2916,27 @@ public class QueryParser extends InputParser {
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
     return null;
+  }
+
+  /**
+   * Parses the body of a focus function.
+   * @param anns annotations
+   * @param enclosed parse an enclosed expression
+   * @return function
+   * @throws QueryException query exception
+   */
+  private Closure focusFunction(final AnnList anns, final boolean enclosed)
+      throws QueryException {
+    final HashMap<Var, Expr> global = localVars.pushContext(true);
+    // register the parameter without making it visible to the body
+    final InputInfo ii = info();
+    final int s = localVars.openScope();
+    final Params params = new Params().add(new QNm("arg"), Types.ITEM_ZM, null, ii).
+        finish(qc, localVars);
+    localVars.closeScope(s);
+    final Expr body = enclosed ? enclosedExpr() : check(expr(), NOEXPR);
+    final Expr expr = new Pipeline(ii, new VarRef(ii, params.vars()[0]), body);
+    return new Closure(info(), expr, params, anns, localVars.popContext(), global);
   }
 
   /**
