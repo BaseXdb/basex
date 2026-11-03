@@ -21,6 +21,8 @@ import org.basex.util.hash.*;
 public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
+  /** No static fields. */
+  private static final int[] NO_SLOTS = {};
 
   /** Record name ({@code null} for {@code record(*)}). */
   private final QNm name;
@@ -34,6 +36,8 @@ public final class RecordType extends ShapeType {
   private RecordType detachedType;
   /** Initializing expressions of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
+  /** Storage slots of the fields (can be {@code null}). */
+  private volatile int[] slots;
 
   /**
    * Constructor for the abstract record type {@code record(*)}.
@@ -108,7 +112,26 @@ public final class RecordType extends ShapeType {
     shape = null;
     detachedType = null;
     inits = null;
+    slots = null;
     return super.add(fieldName, seqType);
+  }
+
+  /**
+   * Returns the storage slots of the fields: an instance slot, or {@code -1} for static fields.
+   * @return slots, or {@code null} if the record has no static fields
+   */
+  public int[] slots() {
+    int[] s = slots;
+    if(s == null) {
+      final TokenObjectMap<ShapeField> fields = fields();
+      final int fs = fields.size();
+      s = new int[fs];
+      int i = 0;
+      for(int f = 0; f < fs; f++) s[f] = fields.value(f + 1).isStatic() ? -1 : i++;
+      if(i == fs) s = NO_SLOTS;
+      slots = s;
+    }
+    return s == NO_SLOTS ? null : s;
   }
 
   @Override

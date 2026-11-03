@@ -856,6 +856,40 @@ public final class RecordTest extends SandboxTest {
     }
   }
 
+  /**
+   * Records with static fields share the values of these fields.
+   * @throws QueryException query exception
+   */
+  @Test public void sharedStatics() throws QueryException {
+    final String prolog = "declare record local:r(a as xs:integer, "
+        + "%static f := fn($r) { $r?a }, %static g := fn($r) { -$r?a }, "
+        + "%static h as fn(local:r) as xs:integer := fn($r) { $r?a }); ";
+    final String[] queries = {
+      "(local:r(1), local:r(2))",
+      "let $r := local:r(1) return ($r, $r but with { 'a': 2 })",
+      "let $r := local:r(1) return ($r, map:put($r, 'a', 2))",
+      "(local:r(1), { 'a': 2 } coerce to local:r)",
+      "let $r := local:r(1) return ($r, fold-left(1 to 100, $r, "
+          + "fn($s, $i) { $s but with { 'a': $i } }))",
+      "let $r := local:r(1) return ($r, fold-left(1 to 100, $r, "
+          + "fn($s, $i) { map:put($s, 'a', $i) }))"
+    };
+    for(final String query : queries) {
+      try(QueryProcessor qp = new QueryProcessor(prolog + query, context)) {
+        final Value value = qp.value();
+        final XQMap r1 = (XQMap) value.itemAt(0), r2 = (XQMap) value.itemAt(1);
+        assertInstanceOf(XQRecordMap.class, r1, query);
+        assertInstanceOf(XQRecordMap.class, r2, query);
+        for(int f = 1; f <= 3; f++) assertSame(r1.valueAt(f), r2.valueAt(f), query);
+      }
+    }
+    query(prolog + "let $r := local:r(3) return $r?f($r) + $r?g($r)", 0);
+    query(prolog + "(local:r(3) but with { 'a': 4 }) => map:keys()", "a\nf\ng\nh");
+    query(prolog + "let $r := map:put(local:r(3), 'a', 5) return $r?f($r)", 5);
+    query(prolog + "map:put(local:r(3), 'f', 0)?f", 0);
+    query(prolog + "map:remove(local:r(3), 'f') => map:keys()", "a\ng\nh");
+  }
+
   /** Coercion of records. */
   @Test public void coercion() {
     // empty record: only the empty map; any field is rejected

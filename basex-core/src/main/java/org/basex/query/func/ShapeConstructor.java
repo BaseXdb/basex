@@ -59,7 +59,7 @@ public final class ShapeConstructor extends StandardFunc {
       final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
       values[f] = typed[f] ? value : shapeType.coerce(f + 1, value, qc, info, null);
     }
-    return XQMap.get(shapeType, values);
+    return XQMap.get(shapeType, values, qc);
   }
 
   @Override

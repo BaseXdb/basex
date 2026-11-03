@@ -144,7 +144,7 @@ public final class ButWith extends Arr {
       if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
       values[i - 1] = rt.coerce(i, value, qc, info, null);
     });
-    return XQMap.get(rt, values);
+    return XQMap.get(rt, values, qc);
   }
 
   @Override

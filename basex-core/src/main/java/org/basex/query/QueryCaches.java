@@ -13,24 +13,24 @@ import org.basex.query.value.map.*;
  * @author Christian Gruen
  */
 public final class QueryCaches {
-  /** Expression caches. */
-  private final IdentityHashMap<Expr, Object> caches = new IdentityHashMap<>();
+  /** Caches of expressions and types. */
+  private final IdentityHashMap<Object, Object> caches = new IdentityHashMap<>();
   /** Per-thread cache for modules compiled by fn:load-xquery-module (read by parallel tasks). */
   private final ThreadLocal<Map<String, XQMap>> moduleCache = ThreadLocal.withInitial(HashMap::new);
 
   /**
-   * Returns the cache for the given expression.
+   * Returns the cache for the given expression or type.
    * @param <T> cache type
-   * @param expr expression
+   * @param key expression or type
    * @param cache supplier for a new cache
    * @return cache
    */
   @SuppressWarnings("unchecked")
-  public <T> T get(final Expr expr, final Supplier<T> cache) {
-    Object c = caches.get(expr);
+  public <T> T get(final Object key, final Supplier<T> cache) {
+    Object c = caches.get(key);
     if(c == null) {
       c = cache.get();
-      caches.put(expr, c);
+      caches.put(key, c);
     }
     return (T) c;
   }
