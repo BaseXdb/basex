@@ -30,6 +30,8 @@ public final class RecordType extends ShapeType {
   private final Object identity;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
+  /** Type without initializing expressions (can be {@code null}). */
+  private RecordType detachedType;
   /** Initializing expressions of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
 
@@ -104,13 +106,16 @@ public final class RecordType extends ShapeType {
   @Override
   public ShapeType add(final String fieldName, final SeqType seqType) {
     shape = null;
+    detachedType = null;
     inits = null;
     return super.add(fieldName, seqType);
   }
 
   @Override
   public ShapeType detach() {
-    return detached() ? this : new RecordType(detachedFields(), name, anns, identity);
+    if(detached()) return this;
+    if(detachedType == null) detachedType = new RecordType(detachedFields(), name, anns, identity);
+    return detachedType;
   }
 
   @Override

@@ -9,7 +9,9 @@ import java.util.function.UnaryOperator;
 
 import org.basex.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -837,6 +839,21 @@ public final class RecordTest extends SandboxTest {
     // so positional field access still resolves each field to its own value
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?a }; local:f(1)", 9);
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?b }; local:f(1)", 1);
+  }
+
+  /**
+   * Materialized records with field initializers share their detached type.
+   * @throws QueryException query exception
+   */
+  @Test public void detachedType() throws QueryException {
+    try(QueryProcessor qp = new QueryProcessor(
+        "declare record local:r(a, b := 1); (local:r(1), local:r(2))", context)) {
+      final Value value = qp.value();
+      final Value r1 = value.itemAt(0).materialize(data -> false, false, null, qp.qc);
+      final Value r2 = value.itemAt(1).materialize(data -> false, false, null, qp.qc);
+      assertNotSame(value.itemAt(0).type, r1.type);
+      assertSame(r1.type, r2.type);
+    }
   }
 
   /** Coercion of records. */
