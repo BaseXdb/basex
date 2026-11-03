@@ -69,6 +69,7 @@ public final class FnOp extends StandardFunc {
       case "intersect" -> new Intersect(info, arg1, arg2);
       case "to" -> new Range(info, arg1, arg2);
       case "otherwise" -> new Otherwise(info, arg1, arg2);
+      case "but with" -> new ButWith(info, arg1, arg2);
       default -> throw UNKNOWNOP_X.get(info, operator);
     };
     final FuncType ft = FuncType.get(body.seqType(), Types.ITEM_ZM, Types.ITEM_ZM);
