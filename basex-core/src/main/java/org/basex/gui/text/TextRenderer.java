@@ -341,7 +341,7 @@ final class TextRenderer extends BaseXBack {
     final int pos = text.jump(dir, select);
     if(pos == -1) return -1;
 
-    final Layout layout = init(renderable(), true);
+    final Layout layout = initCached(renderable());
     final int idx = lineIndex(pos);
     if(idx >= 0) position(layout, idx, 0);
     for(; more(layout) && layout.iter.pos() < pos; next(layout));
@@ -427,6 +427,17 @@ final class TextRenderer extends BaseXBack {
     layout.y = fontHeight - (start ? 0 : scroll.pos()) - 2;
     layout.lineY = layout.y - fontHeight * 4 / 5;
     return layout;
+  }
+
+  /**
+   * Updates a stale line cache and initializes the renderer at the beginning of the text.
+   * @param render indicates if the text can be laid out
+   * @return layout
+   */
+  private Layout initCached(final boolean render) {
+    // a stale cache would make position lookups walk the text from its beginning
+    computeHeight();
+    return init(render, true);
   }
 
   /**
@@ -619,7 +630,7 @@ final class TextRenderer extends BaseXBack {
    * @return new position
    */
   int cursorY() {
-    final Layout layout = init(renderable(), true);
+    final Layout layout = initCached(renderable());
     toCaretRow(layout);
     return layout.y - fontHeight;
   }
@@ -1073,7 +1084,7 @@ final class TextRenderer extends BaseXBack {
    */
   private Layout caretLayout() {
     if(!renderable()) return null;
-    final Layout layout = init(true, true);
+    final Layout layout = initCached(true);
     if(width - offset <= 0) return null;
     toCaretRow(layout);
     return layout;
@@ -1086,7 +1097,7 @@ final class TextRenderer extends BaseXBack {
    * @return layout
    */
   private Layout scan(final int xPos, final int yPos) {
-    final Layout layout = init(true, true);
+    final Layout layout = initCached(true);
     if(cache.valid(text.size(), cacheWidth())) position(layout, cache.indexByY(yPos), 0);
     scan(layout, xPos, yPos);
     return layout;
