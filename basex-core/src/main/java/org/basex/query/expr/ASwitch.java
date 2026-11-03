@@ -77,8 +77,14 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
     for(final G group : groups) {
       changed |= group.simplifyFor(mode, cc) == null;
     }
-    return changed ? optimize(cc) : super.simplifyFor(mode, cc);
+    return changed ? rebuild().optimize(cc) : super.simplifyFor(mode, cc);
   }
+
+  /**
+   * Creates a new expression with the current condition and groups.
+   * @return new expression
+   */
+  abstract ASwitch<G> rebuild();
 
   @Override
   public final boolean vacuous() {

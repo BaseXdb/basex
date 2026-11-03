@@ -3051,4 +3051,11 @@ public final class RewritingsTest extends SandboxTest {
     check("subsequence(if(random:integer(1) = 0) then (1 to 5) else (6 to 9), "
         + "random:integer(1) + 2)", "2\n3\n4\n5", root(SUBSEQUENCE));
   }
+
+  /** Simplified operands: refresh the static type of the parent. */
+  @Test public void simplifyInPlace() {
+    query("declare %basex:inline(0) function local:f($e) { "
+        + "{ 'a': (let $f := random:double() return $e[$f < 2] ! string()) otherwise 'z', "
+        + "'b': 1 }?a }; serialize(local:f(<x>A</x>), { 'method': 'adaptive' })", "\"A\"");
+  }
 }

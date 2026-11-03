@@ -248,18 +248,15 @@ public final class List extends Arr {
       if(mode == Simplify.SET) expr = toUnion(cc);
       if(expr != this) return cc.simplify(this, expr, mode);
 
-      final int el = exprs.length;
-      final ExprList list = new ExprList(el);
-      for(final Expr ex : exprs) {
+      final Expr[] ops = simplifyAll(mode, cc);
+      final ExprList list = new ExprList(ops.length);
+      for(final Expr op : ops) {
         // do not drop duplicate nondeterministic operands, as this would discard side effects
-        final Expr sx = ex.simplifyFor(mode, cc);
-        if(sx.has(Flag.NDT)) list.add(sx);
-        else list.addUnique(sx);
+        if(op.has(Flag.NDT)) list.add(op);
+        else list.addUnique(op);
       }
-      exprs = list.finish();
-      if(exprs.length != el) {
-        // remove duplicate list expressions
-        expr = List.get(cc, info, exprs);
+      if(ops != exprs || list.size() != ops.length) {
+        expr = List.get(cc, info, list.finish());
       } else if(seqType().type == BasicType.INTEGER) {
         // merge numbers and ranges
         expr = toRange();

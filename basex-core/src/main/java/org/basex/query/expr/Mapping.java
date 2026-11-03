@@ -74,10 +74,12 @@ public abstract class Mapping extends Arr {
     final Expr last = exprs[el - 1];
     if(!mode.conditional()) {
       // distinct-values(@id ! data()) → distinct-values(@id)
-      final Expr sx = cc.get(exprs[el - 2], items(), () -> last.simplifyFor(mode, cc));
+      final boolean items = items();
+      final Expr sx = cc.get(exprs[el - 2], items, () -> last.simplifyFor(mode, cc));
       if(sx != last) {
-        exprs[el - 1] = sx;
-        expr = optimize(cc);
+        final Expr[] ops = exprs.clone();
+        ops[el - 1] = sx;
+        expr = items ? SimpleMap.get(cc, info, ops) : Pipeline.get(cc, info, ops);
       }
     }
     if(expr == this) expr = simplifyEbv(mode, cc);

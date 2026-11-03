@@ -111,13 +111,11 @@ public final class Try extends Single {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(try { <a>{ $x }</a> } catch * { }) → data(try { xs:untypedAtomic($x) } catch * { })
     // only atomizations: other modes may discard errors that the catch clauses would handle
+    Expr ex = expr;
     boolean changed = false;
     if(mode.atomizing() || mode == Simplify.STRING_VALUE) {
-      final Expr ex = expr.simplifyFor(mode, cc);
-      if(ex != expr) {
-        expr = ex;
-        changed = true;
-      }
+      ex = expr.simplifyFor(mode, cc);
+      changed = ex != expr;
       for(final Catch ctch : catches) {
         final Expr cx = ctch.expr.simplifyFor(mode, cc);
         if(cx != ctch.expr) {
@@ -127,7 +125,7 @@ public final class Try extends Single {
         }
       }
     }
-    return cc.simplify(this, changed ? optimize(cc) : this, mode);
+    return cc.simplify(this, changed ? new Try(info, ex, fnlly, catches).optimize(cc) : this, mode);
   }
 
   @Override

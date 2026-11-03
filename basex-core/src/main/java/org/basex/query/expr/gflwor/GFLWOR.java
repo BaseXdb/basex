@@ -227,18 +227,16 @@ public final class GFLWOR extends ParseExpr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if order is irrelevant: drop order-by clauses, but keep nondeterministic keys
     // count(for $x in E order by $x/@id return $x) → count(for $x in E return $x)
-    boolean changed = mode.unordered() &&
-        clauses.removeIf(clause -> clause instanceof OrderBy && !clause.has(Flag.NDT));
+    final Checks<Clause> order = clause -> clause instanceof OrderBy && !clause.has(Flag.NDT);
+    final boolean unordered = mode.unordered() && Checks.any(clauses, order);
 
     // data(for $x in $s return <a>{ $x }</a>) → data(for $x in $s return xs:untypedAtomic($x))
-    if(!mode.conditional()) {
-      final Expr expr = rtrn.simplifyFor(mode, cc);
-      if(expr != rtrn) {
-        rtrn = expr;
-        changed = true;
-      }
-    }
-    return cc.simplify(this, changed ? optimize(cc) : this, mode);
+    final Expr rt = mode.conditional() ? rtrn : rtrn.simplifyFor(mode, cc);
+    if(!unordered && rt == rtrn) return cc.simplify(this, this, mode);
+
+    final LinkedList<Clause> cls = new LinkedList<>(clauses);
+    if(unordered) cls.removeIf(order::ok);
+    return cc.simplify(this, new GFLWOR(info, cls, rt).optimize(cc), mode);
   }
 
   /**

@@ -38,6 +38,11 @@ public final class Switch extends ASwitch<SwitchGroup> {
   }
 
   @Override
+  Switch rebuild() {
+    return new Switch(info, cond, groups);
+  }
+
+  @Override
   Expr branch(final SwitchGroup group) {
     return group.rtrn();
   }

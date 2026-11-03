@@ -69,11 +69,7 @@ public final class Extension extends Single {
     } finally {
       pragma.finish(cc.qc, state);
     }
-    Expr simplified = this;
-    if(ex != expr) {
-      expr = ex;
-      simplified = optimize(cc);
-    }
+    final Expr simplified = ex != expr ? new Extension(info, pragma, ex).optimize(cc) : this;
     return cc.simplify(this, simplified, mode);
   }
 
