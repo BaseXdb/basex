@@ -202,9 +202,10 @@ th .sorted {
 tr:has(> td):not(:has(input.filter)):hover {
   background-color: var(--shade);
 }
-/* clients: a web session heads the connections and jobs that were opened in it */
-table.clients tr.group > :is(td, th) {
-  border-top: 1px solid var(--rule);
+/* clients: a web session heads the connections and jobs that were opened in it; below the
+   header, its line would double the header rule */
+table.clients tbody + tbody > tr.group > :is(td, th) {
+  border-top: var(--line) solid var(--rule);
 }
 /* the session heads its group for screen readers; it looks like the cells beside it */
 table.clients tbody th {
@@ -541,9 +542,8 @@ hr {
 input.smallinput {
   width: 170px;
 }
-/* the filter shares its row with five buttons: it takes the room they leave, and only wraps if
-   that is less than its minimum */
-#resource-filter {
+/* a filter that shares its row with buttons takes the room they leave */
+.buttons > input.smallinput {
   flex: 1 1 5rem;
   min-width: 0;
   max-width: 9rem;
