@@ -180,6 +180,7 @@ public abstract class GNode extends Item {
    * @param test node test (can be {@code null})
    * @return iterator
    */
+  @SuppressWarnings("unused")
   public BasicNodeIter namespaceIter(final Test test) {
     return BasicNodeIter.EMPTY;
   }

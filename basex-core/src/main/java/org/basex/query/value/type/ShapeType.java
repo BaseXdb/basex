@@ -615,6 +615,7 @@ public class ShapeType extends MapType {
    * @return map, or {@code null} if an integrity constraint failed and no error was raised
    * @throws QueryException query exception
    */
+  @SuppressWarnings("unused")
   public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
       final InputInfo ii) throws QueryException {
     return XQMap.get(this, values);
