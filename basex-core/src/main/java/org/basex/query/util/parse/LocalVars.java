@@ -119,7 +119,7 @@ public final class LocalVars {
    * @return global map or {@code null}
    */
   public HashMap<Var, Expr> pushContext(final boolean global) {
-    final HashMap<Var, Expr> map = global ? new HashMap<>() : null;
+    final HashMap<Var, Expr> map = global ? new LinkedHashMap<>() : null;
     vars.add(new VarContext(map));
     return map;
   }

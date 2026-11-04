@@ -95,7 +95,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.params = params;
     this.anns = anns;
     this.vs = vs;
-    this.global = global == null ? new HashMap<>() : new HashMap<>(global);
+    this.global = global == null ? new HashMap<>() : new LinkedHashMap<>(global);
     props = new FlagCache(flag -> {
       for(final Expr ex : this.global.values()) {
         if(ex.has(flag)) return true;
@@ -197,7 +197,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
             cc.info(OPTINLINE_X, entry);
             for(final Entry<Var, Expr> expr2 : cl.global.entrySet()) {
               final Var var2 = cc.copy(expr2.getKey(), null);
-              if(add == null) add = new HashMap<>();
+              if(add == null) add = new LinkedHashMap<>();
               add.put(var2, expr2.getValue());
               expr2.setValue(new VarRef(cl.info, var2).optimize(cc));
             }
@@ -335,7 +335,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final VarScope scope = new VarScope();
 
-    final HashMap<Var, Expr> outer = new HashMap<>();
+    final HashMap<Var, Expr> outer = new LinkedHashMap<>();
     global.forEach((key, value) -> outer.put(key, value.copy(cc, vm)));
 
     cc.pushScope(scope);
@@ -343,7 +343,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final IntObjectMap<Var> innerVars = new IntObjectMap<>();
       vs.copy(cc, innerVars);
 
-      final HashMap<Var, Expr> bindings = new HashMap<>();
+      final HashMap<Var, Expr> bindings = new LinkedHashMap<>();
       outer.forEach((key, value) -> bindings.put(innerVars.get(key.id), value));
 
       final Var[] prms = params.clone();
