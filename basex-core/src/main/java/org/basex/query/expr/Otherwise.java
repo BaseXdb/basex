@@ -135,7 +135,7 @@ public final class Otherwise extends Arr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // (A otherwise B) coerce to T → (A coerce to T?) otherwise (B coerce to T)
+    // (A otherwise B) coerce as T → (A coerce as T?) otherwise (B coerce as T)
     final SeqType st = tc.seqType(), lst = st.union(Occ.ZERO);
     final int el = exprs.length;
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {

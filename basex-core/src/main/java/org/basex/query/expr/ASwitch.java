@@ -126,8 +126,8 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
   @Override
   public final Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc)
       throws QueryException {
-    // ((type)switch(C) case X return A default return B) coerce to T →
-    //   (type)switch(C) case X return (A coerce to T) default return (B coerce to T)
+    // ((type)switch(C) case X return A default return B) coerce as T →
+    //   (type)switch(C) case X return (A coerce as T) default return (B coerce as T)
     boolean changed = false;
     for(final G group : groups) {
       changed |= group.inlineTypeCheck(tc, cc) != null;

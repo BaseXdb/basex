@@ -48,7 +48,7 @@ public final class ShapeSet extends Arr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // map:put(RECORD, KEY, VALUE) coerce to T → (RECORD coerce to T) but with map:entry(KEY, VALUE)
+    // map:put(RECORD, KEY, VALUE) coerce as T → (RECORD coerce as T) but with map:entry(KEY, VALUE)
     final byte[] key = type.fields().key(index);
     // (the intermediate record must not be subject to an integrity constraint)
     if(tc.seqType().type instanceof final RecordType rt && !rt.constrained() &&

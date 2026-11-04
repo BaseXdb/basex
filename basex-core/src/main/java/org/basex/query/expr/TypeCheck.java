@@ -56,13 +56,13 @@ public final class TypeCheck extends Single {
     final boolean atomic = type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
 
     if(atomic) {
-      // data(E) coerce to xs:int → E coerce to xs:int
+      // data(E) coerce as xs:int → E coerce as xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         st.occ.instanceOf(expr.seqType().occ) &&
         (!atomic || !expr.arg(0).seqType().mayBeWrapped())) {
-      // exactly-one(ITEM) coerce to item() → ITEM coerce to item()
+      // exactly-one(ITEM) coerce as item() → ITEM coerce as item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
 
@@ -75,10 +75,10 @@ public final class TypeCheck extends Single {
       //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);
       // raise static error if no intersection is possible:
-      //   () coerce to item()
+      //   () coerce as item()
       if(nocc == null) {
         // xs:error is a subtype of every type; its occurrence indicator must not trigger an error
-        //   fn:error() coerce to empty-sequence()
+        //   fn:error() coerce as empty-sequence()
         if(et.instanceOf(st)) {
           cc.info(OPTTYPE_X_X, st, expr);
           return expr;
@@ -86,10 +86,10 @@ public final class TypeCheck extends Single {
         throw typeError(expr, st, name, info);
       }
       // refine result type:
-      //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
+      //   INTEGERS coerce as item() → INTEGERS coerce as xs:integer
       if(nst.refines(st)) st = nst;
       // adopt the refined return type of a coerced function:
-      //   CLOSURE coerce to fn(item()*) as item()* → refined return type of CLOSURE
+      //   CLOSURE coerce as fn(item()*) as item()* → refined return type of CLOSURE
       else if(st.type instanceof final FuncType ft && ft.argTypes != null &&
           et.type instanceof final FuncType eft && eft.refinedType.instanceOf(ft.refinedType)) {
         st = SeqType.get(ft.withRefinedType(eft.refinedType), st.occ);
@@ -101,14 +101,14 @@ public final class TypeCheck extends Single {
 
     // remove redundant type check
     if(expr instanceof final TypeCheck tc && st.coercible(et)) {
-      // (E coerce to xs:integer) coerce to xs:int → E coerce to xs:int
+      // (E coerce as xs:integer) coerce as xs:int → E coerce as xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }
 
     // skip check if return type is correct
-    //   (E coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()* → inner check
+    //   (E coerce as fn(xs:int) as item()*) coerce as fn(xs:int) as item()* → inner check
     if(et.coercible(st) || expr instanceof TypeCheck && et.eq(st)) {
-      // (1, 3) coerce to xs:integer* → (1, 3)
+      // (1, 3) coerce as xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
     }
@@ -199,6 +199,6 @@ public final class TypeCheck extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.open().token(expr).token(COERCE).token(TO).token(seqType()).close();
+    qs.open().token(expr).token(COERCE).token(AS).token(seqType()).close();
   }
 }

@@ -273,7 +273,7 @@ public final class If extends Arr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // (if(C) then A else B) coerce to T → if(C) then (A coerce to T) else (B coerce to T)
+    // (if(C) then A else B) coerce as T → if(C) then (A coerce as T) else (B coerce as T)
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {

@@ -2165,7 +2165,7 @@ public class QueryParser extends InputParser {
   private Expr coerce() throws QueryException {
     final Expr expr = castable();
     if(!wsConsumeWs(COERCE)) return expr;
-    wsCheck(TO);
+    wsCheck(AS);
     return new TypeCheck(info(), expr, sequenceType());
   }
 

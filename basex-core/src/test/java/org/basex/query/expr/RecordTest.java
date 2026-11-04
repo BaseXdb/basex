@@ -123,16 +123,16 @@ public final class RecordTest extends SandboxTest {
   /** Simple record types: coercion and casting create maps without label. */
   @Test public void simple() {
     // matching maps are kept, entries keep their order
-    query("({ 'b': 2, 'a': 1 } coerce to record(a, b)) => map:keys()", "b\na");
+    query("({ 'b': 2, 'a': 1 } coerce as record(a, b)) => map:keys()", "b\na");
     // values are coerced, missing optional fields are appended
-    query("({ 'b': 2, 'a': 1 } coerce to record(a as xs:double, b as xs:double))?a "
+    query("({ 'b': 2, 'a': 1 } coerce as record(a as xs:double, b as xs:double))?a "
         + "=> type-of()", "xs:double");
-    query("({ 'b': 2, 'a': 1 } coerce to record(a as xs:double, b as xs:double)) => map:keys()",
+    query("({ 'b': 2, 'a': 1 } coerce as record(a as xs:double, b as xs:double)) => map:keys()",
         "b\na");
-    query("({ 'b': 2 } coerce to record(a as xs:integer?, b)) => map:keys()", "b\na");
-    query("{ 'b': 2 } coerce to record(a as xs:integer?, b) instance of record(*)", false);
-    error("{ 'b': 2 } coerce to record(a, b, c as xs:integer)", INVTYPE_X);
-    error("{ 'b': 2, 'x': 3 } coerce to record(a as xs:integer?, b)", INVTYPE_X);
+    query("({ 'b': 2 } coerce as record(a as xs:integer?, b)) => map:keys()", "b\na");
+    query("{ 'b': 2 } coerce as record(a as xs:integer?, b) instance of record(*)", false);
+    error("{ 'b': 2 } coerce as record(a, b, c as xs:integer)", INVTYPE_X);
+    error("{ 'b': 2, 'x': 3 } coerce as record(a as xs:integer?, b)", INVTYPE_X);
 
     // casting discards undeclared entries and appends missing fields
     query("({ 'c': 3, 'b': 2 } cast as record(a, b)) => map:keys()", "b\na");
@@ -613,7 +613,7 @@ public final class RecordTest extends SandboxTest {
 
   /** A field update coerced back to its record type is fused into the {@code but with} operator. */
   @Test public void typePutCoerce() {
-    // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R but with map:entry(FIELD, VALUE)
+    // map:put(R, FIELD, VALUE) coerce as RECORD  ->  R but with map:entry(FIELD, VALUE)
     final String ab = "declare record local:ab(a, b); ";
     check(ab + "let $r as local:ab := local:ab(<a/>, 2) "
         + "let $s as local:ab := map:put($r, 'a', 0) return $s",
@@ -868,7 +868,7 @@ public final class RecordTest extends SandboxTest {
       "(local:r(1), local:r(2))",
       "let $r := local:r(1) return ($r, $r but with { 'a': 2 })",
       "let $r := local:r(1) return ($r, map:put($r, 'a', 2))",
-      "(local:r(1), { 'a': 2 } coerce to local:r)",
+      "(local:r(1), { 'a': 2 } coerce as local:r)",
       "let $r := local:r(1) return ($r, fold-left(1 to 100, $r, "
           + "fn($s, $i) { $s but with { 'a': $i } }))",
       "let $r := local:r(1) return ($r, fold-left(1 to 100, $r, "
@@ -960,7 +960,7 @@ public final class RecordTest extends SandboxTest {
     // the type is identified by its declaration: records of other queries must be coerced
     query(prolog + _STORE_PUT.args("record", " local:P(1, 2)"));
     query(prolog + _STORE_GET.args("record") + " instance of local:P", false);
-    query(prolog + "(" + _STORE_GET.args("record") + " coerce to local:P) instance of local:P",
+    query(prolog + "(" + _STORE_GET.args("record") + " coerce as local:P) instance of local:P",
         true);
     query(prolog + _STORE_GET.args("record") + " instance of local:Q", false);
     query(_STORE_CLEAR.args());
@@ -1050,7 +1050,7 @@ public final class RecordTest extends SandboxTest {
     // a simple record type is no subtype of a labeled one
     query(prolog + func + "local:f() instance of fn(local:BA) as item()*", false);
     query(prolog + func + "let $f as fn(local:BA) as item()* := local:f() "
-        + "return $f(({ 'b': 2, 'a': 1 } coerce to local:BA))", 1);
+        + "return $f(({ 'b': 2, 'a': 1 } coerce as local:BA))", 1);
     // the result of a function is coerced if the function is coerced
     final String result = "declare %basex:inline(0) function local:g() as item() { "
         + "fn() as local:AB { local:ab() } }; ";
@@ -1059,7 +1059,7 @@ public final class RecordTest extends SandboxTest {
         + "return ($g()?a, map:keys($g()))", "1\na\nb");
     query(prolog + "for $i in 1 to 2 "
         + "return (if($i = 1) then local:ab() else "
-        + "({ 'b': 2, 'a': 1 } coerce to local:BA))?a", "1\n1");
+        + "({ 'b': 2, 'a': 1 } coerce as local:BA))?a", "1\n1");
 
     // instance checks must not skip subsequent coercions
     final String d = "declare type local:D as record(a as xs:decimal, b as xs:decimal); "
@@ -1081,21 +1081,21 @@ public final class RecordTest extends SandboxTest {
     // union of record types with different field orders
     final String any = "declare %basex:inline(0) function local:any($x) { $x }; ";
     query(prolog + "let $r as local:BA* := (local:AB(1, 2), "
-        + "({ 'b': 2, 'a': 1 } coerce to local:BA)) "
+        + "({ 'b': 2, 'a': 1 } coerce as local:BA)) "
         + "return $r ! string-join(map:keys(.))", "ab\nba");
     query(prolog + any
-        + "let $r as local:BA* := local:any((({ 'b': 2, 'a': 1 } coerce to local:BA), "
+        + "let $r as local:BA* := local:any((({ 'b': 2, 'a': 1 } coerce as local:BA), "
         + "local:ab())) return $r ! string-join(map:keys(.))", "ba\nab");
     query(prolog + any
         + "declare %basex:inline(0) function local:f($a as array(local:BA)*) { "
         + "$a ! string-join(map:keys(.(1))) }; "
-        + "local:f(local:any(([ { 'b': 2, 'a': 1 } coerce to local:BA ], [ local:ab() ])))",
+        + "local:f(local:any(([ { 'b': 2, 'a': 1 } coerce as local:BA ], [ local:ab() ])))",
         "ba\nab");
     query(prolog + any
         + "declare %basex:inline(0) function local:f($m as map(xs:string, local:BA)*) { "
         + "$m ! string-join(map:keys(?x)) }; "
         + "local:f(local:any((map:build(1, fn { 'x' }, fn { { 'b': 2, 'a': 1 } "
-        + "coerce to local:BA }), "
+        + "coerce as local:BA }), "
         + "map:build(1, fn { 'x' }, fn { local:ab() }))))", "ba\nab");
   }
 
@@ -1214,10 +1214,10 @@ public final class RecordTest extends SandboxTest {
         + "%static c as fn(local:r) as xs:integer := fn($r) { $r?a * 10 }); ";
     query(prolog + "let $r := local:r(1, 2) return $r?c($r)", 10);
     query(prolog + "local:r#2 => function-arity()", 2);
-    query(prolog + "({ 'a': 2 } coerce to local:r)?b", 3);
-    query(prolog + "let $r := { 'a': 3 } coerce to local:r return $r?c($r)", 30);
+    query(prolog + "({ 'a': 2 } coerce as local:r)?b", 3);
+    query(prolog + "let $r := { 'a': 3 } coerce as local:r return $r?c($r)", 30);
     query(prolog + "(local:r(1) but with { 'a': 5 })?a", 5);
-    error(prolog + "{ 'a': 1, 'c': 0 } coerce to local:r", INVTYPE_X);
+    error(prolog + "{ 'a': 1, 'c': 0 } coerce as local:r", INVTYPE_X);
     error(prolog + "local:r(1) but with { 'c': 0 }", INVTYPE_X);
     error(prolog + "local:r(1, 2, 3)", INVNARGS_X_X);
 
@@ -1229,12 +1229,12 @@ public final class RecordTest extends SandboxTest {
 
     // errors of initializers are not swallowed by the coercion to choice item types
     final String init = "declare record local:t(a as xs:integer, b := error()); ";
-    error(init + "{ 'a': 1 } coerce to (local:t | xs:string)", FUNERR1);
-    error(init + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | xs:string)", FUNERR1);
+    error(init + "{ 'a': 1 } coerce as (local:t | xs:string)", FUNERR1);
+    error(init + "{ 'o': { 'a': 1 } } coerce as (record(o as local:t) | xs:string)", FUNERR1);
     error("declare function local:x() as item() { 'x' };"
         + "declare record local:t(a as xs:integer, b as xs:integer := local:x()); "
-        + "{ 'o': { 'a': 1 } } coerce to (record(o as local:t) | record(o, p))", INVTYPE_X);
-    query("<a>x</a> coerce to (xs:integer | xs:string)", "x");
+        + "{ 'o': { 'a': 1 } } coerce as (record(o as local:t) | record(o, p))", INVTYPE_X);
+    query("<a>x</a> coerce as (xs:integer | xs:string)", "x");
 
     // syntax
     error("declare record local:s(%static a); 1", WRONGCHAR_X_X);
@@ -1251,8 +1251,8 @@ public final class RecordTest extends SandboxTest {
     error(r + "local:r(2, 1)", RECORDCONSTRAINT_X_X);
 
     // coercion, cast
-    query(r + "({ 'x': 1, 'y': 1 } coerce to local:r)?x", 1);
-    error(r + "{ 'x': 2, 'y': 1 } coerce to local:r", RECORDCONSTRAINT_X_X);
+    query(r + "({ 'x': 1, 'y': 1 } coerce as local:r)?x", 1);
+    error(r + "{ 'x': 2, 'y': 1 } coerce as local:r", RECORDCONSTRAINT_X_X);
     error(r + "declare function local:f($r as local:r) { $r }; local:f({ 'x': 2, 'y': 1 })",
         RECORDCONSTRAINT_X_X);
     error(r + "let $r as local:r := map:put(local:r(1, 1), 'x', 2) return $r",

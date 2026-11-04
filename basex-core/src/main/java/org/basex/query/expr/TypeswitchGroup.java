@@ -147,7 +147,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // case $v as X return R → case $v as X return (R coerce to T)
+    // case $v as X return R → case $v as X return (R coerce as T)
     final Expr rtrn = tc.check(expr, cc);
     if(rtrn == null) return null;
     expr = rtrn;

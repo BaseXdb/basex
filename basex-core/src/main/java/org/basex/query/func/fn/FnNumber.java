@@ -37,7 +37,7 @@ public final class FnNumber extends ContextFn {
 
     // number(string(E))
     // number(xs:untypedAtomic(E))
-    // number(ITEM coerce to xs:untypedAtomic) → number(E)
+    // number(ITEM coerce as xs:untypedAtomic) → number(E)
     if(type != null) {
       final Expr arg = simplify(value, cc);
       if(arg != null) return cc.function(Function.NUMBER, info, arg);

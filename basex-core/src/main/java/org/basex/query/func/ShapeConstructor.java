@@ -93,7 +93,7 @@ public final class ShapeConstructor extends StandardFunc {
   @Override
   protected Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc)
       throws QueryException {
-    // { 'y': Y, 'x': X } coerce to local:point → local:point(X, Y, ())
+    // { 'y': Y, 'x': X } coerce as local:point → local:point(X, Y, ())
     final SeqType st = tc.seqType();
     if(st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt) {
       final Expr[] args = args(rt, cc);

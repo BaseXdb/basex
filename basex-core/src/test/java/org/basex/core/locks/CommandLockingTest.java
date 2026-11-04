@@ -179,7 +179,7 @@ public final class CommandLockingTest extends SandboxTest {
     // initializing expressions of record fields, evaluated by coercions and casts
     final String record = "declare record local:r(a := " + DOC.args(NAME) + "); ";
     final String map = "{}[random:double() >= 0]";
-    ckDBs(new XQuery(record + "{} coerce to local:r"), false, NAME_LIST);
+    ckDBs(new XQuery(record + "{} coerce as local:r"), false, NAME_LIST);
     ckDBs(new XQuery(record + "{} cast as local:r"), false, NAME_LIST);
     ckDBs(new XQuery(record + map + " castable as local:r"), false, NAME_LIST);
     ckDBs(new XQuery(record + "let $r as local:r := " + map + " return $r"), false, NAME_LIST);
@@ -189,9 +189,9 @@ public final class CommandLockingTest extends SandboxTest {
         + "local:f()"), false, NAME_LIST);
     ckDBs(new XQuery(record + "declare variable $r as local:r := " + map + "; $r"), false,
         NAME_LIST);
-    ckDBs(new XQuery(record + "[ " + map + " ] coerce to array(local:r)"), false, NAME_LIST);
+    ckDBs(new XQuery(record + "[ " + map + " ] coerce as array(local:r)"), false, NAME_LIST);
     ckDBs(new XQuery(record + "declare record local:s(r as local:r); "
-        + "{ 'r': " + map + " } coerce to local:s"), false, NAME_LIST);
+        + "{ 'r': " + map + " } coerce as local:s"), false, NAME_LIST);
   }
 
   /** Tests read and write locks of updating queries. */

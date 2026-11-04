@@ -70,7 +70,7 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // case X return R → case X return (R coerce to T)
+    // case X return R → case X return (R coerce as T)
     final Expr rtrn = tc.check(rtrn(), cc);
     if(rtrn == null) return null;
     exprs[0] = rtrn;

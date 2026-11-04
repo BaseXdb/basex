@@ -1076,8 +1076,8 @@ public final class GFLWOR extends ParseExpr {
         final GFLWOR sub = (GFLWOR) (tc == null ? rtrn : tc.expr);
         final Clause clause = sub.clauses.getFirst();
         if(clause instanceof final Let let) {
-          //   let $a := A return (let $b := B where $b return R) coerce to T
-          //  → let $a := A let $b := B return (where $b return R) coerce to T
+          //   let $a := A return (let $b := B where $b return R) coerce as T
+          //  → let $a := A let $b := B return (where $b return R) coerce as T
           cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, let.var);
 
           // propagate all leading 'let' bindings into outer clauses
@@ -1292,8 +1292,8 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // (for $x in E return R) coerce to T* → for $x in E return (R coerce to T*)
-    // (let $x := E return R) coerce to T → let $x := E return (R coerce to T)
+    // (for $x in E return R) coerce as T* → for $x in E return (R coerce as T*)
+    // (let $x := E return R) coerce as T → let $x := E return (R coerce as T)
     if(tc.seqType().occ != Occ.ZERO_OR_MORE) {
       final long[] minMax = calcSize(false);
       if(minMax[0] != 1 || minMax[1] != 1) return null;

@@ -52,7 +52,7 @@ public final class ButWith extends Arr {
         if(exprs[1] instanceof final XQMap map && map.structSize() == 0) {
           return cc.replaceWith(this, exprs[0]);
         }
-        // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
+        // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce as RECORD
         if(covered(exprs[1], rt)) {
           return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
         }

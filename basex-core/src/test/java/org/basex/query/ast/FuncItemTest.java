@@ -643,19 +643,19 @@ public final class FuncItemTest extends SandboxTest {
   /** Function coercion wraps functions with typed parameters, even if they match. */
   @Test public void coerceWrap() {
     final String type = "fn(xs:int) as item()*";
-    error("(identity#1 treat as item()) ! (. coerce to " + type + ")('a')", INVTYPE_X);
-    error("(identity#1 coerce to (" + type + ")?)('a')", INVTYPE_X);
-    error("(array { identity#1 } coerce to array(" + type + "))(1)('a')", INVTYPE_X);
-    error("({ 0: identity#1 } coerce to map(xs:anyAtomicType, " + type + "))(0)('a')", INVTYPE_X);
-    query("(identity#1 coerce to fn(item()*) as item()*)('a')", "a");
-    query("(identity#1 coerce to " + type + ")(1)", 1);
+    error("(identity#1 treat as item()) ! (. coerce as " + type + ")('a')", INVTYPE_X);
+    error("(identity#1 coerce as (" + type + ")?)('a')", INVTYPE_X);
+    error("(array { identity#1 } coerce as array(" + type + "))(1)('a')", INVTYPE_X);
+    error("({ 0: identity#1 } coerce as map(xs:anyAtomicType, " + type + "))(0)('a')", INVTYPE_X);
+    query("(identity#1 coerce as fn(item()*) as item()*)('a')", "a");
+    query("(identity#1 coerce as " + type + ")(1)", 1);
 
     // choice: coerce to the first matching alternative
     final String choice = "(fn(xs:string) as xs:boolean | fn(xs:integer) as xs:boolean)";
     query("let $f as " + choice + "* := fn($x as xs:decimal) as xs:boolean { $x gt 3 } "
         + "return $f(12)", true);
     query("(fn($x as xs:decimal) as xs:boolean { $x gt 3 } treat as item()) ! "
-        + "(. coerce to " + choice + ")(12)", true);
+        + "(. coerce as " + choice + ")(12)", true);
   }
 
   /** Function coercion: static function types are upper bounds. */
@@ -664,39 +664,39 @@ public final class FuncItemTest extends SandboxTest {
         + "declare function local:one($t as item()) { $t };";
     error(funcs + "declare function local:apply($f as fn(item()) as item()*) { $f((1, 2)) };"
         + "let $fs := (local:many#1, local:one#1) return local:apply($fs[1])", INVTYPE_X);
-    error(funcs + "((local:many#1, local:one#1) coerce to (fn(item()) as item()*)+)[1]((1, 2))",
+    error(funcs + "((local:many#1, local:one#1) coerce as (fn(item()) as item()*)+)[1]((1, 2))",
         INVTYPE_X);
-    error(funcs + "([local:many#1, local:one#1] coerce to array(fn(item()) as item()*))(1)((1, 2))",
+    error(funcs + "([local:many#1, local:one#1] coerce as array(fn(item()) as item()*))(1)((1, 2))",
         INVTYPE_X);
     error(funcs + "(map:merge(for $f at $p in (local:many#1, local:one#1) return { $p: $f }) "
-        + "coerce to map(xs:integer, fn(item()) as item()*))(1)((1, 2))", INVTYPE_X);
+        + "coerce as map(xs:integer, fn(item()) as item()*))(1)((1, 2))", INVTYPE_X);
     error("let $f := (identity#1, 1)[random:integer(1) + 1] treat as fn(xs:int) as item()* "
-        + "return ($f coerce to fn(xs:int) as item()*)('a')", INVTYPE_X);
+        + "return ($f coerce as fn(xs:int) as item()*)('a')", INVTYPE_X);
 
     // returned functions, nested coercions
     error("let $g := fn() { fn($x as item()*) { count($x) } } "
-        + "return ($g coerce to fn() as fn(xs:int) as item()*)()(('a', 'b'))", INVTYPE_X);
-    error("declare function local:f($f) { (($f coerce to fn(xs:byte) as item()*) "
-        + "coerce to fn(xs:integer) as item()*)(1000) };"
+        + "return ($g coerce as fn() as fn(xs:int) as item()*)()(('a', 'b'))", INVTYPE_X);
+    error("declare function local:f($f) { (($f coerce as fn(xs:byte) as item()*) "
+        + "coerce as fn(xs:integer) as item()*)(1000) };"
         + "local:f((identity#1, abs#1)[random:integer(2) + 1])", INVTYPE_X);
 
     // identical nested coercions are merged
     check("let $f := (abs#1, 1)[random:integer(2) >= 0][1] "
-        + "return (($f coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()*)(1)",
+        + "return (($f coerce as fn(xs:int) as item()*) coerce as fn(xs:int) as item()*)(1)",
         1, count(TypeCheck.class, 1));
     error("let $f := (abs#1, 1)[random:integer(2) >= 0][1] "
-        + "return (($f coerce to fn(xs:int) as item()*) coerce to fn(xs:int) as item()*)('a')",
+        + "return (($f coerce as fn(xs:int) as item()*) coerce as fn(xs:int) as item()*)('a')",
         INVTYPE_X);
 
     // coercion in variable declarations
     final String e = "let $e := (fn($a) { $a }, 1)[random:integer(2) >= 0][1] return ";
     query(e + "let $x as fn(xs:anyAtomicType) as item()* := "
-        + "($e coerce to fn(xs:double) as item()*) return $x(1) instance of xs:double", true);
+        + "($e coerce as fn(xs:double) as item()*) return $x(1) instance of xs:double", true);
     query(e + "let $x as fn(xs:double) as item()* := "
-        + "($e coerce to fn(xs:anyAtomicType) as item()*) return $x(1) instance of xs:double",
+        + "($e coerce as fn(xs:anyAtomicType) as item()*) return $x(1) instance of xs:double",
         true);
     error(e + "let $x as fn(xs:anyAtomicType) as item()* := "
-        + "($e coerce to fn(xs:string) as item()*) return $x(1)", INVTYPE_X);
+        + "($e coerce as fn(xs:string) as item()*) return $x(1)", INVTYPE_X);
 
     // inferred function types must not be enforced
     final String f = funcs + "declare function local:apply($f) { $f((1, 2)) };"
