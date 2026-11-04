@@ -2,8 +2,10 @@ package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -744,5 +746,38 @@ public final class FuncItemTest extends SandboxTest {
     final String java = "let $j := Q{java:java.util.ArrayList}new() return ";
     query(java + "let $f as fn() as xs:string* := $j return count($f())", 0);
     error(java + "let $f as fn() as xs:integer := $j return $f()", INVTYPE_X);
+  }
+
+  /**
+   * Plans of closures with several captured variables are identical across compilations.
+   * @throws Exception exception
+   */
+  @Test public void closurePlanOrder() throws Exception {
+    final String vars = "let $a := <a/>, $b := <b/>, $c := <c/>, $d := <d/> ";
+    final String[] queries = {
+      // parsed closure
+      vars + "return fn() { ($a, $b, $c, $d) }",
+      "let $n := <n/>, $m := <m/>, $o := <o/> return "
+          + "deep-equal(fn($x) { fn() { $x, $n, $o } }, fn($y) { fn() { $y, $m, $o } })",
+      // nested closure is inlined into the surrounding closure
+      vars + "let $f := fn() { ($a, $b, $c, $d) } return fn() { $f() }",
+      // closure is copied when the function body is inlined
+      "declare %basex:inline(1000) function local:f($x) { "
+          + "let $a := <a/>, $b := <b/>, $c := <c/> return fn() { ($a, $b, $c, $x) } }; "
+          + "local:f(<x/>), local:f(<y/>)",
+      // partial function application is rewritten to a closure
+      "replace(?, random:uuid(), random:uuid(), random:uuid())"
+    };
+    for(final String query : queries) {
+      String first = null;
+      for(int r = 0; r < 100; r++) {
+        try(QueryProcessor qp = new QueryProcessor(query, context)) {
+          qp.optimize();
+          final String plan = qp.toXml().serialize().toString();
+          if(first == null) first = plan;
+          else assertEquals(first, plan, "Run " + r + ": " + query);
+        }
+      }
+    }
   }
 }

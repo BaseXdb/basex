@@ -112,7 +112,7 @@ public final class PartFunc extends Arr {
     cc.pushScope(vs);
     try {
       // the function and the supplied arguments are evaluated once, when the closure is created
-      final HashMap<Var, Expr> global = new HashMap<>();
+      final HashMap<Var, Expr> global = new LinkedHashMap<>();
       final Var fn = vs.addNew(new QNm(FUNCTION), func.seqType(), cc.qc, info);
       global.put(fn, func);
 
