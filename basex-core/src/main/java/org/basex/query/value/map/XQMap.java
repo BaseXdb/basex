@@ -73,18 +73,6 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * Creates a map with a known shape, sharing the values of static record fields.
-   * @param shape shape
-   * @param values values, one per field
-   * @param qc query context
-   * @return map
-   */
-  public static XQMap get(final ShapeType shape, final Value[] values, final QueryContext qc) {
-    return shape instanceof final RecordType rt ? XQRecordMap.get(rt, values, qc) :
-      get(shape, values);
-  }
-
-  /**
    * Creates a map with a shape that has a single field.
    * @param shape shape with a single field
    * @param value value of the field

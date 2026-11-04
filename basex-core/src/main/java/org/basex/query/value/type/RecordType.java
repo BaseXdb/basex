@@ -88,7 +88,7 @@ public final class RecordType extends ShapeType {
   public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
       final InputInfo ii) throws QueryException {
     // the labeled candidate record is the focus of the integrity constraint
-    final XQMap record = XQMap.get(this, values, qc);
+    final XQMap record = XQRecordMap.get(this, values, qc);
     if(constraint == null ||
         ((FItem) constraint.item(qc, ii)).invoke(qc, ii, record).ebv(qc, ii)) return record;
     if(error) throw RECORDCONSTRAINT_X_X.get(ii, this, record);

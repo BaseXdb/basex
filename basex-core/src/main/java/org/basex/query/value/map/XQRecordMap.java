@@ -35,7 +35,7 @@ public final class XQRecordMap extends XQShapeMap {
    * @param qc query context
    * @return record
    */
-  static XQMap get(final RecordType rt, final Value[] values, final QueryContext qc) {
+  public static XQMap get(final RecordType rt, final Value[] values, final QueryContext qc) {
     final int[] slots = rt.slots();
     if(slots == null) return XQMap.get(rt, values);
     final Layout layout = qc.caches.get(rt, () -> new Layout(slots, values));
