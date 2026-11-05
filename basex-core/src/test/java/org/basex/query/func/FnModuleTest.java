@@ -4856,6 +4856,15 @@ return
   }
 
   /** Test method. */
+  @Test public void qName() {
+    final Function func = QNAME;
+    final String xml = "http://www.w3.org/XML/1998/namespace";
+    query(PREFIX_FROM_QNAME.args(func.args(xml, "c")), "");
+    query(PREFIX_FROM_QNAME.args(func.args(xml, "xml:c")), "xml");
+    error("element { " + func.args(xml, "c") + " } {}", CEXML_X_X);
+  }
+
+  /** Test method. */
   @Test public void randomNumberGenerator() {
     final Function func = RANDOM_NUMBER_GENERATOR;
 
