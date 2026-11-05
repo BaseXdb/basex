@@ -1,17 +1,21 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -23,11 +27,27 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnUpdate extends StandardFunc {
+  /** Action: new value. */
+  private static final Str VALUE = Str.get("value");
+  /** Action: new name. */
+  private static final Str RENAME = Str.get("rename");
+  /** Action: replacing nodes. */
+  private static final Str REPLACE = Str.get("replace");
+  /** Action: nodes inserted before. */
+  private static final Str BEFORE = Str.get("before");
+  /** Action: nodes inserted after. */
+  private static final Str AFTER = Str.get("after");
+  /** Default actions: the selected nodes are deleted. */
+  private static final XQMap DELETE = XQMap.get(REPLACE, Empty.VALUE);
+
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).item(qc, info);
     final FItem select = toFunction(arg(1), 1, qc);
-    final Value replacement = arg(2).value(qc);
+    final XQMap actions = defined(2) ?
+      (XQMap) Types.UPDATE_ACTIONS_O.coerce(arg(2).value(qc), qc, info) : DELETE;
+    if(actions.contains(REPLACE) && (actions.contains(VALUE) || actions.contains(RENAME)))
+      throw UPACTIONS.get(info);
 
     // effective value: the supplied value, wrapped in a root JNode if it is a map or an array
     final GNode node;
@@ -37,7 +57,7 @@ public final class FnUpdate extends StandardFunc {
     final TokenSet targets = new TokenSet(), ancestors = new TokenSet();
     for(final Item item : select.invoke(qc, info, node)) {
       if(!(item instanceof final GNode target)) throw typeError(item, NodeType.NODE, info);
-      // the effective value cannot be replaced; namespace nodes and item nodes have a parent,
+      // the effective value cannot be selected; namespace nodes and item nodes have a parent,
       // but are no attributes or children
       if(target.is(node) || target.kind() == Kind.NAMESPACE ||
           target instanceof final JNode jn && jn.isItem()) throw UPSELECT_X.get(info, target);
@@ -52,7 +72,7 @@ public final class FnUpdate extends StandardFunc {
       targets.add(target.id());
     }
     // a supplied map or array is returned as a value
-    final Value result = transform(node, targets, ancestors, replacement, true, qc);
+    final Value result = transform(node, targets, ancestors, actions, true, qc);
     return node == value ? result : ((JNode) result).value;
   }
 
@@ -65,60 +85,95 @@ public final class FnUpdate extends StandardFunc {
   }
 
   /**
-   * Returns the nodes that a node is replaced by.
+   * Returns the nodes that result from updating a node.
    * @param node node
-   * @param targets ids of the nodes to be replaced
-   * @param ancestors ids of the nodes to be replaced and their ancestors
-   * @param replacement replacement
+   * @param targets ids of the selected nodes
+   * @param ancestors ids of the selected nodes and their ancestors
+   * @param actions actions
    * @param root root of the update
    * @param qc query context
    * @return resulting nodes
    * @throws QueryException query exception
    */
   private Value transform(final GNode node, final TokenSet targets, final TokenSet ancestors,
-      final Value replacement, final boolean root, final QueryContext qc) throws QueryException {
+      final XQMap actions, final boolean root, final QueryContext qc) throws QueryException {
 
-    // no node in this subtree is replaced: copy it in one go. JNodes are views on values;
+    // no node in this subtree is selected: copy it in one go. JNodes are views on values;
     // they are consumed by the rebuilt parent and need no copy
     if(!root && !ancestors.contains(node.id()))
       return node instanceof JNode ? node : copy(node, qc);
+    // nodes that are deleted by default are not rebuilt
+    if(actions == DELETE && targets.contains(node.id())) return Empty.VALUE;
 
     // the builder is created first, so that node IDs are assigned in document order
     final FBuilder builder = builder(node, root);
-    // content first: a node reaches the replacement with its descendants already updated
+    // content first: a node reaches the actions with its descendants already updated
     final ValueBuilder attributes = new ValueBuilder(qc), children = new ValueBuilder(qc);
     for(final GNode attribute : node.attributeIter()) {
-      attributes.add(transform(attribute, targets, ancestors, replacement, false, qc));
+      attributes.add(transform(attribute, targets, ancestors, actions, false, qc));
     }
     for(final GNode child : node.childIter()) {
-      children.add(transform(child, targets, ancestors, replacement, false, qc));
+      children.add(transform(child, targets, ancestors, actions, false, qc));
     }
     final GNode copy = rebuild(node, builder, attributes.value(), children.value(), qc);
     if(!targets.contains(node.id())) return copy;
     // the copy has no parent, so the containing structure is taken from the original node
     final XQStruct container = node instanceof final JNode jnode ? jnode.container() : null;
-    return substitute(copy, container, replacement, qc);
+    return apply(copy, container, actions, qc);
   }
 
   /**
-   * Returns the nodes that take the place of a node.
+   * Returns the nodes that result from applying the actions to a node.
    * @param node node with updated descendants
-   * @param container map or array that contains the replaced node (can be {@code null})
-   * @param replacement replacement
+   * @param container map or array that contains the original node (can be {@code null})
+   * @param actions actions
    * @param qc query context
    * @return resulting nodes
    * @throws QueryException query exception
    */
-  private Value substitute(final GNode node, final XQStruct container, final Value replacement,
+  private Value apply(final GNode node, final XQStruct container, final XQMap actions,
       final QueryContext qc) throws QueryException {
 
-    // a single function item is a callback, anything else a literal replacement
-    final Value items = replacement instanceof final FItem func && !(func instanceof XQStruct) ?
-      checkArity(func, 1, false).invoke(qc, info, node) : replacement;
+    // all actions are evaluated before the content of the node is moved to its successor
+    final ValueBuilder vb = new ValueBuilder(qc), after = new ValueBuilder(qc);
+    supply(action(actions, BEFORE, node, qc), vb, qc);
+    final Value replace = action(actions, REPLACE, node, qc);
+    final Value value = action(actions, VALUE, node, qc), name = action(actions, RENAME, node, qc);
+    supply(action(actions, AFTER, node, qc), after, qc);
+    if(replace != null) supply(replace, vb, qc);
+    else vb.add(change(node, container, value, name, qc));
+    vb.add(after.value());
+    return vb.value(this);
+  }
 
-    final ValueBuilder vb = new ValueBuilder(qc);
-    boolean value = false;
-    for(final Item item : items) {
+  /**
+   * Returns the value of an action.
+   * @param actions actions
+   * @param key key of the action
+   * @param node node with updated descendants
+   * @param qc query context
+   * @return value or {@code null}
+   * @throws QueryException query exception
+   */
+  private Value action(final XQMap actions, final Str key, final GNode node,
+      final QueryContext qc) throws QueryException {
+    // a single function item is called with the node
+    final Value action = actions.getOrNull(key);
+    return action instanceof final FItem func && !(func instanceof XQStruct) ?
+      checkArity(func, 1, false).invoke(qc, info, node) : action;
+  }
+
+  /**
+   * Adds the nodes that are supplied by a value.
+   * @param value value (can be {@code null})
+   * @param vb value builder
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  private void supply(final Value value, final ValueBuilder vb, final QueryContext qc)
+      throws QueryException {
+    if(value == null) return;
+    for(final Item item : value) {
       if(item instanceof final GNode gnode) {
         // a root node contributes its children
         final boolean children = gnode.kind() == Kind.DOCUMENT ||
@@ -127,20 +182,13 @@ public final class FnUpdate extends StandardFunc {
         for(final Item nd : children ? gnode.childIter().value(qc, null) : gnode) {
           vb.add(nd instanceof XNode ? copy((GNode) nd, qc) : nd);
         }
-      } else if(container != null && item instanceof final XQStruct struct &&
-          container instanceof XQMap == struct instanceof XQMap) {
-        // a map within a map, or an array within an array, contributes its children
+      } else if(item instanceof final XQStruct struct) {
+        // a map or an array contributes its entries or members
         vb.add(new JNode(struct).childIter().value(qc, null));
       } else {
-        // the item replaces the value of the node, so at most one is allowed
-        if(item instanceof FItem && !(node instanceof JNode))
-          throw UPREPLACE_X_X.get(info, "Node", item.seqType());
-        if(value) throw UPREPLACEVALUE_X.get(info, item);
-        value = true;
-        vb.add(withValue(node, item, qc));
+        throw UPREPLACE_X_X.get(info, "Node, map or array", item.seqType());
       }
     }
-    return vb.value(this);
   }
 
   /**
@@ -212,32 +260,132 @@ public final class FnUpdate extends StandardFunc {
   }
 
   /**
-   * Returns a node of the same kind and name or key as the specified node with a new value.
-   * @param node node
-   * @param value value (a map or an array only if the node is a JNode)
+   * Returns a node of the same kind as the specified node with a new value and name or key.
+   * @param node node with updated descendants
+   * @param container map or array that contains the original node (can be {@code null})
+   * @param value new value (can be {@code null})
+   * @param name new name or key (can be {@code null})
    * @param qc query context
    * @return resulting node
    * @throws QueryException query exception
    */
-  private GNode withValue(final GNode node, final Item value, final QueryContext qc)
-      throws QueryException {
+  private GNode change(final GNode node, final XQStruct container, final Value value,
+      final Value name, final QueryContext qc) throws QueryException {
 
-    if(node instanceof final JNode jnode) return new JNode(jnode.key, value);
+    if(value == null && name == null) return node;
+    if(node instanceof final JNode jnode) {
+      Item key = jnode.key;
+      if(name != null) {
+        if(!(container instanceof XQMap)) throw UPRENAME_X.get(info, node);
+        if(!(name instanceof final Item item) || !item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE))
+          throw typeError(name, BasicType.ANY_ATOMIC_TYPE, info);
+        key = item;
+      }
+      return new JNode(key, value != null ? value : jnode.value);
+    }
 
-    final byte[] string = value.string(info);
     final XNode xnode = (XNode) node;
-    switch(node.kind()) {
+    final Kind kind = node.kind();
+    final QNm qname = name != null ? name(xnode, name, qc) : xnode.qname();
+    final byte[] string = value != null ? string(value, qc) :
+      kind != Kind.ELEMENT ? xnode.string() : null;
+    switch(kind) {
       case ELEMENT:
-        final FBuilder builder = FElem.build(xnode.qname()).ns(xnode.namespaces());
-        for(final GNode attribute : node.attributeIter()) builder.node(copy(attribute, qc));
-        return builder.text(string).finish();
-      case ATTRIBUTE: return new FAttr(xnode.qname(), string);
+        final FBuilder builder = FElem.build(qname).ns(name != null ?
+          namespaces(xnode, qname, qc) : xnode.namespaces());
+        // the node is not exposed anymore, so its attributes and children are moved
+        for(final GNode attribute : node.attributeIter()) builder.node(attribute);
+        if(string != null) builder.text(string);
+        else for(final GNode child : node.childIter()) builder.node(child);
+        // attributes whose prefixes are bound to another URI are renamed
+        if(name != null) Constr.attributeNS(builder, qc);
+        return builder.finish();
+      case ATTRIBUTE:
+        // xml:id processing, as in attribute constructors
+        final boolean id = eq(qname.uri(), XML_URI) && qname.eqLocal(ID);
+        return new FAttr(qname, id ? normalize(string) : string);
       case TEXT: return new FTxt(string);
-      case COMMENT: return new FComm(FComm.parse(string, info));
-      case PROCESSING_INSTRUCTION: return new FPI(xnode.qname(), FPI.content(string, info));
+      case COMMENT:
+        if(!FComm.valid(string)) throw UPVALUE_X_X.get(info, kind, string);
+        return new FComm(string);
+      case PROCESSING_INSTRUCTION:
+        if(!FPI.valid(string)) throw UPVALUE_X_X.get(info, kind, string);
+        return new FPI(qname, string);
       // namespace nodes are not visited by the recursion, documents are never selected
       default: throw Util.notExpected(node);
     }
+  }
+
+  /**
+   * Returns the atomized items of a value, joined with spaces.
+   * @param value value
+   * @param qc query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  private byte[] string(final Value value, final QueryContext qc) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    boolean more = false;
+    final Iter iter = value.atomIter(qc, info);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(more) tb.add(' ');
+      tb.add(item.string(info));
+      more = true;
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Checks and returns a new name for an XNode.
+   * @param node node
+   * @param name name
+   * @param qc query context
+   * @return name, with a generated prefix for attributes in a namespace
+   * @throws QueryException query exception
+   */
+  private QNm name(final XNode node, final Value name, final QueryContext qc)
+      throws QueryException {
+
+    final Kind kind = node.kind();
+    if(kind != Kind.ELEMENT && kind != Kind.ATTRIBUTE && kind != Kind.PROCESSING_INSTRUCTION)
+      throw UPRENAME_X.get(info, node);
+    if(!(name instanceof final QNm qnm)) throw typeError(name, BasicType.QNAME, info);
+
+    final byte[] prefix = qnm.prefix(), uri = qnm.uri();
+    if(kind == Kind.PROCESSING_INSTRUCTION) {
+      if(uri.length != 0 || eq(lc(qnm.local()), XML)) throw UPNAME_X_X.get(info, kind, qnm);
+      return qnm;
+    }
+    final boolean attribute = kind == Kind.ATTRIBUTE;
+    if(eq(prefix, XML) != eq(uri, XML_URI) || eq(prefix, XMLNS) || eq(uri, XMLNS_URI) ||
+        attribute && prefix.length == 0 && eq(qnm.local(), XMLNS))
+      throw UPNAME_X_X.get(info, kind, qnm);
+    // generate a prefix for attribute names in a namespace
+    return attribute && prefix.length == 0 && uri.length != 0 ?
+      qc.shared.qName(concat(qc.shared.prefix(uri), cpToken(':'), qnm.local()), uri) : qnm;
+  }
+
+  /**
+   * Returns the namespaces of an element, with a binding for its (new) name.
+   * @param node element
+   * @param name name of the element
+   * @param qc query context
+   * @return namespaces
+   */
+  private static Atts namespaces(final XNode node, final QNm name, final QueryContext qc) {
+    final Atts ns = new Atts(node.namespaces());
+    final byte[] prefix = name.prefix(), uri = name.uri();
+    final int i = ns.get(prefix);
+    if(uri.length == 0) {
+      // no namespace: an inherited default namespace is undeclared
+      if(i == -1) ns.add(EMPTY, EMPTY);
+      else ns.value(i, EMPTY);
+    } else if(!eq(prefix, XML)) {
+      // the binding of the prefix is added or replaced
+      if(i == -1) ns.add(qc.shared.token(prefix), qc.shared.token(uri));
+      else ns.value(i, qc.shared.token(uri));
+    }
+    return ns;
   }
 
   /**
@@ -285,10 +433,10 @@ public final class FnUpdate extends StandardFunc {
       return ab.array();
     }
     if(node.value.size() > 1) {
-      // sequence node: the values of the updated items
+      // sequence node: the values of the updated items; map entries would lose their keys
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item item : children) {
-        if(!(item instanceof final JNode jnode))
+        if(!(item instanceof final JNode jnode) || jnode.container() instanceof XQMap)
           throw UPREPLACE_X_X.get(info, "Sequence item", item.seqType());
         vb.add(jnode.value);
       }

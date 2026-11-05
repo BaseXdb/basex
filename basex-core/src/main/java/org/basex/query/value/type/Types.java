@@ -163,7 +163,11 @@ public final class Types {
   /** Zero or more database paths (strings, or single-entry maps binding a path to a type). */
   public static final SeqType DB_PATH_SPEC_ZM = ChoiceItemType.get(STRING,
       MapType.get(STRING, DB_RESOURCE_TYPE.seqType())).seqType(ZERO_OR_MORE);
-
+  /** Update actions, used by fn:update. */
+  public static final EnumType UPDATE_ACTION =
+      EnumType.get("value", "rename", "replace", "before", "after");
+  /** Single map of update actions. */
+  public static final SeqType UPDATE_ACTIONS_O = MapType.get(UPDATE_ACTION, ITEM_ZM).seqType();
   /** Single XNode. */
   public static final SeqType XNODE_O = XNODE.seqType();
   /** Zero or one XNodes. */

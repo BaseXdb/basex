@@ -843,9 +843,15 @@ public enum QueryError {
   /** Error code. */
   UPSELECT_X(FOUP, 3, "Node cannot be replaced: %."),
   /** Error code. */
-  UPREPLACE_X_X(FOUP, 4, "% expected as replacement, % found."),
+  UPREPLACE_X_X(FOUP, 4, "% expected, % found."),
   /** Error code. */
-  UPREPLACEVALUE_X(FOUP, 4, "Only one item can replace the value of a node: %."),
+  UPACTIONS(FOUP, 4, "Replacement cannot be combined with a new value or name."),
+  /** Error code. */
+  UPRENAME_X(FOUP, 4, "Node cannot be renamed: %."),
+  /** Error code. */
+  UPNAME_X_X(FOUP, 4, "Invalid name for %: %."),
+  /** Error code. */
+  UPVALUE_X_X(FOUP, 4, "Invalid value for %: %."),
   /** Error code. */
   UPREPLACEATT_X(FOUP, 4, "Duplicate attribute name in replacement: %."),
   /** Error code. */

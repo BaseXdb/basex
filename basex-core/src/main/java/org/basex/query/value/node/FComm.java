@@ -66,7 +66,16 @@ public final class FComm extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] str, final InputInfo info) throws QueryException {
-    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(info);
+    if(!valid(str)) throw COMINVALID.get(info);
     return str;
+  }
+
+  /**
+   * Checks if the specified token is a valid comment.
+   * @param str token to be checked
+   * @return result of check
+   */
+  public static boolean valid(final byte[] str) {
+    return !contains(str, DASHES) && !endsWith(str, '-');
   }
 }

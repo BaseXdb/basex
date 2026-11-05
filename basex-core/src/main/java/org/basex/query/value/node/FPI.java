@@ -87,8 +87,17 @@ public final class FPI extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] atom, final InputInfo info) throws QueryException {
-    if(contains(atom, CLOSE)) throw CPICONT_X.get(info, atom);
+    if(!valid(atom)) throw CPICONT_X.get(info, atom);
     return atom;
+  }
+
+  /**
+   * Checks if the specified token is a valid processing instruction content.
+   * @param atom token to be checked
+   * @return result of check
+   */
+  public static boolean valid(final byte[] atom) {
+    return !contains(atom, CLOSE);
   }
 
   /**

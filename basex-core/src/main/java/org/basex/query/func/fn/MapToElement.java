@@ -38,8 +38,6 @@ public final class MapToElement {
   private static final Atts NO_NSP = new Atts();
   /** Name of the xsi:nil attribute. */
   private static final QNm NIL = new QNm(token("xsi:nil"), QueryText.XSI_URI);
-  /** Two dashes. */
-  private static final byte[] DASHES = token("--");
   /** Layouts that are inferred from a value if the plan assigns no layout, in order of priority. */
   private static final PlanEntry[] INFERRED = entries(PlanLayout.SIMPLE, PlanLayout.SIMPLE_PLUS,
       PlanLayout.RECORD, PlanLayout.MIXED);
@@ -301,7 +299,7 @@ public final class MapToElement {
    * @throws QueryException query exception
    */
   private void comment(final byte[] data) throws QueryException {
-    if(contains(data, DASHES) || endsWith(data, '-')) {
+    if(!FComm.valid(data)) {
       throw MAP_TO_ELEMENT_X.get(info, "Invalid comment content.");
     }
   }
