@@ -26,6 +26,14 @@ public final class WsPoolTest extends WsTest {
   }
 
   /**
+   * Waits until the given number of clients has been registered by the server.
+   * @param count number of clients
+   */
+  private static void awaitClients(final int count) {
+    await(() -> WsPool.ids().size() >= count ? Boolean.TRUE : null);
+  }
+
+  /**
    * Empty messages are rejected.
    */
   @Test public void emptyMessage() {
@@ -72,6 +80,7 @@ public final class WsPoolTest extends WsTest {
     final Listener lb = new Listener();
     final java.net.http.WebSocket wsa = connect("/p", la);
     final java.net.http.WebSocket wsb = connect("/p", lb);
+    awaitClients(2);
     try {
       wsa.sendText("hi", true).get(5, TimeUnit.SECONDS);
       assertEquals("all:hi", la.pollText());
@@ -94,6 +103,7 @@ public final class WsPoolTest extends WsTest {
     final Listener lb = new Listener();
     final java.net.http.WebSocket wsa = connect("/p", la);
     final java.net.http.WebSocket wsb = connect("/p", lb);
+    awaitClients(2);
     try {
       final byte[] payload = { 1, 2, 3, 4, 5 };
       wsa.sendBinary(ByteBuffer.wrap(payload), true).get(5, TimeUnit.SECONDS);
@@ -117,6 +127,7 @@ public final class WsPoolTest extends WsTest {
     final Listener lb = new Listener();
     final java.net.http.WebSocket wsa = connect("/p", la);
     final java.net.http.WebSocket wsb = connect("/p", lb);
+    awaitClients(2);
     try {
       wsa.sendText("ping", true).get(5, TimeUnit.SECONDS);
       assertEquals("other:ping", lb.pollText());
