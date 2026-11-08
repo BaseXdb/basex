@@ -2,12 +2,15 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -79,14 +82,40 @@ public final class DropDB extends ACreate {
    * @return success flag
    */
   public static synchronized boolean drop(final String db, final StaticOptions sopts) {
-    final IOFile dbpath = sopts.dbPath(db);
-    boolean ok = true;
     if(db.isEmpty()) {
+      final IOFile dbpath = sopts.dbPath(db);
+      boolean ok = true;
       for(final String path : sopts.dbFiles(db)) ok &= new IOFile(dbpath, path).delete();
-    } else {
-      ok = dbpath.exists() && dbpath.delete();
+      return ok;
     }
-    return ok;
+    // move directory aside first: fails as a whole if a file is locked
+    try {
+      final IOFile tmp = moveAside(db, sopts);
+      return tmp == null || tmp.delete();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
+    }
+  }
+
+  /**
+   * Moves a database directory to a new temporary database directory.
+   * @param db name of the database
+   * @param sopts static options
+   * @return temporary directory, or {@code null} if the database does not exist
+   * @throws IOException I/O exception
+   */
+  static IOFile moveAside(final String db, final StaticOptions sopts) throws IOException {
+    final IOFile dir = sopts.dbPath(db);
+    if(!dir.exists()) return null;
+    final IOFile tmp = sopts.dbPath(sopts.createTempDb(db));
+    try {
+      dir.moveTo(tmp, true);
+      return tmp;
+    } catch(final IOException ex) {
+      tmp.delete();
+      throw ex;
+    }
   }
 
   /**

@@ -44,10 +44,11 @@ public final class AlterDB extends ACreate {
     // database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);
 
-    // close database if it's currently opened and not opened by others
+    // close databases if they are currently opened and not opened by others
     if(!closed) closed = close(context, src);
-    // check if source database is still opened
     if(context.pinned(src)) return error(DB_PINNED_X, src);
+    close(context, trg);
+    if(context.pinned(trg)) return error(DB_PINNED_X, trg);
 
     // try to alter database
     return alter(src, trg, soptions) && (!closed || new Open(trg).run(context)) ?
@@ -69,11 +70,18 @@ public final class AlterDB extends ACreate {
   public static synchronized boolean alter(final String source, final String target,
       final StaticOptions sopts) {
 
-    // drop target database (unless it is the source, e.g. if only the case differs)
     final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
-    if(!src.sameFile(trg)) DropDB.drop(target, sopts);
     try {
-      src.moveTo(trg, false);
+      // move existing target aside, restore it if the source cannot be moved
+      final IOFile old = trg.exists() && !src.sameFile(trg) ?
+        DropDB.moveAside(target, sopts) : null;
+      try {
+        src.moveTo(trg, false);
+      } catch(final IOException ex) {
+        if(old != null) old.moveTo(trg, false);
+        throw ex;
+      }
+      if(old != null) old.delete();
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -84,7 +92,7 @@ public final class AlterDB extends ACreate {
   @Override
   public boolean newData(final Context ctx) {
     closed = close(ctx, args[0]);
-    return closed;
+    return close(ctx, args[1]) || closed;
   }
 
   @Override

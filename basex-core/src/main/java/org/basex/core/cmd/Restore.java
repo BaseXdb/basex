@@ -78,7 +78,7 @@ public final class Restore extends ABackup {
       final Restore cmd) throws IOException {
 
     // drop existing files
-    DropDB.drop(db, sopts);
+    if(!DropDB.drop(db, sopts) && !db.isEmpty()) throw new BaseXException(DB_NOT_DROPPED_X, db);
     // unzip backup
     final IOFile dbpath = sopts.dbPath(), file = new IOFile(dbpath, backup + IO.ZIPSUFFIX);
     try(ZipFile zip = new ZipFile(file.file())) {

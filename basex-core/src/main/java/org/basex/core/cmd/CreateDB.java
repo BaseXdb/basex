@@ -87,6 +87,7 @@ public final class CreateDB extends ACreate {
         context.datas.pin(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
+        if(!DropDB.drop(name, soptions)) return error(DB_NOT_DROPPED_X, name);
 
         // create disk-based instance
         final DiskBuilder builder = new DiskBuilder(name, parser, soptions, options);
@@ -169,6 +170,7 @@ public final class CreateDB extends ACreate {
     synchronized(CreateDB.class) {
       // database is currently locked by another job
       if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
+      if(!DropDB.drop(name, ctx.soptions)) throw new BaseXException(DB_NOT_DROPPED_X, name);
       new DiskBuilder(name, parser, ctx.soptions, options).build().close();
       return index(Open.open(name, ctx, options, true, true), ctx);
     }

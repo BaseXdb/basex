@@ -49,6 +49,9 @@ public final class Copy extends Command {
 
     // source database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);
+    // close target database if it's currently opened and not opened by others
+    close(context, trg);
+    if(context.pinned(trg)) return error(DB_PINNED_X, trg);
 
     // try to copy database
     try {
@@ -71,22 +74,23 @@ public final class Copy extends Command {
   public static void copy(final String source, final String target, final StaticOptions sopts,
       final Copy cmd) throws IOException {
 
-    // reject target that is the source, then drop target database
-    final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
-    if(src.sameFile(trg)) throw new BaseXException(DB_NOT_COPIED_X, source);
-    DropDB.drop(target, sopts);
+    // reject target that is the source
+    final IOFile src = sopts.dbPath(source);
+    if(src.sameFile(sopts.dbPath(target))) throw new BaseXException(DB_NOT_COPIED_X, source);
     final StringList files = src.descendants();
     if(cmd != null) cmd.tf = files.size();
 
-    // copy all files
+    // copy all files to a temporary database, which then replaces the target
+    final String tmpName = sopts.createTempDb(target);
+    final IOFile tmp = sopts.dbPath(tmpName);
     try {
       for(final String file : files) {
-        new IOFile(src, file).copyTo(new IOFile(trg, file));
+        new IOFile(src, file).copyTo(new IOFile(tmp, file));
         if(cmd != null) cmd.of++;
       }
+      if(!AlterDB.alter(tmpName, target, sopts)) throw new BaseXException(DB_NOT_COPIED_X, source);
     } catch(final IOException ex) {
-      // error: drop new database
-      DropDB.drop(target, sopts);
+      DropDB.drop(tmpName, sopts);
       throw ex;
     }
   }
@@ -96,6 +100,11 @@ public final class Copy extends Command {
     final Locks locks = jc().locks;
     locks.reads.add(args[0]);
     locks.writes.add(args[1]);
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    return close(ctx, args[1]);
   }
 
   @Override

@@ -79,8 +79,6 @@ public final class DiskBuilder extends Builder {
     int bs = (int) Math.min(meta.inputsize, max);
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
-    // drop old database (if available) and create new one
-    DropDB.drop(dbName, sopts);
     sopts.dbPath(dbName).md();
 
     tout = new DataOutput(new TableOutput(meta, DATATBL));

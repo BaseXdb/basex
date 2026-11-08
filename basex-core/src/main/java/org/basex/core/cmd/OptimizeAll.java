@@ -124,6 +124,8 @@ public final class OptimizeAll extends ACreate {
       if(cmd != null) cmd.popJob();
     }
     Close.close(odata, context);
+    // old database will not be updated anymore: remove update marker
+    ometa.updateFile().delete();
 
     // adopt original meta data, create new index structures
     final MetaData nmeta = ndata.meta;
@@ -134,25 +136,35 @@ public final class OptimizeAll extends ACreate {
     nmeta.time = ometa.time;
     nmeta.dirty = true;
     try {
-      StopWords.copy(odata, ndata);
-      CreateIndex.create(ndata, cmd);
+      try {
+        StopWords.copy(odata, ndata);
+        CreateIndex.create(ndata, cmd);
+      } finally {
+        ndata.close();
+      }
+      // move file resources to new database, replace old database
+      moveBinaries(ometa, nmeta);
+      if(!AlterDB.alter(tmpName, name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
     } catch(final Throwable th) {
-      // index creation failed: delete temporary database
+      // restore file resources, delete temporary database
+      moveBinaries(nmeta, ometa);
       DropDB.drop(tmpName, sopts);
       throw th;
-    } finally {
-      ndata.close();
     }
+  }
 
-    // move file resources to new database
+  /**
+   * Moves the file resources of one database to another.
+   * @param source source meta data
+   * @param target target meta data
+   * @throws IOException I/O exception
+   */
+  private static void moveBinaries(final MetaData source, final MetaData target)
+      throws IOException {
     for(final ResourceType type : Resources.BINARIES) {
-      final IOFile bin = ometa.dir(type);
-      if(bin.exists()) bin.moveTo(nmeta.dir(type), true);
+      final IOFile bin = source.dir(type);
+      if(bin.exists()) bin.moveTo(target.dir(type), true);
     }
-
-    // drop old database, rename temporary database
-    if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
-    if(!AlterDB.alter(tmpName, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tmpName);
   }
 
   /**

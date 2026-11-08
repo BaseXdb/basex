@@ -10,6 +10,7 @@ import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -105,6 +106,52 @@ public class CommandTest extends SandboxTest {
     no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME2, "?"));
     no(new AlterDB("?", NAME2));
+  }
+
+  /** Replaces a database while one of its files is opened elsewhere (GH2800). */
+  @Test public final void lockedTarget() {
+    ok(new CreateDB(NAME, "<new/>"));
+    ok(new CreateDB(NAME2, "<old/>"));
+    final File tbl = MetaData.file(context.soptions.dbPath(NAME2), DataText.DATATBL).file();
+    final Command[] cmds = { new Close(), new AlterDB(NAME, NAME2), new Copy(NAME, NAME2),
+      new Open(NAME2), new OptimizeAll() };
+    for(final Command cmd : cmds) {
+      // on Windows, the command will fail; the target database must remain intact
+      try(RandomAccessFile raf = new RandomAccessFile(tbl, "r")) {
+        session.execute(cmd);
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
+      ok(new XQuery(_DB_GET.args(NAME2)));
+    }
+  }
+
+  /** Restores the target database if a source file is opened elsewhere (GH2800). */
+  @Test public final void lockedSource() {
+    ok(new CreateDB(NAME, "<new/>"));
+    ok(new CreateDB(NAME2, "<old/>"));
+    ok(new Close());
+    final File tbl = MetaData.file(context.soptions.dbPath(NAME), DataText.DATATBL).file();
+    // on Windows, the command will fail, and the target database must be restored
+    String expected = "<new/>";
+    try(RandomAccessFile raf = new RandomAccessFile(tbl, "r")) {
+      session.execute(new AlterDB(NAME, NAME2));
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      expected = "<old/>";
+    }
+    assertEquals(expected, ok(new XQuery(_DB_GET.args(NAME2))));
+  }
+
+  /** Replaces a database that is opened by the current session. */
+  @Test public final void openedTarget() {
+    ok(new CreateDB(NAME, "<new/>"));
+    ok(new CreateDB(NAME2, "<old/>"));
+    ok(new Copy(NAME, NAME2));
+    assertEquals("<new/>", ok(new XQuery(_DB_GET.args(NAME2))));
+    ok(new Open(NAME2));
+    ok(new AlterDB(NAME, NAME2));
+    assertEquals("<new/>", ok(new XQuery(_DB_GET.args(NAME2))));
   }
 
   /** Command test. */
