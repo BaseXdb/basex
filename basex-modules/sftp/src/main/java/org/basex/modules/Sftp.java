@@ -1,8 +1,10 @@
 package org.basex.modules;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -11,7 +13,10 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.Strings;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.*;
 
@@ -24,14 +29,28 @@ import com.jcraft.jsch.ChannelSftp.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
-  /** Logs. */
-  private TokenList logs = new TokenList();
+public final class Sftp extends QueryModule {
+  /** Module prefix. */
+  private static final byte[] PREFIX = Token.token("sftp");
+  /** Module namespace URI. */
+  private static final byte[] URI = Token.token("http://basex.org/modules/sftp");
 
-  /** Constructor. */
-  public Sftp() {
-    JSch.setLogger(this);
-  }
+  /** Logs. */
+  private final TokenList logs = new TokenList();
+  /** Logger of the sessions opened by this module instance. */
+  private final Logger logger = new Logger() {
+    @Override
+    public boolean isEnabled(final int level) {
+      return true;
+    }
+
+    @Override
+    public void log(final int level, final String message) {
+      synchronized(logs) {
+        logs.add(level + ": " + message);
+      }
+    }
+  };
 
   /**
    * Connects to an SFTP server.
@@ -76,19 +95,25 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
       final XQMap map) throws QueryException {
 
     // parse options
-    String proxyHost = null;
-    int proxyPort = 0;
+    String proxyHost = null, identity = null, knownHosts = null;
+    byte[] passphrase = null;
+    int proxyPort = 0, timeout = 0;
 
     final Properties config = new Properties();
     for(final Map.Entry<Object, Object> entry : map.toJava().entrySet()) {
       final String name = entry.getKey().toString(), value = entry.getValue().toString();
-      if(name.equals("ProxyHost")) {
-        proxyHost = value;
-      } else if(name.equals("ProxyPort")) {
-        proxyPort = Integer.parseInt(value);
-      } else {
-        config.put(name, value);
+      switch(name) {
+        case "ProxyHost" -> proxyHost = value;
+        case "ProxyPort" -> proxyPort = integer(name, value);
+        case "Timeout" -> timeout = integer(name, value);
+        case "IdentityFile" -> identity = value;
+        case "Passphrase" -> passphrase = Token.token(value);
+        case "KnownHosts" -> knownHosts = value;
+        default -> config.put(name, value);
       }
+    }
+    if(passphrase != null && identity == null) {
+      throw error("options", "Passphrase requires IdentityFile.");
     }
     if(proxyHost == null) {
       final StaticOptions soptions = queryContext.context.soptions;
@@ -98,19 +123,66 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
 
     Session session = null;
     try {
-      session = new JSch().getSession(user.toJava(), server.toJava(), (int) port.itr());
+      final JSch jsch = new JSch();
+      jsch.setInstanceLogger(logger);
+      if(knownHosts != null) jsch.setKnownHosts(knownHosts);
+      if(identity != null) addIdentity(jsch, identity, passphrase);
+      session = jsch.getSession(user.toJava(), server.toJava(), (int) port.itr());
+      // register session before connecting: stopping the query aborts the connection
+      sessions().add(session, timeout);
       if(!proxyHost.isEmpty()) session.setProxy(new ProxyHTTP(proxyHost, proxyPort));
       session.setConfig(config);
       session.setPassword(password.string());
-      session.connect();
+      session.connect(timeout);
 
       final ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-      channel.connect();
+      channel.connect(timeout);
       return channel;
     } catch(final JSchException ex) {
-      if(session != null) session.disconnect();
+      if(session != null) sessions().remove(session);
+      // report a stopped query as such, not as a connection error
+      queryContext.checkStop();
       throw error(ex);
     }
+  }
+
+  /**
+   * Adds a private key and checks the passphrase of encrypted keys.
+   * @param jsch JSch instance
+   * @param identity path to the private key
+   * @param passphrase passphrase (can be {@code null})
+   * @throws QueryException query exception
+   * @throws JSchException JSch exception
+   */
+  private static void addIdentity(final JSch jsch, final String identity,
+      final byte[] passphrase) throws QueryException, JSchException {
+    // loading does not decrypt the key: JSch decrypts it once when it is added
+    final KeyPair key = KeyPair.load(jsch, identity);
+    final boolean encrypted = key.isEncrypted();
+    key.dispose();
+    if(encrypted && passphrase == null) {
+      throw error("passphrase", "Passphrase required: " + identity);
+    }
+    try {
+      jsch.addIdentity(identity, passphrase);
+    } catch(final JSchException ex) {
+      // the key has been loaded before: an encrypted key can only fail to decrypt
+      if(encrypted) throw error("passphrase", "Incorrect passphrase: " + identity);
+      throw ex;
+    }
+  }
+
+  /**
+   * Parses a non-negative integer option.
+   * @param name name of the option
+   * @param value value
+   * @return integer
+   * @throws QueryException query exception
+   */
+  private static int integer(final String name, final String value) throws QueryException {
+    final int i = Strings.toInt(value);
+    if(i >= 0) return i;
+    throw error("options", "Invalid value for " + name + ": " + value);
   }
 
   /**
@@ -119,9 +191,15 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @throws QueryException query exception
    */
   public void disconnect(final ChannelSftp sftp) throws QueryException {
-    run(() -> {
-      sftp.getSession().disconnect();
-    });
+    run(() -> sessions().remove(sftp.getSession()));
+  }
+
+  /**
+   * Returns the open sessions of the current query.
+   * @return sessions
+   */
+  private SftpSessions sessions() {
+    return queryContext.resources.index(SftpSessions.class);
   }
 
   /**
@@ -134,11 +212,25 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
   public Value list(final ChannelSftp sftp, final Str path) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(queryContext);
     run(() -> {
-      for(final Object o : sftp.ls(path.toJava())) {
-        vb.add(Str.get(((LsEntry) o).getFilename()));
-      }
+      for(final LsEntry entry : ls(sftp, path.toJava())) vb.add(Str.get(entry.getFilename()));
     });
     return vb.value();
+  }
+
+  /**
+   * Returns the entries of a remote directory, excluding {@code .} and {@code ..}.
+   * @param sftp SFTP channel
+   * @param dir remote path
+   * @return entries
+   * @throws SftpException SFTP exception
+   */
+  private static List<LsEntry> ls(final ChannelSftp sftp, final String dir) throws SftpException {
+    final List<LsEntry> entries = new ArrayList<>();
+    for(final Object o : sftp.ls(dir)) {
+      final LsEntry entry = (LsEntry) o;
+      if(!Strings.eq(entry.getFilename(), ".", "..")) entries.add(entry);
+    }
+    return entries;
   }
 
   /**
@@ -151,12 +243,125 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
   public XQMap attributes(final ChannelSftp sftp, final Str path) throws QueryException {
     final MapBuilder map = new MapBuilder();
     run(() -> {
-      final SftpATTRS stat = sftp.lstat(path.toJava());
-      map.put("last-modified", Dtm.get(stat.getMTime() * 1000L));
-      map.put("size", Itr.get(stat.getSize()));
-      map.put("dir", Bln.get(stat.isDir()));
+      final String string = path.toJava();
+      attributes(sftp, string, sftp.lstat(string), map);
     });
     return map.map();
+  }
+
+  /**
+   * Returns the names and attributes of the entries of a remote directory.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @return maps with entry names and attributes
+   * @throws QueryException query exception
+   */
+  public Value entries(final ChannelSftp sftp, final Str path) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(queryContext);
+    run(() -> {
+      final String dir = path.toJava();
+      final String prefix = dir.isEmpty() || dir.endsWith("/") ? dir : dir + '/';
+      for(final LsEntry entry : ls(sftp, dir)) {
+        final String name = entry.getFilename();
+        final MapBuilder map = new MapBuilder().put("name", name);
+        attributes(sftp, prefix + name, entry.getAttrs(), map);
+        vb.add(map.map());
+      }
+    });
+    return vb.value();
+  }
+
+  /**
+   * Adds file attributes to a map, following symbolic links.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @param attrs attributes of the file or link
+   * @param map map builder
+   * @throws Exception exception
+   */
+  private static void attributes(final ChannelSftp sftp, final String path,
+      final SftpATTRS attrs, final MapBuilder map) throws Exception {
+    final boolean link = attrs.isLink();
+    final SftpATTRS target = link ? stat(sftp, path) : null;
+    // files and broken links: return the given attributes
+    final SftpATTRS atts = target != null ? target : attrs;
+    final int flags = atts.getFlags();
+    if((flags & SftpATTRS.SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
+      // times are unsigned 32-bit values
+      map.put("last-modified", Dtm.get(Integer.toUnsignedLong(atts.getMTime()) * 1000));
+      map.put("last-accessed", Dtm.get(Integer.toUnsignedLong(atts.getATime()) * 1000));
+    }
+    map.put("size", Itr.get(atts.getSize()));
+    map.put("dir", Bln.get(atts.isDir()));
+    map.put("link", Bln.get(link));
+    if((flags & SftpATTRS.SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
+      map.put("permissions", atts.getPermissionsString().substring(1));
+    }
+    if((flags & SftpATTRS.SSH_FILEXFER_ATTR_UIDGID) != 0) {
+      map.put("uid", Itr.get(atts.getUId()));
+      map.put("gid", Itr.get(atts.getGId()));
+    }
+  }
+
+  /**
+   * Checks if a remote file or directory exists.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public Bln exists(final ChannelSftp sftp, final Str path) throws QueryException {
+    try {
+      return Bln.get(stat(sftp, path.toJava()) != null);
+    } catch(final SftpException ex) {
+      throw error(ex);
+    }
+  }
+
+  /**
+   * Creates a remote directory and all missing parent directories.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @throws QueryException query exception
+   */
+  public void createDir(final ChannelSftp sftp, final Str path) throws QueryException {
+    run(() -> {
+      final String string = path.toJava();
+      // common case: directory exists
+      final SftpATTRS target = stat(sftp, string);
+      if(target != null && target.isDir()) return;
+      final StringBuilder dir = new StringBuilder(string.startsWith("/") ? "/" : "");
+      boolean created = false;
+      for(final String segment : string.split("/")) {
+        if(segment.isEmpty()) continue;
+        final String current = dir.append(segment).toString();
+        // below a created directory, all segments are missing
+        final SftpATTRS attrs = created ? null : stat(sftp, current);
+        if(attrs == null) {
+          created = true;
+          sftp.mkdir(current);
+        } else if(!attrs.isDir()) {
+          throw error("no-dir", "Not a directory: " + current);
+        }
+        dir.append('/');
+      }
+    });
+  }
+
+  /**
+   * Returns the attributes of a remote file.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @return attributes (can be {@code null})
+   * @throws SftpException SFTP exception
+   */
+  private static SftpATTRS stat(final ChannelSftp sftp, final String path) throws SftpException {
+    try {
+      return sftp.stat(path);
+    } catch(final SftpException ex) {
+      if(ex.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) return null;
+      throw ex;
+    }
   }
 
   /**
@@ -167,7 +372,64 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @throws QueryException query exception
    */
   public Str getText(final ChannelSftp sftp, final Str path) throws QueryException {
-    return Str.get(get(sftp, path));
+    return text(get(sftp, path), null);
+  }
+
+  /**
+   * Retrieves the specified file as text in the specified encoding.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @param encoding encoding
+   * @return text
+   * @throws QueryException query exception
+   */
+  public Str getText(final ChannelSftp sftp, final Str path, final Str encoding)
+      throws QueryException {
+    final String enc = encoding(encoding);
+    return text(get(sftp, path), enc);
+  }
+
+  /**
+   * Retrieves the specified file as XML document.
+   * @param sftp SFTP channel
+   * @param path remote path
+   * @return document node
+   * @throws QueryException query exception
+   */
+  public DBNode getXml(final ChannelSftp sftp, final Str path) throws QueryException {
+    final IOContent io = new IOContent(get(sftp, path), path.toJava());
+    try {
+      return new DBNode(Parser.xmlParser(io, queryContext.context.options));
+    } catch(final IOException ex) {
+      throw error("parse", Util.message(ex));
+    }
+  }
+
+  /**
+   * Decodes text and checks for invalid XML characters.
+   * @param bytes bytes
+   * @param encoding encoding (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  private static Str text(final byte[] bytes, final String encoding) throws QueryException {
+    try(TextInput ti = new TextInput(new IOContent(bytes), encoding)) {
+      return Str.get(ti.fallback(false).content());
+    } catch(final IOException ex) {
+      throw error("encoding", Util.message(ex));
+    }
+  }
+
+  /**
+   * Returns a supported encoding.
+   * @param encoding encoding
+   * @return encoding
+   * @throws QueryException query exception
+   */
+  private static String encoding(final Str encoding) throws QueryException {
+    final String enc = encoding.toJava(), error = Strings.checkEncoding(enc);
+    if(error != null) throw error("encoding", error);
+    return Strings.normEncoding(enc, false);
   }
 
   /**
@@ -188,10 +450,10 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @return file contents
    * @throws QueryException query exception
    */
-  private byte[] get(final ChannelSftp sftp, final Str path) throws QueryException {
+  private static byte[] get(final ChannelSftp sftp, final Str path) throws QueryException {
     final ArrayOutput ao = new ArrayOutput();
     run(() -> sftp.get(path.toJava(), ao));
-    return ao.toArray();
+    return ao.finish();
   }
 
   /**
@@ -219,7 +481,45 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    */
   public void putText(final ChannelSftp sftp, final Str string, final Str path)
       throws QueryException {
-    put(sftp, new ArrayInput(string.string()), path);
+    put(sftp, encode(string, null), path, ChannelSftp.OVERWRITE);
+  }
+
+  /**
+   * Uploads a string in the specified encoding to a remote file.
+   * @param sftp SFTP channel
+   * @param string textual string to be uploaded
+   * @param path remote path
+   * @param encoding encoding
+   * @throws QueryException query exception
+   */
+  public void putText(final ChannelSftp sftp, final Str string, final Str path,
+      final Str encoding) throws QueryException {
+    put(sftp, encode(string, encoding), path, ChannelSftp.OVERWRITE);
+  }
+
+  /**
+   * Appends a string to a remote file.
+   * @param sftp SFTP channel
+   * @param string textual string to be appended
+   * @param path remote path
+   * @throws QueryException query exception
+   */
+  public void appendText(final ChannelSftp sftp, final Str string, final Str path)
+      throws QueryException {
+    put(sftp, encode(string, null), path, ChannelSftp.APPEND);
+  }
+
+  /**
+   * Appends a string in the specified encoding to a remote file.
+   * @param sftp SFTP channel
+   * @param string textual string to be appended
+   * @param path remote path
+   * @param encoding encoding
+   * @throws QueryException query exception
+   */
+  public void appendText(final ChannelSftp sftp, final Str string, final Str path,
+      final Str encoding) throws QueryException {
+    put(sftp, encode(string, encoding), path, ChannelSftp.APPEND);
   }
 
   /**
@@ -231,7 +531,35 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    */
   public void putBinary(final ChannelSftp sftp, final Bin item, final Str path)
       throws QueryException {
-    put(sftp, item.input(null), path);
+    put(sftp, item.input(null), path, ChannelSftp.OVERWRITE);
+  }
+
+  /**
+   * Appends a binary to a remote file.
+   * @param sftp SFTP channel
+   * @param item binary item to be appended
+   * @param path remote path
+   * @throws QueryException query exception
+   */
+  public void appendBinary(final ChannelSftp sftp, final Bin item, final Str path)
+      throws QueryException {
+    put(sftp, item.input(null), path, ChannelSftp.APPEND);
+  }
+
+  /**
+   * Encodes a string.
+   * @param string string
+   * @param encoding encoding (can be {@code null})
+   * @return input stream
+   * @throws QueryException query exception
+   */
+  private static ArrayInput encode(final Str string, final Str encoding) throws QueryException {
+    final String enc = encoding != null ? encoding(encoding) : null;
+    try {
+      return new ArrayInput(Token.encode(string.string(), enc));
+    } catch(final CharacterCodingException ex) {
+      throw error("encoding", "String cannot be encoded as " + enc + '.');
+    }
   }
 
   /**
@@ -239,11 +567,12 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @param sftp SFTP channel
    * @param input data to be stored
    * @param path remote path
+   * @param mode transfer mode
    * @throws QueryException query exception
    */
-  private void put(final ChannelSftp sftp, final InputStream input, final Str path)
-      throws QueryException {
-    run(() -> sftp.put(input, path.toJava()));
+  private static void put(final ChannelSftp sftp, final InputStream input, final Str path,
+      final int mode) throws QueryException {
+    run(() -> sftp.put(input, path.toJava(), mode));
   }
 
   /**
@@ -295,6 +624,34 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
   }
 
   /**
+   * Changes the permissions of a remote file.
+   * @param sftp SFTP channel
+   * @param path path
+   * @param permissions octal permissions (e.g. {@code 755})
+   * @throws QueryException query exception
+   */
+  public void chmod(final ChannelSftp sftp, final Str path, final Str permissions)
+      throws QueryException {
+    final String perms = permissions.toJava();
+    if(!perms.matches("[0-7]{3,4}")) throw error("format", "Invalid permissions: " + perms);
+    run(() -> sftp.chmod(Integer.parseInt(perms, 8), path.toJava()));
+  }
+
+  /**
+   * Returns the remote working directory.
+   * @param sftp SFTP channel
+   * @return path
+   * @throws QueryException query exception
+   */
+  public Str pwd(final ChannelSftp sftp) throws QueryException {
+    try {
+      return Str.get(sftp.pwd());
+    } catch(final SftpException ex) {
+      throw error(ex);
+    }
+  }
+
+  /**
    * Changes to a directory.
    * @param sftp SFTP channel
    * @param path path
@@ -309,9 +666,9 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @return logs
    */
   public Value logs() {
-    final Value value = StrSeq.get(logs);
-    logs = new TokenList();
-    return value;
+    synchronized(logs) {
+      return StrSeq.get(logs.next());
+    }
   }
 
   /**
@@ -319,30 +676,37 @@ public final class Sftp extends QueryModule implements com.jcraft.jsch.Logger {
    * @param op operation
    * @throws QueryException query exception
    */
-  public void run(final SftpFunction op) throws QueryException {
+  private static void run(final SftpFunction op) throws QueryException {
     try {
       op.apply();
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final Exception ex) {
       throw error(ex);
     }
   }
 
   /**
-   * Throws a query exception for the specified exception.
+   * Returns a query exception for the specified exception.
    * @param ex exception
    * @return query exception
    */
   private static QueryException error(final Exception ex) {
-    return new QueryException("SFTP: " + Util.message(ex));
+    final String code = ex instanceof final SftpException se ? switch(se.id) {
+      case ChannelSftp.SSH_FX_NO_SUCH_FILE -> "not-found";
+      case ChannelSftp.SSH_FX_PERMISSION_DENIED -> "permission";
+      default -> "error";
+    } : ex instanceof JSchException ? "connect" : "error";
+    return error(code, Util.message(ex));
   }
 
-  @Override
-  public boolean isEnabled(final int level) {
-    return true;
-  }
-
-  @Override
-  public void log(final int level, final String message) {
-    logs.add(level + ": " + message);
+  /**
+   * Returns a query exception with an error code in the module namespace.
+   * @param code error code
+   * @param message error message
+   * @return query exception
+   */
+  private static QueryException error(final String code, final String message) {
+    return new QueryException(null, new QNm(PREFIX, code, URI), "SFTP: %", message);
   }
 }
