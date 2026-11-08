@@ -48,6 +48,9 @@ public final class AlterDB extends ACreate {
     if(!closed) closed = close(context, src);
     // check if source database is still opened
     if(context.pinned(src)) return error(DB_PINNED_X, src);
+    // an existing target database will be replaced: close it, check if it is still opened
+    close(context, trg);
+    if(context.pinned(trg)) return error(DB_PINNED_X, trg);
 
     // try to alter database
     return alter(src, trg, soptions) && (!closed || new Open(trg).run(context)) ?
@@ -60,7 +63,8 @@ public final class AlterDB extends ACreate {
   }
 
   /**
-   * Renames the specified database.
+   * Renames the specified database. An existing target database is replaced.
+   * If renaming fails, both databases are left unchanged.
    * @param source name of the existing database
    * @param target new database name
    * @param sopts static options
@@ -69,16 +73,38 @@ public final class AlterDB extends ACreate {
   public static synchronized boolean alter(final String source, final String target,
       final StaticOptions sopts) {
 
-    // drop target database (unless it is the source, e.g. if only the case differs)
     final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
-    if(!src.sameFile(trg)) DropDB.drop(target, sopts);
+    // move an existing target database aside (unless it is the source, e.g. if only the case
+    // differs). On Windows, this fails if a file of the target is opened by another process.
+    IOFile old = null;
+    if(trg.exists() && !src.sameFile(trg)) {
+      for(int c = 0; old == null || old.exists(); c++) {
+        old = new IOFile(sopts.dbPath(), '.' + target + '.' + c);
+      }
+      try {
+        trg.moveTo(old, false);
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        return false;
+      }
+    }
     try {
       src.moveTo(trg, false);
-      return true;
     } catch(final IOException ex) {
       Util.debug(ex);
+      // restore the target database
+      if(old != null) {
+        try {
+          old.moveTo(trg, false);
+        } catch(final IOException ex2) {
+          Util.debug(ex2);
+        }
+      }
       return false;
     }
+    // delete the replaced database
+    if(old != null && !old.delete()) Util.debugln("Could not delete %", old);
+    return true;
   }
 
   @Override
