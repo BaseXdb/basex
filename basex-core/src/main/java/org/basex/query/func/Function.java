@@ -13,6 +13,7 @@ import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
 import org.basex.query.func.bin.*;
+import org.basex.query.func.bit.*;
 import org.basex.query.func.cache.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
@@ -1183,6 +1184,36 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _BIN_XOR(BinXor::new, "xor(value1, value2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+
+  // Bit Module
+
+  /** XQuery function. */
+  _BIT_AND(BitAnd::new, "and(value1, value2)",
+      params(INTEGER_ZO, INTEGER_ZO), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_COUNT(BitCount::new, "count(value)",
+      params(INTEGER_ZO), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_NOT(BitNot::new, "not(value)",
+      params(INTEGER_ZO), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_OR(BitOr::new, "or(value1, value2)",
+      params(INTEGER_ZO, INTEGER_ZO), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_ROTATE(BitRotate::new, "rotate(value, by, size)",
+      params(INTEGER_ZO, INTEGER_O, INTEGER_O), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_SHIFT(BitShift::new, "shift(value, by)",
+      params(INTEGER_ZO, INTEGER_O), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_TEST(BitTest::new, "test(value, index)",
+      params(INTEGER_ZO, INTEGER_O), BOOLEAN_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_UNSIGNED(BitUnsigned::new, "unsigned(value, size)",
+      params(INTEGER_ZO, INTEGER_O), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
+  _BIT_XOR(BitXor::new, "xor(value1, value2)",
+      params(INTEGER_ZO, INTEGER_ZO), INTEGER_ZO, BIT_URI),
 
   // Cache Module
 
