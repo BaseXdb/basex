@@ -154,7 +154,7 @@ public final class Try extends Single {
     if(type.intersect(BasicType.STRING) != null ||
         type.intersect(BasicType.BASE64_BINARY) != null) {
       for(final Item item : value) {
-        if(item instanceof final Lazy lazy) lazy.cache(info);
+        if(item instanceof Lazy) item.cache(false, info);
       }
     }
     return value;

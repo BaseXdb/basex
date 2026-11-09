@@ -53,8 +53,8 @@ public final class B64IOLazy extends B64Lazy {
   }
 
   @Override
-  IO source() throws IOException {
-    return temp != null ? SpillOutput.read(input, temp) : input;
+  IO source(final boolean single) throws IOException {
+    return temp != null && !single ? SpillOutput.read(input, temp) : input;
   }
 
   @Override

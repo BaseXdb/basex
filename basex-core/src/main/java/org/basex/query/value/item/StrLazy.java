@@ -36,6 +36,8 @@ public final class StrLazy extends AStr implements Lazy {
   private IO contents;
   /** Caching flag. */
   private boolean cache;
+  /** Indicates if the item will be accessed only once more. */
+  private boolean once;
 
   /**
    * Constructor.
@@ -87,8 +89,12 @@ public final class StrLazy extends AStr implements Lazy {
     else cache(ii);
   }
 
-  @Override
-  public void cache(final InputInfo ii) throws QueryException {
+  /**
+   * Caches the contents.
+   * @param ii input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void cache(final InputInfo ii) throws QueryException {
     if(isCached()) return;
     try {
       value = get(false, ii).content();
@@ -118,7 +124,9 @@ public final class StrLazy extends AStr implements Lazy {
    */
   private TextInput get(final boolean keep, final InputInfo info) throws QueryException {
     try {
-      if(keep && contents == null && temp != null) contents = SpillOutput.read(input, temp);
+      if(keep && !once && contents == null && temp != null) {
+        contents = SpillOutput.read(input, temp);
+      }
       final IO io = contents != null ? contents : input;
       final TextInput ti = normalize ? new NewlineInput(io, encoding) : new TextInput(io, encoding);
       return ti.fallback(fallback);
@@ -130,6 +138,11 @@ public final class StrLazy extends AStr implements Lazy {
   @Override
   public boolean isCached() {
     return value != null;
+  }
+
+  @Override
+  public void once() {
+    once = true;
   }
 
   @Override

@@ -80,7 +80,7 @@ public final class RestXqResponse extends WebResponse {
       qc.optimize();
 
       // evaluate query
-      final Iter iter = qc.iter();
+      final Iter iter = new ResultIter(qc.iter());
       Item item = iter.next();
       response = item != null;
 

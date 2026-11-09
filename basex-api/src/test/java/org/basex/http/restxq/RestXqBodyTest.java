@@ -31,6 +31,29 @@ public final class RestXqBodyTest extends RestXqTest {
   }
 
   /**
+   * A forwarded response body is returned unchanged, whether it is streamed or not.
+   * @throws IOException I/O exception
+   */
+  @Test public void forwardedBody() throws IOException {
+    final String body = "http:get('" + HTTP_ROOT + "src', { 'response-body': 'binary' })?body";
+    final String text = "fetch:text('" + HTTP_ROOT + "src')";
+    register("declare %R:path('src') %output:method('basex') "
+        + "function m:src() { bin:encode-string('abc') };");
+    add("declare %R:path('fwd/{$n}') %output:method('basex') function m:fwd($n) { "
+        + "let $b := " + body + " return switch($n) { case '1' return $b "
+        + "case '2' return ($b, $b) default return $b[bin:length(.) = 3] } };");
+    get("abc", "fwd/1");
+    get("abc\nabc", "fwd/2");
+    get("abc", "fwd/3");
+
+    // REST: last item of a query result
+    for(final String query : new String[] { body, text }) {
+      get("abc", "rest", "query", query);
+      get("abc\nabc", "rest", "query", "let $v := " + query + " return ($v, $v)");
+    }
+  }
+
+  /**
    * Bodies that cannot be parsed are rejected as bad requests.
    * @throws IOException I/O exception
    */

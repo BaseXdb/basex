@@ -46,12 +46,14 @@ public final class B64HttpLazy extends B64Lazy {
   }
 
   @Override
-  IO source() throws IOException {
-    // read the body once, spill it to disk if it is large
+  IO source(final boolean single) throws IOException {
+    // read the body once: stream it, or spill it to disk if it is large
     final InputStream is = pending;
     pending = null;
     if(is == null) throw new IOException("Response body is not available anymore.");
-    try(InputStream in = Payload.decode(is, coding)) {
+    final InputStream in = Payload.decode(is, coding);
+    if(single) return new IOStream(in);
+    try(in) {
       return SpillOutput.read(in, temp);
     }
   }

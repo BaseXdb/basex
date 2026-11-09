@@ -126,7 +126,7 @@ public final class ServerQuery extends Job {
 
       qp.optimize();
       queryPlan(PlanStage.OPTIMIZED);
-      final Iter iter = qp.iter();
+      final Iter iter = new ResultIter(qp.iter());
 
       // iterate through results
       int hits = 0;

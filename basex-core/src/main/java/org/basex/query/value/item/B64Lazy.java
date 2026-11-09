@@ -20,13 +20,21 @@ public abstract class B64Lazy extends B64 implements Lazy {
   private boolean cache;
   /** Contents, assigned on first access (can be {@code null}). */
   private IO contents;
+  /** Indicates if the item will be accessed only once more. */
+  private boolean once;
 
   /**
    * Returns the contents of the item; called on first access.
+   * @param single the contents will be read only once
    * @return input reference
    * @throws IOException I/O exception
    */
-  abstract IO source() throws IOException;
+  abstract IO source(boolean single) throws IOException;
+
+  @Override
+  public final void once() {
+    once = true;
+  }
 
   /**
    * Opens a stream on the uncached value.
@@ -44,7 +52,7 @@ public abstract class B64Lazy extends B64 implements Lazy {
    */
   private IO contents() throws IOException {
     if(contents == null) {
-      contents = source();
+      contents = source(once);
       if(contents instanceof IOContent) data = contents.read();
     }
     return contents;
@@ -96,8 +104,12 @@ public abstract class B64Lazy extends B64 implements Lazy {
     else cache(ii);
   }
 
-  @Override
-  public final void cache(final InputInfo ii) throws QueryException {
+  /**
+   * Caches the contents.
+   * @param ii input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void cache(final InputInfo ii) throws QueryException {
     if(isCached()) return;
     try(BufferInput bi = open()) {
       data = bi.content();

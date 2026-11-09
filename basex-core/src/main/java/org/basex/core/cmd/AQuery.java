@@ -91,7 +91,7 @@ public abstract class AQuery extends Command {
               if(exception instanceof final JobException ex) throw ex;
             } else {
               hits = 0;
-              final Iter iter = qp.iter();
+              final Iter iter = new ResultIter(qp.iter());
               for(Item item; (item = iter.next()) != null;) {
                 ser.serialize(item);
                 ++hits;

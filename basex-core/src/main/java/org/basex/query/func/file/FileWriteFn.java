@@ -127,7 +127,7 @@ abstract class FileWriteFn extends FileFn {
       item instanceof final B64IOLazy bin ? bin.input() : null;
     if(input instanceof IOFile && Files.exists(path) &&
         Files.isSameFile(Paths.get(input.path()), path)) {
-      ((Lazy) item).cache(info);
+      item.cache(false, info);
     }
   }
 }

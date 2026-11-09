@@ -1,8 +1,5 @@
 package org.basex.query.value.item;
 
-import org.basex.query.*;
-import org.basex.util.*;
-
 /**
  * Lazy item.
  *
@@ -17,9 +14,7 @@ public interface Lazy {
   boolean isCached();
 
   /**
-   * Caches the value.
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
+   * Indicates that the item will be accessed only once more, allowing its source to be streamed.
    */
-  void cache(InputInfo info) throws QueryException;
+  void once();
 }
