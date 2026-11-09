@@ -339,7 +339,7 @@ public final class JNode extends GNode {
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
     final Item item = value.item(null, ii);
-    return item.isEmpty() ? Token.EMPTY : item.string(ii);
+    return item == Empty.VALUE ? Token.EMPTY : item.string(ii);
   }
 
   @Override

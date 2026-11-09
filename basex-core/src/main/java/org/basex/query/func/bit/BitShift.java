@@ -15,10 +15,10 @@ import org.basex.query.value.seq.*;
 public final class BitShift extends BitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Long value = toLongOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
+    final Item item = arg(0).atomItem(qc, info);
+    if(item == Empty.VALUE) return Empty.VALUE;
 
-    final long by = toLong(arg(1), qc);
+    final long value = toLong(item, arg(0)), by = toLong(arg(1), qc);
     return Itr.get(by >= Long.SIZE ? 0 : by >= 0 ? value << by :
       value >> -Math.max(by, 1 - Long.SIZE));
   }

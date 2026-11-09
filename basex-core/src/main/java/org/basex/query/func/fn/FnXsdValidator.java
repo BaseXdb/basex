@@ -204,7 +204,7 @@ public final class FnXsdValidator extends StandardFunc {
     @Override
     public Value value(final QueryContext qc) throws QueryException {
       final Item item = arg(0).item(qc, info);
-      if(item.isEmpty()) return Empty.VALUE;
+      if(item == Empty.VALUE) return Empty.VALUE;
 
       final XNode node = (XNode) item;
       if(node.type.instanceOf(NodeType.ATTRIBUTE))

@@ -14,10 +14,10 @@ import org.basex.query.value.seq.*;
 public final class BitTest extends BitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Long value = toLongOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
+    final Item item = arg(0).atomItem(qc, info);
+    if(item == Empty.VALUE) return Empty.VALUE;
 
-    final long index = toLong(arg(1).atomItem(qc, info), 0);
+    final long value = toLong(item, arg(0)), index = toLong(arg(1).atomItem(qc, info), 0);
     return Bln.get((value >> Math.min(index, Long.SIZE - 1) & 1) != 0);
   }
 }

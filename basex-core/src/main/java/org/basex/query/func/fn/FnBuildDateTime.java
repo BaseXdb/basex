@@ -128,7 +128,7 @@ public final class FnBuildDateTime extends DateTimeFn {
   private static <T> T get(final XQMap map, final Str key, final QueryFunction<Item, T> convert)
       throws QueryException {
     final Item item = (Item) map.get(key);
-    return item.isEmpty() ? null : convert.apply(item);
+    return item == Empty.VALUE ? null : convert.apply(item);
   }
 
   /**

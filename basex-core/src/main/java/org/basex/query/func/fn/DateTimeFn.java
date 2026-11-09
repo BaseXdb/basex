@@ -36,7 +36,7 @@ abstract class DateTimeFn extends StandardFunc {
     final Expr value = arg(0);
     final Item item = value.atomItem(qc, info);
     final Item zone = arg(1).atomItem(qc, info);
-    if(item.isEmpty()) return Empty.VALUE;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     final ADate date = toDate(item, type, value, qc);
     final boolean empty = zone.isEmpty(), undefined = defined(1) && empty;

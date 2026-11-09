@@ -17,8 +17,8 @@ import org.basex.query.value.seq.*;
 public final class BitNot extends BitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Long value = toLongOrNull(arg(0), qc);
-    return value == null ? Empty.VALUE : Itr.get(~value);
+    final Item item = arg(0).atomItem(qc, info);
+    return item == Empty.VALUE ? Empty.VALUE : Itr.get(~toLong(item, arg(0)));
   }
 
   @Override

@@ -14,6 +14,7 @@ import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -71,7 +72,7 @@ public final class FnReplace extends RegExFn {
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         // replacements are appended verbatim, so no escaping is required
         sb.append(input, pos, matcher.start());
-        if(!item.isEmpty()) sb.append(string(item.string(info)));
+        if(item != Empty.VALUE) sb.append(string(item.string(info)));
         pos = matcher.end();
       }
       return Str.get(sb.append(input, pos, input.length()).toString());

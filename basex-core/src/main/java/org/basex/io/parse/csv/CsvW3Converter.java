@@ -116,7 +116,7 @@ public final class CsvW3Converter extends CsvConverter {
         Item colIndex = toAtomItem(arg(1), qc);
         if(colIndex.type.instanceOf(BasicType.STRING)) {
           final Item it = (Item) columnIndex.get(colIndex);
-          if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
+          if(it == Empty.VALUE) throw CSV_COLUMNNAME_X.get(info, colIndex);
           colIndex = it;
         }
         final long index = colIndex.itr(info) - 1;

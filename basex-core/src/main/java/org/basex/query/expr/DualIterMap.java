@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -68,7 +69,7 @@ public final class DualIterMap extends SimpleMap {
     // single context item: return the value of the right operand
     if(exprs[0].seqType().zeroOrOne()) {
       final Item item = exprs[0].item(qc, info);
-      if(item.isEmpty()) return item;
+      if(item == Empty.VALUE) return item;
       qf.value = item;
       try {
         return exprs[1].value(qc);

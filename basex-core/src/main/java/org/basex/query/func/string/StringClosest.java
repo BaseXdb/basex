@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -140,7 +141,7 @@ public final class StringClosest extends StringFn {
   private double invoke(final FItem function, final int[] cps1, final int[] cps2,
       final QueryContext qc) throws QueryException {
     final Item item = function.invoke(qc, info, str(cps1), str(cps2)).item(qc, info);
-    if(item.isEmpty()) throw typeError(item, BasicType.DOUBLE, info);
+    if(item == Empty.VALUE) throw typeError(item, BasicType.DOUBLE, info);
     return toDouble(item);
   }
 

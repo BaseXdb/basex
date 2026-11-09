@@ -15,10 +15,11 @@ import org.basex.query.value.seq.*;
 abstract class BitLogic extends BitFn {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Long value1 = toLongOrNull(arg(0), qc);
-    if(value1 == null) return Empty.VALUE;
-    final Long value2 = toLongOrNull(arg(1), qc);
-    return value2 == null ? Empty.VALUE : Itr.get(combine(value1, value2));
+    final Item item1 = arg(0).atomItem(qc, info);
+    if(item1 == Empty.VALUE) return Empty.VALUE;
+    final Item item2 = arg(1).atomItem(qc, info);
+    if(item2 == Empty.VALUE) return Empty.VALUE;
+    return Itr.get(combine(toLong(item1, arg(0)), toLong(item2, arg(1))));
   }
 
   @Override

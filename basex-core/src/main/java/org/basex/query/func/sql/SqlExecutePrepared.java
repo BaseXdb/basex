@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -125,7 +126,7 @@ public class SqlExecutePrepared extends SqlExecute {
     for(final Value member : array.members()) {
       final Item item = member.atomItem(qc, info);
       final Type type = item.type;
-      if(item.isEmpty()) {
+      if(item == Empty.VALUE) {
         bindNull(i, ps);
       } else if(type == BasicType.DATE) {
         ps.setDate(i, new java.sql.Date(ms(item, qc)));

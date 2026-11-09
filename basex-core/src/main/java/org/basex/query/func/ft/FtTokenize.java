@@ -42,7 +42,7 @@ public class FtTokenize extends StandardFunc {
     final FtLexerOptions options = options(1, FtLexerOptions::new, qc);
 
     final TokenList tl = new TokenList();
-    if(!item.isEmpty()) {
+    if(item != Empty.VALUE) {
       final FTOpt opt = new FTOpt().assign(qc.ftOpt());
       final FTDiacritics dc = options.get(FtLexerOptions.DIACRITICS);
       if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);

@@ -6,6 +6,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -18,13 +19,13 @@ public final class FnNormalizeSpace extends ContextFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Item item = atomArg(qc);
-    return item.isEmpty() ? Str.EMPTY : Str.get(Token.normalize(item.string(info)));
+    return item == Empty.VALUE ? Str.EMPTY : Str.get(Token.normalize(item.string(info)));
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
     final Item item = atomArg(qc);
-    return !item.isEmpty() && !Token.ws(item.string(info));
+    return item != Empty.VALUE && !Token.ws(item.string(info));
   }
 
   @Override
