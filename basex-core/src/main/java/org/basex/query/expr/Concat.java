@@ -72,13 +72,13 @@ public final class Concat extends Arr {
     if(list.isEmpty()) return cc.replaceWith(this, Str.get(tb.finish()));
     if(!tb.isEmpty()) list.add(Str.get(tb.finish()));
 
-    // single expression left: $x || '' → string($x)
+    // single expression left: $x || '' → string($x), $seq || '' → string-join($seq)
     final int ls = list.size();
     if(ls == 1) {
       final Expr arg = list.peek();
-      if(arg.seqType().atomOcc().max <= 1) {
-        return cc.replaceWith(this, cc.function(Function.STRING, info, arg));
-      }
+      final boolean single = arg.seqType().atomOcc().max <= 1;
+      return cc.replaceWith(this, cc.function(single ? Function.STRING : Function.STRING_JOIN,
+          info, arg));
     }
 
     // replace old with new expressions

@@ -3058,4 +3058,12 @@ public final class RewritingsTest extends SandboxTest {
         + "{ 'a': (let $f := random:double() return $e[$f < 2] ! string()) otherwise 'z', "
         + "'b': 1 }?a }; serialize(local:f(<x>A</x>), { 'method': 'adaptive' })", "\"A\"");
   }
+
+  /** Concatenation with a single sequence operand. */
+  @Test public void concatSingleSequence() {
+    final String input = "let $s := (1 to 3)[. != random:integer(1) + 4] return ";
+    check(input + "'' || $s", "123", exists(STRING_JOIN), empty(Concat.class));
+    check(input + "concat($s)", "123", exists(STRING_JOIN), empty(Concat.class));
+    check(input + "concat(head($s))", "1", exists(STRING), empty(Concat.class));
+  }
 }
