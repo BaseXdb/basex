@@ -3,12 +3,15 @@ package org.basex.modules;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.file.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.XQuery;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
+import org.basex.util.Token;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 
@@ -19,9 +22,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 
 /**
- * Mail test class, sending mails to an in-memory SMTP server. The {@link #main} method can be
- * used to send mails via an installed module and a real mail server, or to a local mock
- * server (argument {@code local}).
+ * Mail test class, sending mails to an in-memory SMTP server.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -36,78 +37,66 @@ public final class MailTest {
   static final GreenMailExtension SMTP = new GreenMailExtension(ServerSetupTest.SMTP);
 
   /**
-   * Test method.
-   * @param args {@code local} to send the mails to a local mock server and list them; otherwise,
-   *   they are sent to the default mail server.
-   * @throws Exception exception
+   * Connects to the specified SSL port, and checks the identity of the server.
    */
-  public static void main(final String[] args) throws Exception {
-    final boolean local = args.length > 0 && "local".equals(args[0]);
-    final GreenMail greenMail;
-    if(local) {
-      greenMail = new GreenMail(ServerSetupTest.SMTP);
-      greenMail.start();
-    } else {
-      greenMail = null;
-    }
+  @Test public void ssl() {
+    final GreenMail smtps = new GreenMail(ServerSetupTest.SMTPS);
+    smtps.start();
+    // trust the self-signed certificate, whose name does not match the host
+    System.setProperty("mail.smtp.ssl.trust", "localhost");
     try {
-      final int port = local ? greenMail.getSmtp().getPort() : 0;
-      testJava(port);
-      list(greenMail);
-      testXQuery(port);
-      list(greenMail);
+      final QueryException ex = assertThrows(QueryException.class, () -> query(
+          "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'message': 'hi',"
+          + " 'host': 'localhost', 'ssl': true(), 'port': " + smtps.getSmtps().getPort() + " }"));
+      assertTrue(ex.getMessage().contains("No name matching localhost"), ex.getMessage());
+      assertEquals(0, smtps.getReceivedMessages().length);
     } finally {
-      if(greenMail != null) greenMail.stop();
+      System.clearProperty("mail.smtp.ssl.trust");
+      smtps.stop();
     }
   }
 
   /**
-   * Java test method.
-   * @param port port of the local mock server ({@code 0}: none, use the mail server specified
-   *   below)
-   * @throws Exception exception
+   * Refuses to send a mail if STARTTLS is requested, but not supported by the server.
    */
-  public static void testJava(final int port) throws Exception {
-    final MapBuilder map = new MapBuilder();
-    map.put("from", "from@basex.org");
-    map.put("to", "to@basex.org");
-    map.put("subject", "Hi");
-    map.put("message", "hi there");
-    if(port != 0) {
-      map.put("host", "localhost");
-      map.put("port", Itr.get(port));
-    }
-    new Mail().send(map.map());
+  @Test public void tls() {
+    final QueryException ex = assertThrows(QueryException.class, () -> query(
+        "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'message': 'hi', 'tls': true() }"));
+    assertTrue(ex.getMessage().contains("STARTTLS is required"), ex.getMessage());
+    assertEquals(0, SMTP.getReceivedMessages().length);
   }
 
   /**
-   * Java XQuery test method.
-   * @param port port of the local mock server ({@code 0}: none, use the mail server specified
-   *   below)
+   * Stopping a query aborts a pending connection.
    * @throws Exception exception
    */
-  public static void testXQuery(final int port) throws Exception {
-    final String server = port != 0 ? ", 'host': 'localhost', 'port': " + port : "";
-    final String query =
-      "import module namespace mail = 'http://basex.org/modules/mail'; " +
-      "mail:send({ 'from': 'from@basex.org', 'to': 'to@basex.org', 'subject': 'Hi', " +
-      "'message': 'hi there'" + server + " })";
-    try(QueryProcessor qp = new QueryProcessor(query, new Context())) {
-      System.out.println(qp.value().serialize());
+  @Test public void stopQuery() throws Exception {
+    final Context ctx = new Context();
+    try(ServerSocket silent = new ServerSocket(0)) {
+      final XQuery cmd = new XQuery(
+          "import module namespace mail = 'http://basex.org/modules/mail'; mail:send("
+          + "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'host': 'localhost',"
+          + " 'port': " + silent.getLocalPort() + ", 'timeout': 0 })");
+      final AtomicReference<Throwable> caught = new AtomicReference<>();
+      final Thread worker = new Thread(() -> {
+        try {
+          cmd.execute(ctx);
+        } catch(final Throwable th) {
+          caught.set(th);
+        }
+      });
+      worker.start();
+      // wait until the client has connected, then stop it while it waits for the greeting
+      silent.setSoTimeout(10_000);
+      try(Socket client = silent.accept()) {
+        cmd.stop();
+        worker.join(10_000);
+      }
+      assertFalse(worker.isAlive(), "connection was not aborted");
+      assertNotNull(caught.get());
+    } finally {
+      ctx.close();
     }
-  }
-
-  /**
-   * Lists and removes the messages received by the mock server.
-   * @param greenMail mock server ({@code null}: do nothing)
-   * @throws Exception exception
-   */
-  private static void list(final GreenMail greenMail) throws Exception {
-    if(greenMail == null) return;
-    for(final MimeMessage message : greenMail.getReceivedMessages()) {
-      System.out.println(GreenMailUtil.getWholeMessage(message));
-    }
-    greenMail.purgeEmailFromAllMailboxes();
   }
 
   /**
@@ -144,6 +133,7 @@ public final class MailTest {
     final QueryException ex = assertThrows(QueryException.class,
         () -> query(options + "'wrong' }"));
     assertTrue(ex.getMessage().contains("Mail:"), ex.getMessage());
+    assertEquals("auth", code(ex));
     assertEquals(0, SMTP.getReceivedMessages().length);
 
     query(options + "'secret' }");
@@ -178,6 +168,125 @@ public final class MailTest {
   }
 
   /**
+   * Sends an HTML mail with a plain-text alternative.
+   * @throws Exception exception
+   */
+  @Test public void html() throws Exception {
+    query("{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'message': 'hi',"
+        + " 'html': '<p>hi</p>' }");
+
+    final MimeMessage message = SMTP.getReceivedMessages()[0];
+    assertTrue(message.isMimeType("multipart/alternative"));
+    final Multipart multipart = (Multipart) message.getContent();
+    assertEquals(2, multipart.getCount());
+    assertEquals("hi", ((String) multipart.getBodyPart(0).getContent()).trim());
+    assertTrue(multipart.getBodyPart(1).isMimeType("text/html"));
+    assertEquals("<p>hi</p>", ((String) multipart.getBodyPart(1).getContent()).trim());
+  }
+
+  /**
+   * Sends attachments from a file URI and from binary and textual data, along with HTML.
+   * @throws Exception exception
+   */
+  @Test public void dataAttachments() throws Exception {
+    query("{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'message': 'hi', 'html': '<p/>',"
+        + " 'attachment': ('" + ATTACHMENT.toUri() + "',"
+        + " { 'name': 'a.bin', 'content': xs:base64Binary('AAEC') },"
+        + " { 'name': 'b.txt', 'content': 'grün' },"
+        + " { 'name': 'c.dat', 'content': xs:hexBinary('41'), 'type': 'text/x-test' },"
+        + " { 'name': 'd.txt', 'content': 'grün', 'type': 'text/plain' }) }");
+
+    final MimeMessage message = SMTP.getReceivedMessages()[0];
+    final Multipart multipart = (Multipart) message.getContent();
+    assertEquals(6, multipart.getCount());
+    assertTrue(multipart.getBodyPart(0).isMimeType("multipart/alternative"));
+    assertEquals(ATTACHMENT.getFileName().toString(), multipart.getBodyPart(1).getFileName());
+
+    final BodyPart bin = multipart.getBodyPart(2), txt = multipart.getBodyPart(3);
+    final BodyPart dat = multipart.getBodyPart(4);
+    assertEquals("a.bin", bin.getFileName());
+    try(InputStream is = bin.getInputStream()) {
+      assertArrayEquals(new byte[] { 0, 1, 2 }, is.readAllBytes());
+    }
+    assertEquals("b.txt", txt.getFileName());
+    assertTrue(txt.isMimeType("text/plain"));
+    assertEquals("grün", txt.getContent());
+    assertTrue(dat.isMimeType("text/x-test"));
+    assertEquals(Part.ATTACHMENT, dat.getDisposition());
+    // explicit type: charset is added for string content
+    assertEquals("grün", multipart.getBodyPart(5).getContent());
+  }
+
+  /**
+   * Rejects invalid attachment data.
+   */
+  @Test public void invalidAttachment() {
+    assertThrows(QueryException.class, () -> query("{ 'from': 'from@basex.org',"
+        + " 'to': 'to@basex.org', 'attachment': { 'name': 'a.txt' } }"));
+    assertThrows(QueryException.class, () -> query("{ 'from': 'from@basex.org',"
+        + " 'to': 'to@basex.org', 'attachment': { 'name': 'a.txt', 'content': 'x', 'size': 1 } }"));
+    assertThrows(QueryException.class, () -> query("{ 'from': 'from@basex.org',"
+        + " 'to': 'to@basex.org', 'attachment': { 'name': 'a.txt', 'content': 1 } }"));
+    assertEquals(0, SMTP.getReceivedMessages().length);
+  }
+
+  /**
+   * Sends custom headers, an envelope sender and a timeout.
+   * @throws Exception exception
+   */
+  @Test public void headers() throws Exception {
+    query("{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'message': 'hi',"
+        + " 'headers': { 'X-Priority': '1', 'X-Tag': ('a', 'ä') },"
+        + " 'bounce': 'bounce@basex.org', 'timeout': 5.5 }");
+
+    final MimeMessage message = SMTP.getReceivedMessages()[0];
+    assertEquals("1", message.getHeader("X-Priority")[0]);
+    final String[] tags = message.getHeader("X-Tag");
+    assertEquals(2, tags.length);
+    assertEquals("a", tags[0]);
+    assertEquals("ä", MimeUtility.decodeText(tags[1]));
+    assertEquals("<bounce@basex.org>", message.getHeader("Return-Path")[0]);
+  }
+
+  /**
+   * Converts internationalized domain names to ASCII.
+   * @throws Exception exception
+   */
+  @Test public void idn() throws Exception {
+    query("{ 'from': 'Jörg <from@müller.de>', 'to': 'to@müller.de', 'message': 'hi' }");
+
+    final MimeMessage[] messages = SMTP.getReceivedMessages();
+    assertEquals(1, messages.length);
+    assertEquals("to@xn--mller-kva.de",
+        ((InternetAddress) messages[0].getRecipients(Message.RecipientType.TO)[0]).getAddress());
+    final InternetAddress from = (InternetAddress) messages[0].getFrom()[0];
+    assertEquals("from@xn--mller-kva.de", from.getAddress());
+    assertEquals("Jörg", from.getPersonal());
+  }
+
+  /**
+   * Rejects a user without password.
+   */
+  @Test public void userWithoutPassword() {
+    final QueryException ex = assertThrows(QueryException.class, () -> query(
+        "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'user': 'user', 'message': 'hi' }"));
+    assertTrue(ex.getMessage().contains("password"), ex.getMessage());
+    assertEquals("options", code(ex));
+    assertEquals(0, SMTP.getReceivedMessages().length);
+  }
+
+  /**
+   * Rejects a missing attachment.
+   */
+  @Test public void missingAttachment() {
+    final QueryException ex = assertThrows(QueryException.class, () -> query(
+        "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'attachment': 'unknown.jpg' }"));
+    assertTrue(ex.getMessage().contains("Attachment not found"), ex.getMessage());
+    assertEquals("not-found", code(ex));
+    assertEquals(0, SMTP.getReceivedMessages().length);
+  }
+
+  /**
    * Rejects unknown options.
    */
   @Test public void unknownOption() {
@@ -194,6 +303,27 @@ public final class MailTest {
         "{ 'from': 'from@basex.org', 'to': 'to@basex.org', 'subject': 'Hi', 'message': 'hi',"
         + " 'host': 'localhost', 'port': 1 }"));
     assertTrue(ex.getMessage().contains("Mail:"), ex.getMessage());
+    assertEquals("connect", code(ex));
+  }
+
+  /**
+   * Rejects an invalid address.
+   */
+  @Test public void invalidAddress() {
+    final QueryException ex = assertThrows(QueryException.class,
+        () -> query("{ 'from': 'from@basex.org', 'to': 'to@@basex.org' }"));
+    assertEquals("address", code(ex));
+  }
+
+  /**
+   * Returns the local name of the error code, and checks its namespace URI.
+   * @param ex query exception
+   * @return local name
+   */
+  private static String code(final QueryException ex) {
+    final QNm qname = ex.qname();
+    assertEquals("http://basex.org/modules/mail", Token.string(qname.uri()));
+    return Token.string(qname.local());
   }
 
   /**

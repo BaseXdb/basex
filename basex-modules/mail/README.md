@@ -1,7 +1,7 @@
 BaseX Mail Module
 -----------------
 
-The BaseX Mail Module provides functions for sending e-mail from XQuery, built on [Apache Commons Email]. Messages are described by a map that carries both the SMTP connection settings and the message.
+The BaseX Mail Module provides functions for sending e-mail from XQuery, built on [Jakarta Mail] and its reference implementation [Angus Mail]. Messages are described by a map that carries both the SMTP connection settings and the message.
 
 Example
 -------
@@ -44,10 +44,11 @@ The module is built with BaseX: `mvn install` in the repository root (or `mvn in
 License
 -------
 
-The Mail Module is provided under the BSD 3-Clause License. It depends on BaseX and Apache Commons Email, the latter transitively adding further dependencies.
+The Mail Module is provided under the BSD 3-Clause License. It depends on BaseX, Jakarta Mail and Angus Mail, the latter two transitively adding Jakarta Activation.
 
 An overview of the licenses of these components is available in [LICENSE.txt].
 
-[Apache Commons Email]: https://commons.apache.org/proper/commons-email/
+[Jakarta Mail]: https://jakarta.ee/specifications/mail/
+[Angus Mail]: https://eclipse-ee4j.github.io/angus-mail/
 [Mail Functions]: https://docs.basex.org/13/Mail_Functions
 [LICENSE.txt]: src/main/resources/LICENSE.txt
