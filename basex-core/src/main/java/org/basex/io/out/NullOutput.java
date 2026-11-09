@@ -21,6 +21,10 @@ public final class NullOutput extends PrintOutput {
   }
 
   @Override
+  public void write(final byte[] b, final int off, final int len) {
+  }
+
+  @Override
   public void flush() {
   }
 

@@ -40,7 +40,7 @@ public final class BinaryGet extends ACreate {
     if(!bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
     try(BufferInput bi = BufferInput.get(bin)) {
-      for(int b; (b = bi.read()) != -1;) out.write(b);
+      bi.transferTo(out);
     } catch(final IOException ex) {
       return error(ex.toString());
     }

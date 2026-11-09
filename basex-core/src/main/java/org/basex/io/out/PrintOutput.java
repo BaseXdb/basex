@@ -65,6 +65,13 @@ public class PrintOutput extends OutputStream {
     if(size++ < max) os.write(b);
   }
 
+  @Override
+  public void write(final byte[] b, final int off, final int len) throws IOException {
+    final int l = (int) Math.min(len, max - size);
+    if(l > 0) os.write(b, off, l);
+    size += len;
+  }
+
   /**
    * Prints a single codepoint, and keeps track of the current line length.
    * @param cp codepoint to be printed
