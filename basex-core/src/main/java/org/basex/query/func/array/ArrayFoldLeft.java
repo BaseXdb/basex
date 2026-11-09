@@ -1,7 +1,6 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
@@ -30,7 +29,7 @@ public class ArrayFoldLeft extends FnFoldLeft {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    return optType(cc, true, true);
+  protected boolean array() {
+    return true;
   }
 }

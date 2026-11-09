@@ -141,6 +141,12 @@ public final class Arith extends Arr {
   }
 
   @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return calc == Calc.ADD ? uf.step(this, Unfolding.Op.ADD, cc) :
+      calc == Calc.MULTIPLY ? uf.step(this, Unfolding.Op.MULTIPLY, cc) : uf.base(this);
+  }
+
+  @Override
   public Arith copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Arith arith = new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc);
     arith.calcOpt = calcOpt;

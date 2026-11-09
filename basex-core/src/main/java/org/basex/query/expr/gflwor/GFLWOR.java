@@ -1270,12 +1270,27 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void markTailCalls(final CompileContext cc) {
+    if(singleTuple()) rtrn.markTailCalls(cc);
+  }
+
+  @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    if(!singleTuple()) return uf.base(this);
+    rtrn = rtrn.unfold(uf, cc);
+    return optimize(cc);
+  }
+
+  /**
+   * Checks if the clauses yield at most one tuple.
+   * @return result of check
+   */
+  private boolean singleTuple() {
     final long[] minMax = { 1, 1 };
     for(final Clause clause : clauses) {
       clause.calcSize(minMax);
-      if(minMax[1] < 0 || minMax[1] > 1) return;
+      if(minMax[1] < 0 || minMax[1] > 1) return false;
     }
-    rtrn.markTailCalls(cc);
+    return true;
   }
 
   @Override

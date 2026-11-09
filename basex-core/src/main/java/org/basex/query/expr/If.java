@@ -250,6 +250,12 @@ public final class If extends Arr {
   }
 
   @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    for(int e = 0; e < 2; e++) exprs[e] = exprs[e].unfold(uf, cc);
+    return optimize(cc);
+  }
+
+  @Override
   public void skipCopy() {
     for(final Expr expr : exprs) expr.skipCopy();
   }

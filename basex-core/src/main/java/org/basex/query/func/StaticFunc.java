@@ -228,6 +228,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       try {
         cc.enter(this, () -> {
           expr = expr.compile(cc);
+          expr = unfold(cc);
           if(declType != null && !checked) expr = new TypeCheck(info, expr, declType).optimize(cc);
           return null;
         });
@@ -250,6 +251,20 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       }
     }
     return null;
+  }
+
+  /**
+   * Rewrites a body with non-tail recursive calls to an iterative expression.
+   * @param cc compilation context
+   * @return rewritten or original body
+   * @throws QueryException query exception
+   */
+  private Expr unfold(final CompileContext cc) throws QueryException {
+    if(memo || updating) return expr;
+    final Expr rewritten = RecursiveUnfolding.unfold(this, declType, cc);
+    if(rewritten == null) return expr;
+    cc.info(OPTREWRITE_X_X, (Supplier<?>) this::funcLabel, rewritten);
+    return rewritten;
   }
 
   @Override

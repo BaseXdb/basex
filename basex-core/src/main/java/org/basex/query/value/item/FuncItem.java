@@ -341,7 +341,7 @@ public final class FuncItem extends FItem implements Scope {
    * the body of the referenced function is returned.
    * @return function body
    */
-  private Expr body() {
+  public Expr body() {
     if(expr instanceof final StaticFuncCall call) {
       final StaticFunc sf = call.func();
       final int pl = params.length;
@@ -373,8 +373,6 @@ public final class FuncItem extends FItem implements Scope {
    */
   public Object fold(final Expr input, final Expr init, final boolean left, final boolean array,
       final boolean empty, final CompileContext cc) throws QueryException {
-
-    if(input.has(Flag.NDT)) return null;
 
     final int arity = arity();
     final IntFunction<Var> param = i -> i < arity ? params[i] : null;

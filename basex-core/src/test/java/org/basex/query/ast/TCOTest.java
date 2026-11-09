@@ -18,7 +18,8 @@ import org.junit.jupiter.api.*;
 public final class TCOTest extends SandboxTest {
   /** Non-tail-recursive function, called with a depth that exhausts the stack. */
   private static final String DEEP =
-      "declare function local:deep($n) { if($n eq 0) then () else ($n, local:deep($n - 1)) };";
+      "declare function local:deep($n) { if($n eq 0) then () else " +
+      "($n, local:deep($n - 1), local:deep(0)) };";
 
   /** Checks if tail-call optimization was applied. */
   @Test public void facTest() {

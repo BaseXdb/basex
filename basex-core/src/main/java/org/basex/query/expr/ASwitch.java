@@ -153,6 +153,12 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
   }
 
   @Override
+  public final Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    for(final G group : groups) branch(group, branch(group).unfold(uf, cc));
+    return optimize(cc);
+  }
+
+  @Override
   public final boolean accept(final ASTVisitor visitor) {
     return cond.accept(visitor) && visitAll(visitor, groups);
   }

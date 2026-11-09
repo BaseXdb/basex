@@ -140,6 +140,15 @@ public final class ArrayModuleTest extends SandboxTest {
         " fn($r, $v) { if($r >= 10) then $r else $r + $v }"), 10);
     query(func.args(" array { 1 to 100 }", " ()",
         " fn($r, $v) { $r otherwise $v[. = 42] }"), 42);
+
+    // flattened folds: appended and added values
+    inline(true);
+    final String array = " array { 1 to 100 } => array:put(2, (1, 2))";
+    check(func.args(array, " ()", " fn($r, $m) { $r, count($m) }") + "[position() < 4]",
+        "1\n2\n1", empty(func));
+    check(func.args(array, " ()", " fn($r, $m) { count($m), $r }") + "[last() - 1]", 2,
+        empty(func));
+    check(func.args(array, 0, " fn($r, $m) { $r + count($m) }"), 101, empty(func));
   }
 
   /** Test method. */
@@ -156,6 +165,14 @@ public final class ArrayModuleTest extends SandboxTest {
     // early exits: recognized patterns
     query(func.args(" array { 1 to 100 }", " ()",
         " fn($v, $r) { $r otherwise $v[. = 42] }"), 42);
+
+    // flattened folds: appended values
+    inline(true);
+    final String array = " array { 1 to 100 } => array:put(2, (1, 2))";
+    check(func.args(array, " ()", " fn($m, $r) { count($m), $r }") + "[position() < 4]",
+        "1\n2\n1", empty(func));
+    check(func.args(array, " ()", " fn($m, $r) { $r, count($m) }") + "[last() - 1]", 2,
+        empty(func));
   }
 
   /** Test method. */

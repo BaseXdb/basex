@@ -314,6 +314,11 @@ public final class List extends Arr {
   }
 
   @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return uf.step(this, Unfolding.Op.LIST, cc);
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new List(info, copyAll(cc, vm, exprs)));
   }

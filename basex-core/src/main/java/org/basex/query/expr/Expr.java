@@ -603,6 +603,18 @@ public abstract class Expr extends ExprInfo {
   public void markTailCalls(final CompileContext cc) { }
 
   /**
+   * Rewrites the accumulating expressions of a function body.
+   * @param uf unfolding context
+   * @param cc compilation context
+   * @return new expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return uf.base(this);
+  }
+
+  /**
    * Marks node constructors whose results will only be serialized.
    */
   public void skipCopy() { }

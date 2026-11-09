@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -51,8 +50,7 @@ public final class FnFoldRight extends FnFoldLeft {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = optType(cc, false, false);
-    return expr != this ? expr : unroll(cc, false);
+  protected boolean left() {
+    return false;
   }
 }

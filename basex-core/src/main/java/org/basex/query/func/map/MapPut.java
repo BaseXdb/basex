@@ -51,4 +51,9 @@ public final class MapPut extends MapFn {
     }
     return this;
   }
+
+  @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return uf.step(this, Unfolding.Op.PUT, cc);
+  }
 }

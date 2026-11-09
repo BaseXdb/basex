@@ -88,6 +88,11 @@ public final class Concat extends Arr {
   }
 
   @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return uf.step(this, Unfolding.Op.CONCAT, cc);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Concat && super.equals(obj);
   }

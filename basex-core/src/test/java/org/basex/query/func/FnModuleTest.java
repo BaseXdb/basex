@@ -2075,13 +2075,14 @@ public final class FnModuleTest extends SandboxTest {
         func.args(" 1 to 6", 0, " fn($_, $b) { (1 to 100)[$a + $b] }"),
         "7\n8", exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
 
-    // type inference
+    // type inference (no inlining: the fold would be flattened)
     inline(true);
-    check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
+    final String append = " %basex:inline(0) function($r, $a) { $r, $a }";
+    check(func.args(" (1, 2)[. = 1]", " ()", append), 1,
         type(func, "xs:integer*"));
-    check(func.args(" (1, 2)[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
+    check(func.args(" (1, 2)[. = 0]", 1, append), 1,
         type(func, "xs:integer+"));
-    check(func.args(" (1, 2)[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
+    check(func.args(" (1, 2)[. = 1]", "a", append), "a\n1",
         type(func, "xs:anyAtomicType+"));
 
     check(func.args(" (1, 2)[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
@@ -2093,7 +2094,7 @@ public final class FnModuleTest extends SandboxTest {
         + "for value $f in { 'a': fn() { local:f() }, 'b': fn() { 0 } } return $f()", "[10]\n0");
 
     // should not be unrolled
-    check(func.args(" 1 to 6", 0, " function($a, $b) { $a + $b }"), 21,
+    check(func.args(" 1 to 6", 0, " %basex:inline(0) function($a, $b) { $a + $b }"), 21,
         exists(func));
 
     // should be unrolled and evaluated at compile time
@@ -2120,6 +2121,94 @@ public final class FnModuleTest extends SandboxTest {
         new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
     checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { 1, $seq }"),
         new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
+
+    // flattened folds: appended, concatenated and added values
+    final String huge = " 1 to 1_000_000_000";
+    check(HEAD.args(func.args(huge, " ()", " fn($r, $v) { $r, $v }")), 1, empty(func));
+    check(func.args(huge, 0, " fn($r, $v) { $r, $v * 2 }") + "[3]", 4, empty(func));
+    check(func.args(huge, " ()", " fn($r, $v) { $v, $r }") + "[1]", 1000000000, empty(func));
+    check(func.args(" 1 to 100", " ()", " fn($r, $v) { ($v, -$v), $r }") + "[2]", -100,
+        empty(func));
+    check(func.args(" 1 to 1_000_000", 0, " fn($r, $v) { $v + $r }"), 500000500000L,
+        empty(func));
+    check(func.args(" 1 to 100", 0.5, " fn($r, $v) { $r + $v }"), 5050.5, empty(func));
+    // additions: no overflow if the partial sums of the fold do not overflow
+    final String limits = " (9223372036854775807, 1)[. != 0]", min = " -9223372036854775807 - 1";
+    check(func.args(limits, min, " fn($r, $v) { $r + $v }"), 0, empty(func));
+    check(FOLD_RIGHT.args(" reverse(" + limits + ")", min, " fn($v, $r) { $v + $r }"), 0,
+        empty(FOLD_RIGHT));
+    check(STRING_LENGTH.args(func.args(" 1 to 100", "x", " fn($r, $v) { $r || $v }")), 193,
+        empty(func));
+    check(func.args(" 1 to 100", "x", " fn($r, $v) { $v || '-' || $r }") + " => substring(1, 8)",
+        "100-99-9", empty(func));
+    // closures with non-local variables
+    final String f = "declare function local:f($s, $k) { ";
+    check(f + func.args(" $s", " ()", " fn($r, $v) { $r, $v * $k }") + " }; " +
+        HEAD.args(" local:f(" + huge + ", 2)"), 2, empty(func));
+    check(f + func.args(" $s", 0, " fn($r, $v) { $r + $v * $k }") + " }; " +
+        "local:f(1 to 100, 2)", 10100, empty(func));
+    // function references, operators
+    check("declare function local:f($r, $v) { $r, $v * 2 }; " +
+        HEAD.args(func.args(huge, " ()", " local:f#2")), 2, empty(func));
+    check(func.args(" (1 to 100)[. > 0]", 0, " op('+')"), 5050, empty(func));
+    // declared result type: checked in each step
+    error(func.args(" (1 to 100)[. > 0]", " ()", " fn($r as xs:integer?, $v) { $r, $v }"),
+        INVTYPE_X);
+    // map:put → map:merge (positions of replaced entries are retained)
+    check(func.args(" (1 to 5, 2, 7)", " { 3: 'x', 9: 0 }",
+        " fn($m, $k) { map:put($m, $k mod 5, $k) }") + " => map:keys()", "3\n9\n1\n2\n4\n0",
+        empty(func), exists(_MAP_MERGE));
+    check(func.args(" (1 to 5, 2, 7)", " {}", " fn($m, $k) { map:put($m, $k mod 5, $k) }") +
+        "(2)", 7, empty(func));
+    // conditions and pipelines: the unchanged result is skipped
+    final String range = " (1 to 100)[. > " + wrap(0) + "]";
+    check(func.args(range, " ()", " fn($r, $v) { if($v mod 10 = 0) then ($r, $v) else $r }") +
+        "[3]", 30, empty(func));
+    check(func.args(range, 0, " fn($r, $v) { if($v > 90) then $r + $v else $r }"), 955,
+        empty(func), exists(SUM));
+    check(func.args(range, " {}", " fn($m, $v) { if($v > 98) then map:put($m, $v, 1) else $m }")
+        + " => map:keys()", "99\n100", empty(func));
+    check(func.args(range, " ''", " fn($r, $v) { string($v) -> (if(ends-with(., '0')) then "
+        + "$r || . else $r) }") + " => string-length()", 21, empty(func));
+    // switch, let clauses
+    check(func.args(range, " ()", " fn($r, $v) { switch($v mod 10) case 0 return ($r, $v) "
+        + "default return $r }") + "[3]", 30, empty(func));
+    check(func.args(range, 0, " fn($r, $v) { let $w := $v * 2 return "
+        + "if($w > 190) then $r + $w else $r }"), 980, empty(func));
+
+    // not flattened: floating-point or untyped values, result referenced in the added value
+    check(func.args(" (1 to 100) ! xs:double(.)", 0, " fn($r, $v) { $r + $v }"), 5050,
+        exists(func));
+    check(func.args(" (1 to 100) ! xs:untypedAtomic(.)", 0, " fn($r, $v) { $r + $v }"), 5050,
+        exists(func));
+    check(COUNT.args(func.args(" 1 to 100", " ()", " fn($r, $v) { $r, count($r) }")), 100,
+        exists(func));
+    check(COUNT.args(func.args(" 1 to 100", " ()", " fn($r, $v) { $r, " +
+        _RANDOM_DOUBLE.args() + " }")), 100, exists(func));
+    // not flattened: unchanged initial value for empty input, positions, non-map input of map:put
+    check(func.args(" (1 to 100)[. > " + wrap(100) + "]", 1, " fn($r, $v) { $r || $v }"), 1,
+        exists(func));
+    check(func.args(" 1 to 100", " ()", " fn($r, $v, $p) { $r, $v * $p }") + "[2]", 4,
+        exists(func));
+    check(func.args(" (1 to 100)[. > " + wrap(100) + "]", " ()",
+        " fn($m, $k) { map:put($m, $k, 1) }"), "", exists(func));
+    // not flattened: different orders, condition referencing the result, non-string concatenation
+    check(func.args(range, " ()", " fn($r, $v) { if($v mod 2 = 0) then ($r, $v) else ($v, $r) }")
+        + "[1]", 99, exists(func));
+    check(func.args(range, " ()", " fn($r, $v) { if(count($r) < 3) then ($r, $v) else $r }"),
+        "1\n2\n3", exists(func));
+    check(func.args(range, 1, " fn($r, $v) { if($v > 100) then $r || $v else $r }"), 1,
+        exists(func));
+    // not flattened: products, result in the middle, branch replacing the result
+    final String small = " (1 to 3)[. > " + wrap(0) + "]";
+    check(func.args(range, 1, " fn($r, $v) { $r * ($v mod 2 + 1) }"), 1125899906842624L,
+        exists(func));
+    check(func.args(small, " ()", " fn($r, $v) { $v, $r, $v }"), "3\n2\n1\n1\n2\n3",
+        exists(func));
+    check(func.args(small, " ()", " fn($r, $v) { if($v > 2) then ($r, $v) else $v }"),
+        "2\n3", exists(func));
+    check(func.args(small, " ()", " fn($r, $v) { switch(count($r)) case 2 return $r "
+        + "default return ($r, $v) }"), "1\n2", exists(func));
   }
 
   /** Test method. */
@@ -2144,7 +2233,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
     // should not be unrolled
-    check(func.args(" 0 to 5", 10, " function($a, $b) { $a + $b }"), 25,
+    check(func.args(" 0 to 5", 10, " %basex:inline(0) function($a, $b) { $a + $b }"), 25,
         exists(func));
 
     // closure
@@ -2161,6 +2250,19 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" 1 to 4", 10, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
+
+    // flattened folds: appended and added values
+    inline(true);
+    final String huge = " 1 to 1_000_000_000";
+    check(func.args(huge, " ()", " fn($v, $r) { $v, $r }") + "[2]", 2, empty(func));
+    check(func.args(huge, " ()", " fn($v, $r) { $r, $v }") + "[1]", 1000000000, empty(func));
+    check(func.args(" 1 to 100", 1, " fn($v, $r) { $v + $r }"), 5051, empty(func));
+
+    // not flattened: floating-point values, positions (step counts)
+    check(func.args(" (1 to 100) ! xs:double(.)", 0, " fn($v, $r) { $v + $r }"), 5050,
+        exists(func));
+    check(func.args(" 1 to 100", " ()", " fn($v, $r, $p) { $p, $r }") + "[1]", 100,
+        exists(func));
   }
 
   /** Test method. */

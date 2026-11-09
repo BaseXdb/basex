@@ -3,7 +3,6 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -32,7 +31,7 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    return optType(cc, true, false);
+  protected boolean left() {
+    return false;
   }
 }

@@ -1,14 +1,24 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
+import org.basex.query.expr.Unfolding.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
+import org.basex.query.func.map.MapMerge.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -58,20 +68,36 @@ public class FnFoldLeft extends StandardFunc {
     return exitOrAction != null ? exitOrAction[1] : toFunction(arg(2), 3, qc);
   }
 
+  /**
+   * Indicates if this is a left fold.
+   * @return result of check
+   */
+  protected boolean left() {
+    return true;
+  }
+
+  /**
+   * Indicates if an array is processed.
+   * @return result of check
+   */
+  protected boolean array() {
+    return false;
+  }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = optType(cc, false, true);
-    return expr != this ? expr : unroll(cc, true);
+    final Expr expr = optType(cc);
+    return expr != this ? expr : unroll(cc);
   }
 
   /**
    * Unrolls the fold.
    * @param cc compilation context
-   * @param left indicates if this is a left/right fold
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
+  private Expr unroll(final CompileContext cc) throws QueryException {
+    if(array()) return this;
     final Expr input = arg(0), init = arg(1), action = arg(2);
     final int arity = arity(action);
     if(arity == 2) {
@@ -79,7 +105,7 @@ public class FnFoldLeft extends StandardFunc {
       if(unroll != null) {
         final Expr func = coerceFunc(2, cc, arity);
         Expr expr = init;
-        if(left) {
+        if(left()) {
           for(final Expr ex : unroll) {
             expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
           }
@@ -97,14 +123,11 @@ public class FnFoldLeft extends StandardFunc {
   /**
    * Refines the types.
    * @param cc compilation context
-   * @param array indicates if an array is processed
-   * @param left indicates if this is a left/right fold
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  protected final Expr optType(final CompileContext cc, final boolean array, final boolean left)
-      throws QueryException {
-
+  private Expr optType(final CompileContext cc) throws QueryException {
+    final boolean array = array(), left = left();
     final Expr input = arg(0), init = arg(1), action = arg(2);
     final SeqType ist = input.seqType();
     final long size = array ? input.structSize() : -1;
@@ -116,9 +139,10 @@ public class FnFoldLeft extends StandardFunc {
     if(action instanceof FuncItem || action instanceof Closure) {
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
         Types.ITEM_O : ist.with(Occ.EXACTLY_ONE);
+      final SeqType[] types = { i1t, i1t, Types.INTEGER_O };
       SeqType st = zst, ost, rt;
       do {
-        final SeqType[] types = { left ? st : i1t, left ? i1t : st, Types.INTEGER_O };
+        types[left ? 0 : 1] = st;
         arg(2, arg -> action.refineFunc(cc, types));
         rt = arg(2).funcType().refinedType;
         ost = st;
@@ -128,16 +152,23 @@ public class FnFoldLeft extends StandardFunc {
 
       // analyze refined action (more specific types) and original action (may be wrapped)
       final Expr[] funcs = arg(2) == action ? new Expr[] { action } : new Expr[] { arg(2), action };
-      for(final boolean empty : new boolean[] { false, true }) {
+      if(!input.has(Flag.NDT)) {
         for(final Expr func : funcs) {
-          // exits on empty results are replaced by other exits
-          if(func instanceof final FuncItem fi && (exitOrAction == null || exitOnEmpty && !empty)) {
-            final Object fold = fi.fold(input, init, left, array, empty, cc);
-            if(fold instanceof final Expr expr) return expr;
-            if(fold instanceof final FuncItem[] eoa) {
-              exitOrAction = eoa;
-              exitOnEmpty = empty;
-              cc.info(QueryText.OPTEXIT_X, this);
+          final Expr flat = flatten(func, types, cc);
+          if(flat != null) return flat;
+        }
+        for(final boolean empty : new boolean[] { false, true }) {
+          for(final Expr func : funcs) {
+            // exits on empty results are replaced by other exits
+            if(func instanceof final FuncItem fi &&
+                (exitOrAction == null || exitOnEmpty && !empty)) {
+              final Object fold = fi.fold(input, init, left, array, empty, cc);
+              if(fold instanceof final Expr expr) return expr;
+              if(fold instanceof final FuncItem[] eoa) {
+                exitOrAction = eoa;
+                exitOnEmpty = empty;
+                cc.info(QueryText.OPTEXIT_X, this);
+              }
             }
           }
         }
@@ -147,6 +178,148 @@ public class FnFoldLeft extends StandardFunc {
       if(ft != null) exprType.assign(filled ? ft.refinedType : zst.union(ft.refinedType));
     }
     return this;
+  }
+
+  /**
+   * Rewrites a fold whose action appends, concatenates, adds or puts values into the result.
+   * @param func action
+   * @param types argument types of the action
+   * @param cc compilation context
+   * @return rewritten expression (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private Expr flatten(final Expr func, final SeqType[] types, final CompileContext cc)
+      throws QueryException {
+
+    // skip inlining if the body cannot have the required shape (static calls: shape is unknown)
+    Expr raw = func instanceof final FuncItem fi ? fi.body() :
+      func instanceof final Closure closure ? closure.expr : null;
+    if(raw instanceof final TypeCheck tc) raw = tc.expr;
+    if(!(raw instanceof StaticFuncCall || Unfolding.candidate(raw)) ||
+        !(func instanceof final XQFunctionExpr fe)) return null;
+    final int arity = fe.arity();
+    if(arity < 2 || arity > 3) return null;
+    // ACTION($result, $value, $pos): declared types are dropped if the argument types match
+    final Var[] vars = new Var[arity];
+    final Expr[] refs = new Expr[arity];
+    for(int a = 0; a < arity; a++) {
+      vars[a] = cc.vs().addNew(fe.paramName(a), null, cc.qc, info);
+      vars[a].refineType(types[a], cc);
+      refs[a] = new VarRef(info, vars[a]);
+    }
+    final Expr body = fe.inline(refs, true, cc);
+    final boolean left = left(), array = array();
+    final Var result = vars[left ? 0 : 1], value = vars[left ? 1 : 0];
+    // positions: not supported (fold-right: step counts)
+    if(body == null || arity > 2 && body.uses(vars[2]) ||
+        body.has(Flag.NDT, Flag.UPD, Flag.CTX)) return null;
+
+    final Expr input = arg(0), init = arg(1);
+    final SeqType zst = init.seqType();
+    final boolean string = zst.instanceOf(Types.STRING_O);
+    final EnumSet<Op> supported = EnumSet.of(Op.LIST);
+    // concatenation: the initial value is returned unchanged if no value is concatenated
+    if(string || (array ? input.structSize() > 0 : input.seqType().oneOrMore())) {
+      supported.add(Op.CONCAT);
+    }
+    if(zst.instanceOf(Types.DECIMAL_O)) supported.add(Op.ADD);
+    if(left && zst.instanceOf(Types.MAP_O)) supported.add(Op.PUT);
+
+    // if(C) then ($result, X) else $result → if(C) then X else ()
+    final Flattening fl = new Flattening(result, supported);
+    final Expr action = body.unfold(fl, cc);
+    final Op op = fl.op();
+    if(!fl.valid || op == null || action.uses(result) ||
+        op == Op.CONCAT && fl.unchanged && !string) return null;
+
+    final boolean list = op == Op.LIST, add = op == Op.ADD, put = op == Op.PUT;
+    final boolean first = fl.first;
+
+    // for $value in INPUT return ACTION
+    // for $member in array:split(INPUT) let $value := array:items($member) return ACTION
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    Expr in = input;
+    if(array) in = cc.function(Function._ARRAY_SPLIT, info, in);
+    // fold-left: $result, X; fold-right: X, $result (integer sums are exact, order is irrelevant)
+    if(!add && left != first) in = cc.function(Function.REVERSE, info, in);
+    if(array) {
+      final Var member = cc.vs().addNew(new QNm("member"), null, cc.qc, info);
+      clauses.add(new For(member, in).optimize(cc));
+      final Expr items = cc.function(Function._ARRAY_ITEMS, info, new VarRef(info, member));
+      clauses.add(new Let(value, items).optimize(cc));
+    } else {
+      clauses.add(new For(value, in).optimize(cc));
+    }
+    final Expr loop = new GFLWOR(info, clauses, action).optimize(cc);
+
+    // sum((INIT, LOOP)), map:merge((INIT, LOOP), use-last), INIT || LOOP, INIT, LOOP
+    if(add) {
+      final boolean zero = init instanceof final Itr itr && itr.itr() == 0;
+      return cc.function(Function.SUM, info, zero ? loop : List.get(cc, info, init, loop));
+    }
+    if(put) {
+      final XQMap options = XQMap.get(Str.get(MergeOptions.DUPLICATES.name()),
+          Str.get(Duplicates.USE_LAST.toString()));
+      return cc.function(Function._MAP_MERGE, info, List.get(cc, info, init, loop), options);
+    }
+    final Expr[] operands = first ? new Expr[] { init, loop } : new Expr[] { loop, init };
+    return (list ? new List(info, operands) : new Concat(info, operands)).optimize(cc);
+  }
+
+  /**
+   * Replaces the accumulating expressions of a fold action with the accumulated values.
+   */
+  private final class Flattening extends Unfolding {
+    /** Result variable. */
+    private final Var result;
+    /** Indicates if the result is the first operand of the accumulating expressions. */
+    private boolean first;
+    /** Indicates if the result is returned unchanged by some branches. */
+    private boolean unchanged;
+    /** Indicates if all branches return the result or accumulate a value. */
+    private boolean valid = true;
+
+    /**
+     * Constructor.
+     * @param result result variable
+     * @param supported supported operations
+     */
+    private Flattening(final Var result, final EnumSet<Op> supported) {
+      super(supported);
+      this.result = result;
+    }
+
+    @Override
+    protected boolean hole(final Expr expr) {
+      return expr instanceof final VarRef vr && vr.var == result;
+    }
+
+    @Override
+    protected Expr replace(final Expr[] ops, final int hole, final Op o, final CompileContext cc)
+        throws QueryException {
+      // $result OP X, X OP $result: same order in all branches
+      final boolean frst = hole == 0;
+      if(!frst && (hole != ops.length - 1 || o == Op.PUT) || op() != null && first != frst) {
+        return null;
+      }
+      first = frst;
+      final Expr[] rest = Array.remove(ops, hole);
+      // integers and decimals only: type promotion of other numbers depends on the order
+      if(o == Op.ADD && !rest[0].seqType().instanceOf(Types.DECIMAL_O)) return null;
+      return o == Op.PUT ? cc.function(Function._MAP_ENTRY, info, rest) :
+        rest.length == 1 ? rest[0] : o == Op.LIST ? List.get(cc, info, rest) :
+        new Concat(info, rest).optimize(cc);
+    }
+
+    @Override
+    public Expr base(final Expr expr) {
+      if(hole(expr)) {
+        unchanged = true;
+        return Empty.VALUE;
+      }
+      valid = false;
+      return expr;
+    }
   }
 
   @Override

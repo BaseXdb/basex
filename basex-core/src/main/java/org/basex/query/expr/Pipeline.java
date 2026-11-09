@@ -52,6 +52,13 @@ public final class Pipeline extends Mapping {
   }
 
   @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    final int last = exprs.length - 1;
+    exprs[last] = exprs[last].unfold(uf, cc);
+    return optimize(cc);
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
       QueryFocus qf;
