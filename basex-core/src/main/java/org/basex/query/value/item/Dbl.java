@@ -103,9 +103,35 @@ public final class Dbl extends ANum {
   @Override
   public Dbl round(final int prec, final RoundMode mode) {
     if(value == 0 || !Double.isFinite(value)) return this;
-    final double d = Dec.round(new BigDecimal(value), prec, mode).doubleValue();
+    final double d = prec == 0 ? round(value, mode) :
+      Dec.round(new BigDecimal(value), prec, mode).doubleValue();
     return d == 0 && Double.doubleToRawLongBits(value) < 0 ? NEGATIVE_ZERO :
       d == value ? this : Dbl.get(d);
+  }
+
+  /**
+   * Rounds a finite double value to an integral value.
+   * @param value value
+   * @param mode rounding mode
+   * @return rounded value
+   */
+  static double round(final double value, final RoundMode mode) {
+    final double l = Math.floor(value);
+    if(l == value) return value;
+    // exact: non-integral doubles are smaller than 2^52
+    final double u = l + 1, m = l + 0.5;
+    final boolean pos = value > 0;
+    return switch(mode) {
+      case FLOOR -> l;
+      case CEILING -> u;
+      case TOWARD_ZERO -> pos ? l : u;
+      case AWAY_FROM_ZERO -> pos ? u : l;
+      case HALF_TO_FLOOR -> value <= m ? l : u;
+      case HALF_TO_CEILING -> value < m ? l : u;
+      case HALF_TOWARD_ZERO -> value < m || value == m && pos ? l : u;
+      case HALF_AWAY_FROM_ZERO -> value < m || value == m && !pos ? l : u;
+      default -> Math.rint(value);
+    };
   }
 
   @Override

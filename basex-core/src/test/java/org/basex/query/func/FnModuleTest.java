@@ -5423,6 +5423,13 @@ return
     error(func.args(" -9223372036854775808", -1), RANGE_X);
     error(func.args(" 9223372036854775807", -19), RANGE_X);
     error(ROUND_HALF_TO_EVEN.args(" 9223372036854775807", -1), RANGE_X);
+
+    query(func.args(" 0.49999999999999994e0"), 0);
+    query(func.args(" -0.49999999999999994e0", 0, "half-to-floor"), "-0");
+    query(func.args(" -0.5e0"), "-0");
+    query(func.args(" -2.5e0", 0, "half-to-even"), -2);
+    query(func.args(" -2.5e0", 0, "half-away-from-zero"), -3);
+    query(func.args(" xs:float(2.5)", 0, "half-toward-zero") + " instance of xs:float", true);
   }
 
   /** Test method. */
