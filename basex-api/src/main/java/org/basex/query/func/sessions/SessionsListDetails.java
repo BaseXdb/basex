@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  */
 public final class SessionsListDetails extends SessionsFn {
   /** QName. */
-  private static final QNm Q_SESSION = new QNm("session");
+  public static final QNm Q_SESSION = new QNm("session");
   /** QName. */
   private static final QNm Q_ID = new QNm("id");
   /** QName. */

@@ -37,7 +37,6 @@ import org.basex.util.options.*;
  */
 public final class FnLoadXQueryModule extends StandardFunc {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
-  private static final MapType QNAME_MAP_TYPE = MapType.get(BasicType.QNAME, Types.ITEM_ZM);
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
@@ -94,12 +93,13 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
-      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, info, null);
+      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(Types.QNAME_ITEM_SEQ_MAP, qc, info,
+          null);
       vars.forEach((key, value) -> bindings.put((QNm) key, value));
     }
 
     if(opt.contains(VENDOR_OPTIONS)) {
-      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, info, null);
+      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(Types.QNAME_ITEM_SEQ_MAP, qc, info, null);
     }
 
     if(opt.contains(XQUERY_VERSION)) {

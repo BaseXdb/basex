@@ -86,6 +86,26 @@ public final class NodeType implements Type {
   }
 
   /**
+   * Returns an element type for the specified names.
+   * @param names element names (at least one)
+   * @return type
+   */
+  public static NodeType get(final QNm... names) {
+    final ArrayList<Test> tests = new ArrayList<>(names.length);
+    for(final QNm name : names) tests.add(NameTest.get(name));
+    return get(Test.get(tests));
+  }
+
+  /**
+   * Returns an element type for the specified names.
+   * @param names element names (at least one)
+   * @return type
+   */
+  public static NodeType get(final String... names) {
+    return get(Arrays.stream(names).map(QNm::new).toArray(QNm[]::new));
+  }
+
+  /**
    * Returns a JNode type for the specified key and value type.
    * @param key key ({@code null} for wildcard, {@link Empty#VALUE} for root node)
    * @param valueType value type (can be {@code null})

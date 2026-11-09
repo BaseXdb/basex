@@ -12,6 +12,9 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class InspectFunction extends StandardFunc {
+  /** Name of the result element. */
+  public static final QNm Q_FUNCTION = new QNm("function");
+
   @Override
   public FNode value(final QueryContext qc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);

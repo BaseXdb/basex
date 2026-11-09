@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.util.regex.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
@@ -41,7 +40,7 @@ public final class CollectionOptions extends Options {
   public static final StringOption MATCH_FLAGS = new StringOption("match-flags", "");
   /** Mapping from file extensions to media types. */
   public static final ValueOption FILE_EXTENSIONS = new ValueOption("file-extensions",
-      MapType.get(BasicType.STRING, STRING_O).seqType());
+      STRING_STRING_MAP_O);
   /** Options for parsing XML resources. */
   public static final OptionsOption<DocOptions> XML_OPTIONS =
       new OptionsOption<>("xml-options", DocOptions.class);

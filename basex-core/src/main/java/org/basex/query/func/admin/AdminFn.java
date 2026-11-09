@@ -9,11 +9,11 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class AdminFn extends StandardFunc {
+public abstract class AdminFn extends StandardFunc {
   /** QName. */
-  static final QNm Q_SESSION = new QNm("session");
+  public static final QNm Q_SESSION = new QNm("session");
   /** QName. */
-  static final QNm Q_ENTRY = new QNm("entry");
+  public static final QNm Q_ENTRY = new QNm("entry");
   /** QName. */
   static final QNm Q_SIZE = new QNm("size");
   /** QName. */

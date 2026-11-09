@@ -26,7 +26,7 @@ import org.basex.query.value.type.*;
 public final class FnReplace extends RegExFn {
   /** Type of the groups argument of a replacement function. */
   private static final SeqType GROUPS_TYPE = MapType.get(
-      ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING), Types.UNTYPED_ATOMIC_O).seqType();
+      Types.INTEGER_OR_STRING, Types.UNTYPED_ATOMIC_O).seqType();
   /** Type of the replacement argument (deprecated, including the old function signature). */
   public static final SeqType REPLACEMENT_TYPE = ChoiceItemType.get(BasicType.STRING,
       FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O, GROUPS_TYPE),

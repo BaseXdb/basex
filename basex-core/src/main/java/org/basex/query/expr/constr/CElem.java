@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
-import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -76,7 +75,7 @@ public final class CElem extends CName {
     if(name instanceof Value) {
       final QNm nm = qname(true, cc.qc);
       name = nm;
-      exprType.assign(NodeType.get(NameTest.get(nm, Kind.ELEMENT)));
+      exprType.assign(NodeType.get(nm));
     }
 
     // merge adjacent and nested text values

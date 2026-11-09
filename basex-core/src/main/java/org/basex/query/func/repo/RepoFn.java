@@ -11,9 +11,9 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class RepoFn extends StandardFunc {
+public abstract class RepoFn extends StandardFunc {
   /** QName. */
-  static final QNm Q_PACKAGE = new QNm("package");
+  public static final QNm Q_PACKAGE = new QNm("package");
   /** QName. */
   static final QNm Q_NAME = new QNm("name");
   /** QName. */

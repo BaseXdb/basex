@@ -23,9 +23,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class UserFn extends StandardFunc {
-  /** QName. */
-  static final QNm Q_INFO = new QNm("info");
-
   /**
    * Evaluates an expression to database patterns.
    * @param expr expression (can be {@code Empty#UNDEFINED})

@@ -17,6 +17,6 @@ public final class UserInfo extends UserFn {
     if(user == null) checkPerm(qc, Perm.ADMIN);
 
     final XNode node = user != null ? user.info() : qc.context.users.info();
-    return node != null ? node : FElem.build(Q_INFO).finish();
+    return node != null ? node : FElem.build(UserText.Q_INFO).finish();
   }
 }

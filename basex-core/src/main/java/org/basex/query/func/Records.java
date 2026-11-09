@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
@@ -20,9 +19,9 @@ import org.basex.util.hash.*;
 public enum Records {
   /** Record definition. */
   ARRAY_SORT_KEY(FN_URI, "array-sort-key",
-    field("key", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
+    field("key", Types.SORT_KEY_SEQ_ZO),
     field("collation", Types.STRING_ZO),
-    field("order", EnumType.get("ascending", "descending").seqType(Occ.ZERO_OR_ONE))),
+    field("order", Types.SORT_ORDER_ZO)),
   /** Record definition. */
   ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string", "skip").
@@ -71,7 +70,7 @@ public enum Records {
     field("csv", Types.MAP_ZO)),
   /** Record definition. */
   HTTP_PART(HTTP_URI, "part",
-    field("headers", MapType.get(BasicType.STRING, Types.STRING_ZM).seqType(Occ.ZERO_OR_ONE)),
+    field("headers", Types.STRING_STRING_SEQ_MAP.seqType(Occ.ZERO_OR_ONE)),
     field("body", Types.ITEM_ZO)),
   /** Record definition. */
   HTTP_RESPONSE(HTTP_URI, "response",
@@ -106,7 +105,7 @@ public enum Records {
   ),
   /** Record definition. */
   LOAD_XQUERY_MODULE(FN_URI, "load-xquery-module",
-    field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZM).seqType()),
+    field("variables", Types.QNAME_ITEM_SEQ_MAP.seqType()),
     field("functions", MapType.get(BasicType.QNAME,
       MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
@@ -119,24 +118,24 @@ public enum Records {
   MATCHING_SEGMENT(FN_URI, "matching-segment",
     field("substring", Types.STRING_O),
     field("position", Types.INTEGER_O),
-    field("groups", MapType.get(ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING),
+    field("groups", MapType.get(Types.INTEGER_OR_STRING,
         CAPTURED_GROUP.get().seqType()).seqType())),
   /** Record definition. */
   PARSED_CSV_STRUCTURE(FN_URI, "parsed-csv-structure",
     field("columns", Types.STRING_ZM),
-    field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
+    field("column-index", Types.STRING_INTEGER_MAP.seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.INTEGER_O,
-      ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING).seqType()).seqType())),
+      Types.INTEGER_OR_STRING.seqType()).seqType())),
   /** Record definition. */
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */
   SCHEMA_TYPE(FN_URI, "schema-type"),
   /** Record definition. */
   SORT_KEY(FN_URI, "sort-key",
-    field("key", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+    field("key", Types.SORT_KEY_ZO),
     field("collation", Types.STRING_ZO),
-    field("order", EnumType.get("ascending", "descending").seqType(Occ.ZERO_OR_ONE))),
+    field("order", Types.SORT_ORDER_ZO)),
   /** Record definition. */
   URI_STRUCTURE(FN_URI, "uri-structure",
     field("uri", Types.STRING_ZO),
@@ -151,8 +150,7 @@ public enum Records {
     field("query", Types.STRING_ZO),
     field("fragment", Types.STRING_ZO),
     field("path-segments", Types.STRING_ZM),
-    field("query-parameters", MapType.get(BasicType.STRING, Types.STRING_ZM).
-        seqType(Occ.ZERO_OR_ONE)),
+    field("query-parameters", Types.STRING_STRING_SEQ_MAP.seqType(Occ.ZERO_OR_ONE)),
     field("filepath", Types.STRING_ZO)
   ),
   /** Record definition. */
@@ -172,9 +170,8 @@ public enum Records {
     final ShapeType rng = RANDOM_NUMBER_GENERATOR.get();
     rng.add("number", Types.DOUBLE_O).
         add("next", FuncType.get(rng.seqType()).seqType()).
-        add("permute", FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType()).
-        add("take", FuncType.get(Types.DOUBLE_ZM, BasicType.NON_NEGATIVE_INTEGER.seqType()).
-            seqType());
+        add("permute", Types.PERMUTE_FUNCTION.seqType()).
+        add("take", Types.TAKE_FUNCTION.seqType());
 
     final ShapeType stp = SCHEMA_TYPE.get();
     stp.add("name", Types.QNAME_ZO).
@@ -197,7 +194,7 @@ public enum Records {
         add("replace", FuncType.get(Types.STRING_O, Types.STRING_O,
             FnReplace.REPLACEMENT_TYPE).seqType()).
         add("analyze-string", FuncType.get(
-            NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(),
+            NodeType.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT).seqType(),
             Types.STRING_O).seqType()).
         add("matching-segments", FuncType.get(
             MATCHING_SEGMENT.get().seqType(Occ.ZERO_OR_MORE), Types.STRING_O).seqType());

@@ -36,7 +36,6 @@ public final class FnTransform extends StandardFunc {
   /** Options for fn:transform. */
   public static final class TransformOptions extends Options {
     /** Map with QName keys and arbitrary values. */
-    private static final SeqType QNAME_MAP = MapType.get(BasicType.QNAME, Types.ITEM_ZM).seqType();
 
     /** URI of the principal result document. */
     public static final StringOption BASE_OUTPUT_URI = new StringOption("base-output-uri");
@@ -86,8 +85,7 @@ public final class FnTransform extends StandardFunc {
         FuncType.get(Types.ITEM_ZM, Types.STRING_O, Types.ITEM_ZM).seqType(), null);
     /** Requested properties of the XSLT processor. */
     public static final ValueOption REQUESTED_PROPERTIES = new ValueOption(
-        "requested-properties", MapType.get(BasicType.QNAME, Types.ANY_ATOMIC_TYPE_O).seqType(),
-        null);
+        "requested-properties", Types.QNAME_ANY_ATOMIC_TYPE_MAP.seqType(), null);
     /** Serialization parameters of the principal result document. */
     public static final ValueOption SERIALIZATION_PARAMS =
         new ValueOption("serialization-params", Types.MAP_ZO, null);
@@ -98,7 +96,7 @@ public final class FnTransform extends StandardFunc {
         new ValueOption("source-node", Types.XNODE_ZO, null);
     /** Values of static stylesheet parameters. */
     public static final ValueOption STATIC_PARAMS =
-        new ValueOption("static-params", QNAME_MAP, null);
+        new ValueOption("static-params", Types.QNAME_ITEM_SEQ_MAP.seqType(), null);
     /** Static base URI of the stylesheet. */
     public static final StringOption STYLESHEET_BASE_URI =
         new StringOption("stylesheet-base-uri");
@@ -110,20 +108,20 @@ public final class FnTransform extends StandardFunc {
         new ValueOption("stylesheet-node", Types.XNODE_ZO, null);
     /** Values of stylesheet parameters. */
     public static final ValueOption STYLESHEET_PARAMS =
-        new ValueOption("stylesheet-params", QNAME_MAP, null);
+        new ValueOption("stylesheet-params", Types.QNAME_ITEM_SEQ_MAP.seqType(), null);
     /** Text of the stylesheet. */
     public static final StringOption STYLESHEET_TEXT = new StringOption("stylesheet-text");
     /** Values of the parameters of the initial template. */
     public static final ValueOption TEMPLATE_PARAMS =
-        new ValueOption("template-params", QNAME_MAP, null);
+        new ValueOption("template-params", Types.QNAME_ITEM_SEQ_MAP.seqType(), null);
     /** Allow access to external resources. */
     public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED, false);
     /** Values of the tunnel parameters of the initial template. */
     public static final ValueOption TUNNEL_PARAMS =
-        new ValueOption("tunnel-params", QNAME_MAP, null);
+        new ValueOption("tunnel-params", Types.QNAME_ITEM_SEQ_MAP.seqType(), null);
     /** Vendor-defined configuration options (ignored). */
     public static final ValueOption VENDOR_OPTIONS =
-        new ValueOption("vendor-options", QNAME_MAP, null);
+        new ValueOption("vendor-options", Types.QNAME_ITEM_SEQ_MAP.seqType(), null);
     /** Requested XSLT version. */
     public static final ValueOption XSLT_VERSION =
         new ValueOption("xslt-version", Types.DECIMAL_O, null);

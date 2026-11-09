@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.users.*;
+import org.basex.http.restxq.*;
 import org.basex.query.func.request.*;
 import org.basex.query.func.rest.*;
 import org.basex.query.func.session.*;
@@ -51,7 +52,7 @@ public enum ApiFunction implements AFunction {
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_COOKIE_MAP(RequestCookieMap::new, "cookie-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), STRING_STRING_MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -63,7 +64,7 @@ public enum ApiFunction implements AFunction {
       params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_MAP(RequestHeaderMap::new, "header-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), STRING_STRING_SEQ_MAP.seqType(), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_NAMES(RequestHeaderNames::new, "header-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -126,7 +127,7 @@ public enum ApiFunction implements AFunction {
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
   _REST_WADL(RestWadl::new, "wadl()",
-      params(), ELEMENT_O, REST_URI),
+      params(), NodeType.get(RestXqWadl.Q_APPLICATION).seqType(), REST_URI),
 
   // Session Module
 
@@ -180,7 +181,8 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_LIST_DETAILS(SessionsListDetails::new, "list-details(id?)",
-      params(STRING_ZO), ELEMENT_ZM, SESSIONS_URI, Perm.ADMIN),
+      params(STRING_ZO), NodeType.get(SessionsListDetails.Q_SESSION).seqType(Occ.ZERO_OR_MORE),
+      SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_NAMES(SessionsNames::new, "names(id)",
       params(STRING_O), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
@@ -225,7 +227,8 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_LIST_DETAILS(WsListDetails::new, "list-details(id?)",
-      params(STRING_ZO), ELEMENT_ZM, WS_URI, Perm.ADMIN),
+      params(STRING_ZO), NodeType.get(WsFn.Q_WEBSOCKET).seqType(Occ.ZERO_OR_MORE), WS_URI,
+      Perm.ADMIN),
   /** XQuery function. */
   _WS_NAMES(WsNames::new, "names(id)",
       params(STRING_O), STRING_ZM, WS_URI, Perm.ADMIN),

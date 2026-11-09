@@ -31,12 +31,12 @@ import org.xml.sax.*;
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */
-abstract class ValidateFn extends StandardFunc {
+public abstract class ValidateFn extends StandardFunc {
   /** Schema cache. */
   static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
 
   /** QName. */
-  private static final QNm Q_REPORT = new QNm("report");
+  public static final QNm Q_REPORT = new QNm("report");
   /** QName. */
   private static final QNm Q_MESSAGE = new QNm("message");
   /** QName. */

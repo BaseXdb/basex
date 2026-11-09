@@ -2186,7 +2186,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" void(())"), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
-    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "(element(b)|element(a))?"));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "element(b|a)?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(FOOT));

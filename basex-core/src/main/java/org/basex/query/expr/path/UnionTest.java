@@ -102,11 +102,15 @@ public final class UnionTest extends Test {
 
   @Override
   public String toString(final boolean type) {
+    // element(a|b), attribute(a|b)
+    final boolean names = type && kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE) &&
+        Arrays.stream(tests).allMatch(NameTest.class::isInstance);
     final TokenBuilder tb = new TokenBuilder();
     for(final Test test : tests) {
       if(!tb.isEmpty()) tb.add('|');
-      tb.add(test.toString(type));
+      tb.add(names ? ((NameTest) test).nameString() : test.toString(type));
     }
+    if(names) return kind.toString(tb.toString());
     return type ? "(" + tb + ")" : tb.toString();
   }
 }

@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class RestXqWadl {
   /** QName. */
-  private static final QNm Q_APPLICATION = qnm("application");
+  public static final QNm Q_APPLICATION = qnm("application");
   /** QName. */
   private static final QNm Q_RESOURCES = qnm("resources");
   /** QName. */

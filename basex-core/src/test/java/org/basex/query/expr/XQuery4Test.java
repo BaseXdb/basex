@@ -930,12 +930,12 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/child::{#c, 1}", "", exists(SelectorStep.class));
 
     check("<a><b/><c/></a>/child::{#c, #b}", "<b/>\n<c/>",
-        type(IterStep.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "element(c|b)*"));
     check("let $names := (#c, #b) return <a><b/><c/></a>/child::{$names}", "<b/>\n<c/>",
-        type(IterStep.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "element(c|b)*"));
 
     check("<a><b/><c/></a>/(c | child::{#b})", "<b/>\n<c/>",
-        type(IterStep.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "element(c|b)*"));
     check("<a><b/><c/></a>/child::{xs:QName('c')}", "<c/>",
         type(IterStep.class, "element(c)*"));
     check("<a><b/><c/></a>/child::{xs:QName(<?_ c?>)}", "<c/>",

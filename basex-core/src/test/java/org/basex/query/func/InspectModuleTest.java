@@ -232,7 +232,7 @@ public final class InspectModuleTest extends SandboxTest {
 
     query(func.args(" 1 to 2", " { 'item': true() }"), "xs:integer");
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " { 'mode': 'expression' }"),
-        "(element(a)|element(b))*");
+        "element(a|b)*");
     query(func.args(" ('z' cast as enum('x', 'a', 'z'), 'a' cast as (enum('a')|enum('b')))"),
         "enum(\"z\", \"a\")+");
 
@@ -241,7 +241,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(expr), result);
     query(func.args(expr, " { 'mode': 'computed' }"), result);
     query(func.args(expr, " { 'mode': 'value' }"), result);
-    query(func.args(expr, " { 'mode': 'expression' }"), "(element(a)|element(b))*");
+    query(func.args(expr, " { 'mode': 'expression' }"), "element(a|b)*");
 
     expr = " map:put({ 1: text { 2 } }, 2, text { 2 })";
     result = "map(xs:integer, text())";

@@ -653,7 +653,7 @@ public abstract class Path extends ParseExpr {
     final Expr prev = steps.length > 1 ? steps[steps.length - 2] : rt;
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
         (prev == null || !prev.seqType().type.instanceOf(NodeType.XNODE))) {
-      st = NodeType.JNODE.seqType();
+      st = Types.JNODE_O;
     }
     Occ occ = Occ.ZERO_OR_MORE;
     long size = size(rt, data);

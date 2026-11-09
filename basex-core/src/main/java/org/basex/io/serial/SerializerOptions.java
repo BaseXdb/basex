@@ -37,8 +37,7 @@ public final class SerializerOptions extends Options {
   private static final SeqType METHOD_TYPE =
       ChoiceItemType.get(BasicType.STRING, BasicType.QNAME).seqType(Occ.ZERO_OR_ONE);
   /** Required type of the character map. */
-  private static final SeqType CHARACTER_MAPS =
-      MapType.get(BasicType.STRING, Types.STRING_O).seqType(Occ.ZERO_OR_ONE);
+  private static final SeqType CHARACTER_MAPS = Types.STRING_STRING_MAP.seqType(Occ.ZERO_OR_ONE);
 
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> BYTE_ORDER_MARK =

@@ -14,8 +14,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class XQStrIntMap extends XQHashMap {
-  /** Map type. */
-  private static final MapType TYPE = MapType.get(BasicType.STRING, Types.INTEGER_O);
   /** Hash map. */
   private final TokenIntMap map;
 
@@ -24,7 +22,7 @@ public final class XQStrIntMap extends XQHashMap {
    * @param capacity initial capacity
    */
   XQStrIntMap(final int capacity) {
-    super(TYPE);
+    super(Types.STRING_INTEGER_MAP);
     map = new TokenIntMap(capacity);
   }
 

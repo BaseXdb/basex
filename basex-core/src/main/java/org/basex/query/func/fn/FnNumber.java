@@ -21,7 +21,7 @@ public final class FnNumber extends ContextFn {
     final Item value = contextArg(qc).atomItem(qc, info);
     if(value.isEmpty()) return Dbl.NAN;
     // invalid input: NaN is returned
-    final Item cast = (Item) DOUBLE.seqType().cast(value, false, qc, info);
+    final Item cast = (Item) Types.DOUBLE_O.cast(value, false, qc, info);
     return cast != null ? cast : Dbl.NAN;
   }
 

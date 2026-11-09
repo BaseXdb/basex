@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class ProcExecute extends ProcFn {
   /** QName: result. */
-  private static final QNm Q_RESULT = new QNm("result");
+  public static final QNm Q_RESULT = new QNm("result");
   /** QName: output. */
   private static final QNm Q_OUTPUT = new QNm("output");
   /** QName: error. */

@@ -14,9 +14,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class WsFn extends StandardFunc {
+public abstract class WsFn extends StandardFunc {
   /** QName. */
-  static final QNm Q_WEBSOCKET = new QNm("websocket");
+  public static final QNm Q_WEBSOCKET = new QNm("websocket");
   /** QName. */
   static final QNm Q_ID = new QNm("id");
   /** QName. */

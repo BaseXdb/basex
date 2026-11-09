@@ -9,7 +9,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -33,7 +32,7 @@ import de.bottlecaps.markup.blitz.ResultHandler;
 public final class FnInvisibleXml extends StandardFunc {
   /** The function's argument type. */
   public static final SeqType ARG_TYPE = ChoiceItemType.get(BasicType.STRING,
-      NodeType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
+      NodeType.get("ixml")).seqType(Occ.ZERO_OR_ONE);
   /** The invisible XML parser generator (can be {@code null}). */
   private Generator generator;
 

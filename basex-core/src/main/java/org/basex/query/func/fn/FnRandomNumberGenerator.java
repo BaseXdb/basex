@@ -21,14 +21,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnRandomNumberGenerator extends StandardFunc {
-  /** Type for permute function. */
-  private static final FuncType PERMUTE_TYPE = FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM);
   /** Type for next function. */
   private static final FuncType NEXT_TYPE =
       FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType());
-  /** Type for take function. */
-  private static final FuncType TAKE_TYPE =
-      FuncType.get(Types.DOUBLE_ZM, BasicType.NON_NEGATIVE_INTEGER.seqType());
   /** Parameter name of permute function. */
   private static final QNm Q_SEQ = new QNm("seq");
   /** Parameter name of take function. */
@@ -71,7 +66,8 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     final Var var = new Var(Q_SEQ, null, qc, info, 0, null);
     final StandardFunc sf = Function._RANDOM_SEEDED_PERMUTATION.get(info, Itr.get(seed),
         new VarRef(info, var));
-    return new FuncItem(info, sf, new Var[] { var }, AnnList.EMPTY, PERMUTE_TYPE, 1, null);
+    return new FuncItem(info, sf, new Var[] { var }, AnnList.EMPTY, Types.PERMUTE_FUNCTION, 1,
+        null);
   }
 
   /**
@@ -84,7 +80,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static FuncItem takeFunc(final long state, final QueryContext qc, final InputInfo info) {
     final Var var = new Var(Q_COUNT, null, qc, info, 0, null);
     final Take take = new Take(info, state, new VarRef(info, var));
-    return new FuncItem(info, take, new Var[] { var }, AnnList.EMPTY, TAKE_TYPE, 1, null);
+    return new FuncItem(info, take, new Var[] { var }, AnnList.EMPTY, Types.TAKE_FUNCTION, 1, null);
   }
 
   /**

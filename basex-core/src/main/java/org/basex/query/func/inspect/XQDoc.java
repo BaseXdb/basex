@@ -26,9 +26,9 @@ import org.basex.util.list.*;
  */
 final class XQDoc extends Inspect {
   /** Namespace URI. */
-  private static final byte[] XQDOC_URI = token("http://www.xqdoc.org/1.0");
+  static final byte[] XQDOC_URI = token("http://www.xqdoc.org/1.0");
   /** Token: xqdoc. */
-  private static final byte[] XQDOC_PREFIX = token("xqdoc");
+  static final byte[] XQDOC_PREFIX = token("xqdoc");
 
   /**
    * Constructor.
@@ -42,7 +42,7 @@ final class XQDoc extends Inspect {
   @Override
   public FNode parse(final IOContent content) throws QueryException {
     final AModule module = parseModule(content);
-    final FBuilder xqdoc = element("xqdoc").ns();
+    final FBuilder xqdoc = FElem.build(InspectXqdoc.Q_XQDOC).ns();
     final FBuilder control = element("control");
     control.node(element("date").text(qc.dateTime().datm.string(info)));
     control.node(element("version").text("1.1"));

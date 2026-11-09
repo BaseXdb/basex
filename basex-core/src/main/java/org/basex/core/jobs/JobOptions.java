@@ -31,7 +31,7 @@ public class JobOptions extends Options {
   public static final NumberOption MEMORY = new NumberOption("memory", 0);
   /** Timeout in seconds. */
   public static final ValueOption TIMEOUT =
-      new ValueOption("timeout", BasicType.DECIMAL.seqType(), Dec.ZERO);
+      new ValueOption("timeout", Types.DECIMAL_O, Dec.ZERO);
   /** Permission. */
   public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
   /** Start date/time/duration. */

@@ -25,9 +25,9 @@ import org.basex.util.options.*;
  */
 public final class XQueryParse extends StandardFunc {
   /** QName. */
-  private static final QNm Q_LIBRARY_MODULE = new QNm("LibraryModule");
+  public static final QNm Q_LIBRARY_MODULE = new QNm("LibraryModule");
   /** QName. */
-  private static final QNm Q_MAIN_MODULE = new QNm("MainModule");
+  public static final QNm Q_MAIN_MODULE = new QNm("MainModule");
   /** QName. */
   private static final QNm Q_UPDATING = new QNm("updating");
   /** QName. */

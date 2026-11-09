@@ -38,7 +38,7 @@ final class PlainDoc extends Inspect {
    * @throws QueryException query exception
    */
   FNode context() throws QueryException {
-    final FBuilder root = element("context");
+    final FBuilder root = FElem.build(InspectContext.Q_CONTEXT);
     for(final StaticVar sv : qc.vars) root.node(variable(sv));
     for(final StaticFunc sf : qc.functions) {
       if(!NSGlobal.reserved(sf.name.uri())) {
@@ -51,7 +51,7 @@ final class PlainDoc extends Inspect {
   @Override
   public FNode parse(final IOContent source) throws QueryException {
     final AModule module = parseModule(source);
-    final FBuilder root = element("module");
+    final FBuilder root = FElem.build(InspectModule.Q_MODULE);
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
       root.attr(Q_PREFIX, name.string()).attr(Q_URI, name.uri());
@@ -98,7 +98,7 @@ final class PlainDoc extends Inspect {
   FNode function(final QNm fname, final StaticFunc sf, final FuncType ft, final AnnList anns)
       throws QueryException {
 
-    final FBuilder function = element("function");
+    final FBuilder function = FElem.build(InspectFunction.Q_FUNCTION);
     if(fname != null) {
       function.attr(Q_NAME, fname.string());
       if(fname.uri().length != 0) function.attr(Q_URI, fname.uri());

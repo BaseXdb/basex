@@ -489,9 +489,9 @@ public final class ExprTest extends SandboxTest {
     check("<_><a/></_>/(a union a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element(a)*"));
     check("<_><a/></_>/(a union b)", "<a/>",
-        empty(Union.class), type(IterPath.class, "(element(a)|element(b))*"));
+        empty(Union.class), type(IterPath.class, "element(a|b)*"));
     check("<_><a/></_>/(*:a union *:b)", "<a/>",
-        empty(Union.class), type(IterPath.class, "(element(*:a)|element(*:b))*"));
+        empty(Union.class), type(IterPath.class, "element(*:a|*:b)*"));
     check("<_><a/></_>/(Q{}a union Q{}b)", "<a/>",
         empty(Union.class));
     check("declare namespace a = 'A'; declare namespace b = 'A'; " +
@@ -499,10 +499,10 @@ public final class ExprTest extends SandboxTest {
         empty(Union.class));
     check("declare namespace a = 'A'; declare namespace b = 'B'; " +
         "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
-        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
+        empty(Union.class), type(IterPath.class, "element(a:a|b:a)*"));
     check("declare namespace a = 'A'; declare namespace b = 'B'; " +
         "<_><b:a/></_>/(a:a union b:a)", "<b:a xmlns:b=\"B\"/>",
-        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
+        empty(Union.class), type(IterPath.class, "element(a:a|b:a)*"));
     check("<_><a/></_>/(a union *)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
     check("<_><a/></_>/(* union a)", "<a/>",

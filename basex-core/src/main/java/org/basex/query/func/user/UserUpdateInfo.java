@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class UserUpdateInfo extends UserFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XNode node = toElem(arg(0), Q_INFO, qc, ELM_X_X_X);
+    final XNode node = toElem(arg(0), UserText.Q_INFO, qc, ELM_X_X_X);
     final User user = toUser(arg(1), true, qc);
     if(user == null) checkPerm(qc, Perm.ADMIN);
 

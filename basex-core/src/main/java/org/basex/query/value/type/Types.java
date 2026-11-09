@@ -1,6 +1,5 @@
 package org.basex.query.value.type;
 
-import static org.basex.query.QueryText.FN_URI;
 import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
@@ -11,7 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
- * Numeric access to types.
+ * Basic types with occurrence variants, and composite types that are used more than once.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -78,6 +77,8 @@ public final class Types {
   public static final SeqType STRING_OM = STRING.seqType(ONE_OR_MORE);
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
+  /** Namespace prefix (NCName or empty string). */
+  public static final Type PREFIX = ChoiceItemType.get(NCNAME, EnumType.get(""));
   /** Single language. */
   public static final SeqType LANGUAGE_O = LANGUAGE.seqType();
   /** Single untyped atomic. */
@@ -150,26 +151,16 @@ public final class Types {
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
-  /** String or xs:base64Binary. */
-  public static final Type STRING_OR_BASE64_BINARY = ChoiceItemType.get(STRING, BASE64_BINARY);
-  /** Single string or xs:base64-binary. */
-  public static final SeqType STRING_OR_BASE64_BINARY_O = STRING_OR_BASE64_BINARY.seqType();
-
-  /** XNode, string, or binary item (used by db:put). */
-  public static final Type XNODE_OR_STRING_OR_BINARY = ChoiceItemType.get(XNODE, STRING_OR_BINARY);
-  /** Single XNode, string, or binary item. */
-  public static final SeqType XNODE_OR_STRING_OR_BINARY_O = XNODE_OR_STRING_OR_BINARY.seqType();
-
   /** Resource type enum, used by db:add and db:create as a per-path override. */
   public static final EnumType DB_RESOURCE_TYPE = EnumType.get("xml", "binary", "value");
-  /** Runtime option enum, used by prof:runtime. */
-  public static final EnumType PROF_RUNTIME_OPTION =
-      EnumType.get("used", "total", "max", "processors");
-  /** Database path: a string, or a single-entry map binding the path to a resource type. */
-  public static final Type DB_PATH_SPEC = ChoiceItemType.get(STRING,
-      MapType.get(STRING, DB_RESOURCE_TYPE.seqType()));
-  /** Zero or more database path specs. */
-  public static final SeqType DB_PATH_SPEC_ZM = DB_PATH_SPEC.seqType(ZERO_OR_MORE);
+  /** Optional sort order. */
+  public static final SeqType SORT_ORDER_ZO =
+      EnumType.get("ascending", "descending").seqType(ZERO_OR_ONE);
+  /** Integer or string. */
+  public static final Type INTEGER_OR_STRING = ChoiceItemType.get(INTEGER, STRING);
+  /** Zero or more database paths (strings, or single-entry maps binding a path to a type). */
+  public static final SeqType DB_PATH_SPEC_ZM = ChoiceItemType.get(STRING,
+      MapType.get(STRING, DB_RESOURCE_TYPE.seqType())).seqType(ZERO_OR_MORE);
 
   /** Single XNode. */
   public static final SeqType XNODE_O = XNODE.seqType();
@@ -205,6 +196,9 @@ public final class Types {
   public static final SeqType TEXT_ZO = TEXT.seqType(ZERO_OR_ONE);
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
+  /** One element or attribute. */
+  public static final SeqType ELEMENT_OR_ATTRIBUTE_O =
+      ChoiceItemType.get(ELEMENT, ATTRIBUTE).seqType();
 
   /** Document with single element. */
   public static final NodeType DOCUMENT_ELEMENT = NodeType.get(new DocTest(NodeTest.ELEMENT));
@@ -217,12 +211,6 @@ public final class Types {
   /** Zero or one html document (any namespace; {@code document-node(*:html)}). */
   public static final SeqType DOCUMENT_HTML_ZO = NodeType.get(new DocTest(
       Test.get(Kind.ELEMENT, new QNm("html"), NameTest.Scope.LOCAL, null))).seqType(ZERO_OR_ONE);
-  /** Zero or one document with an fn-namespace root element ({@code document-node(fn:*)}). */
-  public static final SeqType DOCUMENT_FN_ZO = NodeType.get(new DocTest(
-      Test.get(Kind.ELEMENT, new QNm("", FN_URI), NameTest.Scope.URI, null))).seqType(ZERO_OR_ONE);
-  /** Zero or one document with an {@code fn:csv} root element ({@code document-node(fn:csv)}). */
-  public static final SeqType DOCUMENT_FN_CSV_ZO = NodeType.get(new DocTest(
-      NameTest.get(new QNm("csv", FN_URI)))).seqType(ZERO_OR_ONE);
 
   /** Single GNode. */
   public static final SeqType NODE_O = NODE.seqType();
@@ -236,11 +224,9 @@ public final class Types {
   /** Single NMTOKENS. */
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
-  /** Gregorian type. */
-  public static final Type GREGORIAN = ChoiceItemType.get(DATE_TIME, DATE, TIME,
-      G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY);
   /** Zero or one Gregorian. */
-  public static final SeqType GREGORIAN_ZO = GREGORIAN.seqType(ZERO_OR_ONE);
+  public static final SeqType GREGORIAN_ZO = ChoiceItemType.get(DATE_TIME, DATE, TIME,
+      G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY).seqType(ZERO_OR_ONE);
   /** Zero or one Gregorian with year and month. */
   public static final SeqType YEAR_MONTH_ZO =
       ChoiceItemType.get(DATE_TIME, DATE, G_YEAR_MONTH).seqType(ZERO_OR_ONE);
@@ -256,18 +242,42 @@ public final class Types {
   /** Zero or more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
 
-  /** Job target: a query string or URI, or a function to be invoked. */
-  public static final Type QUERY_SPEC = ChoiceItemType.get(ANY_ATOMIC_TYPE, FUNCTION);
-  /** Single job target. */
-  public static final SeqType QUERY_SPEC_O = QUERY_SPEC.seqType();
+  /** Single job target: a query string or URI, or a function to be invoked. */
+  public static final SeqType QUERY_SPEC_O =
+      ChoiceItemType.get(ANY_ATOMIC_TYPE, FUNCTION).seqType();
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
   /** Predicate function for sequences. */
-  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_ZO, ITEM_ZM, INTEGER_O).seqType();
+  public static final SeqType PREDICATE_SEQ_O =
+      FuncType.get(BOOLEAN_ZO, ITEM_ZM, INTEGER_O).seqType();
   /** Binary predicate function. */
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
+  /** Action function for sequences. */
+  public static final SeqType ACTION_SEQ_O = FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType();
+  /** Binary action function. */
+  public static final SeqType BIACTION_O =
+      FuncType.get(ITEM_ZM, ITEM_O, ITEM_O, INTEGER_O).seqType();
+  /** Binary action function for sequences. */
+  public static final SeqType BIACTION_SEQ_O =
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM, INTEGER_O).seqType();
+  /** Action function for folds. */
+  public static final SeqType FOLD_ACTION_O =
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType();
+  /** Optional sort key function. */
+  public static final SeqType SORT_KEY_ZO =
+      FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(ZERO_OR_ONE);
+  /** Optional sort key function for sequences. */
+  public static final SeqType SORT_KEY_SEQ_ZO =
+      FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(ZERO_OR_ONE);
+  /** Permute function of a random number generator. */
+  public static final FuncType PERMUTE_FUNCTION = FuncType.get(ITEM_ZM, ITEM_ZM);
+  /** Take function of a random number generator. */
+  public static final FuncType TAKE_FUNCTION =
+      FuncType.get(DOUBLE_ZM, NON_NEGATIVE_INTEGER.seqType());
+  /** Supplier function. */
+  public static final SeqType SUPPLIER_O = FuncType.get(ITEM_ZM).seqType();
   /** Java function type. */
   public static final FuncType JAVA = new FuncType(null);
 
@@ -279,6 +289,20 @@ public final class Types {
   public static final SeqType MAP_ZO = MAP.seqType(ZERO_OR_ONE);
   /** Zero or more maps. */
   public static final SeqType MAP_ZM = MAP.seqType(ZERO_OR_MORE);
+  /** Map with string keys and values. */
+  public static final MapType STRING_STRING_MAP = MapType.get(STRING, STRING_O);
+  /** Single map with string keys and values. */
+  public static final SeqType STRING_STRING_MAP_O = STRING_STRING_MAP.seqType();
+  /** Map with string keys and string sequences as values. */
+  public static final MapType STRING_STRING_SEQ_MAP = MapType.get(STRING, STRING_ZM);
+  /** Map with string keys and integer values. */
+  public static final MapType STRING_INTEGER_MAP = MapType.get(STRING, INTEGER_O);
+  /** Map with string keys and arbitrary values. */
+  public static final MapType STRING_ITEM_SEQ_MAP = MapType.get(STRING, ITEM_ZM);
+  /** Map with QName keys and arbitrary values. */
+  public static final MapType QNAME_ITEM_SEQ_MAP = MapType.get(QNAME, ITEM_ZM);
+  /** Map with QName keys and atomic values. */
+  public static final MapType QNAME_ANY_ATOMIC_TYPE_MAP = MapType.get(QNAME, ANY_ATOMIC_TYPE_O);
 
   /** The general array type. */
   public static final ArrayType ARRAY = ITEM_ZM.arrayType();

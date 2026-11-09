@@ -38,9 +38,9 @@ public final class SeqTypeTest {
   /** Type node(). */
   private static final SeqType NODE_O = NODE.seqType();
   /** Type element(x). */
-  private static final SeqType ELEMENT_X_O = NodeType.get(NameTest.get(new QNm("X"))).seqType();
+  private static final SeqType ELEMENT_X_O = NodeType.get("X").seqType();
   /** Type element(y). */
-  private static final SeqType ELEMENT_Y_O = NodeType.get(NameTest.get(new QNm("Y"))).seqType();
+  private static final SeqType ELEMENT_Y_O = NodeType.get("Y").seqType();
   /** Type jnode(). */
   private static final SeqType JNODE_XX_O = NodeType.get(JNodeTest.get(null, null)).seqType();
   /** Type jnode(*, xs:integer). */

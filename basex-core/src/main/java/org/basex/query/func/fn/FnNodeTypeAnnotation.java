@@ -15,8 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnNodeTypeAnnotation extends FnSchemaType {
   /** The function's argument type. */
-  private static final SeqType ARG_TYPE =
-      ChoiceItemType.get(NodeType.ELEMENT, NodeType.ATTRIBUTE).seqType();
+  private static final SeqType ARG_TYPE = Types.ELEMENT_OR_ATTRIBUTE_O;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

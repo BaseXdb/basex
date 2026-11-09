@@ -24,19 +24,19 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class DbAccessFn extends StandardFunc {
+public abstract class DbAccessFn extends StandardFunc {
   /** QName. */
-  static final QNm Q_BACKUP = new QNm("backup");
+  public static final QNm Q_BACKUP = new QNm("backup");
   /** QName. */
   static final QNm Q_SIZE = new QNm("size");
   /** QName. */
   static final QNm Q_DATE = new QNm("date");
   /** QName. */
-  static final QNm Q_DATABASE = new QNm("database");
+  public static final QNm Q_DATABASE = new QNm("database");
   /** QName. */
   static final QNm Q_COMMENT = new QNm("comment");
   /** QName. */
-  static final QNm Q_RESOURCE = new QNm("resource");
+  public static final QNm Q_RESOURCE = new QNm("resource");
   /** QName. */
   static final QNm Q_RESOURCES = new QNm("resources");
   /** QName. */
@@ -44,13 +44,13 @@ abstract class DbAccessFn extends StandardFunc {
   /** QName. */
   static final QNm Q_MODIFIED_DATE = new QNm("modified-date");
   /** QName. */
-  static final QNm Q_DIR = new QNm("dir");
+  public static final QNm Q_DIR = new QNm("dir");
   /** QName. */
   static final QNm Q_TYPE = new QNm("type");
   /** QName. */
   static final QNm Q_PATH = new QNm("path");
   /** QName. */
-  static final QNm Q_SYSTEM = new QNm("system");
+  public static final QNm Q_SYSTEM = new QNm("system");
 
   /**
    * Evaluates an expression to a normalized database path.

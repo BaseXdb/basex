@@ -24,7 +24,7 @@ public abstract class IndexFn extends StandardFunc {
   /** QName. */
   static final QNm Q_COUNT = new QNm("count");
   /** QName. */
-  static final QNm Q_ENTRY = new QNm("entry");
+  public static final QNm Q_ENTRY = new QNm("entry");
   /** QName. */
   static final QNm Q_MIN = new QNm("min");
   /** QName. */

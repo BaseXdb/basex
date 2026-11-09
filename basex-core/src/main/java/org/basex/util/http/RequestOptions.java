@@ -34,7 +34,7 @@ public final class RequestOptions extends Options {
     MapType.get(BasicType.STRING, Types.ANY_ATOMIC_TYPE_ZM).seqType());
   /** HTTP header fields. */
   public static final ValueOption HEADERS = new ValueOption("headers",
-    MapType.get(BasicType.STRING, Types.STRING_ZM).seqType());
+    Types.STRING_STRING_SEQ_MAP.seqType());
   /** Authentication. */
   public static final ValueOption AUTH = new ValueOption("auth",
     Records.HTTP_AUTH.get().seqType(Occ.ZERO_OR_ONE));
@@ -60,7 +60,7 @@ public final class RequestOptions extends Options {
     Types.MAP_ZO);
   /** Timeout in seconds. */
   public static final ValueOption TIMEOUT = new ValueOption("timeout",
-    BasicType.DECIMAL.seqType(Occ.ZERO_OR_ONE));
+    Types.DECIMAL_ZO);
 
   /**
    * Returns a request with the specified method and the assigned options.

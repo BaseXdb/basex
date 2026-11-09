@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-interface ArchiveText {
+public interface ArchiveText {
   /** QName. */
   QNm Q_ENTRY = new QNm(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
   /** QName. */

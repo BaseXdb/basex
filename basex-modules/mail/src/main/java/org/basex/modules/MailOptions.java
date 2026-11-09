@@ -46,12 +46,12 @@ public final class MailOptions extends Options {
   public static final StringOption HTML = new StringOption("html");
   /** Option: additional headers. */
   public static final ValueOption HEADERS = new ValueOption("headers",
-      Types.STRING_ZM.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE));
+      Types.STRING_STRING_SEQ_MAP.seqType(Occ.ZERO_OR_ONE));
   /** Option: envelope sender address for bounces. */
   public static final StringOption BOUNCE = new StringOption("bounce");
   /** Option: timeout in seconds ({@code 0}: none). */
   public static final ValueOption TIMEOUT = new ValueOption("timeout",
-      BasicType.DECIMAL.seqType(), Dec.get(BigDecimal.valueOf(60)));
+      Types.DECIMAL_O, Dec.get(BigDecimal.valueOf(60)));
 
   /**
    * Attachment options.
