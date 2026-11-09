@@ -149,6 +149,27 @@ public final class ModuleTest extends SandboxTest {
     }
   }
 
+  /**
+   * Skips the URI resolver for paths that point to databases.
+   * @throws Exception exception
+   */
+  @Test public void uriResolverDatabase() throws Exception {
+    execute(new CreateDB(NAME, "<db/>"));
+    for(final String query : new String[] {
+      "doc('" + NAME + "')", "collection('" + NAME + "')", "doc('/" + NAME + "/" + NAME + ".xml')"
+    }) {
+      try(QueryProcessor qp = new QueryProcessor(query, context)) {
+        qp.uriResolver((path, uri, base) -> fail("Resolver called: " + query));
+        assertEquals("<db/>", qp.value().serialize().toString(), query);
+      }
+    }
+    try(QueryProcessor qp = new QueryProcessor("doc('x.xml')", context)) {
+      qp.uriResolver((path, uri, base) -> new IOContent("<file/>", path));
+      assertEquals("<file/>", qp.value().serialize().toString());
+    }
+    execute(new DropDB(NAME));
+  }
+
   /** Tests type import. */
   @Test public void importedTypes() {
     final IOFile sandbox = sandbox();

@@ -285,10 +285,9 @@ public final class QueryResources {
     final String form = options.get(CollectionOptions.FORM);
     final boolean db = withdb && (form == null || form.equals(CollectionOptions.DATABASE));
     if(form != null && !switch(form) {
-      case CollectionOptions.DATABASE -> withdb && qi.dbName != null &&
-        context.soptions.dbExists(qi.dbName);
-      case CollectionOptions.DIRECTORY -> qi.io instanceof IOFile && qi.io.isDir();
-      case CollectionOptions.ARCHIVE -> qi.io != null && qi.io.isArchive();
+      case CollectionOptions.DATABASE -> withdb && qi.dbExists(context.soptions);
+      case CollectionOptions.DIRECTORY -> qi.io() instanceof final IOFile dir && dir.isDir();
+      case CollectionOptions.ARCHIVE -> qi.io() instanceof final IO io && io.isArchive();
       default -> false;
     }) throw COLLFORM_X_X.get(info, form, qi.original);
 
@@ -297,7 +296,7 @@ public final class QueryResources {
     if(value != null) return value;
 
     // list files of a directory without parsing them
-    if(uris && qi.io instanceof final IOFile dir && dir.isDir()) {
+    if(uris && qi.io() instanceof final IOFile dir && dir.isDir()) {
       checkAccess(dir, qi.original, qc, info);
       final String key = dir.path() + ';' + key(docOpts, options);
       final Value cached = dirs.get(key);
@@ -330,7 +329,7 @@ public final class QueryResources {
   public ArrayList<IOFile> others(final QueryInput qi, final DocOptions docOpts,
       final CollectionOptions options, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(!(qi.io instanceof final IOFile dir && dir.isDir()) ||
+    if(!(qi.io() instanceof final IOFile dir && dir.isDir()) ||
         CollectionOptions.DATABASE.equals(options.get(CollectionOptions.FORM))) {
       return new ArrayList<>(0);
     }
@@ -366,10 +365,12 @@ public final class QueryResources {
       }
 
       // check currently opened collections (required for tests)
-      final String path = qi.io != null ? qi.io.path() : null;
-      final int cs = colls.size();
-      for(int c = 0; c < cs; c++) {
-        if(IO.equals(collNames.get(c), path)) return colls.get(c);
+      if(!qi.dbExists(context.soptions) && qi.io() instanceof final IO io) {
+        final String path = io.path();
+        final int cs = colls.size();
+        for(int c = 0; c < cs; c++) {
+          if(IO.equals(collNames.get(c), path)) return colls.get(c);
+        }
       }
     }
 
@@ -602,17 +603,18 @@ public final class QueryResources {
     for(final Data data : datas) {
       final boolean mainmem = data.inMemory();
       if(withdb || mainmem) {
-        // compare input path
+        // compare input path (skipped for existing databases, which take precedence)
         final String original = data.meta.original;
-        if(!original.isEmpty() && qi.io != null && original(data).eq(qi.io) &&
+        if(!original.isEmpty() && !(withdb && qi.dbExists(context.soptions)) &&
+            qi.io() instanceof final IO io && original(data).eq(io) &&
             key.equals(data.meta.docOpts)) {
-          checkTrusted(qi.io, qi.original, qc, info);
+          checkTrusted(io, qi.original, qc, info);
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
         // compare database name; favor existing database instances
-        if(IO.equals(data.meta.name, name) && (!mainmem || !context.soptions.dbExists(name))) {
+        if(IO.equals(data.meta.name, name) && (!mainmem || !qi.dbExists(context.soptions))) {
           checkRead(data, qc, info);
           docOpts.checkDbAccess(info);
           return data;
@@ -740,7 +742,7 @@ public final class QueryResources {
       final CollectionOptions collOpts, final QueryContext qc, final InputInfo info,
       final boolean single, final boolean allowExternal) throws QueryException {
 
-    final IO io = input.io;
+    final IO io = input.io();
     if(io == null) throw WHICHRES_X.get(info, input.original);
     checkAccess(io, input.original, qc, info);
 

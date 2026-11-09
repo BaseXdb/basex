@@ -13,8 +13,14 @@ import org.basex.util.*;
 public final class QueryInput {
   /** Original input string (resource URI, database path or XML string). */
   public final String original;
-  /** Input reference ({@code null} if the input cannot be resolved). */
-  public final IO io;
+  /** Static context. */
+  private final StaticContext sc;
+  /** Input reference (can be {@code null}). */
+  private IO io;
+  /** Indicates if the input reference has been resolved. */
+  private boolean resolved;
+  /** Indicates if the input points to an existing database (can be {@code null}). */
+  private Boolean exists;
 
   /** Database name (if {@code null}, no name could be extracted from original path). */
   public String dbName;
@@ -28,7 +34,7 @@ public final class QueryInput {
    */
   public QueryInput(final String original, final StaticContext sc) {
     this.original = original;
-    io = sc.location(original, null);
+    this.sc = sc;
 
     // check if the specified input string can be rewritten to a database name and path
     String name = Strings.startsWith(original, '/') ? original.substring(1) : original, path = "";
@@ -41,6 +47,28 @@ public final class QueryInput {
       dbName = name;
       dbPath = path;
     }
+  }
+
+  /**
+   * Returns the input reference, which is resolved on first access.
+   * @return input reference ({@code null} if the input cannot be resolved)
+   */
+  public IO io() {
+    if(!resolved) {
+      io = sc.location(original, null);
+      resolved = true;
+    }
+    return io;
+  }
+
+  /**
+   * Indicates if the input points to an existing database.
+   * @param soptions static options
+   * @return result of check
+   */
+  public boolean dbExists(final StaticOptions soptions) {
+    if(exists == null) exists = dbName != null && soptions.dbExists(dbName);
+    return exists;
   }
 
   @Override
