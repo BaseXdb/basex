@@ -202,6 +202,7 @@ public final class ServerQuery extends Job {
   private QueryProcessor qp() {
     if(parsed || qp == null) {
       qp = pushJob(new QueryProcessor(query, ctx));
+      qp.qc.globalBindings = true;
       parsed = false;
     }
     return qp;

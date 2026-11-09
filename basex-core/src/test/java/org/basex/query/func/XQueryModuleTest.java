@@ -682,6 +682,14 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     final String ext = "declare variable $x as xs:integer external; $x + 1";
     query("exists(" + func.args(ext, " { 'compile': true() }") + "//StaticVarRef)", true);
     query("exists(" + func.args(ext, " { 'optimize': true() }") + "//StaticVarRef)", true);
+    // global bindings are ignored
+    set(MainOptions.BINDINGS, "x=1");
+    try {
+      query("exists(" + func.args(ext, " { 'compile': true() }") + "//StaticVarRef)", true);
+      query("exists(" + func.args(lib, " { 'compile': true() }") + ")", true);
+    } finally {
+      set(MainOptions.BINDINGS, "");
+    }
 
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);

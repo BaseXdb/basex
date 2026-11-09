@@ -228,6 +228,7 @@ public abstract class AQuery extends Command {
     }
 
     qp = pushJob(new QueryProcessor(query, uri, ctx, info));
+    qp.qc.globalBindings = true;
 
     for(final Entry<String, Entry<Object, String>> entry : bindings.entrySet()) {
       final Entry<Object, String> value = entry.getValue();

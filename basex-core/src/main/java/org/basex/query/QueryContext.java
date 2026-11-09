@@ -103,6 +103,8 @@ public final class QueryContext extends Job implements Closeable {
   public boolean inlineModule;
   /** Custom URI resolver for parsed modules (can be {@code null}). */
   public UriResolver resolver;
+  /** Indicates if the values of the {@link MainOptions#BINDINGS} option will be bound. */
+  public boolean globalBindings;
 
   /** Cached full-text position data. */
   public FTPosData ftPosData;
@@ -341,7 +343,7 @@ public final class QueryContext extends Job implements Closeable {
       options.compile();
 
       // bind external variables
-      if(parent == null) {
+      if(globalBindings) {
         final Map<String, String> map = context.options.toMap(MainOptions.BINDINGS);
         for(final Entry<String, String> entry : map.entrySet()) {
           bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
