@@ -260,8 +260,9 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
+  public Expr inline(final Expr[] exprs, final boolean unlimited, final CompileContext cc)
+      throws QueryException {
+    if(!cc.inlineable(anns, expr, unlimited) || expr.has(Flag.CTX)) return null;
     cc.info(QueryText.OPTINLINE_X, this);
     // fn($x) { $x * 2 }(E) → let $x := E return $x * 2
     return cc.inline(params, exprs, null, expr, null, info);
@@ -473,29 +474,29 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public FuncItem refineFunc(final CompileContext cc, final SeqType... argTypes)
       throws QueryException {
-    // skip refinement if function has too many parameters
-    final int nargs = argTypes.length, arity = arity();
-    if(nargs >= arity) {
-      // select more specific types arguments and return types
-      final FuncType oldType = funcType();
-      final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
-      for(int a = 0; a < arity; a++) {
-        final SeqType at = argTypes[a], oat = oldArgTypes[a];
-        newArgTypes[a] = at.refines(oat) ? at : oat;
-      }
-      final FuncType newType = FuncType.get(oldType.declType, newArgTypes);
-      // coerce to refined function type
-      final FuncItem fitem = (FuncItem) coerceTo(newType, cc.qc, cc, info);
+    // skip refinement if argument types are missing, or if no type can be narrowed
+    if(!Var.narrows(params, argTypes)) return this;
+    final int arity = arity();
 
-      // drop redundant type checks, adopt the refined types
-      final Var[] vars = fitem.params;
-      for(int a = 0; a < arity; a++) {
-        final SeqType vt = vars[a].declType;
-        if(vt != null && argTypes[a].instanceOf(vt)) vars[a].refineType(argTypes[a], cc);
-      }
-      return fitem;
+    // select more specific types arguments and return types
+    final FuncType oldType = funcType();
+    final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
+    for(int a = 0; a < arity; a++) {
+      final SeqType at = argTypes[a], oat = oldArgTypes[a];
+      newArgTypes[a] = at.refines(oat) ? at : oat;
     }
-    return this;
+    final FuncType newType = FuncType.get(oldType.declType, newArgTypes);
+    // coerce to refined function type
+    final FuncItem fitem = (FuncItem) coerceTo(newType, cc.qc, cc, info);
+    if(fitem == this) return this;
+
+    // drop redundant type checks, adopt the refined types
+    final Var[] vars = fitem.params;
+    for(int a = 0; a < arity; a++) {
+      final SeqType vt = vars[a].declType;
+      if(vt != null && argTypes[a].instanceOf(vt)) vars[a].refineType(argTypes[a], cc);
+    }
+    return fitem;
   }
 
   @Override

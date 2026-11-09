@@ -103,7 +103,7 @@ public abstract class FItem extends Item implements XQFunction {
       vars[a] = vs.addNew(QNm.EMPTY, argTypes[a], qc, info);
     }
 
-    final Expr body = funcBody(vs, args, ft.declType, cc, info);
+    final Expr body = funcBody(vs, args, ft.declType, true, cc, info);
 
     // advertise the target type; keep the body type as refined return type for result typing
     final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
@@ -116,20 +116,22 @@ public abstract class FItem extends Item implements XQFunction {
    * @param vs variable scope with the parameters of the new function item
    * @param args arguments
    * @param declType declared return type (can be {@code null})
+   * @param unlimited ignore the size limit of enabled inlining
    * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
    * @return function body
    * @throws QueryException query exception
    */
   private Expr funcBody(final VarScope vs, final Expr[] args, final SeqType declType,
-      final CompileContext cc, final InputInfo ii) throws QueryException {
+      final boolean unlimited, final CompileContext cc, final InputInfo ii)
+      throws QueryException {
 
     try {
       if(cc != null) cc.pushScope(vs);
 
-      // create new function call (will immediately be inlined/simplified when optimized)
-      Expr body = new DynFuncCall(ii, updating(), false, this, args);
-      if(cc != null) body = body.optimize(cc);
+      // create new function call (inlined if possible when optimized)
+      final DynFuncCall call = new DynFuncCall(ii, updating(), false, this, args);
+      Expr body = cc != null ? call.optimize(unlimited, cc) : call;
 
       // add type check if return types differ
       if(declType != null && !body.seqType().coercible(declType)) {
@@ -175,7 +177,7 @@ public abstract class FItem extends Item implements XQFunction {
       }
     }
     final AnnList anns = annotations();
-    final Expr body = funcBody(vs, args, null, cc, ii);
+    final Expr body = funcBody(vs, args, null, false, cc, ii);
     final FuncType tp = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
     return new FuncItem(ii, body, params, anns, tp, vs.stackSize(), null, null, simple(body, cc));
   }
@@ -205,7 +207,8 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+  public Expr inline(final Expr[] exprs, final boolean unlimited, final CompileContext cc)
+      throws QueryException {
     return null;
   }
 

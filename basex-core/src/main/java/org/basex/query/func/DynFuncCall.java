@@ -69,6 +69,17 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    return optimize(false, cc);
+  }
+
+  /**
+   * Optimizes the function call.
+   * @param unlimited ignore the size limit of enabled inlining
+   * @param cc compilation context
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  public Expr optimize(final boolean unlimited, final CompileContext cc) throws QueryException {
     final Expr func = body();
     final Type ftype = func.seqType().type;
     final boolean struct = lookup(ftype);
@@ -131,7 +142,7 @@ public final class DynFuncCall extends FuncCall {
     if(func instanceof final XQFunctionExpr fe) {
       final Expr inlined = cc.enter(fe, () -> {
         checkUp(fe, updating);
-        return fe.inline(Arrays.copyOf(exprs, nargs), cc);
+        return fe.inline(Arrays.copyOf(exprs, nargs), unlimited, cc);
       });
       if(inlined != null) return inlined;
     }

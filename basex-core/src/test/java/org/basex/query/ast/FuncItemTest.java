@@ -724,6 +724,40 @@ public final class FuncItemTest extends SandboxTest {
     check(f + "for-each((1, 'a'), fn($x) { f($x) })", "true\nfalse", exists(Instance.class));
   }
 
+  /** Refined function items are not wrapped if no parameter type is narrowed. */
+  @Test public void refineWithoutWrapper() {
+    check("declare option db:inlinelimit '10';"
+        + "declare %basex:inline function f($n) {"
+        + "  fold-left(1 to $n, (1, 1), fn($w, $i) { $w, $w[$i] + $w[$i + 1] + $i * $i })"
+        + "};"
+        + "f(random:integer(1) + 5)",
+        "1\n1\n3\n8\n20\n44\n89", empty(DynFuncCall.class));
+  }
+
+  /** Refinement must not narrow the parameters of a shared function item. */
+  @Test public void refineShared() {
+    error("let $f := fn($g as function(*)) as xs:integer { 42 } "
+        + "let $h := fn($x as xs:integer) as xs:integer { $x } "
+        + "let $any := ($f, fn($a) { 0 }, 1)[random-number-generator()?number < 2][1] "
+        + "return (sort(($h, $h), (), $f) => count(), $any(<x/>))", INVTYPE_X);
+  }
+
+  /** Coerced function items are inlined regardless of their size. */
+  @Test public void refineInlined() {
+    final String limit = "declare option db:inlinelimit '10';";
+    final String fold = "; fold-left(1 to random:integer(1) + 5, 0, $f)";
+    check(limit + "declare variable $f := fn($s, $i) { $s + $i * $i - $i idiv 2 + $i mod 7 }"
+        + fold, "64", empty(DynFuncCall.class));
+    check(limit + "declare variable $f := %basex:inline(0) fn($s, $i) { $s + $i }" + fold,
+        "15", exists(DynFuncCall.class));
+
+    // global variable with declared function type
+    final String typed = limit + "declare variable $f as fn(xs:integer) as xs:integer := ";
+    check(typed + "fn($i) { $i * $i - $i idiv 2 + $i mod 7 + $i }; $f(random:integer(1) + 2)",
+        "7", count(FuncItem.class, 1));
+    error(typed + "fn($i) { $i || '' || $i || '' || $i }; $f(random:integer(1))", INVTYPE_X);
+  }
+
   /** Lookups in maps with nondeterministic functions. */
   @Test public void ndtFuncItemInMap() {
     final String m = "let $m := { 'f': random:double#0 } return ";

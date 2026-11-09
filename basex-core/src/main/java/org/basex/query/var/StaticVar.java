@@ -67,7 +67,7 @@ public final class StaticVar extends StaticDecl {
       // (record fields: only if used)
       if(!field && (expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT))) {
         try {
-          if(value == null) value = compute(cc.qc);
+          if(value == null) value = compute(cc.qc, cc);
           cc.replaceWith(expr, value);
         } catch(final QueryException ex) {
           if(ex.error() != NOCTX_X) throw ex;
@@ -93,15 +93,16 @@ public final class StaticVar extends StaticDecl {
   /**
    * Evaluates the expression of this variable.
    * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
    * @return value
    * @throws QueryException query exception
    */
-  Value compute(final QueryContext qc) throws QueryException {
+  Value compute(final QueryContext qc, final CompileContext cc) throws QueryException {
     final QueryFocus focus = qc.focus;
     qc.focus = focus(qc);
     final int fp = vs.enter(qc);
     try {
-      return coerce(expr.value(qc), qc);
+      return coerce(expr.value(qc), qc, cc);
     } catch(final QueryException ex) {
       // errors of lazy variables can surface anywhere: make them non-catchable
       throw lazy ? ex.notCatchable() : ex;

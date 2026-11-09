@@ -84,7 +84,7 @@ public final class StaticFuncCall extends FuncCall {
     // try to inline the function
     // local:inc(E) → let $x := E return $x + 1  (with local:inc($x) { $x + 1 })
     if(!selfRecursive()) {
-      final Expr inlined = cc.enter(func, () -> func.inline(exprs, cc));
+      final Expr inlined = cc.enter(func, () -> func.inline(exprs, false, cc));
       if(inlined != null) return inlined;
     }
 

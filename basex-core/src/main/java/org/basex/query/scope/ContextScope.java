@@ -36,7 +36,7 @@ public final class ContextScope extends MainModule {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    if(value == null) value = coerce(super.value(qc), qc);
+    if(value == null) value = coerce(super.value(qc), qc, null);
     return value;
   }
 }

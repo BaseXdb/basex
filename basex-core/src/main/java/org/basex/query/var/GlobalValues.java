@@ -48,7 +48,7 @@ public final class GlobalValues {
     if(cached != null) return cached;
 
     try {
-      final Value value = var.compute(qc);
+      final Value value = var.compute(qc, null);
       release(var, value);
       return value;
     } catch(final QueryException | RuntimeException | Error ex) {

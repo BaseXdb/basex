@@ -78,11 +78,13 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * Coerces a value to the declared type of this scope.
    * @param value value
    * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
    * @return coerced value
    * @throws QueryException query exception
    */
-  protected final Value coerce(final Value value, final QueryContext qc) throws QueryException {
-    return declType != null ? declType.coerce(value, qc, info, name, null) : value;
+  protected final Value coerce(final Value value, final QueryContext qc, final CompileContext cc)
+      throws QueryException {
+    return declType != null ? declType.coerce(value, qc, info, name, cc) : value;
   }
 
   /**

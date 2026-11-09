@@ -91,6 +91,22 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Checks if the specified argument types narrow at least one parameter type.
+   * @param params parameters
+   * @param argTypes argument types
+   * @return result of check
+   */
+  public static boolean narrows(final Var[] params, final SeqType[] argTypes) {
+    final int pl = params.length;
+    if(argTypes.length < pl) return false;
+    for(int p = 0; p < pl; p++) {
+      final SeqType at = argTypes[p], pt = params[p].seqType();
+      if(!at.eq(pt) && at.instanceOf(pt)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Stack slot of this variable.
    * @return stack slot ({@code -1} if unused)
    */

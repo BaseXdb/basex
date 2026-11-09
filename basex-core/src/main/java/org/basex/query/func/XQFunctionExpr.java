@@ -85,11 +85,12 @@ public interface XQFunctionExpr {
   /**
    * Tries to inline this function with the given arguments.
    * @param exprs arguments
+   * @param unlimited ignore the size limit of enabled inlining
    * @param cc compilation context
    * @return expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
-  Expr inline(Expr[] exprs, CompileContext cc) throws QueryException;
+  Expr inline(Expr[] exprs, boolean unlimited, CompileContext cc) throws QueryException;
 
   /**
    * Checks if this function returns vacuous results (see {@link Expr#vacuous()}).

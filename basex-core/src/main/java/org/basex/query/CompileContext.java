@@ -578,9 +578,10 @@ public final class CompileContext {
    * Checks if the conditions are given for inlining a function body.
    * @param anns annotations
    * @param expr expression (function body)
+   * @param unlimited ignore the size limit of enabled inlining
    * @return result of check
    */
-  public boolean inlineable(final AnnList anns, final Expr expr) {
+  public boolean inlineable(final AnnList anns, final Expr expr, final boolean unlimited) {
     final Ann inline = anns.get(Annotation._BASEX_INLINE);
     final long limit;
     if(inline != null) {
@@ -590,8 +591,9 @@ public final class CompileContext {
       limit = 0;
     } else {
       limit = qc.context.options.get(MainOptions.INLINELIMIT);
+      if(unlimited && limit > 0) return true;
     }
-    return expr.exprSize() < limit;
+    return limit > 0 && expr.exprSize() < limit;
   }
 
   /**

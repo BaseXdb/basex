@@ -417,8 +417,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * {@inheritDoc}
    */
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(memo || !cc.inlineable(anns, expr) || has(Flag.CTX)) return null;
+  public Expr inline(final Expr[] exprs, final boolean unlimited, final CompileContext cc)
+      throws QueryException {
+    if(memo || !cc.inlineable(anns, expr, unlimited) || has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) this::funcLabel);
     // local:inc(E) → let $x := E return $x + 1  (with local:inc($x) { $x + 1 })
     return cc.inline(params, exprs, null, expr, null, info);

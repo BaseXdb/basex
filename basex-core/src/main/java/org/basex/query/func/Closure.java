@@ -249,20 +249,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr refineFunc(final CompileContext cc, final SeqType... argTypes) throws QueryException {
-    // skip refinement if function has too many parameters
+    // skip refinement if argument types are missing, or if no type can be narrowed
+    if(!Var.narrows(params, argTypes)) return this;
     final int arity = arity();
-    if(argTypes.length < arity) return this;
-
-    // skip if no parameter type can be narrowed
-    boolean narrow = false;
-    for(int a = 0; a < arity; a++) {
-      final SeqType at = argTypes[a], pt = params[a].seqType();
-      if(at.instanceOf(pt) && !at.eq(pt)) {
-        narrow = true;
-        break;
-      }
-    }
-    if(!narrow) return this;
 
     // clone the closure and narrow the cloned parameters
     final Closure copy = (Closure) copy(cc, new IntObjectMap<>());
@@ -359,8 +348,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
+  public Expr inline(final Expr[] exprs, final boolean unlimited, final CompileContext cc)
+      throws QueryException {
+    if(!cc.inlineable(anns, expr, unlimited) || expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
     // fn($x) { $x + 1 }(E) → let $x := E return $x + 1
