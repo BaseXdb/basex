@@ -246,6 +246,8 @@ public class FnSum extends NumericFn {
     final boolean dtd = type == DAY_TIME_DURATION, ymd = type == YEAR_MONTH_DURATION;
     if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, type, result);
 
+    // integers: exact partial sums, so that the result does not depend on the summation order
+    boolean itr = type.instanceOf(INTEGER);
     long c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
       final Type tp = it.type;
@@ -258,9 +260,30 @@ public class FnSum extends NumericFn {
         t = DURATION;
       }
       if(t != null) throw ARGTYPE_X_X_X.get(info, t, tp, it);
-      result = Calc.ADD.eval(result, it, info);
+      itr &= tp.instanceOf(INTEGER);
+      result = itr ? addInt(result, it) : Calc.ADD.eval(result, it, info);
       c++;
     }
+    if(itr && !avg && result instanceof Dec) {
+      final BigInteger bi = result.dec(info).toBigInteger();
+      if(bi.bitLength() < 64) return Itr.get(bi.longValue());
+      throw RANGE_X.get(info, bi);
+    }
     return avg ? Calc.DIVIDE.eval(result, Itr.get(c), info) : result;
+  }
+
+  /**
+   * Adds two integers, switching to a decimal on overflow.
+   * @param result integer or decimal result
+   * @param item integer item
+   * @return integer or decimal sum
+   * @throws QueryException query exception
+   */
+  private Item addInt(final Item result, final Item item) throws QueryException {
+    if(result instanceof Itr) {
+      final long sum = Util.add(result.itr(info), item.itr(info));
+      if(sum != Long.MIN_VALUE) return Itr.get(sum);
+    }
+    return Dec.get(result.dec(info).add(item.dec(info)));
   }
 }

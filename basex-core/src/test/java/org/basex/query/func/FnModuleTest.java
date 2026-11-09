@@ -6616,6 +6616,18 @@ return
     query(func.args(" reverse(-4000000000 to 0)"), -8000000002000000000L);
     query(func.args(" -4000000000 to 3999999999"), -4000000000L);
 
+    // integer overflow: exact partial sums, independent of the summation order
+    final String ints = " (1, 9223372036854775807, -9223372036854775808)[random:double() < 2]";
+    query(func.args(ints), 0);
+    query(func.args(" reverse(" + ints + ')'), 0);
+    query(func.args(" sort(" + ints + ')'), 0);
+    query(func.args(" (9223372036854775807, 1, -1)[random:double() < 2]"), Long.MAX_VALUE);
+    query(AVG.args(" (9223372036854775807, 9223372036854775807)[random:double() < 2]"),
+        Long.MAX_VALUE);
+    query(func.args(" (9223372036854775807, 1, 0.5)[random:double() < 2]"),
+        "9223372036854775808.5");
+    error(func.args(" (9223372036854775807, 1)[random:double() < 2]"), RANGE_X);
+
     query(func.args(" (1 to 10) ! 1"), 10);
     query(func.args(" (1 to 10) ! 10"), 100);
     query(func.args(" (1 to 1_000_000) ! 1_000_000"), 1000000000000L);
