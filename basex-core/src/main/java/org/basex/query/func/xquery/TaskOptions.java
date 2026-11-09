@@ -21,7 +21,7 @@ public final class TaskOptions extends Options {
   public static final BooleanOption REPORT = new BooleanOption("report", false);
   /** Timeout in seconds. */
   public static final ValueOption TIMEOUT =
-      new ValueOption("timeout", BasicType.DECIMAL.seqType(), Dec.ZERO);
+      new ValueOption("timeout", Types.DECIMAL_O, Dec.ZERO);
 
   /**
    * Returns the number of maximum parallel threads. A value of {@code 0} indicates that the
@@ -31,5 +31,22 @@ public final class TaskOptions extends Options {
   public int parallel() {
     final int p = get(PARALLEL);
     return p < 1 ? 0 : Math.min(0x7FFF, p);
+  }
+
+  /**
+   * Returns the result type of a task.
+   * @param ft type of the invoked functions (can be {@code null})
+   * @param occ number of function calls
+   * @return result type (can be {@code null})
+   */
+  SeqType type(final FuncType ft, final Occ occ) {
+    // one report record per function call
+    if(get(REPORT)) return Types.MAP_O.with(occ);
+    if(!get(RESULTS)) return Types.EMPTY_SEQUENCE_Z;
+    if(ft == null) return null;
+    // failed function calls contribute no results if errors are ignored
+    final SeqType type = ft.refinedType;
+    final Occ total = type.occ.multiply(occ);
+    return type.with(get(ERRORS) ? total : total.union(Occ.ZERO));
   }
 }

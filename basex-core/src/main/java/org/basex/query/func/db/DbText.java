@@ -44,7 +44,7 @@ public class DbText extends DbAccessFn {
     // count number of results
     final Data data = data();
     final IndexType type = type();
-    if(type != IndexType.TOKEN && data != null && arg(1) instanceof Value) {
+    if(type != IndexType.TOKEN && data != null && arg(1) instanceof Value && !defined(2)) {
       type.check(data, info);
       long size = 0;
       for(final byte[] token : tokens(cc.qc)) {

@@ -1,7 +1,5 @@
 package org.basex.query.func.xquery;
 
-import static org.basex.query.func.xquery.TaskOptions.*;
-
 import java.util.*;
 
 import org.basex.query.*;
@@ -40,26 +38,19 @@ public final class XQueryForkJoin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr functions = arg(0), options = arg(1);
+    final Expr functions = arg(0);
     final SeqType st = functions.seqType();
     // xquery:fork-join(()) → ()
     if(st.zero()) return functions;
     // xquery:fork-join($function) → $function()
-    if(st.one() && options == Empty.UNDEFINED) {
+    if(st.one() && !defined(1)) {
       return new DynFuncCall(info, coerceFunc(0, cc)).optimize(cc);
     }
 
     optOptions(1, TaskOptions::new, cc);
-    final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
-      options instanceof Value ? options(1, TaskOptions::new, cc.qc).get(RESULTS) : null;
-    if(results == Boolean.TRUE) {
-      final FuncType ft = functions.funcType();
-      if(ft != null) {
-        final SeqType dt = ft.refinedType;
-        exprType.assign(dt.with(dt.occ.multiply(st.occ)));
-      }
-    } else if(results == Boolean.FALSE) {
-      exprType.assign(Types.EMPTY_SEQUENCE_Z);
+    if(arg(1) instanceof Value) {
+      final SeqType type = options(1, TaskOptions::new, cc.qc).type(functions.funcType(), st.occ);
+      if(type != null) exprType.assign(type);
     }
     return this;
   }

@@ -265,6 +265,9 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "0", "id"), "id=\"0\"");
     query(func.args(NAME, "0", "XXX"), "");
     query(func.args(NAME, "XXX"), "");
+
+    // name filter: index size must not be assigned as result size
+    query("let $a := " + func.args(NAME, "0", "XXX") + " return count($a)", 0);
   }
 
   /** Test method. */

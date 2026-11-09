@@ -41,18 +41,15 @@ public final class XQueryForEach extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), action = arg(1);
+    final SeqType st = input.seqType();
     // xquery:for-each((), $action) → ()
-    if(input.seqType().zero()) return input;
+    if(st.zero()) return input;
     optOptions(2, TaskOptions::new, cc);
-    final SeqType[] types = { input.seqType().with(Occ.EXACTLY_ONE), Types.INTEGER_O };
+    final SeqType[] types = { st.with(Occ.EXACTLY_ONE), Types.INTEGER_O };
     arg(1, arg -> action.refineFunc(cc, types));
-    // default options: results are collected in input order
-    if(arg(2) == Empty.UNDEFINED) {
-      final FuncType ft = arg(1).funcType();
-      if(ft != null) {
-        final SeqType dt = ft.refinedType;
-        exprType.assign(dt.with(dt.occ.multiply(input.seqType().occ)));
-      }
+    if(arg(2) instanceof Value) {
+      final SeqType type = options(2, TaskOptions::new, cc.qc).type(arg(1).funcType(), st.occ);
+      if(type != null) exprType.assign(type);
     }
     return this;
   }

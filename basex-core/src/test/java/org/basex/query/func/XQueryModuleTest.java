@@ -369,6 +369,10 @@ public final class XQueryModuleTest extends SandboxTest {
     // options
     query(func.args(" (1 to 2) ! function() { 1 }", " { 'results': false() }"), "");
     query(func.args(" (error#0, true#0)", " { 'errors': false() }"), true);
+    // static type: failed functions contribute no results
+    query("let $r := " + func.args(
+        " (1 to 2) ! fn() as xs:boolean { random:double() < 2 and error() }",
+        " { 'errors': false() }") + " return exists($r)", false);
     query(func.args(" (true#0, false#0)", " { 'parallel': -1 }"), "true\nfalse");
     query(func.args(" (true#0, false#0)", " { 'parallel': 100 }"), "true\nfalse");
     query(func.args(" (true#0, false#0)", " { 'parallel': 1000000000 }"), "true\nfalse");
@@ -448,6 +452,10 @@ xquery:fork-join(
     // report overrides the 'results' and 'errors' options
     query(func.args(" (true#0, error#0)", " { 'report': true(), 'results': false() }") +
         " => count()", 2);
+    // static type: report records, not the function results
+    query(func.args(" (true#0, false#0)", report) + " instance of xs:boolean+", false);
+    query(func.args(" (true#0, false#0)", " { 'report': true(), 'results': false() }") +
+        " => empty()", false);
   }
 
   /** Test method. */
@@ -566,6 +574,11 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query(func.args(" (1, 2)", " fn($n) { $n }", " { 'report': true() }") + " ! ?value", "1\n2");
     query("exists(" + func.args(" 1", " fn($n) { error() }", " { 'report': true() }") + "?error)",
         true);
+    // static type: options are considered
+    check(func.args(" (1, 2)", " fn($n) { $n }", " { 'report': true() }"),
+        "{\"value\":1}\n{\"value\":2}", type(_XQUERY_FOR_EACH, "map(*)+"));
+    check(func.args(" (1, 2)", " fn($n) as xs:integer { $n }", " { 'errors': false() }"),
+        "1\n2", type(_XQUERY_FOR_EACH, "xs:integer*"));
     // optimizations
     check(func.args(" ()", " fn($n) { $n }"), "", empty());
     check(func.args(" 1 to " + wrap(2), " fn($n) { $n instance of xs:integer }"), "true\ntrue",
