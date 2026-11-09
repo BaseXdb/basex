@@ -30,16 +30,43 @@ public final class XQueryReduce extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0), init = arg(1);
+    final Expr input = arg(0), init = arg(1), action = arg(2), combine = arg(3);
+    final SeqType ist = input.seqType();
     // xquery:reduce((), $init, $action, $combine) → $init
-    if(input.seqType().zero()) return init;
+    if(ist.zero()) return init;
     optOptions(4, TaskOptions::new, cc);
-    // result type: union of the seed type and the declared action/combine types
-    SeqType st = init.seqType();
-    final FuncType at = arg(2).funcType(), ct = arg(3).funcType();
-    if(at != null) st = st.union(at.refinedType);
-    if(ct != null) st = st.union(ct.refinedType);
-    exprType.assign(st);
+
+    // action: called with the seed value or its own results
+    final SeqType zst = init.seqType(), itemType = ist.with(Occ.EXACTLY_ONE);
+    SeqType st = zst, ost, rt;
+    do {
+      final SeqType[] types = { st, itemType };
+      arg(2, arg -> action.refineFunc(cc, types));
+      rt = refinedType(2);
+      ost = st;
+      st = st.union(rt);
+    } while(!st.eq(ost));
+
+    // combine: called with partial results (chunks are never empty)
+    SeqType pst = rt;
+    do {
+      final SeqType[] types = { pst, pst };
+      arg(3, arg -> combine.refineFunc(cc, types));
+      ost = pst;
+      pst = pst.union(refinedType(3));
+    } while(!pst.eq(ost));
+
+    exprType.assign(ist.oneOrMore() ? pst : zst.union(pst));
     return this;
+  }
+
+  /**
+   * Returns the refined return type of a function argument.
+   * @param a index of the argument
+   * @return return type
+   */
+  private SeqType refinedType(final int a) {
+    final FuncType ft = arg(a).funcType();
+    return ft != null ? ft.refinedType : Types.ITEM_ZM;
   }
 }

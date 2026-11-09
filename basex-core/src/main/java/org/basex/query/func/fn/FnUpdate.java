@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
@@ -53,6 +54,14 @@ public final class FnUpdate extends StandardFunc {
     // a supplied map or array is returned as a value
     final Value result = transform(node, targets, ancestors, replacement, true, qc);
     return node == value ? result : ((JNode) result).value;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // supplied nodes are passed on to the select function
+    final SeqType st = arg(0).seqType();
+    if(st.type instanceof NodeType) arg(1, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
+    return this;
   }
 
   /**

@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -108,21 +107,24 @@ public class FnFoldLeft extends StandardFunc {
 
     final Expr input = arg(0), init = arg(1), action = arg(2);
     final SeqType ist = input.seqType();
+    final long size = array ? input.structSize() : -1;
     // fold-left((), INIT, $f) → INIT
-    if(array ? input == XQArray.empty() : ist.zero()) return cc.voidAndReturn(input, init, info);
+    if(array ? size == 0 : ist.zero()) return cc.voidAndReturn(input, init, info);
+    final boolean filled = array ? size > 0 : ist.oneOrMore();
 
     final SeqType zst = init.seqType();
     if(action instanceof FuncItem || action instanceof Closure) {
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
         Types.ITEM_O : ist.with(Occ.EXACTLY_ONE);
-      SeqType st = zst, ost;
+      SeqType st = zst, ost, rt;
       do {
         final SeqType[] types = { left ? st : i1t, left ? i1t : st, Types.INTEGER_O };
         arg(2, arg -> action.refineFunc(cc, types));
+        rt = arg(2).funcType().refinedType;
         ost = st;
-        st = st.union(arg(2).funcType().refinedType);
+        st = st.union(rt);
       } while(!st.eq(ost));
-      exprType.assign(st);
+      exprType.assign(filled ? rt : st);
 
       // analyze refined action (more specific types) and original action (may be wrapped)
       final Expr[] funcs = arg(2) == action ? new Expr[] { action } : new Expr[] { arg(2), action };
@@ -142,7 +144,7 @@ public class FnFoldLeft extends StandardFunc {
       }
     } else {
       final FuncType ft = action.funcType();
-      if(ft != null) exprType.assign(ist.oneOrMore() ? ft.refinedType : zst.union(ft.refinedType));
+      if(ft != null) exprType.assign(filled ? ft.refinedType : zst.union(ft.refinedType));
     }
     return this;
   }

@@ -62,7 +62,8 @@ public final class FnScan extends StandardFunc {
       final FuncType ft = action.funcType();
       if(ft != null) st = st.union(ft.refinedType);
     }
-    exprType.assign(ArrayType.get(st).seqType(Occ.ONE_OR_MORE));
+    final long size = input.size();
+    exprType.assign(ArrayType.get(st).seqType(), Occ.ONE_OR_MORE, size == -1 ? -1 : size + 1);
     return this;
   }
 }

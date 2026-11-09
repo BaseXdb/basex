@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -31,9 +32,15 @@ public final class FnSortWith extends SortFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr input = arg(0);
+    final SeqType ist = input.seqType();
+    if(!ist.zero()) {
+      final SeqType st = ist.with(Occ.EXACTLY_ONE);
+      arg(1, arg -> arg.refineFunc(cc, st, st));
+    }
     // even single items must be sorted, as the input might be invalid
-    return adoptType(arg(0));
+    return adoptType(input);
   }
 
   @Override

@@ -55,6 +55,11 @@ public final class MapModuleTest extends SandboxTest {
     try {
       check(func.args("a", " fn($x) { if($x instance of xs:string) then 1 else 'x' }"),
           "{1:\"a\"}", type(func, "map(xs:integer, xs:string+)"));
+      final String input = " (1, 1)", id = " fn($i) { $i }";
+      check(func.args(input, " ()", id, " { 'duplicates': op('+') }"),
+          "{1:2}", type(func, "map(xs:integer, xs:integer)"));
+      check(func.args(input, " ()", id, " { 'duplicates': op(',') }"),
+          "{1:(1,1)}", type(func, "map(xs:integer, xs:integer+)"));
     } finally {
       inline(false);
     }
@@ -420,6 +425,16 @@ public final class MapModuleTest extends SandboxTest {
 
     check(func.args(" {}") + " => map:keys()", "", empty());
     check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Itr.class));
+
+    inline(true);
+    try {
+      check(func.args(input, " { 'duplicates': op('+') }"),
+          "{1:5}", type(func, "map(xs:integer, xs:integer)"));
+      check(func.args(input, " { 'duplicates': op(',') }"),
+          "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
+    } finally {
+      inline(false);
+    }
   }
 
   /**

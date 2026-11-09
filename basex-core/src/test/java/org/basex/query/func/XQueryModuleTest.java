@@ -11,6 +11,8 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -566,6 +568,8 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
         true);
     // optimizations
     check(func.args(" ()", " fn($n) { $n }"), "", empty());
+    check(func.args(" 1 to " + wrap(2), " fn($n) { $n instance of xs:integer }"), "true\ntrue",
+        empty(Instance.class));
     // errors
     error(func.args(" 1", " fn($a, $b, $c) { $a }"), INVARITY_X_X);
     error(func.args(" 1", " 123"), INVTYPE_X);
@@ -621,6 +625,9 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
         "1\n2\n3\n4\n5");
     // count (per-chunk count, combined by addition)
     query(func.args(" 1 to 1000", " 0", " fn($a, $b) { $a + 1 }", " op('+')"), 1000);
+    // optimizations: non-empty input never returns the seed
+    check("exists(" + func.args(" (" + wrap(1) + ", " + wrap(2) + ")", " ()",
+        " fn($a, $b) { $a, string($b) }", " fn($a, $b) { $a, $b }") + ')', true, root(Bln.class));
     // errors
     error(func.args(" 1 to 10", " 0", " fn($a, $b) { error() }", " op('+')"), FUNERR1);
     error(func.args(" 1 to 4", " 0", " op('+')", " fn($a, $b, $c) { $a }"), INVARITY_X_X);

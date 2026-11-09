@@ -31,10 +31,14 @@ public final class ArraySortWith extends SortFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     // even single items must be sorted, as the input might be invalid
     final Expr array = arg(0);
-    if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
+    if(array.seqType().type instanceof final ArrayType at) {
+      final SeqType vt = at.valueType();
+      arg(1, arg -> arg.refineFunc(cc, vt, vt));
+      exprType.assign(at);
+    }
     return this;
   }
 

@@ -4,7 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.array.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
@@ -123,6 +125,15 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]", 0, " function($a, $b) { $a + $b }"), 3);
     query(func.args(" array { 1 to 6 }", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
     query(func.args(" array { 2 to 7 }", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
+
+    // result types: non-empty arrays never return the initial value
+    check(func.args(" array { 1, <_>2</_> }", " ()", " fn($a, $b) { $a, string($b) }") +
+        " => exists()", true, root(Bln.class));
+    check(func.args(" array { <_>2</_>[. = 1] }", " ()", " fn($a, $b) { $a, string($b) }") +
+        " => exists()", false, root(EXISTS));
+    query("let $i := random:integer(2) + 1 return " + func.args(" array { <_>2</_>[. = 1] }",
+        "x", " (fn($a, $b) { abs($b) }, fn($a, $b) { abs($b) })[$i]") +
+        " instance of xs:numeric", false);
 
     // early exits: recognized patterns
     query(func.args(" array { 1 to 100 }", 0,
@@ -539,6 +550,15 @@ public final class ArrayModuleTest extends SandboxTest {
         empty(func), exists(_ARRAY_SORT));
     check(func.args(array, " { 'order': 'descending' }"), "[\"b\",\"a\"]", exists(func));
     check(func.args(array, " ({}, {})"), "[\"a\",\"b\"]", exists(func));
+  }
+
+  /** Test method. */
+  @Test public void sortWith() {
+    final Function func = _ARRAY_SORT_WITH;
+    query(func.args(" [ 'b', 'a' ]", " compare#2"), "[\"a\",\"b\"]");
+    check(func.args(" array { 1 to " + wrap(2) + " }",
+        " fn($a, $b) { if($a instance of xs:integer) then compare($b, $a) else 0 }"), "[2,1]",
+        empty(Instance.class));
   }
 
   /** Test method. */

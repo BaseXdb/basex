@@ -31,26 +31,31 @@ public class FnWhileDo extends StandardFunc {
     final int p = until ? 2 : 1, a = until ? 1 : 2;
     final Expr input = arg(0), action = arg(a), predicate = arg(p);
 
-    SeqType st = input.seqType();
+    // type of the predicate argument and the result: do-until never tests or returns the input
+    final SeqType ist = input.seqType();
+    final SeqType st;
     if(action instanceof FuncItem || action instanceof Closure) {
-      SeqType ost;
+      SeqType ast = ist, ost, rt;
       do {
-        final SeqType[] types = { st, Types.INTEGER_O };
+        final SeqType[] types = { ast, Types.INTEGER_O };
         arg(a, arg -> action.refineFunc(cc, types));
-        ost = st;
-        st = st.union(arg(a).funcType().refinedType);
-      } while(!st.eq(ost));
-
-      final SeqType[] types = { st, Types.INTEGER_O };
-      arg(p, arg -> predicate.refineFunc(cc, types));
-      // while-do(E, fn { false() }, ACTION) → E
-      if(!until && arg(p) instanceof final FuncItem fi && fi.expr == Bln.FALSE) return input;
-
-      exprType.assign(st);
+        rt = arg(a).funcType().refinedType;
+        ost = ast;
+        ast = ast.union(rt);
+      } while(!ast.eq(ost));
+      st = until ? rt : ast;
     } else {
       final FuncType ft = action.funcType();
-      if(ft != null) exprType.assign(st.union(ft.refinedType));
+      if(ft == null) return this;
+      st = until ? ft.refinedType : ist.union(ft.refinedType);
     }
+
+    final SeqType[] types = { st, Types.INTEGER_O };
+    arg(p, arg -> predicate.refineFunc(cc, types));
+    // while-do(E, fn { false() }, ACTION) → E
+    if(!until && arg(p) instanceof final FuncItem fi && fi.expr == Bln.FALSE) return input;
+
+    exprType.assign(st);
     return this;
   }
 }

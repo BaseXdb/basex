@@ -44,9 +44,11 @@ public final class XQueryForEach extends StandardFunc {
     // xquery:for-each((), $action) → ()
     if(input.seqType().zero()) return input;
     optOptions(2, TaskOptions::new, cc);
+    final SeqType[] types = { input.seqType().with(Occ.EXACTLY_ONE), Types.INTEGER_O };
+    arg(1, arg -> action.refineFunc(cc, types));
     // default options: results are collected in input order
     if(arg(2) == Empty.UNDEFINED) {
-      final FuncType ft = action.funcType();
+      final FuncType ft = arg(1).funcType();
       if(ft != null) {
         final SeqType dt = ft.refinedType;
         exprType.assign(dt.with(dt.occ.multiply(input.seqType().occ)));

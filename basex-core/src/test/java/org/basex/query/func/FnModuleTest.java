@@ -1615,6 +1615,9 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(1, " identity#1", " true#0"), 1, root(DO_UNTIL));
     check(func.args(" (1, 2)", " identity#1", " true#0"), "1\n2", root(DO_UNTIL));
+    // input is never tested or returned
+    check(func.args(" 'a'", " fn { 1 }", " fn { . instance of xs:integer }"), 1,
+        type(DO_UNTIL, "xs:integer"), empty(Instance.class));
 
     // GH-2257
     query("head(" + func.args(" (1, 2)", " identity#1",
@@ -2124,6 +2127,10 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FOLD_RIGHT;
     query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
     query(func.args(" 1 to 6", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
+
+    // result types: non-empty input never returns the initial value
+    check(func.args(" (" + wrap(1) + ", 1 to " + wrap(3) + ")", " ()",
+        " fn($a, $b) { $a * 2, $b }") + " => exists()", true, root(Bln.class));
 
     // early exits: check the exit condition before the first call
     query(func.args(" 1 to 5", 100, " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
@@ -5459,6 +5466,8 @@ return
     check(func.args(" ()", " (1, 2)", " op('+')"), "[(1,2)]", empty(func));
     check(func.args(" (1 to 5)[. > 4]", 0, " op('+')"), "[0]\n[5]",
         type(func, "array(xs:anyAtomicType?)+"));
+    check("count(" + func.args(" (" + wrap(1) + ", " + wrap(2) + ")", 0, " op('+')") + ")", 3,
+        root(Itr.class));
 
     error(func.args(" 1 to 5", 0, " fn($acc, $item, $pos, $x) { $acc }"), INVARITY_X_X);
     error(func.args(" 1 to 5", "a", " fn($acc as xs:integer, $item) { $acc + $item }"),
@@ -6046,6 +6055,9 @@ return
     final String input = " ('b', 'a')";
     query(func.args(input, " compare#2"), "a\nb");
     query(func.args(input, " fn($a, $b) { -compare($a, $b) }"), "b\na");
+    check(func.args(" (1 to " + wrap(2) + ")",
+        " fn($a, $b) { if($a instance of xs:integer) then compare($b, $a) else 0 }"), "2\n1",
+        empty(Instance.class));
 
     // inconsistent comparator: unpredictable order, but no error and no lost items
     query("let $input := (1 to 2000) ! (. mod 1000) return sort(" + func.args(" $input",
@@ -6846,6 +6858,17 @@ return
   }
 
   /** Test method. */
+  @Test public void transitiveClosure() {
+    final Function func = TRANSITIVE_CLOSURE;
+    query(func.args(" <a><b><c/></b></a>", " fn { * }") + " ! name()", "b\nc");
+    query(func.args(" ()", " fn { * }"), "");
+
+    // step is applied to the input node and its results
+    check(func.args(" <a><b><c/></b></a>", " fn { if(. instance of element()) then * else () }") +
+        " => count()", 2, empty(If.class), type(func, "element()*"));
+  }
+
+  /** Test method. */
   @Test public void translate() {
     final Function func = TRANSLATE;
     query(func.args("a", "a", "b"), "b");
@@ -7069,6 +7092,9 @@ return
         + "<book draft='true'><title>JSON</title><price cur='EUR'>24.50</price></book>"
         + "</books></store>";
 
+    // the select function is applied to the supplied node
+    check(func.args(" <a><b/></a>", " fn { if(. instance of element(a)) then b else () }",
+        " <c/>"), "<a><c/></a>", empty(Instance.class));
     // JSON nodes
     query(func.args(store, " fn { .//draft }"), "{\"store\":{\"books\":["
         + "{\"title\":\"XQuery\",\"price\":39.95},{\"title\":\"JSON\",\"price\":24.5}],"

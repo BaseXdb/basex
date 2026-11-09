@@ -115,7 +115,7 @@ public class MapMerge extends MapFn {
         }
       }
       final MapType mt = (MapType) st.type;
-      assignType(mt.keyType(), mt.valueType());
+      assignType(mt.keyType(), mt.valueType(), cc);
     }
     return this;
   }
@@ -129,7 +129,23 @@ public class MapMerge extends MapFn {
    */
   final void prepareMerge(final int arg, final Duplicates dflt, final CompileContext cc)
       throws QueryException {
-    if(arg(arg) instanceof Value) md = duplicates(arg, cc.qc, dflt);
+    // reuse fixed mergers; refinement fixpoint must start from the supplied function
+    if(arg(arg) instanceof Value && (md == null || md instanceof Invoke)) {
+      md = merger(arg, cc.qc, dflt);
+    }
+  }
+
+  /**
+   * Returns the static or a new merger for duplicate values.
+   * @param arg options argument
+   * @param qc query context
+   * @param dflt default duplicate operation
+   * @return merger
+   * @throws QueryException query exception
+   */
+  final MapDuplicates duplicates(final int arg, final QueryContext qc, final Duplicates dflt)
+      throws QueryException {
+    return md != null ? md : merger(arg, qc, dflt);
   }
 
   /**
@@ -140,11 +156,8 @@ public class MapMerge extends MapFn {
    * @return merger
    * @throws QueryException query exception
    */
-  final MapDuplicates duplicates(final int arg, final QueryContext qc, final Duplicates dflt)
+  private MapDuplicates merger(final int arg, final QueryContext qc, final Duplicates dflt)
       throws QueryException {
-
-    // return static options instance
-    if(md != null) return md;
     // function
     final MergeOptions options = toOptions(arg(arg), new MergeOptions(), qc);
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
@@ -163,11 +176,15 @@ public class MapMerge extends MapFn {
   }
 
   /**
-   * Assigns a map type for this expression.
+   * Refines the merger and assigns a map type for this expression.
    * @param kt key type (can be {@code null})
    * @param vt value type
+   * @param cc compilation context
+   * @throws QueryException query exception
    */
-  final void assignType(final Type kt, final SeqType vt) {
+  final void assignType(final Type kt, final SeqType vt, final CompileContext cc)
+      throws QueryException {
+    if(md != null) md = md.refine(vt, cc);
     exprType.assign(MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE,
       md != null ? md.type(vt) : Types.ITEM_ZM));
   }
@@ -243,6 +260,19 @@ public class MapMerge extends MapFn {
      */
     Invoke(final FItem function) {
       this.function = function;
+    }
+
+    @Override
+    MapDuplicates refine(final SeqType st, final CompileContext cc) throws QueryException {
+      // widen the type of merged values until it is stable
+      SeqType mt = st, omt;
+      FItem refined;
+      do {
+        refined = (FItem) function.refineFunc(cc, mt, st);
+        omt = mt;
+        mt = mt.union(refined.funcType().refinedType);
+      } while(!mt.eq(omt));
+      return refined == function ? this : new Invoke(refined);
     }
 
     @Override

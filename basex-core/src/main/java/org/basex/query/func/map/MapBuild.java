@@ -61,7 +61,7 @@ public final class MapBuild extends MapMerge {
       arg(2, arg -> arg.refineFunc(cc, s1t));
       vt = arg(2).funcType().refinedType;
     }
-    assignType(kt, vt);
+    assignType(kt, vt, cc);
     return this;
   }
 

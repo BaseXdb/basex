@@ -45,4 +45,16 @@ public abstract class MapDuplicates {
   SeqType type(final SeqType st) {
     return st;
   }
+
+  /**
+   * Returns a merger that is refined for the supplied value type.
+   * @param st value type
+   * @param cc compilation context
+   * @return merger
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  MapDuplicates refine(final SeqType st, final CompileContext cc) throws QueryException {
+    return this;
+  }
 }
