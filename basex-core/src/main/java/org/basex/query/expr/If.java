@@ -66,6 +66,11 @@ public final class If extends Arr {
   }
 
   @Override
+  public Expr[] conditions() {
+    return new Expr[] { cond };
+  }
+
+  @Override
   public boolean navigational() {
     // an empty branch is equivalent to an omitted 'else' branch
     return Checks.all(exprs, expr -> expr == Empty.VALUE || expr.navigational());

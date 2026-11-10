@@ -609,9 +609,8 @@ public abstract class Expr extends ExprInfo {
    * @return new expression
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
   public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
-    return uf.base(this);
+    return uf.base(this, cc);
   }
 
   /**
@@ -692,6 +691,14 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr mapBranches(final QueryFunction<Expr, Expr> func, final CompileContext cc)
       throws QueryException {
+    return null;
+  }
+
+  /**
+   * Returns the expressions that select a branch of this expression.
+   * @return conditions (can be {@code null})
+   */
+  public Expr[] conditions() {
     return null;
   }
 

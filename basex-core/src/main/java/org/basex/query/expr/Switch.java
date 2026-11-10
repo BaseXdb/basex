@@ -53,6 +53,15 @@ public final class Switch extends ASwitch<SwitchGroup> {
   }
 
   @Override
+  public Expr[] conditions() {
+    final ExprList list = new ExprList().add(cond);
+    for(final SwitchGroup group : groups) {
+      list.add(Arrays.copyOfRange(group.exprs, 1, group.exprs.length));
+    }
+    return list.finish();
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     for(final SwitchGroup group : groups) group.checkUp();

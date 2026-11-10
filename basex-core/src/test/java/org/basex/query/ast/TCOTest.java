@@ -34,7 +34,7 @@ public final class TCOTest extends SandboxTest {
         "14721860295199062616467307339074198149529600000000000000000000000000" +
         "00",
 
-        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
+        exists(Unfold.class)
     );
   }
 
@@ -91,8 +91,7 @@ public final class TCOTest extends SandboxTest {
 
         12345,
 
-        exists(Util.className(If.class) + '/' + Util.className(StaticFuncCall.class) +
-            "[@tailCall eq 'true']")
+        empty(Util.className(StaticFunc.class) + "//" + Util.className(StaticFuncCall.class))
     );
   }
 
@@ -105,8 +104,7 @@ public final class TCOTest extends SandboxTest {
 
         12345,
 
-        exists(Util.className(If.class) + '/' + Util.className(StaticFuncCall.class) +
-            "[@tailCall eq 'true']")
+        exists(Unfold.class)
     );
   }
 
@@ -220,7 +218,7 @@ public final class TCOTest extends SandboxTest {
         + "        fn:error() cast as xs:error\n"
         + "};\n"
         + "local:sum(0, 1 to 100000)", 5000050000L,
-        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
+        exists(Unfold.class)
     );
   }
 

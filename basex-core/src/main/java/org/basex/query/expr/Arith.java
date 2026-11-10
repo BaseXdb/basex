@@ -143,7 +143,7 @@ public final class Arith extends Arr {
   @Override
   public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
     return calc == Calc.ADD ? uf.step(this, Unfolding.Op.ADD, cc) :
-      calc == Calc.MULTIPLY ? uf.step(this, Unfolding.Op.MULTIPLY, cc) : uf.base(this);
+      calc == Calc.MULTIPLY ? uf.step(this, Unfolding.Op.MULTIPLY, cc) : uf.base(this, cc);
   }
 
   @Override

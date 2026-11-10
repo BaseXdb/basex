@@ -165,12 +165,25 @@ public final class TypeCheck extends Single {
    * @return resulting expression, or {@code null} if no type check is necessary
    */
   public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
-    if(ex.seqType().coercible(st)) return null;
+    return ex.seqType().coercible(st) ? null : get(info, ex, st, name, cc);
+  }
+
+  /**
+   * Creates an optimized type check, or an error if the check is known to fail.
+   * @param info input info (can be {@code null})
+   * @param expr expression to check
+   * @param st sequence type
+   * @param name name of the checked variable (can be {@code null})
+   * @param cc compilation context
+   * @return resulting expression
+   */
+  public static Expr get(final InputInfo info, final Expr expr, final SeqType st, final QNm name,
+      final CompileContext cc) {
     try {
-      return new TypeCheck(info, ex, st, name).optimize(cc);
-    } catch(final QueryException qe) {
+      return new TypeCheck(info, expr, st, name).optimize(cc);
+    } catch(final QueryException ex) {
       // the checked expression may never be evaluated: raise the error at runtime
-      return FnError.get(qe);
+      return FnError.get(ex);
     }
   }
 

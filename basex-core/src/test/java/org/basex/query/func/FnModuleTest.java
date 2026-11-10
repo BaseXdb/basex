@@ -2164,6 +2164,9 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (1 to 10)[. > " + wrap(1) + "]", " map:build(1 to 12)",
         " fn($m, $k) { if($k mod 2 = 0) then map:remove($m, $k) else $m }") + " => map:keys()",
         "1\n3\n5\n7\n9\n11\n12", empty(func), exists(_MAP_REMOVE));
+    // non-deterministic input: evaluated once
+    check("count(" + func.args(" 1 to 3 + " + _RANDOM_INTEGER.args(1), " ()",
+        " fn($r, $v) { $r, $v * 2 }") + ")", 3, empty(func));
     // conditions and pipelines: the unchanged result is skipped
     final String range = " (1 to 100)[. > " + wrap(0) + "]";
     check(func.args(range, " ()", " fn($r, $v) { if($v mod 10 = 0) then ($r, $v) else $r }") +

@@ -4,21 +4,16 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.expr.Unfolding.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
-import org.basex.query.func.map.MapMerge.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -152,11 +147,12 @@ public class FnFoldLeft extends StandardFunc {
 
       // analyze refined action (more specific types) and original action (may be wrapped)
       final Expr[] funcs = arg(2) == action ? new Expr[] { action } : new Expr[] { arg(2), action };
+      for(final Expr func : funcs) {
+        final Expr flat = flatten(func, types, cc);
+        if(flat != null) return flat;
+      }
+      // exits skip the remaining input
       if(!input.has(Flag.NDT)) {
-        for(final Expr func : funcs) {
-          final Expr flat = flatten(func, types, cc);
-          if(flat != null) return flat;
-        }
         for(final boolean empty : new boolean[] { false, true }) {
           for(final Expr func : funcs) {
             // exits on empty results are replaced by other exits
@@ -223,17 +219,14 @@ public class FnFoldLeft extends StandardFunc {
       supported.add(Op.CONCAT);
     }
     if(zst.instanceOf(Types.DECIMAL_O)) supported.add(Op.ADD);
-    if(left && zst.instanceOf(Types.MAP_O)) supported.add(Op.PUT);
+    if(left && zst.instanceOf(Types.MAP_O)) Collections.addAll(supported, Op.PUT, Op.REMOVE);
 
     // if(C) then ($result, X) else $result → if(C) then X else ()
-    final Flattening fl = new Flattening(result, supported);
-    final Expr action = body.unfold(fl, cc);
-    final Op op = fl.op();
-    if(!fl.valid || op == null || action.uses(result) ||
-        op == Op.CONCAT && fl.unchanged && !string) return null;
-
-    final boolean list = op == Op.LIST, add = op == Op.ADD, put = op == Op.PUT;
-    final boolean first = fl.first;
+    final Unfolding uf = new Unfolding(result, supported, info);
+    final Expr action = body.unfold(uf, cc);
+    final Op op = uf.op();
+    if(!uf.valid() || op == null || action.uses(result) ||
+        op == Op.CONCAT && uf.unchanged() && !string) return null;
 
     // for $value in INPUT return ACTION
     // for $member in array:split(INPUT) let $value := array:items($member) return ACTION
@@ -241,7 +234,7 @@ public class FnFoldLeft extends StandardFunc {
     Expr in = input;
     if(array) in = cc.function(Function._ARRAY_SPLIT, info, in);
     // fold-left: $result, X; fold-right: X, $result (integer sums are exact, order is irrelevant)
-    if(!add && left != first) in = cc.function(Function.REVERSE, info, in);
+    if(op != Op.ADD && left != uf.first()) in = cc.function(Function.REVERSE, info, in);
     if(array) {
       final Var member = cc.vs().addNew(new QNm("member"), null, cc.qc, info);
       clauses.add(new For(member, in).optimize(cc));
@@ -250,76 +243,8 @@ public class FnFoldLeft extends StandardFunc {
     } else {
       clauses.add(new For(value, in).optimize(cc));
     }
-    final Expr loop = new GFLWOR(info, clauses, action).optimize(cc);
-
     // sum((INIT, LOOP)), map:merge((INIT, LOOP), use-last), INIT || LOOP, INIT, LOOP
-    if(add) {
-      final boolean zero = init instanceof final Itr itr && itr.itr() == 0;
-      return cc.function(Function.SUM, info, zero ? loop : List.get(cc, info, init, loop));
-    }
-    if(put) {
-      final XQMap options = XQMap.get(Str.get(MergeOptions.DUPLICATES.name()),
-          Str.get(Duplicates.USE_LAST.toString()));
-      return cc.function(Function._MAP_MERGE, info, List.get(cc, info, init, loop), options);
-    }
-    final Expr[] operands = first ? new Expr[] { init, loop } : new Expr[] { loop, init };
-    return (list ? new List(info, operands) : new Concat(info, operands)).optimize(cc);
-  }
-
-  /**
-   * Replaces the accumulating expressions of a fold action with the accumulated values.
-   */
-  private final class Flattening extends Unfolding {
-    /** Result variable. */
-    private final Var result;
-    /** Indicates if the result is the first operand of the accumulating expressions. */
-    private boolean first;
-    /** Indicates if the result is returned unchanged by some branches. */
-    private boolean unchanged;
-    /** Indicates if all branches return the result or accumulate a value. */
-    private boolean valid = true;
-
-    /**
-     * Constructor.
-     * @param result result variable
-     * @param supported supported operations
-     */
-    private Flattening(final Var result, final EnumSet<Op> supported) {
-      super(supported);
-      this.result = result;
-    }
-
-    @Override
-    protected boolean hole(final Expr expr) {
-      return expr instanceof final VarRef vr && vr.var == result;
-    }
-
-    @Override
-    protected Expr replace(final Expr[] ops, final int hole, final Op o, final CompileContext cc)
-        throws QueryException {
-      // $result OP X, X OP $result: same order in all branches
-      final boolean frst = hole == 0;
-      if(!frst && (hole != ops.length - 1 || o == Op.PUT) || op() != null && first != frst) {
-        return null;
-      }
-      first = frst;
-      final Expr[] rest = Array.remove(ops, hole);
-      // integers and decimals only: type promotion of other numbers depends on the order
-      if(o == Op.ADD && !rest[0].seqType().instanceOf(Types.DECIMAL_O)) return null;
-      return o == Op.PUT ? cc.function(Function._MAP_ENTRY, info, rest) :
-        rest.length == 1 ? rest[0] : o == Op.LIST ? List.get(cc, info, rest) :
-        new Concat(info, rest).optimize(cc);
-    }
-
-    @Override
-    public Expr base(final Expr expr) {
-      if(hole(expr)) {
-        unchanged = true;
-        return Empty.VALUE;
-      }
-      valid = false;
-      return expr;
-    }
+    return uf.reduce(init, new GFLWOR(info, clauses, action).optimize(cc), cc);
   }
 
   @Override

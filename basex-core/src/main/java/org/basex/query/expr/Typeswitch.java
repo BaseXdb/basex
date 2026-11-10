@@ -46,6 +46,11 @@ public final class Typeswitch extends ASwitch<TypeswitchGroup> {
   }
 
   @Override
+  public Expr[] conditions() {
+    return new Expr[] { cond };
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     checkAllUp(branches());

@@ -173,7 +173,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // shortcut for expressions with let clauses only: bind variables, evaluate return expression
-    if(Checks.all(clauses, clause -> clause instanceof Let)) {
+    if(lets()) {
       for(final Clause clause : clauses) ((Let) clause).bind(qc);
       return rtrn.value(qc);
     }
@@ -1275,9 +1275,44 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
-    if(!singleTuple()) return uf.base(this);
+    if(!singleTuple()) return uf.base(this, cc);
     rtrn = rtrn.unfold(uf, cc);
-    return optimize(cc);
+    final Expr expr = optimize(cc);
+    if(expr instanceof final GFLWOR gflwor && gflwor.rtrn instanceof final Recur recur &&
+        gflwor.lets()) {
+      final Expr absorbed = recur.absorb(gflwor::binds,
+          ex -> new GFLWOR(info, gflwor.clauses, ex).optimize(cc), cc);
+      if(absorbed != null) return absorbed;
+    }
+    return expr;
+  }
+
+  /**
+   * Returns the return expression as conditional step, with the lets moved into its branches.
+   * @param cc compilation context
+   * @return conditional expression (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public If branches(final CompileContext cc) throws QueryException {
+    return lets() ? Unfold.distribute(rtrn, this::binds,
+        ex -> new GFLWOR(info, clauses, ex), cc) : null;
+  }
+
+  /**
+   * Checks if all clauses are let clauses.
+   * @return result of check
+   */
+  private boolean lets() {
+    return Checks.all(clauses, Let.class::isInstance);
+  }
+
+  /**
+   * Checks if an expression references a variable declared by the clauses.
+   * @param expr expression
+   * @return result of check
+   */
+  private boolean binds(final Expr expr) {
+    return Checks.any(clauses, clause -> Checks.any(clause.vars, expr::uses));
   }
 
   /**

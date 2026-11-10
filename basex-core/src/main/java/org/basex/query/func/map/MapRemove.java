@@ -59,4 +59,9 @@ public final class MapRemove extends MapFn {
     if(mti.mapType != null) exprType.assign(MapType.get(mti.mapType));
     return this;
   }
+
+  @Override
+  public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
+    return uf.step(this, Unfolding.Op.REMOVE, cc);
+  }
 }

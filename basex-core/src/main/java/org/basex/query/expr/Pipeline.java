@@ -55,7 +55,35 @@ public final class Pipeline extends Mapping {
   public Expr unfold(final Unfolding uf, final CompileContext cc) throws QueryException {
     final int last = exprs.length - 1;
     exprs[last] = exprs[last].unfold(uf, cc);
-    return optimize(cc);
+    final Expr expr = optimize(cc);
+    if(expr instanceof final Pipeline pipeline &&
+        pipeline.exprs[pipeline.exprs.length - 1] instanceof final Recur recur) {
+      final Expr absorbed = recur.absorb(ex -> ex.has(Flag.CTX),
+          ex -> pipeline.with(ex).optimize(cc), cc);
+      if(absorbed != null) return absorbed;
+    }
+    return expr;
+  }
+
+  /**
+   * Returns the last operand as conditional step, with the pipeline moved into its branches.
+   * @param cc compilation context
+   * @return conditional expression (can be {@code null})
+   * @throws QueryException query exception
+   */
+  If branches(final CompileContext cc) throws QueryException {
+    return Unfold.distribute(exprs[exprs.length - 1], ex -> ex.has(Flag.CTX), this::with, cc);
+  }
+
+  /**
+   * Returns a new pipeline with a replaced last operand.
+   * @param last last operand
+   * @return pipeline
+   */
+  private Pipeline with(final Expr last) {
+    final Expr[] ops = exprs.clone();
+    ops[ops.length - 1] = last;
+    return new Pipeline(info, ops);
   }
 
   @Override
