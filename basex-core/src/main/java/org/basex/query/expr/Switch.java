@@ -77,8 +77,7 @@ public final class Switch extends ASwitch<SwitchGroup> {
     final Expr expr = opt(cc);
     if(expr != this) return cc.replaceWith(this, expr);
 
-    // combine types of return expressions
-    exprType.assign(SeqType.union(groups, true)).data(groups);
+    assignType();
 
     strings = index();
     return this;
@@ -158,7 +157,10 @@ public final class Switch extends ASwitch<SwitchGroup> {
     for(int g = 1; g < tmpGroups.size(); g++) {
       final SwitchGroup group1 = tmpGroups.get(g - 1), group2 = tmpGroups.get(g);
       if(group1.rtrn().equals(group2.rtrn())) {
-        if(g + 1 == tmpGroups.size() && !group1.has(Flag.NDT)) {
+        final boolean last = g + 1 == tmpGroups.size();
+        // nondeterministic cases must not be merged with the default branch
+        if(last && group1.ndt()) continue;
+        if(last) {
           // case 'a' return A default return A → default return A
           tmpGroups.set(g - 1, group2);
         } else {
@@ -177,22 +179,20 @@ public final class Switch extends ASwitch<SwitchGroup> {
       groups = tmpGroups.toArray(SwitchGroup[]::new);
     }
 
-    Expr expr = toBranch();
+    Expr expr = toBranch(cc);
     if(expr == this) expr = toIf(cc);
     return expr;
   }
 
   /**
    * Rewrites a switch with identical branches to a single branch.
+   * @param cc compilation context
    * @return new or original expression
+   * @throws QueryException query exception
    */
-  private Expr toBranch() {
-    // only the default branch may be left at this stage: switch($x) default return A → A
-    final Expr expr = groups[0].rtrn();
-    for(int g = groups.length - 1; g >= 1; g--) {
-      if(!expr.equals(groups[g].rtrn())) return this;
-    }
-    return expr;
+  private Expr toBranch(final CompileContext cc) throws QueryException {
+    // only the default branch may be left at this stage: switch(E) default return A → void(E), A
+    return groups.length == 1 ? cc.voidAndReturn(cond, groups[0].rtrn(), info) : this;
   }
 
   /**

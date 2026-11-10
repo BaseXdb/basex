@@ -135,6 +135,18 @@ public final class SwitchGroup extends Arr {
   }
 
   /**
+   * Checks if one of the case expressions is nondeterministic.
+   * @return result of check
+   */
+  boolean ndt() {
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) {
+      if(exprs[e].has(Flag.NDT)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the return expression.
    * @return return expression
    */
@@ -147,7 +159,9 @@ public final class SwitchGroup extends Arr {
     // varying behavior: return null if return expression has changed
     final Expr rtrn = rtrn();
     exprs[0] = rtrn.simplifyFor(mode, cc);
-    return rtrn != exprs[0] ? null : this;
+    if(rtrn == exprs[0]) return this;
+    adoptType(exprs[0]);
+    return null;
   }
 
   @Override

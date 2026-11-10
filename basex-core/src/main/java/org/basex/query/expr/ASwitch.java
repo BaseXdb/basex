@@ -58,6 +58,14 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
     return branches;
   }
 
+  /**
+   * Assigns the combined type of the return expressions.
+   */
+  final void assignType() {
+    final Expr[] branches = branches();
+    exprType.assign(SeqType.union(branches, true)).data(branches);
+  }
+
   @Override
   public final boolean navigational() {
     return Checks.all(groups, group -> branch(group).navigational());

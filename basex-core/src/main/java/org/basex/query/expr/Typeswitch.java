@@ -77,26 +77,13 @@ public final class Typeswitch extends ASwitch<TypeswitchGroup> {
     }
     groups = newGroups.toArray(TypeswitchGroup[]::new);
 
-    // determine common type
-    exprType.assign(SeqType.union(groups, true)).data(groups);
+    assignType();
 
-    // check if always the same branch will be evaluated
+    // check if always the same branch will be evaluated (only the first group qualifies)
+    // typeswitch($i) case xs:integer return A default return B → A
     Expr expr = this;
-    TypeswitchGroup tg = null;
     final int gl = groups.length;
-    for(int g = 0; g < gl - 1; g++) {
-      final ArrayList<SeqType> matching = groups[g].matchingTypes(ct);
-      if(!matching.isEmpty()) {
-        // make sure that preceding groups do not branch on subtypes
-        boolean branch = false;
-        for(int h = 0; !branch && h < g; h++) {
-          branch = Checks.any(groups[h].seqTypes, st -> Checks.any(matching, st::instanceOf));
-        }
-        // typeswitch($i) case xs:integer return A default return B → A
-        if(!branch) tg = groups[g];
-        break;
-      }
-    }
+    TypeswitchGroup tg = groups[0].matches(ct) ? groups[0] : null;
     // choose default branch if none of the branches will be chosen
     if(tg == null) {
       boolean opt = true;

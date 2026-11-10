@@ -161,16 +161,12 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
-   * Finds the matching types from this group for the given sequence types.
-   * @param types sequence types
-   * @return matching types from this group
+   * Checks if the given type always matches this group at runtime.
+   * @param seqType sequence type to be matched
+   * @return result of check
    */
-  ArrayList<SeqType> matchingTypes(final SeqType... types) {
-    final ArrayList<SeqType> tmp = new ArrayList<>(seqTypes.length);
-    for(final SeqType st : seqTypes) {
-      if(Checks.any(types, type -> type.instanceOf(st))) tmp.add(st);
-    }
-    return tmp;
+  boolean matches(final SeqType seqType) {
+    return Checks.any(seqTypes, seqType::instanceOf);
   }
 
   /**
@@ -254,7 +250,9 @@ public final class TypeswitchGroup extends Single {
     // varying behavior: return null if return expression has changed
     final Expr rtrn = expr;
     expr = rtrn.simplifyFor(mode, cc);
-    return rtrn != expr ? null : this;
+    if(rtrn == expr) return this;
+    adoptType(expr);
+    return null;
   }
 
   @Override

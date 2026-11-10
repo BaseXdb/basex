@@ -3066,4 +3066,26 @@ public final class RewritingsTest extends SandboxTest {
     check(input + "concat($s)", "123", exists(STRING_JOIN), empty(Concat.class));
     check(input + "concat(head($s))", "1", exists(STRING), empty(Concat.class));
   }
+
+  /** Switch and typeswitch rewrites. */
+  @Test public void switches() {
+    // nondeterministic cases are not merged with the default branch
+    query("switch(string(random:integer(1) + 10)) case 'a' return 'A' case 'b' return 'C' "
+        + "case string(random:integer(2)) return 'B' default return 'B'", "B");
+    check("switch(<a/>) case string(random:integer(2)) return 'B' default return 'B'", "B",
+        exists(_RANDOM_INTEGER));
+    check("switch(random:integer(2)) case 5 return 'B' default return 'B'", "B",
+        empty(Switch.class), exists(_RANDOM_INTEGER));
+    // preceding groups may match a type that is not a subtype of a later group
+    query("let $x := head((1, 2)[. = random:integer(1) + 1]) return typeswitch($x) "
+        + "case xs:decimal+ return 'A' case xs:integer? return 'B' default return 'C'", "A");
+    // simplified branches: refresh the static type
+    final String input = "declare variable $n := <a>1</a>; string-join(";
+    final String branches = " return string($n) case %s return string($n/..) "
+        + "default return string($n/text())) instance of xs:string";
+    query(input + "switch(substring('a', random:integer(1) + 1)) case 'a'"
+        + String.format(branches, "'b'"), true);
+    query(input + "typeswitch(('a', 1)[random:integer(1) + 1]) case xs:string"
+        + String.format(branches, "xs:integer"), true);
+  }
 }
