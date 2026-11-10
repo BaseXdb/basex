@@ -47,10 +47,12 @@ public final class FnAnalyzeString extends RegExFn {
     final Matcher matcher = regExpr.matcher(value, qc);
     final IntUnaryOperator positions = positions(value);
     final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).ns();
+    final boolean[] assertionFlags = regExpr.getAssertionFlags();
     int start = 0;
     while(matcher.find()) {
       if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
-      match(matcher, value, root, 0, regExpr, positions);
+      final boolean[] done = assertionFlags.clone();
+      match(matcher, value, root, 0, done, regExpr, positions);
       start = matcher.end();
     }
     if(start != value.length()) nonmatch(value.substring(start), root);
@@ -63,12 +65,13 @@ public final class FnAnalyzeString extends RegExFn {
    * @param string string
    * @param parent parent
    * @param group group number
+   * @param done processed groups (lookahead groups are marked in advance)
    * @param regExpr regExpr
    * @param positions mapping from string indexes to character positions
-   * @return next group number and position in string
    */
-  private static int[] match(final Matcher matcher, final String string, final FBuilder parent,
-      final int group, final RegExpr regExpr, final IntUnaryOperator positions) {
+  private static void match(final Matcher matcher, final String string, final FBuilder parent,
+      final int group, final boolean[] done, final RegExpr regExpr,
+      final IntUnaryOperator positions) {
 
     final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP);
     if(group > 0) {
@@ -77,28 +80,16 @@ public final class FnAnalyzeString extends RegExFn {
       node.attr(Q_NR, group);
     }
 
-    final int jg = regExpr.group(group), gc = regExpr.groupCount(matcher);
-    final int start = matcher.start(jg), end = matcher.end(jg);
-    int[] pos = { group + 1, start }; // group and position in string
-    while(pos[0] <= gc) {
-      final int g = pos[0], j = regExpr.group(g), st = matcher.start(j);
-      // skip lookahead groups: they may exceed the match, and they are added at the end
-      if(!regExpr.getAssertionFlags()[g - 1]) {
-        // stop at groups outside the current group
-        if(matcher.end(j) > end || st >= end && regExpr.getParentGroups()[g - 1] != group) break;
-        // skip unmatched groups and groups captured in previous iterations
-        if(st >= pos[1]) {
-          if(pos[1] < st) node.text(string.substring(pos[1], st));
-          pos = match(matcher, string, node, g, regExpr, positions);
-          continue;
-        }
-      }
-      pos[0]++;
+    final int jg = regExpr.group(group), end = matcher.end(jg);
+    int pos = matcher.start(jg);
+    for(int g; (g = child(matcher, group, pos, end, done, regExpr)) != 0;) {
+      final int j = regExpr.group(g), st = matcher.start(j);
+      if(pos < st) node.text(string.substring(pos, st));
+      done[g - 1] = true;
+      match(matcher, string, node, g, done, regExpr, positions);
+      pos = matcher.end(j);
     }
-    if(pos[1] < end) {
-      node.text(string.substring(pos[1], end));
-      pos[1] = end;
-    }
+    if(pos < end) node.text(string.substring(pos, end));
     if(group == 0) {
       final boolean[] assertionFlags = regExpr.getAssertionFlags();
       for(int g = 1; g <= assertionFlags.length; g++) {
@@ -115,7 +106,36 @@ public final class FnAnalyzeString extends RegExFn {
       }
     }
     parent.node(node);
-    return pos;
+  }
+
+  /**
+   * Returns the next captured group that will be nested in the specified group.
+   * @param matcher matcher
+   * @param group group number
+   * @param pos current position in string
+   * @param end end of group in string
+   * @param done processed groups
+   * @param regExpr regExpr
+   * @return group number, or {@code 0} if no group is left
+   */
+  private static int child(final Matcher matcher, final int group, final int pos, final int end,
+      final boolean[] done, final RegExpr regExpr) {
+    final int[] parents = regExpr.getParentGroups();
+    int child = 0, cst = 0, cend = 0;
+    for(int g = 1; g <= done.length; g++) {
+      if(done[g - 1]) continue;
+      final int j = regExpr.group(g), st = matcher.start(j), en = matcher.end(j);
+      if(st < pos || en > end) continue;
+      int p = parents[g - 1];
+      while(p > group) p = parents[p - 1];
+      if(p != group) continue;
+      if(child == 0 || st < cst || st == cst && en > cend) {
+        child = g;
+        cst = st;
+        cend = en;
+      }
+    }
+    return child;
   }
 
   /**

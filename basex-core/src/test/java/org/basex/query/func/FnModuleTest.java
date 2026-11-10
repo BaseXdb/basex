@@ -205,8 +205,8 @@ public final class FnModuleTest extends SandboxTest {
         + "</match><non-match>c</non-match></analyze-string-result>");
     // nested groups captured in previous iterations are skipped
     query(func.args("ab", "((a)|b)+"), "<analyze-string-result xmlns="
-        + "\"http://www.w3.org/2005/xpath-functions\"><match>a<group nr=\"1\">b</group>"
-        + "</match></analyze-string-result>");
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"2\">a</group>"
+        + "<group nr=\"1\">b</group></match></analyze-string-result>");
   }
 
   /** Test method. */
@@ -2160,6 +2160,10 @@ public final class FnModuleTest extends SandboxTest {
         empty(func), exists(_MAP_MERGE));
     check(func.args(" (1 to 5, 2, 7)", " {}", " fn($m, $k) { map:put($m, $k mod 5, $k) }") +
         "(2)", 7, empty(func));
+    // map:remove
+    check(func.args(" (1 to 10)[. > " + wrap(1) + "]", " map:build(1 to 12)",
+        " fn($m, $k) { if($k mod 2 = 0) then map:remove($m, $k) else $m }") + " => map:keys()",
+        "1\n3\n5\n7\n9\n11\n12", empty(func), exists(_MAP_REMOVE));
     // conditions and pipelines: the unchanged result is skipped
     final String range = " (1 to 100)[. > " + wrap(0) + "]";
     check(func.args(range, " ()", " fn($r, $v) { if($v mod 10 = 0) then ($r, $v) else $r }") +
