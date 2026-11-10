@@ -36,8 +36,8 @@ abstract sealed class FilterClause extends SingleClause permits Where, While {
 
   @Override
   final boolean skippable(final Clause cl) {
-    // do not slide LET clauses over filters (they may filter out many items)
-    return !(cl instanceof Let);
+    // only slide WHERE over WHERE clauses (LET: may filter out many items; WHILE: stops iteration)
+    return cl instanceof Where && this instanceof Where;
   }
 
   @Override

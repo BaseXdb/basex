@@ -768,7 +768,7 @@ public final class GFLWOR extends ParseExpr {
           final Clause curr = clauses.get(j);
           if(curr.has(Flag.NDT) || !curr.skippable(clause)) break;
           // where clauses are always moved to avoid unnecessary computations,
-          // but skipping other where/while clauses can cause infinite loops
+          // but skipping other where clauses can cause infinite loops
           if(!(curr instanceof FilterClause)) insert = j;
         }
         // for $a in A for $b in B where $a → for $a in A where $a for $b in B

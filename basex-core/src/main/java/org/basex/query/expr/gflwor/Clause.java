@@ -62,11 +62,17 @@ public abstract class Clause extends ParseExpr {
   public abstract Clause copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
-   * Checks if the given clause (currently: let or where) can be slid over this clause.
+   * Checks if the given clause (currently: let, where or while) can be slid over this clause.
    * @param cl clause
    * @return result of check
    */
   boolean skippable(final Clause cl) {
+    // while clauses must not see tuples that this clause may drop
+    if(cl instanceof While) {
+      final long[] minMax = { 1, 1 };
+      calcSize(minMax);
+      if(minMax[0] == 0) return false;
+    }
     return cl.accept(new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {

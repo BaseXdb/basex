@@ -834,4 +834,16 @@ public final class GFLWORTest extends SandboxTest {
         + "only end at $e when $e - $s eq 2 return sum($w)",
         "6\n15", exists(Window.class));
   }
+
+  /** Sliding while clauses, and where clauses over while clauses. */
+  @Test public void slideWhile() {
+    final String f = "declare %basex:inline(0) function f($n) { ";
+    query(f + "for $a in (1, 2) for $b in (1 to $n)[$a = 2] "
+        + "while $a = 2 return $b }; f(3)", "1\n2\n3");
+    query(f + "for $a in (1, 2) for sliding window $w in 1 to $n "
+        + "start at $s when $a = 2 end at $e when $e = $s while $a = 2 return $a }; f(3)",
+        "2\n2\n2");
+    query(f + "for $a in (1, 2, 3) for $c in (0, 1 to $n) while $a != 2 "
+        + "for $b in (0, 1 to $n) where $a = 3 return $a }; f(0)", "");
+  }
 }
