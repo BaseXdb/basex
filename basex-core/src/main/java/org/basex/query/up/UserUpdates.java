@@ -35,6 +35,15 @@ final class UserUpdates {
   }
 
   /**
+   * Adds the update primitives of another list.
+   * @param updates updates to be added
+   * @throws QueryException query exception
+   */
+  void add(final UserUpdates updates) throws QueryException {
+    for(final UserUpdate up : updates.userUpdates) add(up);
+  }
+
+  /**
    * Applies all updates.
    */
   void apply() {

@@ -76,7 +76,7 @@ public abstract class JavaCall extends Arr {
     if(!updating) return value;
 
     // updating function: cache output
-    qc.updates().addOutput(value, qc);
+    qc.updates().addOutput(value, info, qc);
     return Empty.VALUE;
   }
 

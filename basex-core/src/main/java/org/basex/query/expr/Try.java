@@ -10,6 +10,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -31,6 +32,8 @@ public final class Try extends Single {
   private Catch[] catches;
   /** Finally clause. */
   private Expr fnlly;
+  /** Indicates if the try clause is updating. */
+  private boolean updating;
 
   /**
    * Constructor.
@@ -99,6 +102,9 @@ public final class Try extends Single {
       catches = new Catch[0];
     }
 
+    // without catch clauses, errors (and the pending updates) are passed on to the outer scope
+    updating = catches.length > 0 && expr.has(Flag.UPD);
+
     // join types of try and catch expressions
     SeqType st = expr.seqType();
     for(final Catch ctch : catches) st = st.union(ctch.seqType());
@@ -130,13 +136,26 @@ public final class Try extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // updates of the try clause are only adopted if it succeeds
+    final Updates updates = updating ? qc.updates() : null;
     try {
-      return cache(expr.value(qc));
-    } catch(final QueryException ex) {
-      return caught(ex, qc);
-    } catch(final StackOverflowError | ArraySizeException ex) {
-      // the stack has been unwound to this expression, so the catch clause has room to run
-      return caught(limitError(ex, info), qc);
+      if(updates != null) updates.nest();
+      Value value = null;
+      QueryException error = null;
+      try {
+        final Value val = cache(expr.value(qc));
+        // namespace conflicts of the try clause can be caught (upd:compatibilityCheck)
+        if(updates != null) updates.checkNamespaces();
+        value = val;
+      } catch(final QueryException ex) {
+        error = ex;
+      } catch(final StackOverflowError | ArraySizeException ex) {
+        // the stack has been unwound to this expression, so the catch clause has room to run
+        error = limitError(ex, info);
+      } finally {
+        if(updates != null) updates.unnest(value != null);
+      }
+      return error != null ? caught(error, qc) : value;
     } finally {
       final Value fnl = fnlly.value(qc);
       if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);
@@ -216,8 +235,10 @@ public final class Try extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new Try(info, expr.copy(cc, vm), fnlly.copy(cc, vm),
-        Arr.copyAll(cc, vm, catches)));
+    final Try t = new Try(info, expr.copy(cc, vm), fnlly.copy(cc, vm),
+        Arr.copyAll(cc, vm, catches));
+    t.updating = updating;
+    return copyType(t);
   }
 
   @Override

@@ -68,7 +68,7 @@ public final class Insert extends Update {
         if(!kind.oneOf(Kind.ELEMENT, Kind.DOCUMENT)) throw UPTRGTYP_X.get(info, node);
       }
 
-      if(builder == null) builder = builder(arg(1), qc);
+      if(builder == null) builder = builder(arg(1), UPNOATTRPER_X, qc);
       final Updates updates = qc.updates();
 
       // no update primitive is created if node list is empty

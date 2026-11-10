@@ -30,10 +30,15 @@ public final class ReplaceNode extends NodeCopy {
 
   @Override
   public void update(final NamePool pool) {
-    // only replaced attributes affect the names of an element
-    if(insseq == null || data.kind(pre) != Data.ATTR) return;
+    if(!addsNames()) return;
     add(pool);
     pool.remove(node());
+  }
+
+  @Override
+  public boolean addsNames() {
+    // only replaced attributes affect the names of an element
+    return data.kind(pre) == Data.ATTR;
   }
 
   @Override

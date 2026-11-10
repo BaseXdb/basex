@@ -69,7 +69,9 @@ public final class Replace extends Update {
         final XNode parent = targ.parent();
         if(parent == null) throw UPNOPAR_X.get(info, targ);
 
-        if(builder == null) builder = builder(arg(1), qc);
+        if(builder == null) {
+          builder = builder(arg(1), kind == Kind.ATTRIBUTE ? UPWRATTR_X : UPWRELM_X, qc);
+        }
         final GNodeList list;
         final Atts ns = builder.namespaces;
         if(kind == Kind.ATTRIBUTE) {

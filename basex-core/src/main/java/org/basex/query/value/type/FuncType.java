@@ -137,7 +137,10 @@ public final class FuncType extends FType {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == FUNCTION || type == FUNCTION || !(type instanceof final FuncType ft)) return false;
+    if(!(type instanceof final FuncType ft)) return false;
+    if(argTypes == null || ft.argTypes == null) {
+      return argTypes == ft.argTypes && anns.equals(ft.anns);
+    }
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
@@ -151,15 +154,17 @@ public final class FuncType extends FType {
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
-    if(this == FUNCTION || !(type instanceof final FuncType ft)) return false;
+    if(!(type instanceof final FuncType ft)) return false;
+    for(final Ann ann : ft.anns) {
+      if(!anns.contains(ann)) return false;
+    }
+    if(ft.argTypes == null) return true;
+    if(argTypes == null) return false;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {
       if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
-    }
-    for(final Ann ann : ft.anns) {
-      if(!anns.contains(ann)) return false;
     }
     return declType.instanceOf(ft.declType);
   }
@@ -172,21 +177,31 @@ public final class FuncType extends FType {
 
     // typed function types of equal arity: covering operand (including the refined type), or
     // structural union
-    if(this != FUNCTION && ft != null && ft != FUNCTION && argTypes.length == ft.argTypes.length) {
+    if(argTypes != null && ft != null && ft.argTypes != null &&
+        argTypes.length == ft.argTypes.length) {
       if(ft.instanceOf(this) && ft.refinedType.instanceOf(refinedType)) return this;
       if(instanceOf(ft) && refinedType.instanceOf(ft.refinedType)) return ft;
       final int arity = argTypes.length;
       final SeqType[] arg = new SeqType[arity];
       for(int a = 0; a < arity; a++) {
         arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-        if(arg[a] == null) return FUNCTION;
+        if(arg[a] == null) return wildcard(ft);
       }
       return new FuncType(anns.union(ft.anns), declType.union(ft.declType),
           refinedType.union(ft.refinedType), arg);
     }
 
     if(type.instanceOf(this)) return this;
-    return ft == null ? BasicType.ITEM : FUNCTION;
+    return ft == null ? BasicType.ITEM : wildcard(ft);
+  }
+
+  /**
+   * Returns the wildcard function type that is shared by this and the specified type.
+   * @param ft function type
+   * @return wildcard function type
+   */
+  private FuncType wildcard(final FuncType ft) {
+    return updating() && ft.updating() ? UPDATING_FUNCTION : FUNCTION;
   }
 
   @Override
@@ -214,11 +229,17 @@ public final class FuncType extends FType {
     final FuncType ft = type.funcType();
     if(ft == null) return null;
 
+    final AnnList an = anns.intersect(ft.anns);
+    if(an == null) return null;
+    // wildcard: keep the signature of the other operand
+    if(argTypes == null || ft.argTypes == null) {
+      final FuncType typed = argTypes == null ? ft : this;
+      return new FuncType(an, typed.declType, typed.refinedType, typed.argTypes);
+    }
+
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return null;
 
-    final AnnList an = anns.intersect(ft.anns);
-    if(an == null) return null;
     final SeqType dt = declType.intersect(ft.declType);
     if(dt == null) return null;
     final SeqType rf = refinedType.intersect(ft.refinedType);
@@ -234,6 +255,14 @@ public final class FuncType extends FType {
   }
 
   /**
+   * Checks if functions of this type must be updating.
+   * @return result of check
+   */
+  public boolean updating() {
+    return anns.contains(Annotation.UPDATING);
+  }
+
+  /**
    * Checks if one of the parameters is typed.
    * @return result of check
    */
@@ -242,12 +271,12 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Checks if functions of this type take a single argument that is an instance of the given type.
+   * Checks if this is a non-updating type with a single argument of the given type.
    * @param arg argument type
    * @return result of check
    */
-  boolean unary(final SeqType arg) {
-    return argTypes != null && argTypes.length == 1 && argTypes[0].instanceOf(arg);
+  public boolean unary(final SeqType arg) {
+    return argTypes != null && argTypes.length == 1 && argTypes[0].instanceOf(arg) && !updating();
   }
 
   /**
@@ -277,8 +306,8 @@ public final class FuncType extends FType {
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token(anns);
-    qs.token(toString(", ", this == FUNCTION ? WILDCARD : argTypes));
-    if(this != FUNCTION) qs.token(QueryText.AS).token(declType);
+    qs.token(toString(", ", argTypes == null ? WILDCARD : argTypes));
+    if(argTypes != null) qs.token(QueryText.AS).token(declType);
     return qs.toString();
   }
 }

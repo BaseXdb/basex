@@ -310,7 +310,7 @@ public abstract class XQArray extends XQStruct {
       mt = at.valueType();
     } else if(!coerce && tp instanceof final FuncType ft) {
       // without coercion: arrays are functions; with coercion, they are wrapped
-      if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(Types.INTEGER_O)) return false;
+      if(!ft.unary(Types.INTEGER_O)) return false;
       mt = ft.declType;
     } else {
       return false;

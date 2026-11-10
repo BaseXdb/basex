@@ -57,6 +57,14 @@ public abstract class NodeUpdate extends DataUpdate {
   public void update(final NamePool pool) { }
 
   /**
+   * Indicates if this update adds names to an element.
+   * @return result of check
+   */
+  public boolean addsNames() {
+    return false;
+  }
+
+  /**
    * Adds the atomic update operations for this update primitive to the given list.
    * @param auc list of atomic updates
    */

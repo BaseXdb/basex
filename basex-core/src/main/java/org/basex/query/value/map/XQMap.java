@@ -348,8 +348,7 @@ public abstract class XQMap extends XQStruct {
         vt = mt.valueType().eq(Types.ITEM_ZM) ? null : mt.valueType();
       } else if(!coerce && tp instanceof final FuncType ft) {
         // without coercion: maps are functions; with coercion, they are wrapped
-        if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
-            !ft.argTypes[0].instanceOf(Types.ANY_ATOMIC_TYPE_O)) return false;
+        if(ft.declType.occ.min != 0 || !ft.unary(Types.ANY_ATOMIC_TYPE_O)) return false;
         kt = null;
         vt = ft.declType.eq(Types.ITEM_ZM) ? null : ft.declType;
       } else {

@@ -91,14 +91,16 @@ abstract class Update extends Arr {
   /**
    * Creates a node builder.
    * @param expr node expression
+   * @param error error for attributes that follow other nodes
    * @param qc query context
    * @return builder
    * @throws QueryException query exception
    */
-  final FBuilder builder(final Expr expr, final QueryContext qc) throws QueryException {
+  final FBuilder builder(final Expr expr, final QueryError error, final QueryContext qc)
+      throws QueryException {
     final FBuilder builder = new FBuilder();
     final Constr constr = new Constr(builder, false, info, qc).add(expr);
-    if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
+    if(constr.errAtt != null) throw error.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
     constr.checkNS();
     return builder;

@@ -6,7 +6,6 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -63,7 +62,7 @@ public final class PartFunc extends Arr {
     final Expr func = body();
     if(func.size() == 1) {
       final FuncType ft = func.funcType();
-      if(ft != null && ft != Types.FUNCTION) {
+      if(ft != null && ft.argTypes != null) {
         final int nargs = exprs.length - 1, arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
@@ -85,7 +84,8 @@ public final class PartFunc extends Arr {
           args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
           ++a;
         }
-        exprType.assign(FuncType.get(ft.declType, args).withRefinedType(ft.refinedType).seqType());
+        final FuncType pft = FuncType.get(ft.anns, ft.declType, args);
+        exprType.assign(pft.withRefinedType(ft.refinedType).seqType());
       }
     }
     return this;
@@ -105,7 +105,7 @@ public final class PartFunc extends Arr {
 
     final XQFunctionExpr xqf = func instanceof final XQFunctionExpr fe ? fe : null;
     final AnnList anns = ft.anns;
-    final boolean updating = anns.contains(Annotation.UPDATING);
+    final boolean updating = ft.updating();
 
     final Closure closure;
     final VarScope vs = new VarScope();

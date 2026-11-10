@@ -10,6 +10,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.Function;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
@@ -1025,6 +1026,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void dbUpdateTransform() {
     error("copy $c := <a/> modify" + _UPDATE_OUTPUT.args("x") + " return $c", BASEX_UPDATE);
+    error("<a/> update { try {" + _UPDATE_OUTPUT.args("x") + " } catch * { } }", BASEX_UPDATE);
     error("copy $c := <a/> modify" + _DB_ADD.args(NAME, " <x/>", "x.xml") + " return $c",
         BASEX_UPDATE);
     error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASEX_UPDATE);
@@ -1161,6 +1163,47 @@ public final class UpdateTest extends SandboxTest {
     error("updating function($a) { count($a) }(1)", FUNCNOTUP_X);
     error("declare function local:a() { local:b#0 };"
         + "declare function local:b() { count('1') }; updating local:a()()", FUNCNOTUP_X);
+  }
+
+  /** Function tests with %updating annotations. */
+  @Test public void updatingFunctionTests() {
+    final String u = "declare %updating function local:u() { () }; ";
+
+    // wildcards
+    query(u + "local:u#0 instance of %updating fn(*)", true);
+    query(u + "local:u#0 instance of fn(*)", true);
+    query("count#1 instance of fn(*)", true);
+    query("fn { 1 } instance of %updating fn(*)", false);
+    query("{} instance of %updating fn(*)", false);
+    query("[] instance of %updating fn(*)", false);
+    query(u + "(local:u#0, count#1) instance of (%updating fn(*))+", false);
+    check(u + "declare %updating function local:v($a) { () }; "
+        + "(local:u#0, local:v#1)[" + _RANDOM_INTEGER.args(2) + " >= 0] "
+        + "instance of (%updating fn(*))*", true, type(IterFilter.class, "(%updating fn(*))*"));
+
+    // typed tests
+    query(u + "local:u#0 instance of %updating fn() as item()*", true);
+    query("true#0 instance of %updating fn() as item()*", false);
+    query("{} instance of %updating fn(xs:anyAtomicType) as item()*", false);
+    query("[] instance of %updating fn(xs:integer) as item()*", false);
+
+    // other annotations are ignored
+    query("declare namespace x = 'x'; fn() { 1 } instance of %x:foo fn() as item()*", true);
+    query("fn() { 1 } instance of %public fn() as item()*", true);
+
+    // annotations are only allowed for function tests
+    error("{} instance of %updating map(*)", NOANN);
+    error("[] instance of %updating array(*)", NOANN);
+    error("{} instance of %updating map(xs:string, item())", NOANN);
+    error("{} instance of %public record(*)", NOANN);
+    error("{} instance of %updating record(a)", NOANN);
+
+    // coercion
+    query(u + "let $f as %updating fn(*) := local:u#0 return updating $f()", "");
+    error(u + "let $f as %updating fn(*) := local:u#0 return $f()", FUNCUP_X);
+    error("let $f as %updating fn(*) := fn { 1 } return $f", INVTYPE_X);
+    error("let $f as %updating fn(*) := {} return $f", INVTYPE_X);
+    error("let $f as %updating fn() as item()* := true#0 return $f", INVTYPE_X);
   }
 
   /** Coercion of updating functions. */
@@ -1413,6 +1456,13 @@ public final class UpdateTest extends SandboxTest {
     query("<e a='' b=''/> update { replace node @b with () }", "<e a=\"\"/>");
   }
 
+  /** Replace node: attributes following other nodes. */
+  @Test public void replaceAttributeOrder() {
+    error("<a>x</a> update { replace node text() with (<b/>, attribute x { }) }", UPWRELM_X);
+    error("<a x=''/> update { replace node @x with (<b/>, attribute y { }) }", UPWRATTR_X);
+    error("<a/> update { insert node (<b/>, attribute x { }) into . }", UPNOATTRPER_X);
+  }
+
   /** String value of modified text nodes. */
   @Test public void gh2148() {
     query("data(<_>a</_> update { replace node text() with . || 'b' })", "ab");
@@ -1637,5 +1687,76 @@ public final class UpdateTest extends SandboxTest {
     query(_FILE_WRITE_TEXT.args(file, "<a/>"));
     query("base-uri(" + Function.DOC.args(file) + "/a update { }) = base-uri("
         + Function.DOC.args(file) + ")", true);
+  }
+
+  /** Pending updates of a failed try clause are discarded. */
+  @Test public void tryUpdates() {
+    query("<a/> update { try { rename node . as 'b', rename node . as 'c' } "
+        + "catch * { insert node text { $err:code } into . } }", "<a>err:XUDY0015</a>");
+    query("<a/> update { try { rename node . as 'b', error() } "
+        + "catch * { insert node <x/> into . } }", "<a><x/></a>");
+    query("<a/> update { insert node <x/> into ., try { insert node <y/> into . } catch * { } }",
+        "<a><x/><y/></a>");
+    query("<a/> update { try { insert node <x/> into ., "
+        + "try { insert node <y/> into ., error() } catch * { insert node <z/> into . } "
+        + "} catch * { } }", "<a><x/><z/></a>");
+    query("<a/> update { try { "
+        + "insert node attribute { QName('u1', 'p:x') } { } into ., "
+        + "insert node attribute { QName('u2', 'p:y') } { } into . "
+        + "} catch * { insert node text { $err:code } into . } }", "<a>err:XUDY0024</a>");
+    query("<a b=''/> update { try { "
+        + "rename node @b as QName('u1', 'p:b'), rename node . as QName('u2', 'p:a') "
+        + "} catch * { insert node text { $err:code } into . } }", "<a b=\"\">err:XUDY0024</a>");
+    query("count((<a/> update { try { "
+        + "insert node attribute { QName('u1', 'p:x') } { } into ., "
+        + "insert node attribute { QName('u1', 'p:y') } { } into . "
+        + "} catch * { } })/@*)", 2);
+    // conflicts with outer updates are raised outside the try clause
+    error("<a/> update { rename node . as 'b', try { rename node . as 'c' } catch * { } }",
+        UPMULTREN_X);
+    error("<a/> update { insert node attribute { QName('u1', 'p:x') } { } into ., try { "
+        + "insert node attribute { QName('u2', 'p:y') } { } into . } catch * { } }",
+        UPNSCONFL2_X_X);
+    // targets of transform expressions are checked after the evaluation of the modify clause
+    error("let $x := <x/> return <a/> update { try { insert node <b/> into $x } catch * { } }",
+        UPNOTCOPIED_X);
+    error("let $x := <x/> return copy $c := <a/> modify "
+        + "(try { insert node <b/> into $x } catch * { }) return $c", UPNOTCOPIED_X);
+    error("<a/> update { try { " + _UPDATE_OUTPUT.args(1) + " } catch * { } }", BASEX_UPDATE);
+    query("let $x := <x/> return <a/> update { try { insert node <b/> into $x, error() } "
+        + "catch * { } }", "<a/>");
+
+    query("try { " + _DB_CREATE.args(NAME + "try") + ", error() } catch * { }");
+    query(_DB_EXISTS.args(NAME + "try"), false);
+
+    // merged name updates of the try clause
+    execute(new CreateDB(NAME, "<a/>"));
+    query(_DB_COPY.args(NAME, NAME + "x") + ", try { " + _DB_COPY.args(NAME, NAME + "y") + ", "
+        + _DB_COPY.args(NAME, NAME + "z") + " } catch * { }");
+    query("every $s in ('x', 'y', 'z') satisfies " + _DB_EXISTS.args(" '" + NAME + "' || $s"),
+        true);
+    query("('x', 'y', 'z') ! " + _DB_DROP.args(" '" + NAME + "' || ."));
+
+    final String base = "declare base-uri \"" + sandbox() + "\"; ";
+    query(base + "try { " + PUT.args(" <a/>", "try.xml") + ", error() } catch * { }, "
+        + PUT.args(" <b/>", "try.xml"));
+    query(_FILE_READ_TEXT.args(sandbox() + "try.xml"), "<b/>");
+    error(base + "try { " + PUT.args(" <a/>", "try.xml") + " } catch * { }, "
+        + PUT.args(" <b/>", "try.xml"), UPURIDUP_X);
+    // conflicts with outer puts are raised outside the try clause
+    error(base + PUT.args(" <a/>", "try.xml") + ", try { "
+        + PUT.args(" <b/>", "try.xml") + " } catch * { }", UPURIDUP_X);
+    query(base + "try { " + PUT.args(" <a/>", "try2.xml") + ", "
+        + PUT.args(" <b/>", "try2.xml") + " } catch * { }");
+    query(_FILE_EXISTS.args(sandbox() + "try2.xml"), false);
+
+    query(_UPDATE_OUTPUT.args(1) + ", try { " + _UPDATE_OUTPUT.args(2) + ", error() } "
+        + "catch * { " + _UPDATE_OUTPUT.args(3) + " }", "1\n3");
+    query(_UPDATE_OUTPUT.args(1) + ", try { " + _UPDATE_OUTPUT.args(2) + " } catch * { }",
+        "1\n2");
+    query(_UPDATE_OUTPUT.args(1) + ", try { " + _UPDATE_OUTPUT.args(2) + ", "
+        + _UPDATE_OUTPUT.args(" " + _UPDATE_CACHE.args()) + " } catch * { }", "1\n2\n1\n2");
+    query(_UPDATE_OUTPUT.args(1) + ", try { " + _UPDATE_OUTPUT.args(2) + ", "
+        + _UPDATE_OUTPUT.args(" " + _UPDATE_CACHE.args(true)) + " } catch * { }", "1\n2");
   }
 }

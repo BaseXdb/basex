@@ -71,6 +71,10 @@ abstract class NodeCopy extends NodeUpdate {
    * @param pool name pool
    */
   final void add(final NamePool pool) {
+    if(insseq == null) {
+      for(final GNode node : nodes) pool.add(node.qname(), NodeType.ATTRIBUTE);
+      return;
+    }
     final Data d = insseq.data;
     for(int p = insseq.start; p < insseq.end; p++) {
       final byte[][] qname = d.qname(p, Data.ATTR);

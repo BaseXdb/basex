@@ -5,7 +5,9 @@ import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
+import org.basex.query.ann.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -241,7 +243,10 @@ public final class Types {
   public static final SeqType FUNCTION_ZO = FUNCTION.seqType(ZERO_OR_ONE);
   /** Zero or more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
-
+  /** The general updating function type. */
+  public static final FuncType UPDATING_FUNCTION = FuncType.get(
+      AnnList.EMPTY.attach(new Ann(null, Annotation.UPDATING, Empty.VALUE)), null,
+      (SeqType[]) null);
   /** Single job target: a query string or URI, or a function to be invoked. */
   public static final SeqType QUERY_SPEC_O =
       ChoiceItemType.get(ANY_ATOMIC_TYPE, FUNCTION).seqType();

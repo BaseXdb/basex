@@ -48,6 +48,14 @@ public final class Put extends DBUpdate {
     options.add(sopts);
   }
 
+  /**
+   * Returns the target paths.
+   * @return paths
+   */
+  public StringList paths() {
+    return paths;
+  }
+
   @Override
   public void apply() throws QueryException {
     final int pre = data.pre(id);

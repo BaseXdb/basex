@@ -28,7 +28,12 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public void update(final NamePool pool) {
-    if(insseq != null) add(pool);
+    add(pool);
+  }
+
+  @Override
+  public boolean addsNames() {
+    return true;
   }
 
   @Override

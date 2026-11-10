@@ -27,13 +27,26 @@ final class NameUpdates {
   void add(final NameUpdate up) throws QueryException {
     final boolean alter = up.type == UpdateType.DBALTER;
     final boolean drop = up.type == UpdateType.DBDROP;
+    boolean merged = false;
     for(final NameUpdate o : nameUpdates) {
-      if(o.type == up.type) o.merge(up);
+      if(o.type == up.type) {
+        o.merge(up);
+        merged = true;
+      }
       if(drop && o.type == UpdateType.DBALTER || alter && o.type == UpdateType.DBDROP) {
         throw DB_CONFLICT3_X.get(o.info(), o.name());
       }
     }
-    nameUpdates.add(up);
+    if(!merged) nameUpdates.add(up);
+  }
+
+  /**
+   * Adds the update primitives of another list.
+   * @param updates updates to be added
+   * @throws QueryException query exception
+   */
+  void add(final NameUpdates updates) throws QueryException {
+    for(final NameUpdate up : updates.nameUpdates) add(up);
   }
 
   /**

@@ -91,6 +91,62 @@ final class DataUpdates {
   }
 
   /**
+   * Adds the update primitives of another list.
+   * @param updates updates to be added
+   * @throws QueryException query exception
+   */
+  void add(final DataUpdates updates) throws QueryException {
+    // node updates have already been substituted
+    final IntObjectMap<NodeUpdates> nus = updates.nodeUpdates;
+    final int ns = nus.size();
+    for(int n = 1; n <= ns; n++) {
+      final int pre = nus.key(n);
+      final NodeUpdates nu = nus.value(n), old = nodeUpdates.get(pre);
+      if(old == null) {
+        nodeUpdates.put(pre, nu);
+      } else {
+        for(final NodeUpdate up : nu.updates) old.add(up);
+      }
+    }
+    for(final Put up : updates.puts.values()) add(up, null);
+    for(final DBUpdate up : updates.dbUpdates) add(up, null);
+  }
+
+  /**
+   * Checks if the node updates create conflicting namespace bindings for the same element.
+   * @throws QueryException query exception
+   */
+  void checkNamespaces() throws QueryException {
+    if(!addsNames()) return;
+
+    final IntObjectMap<NamePool> pools = new IntObjectMap<>();
+    final int ns = nodeUpdates.size();
+    for(int n = 1; n <= ns; n++) {
+      int pre = nodeUpdates.key(n);
+      if(pre == -1) continue;
+      final int kind = data.kind(pre);
+      if(kind == Data.ATTR) pre = data.parent(pre, kind);
+      else if(kind != Data.ELEM) continue;
+      final NamePool pool = pools.computeIfAbsent(pre, NamePool::new);
+      for(final NodeUpdate up : nodeUpdates.value(n).updates) up.update(pool);
+    }
+    for(final NamePool pool : pools.values()) pool.checkNamespaces();
+  }
+
+  /**
+   * Indicates if a node update adds names to an element.
+   * @return result of check
+   */
+  private boolean addsNames() {
+    for(final NodeUpdates updates : nodeUpdates.values()) {
+      for(final NodeUpdate up : updates.updates) {
+        if(up.addsNames()) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Checks updates for violations. If a violation is found, the complete update process is aborted.
    * @param memData temporary data instance
    * @param qc query context
@@ -282,9 +338,7 @@ final class DataUpdates {
         for(final NodeUpdate up : ups.updates) up.update(names);
       }
     }
-    // check namespaces
-    final byte[][] ns = names.nsOK();
-    if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
+    names.checkNamespaces();
 
     // check PRE values of attributes that have already been added to the name pool
     final IntSet set = new IntSet();

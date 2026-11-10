@@ -1,7 +1,9 @@
 package org.basex.query.up;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -59,10 +61,10 @@ public final class NamePool {
   }
 
   /**
-   * Checks if no namespace conflicts occur.
-   * @return conflicting namespaces or {@code null}
+   * Checks for namespace conflicts.
+   * @throws QueryException query exception
    */
-  byte[][] nsOK() {
+  void checkNamespaces() throws QueryException {
     final Atts at = new Atts();
     for(int i = 0; i < size; i++) {
       final NameCache nc = cache[i];
@@ -74,9 +76,8 @@ public final class NamePool {
       final byte[] u = at.value(prefix);
       if(u == null) at.add(prefix, uri);
       // check if only one URI is assigned to a prefix
-      else if(!eq(uri, u)) return new byte[][] { uri, u };
+      else if(!eq(uri, u)) throw UPNSCONFL2_X_X.get(null, uri, u);
     }
-    return null;
   }
 
   /**

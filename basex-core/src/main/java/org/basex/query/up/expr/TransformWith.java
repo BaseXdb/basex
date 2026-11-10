@@ -76,8 +76,8 @@ public final class TransformWith extends Copy {
         if(copy.data() != null) updates.addData(copy.data());
 
         if(arg(update()).value(qc) != Empty.VALUE) throw UPMODIFY.get(info);
+        updates.prepare(qc);
         if(!updates.isEmpty()) {
-          updates.prepare(qc);
           updates.apply(qc);
           // cached results may refer to the updated copy
           qc.caches.clear();

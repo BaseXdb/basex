@@ -9,7 +9,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.iter.*;
@@ -116,7 +115,7 @@ public final class DynFuncCall extends FuncCall {
           }
         }
       }
-      if(!updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!updating && ft.updating()) {
         throw FUNCUP_X.get(info, func);
       }
       exprType.assign(ft.refinedType);
@@ -323,7 +322,7 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public boolean vacuous() {
     final FuncType ft = updating ? null : body().funcType();
-    return ft != null && ft.declType.itemless() && !ft.anns.contains(Annotation.UPDATING);
+    return ft != null && ft.declType.itemless() && !ft.updating();
   }
 
   @Override

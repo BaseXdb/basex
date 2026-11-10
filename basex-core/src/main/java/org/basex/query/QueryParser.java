@@ -4031,7 +4031,7 @@ public class QueryParser extends InputParser {
         type = enumerationType();
       } else if(ft != null && wsConsume("(")) {
         // array(...), map(...), record(...); function(...) is rejected in checkCastTarget
-        type = functionTest(AnnList.EMPTY, ft);
+        type = functionTest(false, ft);
       } else {
         // attach default element namespace, or schema namespace if default is ##any
         if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
@@ -4139,8 +4139,9 @@ public class QueryParser extends InputParser {
       // function type
       type = FuncType.get(name);
       if(type != null) {
-        st = functionTest(anns, type).seqType();
-        function = true;
+        // only %updating is relevant for function tests; other annotations are ignored
+        st = functionTest(anns.contains(Annotation.UPDATING), type).seqType();
+        function = type == Types.FUNCTION;
       } else {
         final Kind kind = Kind.get(name);
         if(kind == Kind.JNODE) {
@@ -4206,12 +4207,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionType" rule.
-   * @param anns annotations
+   * @param updating updating annotation
    * @param type function type
    * @return resulting type
    * @throws QueryException query exception
    */
-  private Type functionTest(final AnnList anns, final Type type) throws QueryException {
+  private Type functionTest(final boolean updating, final Type type) throws QueryException {
     if(type == Types.RECORD) {
       // record(*): any record
       if(wsConsume("*")) {
@@ -4223,7 +4224,7 @@ public class QueryParser extends InputParser {
     } else if(wsConsume("*")) {
       // wildcard
       wsCheck(")");
-      return type;
+      return updating && type == Types.FUNCTION ? Types.UPDATING_FUNCTION : type;
     }
 
     // record
@@ -4277,7 +4278,8 @@ public class QueryParser extends InputParser {
       wsCheck(")");
     }
     wsCheck(AS);
-    return FuncType.get(anns, sequenceType(), args);
+    return FuncType.get(updating ? Types.UPDATING_FUNCTION.anns : AnnList.EMPTY, sequenceType(),
+        args);
   }
 
   /**

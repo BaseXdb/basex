@@ -53,6 +53,11 @@ public final class RenameNode extends NodeUpdate {
   }
 
   @Override
+  public boolean addsNames() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return Util.className(this) + '[' + node() + ", " + name + ']';
   }

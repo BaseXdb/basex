@@ -9,7 +9,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -59,11 +59,7 @@ import org.basex.util.list.*;
  */
 public final class Updates {
   /** Current context modifier. */
-  public final ContextModifier mod;
-  /** All file paths that are targeted during a snapshot by an fn:put expression. */
-  public final TokenSet putPaths = new TokenSet();
-  /** Cached outputs (can be {@code null}). */
-  private ValueBuilder output;
+  private ContextModifier mod;
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
@@ -76,7 +72,7 @@ public final class Updates {
    * @param transform transform flag
    */
   public Updates(final boolean transform) {
-    mod = transform ? new TransformModifier() : new DatabaseModifier();
+    mod = transform ? new TransformModifier() : new DatabaseModifier(null);
   }
 
   /**
@@ -99,13 +95,40 @@ public final class Updates {
   }
 
   /**
+   * Starts a nested pending update list.
+   */
+  public synchronized void nest() {
+    mod = mod.nest();
+  }
+
+  /**
+   * Checks if the current pending update list creates conflicting namespace bindings.
+   * @throws QueryException query exception
+   */
+  public synchronized void checkNamespaces() throws QueryException {
+    mod.checkNamespaces();
+  }
+
+  /**
+   * Finishes a nested pending update list.
+   * @param adopt whether to adopt the nested updates
+   * @throws QueryException query exception
+   */
+  public synchronized void unnest(final boolean adopt) throws QueryException {
+    final ContextModifier nested = mod;
+    mod = nested.outer;
+    if(adopt) mod.add(nested);
+  }
+
+  /**
    * Adds output.
    * @param value value to be added
+   * @param info input info (can be {@code null})
    * @param qc query context
    */
-  public synchronized void addOutput(final Value value, final QueryContext qc) {
-    if(output == null) output = new ValueBuilder(qc);
-    output.add(value);
+  public synchronized void addOutput(final Value value, final InputInfo info,
+      final QueryContext qc) {
+    mod.addOutput(value, info, qc);
   }
 
   /**
@@ -115,10 +138,9 @@ public final class Updates {
    * @return value
    */
   public synchronized Value output(final boolean reset, final QueryContext qc) {
-    final Value value = output != null ? output.value() : Empty.VALUE;
-    output = null;
-    if(!reset) addOutput(value, qc);
-    return value;
+    final ValueBuilder vb = new ValueBuilder(qc);
+    mod.output(vb, reset);
+    return vb.value();
   }
 
   /**

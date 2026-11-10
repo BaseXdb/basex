@@ -198,6 +198,10 @@ public final class UserModuleTest extends SandboxTest {
 
     // distinct patterns of a single user: primitives are merged
     query(func.args(NAME, Perm.READ, "p1") + ',' + func.args(NAME, Perm.WRITE, "p2"));
+    query(func.args(NAME, Perm.READ, "p3") + ", try { " + func.args(NAME, Perm.WRITE, "p4")
+        + " } catch * { }");
+    query("string-join(" + _USER_LIST_DETAILS.args(NAME) + "/database[starts-with(@pattern, 'p')]"
+        + " ! `{ @pattern }:{ @permission }`, ' ')", "p1:read p2:write p3:read p4:write");
     // distinct users: primitives are not merged
     query(_USER_CREATE.args(NAME + '2', NAME));
     try {

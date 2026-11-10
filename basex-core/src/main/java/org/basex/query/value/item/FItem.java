@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -81,10 +82,13 @@ public abstract class FItem extends Item implements XQFunction {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
+    final InputInfo info = info(ii);
+    if(ft.updating() && !annotations().contains(Annotation.UPDATING)) {
+      throw typeError(this, ft, info);
+    }
     final SeqType[] argTypes = ft.argTypes;
     if(argTypes == null) return this;
 
-    final InputInfo info = info(ii);
     final int arity = arity(), nargs = argTypes.length;
     if(nargs < arity) throw arityError(this, arity, nargs, true, info);
 

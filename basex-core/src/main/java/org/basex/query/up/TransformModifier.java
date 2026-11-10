@@ -8,6 +8,8 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
+import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * The Transform context modifier carries out updates of a single transform
@@ -18,12 +20,27 @@ import org.basex.query.up.primitives.node.*;
  * @author Lukas Kircher
  */
 public final class TransformModifier extends ContextModifier {
-  /** Holds all data references created by the copy clause of a transform
-   * expression. Adding an update primitive that is declared within the MODIFY
-   * clause of this transform expression will cause a query exception
-   * (XUDY0014) if the data reference of the corresponding target node is not
-   * part of this set; hence, the target node has not been copied. */
-  private final Set<Data> refs = new HashSet<>();
+  /** Data references created by the copy clause. */
+  private final Set<Data> refs;
+  /** First error of a rejected update, raised after the modify clause (can be {@code null}). */
+  private QueryException error;
+
+  /**
+   * Constructor.
+   */
+  TransformModifier() {
+    this(null, new HashSet<>());
+  }
+
+  /**
+   * Constructor.
+   * @param outer outer context modifier (can be {@code null})
+   * @param refs data references
+   */
+  private TransformModifier(final ContextModifier outer, final Set<Data> refs) {
+    super(outer);
+    this.refs = refs;
+  }
 
   @Override
   public synchronized void addData(final Data data) {
@@ -31,13 +48,43 @@ public final class TransformModifier extends ContextModifier {
   }
 
   @Override
-  synchronized void add(final Update up, final QueryContext qc) throws QueryException {
-    // Disallow side-effecting updates within transform expressions.
-    if(!(up instanceof final NodeUpdate nodeUp)) throw BASEX_UPDATE.get(up.info());
-    // Check if the target node of the given primitive has been copied in the
-    // 'copy' statement of this transform expression.
-    if(!refs.contains(nodeUp.data())) throw UPNOTCOPIED_X.get(nodeUp.info(), nodeUp.node());
+  ContextModifier nest() {
+    return new TransformModifier(this, refs);
+  }
 
-    super.add(up, qc);
+  @Override
+  synchronized void add(final Update up, final QueryContext qc) throws QueryException {
+    // side-effecting updates and updates of nodes that have not been copied are rejected
+    if(!(up instanceof final NodeUpdate nodeUp)) {
+      reject(BASEX_UPDATE.get(up.info()));
+    } else if(!refs.contains(nodeUp.data())) {
+      reject(UPNOTCOPIED_X.get(nodeUp.info(), nodeUp.node()));
+    } else {
+      super.add(up, qc);
+    }
+  }
+
+  @Override
+  synchronized void addOutput(final Value value, final InputInfo info, final QueryContext qc) {
+    reject(BASEX_UPDATE.get(info));
+  }
+
+  @Override
+  synchronized void add(final ContextModifier nested) throws QueryException {
+    super.add(nested);
+    reject(((TransformModifier) nested).error);
+  }
+
+  /**
+   * Records the error of a rejected update, unless an error has already been recorded.
+   * @param ex error (can be {@code null})
+   */
+  private void reject(final QueryException ex) {
+    if(error == null) error = ex;
+  }
+
+  @Override
+  void check() throws QueryException {
+    if(error != null) throw error;
   }
 }
