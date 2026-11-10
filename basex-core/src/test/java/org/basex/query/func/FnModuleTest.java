@@ -7218,7 +7218,7 @@ return
 
     // the select function is applied to the supplied node
     check(func.args(" <a><b/></a>", " fn { if(. instance of element(a)) then b else () }",
-        " <c/>"), "<a><c/></a>", empty(Instance.class));
+        " { 'replace': <c/> }"), "<a><c/></a>", empty(Instance.class));
     // JSON nodes
     query(func.args(store, " fn { .//draft }"), "{\"store\":{\"books\":["
         + "{\"title\":\"XQuery\",\"price\":39.95},{\"title\":\"JSON\",\"price\":24.5}],"

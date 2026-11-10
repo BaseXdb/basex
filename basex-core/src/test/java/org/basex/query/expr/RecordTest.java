@@ -1320,11 +1320,14 @@ public final class RecordTest extends SandboxTest {
 
     // records of a library module with a location are identified by its path
     final IOFile lib = new IOFile(sandbox(), "identity.xqm");
-    lib.write("module namespace l = 'l'; declare record l:p(x);");
+    lib.write("module namespace l = 'l'; declare record l:p(x); "
+        + "declare record l:list(next as l:list?);");
     final String imp = "import module namespace l = 'l' at '" + lib.path() + "'; ";
     query(imp + _XQUERY_EVAL.args(imp + "l:p(1)") + " instance of l:p", true);
     query(imp + LOAD_XQUERY_MODULE.args("l", " { 'location-hints': '" + lib.path() + "' }")
         + "?functions?(xs:QName('l:p'))?1(1) instance of l:p", true);
+    // recursive ShapeType.instanceOf: same declaration, parsed by different queries
+    query(imp + _XQUERY_EVAL.args(imp + "l:list(l:list(()))") + " instance of l:list", true);
 
     // inline modules: records with the same name and path are still different
     final String mod = "module namespace x = \"x\"; declare %private record x:p(a); "
@@ -1416,6 +1419,10 @@ public final class RecordTest extends SandboxTest {
     query(area + "local:circle(1) instance of local:shape", true);
     query("declare record local:a(%fixed f as xs:integer := 1); "
         + "declare record local:b extends local:a(%fixed f as xs:byte := 2); local:b()?f", 2);
+    // recursive ShapeType.instanceOf: narrowed fixed field refers to the derived type
+    query("declare record local:a(%fixed next as local:a? := ()); "
+        + "declare record local:b extends local:a(%fixed next as local:b? := ()); "
+        + "local:b() instance of local:a", true);
 
     // integrity constraints are inherited
     final String where = "declare record local:a(x as xs:integer) where ?x ge 0; "
@@ -1459,4 +1466,5 @@ public final class RecordTest extends SandboxTest {
     error("declare record local:a extends local:b(x); "
         + "declare record local:b extends local:a(y); 1", RECORDBASE_X);
   }
+
 }
