@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
-  /** No static fields. */
+  /** No fixed fields. */
   private static final int[] NO_SLOTS = {};
 
   /** Record name ({@code null} for {@code record(*)}). */
@@ -34,10 +34,14 @@ public final class RecordType extends ShapeType {
   private final Object identity;
   /** Integrity constraint: reference to a focus function (can be {@code null}). */
   private final Expr constraint;
+  /** Base record type (can be {@code null}). */
+  private final RecordType base;
+  /** Integrity constraints of this and all base types. */
+  private final Expr[] constraints;
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
-  /** Type without initializing expressions and integrity constraint (can be {@code null}). */
-  private RecordType detachedType;
+  /** Type without initializing expressions and integrity constraints (can be {@code null}). */
+  private volatile RecordType detachedType;
   /** Initializers and constraints of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
   /** Storage slots of the fields (can be {@code null}). */
@@ -47,11 +51,7 @@ public final class RecordType extends ShapeType {
    * Constructor for the abstract record type {@code record(*)}.
    */
   RecordType() {
-    super(new TokenObjectMap<>(0));
-    name = null;
-    anns = AnnList.EMPTY;
-    identity = null;
-    constraint = null;
+    this(new TokenObjectMap<>(0), null, AnnList.EMPTY, null, null, null);
   }
 
   /**
@@ -61,42 +61,50 @@ public final class RecordType extends ShapeType {
    * @param anns annotations
    * @param identity identity of the record declaration (can be {@code null})
    * @param constraint integrity constraint (can be {@code null})
+   * @param base base record type (can be {@code null})
    */
   public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
-      final Object identity, final Expr constraint) {
-    super(fields);
+      final Object identity, final Expr constraint, final RecordType base) {
+    // records of derived types may have additional fields of any type
+    super(fields, Types.ITEM_ZM);
     this.name = name;
     this.anns = anns;
     this.identity = identity;
     this.constraint = constraint;
+    this.base = base;
+    final Expr[] ec = base != null ? base.constraints : NO_INITS;
+    constraints = constraint != null ? Array.add(ec, constraint) : ec;
   }
 
   /**
-   * Indicates if this type has an integrity constraint.
+   * Indicates if this type or a type it extends has an integrity constraint.
    * @return result of check
    */
   public boolean constrained() {
-    return constraint != null;
+    return constraints.length != 0;
   }
 
   @Override
   public boolean detached() {
-    return constraint == null && super.detached();
+    return !constrained() && super.detached();
   }
 
   @Override
   public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
       final InputInfo ii) throws QueryException {
-    // the labeled candidate record is the focus of the integrity constraint
+    // the labeled candidate record is the focus of the integrity constraints of all base types
     final XQMap record = XQRecordMap.get(this, values, qc);
-    if(constraint == null ||
-        ((FItem) constraint.item(qc, ii)).invoke(qc, ii, record).ebv(qc, ii)) return record;
-    if(error) throw RECORDCONSTRAINT_X_X.get(ii, this, record);
-    return null;
+    for(final Expr constr : constraints) {
+      if(!((FItem) constr.item(qc, ii)).invoke(qc, ii, record).ebv(qc, ii)) {
+        if(error) throw RECORDCONSTRAINT_X_X.get(ii, this, record);
+        return null;
+      }
+    }
+    return record;
   }
 
   @Override
-  boolean labeled() {
+  public boolean labeled() {
     return true;
   }
 
@@ -119,7 +127,23 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns, identity, constraint);
+    return new RecordType(map, name, anns, identity, constraint, base);
+  }
+
+  @Override
+  RecordType base() {
+    return base;
+  }
+
+  /**
+   * Checks if a type is a record type derived from the specified type.
+   * @param type type
+   * @param target target type
+   * @return result of check
+   */
+  public static boolean derives(final Type type, final Type target) {
+    return TypeRef.deref(type) instanceof final RecordType rt && rt.base != null &&
+        TypeRef.deref(target) instanceof final RecordType tt && rt.base.ancestor(tt) != null;
   }
 
   /**
@@ -148,8 +172,8 @@ public final class RecordType extends ShapeType {
   }
 
   /**
-   * Returns the storage slots of the fields: an instance slot, or {@code -1} for static fields.
-   * @return slots, or {@code null} if the record has no static fields
+   * Returns the storage slots of the fields: an instance slot, or {@code -1} for fixed fields.
+   * @return slots, or {@code null} if the record has no fixed fields
    */
   public int[] slots() {
     int[] s = slots;
@@ -158,7 +182,7 @@ public final class RecordType extends ShapeType {
       final int fs = fields.size();
       s = new int[fs];
       int i = 0;
-      for(int f = 0; f < fs; f++) s[f] = fields.value(f + 1).isStatic() ? -1 : i++;
+      for(int f = 0; f < fs; f++) s[f] = fields.value(f + 1).isFixed() ? -1 : i++;
       if(i == fs) s = NO_SLOTS;
       slots = s;
     }
@@ -166,12 +190,15 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public ShapeType detach() {
+  public RecordType detach() {
     if(detached()) return this;
-    if(detachedType == null) {
-      detachedType = new RecordType(detachedFields(), name, anns, identity, null);
+    RecordType dt = detachedType;
+    if(dt == null) {
+      dt = new RecordType(detachedFields(), name, anns, identity, null,
+        base != null ? base.detach() : null);
+      detachedType = dt;
     }
-    return detachedType;
+    return dt;
   }
 
   @Override
@@ -226,7 +253,9 @@ public final class RecordType extends ShapeType {
         case final ShapeType sh -> {
           if(visited == null) visited = Collections.newSetFromMap(new IdentityHashMap<>());
           if(visited.add(sh)) {
-            if(sh instanceof final RecordType rt && rt.constraint != null) add(rt.constraint);
+            if(sh instanceof final RecordType rt) {
+              for(final Expr constr : rt.constraints) add(constr);
+            }
             for(final ShapeField rf : sh.fields().values()) {
               if(rf.init() != null) add(rf.init());
               collect(rf.seqType().type);
@@ -254,7 +283,7 @@ public final class RecordType extends ShapeType {
      */
     private void add(final Expr expr) {
       if(list == null) list = new ExprList();
-      list.add(expr);
+      if(!list.contains(expr)) list.add(expr);
     }
   }
 
@@ -264,19 +293,23 @@ public final class RecordType extends ShapeType {
    * @return query string
    */
   public QueryString declaration(final QueryString qs) {
+    // inherited fields are omitted, unless they are redeclared
     final TokenObjectMap<ShapeField> fields = fields();
-    final Object[] params = new Object[fields.size()];
-    int f = 0;
-    for(final byte[] key : fields) {
-      final ShapeField field = fields.get(key);
+    final TokenObjectMap<ShapeField> efields = base != null ? base.fields() : null;
+    final ArrayList<QueryString> params = new ArrayList<>();
+    for(int f = 1; f <= fields.size(); f++) {
+      final ShapeField field = fields.value(f);
+      if(efields != null && f <= efields.size() && field == efields.value(f)) continue;
       final QueryString param = new QueryString();
-      if(field.isStatic()) param.token("%static");
-      param.token(key);
+      if(field.isFixed()) param.token('%' + FIXED);
+      param.token(fields.key(f));
       if(!field.seqType().eq(Types.ITEM_ZM)) param.token(AS).token(field.seqType());
       if(field.init() != null) param.token(":=").token(field.init());
-      params[f++] = param;
+      params.add(param);
     }
-    qs.token(DECLARE).token(anns).token(RECORD).token(name.prefixId()).params(params);
+    qs.token(DECLARE).token(anns).token(RECORD).token(name.prefixId());
+    if(base != null) qs.token(EXTENDS).token(base.name().prefixId());
+    qs.params(params.toArray());
     if(constraint != null) qs.token(WHERE).token(constraint);
     return qs.token(';');
   }

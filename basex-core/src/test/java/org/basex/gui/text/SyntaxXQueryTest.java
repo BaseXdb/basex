@@ -230,7 +230,7 @@ public final class SyntaxXQueryTest {
     declarations("declare %rest:GET %rest:query-param('p', '{$p}', 1) function f($p) {};", "f 1");
     declarations("declare updating function f() {};", "f 1");
     declarations("declare record x();", "x 1");
-    declarations("declare %private record r(a, %static b as xs:integer := 1);", "r 1");
+    declarations("declare %private record r(a, %fixed b as xs:integer := 1);", "r 1");
     // other prolog declarations are skipped
     declarations("declare namespace a = 'b'; declare option db:chop 'true';");
     declarations("declare default function namespace 'a';");

@@ -14,10 +14,12 @@ import org.basex.query.value.type.*;
 public final class MapTypeInfo {
   /** Map type ({@code null} if statically unknown). */
   public MapType mapType;
-  /** Shape of the map ({@code null} if statically unknown). */
+  /** Shape with the exact field set of the map ({@code null} if statically unknown). */
   public ShapeType shape;
   /** Field index ({@code 0} if the key is unknown or no field of the shape). */
   public int index;
+  /** Shape with the known fields of the map ({@code null} if statically unknown). */
+  private ShapeType known;
   /** Key type mismatch. */
   public boolean keyMismatch;
   /** Key is known to be valid. */
@@ -34,7 +36,11 @@ public final class MapTypeInfo {
     if(st.one() && st.type instanceof final MapType mt) {
       mti.mapType = mt;
       // record(*) has an unknown field set: no static information on single fields
-      if(mt instanceof final ShapeType sh && !sh.any()) mti.shape = sh;
+      if(mt instanceof final ShapeType sh && !sh.any()) {
+        mti.known = sh;
+        // records of extending types may have additional fields
+        if(!sh.labeled()) mti.shape = sh;
+      }
     }
     return mti;
   }
@@ -46,9 +52,9 @@ public final class MapTypeInfo {
    * @throws QueryException query exception
    */
   public MapTypeInfo key(final Expr expr) throws QueryException {
-    if(shape != null && expr instanceof final Item item) {
-      index = shape.index(item);
-      if(item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
+    if(known != null && expr instanceof final Item item) {
+      index = known.index(item);
+      if(shape != null && item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
     }
     final SeqType st = expr.seqType();
     if(mapType != null && st.atomOcc() == Occ.EXACTLY_ONE) {

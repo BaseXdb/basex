@@ -460,8 +460,8 @@ public abstract class XQMap extends XQStruct {
       final ShapeField rf = fields.value(f + 1);
       final Value value = sameOrder ? valueAt(f) : getOrNull(rt.key(f + 1));
       if(value != null) {
-        // static fields must not be supplied
-        if(rf.isStatic()) throw typeError(this, rt, ii);
+        // fixed fields must not be supplied
+        if(rf.isFixed()) throw typeError(this, rt, ii);
         values[f] = rt.coerce(f + 1, value, qc, ii, cc);
       } else if(rf.init() == null && rf.seqType().occ.min > 0) {
         throw typeError(this, rt, ii);
@@ -599,9 +599,9 @@ public abstract class XQMap extends XQStruct {
       final Value value = getOrNull(rt.key(f + 1));
       final Value cast;
       if(value != null) {
-        if(!rf.isStatic()) cast = ft.convert(value, error, qc, info);
-        // static fields can only be supplied by records of the target type
-        else if(instanceOf(rt, false)) cast = value;
+        if(!rf.isFixed()) cast = ft.convert(value, error, qc, info);
+        // fixed fields can only be supplied by records of the target type or a derived type
+        else if(instanceOf(rt, false)) cast = RecordType.derives(type, rt) ? rf.init(qc) : value;
         else if(error) throw typeError(this, rt, info);
         else cast = null;
       } else if(rf.init() != null) {

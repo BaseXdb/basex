@@ -797,7 +797,8 @@ public final class SeqType {
    */
   public static boolean kept(final Type type, final Type target, final boolean coerce) {
     return type.instanceOf(target) && (!coerce || type == target || type == BasicType.ERROR ||
-      !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)));
+      !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)) ||
+      RecordType.derives(type, target));
   }
 
   /**

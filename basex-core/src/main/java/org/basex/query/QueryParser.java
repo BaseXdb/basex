@@ -92,6 +92,8 @@ public class QueryParser extends InputParser {
   private final QNmMap<TypeDecl> publicTypes = new QNmMap<>();
   /** References to named types (resolved after all type declarations have been parsed). */
   private final QNmMap<TypeRef> typeRefs = new QNmMap<>();
+  /** Declarations of derived record types (declared after the module has been parsed). */
+  private final QNmMap<RecordDecl> extensions = new QNmMap<>();
   /** Map key types referencing a named type; their atomicity is checked after resolution. */
   private final ArrayList<TypeRef> deferredMapKeys = new ArrayList<>();
   /** Cast target types referencing a named type; resolved and validated after parsing. */
@@ -303,6 +305,7 @@ public class QueryParser extends InputParser {
 
     // completes the parsing step
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
+    declareExtensions();
     // reject item type declarations of this module that depend on themselves
     checkTypes(sc.types.values());
     resolveTypeRefs();
@@ -1155,17 +1158,29 @@ public class QueryParser extends InputParser {
    */
   private void typeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME_X);
-    if(sc.types.contains(qn)) throw error(DUPLTYPE_X, qn.string());
-    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    final QNm qn = checkTypeName(eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME_X));
     wsCheck(AS);
     // collect referenced type names to detect cyclic or self-referential declarations
     final QNmSet refs = new QNmSet();
     currentTypeDeps = refs;
     final SeqType st = itemType();
     currentTypeDeps = null;
-    declareType(qn, st, refs, anns);
+    declareType(qn, st, refs, anns, ii);
     qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
+  }
+
+  /**
+   * Checks the name of a type declaration.
+   * @param qn type name
+   * @return type name
+   * @throws QueryException query exception
+   */
+  private QNm checkTypeName(final QNm qn) throws QueryException {
+    if(sc.types.contains(qn) || extensions.contains(qn)) {
+      throw error(DUPLTYPE_X, qn.string());
+    }
+    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    return qn;
   }
 
   /**
@@ -1175,16 +1190,17 @@ public class QueryParser extends InputParser {
    */
   private void labeledRecordTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm qn = eQName(sc.elemNS, TYPENAME_X);
-    if(sc.types.contains(qn)) throw error(DUPLTYPE_X, qn.string());
-    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    final QNm qn = checkTypeName(eQName(sc.elemNS, TYPENAME_X));
+    final QNm base = wsConsumeWs(EXTENDS) ?
+      eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME_X) : null;
     wsCheck("(");
     final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
+    final TokenSet untyped = new TokenSet();
     if(!wsConsume(")")) {
       boolean defaults = false;
       do {
-        final boolean statik = wsConsume("%");
-        if(statik && !wsConsumeWs("static")) throw error(WRONGCHAR_X_X, "static", found());
+        final boolean fixed = wsConsumeWs('%' + FIXED);
+        if(!fixed && wsConsume("%")) throw error(WRONGCHAR_X_X, FIXED, found());
         final InputInfo fi = info();
         skipWs();
         final byte[] name = ncName(NONCNAME_X, false);
@@ -1199,12 +1215,13 @@ public class QueryParser extends InputParser {
           final QNm vn = new QNm(concat(qn.string(), cpToken('?'), name), qn.uri());
           init = qc.vars.declareField(new Var(vn, seqType, qc, fi), expr, vs);
           defaults = true;
-        } else if(statik) {
+        } else if(fixed) {
           wsCheck(":=");
         } else if(defaults) {
           throw error(PARAMOPTIONAL_X, name);
         }
-        fields.put(name, new ShapeField(seqType, init, statik));
+        if(seqType == null) untyped.add(name);
+        fields.put(name, new ShapeField(seqType, init, fixed));
       } while(wsConsume(","));
       wsCheck(")");
     }
@@ -1217,12 +1234,97 @@ public class QueryParser extends InputParser {
       final QNm vn = new QNm(concat(qn.string(), token("?where")), qn.uri());
       constraint = qc.vars.declareField(new Var(vn, null, qc, ci), func, localVars.popContext());
     }
-    // records of different declarations are different types
-    final RecordType rt = new RecordType(fields, qn, anns, recordIdentity, constraint);
-    // record types may be recursive: references are not followed
-    declareType(qn, rt.seqType(), new QNmSet(), anns);
-    declareShapeConstructor(rt, ii);
+    final RecordDecl rd = new RecordDecl(qn, base, fields, untyped, anns, constraint,
+        docBuilder.toString(), ii);
+    if(base != null) extensions.put(qn, rd);
+    else declareRecord(rd, fields, null);
   }
+
+  /**
+   * Declares the derived record types, after their base record types.
+   * @throws QueryException query exception
+   */
+  private void declareExtensions() throws QueryException {
+    if(extensions.isEmpty()) return;
+    final Cycles<RecordDecl> cycles = new Cycles<>() {
+      @Override
+      protected Iterable<RecordDecl> next(final RecordDecl rd) {
+        final RecordDecl ed = extensions.get(rd.base);
+        return ed != null ? Collections.singletonList(ed) : Collections.emptyList();
+      }
+      @Override
+      protected void finish(final RecordDecl rd) throws QueryException {
+        declareExtension(rd);
+      }
+      @Override
+      protected QueryException error(final RecordDecl rd) {
+        return RECORDBASE_X.get(rd.info, rd.base.prefixString());
+      }
+    };
+    for(final RecordDecl rd : extensions.values()) cycles.visit(rd);
+  }
+
+  /**
+   * Declares a derived record type.
+   * @param rd record declaration
+   * @throws QueryException query exception
+   */
+  private void declareExtension(final RecordDecl rd) throws QueryException {
+    // references in item type declarations are resolved later
+    Type tp = sc.type(rd.base);
+    for(final QNmSet names = new QNmSet(); tp instanceof final TypeRef ref && !ref.resolved() &&
+        names.add(ref.name());) tp = sc.type(ref.name());
+    tp = TypeRef.deref(tp);
+    if(!(tp instanceof final RecordType ext) || ext.any()) {
+      throw RECORDBASE_X.get(rd.info, rd.base.prefixString());
+    }
+    // inherited fields come first; redeclared fixed fields keep their position
+    final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>(), efields = ext.fields();
+    for(final byte[] key : efields) fields.put(key, efields.get(key));
+    for(final byte[] key : rd.fields) {
+      ShapeField field = rd.fields.get(key);
+      final ShapeField ef = fields.get(key);
+      if(ef != null) {
+        if(!ef.isFixed() || !field.isFixed()) throw DUPFIELD_X.get(rd.info, key);
+        final SeqType fst = field.seqType(), est = ef.seqType();
+        if(rd.untyped.contains(key)) field = field.with(est);
+        else if(!fst.instanceOf(est)) throw RECORDFIELD_X_X_X.get(rd.info, key, est, fst);
+      }
+      fields.put(key, field);
+    }
+    declareRecord(rd, fields, ext);
+  }
+
+  /**
+   * Declares a labeled record type and its constructor function.
+   * @param rd record declaration
+   * @param fields all fields, including inherited ones
+   * @param base base record type (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void declareRecord(final RecordDecl rd, final TokenObjectMap<ShapeField> fields,
+      final RecordType base) throws QueryException {
+    // records of different declarations are different types
+    final RecordType rt = new RecordType(fields, rd.name, rd.anns, recordIdentity, rd.constraint,
+        base);
+    // record types may be recursive: references are not followed
+    declareType(rd.name, rt.seqType(), new QNmSet(), rd.anns, rd.info);
+    declareShapeConstructor(rt, rd.doc, rd.info);
+  }
+
+  /**
+   * Declaration of a labeled record type.
+   * @param name record name
+   * @param base name of the base type (can be {@code null})
+   * @param fields declared fields
+   * @param untyped names of the declared fields without type
+   * @param anns annotations
+   * @param constraint integrity constraint (can be {@code null})
+   * @param doc documentation
+   * @param info input info
+   */
+  private record RecordDecl(QNm name, QNm base, TokenObjectMap<ShapeField> fields,
+      TokenSet untyped, AnnList anns, Expr constraint, String doc, InputInfo info) { }
 
   /**
    * Declares a named item type.
@@ -1230,15 +1332,16 @@ public class QueryParser extends InputParser {
    * @param st declared type
    * @param refs names of the referenced types
    * @param anns annotations
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns)
-      throws QueryException {
+  private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns,
+      final InputInfo ii) throws QueryException {
     final TypeDecl td = new TypeDecl(qn, st, refs, sc.types, anns);
     qc.typeDecls.add(td);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !qn.eqUri(sc.module))
-        throw error(MODULENS_X, qn.prefixString());
+        throw MODULENS_X.get(ii, qn.prefixString());
       publicTypes.put(qn, td);
       qc.namedTypes.put(qn, td);
     }
@@ -1248,35 +1351,42 @@ public class QueryParser extends InputParser {
   /**
    * Declares a record constructor function for the specified record type.
    * @param rt record type
+   * @param doc documentation
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void declareShapeConstructor(final RecordType rt, final InputInfo ii)
+  private void declareShapeConstructor(final RecordType rt, final String doc, final InputInfo ii)
       throws QueryException {
 
-    // static fields are no parameters
+    // fixed fields are no parameters; fields without initializer come first
     final TokenObjectMap<ShapeField> fields = rt.fields();
+    final int fs = fields.size();
+    final int[] indexes = new int[fs + 1];
     localVars.pushContext(false);
     final Params params = new Params();
-    for(final byte[] key : fields) {
-      final ShapeField rf = fields.get(key);
-      if(!rf.isStatic()) params.add(new QNm(key), rf.seqType(), rf.init(), ii);
+    for(final boolean defaults : new boolean[] { false, true }) {
+      for(int f = 1; f <= fs; f++) {
+        final ShapeField rf = fields.value(f);
+        if(!rf.isFixed() && (rf.init() != null) == defaults) {
+          indexes[f] = params.size();
+          params.add(new QNm(fields.key(f)), rf.seqType(), rf.init(), ii);
+        }
+      }
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
-    // static fields are assigned the values of their initializing expressions
+    // fixed fields are assigned the values of their initializing expressions
     final Var[] pv = params.vars();
-    final Expr[] args = new Expr[fields.size()];
-    int a = 0, p = 0;
-    for(final ShapeField rf : fields.values()) {
-      args[a++] = rf.isStatic() ? rf.init() : new VarRef(null, pv[p++]);
+    final Expr[] args = new Expr[fs];
+    for(int f = 1; f <= fs; f++) {
+      final ShapeField rf = fields.value(f);
+      args[f - 1] = rf.isFixed() ? rf.init() : new VarRef(null, pv[indexes[f]]);
     }
     final Expr expr = ShapeConstructor.get(ii, rt, args);
-    final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
 
     final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, rt.anns(), doc, vs,
-        info());
+        ii);
     funcs.add(func);
   }
 
@@ -5200,7 +5310,8 @@ public class QueryParser extends InputParser {
   private boolean wsConsumeWs(final String string) throws QueryException {
     final int p = pos;
     if(wsConsume(string)) {
-      if(skipWs() || !XMLToken.isNCStartChar(string.charAt(0)) || !XMLToken.isNCChar(current()))
+      if(skipWs() || !XMLToken.isNCChar(string.charAt(string.length() - 1)) ||
+          !XMLToken.isNCChar(current()))
         return true;
       pos = p;
     }

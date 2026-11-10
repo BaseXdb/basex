@@ -18,8 +18,8 @@ public final class ShapeField {
   private final SeqType seqType;
   /** Initializing expression (can be {@code null}). */
   private final Expr init;
-  /** Static flag. */
-  private final boolean statik;
+  /** Fixed flag. */
+  private final boolean fixed;
 
   /**
    * Constructor for a field without initializer.
@@ -33,21 +33,21 @@ public final class ShapeField {
    * Constructor.
    * @param seqType field type (can be {@code null})
    * @param init initializing expression (can be {@code null})
-   * @param statik static flag
+   * @param fixed fixed flag
    */
-  public ShapeField(final SeqType seqType, final Expr init, final boolean statik) {
+  public ShapeField(final SeqType seqType, final Expr init, final boolean fixed) {
     this.seqType = seqType == null ? Types.ITEM_ZM : seqType;
     this.init = init;
-    this.statik = statik;
+    this.fixed = fixed;
   }
 
   /**
-   * Returns a field with the initializing expression and static flag of this field.
+   * Returns a field with the initializing expression and fixed flag of this field.
    * @param st field type
    * @return field
    */
   public ShapeField with(final SeqType st) {
-    return new ShapeField(st, init, statik);
+    return new ShapeField(st, init, fixed);
   }
 
   /**
@@ -55,7 +55,7 @@ public final class ShapeField {
    * @return field
    */
   public ShapeField detach() {
-    return init == null ? this : new ShapeField(seqType, null, statik);
+    return init == null ? this : new ShapeField(seqType, null, fixed);
   }
 
   /**
@@ -82,11 +82,11 @@ public final class ShapeField {
   }
 
   /**
-   * Indicates if this field is static.
+   * Indicates if this field is fixed.
    * @return result of check
    */
-  public boolean isStatic() {
-    return statik;
+  public boolean isFixed() {
+    return fixed;
   }
 
   /**

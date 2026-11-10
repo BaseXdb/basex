@@ -43,7 +43,16 @@ public class ShapeType extends MapType {
    * @param fields field declarations
    */
   public ShapeType(final TokenObjectMap<ShapeField> fields) {
-    super(BasicType.STRING, unionType(fields));
+    this(fields, unionType(fields));
+  }
+
+  /**
+   * Constructor.
+   * @param fields field declarations
+   * @param valueType value type
+   */
+  ShapeType(final TokenObjectMap<ShapeField> fields, final SeqType valueType) {
+    super(BasicType.STRING, valueType);
     this.fields = fields;
     boolean d = true, g = true;
     for(final ShapeField rf : fields.values()) {
@@ -240,8 +249,27 @@ public class ShapeType extends MapType {
    * Indicates if this is a labeled record type, which is assigned to its records as label.
    * @return result of check
    */
-  boolean labeled() {
+  public boolean labeled() {
     return false;
+  }
+
+  /**
+   * Returns the base record type of this type.
+   * @return base type (can be {@code null})
+   */
+  RecordType base() {
+    return null;
+  }
+
+  /**
+   * Returns this type or the base type that has the identity of the specified type.
+   * @param sh shape type
+   * @return type with the same identity (can be {@code null})
+   */
+  final ShapeType ancestor(final ShapeType sh) {
+    ShapeType st = this;
+    while(st != null && !st.sameIdentity(sh)) st = st.base();
+    return st;
   }
 
   /**
@@ -323,7 +351,7 @@ public class ShapeType extends MapType {
 
     for(final byte[] key : fields) {
       final ShapeField f1 = fields.get(key), f2 = sh.fields.get(key);
-      if(f1.isStatic() != f2.isStatic() || !Objects.equals(f1.init(), f2.init())) return false;
+      if(f1.isFixed() != f2.isFixed() || !Objects.equals(f1.init(), f2.init())) return false;
       final SeqType st1 = f1.seqType(), st2 = f2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = TypeRef.deref(st1.type), tp2 = TypeRef.deref(st2.type);
@@ -399,9 +427,9 @@ public class ShapeType extends MapType {
     // record(*) is only matched by labeled record types
     if(type == Types.RECORD) return labeled();
     if(type instanceof final ShapeType sh) {
-      // a labeled record type is only a subtype of itself (simple types have no name)
-      if(sh.labeled() && !sameIdentity(sh)) return false;
-      if(!sameFields(sh)) return false;
+      // labeled types: subtypes of the types they extend, never of simple types
+      final ShapeType st = sh.labeled() ? ancestor(sh) : labeled() ? null : this;
+      if(st == null || !st.sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
         if(fst != shfst) {
@@ -445,7 +473,14 @@ public class ShapeType extends MapType {
     if(SeqType.kept(this, type, true)) return type;
 
     if(type instanceof final ShapeType sh) {
-      if(sameFields(sh)) {
+      // labeled record types: closest common base type
+      if(labeled() && sh.labeled() && !sameIdentity(sh)) {
+        for(ShapeType st = base(); st != null; st = st.base()) {
+          if(sh.instanceOf(st)) return st;
+        }
+      }
+      // records of derived types have additional fields: no common shape
+      if(sameIdentity(sh) && (!labeled() || sameOrder(sh)) && sameFields(sh)) {
         final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -463,9 +498,7 @@ public class ShapeType extends MapType {
           }
           map.put(key, new ShapeField(union));
         }
-        // records with other identities or field orders must still be coerced
-        return labeled() && sameIdentity(sh) && sameOrder(sh) ?
-          with(map) : new ShapeType(map);
+        return with(map);
       }
       // fallback (map supertype)
       return union(sh.keyType(), sh.valueType());
@@ -480,7 +513,15 @@ public class ShapeType extends MapType {
    */
   private boolean sameFields(final ShapeType sh) {
     // the fields of record(*) are unknown
-    if(any() || sh.any() || fields.size() != sh.fields.size()) return false;
+    return !any() && !sh.any() && fields.size() == sh.fields.size() && fieldsOf(sh);
+  }
+
+  /**
+   * Checks whether the given shape declares all field names of this shape.
+   * @param sh other shape
+   * @return result of check
+   */
+  private boolean fieldsOf(final ShapeType sh) {
     for(final byte[] key : fields) {
       if(!sh.fields.contains(key)) return false;
     }
@@ -538,8 +579,13 @@ public class ShapeType extends MapType {
       // record(*) and a simple record type: the simple type includes the intersection
       if(any()) return sh;
       if(sh.any()) return this;
-      // a record has the fields of its type, and a single labeled record type
-      if(!sameFields(sh) || labeled() && sh.labeled() && !sameIdentity(sh)) return null;
+      // a record has a single label; records of derived types have additional fields
+      if(labeled() && sh.labeled() && !sameIdentity(sh)) return null;
+      if(!sameFields(sh)) {
+        // labeled and simple type: records of derived types may have the additional fields
+        if(labeled() == sh.labeled()) return null;
+        return labeled() ? fieldsOf(sh) ? this : null : sh.fieldsOf(this) ? sh : null;
+      }
       final ShapeType st = sh.labeled() ? sh : this;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : st.fields) {

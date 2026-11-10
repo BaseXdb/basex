@@ -529,10 +529,12 @@ public final class RecordTest extends SandboxTest {
   /** Type propagation when removing entries. */
   @Test public void typeRemove() {
     final Function func = _MAP_REMOVE;
+    final String any = "map(xs:string, item()*)";
+    // labeled record types are lower bounds: records of extending types have additional fields
     check("declare record local:x(x); local:x(1) => map:remove('x')", "{}",
-        root(XQTrieMap.class));
+        root(func), type(func, any));
     check("declare record local:x(x); local:x(1) => map:remove(<_>x</_>)", "{}",
-        root(XQTrieMap.class));
+        root(func), type(func, any));
     check("declare record local:x(x); local:x(1) => map:remove('y')", "{\"x\":1}",
         root(func));
     check("declare record local:x(x); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
@@ -541,33 +543,37 @@ public final class RecordTest extends SandboxTest {
         root(func));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
-        type(func, "record(y)"), shape(func, "y"));
+        type(func, any));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>x</_>)", "{\"y\":()}",
-        type(func, "record(y)"), shape(func, "y"));
+        type(func, any));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "record(x)"), shape(func, "x"));
+        type(func, any));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "record(x)"), shape(func, "x"));
-    // the removed field is no longer looked up
-    check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('x')", "",
-        empty());
-    check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('y')", 2,
-        root(ShapeGet.class));
+        type(func, any));
+    query("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('x')", "");
+    query("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('y')", 2);
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('z')", "{\"x\":1,\"y\":()}",
-        root(func), shape(func, "x, y"));
+        root(func), type(func, any));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(1)", "{\"x\":1,\"y\":()}",
-        root(func), shape(func, "x, y"));
+        root(func), type(func, any));
+
+    // shapes of maps are narrowed
+    check("{ 'x': <x/>, 'y': 2 } => map:remove('x')", "{\"y\":2}",
+        type(func, "record(y as xs:integer)"), shape(func, "y"));
+    check("{ 'x': <x/>, 'y': 2 } => map:remove('x') => map:get('x')", "", empty());
   }
 
   /** Type propagation when inserting entries. */
   @Test public void typePut() {
     final Function func = _MAP_PUT;
+    final String any = "map(xs:string, item()*)";
+    // labeled record types are lower bounds: records of extending types have additional fields
     check("declare record local:x(x); local:x(1) => map:put('x', 2)",
-        "{\"x\":2}", type(ShapeSet.class, "record(x)"), shape(ShapeSet.class, "x"));
+        "{\"x\":2}", type(func, any), empty(ShapeSet.class));
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2}", type(ShapeSet.class, "record(x)"), shape(ShapeSet.class, "x"));
+        "{\"x\":2}", type(func, "map(*)"), empty(ShapeSet.class));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(func, "record(x, y as xs:integer)"), shape(func, "x, y"));
+        "{\"x\":1,\"y\":2}", type(func, any));
     // the new field is appended, and the record annotation is dropped
     query("declare record local:x(x); local:x(1) => map:put('y', 2) instance of local:x", false);
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)",
@@ -575,25 +581,15 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:put(0, 0)",
         "{\"x\":1,0:0}", type(func, "map(*)"));
 
-    // a mismatching value widens the field type, the field set is preserved
-    check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)",
-        "{\"x\":<x/>}", type(ShapeSet.class, "record(x as element(x))"),
-        shape(ShapeSet.class, "x"));
-    check("declare record local:x(x, y); local:x(1, 2) => map:put('x', <x/>) => map:get('z')", "",
-        empty());
+    query("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}");
+    query("declare record local:x(x, y); local:x(1, 2) => map:put('x', <x/>) => map:get('z')", "");
+    query("declare record local:x(x, y := ()); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}");
 
-    check("declare record local:x(x, y := ()); local:x(1) => map:put('x', 2)",
-        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "record(x, y)"),
+    // a mismatching value widens the field type of a shape, the field set is preserved
+    check("{ 'x': 1, 'y': <y/> } => map:put('x', <x/>)", "{\"x\":<x/>,\"y\":<y/>}",
+        type(ShapeSet.class, "record(x as element(x), y as element(y))"),
         shape(ShapeSet.class, "x, y"));
-    check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "record(x, y)"),
-        shape(ShapeSet.class, "x, y"));
-    check("declare record local:x(x, y := ()); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "record(x, y)"),
-        shape(ShapeSet.class, "x, y"));
-    check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>y</_>, 2)",
-        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "record(x, y)"),
-        shape(ShapeSet.class, "x, y"));
+    check("{ 'x': 1, 'y': <y/> } => map:put('x', <x/>) => map:get('z')", "", empty());
     check("declare record local:x(x, y := ()); local:x(1) => map:put(0, 0)",
         "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
 
@@ -615,9 +611,10 @@ public final class RecordTest extends SandboxTest {
   @Test public void typePutCoerce() {
     // map:put(R, FIELD, VALUE) coerce as RECORD  ->  R but with map:entry(FIELD, VALUE)
     final String ab = "declare record local:ab(a, b); ";
+    // no fusion for labeled types: records of extending types have additional fields
     check(ab + "let $r as local:ab := local:ab(<a/>, 2) "
         + "let $s as local:ab := map:put($r, 'a', 0) return $s",
-        "{\"a\":0,\"b\":2}", root(ButWith.class), empty(ShapeSet.class));
+        "{\"a\":0,\"b\":2}", empty(ButWith.class), empty(ShapeSet.class));
     // the fused result is a record again: strict field access applies
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
@@ -625,6 +622,9 @@ public final class RecordTest extends SandboxTest {
     // no fusion when the coercion target is not the record's own (strict) type
     check(ab + "let $r as local:ab := local:ab(<a/>, 2) return map:put($r, 'a', 0)",
         "{\"a\":0,\"b\":2}", empty(ButWith.class));
+    // updates of a map that is no record are coerced
+    query(ab + "({ 'a': <a/>, 'b': 1 } => map:put('a', 0) => map:put('b', 2) coerce as local:ab)"
+        + " instance of local:ab", true);
     // no fusion for simple record types: a matching map is not rebuilt
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
@@ -645,10 +645,10 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:c(x, y, z); "
         + "local:c(<x>1</x>, <x>2</x>, 3) but with { 'x': 0 } but with { 'y': 0 }",
         "{\"x\":0,\"y\":0,\"z\":3}", root(ButWith.class), count(ButWith.class, 1));
-    // ... and are dropped if they cover all fields
+    // ... and are kept if they cover all fields (records of extending types have more fields)
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 }",
-        "{\"x\":0,\"y\":0}", empty(ButWith.class));
+        "{\"x\":0,\"y\":0}", count(ButWith.class, 1));
     // overlapping keys are not merged (the earlier value is still coerced), but use-last holds
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'x': 1 }",
@@ -665,7 +665,7 @@ public final class RecordTest extends SandboxTest {
         + "declare function local:f($c as local:c, $i, $j) as local:c {"
         + " $c => map:put('x', $i) => map:put('y', $j) };\n"
         + "local:f(local:c(1, 2, 3), 4, <y/>)",
-        "{\"x\":4,\"y\":<y/>,\"z\":3}", count(ButWith.class, 1), empty(ShapeSet.class));
+        "{\"x\":4,\"y\":<y/>,\"z\":3}", empty(ButWith.class), empty(ShapeSet.class));
     // ... coercion errors are still raised
     error("declare record local:c(x as xs:integer, y, z); "
         + "local:c(1, 2, 3) but with { 'x': string(<_>y</_>) } but with { 'y': 0 }", INVTYPE_X);
@@ -690,24 +690,24 @@ public final class RecordTest extends SandboxTest {
         + "local:c(1) but with { 'x': 'y' } but with { 'x': 3 }", INVTYPE_X);
   }
 
-  /** An update that supplies every field overwrites the record and drops the merge operator. */
+  /** An update that supplies every field keeps the operator: the record may have more fields. */
   @Test public void butWithCovered() {
-    // a covering constant update makes the left operand dead: the operator folds away entirely
     final String ab = "declare record local:ab(a, b); ", a = "declare record local:a(a); ";
     check(ab + "local:ab(1, 2) but with { 'a': 7, 'b': 8 }",
-        "{\"a\":7,\"b\":8}", empty(ButWith.class));
+        "{\"a\":7,\"b\":8}", root(ButWith.class));
     // record(...) but with record(...): every field is overwritten by the right operand
     query("declare record local:rec(a, b); local:rec(1, 2) but with local:rec(4, 5)",
         "{\"a\":4,\"b\":5}");
-    // a non-constant covering update also drops the operator; only the update construction remains
     check(ab + "local:ab(1, 2) but with { 'a': <c/>, 'b': <d/> }",
-        "{\"a\":<c/>,\"b\":<d/>}", empty(ButWith.class), count(ShapeConstructor.class, 1));
-    // a covering constructor update builds the record type directly: no intermediate + coercion,
-    // so the plan carries no TypeCheck (field types differ: integer arguments, double fields)
-    check("declare record pt(x as xs:double, y as xs:double);\n"
+        "{\"a\":<c/>,\"b\":<d/>}", root(ButWith.class));
+    // field values are coerced: integer arguments, double fields
+    query("declare record pt(x as xs:double, y as xs:double);\n"
         + "declare function f($p as pt, $i) as pt { $p but with { 'x': $i, 'y': $i } };\n"
-        + "f(pt(0, 0), 3)",
-        "{\"x\":3,\"y\":3}", empty(ButWith.class), empty(TypeCheck.class));
+        + "f(pt(0, 0), 3)", "{\"x\":3,\"y\":3}");
+    query("declare record pt(x as xs:double, y as xs:double); "
+        + "declare record pt3 extends pt(z); "
+        + "declare function f($p as pt, $i) as pt { $p but with { 'x': $i, 'y': $i } }; "
+        + "f(pt3(0, 0, 0), 3)", "{\"x\":3,\"y\":3,\"z\":0}");
     // coercion still applies on the collapsed path: the integer is promoted to the field type
     query("declare record local:d(a as xs:double); (local:d(1) but with { 'a': 2 })?a", 2);
     // the collapsed result stays a record: an undeclared field in the update still errors
@@ -857,13 +857,13 @@ public final class RecordTest extends SandboxTest {
   }
 
   /**
-   * Records with static fields share the values of these fields.
+   * Records with fixed fields share the values of these fields.
    * @throws QueryException query exception
    */
-  @Test public void sharedStatics() throws QueryException {
+  @Test public void sharedFixed() throws QueryException {
     final String prolog = "declare record local:r(a as xs:integer, "
-        + "%static f := fn($r) { $r?a }, %static g := fn($r) { -$r?a }, "
-        + "%static h as fn(local:r) as xs:integer := fn($r) { $r?a }); ";
+        + "%fixed f := fn($r) { $r?a }, %fixed g := fn($r) { -$r?a }, "
+        + "%fixed h as fn(local:r) as xs:integer := fn($r) { $r?a }); ";
     final String[] queries = {
       "(local:r(1), local:r(2))",
       "let $r := local:r(1) return ($r, $r but with { 'a': 2 })",
@@ -1054,7 +1054,8 @@ public final class RecordTest extends SandboxTest {
     // the result of a function is coerced if the function is coerced
     final String result = "declare %basex:inline(0) function local:g() as item() { "
         + "fn() as local:AB { local:ab() } }; ";
-    query(prolog + result + "local:g() instance of fn() as local:BA", true);
+    // a labeled record type is no subtype of a simple one (extending types have additional fields)
+    query(prolog + result + "local:g() instance of fn() as local:BA", false);
     query(prolog + result + "let $g as fn() as local:BA := local:g() "
         + "return ($g()?a, map:keys($g()))", "1\na\nb");
     query(prolog + "for $i in 1 to 2 "
@@ -1208,10 +1209,10 @@ public final class RecordTest extends SandboxTest {
     error("fn:division-record#2", WHICHFUNC_X);
   }
 
-  /** Static fields, initializers in coercions, constructor annotation. */
-  @Test public void staticFields() {
+  /** Fixed fields, initializers in coercions, constructor annotation. */
+  @Test public void fixedFields() {
     final String prolog = "declare record local:r(a as xs:integer, b := 1 + 2, "
-        + "%static c as fn(local:r) as xs:integer := fn($r) { $r?a * 10 }); ";
+        + "%fixed c as fn(local:r) as xs:integer := fn($r) { $r?a * 10 }); ";
     query(prolog + "let $r := local:r(1, 2) return $r?c($r)", 10);
     query(prolog + "local:r#2 => function-arity()", 2);
     query(prolog + "({ 'a': 2 } coerce as local:r)?b", 3);
@@ -1237,7 +1238,11 @@ public final class RecordTest extends SandboxTest {
     query("<a>x</a> coerce as (xs:integer | xs:string)", "x");
 
     // syntax
-    error("declare record local:s(%static a); 1", WRONGCHAR_X_X);
+    error("declare record local:s(%fixed a); 1", WRONGCHAR_X_X);
+    error("declare record local:s(% fixed a := 1); 1", WRONGCHAR_X_X);
+    error("declare record local:s(%fixeda := 1); 1", WRONGCHAR_X_X);
+    error("declare record local:s(%static a := 1); 1", WRONGCHAR_X_X);
+    query("declare record local:s(%fixed(::)fixed := 1); local:s()?fixed", 1);
     error("declare record local:s(a := 1, b); 1", PARAMOPTIONAL_X);
     error("declare record local:s('a'); 1", NONCNAME_X);
     error("declare record local:s(1); 1", NONCNAME_X);
@@ -1282,7 +1287,7 @@ public final class RecordTest extends SandboxTest {
     query(s + "local:s((1, 2))?a", "1\n2");
     error(s + "local:s((1, 2, 3))", RECORDCONSTRAINT_X_X);
     final String m = "declare record local:m(a as xs:integer*, "
-        + "%static size := fn($m as local:m) { count($m?a) }) where . =?> size() le 2; ";
+        + "%fixed size := fn($m as local:m) { count($m?a) }) where . =?> size() le 2; ";
     query(m + "local:m((1, 2)) =?> size()", 2);
     error(m + "local:m((1, 2, 3))", RECORDCONSTRAINT_X_X);
 
@@ -1330,5 +1335,128 @@ public final class RecordTest extends SandboxTest {
         + "let $a := $load(), $b := $load() "
         + "let $is := $a?(QName('x', 'is'))?1, $make := fn($m) { $m?(QName('x', 'make'))?0() } "
         + "return ($is($make($b)), $is($make($a)))", "false\ntrue");
+  }
+
+  /** Derived record types. */
+  @Test public void extension() {
+    final String prolog = "declare record local:p(x as xs:integer, y as xs:integer := 0); "
+        + "declare record local:q extends local:p(z as xs:string := 'z'); "
+        + "declare function local:f($p as local:p) { $p }; ";
+
+    // constructor, subtyping
+    query(prolog + "local:q(1)", "{\"x\":1,\"y\":0,\"z\":\"z\"}");
+    query(prolog + "local:q(1, 2, 'a')", "{\"x\":1,\"y\":2,\"z\":\"a\"}");
+    query(prolog + "local:q(1) instance of local:q", true);
+    query(prolog + "local:q(1) instance of local:p", true);
+    query(prolog + "local:q(1) instance of record(*)", true);
+    query(prolog + "local:p(1) instance of local:q", false);
+    query(prolog + "local:q(1) instance of record(x, y)", false);
+    query(prolog + "local:q(1) instance of record(x, y, z)", true);
+    query(prolog + "local:p(1) instance of record(x, y)", true);
+    query(prolog + "local:f#1 instance of fn(local:q) as item()*", true);
+    query(prolog + "fn() as local:q { local:q(1) } instance of fn() as local:p", true);
+    query(prolog + "fn($q as local:q) { } instance of fn(local:p) as item()*", false);
+
+    // records keep their label
+    query(prolog + "local:f(local:q(1)) instance of local:q", true);
+    query(prolog + "let $p as local:p := local:q(1) return $p?z", "z");
+    query(prolog + "(local:q(1) but with { 'x': 2 }) instance of local:q", true);
+    query(prolog + "local:f(local:q(1)) but with { 'x': 5, 'y': 6 }",
+        "{\"x\":5,\"y\":6,\"z\":\"z\"}");
+    query(prolog + "(if(random-number-generator()?number < 2) then local:q(1) else local:p(1))"
+        + " instance of local:q", true);
+
+    // labeled types are lower bounds: subtype records may have more fields
+    query(prolog + "local:f(local:q(1))?z", "z");
+    error(prolog + "local:f(local:p(1))?z", RECORDFIELD_X_X);
+    query(prolog + "map:size(local:f(local:q(1)))", 3);
+    query(prolog + "map:get(local:f(local:q(1)), 'z')", "z");
+    query(prolog + "map:contains(local:f(local:q(1)), 'z')", true);
+    query(prolog + "map:contains(local:f(local:p(1)), 'z')", false);
+    query(prolog + "map:size(map:merge(local:f(local:q(1))))", 3);
+    query(prolog + "string-join(local:f(local:q(1))?*, ',')", "1,0,z");
+    query(prolog + "string-join(map:keys(map:remove(local:f(local:q(1)), 'x')), ',')", "y,z");
+    query(prolog + "map:size(map:remove(local:f(local:q(1)), 'w'))", 3);
+    query(prolog + "map:size(map:put(local:f(local:q(1)), 'x', 5))", 3);
+    query(prolog + "map:size(map:put(local:f(local:q(1)), 'w', 5))", 4);
+    query("declare record local:a(a); declare record local:b extends local:a(b); "
+        + "declare function local:f($a as local:a) { map:remove($a, 'a') }; "
+        + "local:f(local:b(1, 2))", "{\"b\":2}");
+    error(prolog + "map:put(local:f(local:q(1)), 'x', 5) coerce as local:p", INVTYPE_X);
+
+    // casts and coercions to labeled types rebuild records of other types
+    query(prolog + "local:q(1) cast as local:p", "{\"x\":1,\"y\":0}");
+    query(prolog + "(local:q(1) cast as local:p) instance of local:q", false);
+    query(prolog + "local:p(1) coerce as local:q", "{\"x\":1,\"y\":0,\"z\":\"z\"}");
+
+    // chains, forward references, fixed fields
+    final String chain = "declare record local:c extends local:b(c := 3); "
+        + "declare record local:b extends local:a(b := 2); "
+        + "declare record local:a(a := 1, %fixed f := fn($r as local:a) { $r?a * 10 }); ";
+    query(chain + "string-join(map:keys(local:c()), ',')", "a,f,b,c");
+    query(chain + "local:c() instance of local:a", true);
+    query(chain + "let $c := local:c(5) return $c?f($c)", 50);
+    query(chain + "local:c#3 => function-arity()", 3);
+
+    // constructor parameters: fields without initializer first
+    final String opt = "declare record local:a(x, y := 2); "
+        + "declare record local:b extends local:a(z, %fixed s := 0); ";
+    query(opt + "local:b(1, 3)", "{\"x\":1,\"y\":2,\"z\":3,\"s\":0}");
+    query(opt + "local:b(1, 3, 4)", "{\"x\":1,\"y\":4,\"z\":3,\"s\":0}");
+    query(opt + "local:b(x := 1, z := 3)?y", 2);
+    query(opt + "local:b#2 => function-arity()", 2);
+
+    // redeclared fixed fields
+    final String area = "declare record local:shape(%fixed area as fn(*) := fn { 0 }); "
+        + "declare record local:circle extends local:shape(r as xs:double, "
+        + "%fixed area := fn { 3 * ?r * ?r }); "
+        + "declare record local:square extends local:shape(s as xs:double); ";
+    query(area + "(local:circle(1), local:square(2)) =?> area()", "3\n0");
+    query(area + "string-join(map:keys(local:circle(1)), ',')", "area,r");
+    query(area + "local:circle(1) instance of local:shape", true);
+    query("declare record local:a(%fixed f as xs:integer := 1); "
+        + "declare record local:b extends local:a(%fixed f as xs:byte := 2); local:b()?f", 2);
+
+    // integrity constraints are inherited
+    final String where = "declare record local:a(x as xs:integer) where ?x ge 0; "
+        + "declare record local:b extends local:a(y as xs:integer) where ?y ge ?x; ";
+    query(where + "local:b(1, 2)?y", 2);
+    error(where + "local:b(-1, 2)", RECORDCONSTRAINT_X_X);
+    error(where + "local:b(2, 1)", RECORDCONSTRAINT_X_X);
+    error(where + "local:b(1, 2) but with { 'x': -1 }", RECORDCONSTRAINT_X_X);
+    // updates are not merged if a derived type has a constraint
+    error("declare record local:r(a, b); declare record local:s extends local:r() where ?a = ?b; "
+        + "declare %basex:inline(0) function local:f($r as local:r) { "
+        + "$r but with { 'a': 2 } but with { 'b': 2 } }; local:f(local:s(1, 1))",
+        RECORDCONSTRAINT_X_X);
+
+    // casts to a base type use its fixed fields
+    query("declare record local:a(%fixed m := 1); declare record local:b extends local:a("
+        + "%fixed m := 2); (local:b() cast as local:a)?m", 1);
+    // base types referenced by aliases
+    query("declare type local:b as local:a; declare record local:a(x); "
+        + "declare record local:c extends local:b(y); local:c(1, 2) instance of local:a", true);
+
+    // errors
+    error("declare record local:a(x); declare record local:b extends local:a(x); 1", DUPFIELD_X);
+    error("declare record local:a(%fixed x := 1); "
+        + "declare record local:b extends local:a(x); 1", DUPFIELD_X);
+    error("declare record local:a(x); "
+        + "declare record local:b extends local:a(%fixed x := 1); 1", DUPFIELD_X);
+    error("declare record local:a(%fixed x as xs:integer := 1); "
+        + "declare record local:b extends local:a(%fixed x as xs:string := ''); 1",
+        RECORDFIELD_X_X_X);
+    error("declare record local:a(%fixed x as xs:integer := 1); "
+        + "declare record local:b extends local:a(%fixed x as item()* := 2); 1",
+        RECORDFIELD_X_X_X);
+    error("declare record local:a(%fixed x as xs:integer := 1); "
+        + "declare record local:b extends local:a(%fixed x := ''); local:b()", INVTYPE_X);
+    error("declare type local:a as record(x); declare record local:b extends local:a(y); 1",
+        RECORDBASE_X);
+    error("declare record local:b extends xs:string(y); 1", RECORDBASE_X);
+    error("declare record local:b extends local:unknown(y); 1", RECORDBASE_X);
+    error("declare record local:a extends local:a(x); 1", RECORDBASE_X);
+    error("declare record local:a extends local:b(x); "
+        + "declare record local:b extends local:a(y); 1", RECORDBASE_X);
   }
 }

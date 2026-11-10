@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -37,7 +38,7 @@ public final class ButWith extends Arr {
     // RECORD but with { 'a': A } but with { 'b': B } → RECORD but with { 'a': A, 'b': B }
     // (the intermediate record must not be subject to an integrity constraint)
     if(exprs[0] instanceof final ButWith bw && bw.seqType().type instanceof final RecordType rt &&
-        !rt.any() && !rt.constrained() && disjoint(bw.exprs[1], exprs[1])) {
+        !rt.any() && !constrained(rt, cc.qc) && disjoint(bw.exprs[1], exprs[1])) {
       final Expr update = new CMap(info, new Expr[] { bw.exprs[1], Empty.UNDEFINED, exprs[1],
         Empty.UNDEFINED }).optimize(cc);
       exprs = new Expr[] { bw.exprs[0], update };
@@ -46,16 +47,10 @@ public final class ButWith extends Arr {
     // the result carries the label of the left operand; if no label is known statically, a record
     // may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
-    if(st.type instanceof final RecordType rt) {
-      if(st.one()) {
-        // RECORD but with { } → RECORD
-        if(exprs[1] instanceof final XQMap map && map.structSize() == 0) {
-          return cc.replaceWith(this, exprs[0]);
-        }
-        // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce as RECORD
-        if(covered(exprs[1], rt)) {
-          return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
-        }
+    if(st.type instanceof RecordType) {
+      // RECORD but with { } → RECORD
+      if(st.one() && exprs[1] instanceof final XQMap map && map.structSize() == 0) {
+        return cc.replaceWith(this, exprs[0]);
       }
       exprType.assign(st.with(Occ.EXACTLY_ONE));
     }
@@ -63,21 +58,18 @@ public final class ButWith extends Arr {
   }
 
   /**
-   * Checks whether the update supplies every non-static field of the record type.
-   * @param update update expression (right operand)
-   * @param rt record type of the left operand
+   * Checks if records of the specified or a derived type may have integrity constraints.
+   * @param rt record type
+   * @param qc query context
    * @return result of check
    */
-  private static boolean covered(final Expr update, final RecordType rt) {
-    // the fields of record(*) are unknown
-    if(rt.any() || !(update instanceof ShapeConstructor || update instanceof XQMap) ||
-        !(update.seqType().type instanceof final ShapeType ush)) return false;
-    final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
-    final int fs = fields.size();
-    for(int f = 1; f <= fs; f++) {
-      if(!fields.value(f).isStatic() && !ufields.contains(fields.key(f))) return false;
+  private static boolean constrained(final RecordType rt, final QueryContext qc) {
+    if(rt.constrained()) return true;
+    for(final TypeDecl td : qc.typeDecls) {
+      if(td.seqType.type instanceof final RecordType dt && dt.constrained() &&
+          RecordType.derives(dt, rt)) return true;
     }
-    return true;
+    return false;
   }
 
   /**
@@ -142,8 +134,8 @@ public final class ButWith extends Arr {
     }
     update.forEach((key, value) -> {
       final int i = rt.index(key);
-      // static fields cannot be updated
-      if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
+      // fixed fields cannot be updated
+      if(i == 0 || fields.value(i).isFixed()) throw typeError(update, rt, info);
       values[i - 1] = rt.coerce(i, value, qc, info, null);
     });
     return rt.build(values, true, qc, info);

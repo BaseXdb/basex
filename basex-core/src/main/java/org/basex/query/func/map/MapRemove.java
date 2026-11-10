@@ -40,8 +40,8 @@ public final class MapRemove extends MapFn {
     if(map == XQMap.empty()) return map;
 
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
-    if(mti.index != 0) {
-      // remove the only field of a record: map:remove(RECORD, FIELD) → {}
+    if(mti.index != 0 && mti.shape != null) {
+      // remove the only field of a shape: map:remove({ 'a': 1 }, 'a') → {}
       if(mti.shape.fields().size() == 1) return cc.voidAndReturn(map, XQMap.empty(), info);
       // narrow the shape: map:remove({ 'a': 1, 'b': 2 }, 'a') → map with field b
       exprType.assign(cc.qc.shared.shape(mti.shape.remove(mti.shape.fields().key(mti.index))));
@@ -50,9 +50,9 @@ public final class MapRemove extends MapFn {
     // return input map if nothing changes: map:remove({ 1: 2 }, 'a') → { 1: 2 }
     if(mti.validKey || mti.keyMismatch) {
       if(noRecords(map)) return map;
-      // drop the record annotation, keep the shape
+      // exact (simple) shapes are kept
       if(mti.shape != null) {
-        exprType.assign(cc.qc.shared.shape(mti.shape.shape()));
+        exprType.assign(cc.qc.shared.shape(mti.shape));
         return this;
       }
     }

@@ -36,7 +36,7 @@ abstract class MapFn extends StandardFunc {
 
   @Override
   public long structSize() {
-    // the fields of record(*) are unknown
-    return seqType().type instanceof final ShapeType sh && !sh.any() ? sh.fields().size() : -1;
+    // records of extending types may have additional fields
+    return seqType().type instanceof final ShapeType sh && !sh.labeled() ? sh.fields().size() : -1;
   }
 }

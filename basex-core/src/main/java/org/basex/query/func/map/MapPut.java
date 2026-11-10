@@ -32,16 +32,16 @@ public final class MapPut extends MapFn {
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
-    if(mti.index != 0) {
-      // use optimized setter for records
-      return new ShapeSet(info, map, mti.index, value).optimize(cc);
-    }
-    if(mti.shape != null && key instanceof final Str str && key.seqType().eq(Types.STRING_O)) {
-      // extend the shape: map:put({ 'a': 1 }, 'b', 2) → map with fields a, b
-      final ShapeType sh = mti.shape.put(str.string(), value.seqType());
-      if(sh != null) {
-        exprType.assign(cc.qc.shared.shape(sh));
-        return this;
+    if(mti.shape != null) {
+      // use optimized setter for shapes
+      if(mti.index != 0) return new ShapeSet(info, map, mti.index, value).optimize(cc);
+      if(key instanceof final Str str && key.seqType().eq(Types.STRING_O)) {
+        // extend the shape: map:put({ 'a': 1 }, 'b', 2) → map with fields a, b
+        final ShapeType sh = mti.shape.put(str.string(), value.seqType());
+        if(sh != null) {
+          exprType.assign(cc.qc.shared.shape(sh));
+          return this;
+        }
       }
     }
 

@@ -117,15 +117,15 @@ public final class MapModuleTest extends SandboxTest {
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(func));
 
     record = "declare record local:x(x as xs:integer?);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(func));
 
     record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(func));
   }
 
   /** Test method. */
@@ -260,17 +260,17 @@ public final class MapModuleTest extends SandboxTest {
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
         type(ShapeGet.class, "xs:integer"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
 
     record = "declare record local:x(x as xs:integer?);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
         type(ShapeGet.class, "xs:integer?"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
 
     record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
         type(ShapeGet.class, "xs:integer"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
 
     // preserve side effects of a nondeterministic map
     final String ndt = " (" + MESSAGE.args("m") + ", { 'a': 1 })";
@@ -384,8 +384,8 @@ public final class MapModuleTest extends SandboxTest {
     query("let $r as record(x) := { 'x': " + wrap(1) + " } return " + func.args(" $r") +
         "?y", "");
     // the fields of a record are preserved
-    check(record + func.args(" local:x(" + wrap(1) + ")") + "?x", 1, root(ShapeGet.class));
-    check(record + func.args(" local:x(" + wrap(1) + ")") + " => map:size()", 1, root(Itr.class));
+    query(record + func.args(" local:x(" + wrap(1) + ")") + "?x", 1);
+    query(record + func.args(" local:x(" + wrap(1) + ")") + " => map:size()", 1);
 
     // GH-1954
     query(func.args(" if (<a/>/text()) then {} else ()") + " ! map:keys(.)", "");
@@ -520,29 +520,21 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(_MAP_ENTRY.args(1, wrap(0)), "a", 0), "{1:\"0\",\"a\":0}",
         type(func, "map(xs:anyAtomicType, xs:anyAtomicType)"));
 
-    String record = "declare record local:x(x as xs:integer);";
+    // labeled record types are lower bounds: records of extending types have additional fields
+    final String record = "declare record local:x(x as xs:integer);";
+    final String any = "map(xs:string, item()*)";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
+        type(func, any));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
+        type(func, any));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "record(x as xs:integer, y as xs:integer)"));
+        type(func, any));
 
-    record = "declare record local:x(x as xs:integer?);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(ShapeSet.class, "record(x as xs:integer?)"), shape(ShapeSet.class, "x"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "record(x as xs:integer?, y as xs:integer)"));
-
-    record = "declare record local:x(x as xs:integer);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
+    // shapes of maps are updated
+    check(func.args(" { 'x': " + wrap(0) + " }", "x", 1), "{\"x\":1}",
         type(ShapeSet.class, "record(x as xs:integer)"), shape(ShapeSet.class, "x"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "record(x as xs:string)"), shape(ShapeSet.class, "x"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "record(x as xs:integer, y as xs:integer)"));
+    check(func.args(" { 'x': " + wrap(0) + " }", "y", 2), "{\"x\":\"0\",\"y\":2}",
+        type(func, "record(x as xs:untypedAtomic, y as xs:integer)"));
   }
 
   /** Test method. */
@@ -560,23 +552,14 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(_MAP_ENTRY.args(1, wrap(0)), "a"), "{1:\"0\"}",
         empty(func));
 
-    String record = "declare record local:x(x as xs:integer);";
+    // labeled record types are lower bounds: records of extending types have additional fields
+    final String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        root(XQTrieMap.class));
+        root(func));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
         root(func));
-
-    record = "declare record local:x(x as xs:integer?);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        empty(func));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        root(func));
-
-    record = "declare record local:x(x as xs:integer);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        empty(func));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        root(func));
+    // the only field of a shape is removed
+    check(func.args(" { 'x': " + wrap(0) + " }", "x"), "{}", root(XQTrieMap.class));
 
     // the result is no record, even if nothing is removed
     query(record + func.args(" local:x(1)", "y") + " instance of local:x", false);

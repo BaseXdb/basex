@@ -119,8 +119,8 @@ public final class ShapeConstructor extends StandardFunc {
       final ShapeField rf = fields.value(f);
       final int i = shfields.index(fields.key(f));
       if(i != 0) {
-        // static fields must not be supplied
-        if(rf.isStatic()) return null;
+        // fixed fields must not be supplied
+        if(rf.isFixed()) return null;
         args[f - 1] = exprs[i - 1];
         found++;
       } else if(rf.init() != null) {

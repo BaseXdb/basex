@@ -66,6 +66,7 @@ public interface QueryText {
   /** Parser token. */ String EVERY = "every";
   /** Parser token. */ String EXACTLY = "exactly";
   /** Parser token. */ String EXCEPT = "except";
+  /** Parser token. */ String EXTENDS = "extends";
   /** Parser token. */ String EXTERNAL = "external";
   /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FINALLY = "finally";

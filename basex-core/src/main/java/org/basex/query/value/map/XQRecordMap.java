@@ -5,13 +5,13 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
 /**
- * Record whose static field values are shared by all records of the same type.
+ * Record whose fixed field values are shared by all records of the same type.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQRecordMap extends XQShapeMap {
-  /** Values of the non-static fields. */
+  /** Values of the non-fixed fields. */
   private final Value[] values;
   /** Layout. */
   private final Layout layout;
@@ -19,7 +19,7 @@ public final class XQRecordMap extends XQShapeMap {
   /**
    * Constructor.
    * @param type shape
-   * @param values values of the non-static fields
+   * @param values values of the non-fixed fields
    * @param layout layout
    */
   private XQRecordMap(final ShapeType type, final Value[] values, final Layout layout) {
@@ -29,7 +29,7 @@ public final class XQRecordMap extends XQShapeMap {
   }
 
   /**
-   * Creates a record that shares its static field values with other records of the same type.
+   * Creates a record that shares its fixed field values with other records of the same type.
    * @param rt record type
    * @param values values, one per field
    * @param qc query context
@@ -44,7 +44,7 @@ public final class XQRecordMap extends XQShapeMap {
     for(int v = 0; v < vl; v++) {
       final int s = slots[v];
       if(s >= 0) vals[s] = values[v];
-      else if(values[v] != layout.statics[v]) return XQMap.get(rt, values);
+      else if(values[v] != layout.fixed[v]) return XQMap.get(rt, values);
     }
     return new XQRecordMap(rt, vals, layout);
   }
@@ -52,7 +52,7 @@ public final class XQRecordMap extends XQShapeMap {
   @Override
   public Value valueAt(final long index) {
     final int s = layout.slots[(int) index];
-    return s >= 0 ? values[s] : layout.statics[(int) index];
+    return s >= 0 ? values[s] : layout.fixed[(int) index];
   }
 
   @Override
@@ -64,13 +64,13 @@ public final class XQRecordMap extends XQShapeMap {
     return new XQRecordMap(tp, vals, layout);
   }
 
-  /** Storage slots of the fields and shared values of the static fields. */
+  /** Storage slots of the fields and shared values of the fixed fields. */
   private static final class Layout {
-    /** Storage slots: an instance slot, or {@code -1} for static fields. */
+    /** Storage slots: an instance slot, or {@code -1} for fixed fields. */
     private final int[] slots;
-    /** Values of the static fields, indexed by field ({@code null} for non-static fields). */
-    private final Value[] statics;
-    /** Number of non-static fields. */
+    /** Values of the fixed fields, indexed by field ({@code null} for non-fixed fields). */
+    private final Value[] fixed;
+    /** Number of non-fixed fields. */
     private final int size;
 
     /**
@@ -80,12 +80,12 @@ public final class XQRecordMap extends XQShapeMap {
      */
     private Layout(final int[] slots, final Value[] values) {
       this.slots = slots;
-      statics = values.clone();
+      fixed = values.clone();
       final int sl = slots.length;
       int s = 0;
       for(int v = 0; v < sl; v++) {
         if(slots[v] >= 0) {
-          statics[v] = null;
+          fixed[v] = null;
           s++;
         }
       }

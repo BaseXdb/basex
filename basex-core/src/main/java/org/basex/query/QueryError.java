@@ -1452,6 +1452,10 @@ public enum QueryError {
   DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
   /** Error code. */
   PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: %."),
+  /** Error code. */
+  RECORDBASE_X(XQST, 155, "Invalid base record type: %."),
+  /** Error code. */
+  RECORDFIELD_X_X_X(XQST, 155, "Type of fixed field % must be a subtype of %, found: %."),
 
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),

@@ -107,10 +107,10 @@ public class MapMerge extends MapFn {
       final SeqType st = arg(0).seqType();
       if(st.one()) {
         if(noRecords(arg(0))) return arg(0);
-        // drop the record annotation, keep the shape
+        // exact (simple) shapes are kept
         final ShapeType sh = MapTypeInfo.get(arg(0)).shape;
         if(sh != null) {
-          exprType.assign(cc.qc.shared.shape(sh.shape()));
+          exprType.assign(cc.qc.shared.shape(sh));
           return this;
         }
       }

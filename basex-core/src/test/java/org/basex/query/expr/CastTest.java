@@ -289,7 +289,7 @@ public final class CastTest extends SandboxTest {
     // a missing field yields the value of its initializer
     query("declare record local:r(a as xs:integer := 5); local:r()?a", 5);
     query("declare record local:r(a as xs:integer := 5); ({} cast as local:r)?a", 5);
-    error("declare record local:r(%static a := 5); { 'a': 1 } cast as local:r", INVTYPE_X);
+    error("declare record local:r(%fixed a := 5); { 'a': 1 } cast as local:r", INVTYPE_X);
     query("declare record local:r(a as xs:integer := 5); ({ 'a': '1' } cast as local:r)?a", 1);
   }
 

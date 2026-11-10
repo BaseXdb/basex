@@ -40,27 +40,10 @@ public final class ShapeSet extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType vt = exprs[1].seqType(), ft = type.fields().value(index).seqType();
-    // the field set is preserved (without the type annotation)
-    exprType.assign(cc.qc.shared.shape(vt.instanceOf(ft) ? type.shape() :
+    // the field set is preserved
+    exprType.assign(cc.qc.shared.shape(vt.instanceOf(ft) ? type :
       type.put(type.fields().key(index), vt)));
     return values(false, cc) ? cc.preEval(this) : this;
-  }
-
-  @Override
-  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // map:put(RECORD, KEY, VALUE) coerce as T → (RECORD coerce as T) but with map:entry(KEY, VALUE)
-    final byte[] key = type.fields().key(index);
-    // (the intermediate record must not be subject to an integrity constraint)
-    if(tc.seqType().type instanceof final RecordType rt && !rt.constrained() &&
-        rt.fields().contains(key) &&
-        // the operand keeps its own type, which must not constrain the field any further
-        type.fields().value(index).seqType().eq(rt.fields().get(key).seqType()) &&
-        (exprs[0] instanceof ShapeSet || type.instanceOf(rt))) {
-      final Expr rec = tc.check(exprs[0], cc);
-      final Expr entry = cc.function(_MAP_ENTRY, info, Str.get(key), exprs[1]);
-      return new ButWith(info, rec != null ? rec : exprs[0], entry).optimize(cc);
-    }
-    return null;
   }
 
   @Override

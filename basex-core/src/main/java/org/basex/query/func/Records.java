@@ -230,7 +230,7 @@ public enum Records {
       map.put(field.name, field.field);
     }
     final QNm qnm = new QNm(name + "-record", namespace);
-    type = new RecordType(map, qnm, AnnList.EMPTY, null, null);
+    type = new RecordType(map, qnm, AnnList.EMPTY, null, null, null);
   }
 
   /**
