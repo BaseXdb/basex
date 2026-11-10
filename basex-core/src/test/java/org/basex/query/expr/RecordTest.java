@@ -1467,4 +1467,71 @@ public final class RecordTest extends SandboxTest {
         + "declare record local:b extends local:a(y); 1", RECORDBASE_X);
   }
 
+  /**
+   * Derived record types with base types of cyclically imported modules.
+   * @throws IOException I/O exception
+   */
+  @Test public void extensionCyclicImports() throws IOException {
+    final IOFile m1 = new IOFile(sandbox(), "ext-m1.xqm"), m2 = new IOFile(sandbox(), "ext-m2.xqm");
+    m1.write("module namespace m1 = 'm1'; import module namespace m2 = 'm2' at 'ext-m2.xqm'; "
+        + "declare record m1:a(a); declare record m1:d extends m2:c(d); "
+        + "declare function m1:d() { m1:d(1, 2, 3, 4) }; "
+        + "declare function m1:c() { { 'a': 1, 'b': 2, 'c': 3 } cast as m2:c };");
+    m2.write("module namespace m2 = 'm2'; import module namespace m1 = 'm1' at 'ext-m1.xqm'; "
+        + "declare %private record m2:p extends m1:a(p); "
+        + "declare record m2:b extends m1:a(b); declare record m2:c extends m2:b(c); "
+        + "declare function m2:p() as m2:p { m2:p(1, 2) }; "
+        + "declare function m2:q() { { 'a': 1, 'p': 2 } cast as m2:p }; "
+        + "declare function m2:b($b as m2:b) as m2:b { $b };");
+    final String imp = "import module namespace m1 = 'm1' at '" + m1.path() + "'; "
+        + "import module namespace m2 = 'm2' at '" + m2.path() + "'; ";
+    query(imp + "m1:d() instance of m2:c", true);
+    query(imp + "m1:d() instance of m1:a", true);
+    query(imp + "m2:p() instance of m1:a", true);
+    query(imp + "m2:b(m1:d())", "{\"a\":1,\"b\":2,\"c\":3,\"d\":4}");
+    query(imp + "m2:b(1, 2) instance of m2:c", false);
+    // casts to derived types that are declared after parsing
+    query(imp + "({ 'a': 1, 'b': 2 } cast as m2:b) instance of m2:b", true);
+    query(imp + "m1:c() instance of m2:c", true);
+    query(imp + "m2:q() instance of m1:a", true);
+    error("import module namespace m1 = 'm1' at '" + m1.path() + "'; "
+        + "{ 'a': 1, 'b': 2 } cast as Q{m2}b", TYPEUNKNOWN_X);
+
+    // cycles across modules
+    m1.write("module namespace m1 = 'm1'; import module namespace m2 = 'm2' at 'ext-m2.xqm'; "
+        + "declare record m1:a extends m2:b(a);");
+    m2.write("module namespace m2 = 'm2'; import module namespace m1 = 'm1' at 'ext-m1.xqm'; "
+        + "declare record m2:b extends m1:a(b);");
+    error(imp + "1", RECORDBASE_X);
+  }
+
+  /**
+   * Named item types of modules that are not imported by the referencing module.
+   * @throws IOException I/O exception
+   */
+  @Test public void typesWithoutImport() throws IOException {
+    final IOFile a = new IOFile(sandbox(), "vis-a.xqm"), b = new IOFile(sandbox(), "vis-b.xqm");
+    final String moduleA =
+        "module namespace a = 'a'; declare type a:t as xs:integer; declare record a:r(x);";
+    a.write(moduleA);
+    final String imp = "import module namespace a = 'a' at '" + a.path() + "'; "
+        + "import module namespace b = 'b' at '" + b.path() + "'; ";
+
+    b.write("module namespace b = 'b'; declare function b:f($x as Q{a}t) { $x };");
+    error(imp + "b:f(1)", TYPEUNKNOWN_X);
+    b.write("module namespace b = 'b'; declare function b:g($x) { $x instance of Q{a}r };");
+    error(imp + "b:g(a:r(1))", TYPEUNKNOWN_X);
+    b.write("module namespace b = 'b'; declare record b:s extends Q{a}r(y);");
+    error(imp + "1", RECORDBASE_X);
+    // no cycle through a type of a module that is not imported
+    a.write("module namespace a = 'a'; import module namespace b = 'b' at 'vis-b.xqm'; "
+        + "declare type a:t as b:u;");
+    b.write("module namespace b = 'b'; declare type b:u as Q{a}t;");
+    error("import module namespace a = 'a' at '" + a.path() + "'; 1", TYPEUNKNOWN_X);
+
+    a.write(moduleA);
+    b.write("module namespace b = 'b'; import module namespace a = 'a' at 'vis-a.xqm'; "
+        + "declare function b:f($x as a:t) { $x }; declare record b:s extends a:r(y);");
+    query(imp + "b:f(1), b:s(1, 2) instance of a:r", "1\ntrue");
+  }
 }

@@ -270,6 +270,28 @@ public final class StaticContext {
     return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
   }
 
+  /**
+   * Returns a declared or imported named item type, or a public type of an imported module.
+   * @param name type name
+   * @param publics public types of all parsed modules
+   * @return type declaration (can be {@code null})
+   */
+  public TypeDecl typeDecl(final QNm name, final QNmMap<TypeDecl> publics) {
+    final TypeDecl td = types.get(name);
+    return td != null || !imports.contains(name.uri()) ? td : publics.get(name);
+  }
+
+  /**
+   * Returns a declared, imported or built-in type, or a public type of an imported module.
+   * @param name type name
+   * @param publics public types of all parsed modules
+   * @return type (can be {@code null})
+   */
+  public Type type(final QNm name, final QNmMap<TypeDecl> publics) {
+    final TypeDecl td = typeDecl(name, publics);
+    return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
+  }
+
   @Override
   public String toString() {
     return Util.className(this) + '[' + baseIO() + ']';

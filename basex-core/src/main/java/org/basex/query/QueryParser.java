@@ -93,7 +93,7 @@ public class QueryParser extends InputParser {
   /** References to named types (resolved after all type declarations have been parsed). */
   private final QNmMap<TypeRef> typeRefs = new QNmMap<>();
   /** Declarations of derived record types (declared after the module has been parsed). */
-  private final QNmMap<RecordDecl> extensions = new QNmMap<>();
+  private final QNmMap<DerivedRecord> extensions = new QNmMap<>();
   /** Map key types referencing a named type; their atomicity is checked after resolution. */
   private final ArrayList<TypeRef> deferredMapKeys = new ArrayList<>();
   /** Cast target types referencing a named type; resolved and validated after parsing. */
@@ -305,7 +305,7 @@ public class QueryParser extends InputParser {
 
     // completes the parsing step
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
-    declareExtensions();
+    declareExtensions(extensions, true);
     // reject item type declarations of this module that depend on themselves
     checkTypes(sc.types.values());
     resolveTypeRefs();
@@ -320,11 +320,9 @@ public class QueryParser extends InputParser {
     final Cycles<TypeDecl> cycles = new Cycles<>() {
       @Override
       protected Iterable<TypeDecl> next(final TypeDecl td) {
-        // resolve references against the declaring module, then against all public types
         final ArrayList<TypeDecl> list = new ArrayList<>();
         for(final QNm ref : td.refs) {
-          TypeDecl target = td.module.get(ref);
-          if(target == null) target = qc.namedTypes.get(ref);
+          final TypeDecl target = td.sc.typeDecl(ref, qc.namedTypes);
           if(target != null) list.add(target);
         }
         return list;
@@ -370,34 +368,28 @@ public class QueryParser extends InputParser {
     // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
       final QNm name = ref.name();
-      final Type type = sc.type(name);
-      if(type == null) {
+      if(ref.resolved()) {
+        checkCastTarget(ref, false);
+      } else if(!deferredRecord(name)) {
         // known schema type that is not simple (xs:anyType, xs:untyped)
         if(BasicType.get(name, true) != null) throw error(WHICHCAST_X, name.prefixId(XML));
         throw error(TYPEUNKNOWN_X, BasicType.similar(name));
       }
-      ref.resolve(type);
-      checkCastTarget(ref, false);
     }
     deferredCastTargets.clear();
   }
 
   /**
    * Resolves references that could not be resolved within their module, against the public types
-   * of all parsed modules.
+   * of the imported modules.
    * @throws QueryException query exception
    */
   private void resolveDeferredTypeRefs() throws QueryException {
     for(final TypeRef ref : qc.deferredTypeRefs) {
       if(ref.resolved()) continue;
-      final TypeDecl td = qc.namedTypes.get(ref.name());
-      if(td != null) {
-        ref.resolve(td.seqType.type);
-      } else {
-        final RecordType rt = Records.BUILT_IN.get(ref.name());
-        if(rt == null) throw TYPEUNKNOWN_X.get(ref.info(), BasicType.similar(ref.name()));
-        ref.resolve(rt);
-      }
+      final Type type = ref.info().sc().type(ref.name(), qc.namedTypes);
+      if(type == null) throw TYPEUNKNOWN_X.get(ref.info(), BasicType.similar(ref.name()));
+      ref.resolve(type);
     }
     qc.deferredTypeRefs.clear();
   }
@@ -408,6 +400,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final MainModule main) throws QueryException {
+    // declare derived record types whose base types were declared later (cyclic imports)
+    if(!qc.extensions.isEmpty()) {
+      final QNmMap<DerivedRecord> exts = new QNmMap<>();
+      for(final DerivedRecord dr : qc.extensions) exts.put(dr.decl.name, dr);
+      declareExtensions(exts, false);
+      qc.extensions.clear();
+    }
     // reject item type declarations across modules that depend on themselves
     checkTypes(qc.namedTypes.values());
     // resolve deferred (cross-module) type references
@@ -1236,44 +1235,55 @@ public class QueryParser extends InputParser {
     }
     final RecordDecl rd = new RecordDecl(qn, base, fields, untyped, anns, constraint,
         docBuilder.toString(), ii);
-    if(base != null) extensions.put(qn, rd);
+    if(base != null) extensions.put(qn, new DerivedRecord(this, rd));
     else declareRecord(rd, fields, null);
   }
 
   /**
-   * Declares the derived record types, after their base record types.
+   * Declares derived record types, after their base record types.
+   * @param exts derived record types
+   * @param defer defer declarations whose base types are unknown
    * @throws QueryException query exception
    */
-  private void declareExtensions() throws QueryException {
-    if(extensions.isEmpty()) return;
-    final Cycles<RecordDecl> cycles = new Cycles<>() {
+  private static void declareExtensions(final QNmMap<DerivedRecord> exts, final boolean defer)
+      throws QueryException {
+    if(exts.isEmpty()) return;
+    final Cycles<DerivedRecord> cycles = new Cycles<>() {
       @Override
-      protected Iterable<RecordDecl> next(final RecordDecl rd) {
-        final RecordDecl ed = extensions.get(rd.base);
-        return ed != null ? Collections.singletonList(ed) : Collections.emptyList();
+      protected Iterable<DerivedRecord> next(final DerivedRecord ext) {
+        final DerivedRecord base = exts.get(ext.decl.base);
+        return base != null ? Collections.singletonList(base) : Collections.emptyList();
       }
       @Override
-      protected void finish(final RecordDecl rd) throws QueryException {
-        declareExtension(rd);
+      protected void finish(final DerivedRecord ext) throws QueryException {
+        ext.parser.declareExtension(ext, defer);
       }
       @Override
-      protected QueryException error(final RecordDecl rd) {
-        return RECORDBASE_X.get(rd.info, rd.base.prefixString());
+      protected QueryException error(final DerivedRecord ext) {
+        return RECORDBASE_X.get(ext.decl.info, ext.decl.base.prefixString());
       }
     };
-    for(final RecordDecl rd : extensions.values()) cycles.visit(rd);
+    for(final DerivedRecord ext : exts.values()) cycles.visit(ext);
   }
 
   /**
    * Declares a derived record type.
-   * @param rd record declaration
+   * @param dr derived record type
+   * @param defer defer the declaration if the base type is unknown
    * @throws QueryException query exception
    */
-  private void declareExtension(final RecordDecl rd) throws QueryException {
+  private void declareExtension(final DerivedRecord dr, final boolean defer)
+      throws QueryException {
+    final RecordDecl rd = dr.decl;
     // references in item type declarations are resolved later
-    Type tp = sc.type(rd.base);
+    Type tp = baseType(rd.base, defer);
     for(final QNmSet names = new QNmSet(); tp instanceof final TypeRef ref && !ref.resolved() &&
-        names.add(ref.name());) tp = sc.type(ref.name());
+        names.add(ref.name());) tp = baseType(ref.name(), defer);
+    // the base type may be declared by a module that is still being parsed (cyclic imports)
+    if(defer && (tp == null || tp instanceof final TypeRef ref && !ref.resolved())) {
+      qc.extensions.add(dr);
+      return;
+    }
     tp = TypeRef.deref(tp);
     if(!(tp instanceof final RecordType ext) || ext.any()) {
       throw RECORDBASE_X.get(rd.info, rd.base.prefixString());
@@ -1292,7 +1302,39 @@ public class QueryParser extends InputParser {
       }
       fields.put(key, field);
     }
-    declareRecord(rd, fields, ext);
+    final RecordType rt = declareRecord(rd, fields, ext);
+    // references of a deferred declaration were not resolved within the module
+    final TypeRef ref = typeRefs.get(rd.name);
+    if(ref != null) ref.resolve(rt);
+  }
+
+  /**
+   * Checks if a deferred derived record type is visible in this module.
+   * @param name type name
+   * @return result of check
+   */
+  private boolean deferredRecord(final QNm name) {
+    return Checks.any(qc.extensions, dr -> dr.decl.name.eq(name) && (dr.parser == this ||
+        !dr.decl.anns.contains(Annotation.PRIVATE) && sc.imports.contains(name.uri())));
+  }
+
+  /**
+   * Returns the shared reference to a named type.
+   * @param name type name
+   * @return type reference
+   */
+  private TypeRef typeRef(final QNm name) {
+    return typeRefs.computeIfAbsent(name, () -> new TypeRef(name, info()));
+  }
+
+  /**
+   * Returns a type declared in or imported into this module, or a public type of an imported one.
+   * @param name type name
+   * @param local only consider types declared in or imported into this module
+   * @return type, or {@code null} if it is unknown
+   */
+  private Type baseType(final QNm name, final boolean local) {
+    return local ? sc.type(name) : sc.type(name, qc.namedTypes);
   }
 
   /**
@@ -1300,9 +1342,10 @@ public class QueryParser extends InputParser {
    * @param rd record declaration
    * @param fields all fields, including inherited ones
    * @param base base record type (can be {@code null})
+   * @return record type
    * @throws QueryException query exception
    */
-  private void declareRecord(final RecordDecl rd, final TokenObjectMap<ShapeField> fields,
+  private RecordType declareRecord(final RecordDecl rd, final TokenObjectMap<ShapeField> fields,
       final RecordType base) throws QueryException {
     // records of different declarations are different types
     final RecordType rt = new RecordType(fields, rd.name, rd.anns, recordIdentity, rd.constraint,
@@ -1310,6 +1353,7 @@ public class QueryParser extends InputParser {
     // record types may be recursive: references are not followed
     declareType(rd.name, rt.seqType(), new QNmSet(), rd.anns, rd.info);
     declareShapeConstructor(rt, rd.doc, rd.info);
+    return rt;
   }
 
   /**
@@ -1327,6 +1371,13 @@ public class QueryParser extends InputParser {
       TokenSet untyped, AnnList anns, Expr constraint, String doc, InputInfo info) { }
 
   /**
+   * Declaration of a derived record type.
+   * @param parser parser of the declaring module
+   * @param decl record declaration
+   */
+  record DerivedRecord(QueryParser parser, RecordDecl decl) { }
+
+  /**
    * Declares a named item type.
    * @param qn type name
    * @param st declared type
@@ -1337,7 +1388,7 @@ public class QueryParser extends InputParser {
    */
   private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns,
       final InputInfo ii) throws QueryException {
-    final TypeDecl td = new TypeDecl(qn, st, refs, sc.types, anns);
+    final TypeDecl td = new TypeDecl(qn, st, refs, sc, anns);
     qc.typeDecls.add(td);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !qn.eqUri(sc.module))
@@ -4158,7 +4209,7 @@ public class QueryParser extends InputParser {
             if(st != null) {
               type = st.type;
             } else {
-              final TypeRef ref = new TypeRef(name, info());
+              final TypeRef ref = typeRef(name);
               deferredCastTargets.add(ref);
               type = ref;
             }
@@ -4274,12 +4325,7 @@ public class QueryParser extends InputParser {
         if(currentTypeDeps != null) currentTypeDeps.add(name);
         st = declaredType(name);
         if(st == null) {
-          TypeRef ref = typeRefs.get(name);
-          if(ref == null) {
-            ref = new TypeRef(name, info());
-            typeRefs.put(name, ref);
-          }
-          type = ref;
+          type = typeRef(name);
         }
       }
     }

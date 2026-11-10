@@ -21,8 +21,8 @@ public final class TypeDecl {
   public final SeqType seqType;
   /** Names of the referenced types. */
   public final QNmSet refs;
-  /** Declared and imported types of the declaring module. */
-  public final QNmMap<TypeDecl> module;
+  /** Static context of the declaring module. */
+  public final StaticContext sc;
   /** Annotations. */
   private final AnnList anns;
 
@@ -31,15 +31,15 @@ public final class TypeDecl {
    * @param name type name
    * @param seqType declared type
    * @param refs names of the referenced types
-   * @param module declared and imported types of the declaring module
+   * @param sc static context of the declaring module
    * @param anns annotations
    */
   public TypeDecl(final QNm name, final SeqType seqType, final QNmSet refs,
-      final QNmMap<TypeDecl> module, final AnnList anns) {
+      final StaticContext sc, final AnnList anns) {
     this.name = name;
     this.seqType = seqType;
     this.refs = refs;
-    this.module = module;
+    this.sc = sc;
     this.anns = anns;
   }
 
