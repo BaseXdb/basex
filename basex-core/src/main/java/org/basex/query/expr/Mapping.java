@@ -198,14 +198,17 @@ public abstract class Mapping extends Arr {
     final int el = exprs.length;
     final ExprList list = new ExprList(el).add(exprs[0]);
 
-    boolean pushed = false;
+    boolean pushed = false, single = true;
     try {
       final boolean items = items();
       for(int e = 1; e < el; e++) {
-        final Expr merged = merge(list.peek(), exprs[e], cc);
+        // positional operands refer to the results of all preceding operands
+        final Expr merged = !single && exprs[e].has(Flag.POS) ? null :
+          merge(list.peek(), exprs[e], cc);
         if(merged != null) {
           list.set(list.size() - 1, merged);
         } else {
+          single &= list.peek().seqType().zeroOrOne();
           list.add(exprs[e]);
         }
         if(list.size() > 1) {

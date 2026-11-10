@@ -3088,4 +3088,16 @@ public final class RewritingsTest extends SandboxTest {
     query(input + "typeswitch(('a', 1)[random:integer(1) + 1]) case xs:string"
         + String.format(branches, "xs:integer"), true);
   }
+
+  /** Simple map: positional operands are only merged with the complete input. */
+  @Test public void mapPositional() {
+    final String input = "let $s := (1 to 2)[. != random:integer(1) + 4] "
+        + "let $c := random:integer(1) = 0 return ";
+    query(input + "$s ! $c ! (if(position() > 1) then . else ())", true);
+    query(input + "$s ! (if(. > 0) then . else error()) ! last()", "2\n2");
+    query(input + "$s ! (if(. > 0) then . else error()) ! position()", "1\n2");
+    // first operand, or preceding operands with single items
+    check(input + "$s ! (if(position() > 1) then . else ())", 2, empty(If.class));
+    check(input + "head($s) ! $s ! (if(position() > 1) then . else ())", 2, empty(If.class));
+  }
 }
