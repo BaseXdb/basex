@@ -1244,6 +1244,12 @@ public final class RecordTest extends SandboxTest {
     error("declare record local:s(%static a := 1); 1", WRONGCHAR_X_X);
     query("declare record local:s(%fixed(::)fixed := 1); local:s()?fixed", 1);
     error("declare record local:s(a := 1, b); 1", PARAMOPTIONAL_X);
+    error("declare record local:s(%fixed a := 1, b := 2, c); 1", PARAMOPTIONAL_X);
+    // fixed fields are not parameters: required fields may follow
+    query("declare record local:s(%fixed a := 1, b); local:s(2)", "{\"a\":1,\"b\":2}");
+    query("declare record local:s(%fixed a := 1); "
+        + "declare record local:t extends local:s(%fixed a := 2, b); local:t(3)",
+        "{\"a\":2,\"b\":3}");
     error("declare record local:s('a'); 1", NONCNAME_X);
     error("declare record local:s(1); 1", NONCNAME_X);
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);

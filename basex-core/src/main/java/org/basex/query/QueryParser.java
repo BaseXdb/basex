@@ -1213,7 +1213,8 @@ public class QueryParser extends InputParser {
           final VarScope vs = localVars.popContext();
           final QNm vn = new QNm(concat(qn.string(), cpToken('?'), name), qn.uri());
           init = qc.vars.declareField(new Var(vn, seqType, qc, fi), expr, vs);
-          defaults = true;
+          // fixed fields are not parameters of the constructor function
+          if(!fixed) defaults = true;
         } else if(fixed) {
           wsCheck(":=");
         } else if(defaults) {
