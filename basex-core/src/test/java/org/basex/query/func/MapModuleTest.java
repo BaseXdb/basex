@@ -297,6 +297,10 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(" { 1: 2 }"), 2);
     query(func.args(" { 1: (2, 3) }"), "2\n3");
     query(func.args(" { 1: 2, 3: 4 }"), "2\n4");
+
+    // several shapes: the number of fields must not be taken as the size of each step input
+    query("let $s := { 'a': 1, 'b': <b/> } return count("
+        + func.args(" { 'x': $s, 'y': $s }") + "/*)", 4);
   }
 
   /** Test method. */
@@ -594,6 +598,13 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(" {}"), 0, root(Itr.class));
     check(func.args(" { 'a': <a/> }"), 1, root(Itr.class));
     check("{} => map:put('a', <a/>) => map:put('b', <b/>) =>" + func.args(), 2, root(Itr.class));
+    check("{ 'a': 1, 'b': <b/> } => map:put('a', <a/>) =>" + func.args(), 2, root(Itr.class));
+
+    // record constructor calls are only rewritten to constructors if they are inlined
+    inline(true);
+    check("declare record local:p(a, b); local:p(1, <b/>) => map:put('a', <a/>) =>"
+        + func.args(), 2, root(Itr.class));
+    inline(false);
   }
 
   /**

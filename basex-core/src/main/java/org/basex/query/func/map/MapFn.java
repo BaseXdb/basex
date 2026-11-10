@@ -33,10 +33,4 @@ abstract class MapFn extends StandardFunc {
     return tp.intersect(Types.RECORD) == null ||
         tp instanceof final MapType mt && mt.keyType().intersect(BasicType.STRING) == null;
   }
-
-  @Override
-  public long structSize() {
-    // records of extending types may have additional fields
-    return seqType().type instanceof final ShapeType sh && !sh.labeled() ? sh.fields().size() : -1;
-  }
 }
