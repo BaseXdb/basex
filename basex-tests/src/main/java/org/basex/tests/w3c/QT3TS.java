@@ -717,8 +717,8 @@ public final class QT3TS extends Main {
     "@type = 'xsd-version' and @value != '" + ValidateXsd.version() + "' or " +
     // skip default-language
     "@type = 'default-language' and @value != 'en' or " +
-    // skip non-XQuery tests
-    "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
+    // skip non-XQuery tests and XQUF 1.0 tests
+    "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)|XQUF(\\d\\d\\+|30)'))" +
     "]," +
     // skip tests where BaseX implementation deviates from the spec
     "@name[. = " + SKIP + "])";
