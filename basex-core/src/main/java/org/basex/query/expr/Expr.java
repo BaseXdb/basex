@@ -272,10 +272,18 @@ public abstract class Expr extends ExprInfo {
    * @return size, or {@code -1} if it is unknown or if the result is not a structure
    */
   public long structSize() {
-    // the field set of a single shape is fixed (records of extending types may have more fields)
+    final ShapeType sh = exactShape();
+    return sh != null ? sh.fields().size() : -1;
+  }
+
+  /**
+   * Returns the shape of a single map resulting from this expression if its field set is fixed.
+   * @return shape (can be {@code null})
+   */
+  public ShapeType exactShape() {
+    // records of extending types may have additional fields
     final SeqType st = seqType();
-    return st.one() && st.type instanceof final ShapeType sh && !sh.labeled() ?
-      sh.fields().size() : -1;
+    return st.one() && st.type instanceof final ShapeType sh && !sh.labeled() ? sh : null;
   }
 
   /**

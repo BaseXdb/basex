@@ -95,33 +95,50 @@ public final class ShapeConstructor extends StandardFunc {
       throws QueryException {
     // { 'y': Y, 'x': X } coerce as local:point → local:point(X, Y, ())
     final SeqType st = tc.seqType();
-    if(st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt) {
-      final Expr[] args = args(rt, cc);
-      if(args != null) return get(info, rt, args).optimize(cc);
-    }
-    return null;
+    return st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt &&
+      !rt.any() && !(shapeType instanceof RecordType) ? record(info, rt, entries(), cc) : null;
   }
 
   /**
-   * Returns the arguments for a constructor function that creates the result of coercing this map
-   * to a record type.
-   * @param rt record type
-   * @param cc compilation context
-   * @return arguments, or {@code null} if coercion fails or if the shape is a record
+   * Returns the field values supplied by the arguments of this call.
+   * @return field values (can be {@code null})
    */
-  private Expr[] args(final RecordType rt, final CompileContext cc) {
-    final TokenObjectMap<ShapeField> fields = rt.fields(), shfields = shapeType.fields();
-    if(rt.any() || shapeType instanceof RecordType || exprs.length != shfields.size()) return null;
+  public TokenObjectMap<Expr> entries() {
+    final TokenObjectMap<ShapeField> fields = shapeType.fields();
+    final int el = exprs.length;
+    // the arguments of anonymous shapes must be complete
+    if(!(shapeType instanceof RecordType) && el != fields.size()) return null;
+    final TokenObjectMap<Expr> entries = new TokenObjectMap<>(el);
+    for(int e = 0; e < el; e++) {
+      // values of fixed fields are not supplied by the caller
+      if(!fields.value(e + 1).isFixed()) entries.put(fields.key(e + 1), exprs[e]);
+    }
+    return entries;
+  }
+
+  /**
+   * Returns an optimized constructor call for a record type.
+   * @param ii input info
+   * @param rt record type
+   * @param supplied supplied field values (can be {@code null})
+   * @param cc compilation context
+   * @return constructor call, or {@code null} if a field is unknown, fixed or missing
+   * @throws QueryException query exception
+   */
+  public static Expr record(final InputInfo ii, final RecordType rt,
+      final TokenObjectMap<Expr> supplied, final CompileContext cc) throws QueryException {
+    if(supplied == null) return null;
+    final TokenObjectMap<ShapeField> fields = rt.fields();
     final int fs = fields.size();
     final Expr[] args = new Expr[fs];
     int found = 0;
     for(int f = 1; f <= fs; f++) {
       final ShapeField rf = fields.value(f);
-      final int i = shfields.index(fields.key(f));
-      if(i != 0) {
+      final Expr expr = supplied.get(fields.key(f));
+      if(expr != null) {
         // fixed fields must not be supplied
         if(rf.isFixed()) return null;
-        args[f - 1] = exprs[i - 1];
+        args[f - 1] = expr;
         found++;
       } else if(rf.init() != null) {
         args[f - 1] = rf.init().copy(cc, new IntObjectMap<>());
@@ -132,12 +149,13 @@ public final class ShapeConstructor extends StandardFunc {
       }
     }
     // reject undeclared keys
-    return found == shfields.size() ? args : null;
+    return found == supplied.size() ? get(ii, rt, args).optimize(cc) : null;
   }
 
   @Override
-  public long structSize() {
-    return shapeType.fields().size();
+  public ShapeType exactShape() {
+    // constructed records have no additional fields
+    return shapeType.shape();
   }
 
   @Override

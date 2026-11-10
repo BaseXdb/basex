@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -44,6 +45,10 @@ public final class ButWith extends Arr {
       exprs = new Expr[] { bw.exprs[0], update };
       cc.info(OPTMERGE_X, this);
     }
+    // local:p(A, B) but with { 'b': C } → local:p(A, C)
+    final Expr constr = constructor(cc);
+    if(constr != null) return cc.replaceWith(this, constr);
+
     // the result carries the label of the left operand; if no label is known statically, a record
     // may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
@@ -73,6 +78,28 @@ public final class ButWith extends Arr {
   }
 
   /**
+   * Returns a record constructor call with the arguments replaced by the update values.
+   * @param cc compilation context
+   * @return constructor call, or {@code null} if the expression cannot be rewritten
+   * @throws QueryException query exception
+   */
+  private Expr constructor(final CompileContext cc) throws QueryException {
+    // the replaced arguments are dropped, and the intermediate record is not checked
+    if(!(exprs[0] instanceof final ShapeConstructor sc) ||
+        !(sc.seqType().type instanceof final RecordType rt) || rt.any() || rt.constrained()) {
+      return null;
+    }
+    final TokenObjectMap<Expr> entries = entries(exprs[1]);
+    if(entries == null || sc.has(Flag.NDT)) return null;
+
+    // supplied arguments, overwritten by the update values
+    final TokenObjectMap<Expr> supplied = sc.entries();
+    final int es = entries.size();
+    for(int e = 1; e <= es; e++) supplied.put(entries.key(e), entries.value(e));
+    return ShapeConstructor.record(info, rt, supplied, cc);
+  }
+
+  /**
    * Checks if two updates have statically known, disjoint string keys.
    * @param update1 first update
    * @param update2 second update
@@ -80,39 +107,38 @@ public final class ButWith extends Arr {
    * @throws QueryException query exception
    */
   private boolean disjoint(final Expr update1, final Expr update2) throws QueryException {
-    final TokenSet keys1 = keys(update1), keys2 = keys(update2);
-    if(keys1 == null || keys2 == null) return false;
-    for(final byte[] key : keys2) {
-      if(keys1.contains(key)) return false;
+    final TokenObjectMap<Expr> entries1 = entries(update1), entries2 = entries(update2);
+    if(entries1 == null || entries2 == null) return false;
+    for(final byte[] key : entries2) {
+      if(entries1.contains(key)) return false;
     }
     return true;
   }
 
   /**
-   * Returns the statically known string keys of an update.
+   * Returns the statically known string keys and value expressions of an update.
    * @param update update expression
-   * @return keys, or {@code null} if they are unknown or if a key is no string
+   * @return entries, or {@code null} if the keys are unknown or if a key is no string
    * @throws QueryException query exception
    */
-  private TokenSet keys(final Expr update) throws QueryException {
-    final TokenSet keys = new TokenSet();
+  private TokenObjectMap<Expr> entries(final Expr update) throws QueryException {
+    // anonymous shapes only: the arguments of a record constructor are coerced to its fields
+    if(update instanceof final ShapeConstructor sc) {
+      return sc.seqType().type instanceof RecordType ? null : sc.entries();
+    }
+    final TokenObjectMap<Expr> entries = new TokenObjectMap<>();
     if(update instanceof final XQMap map) {
       for(final Item key : map.keys()) {
         if(key.type != BasicType.STRING) return null;
-        keys.add(key.string(info));
+        entries.put(key.string(info), map.get(key));
       }
     } else if(Function._MAP_ENTRY.is(update)) {
       if(!(update.arg(0) instanceof final Str key) || key.type != BasicType.STRING) return null;
-      keys.add(key.string());
-    } else if(update instanceof ShapeConstructor &&
-        update.seqType().type instanceof final ShapeType sh && !(sh instanceof RecordType) &&
-        update.args().length == sh.fields().size()) {
-      // anonymous shapes only: the arguments of a record constructor are coerced to its fields
-      for(final byte[] key : sh.fields()) keys.add(key);
+      entries.put(key.string(), update.arg(1));
     } else {
       return null;
     }
-    return keys;
+    return entries;
   }
 
   @Override

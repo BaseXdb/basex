@@ -40,8 +40,8 @@ public final class ShapeSet extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType vt = exprs[1].seqType(), ft = type.fields().value(index).seqType();
-    // the field set is preserved
-    exprType.assign(cc.qc.shared.shape(vt.instanceOf(ft) ? type :
+    // the field set is preserved (records lose their label)
+    exprType.assign(cc.qc.shared.shape(vt.instanceOf(ft) ? type.shape() :
       type.put(type.fields().key(index), vt)));
     return values(false, cc) ? cc.preEval(this) : this;
   }

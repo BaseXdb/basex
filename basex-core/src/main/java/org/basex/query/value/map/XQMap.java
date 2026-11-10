@@ -334,6 +334,12 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
+  public final ShapeType exactShape() {
+    // the type of a map value is exact
+    return type instanceof final ShapeType sh && !sh.any() ? sh.shape() : null;
+  }
+
+  @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
     if(type == tp) return true;
 

@@ -108,7 +108,7 @@ public class MapMerge extends MapFn {
       if(st.one()) {
         if(noRecords(arg(0))) return arg(0);
         // exact (simple) shapes are kept
-        final ShapeType sh = MapTypeInfo.get(arg(0)).shape;
+        final ShapeType sh = arg(0).exactShape();
         if(sh != null) {
           exprType.assign(cc.qc.shared.shape(sh));
           return this;

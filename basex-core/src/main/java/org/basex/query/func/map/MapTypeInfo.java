@@ -38,8 +38,7 @@ public final class MapTypeInfo {
       // record(*) has an unknown field set: no static information on single fields
       if(mt instanceof final ShapeType sh && !sh.any()) {
         mti.known = sh;
-        // records of extending types may have additional fields
-        if(!sh.labeled()) mti.shape = sh;
+        mti.shape = map.exactShape();
       }
     }
     return mti;
