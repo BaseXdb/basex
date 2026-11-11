@@ -1957,6 +1957,12 @@ public class QueryParser extends InputParser {
       if(exprs.size() == 1) {
         // add default case
         if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());
+        // braced switch without default case: return empty sequence if no case matches
+        skipWs();
+        if(brace && current('}')) {
+          groups.add(new SwitchGroup(info(), Empty.VALUE));
+          break;
+        }
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
@@ -1988,6 +1994,12 @@ public class QueryParser extends InputParser {
     do {
       cs = wsConsumeWs(CASE);
       if(!cs) {
+        // braced typeswitch without default case: return empty sequence if no case matches
+        skipWs();
+        if(brace && current('}')) {
+          cases = Array.add(cases, new TypeswitchGroup(info(), null, new SeqType[0], Empty.VALUE));
+          break;
+        }
         wsCheck(DEFAULT);
         skipWs();
       }

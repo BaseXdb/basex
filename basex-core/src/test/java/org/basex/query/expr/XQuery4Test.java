@@ -546,6 +546,12 @@ public final class XQuery4Test extends SandboxTest {
     query("tail(" + sw + "(1, 2, 3) default return (4, 5, 6))", "2\n3");
     // iterator-based branch: results must not be materialized
     query("head(" + sw + "(1 to 100_000_000)[. > 0] default return ())", 1);
+
+    // braced switch and typeswitch: optional default clause
+    query("switch(" + wrap(1) + ") { case '1' return 1 }", 1);
+    query("switch(" + wrap(2) + ") { case '1' return 1 }", "");
+    query("typeswitch(" + wrap(1) + ") { case xs:untypedAtomic return 1 }", 1);
+    query("typeswitch(1) { case xs:string return 1 }", "");
   }
 
   /** Numeric literals. */
