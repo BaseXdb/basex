@@ -119,7 +119,7 @@ public abstract class Single extends ParseExpr {
    */
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final Single sngl && expr.equals(sngl.expr);
+    return obj instanceof final Single sngl && sc() == sngl.sc() && expr.equals(sngl.expr);
   }
 
   @Override

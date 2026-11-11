@@ -31,8 +31,10 @@ import org.xml.sax.*;
 public final class StaticContext {
   /** Decimal formats. */
   public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
-  /** Declared and imported named item types. */
+  /** Declared named item types. */
   public final QNmMap<TypeDecl> types = new QNmMap<>();
+  /** Public named item types of all library modules of the query. */
+  private final QNmMap<TypeDecl> publics;
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
   /** Look up documents in databases. */
@@ -98,6 +100,7 @@ public final class StaticContext {
     withdb = mopts.get(MainOptions.WITHDB);
     defaultdb = mopts.get(MainOptions.DEFAULTDB);
     maxPerm = qc.maxPerm;
+    publics = qc.namedTypes;
     resolver = qc.resolver;
     uriResolver = mopts.resolver().uriResolver();
   }
@@ -261,34 +264,22 @@ public final class StaticContext {
   }
 
   /**
-   * Returns a declared, imported or built-in named item type.
+   * Returns a declared named item type or a public type of an imported module.
    * @param name type name
-   * @return type, or {@code null} if it is unknown
-   */
-  public Type type(final QNm name) {
-    final TypeDecl td = types.get(name);
-    return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
-  }
-
-  /**
-   * Returns a declared or imported named item type, or a public type of an imported module.
-   * @param name type name
-   * @param publics public types of all parsed modules
    * @return type declaration (can be {@code null})
    */
-  public TypeDecl typeDecl(final QNm name, final QNmMap<TypeDecl> publics) {
+  public TypeDecl typeDecl(final QNm name) {
     final TypeDecl td = types.get(name);
     return td != null || !imports.contains(name.uri()) ? td : publics.get(name);
   }
 
   /**
-   * Returns a declared, imported or built-in type, or a public type of an imported module.
+   * Returns a declared, imported or built-in named item type.
    * @param name type name
-   * @param publics public types of all parsed modules
-   * @return type (can be {@code null})
+   * @return type, or {@code null} if it is unknown
    */
-  public Type type(final QNm name, final QNmMap<TypeDecl> publics) {
-    final TypeDecl td = typeDecl(name, publics);
+  public Type type(final QNm name) {
+    final TypeDecl td = typeDecl(name);
     return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
   }
 

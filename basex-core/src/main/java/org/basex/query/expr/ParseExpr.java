@@ -177,7 +177,7 @@ public abstract class ParseExpr extends Expr {
    * @return static context (can be {@code null})
    */
   public final StaticContext sc() {
-    return info.sc();
+    return info != null ? info.sc() : null;
   }
 
   // OPTIMIZATIONS ================================================================================

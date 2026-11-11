@@ -1540,4 +1540,47 @@ public final class RecordTest extends SandboxTest {
         + "declare function b:f($x as a:t) { $x }; declare record b:s extends a:r(y);");
     query(imp + "b:f(1), b:s(1, 2) instance of a:r", "1\ntrue");
   }
+
+  /**
+   * Named item types of cyclically imported modules.
+   * @throws IOException I/O exception
+   */
+  @Test public void typesCyclicImport() throws IOException {
+    final IOFile a = new IOFile(sandbox(), "cyc-a.xqm"), b = new IOFile(sandbox(), "cyc-b.xqm");
+    final String impB = "import module namespace b = 'b' at '" + b.path() + "'; ";
+    final String imp = "import module namespace a = 'a' at '" + a.path() + "'; " + impB;
+    final String moduleB = "module namespace b = 'b'; import module namespace a = 'a' at "
+        + "'cyc-a.xqm'; ";
+    a.write("module namespace a = 'a'; import module namespace b = 'b' at 'cyc-b.xqm'; "
+        + "declare record a:r(x); declare type a:t as xs:integer; "
+        + "declare type a:n as element();");
+
+    // runtime lookups
+    b.write(moduleB + "declare function b:f() { parse-json('{\"x\":1}', { 'match': #a:r }) };");
+    query(imp + "b:f() instance of a:r", true);
+    b.write(moduleB + "declare record b:s extends a:r(y); "
+        + "declare function b:f() { parse-json('{\"x\":1,\"y\":2}', { 'match': #b:s }) };");
+    query(imp + "parse-json('{\"x\":1,\"y\":2}', { 'match': #b:s }) instance of b:s", true);
+    query(imp + "b:f() instance of b:s", true);
+
+    // cast targets and map keys
+    b.write(moduleB + "declare function b:c($v) { $v cast as a:t };");
+    query(imp + "b:c('3')", 3);
+    query(impB + "b:c('3')", 3);
+    b.write(moduleB + "declare function b:c($v) { $v cast as a:n };");
+    error(imp + "b:c('3')", INVALIDCAST_X);
+    error(impB + "b:c('3')", INVALIDCAST_X);
+    b.write(moduleB + "declare function b:f($m as map(a:n, item())) { $m };");
+    error(imp + "b:f({})", MAPKEYATOMIC_X);
+    error(impB + "b:f({})", MAPTAAT_X);
+
+    // duplicate types
+    b.write(moduleB + "declare %private type a:t as xs:string;");
+    error(imp + "1", DUPLTYPE_X);
+    error(impB + "1", DUPLTYPE_X);
+    final IOFile a2 = new IOFile(sandbox(), "cyc-a2.xqm");
+    a2.write("module namespace a = 'a'; declare type a:t as xs:string;");
+    error("import module namespace a = 'a' at '" + a.path() + "', '" + a2.path() + "'; 1",
+        DUPLTYPE_X);
+  }
 }

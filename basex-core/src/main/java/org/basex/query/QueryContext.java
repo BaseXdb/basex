@@ -142,10 +142,14 @@ public final class QueryContext extends Job implements Closeable {
   /** Pre-declared modules, containing module URI and their file paths (required for test APIs). */
   public final TokenObjectMap<TokenList> modDeclared = new TokenObjectMap<>();
 
-  /** Public type declarations of all parsed modules (for resolving cross-module references). */
-  public final QNmMap<TypeDecl> namedTypes = new QNmMap<>();
+  /** Public type declarations of all parsed library modules. */
+  final QNmMap<TypeDecl> namedTypes = new QNmMap<>();
   /** Type references that could not be resolved within their module (resolved after parsing). */
   final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
+  /** Map key types referencing a named type (checked after parsing). */
+  final ArrayList<QueryParser.DeferredRef> deferredMapKeys = new ArrayList<>();
+  /** Cast target types referencing a named type (checked after parsing). */
+  final ArrayList<QueryParser.DeferredRef> deferredCastTargets = new ArrayList<>();
   /** Type declarations of all parsed modules. */
   public final ArrayList<TypeDecl> typeDecls = new ArrayList<>();
   /** Data for type constructors. */

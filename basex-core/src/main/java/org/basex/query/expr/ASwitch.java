@@ -180,8 +180,8 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final ASwitch<?> s && cond.equals(s.cond) &&
-        Arrays.equals(groups, s.groups);
+    return this == obj || obj instanceof final ASwitch<?> s && sc() == s.sc() &&
+        cond.equals(s.cond) && Arrays.equals(groups, s.groups);
   }
 
   @Override

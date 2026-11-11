@@ -7,6 +7,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Declaration of a named item type.
@@ -21,8 +22,8 @@ public final class TypeDecl {
   public final SeqType seqType;
   /** Names of the referenced types. */
   public final QNmSet refs;
-  /** Static context of the declaring module. */
-  public final StaticContext sc;
+  /** Input info, containing the static context of the declaring module. */
+  public final InputInfo info;
   /** Annotations. */
   private final AnnList anns;
 
@@ -31,16 +32,16 @@ public final class TypeDecl {
    * @param name type name
    * @param seqType declared type
    * @param refs names of the referenced types
-   * @param sc static context of the declaring module
    * @param anns annotations
+   * @param info input info
    */
-  public TypeDecl(final QNm name, final SeqType seqType, final QNmSet refs,
-      final StaticContext sc, final AnnList anns) {
+  public TypeDecl(final QNm name, final SeqType seqType, final QNmSet refs, final AnnList anns,
+      final InputInfo info) {
     this.name = name;
     this.seqType = seqType;
     this.refs = refs;
-    this.sc = sc;
     this.anns = anns;
+    this.info = info;
   }
 
   /**

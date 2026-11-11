@@ -182,7 +182,7 @@ public final class CmpSR extends CmpRange {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final CmpSR cmp && Token.eq(min, cmp.min) &&
-        mni == cmp.mni && Token.eq(max, cmp.max) && mxi == cmp.mxi && sc() == cmp.sc() &&
+        mni == cmp.mni && Token.eq(max, cmp.max) && mxi == cmp.mxi &&
         super.equals(obj);
   }
 

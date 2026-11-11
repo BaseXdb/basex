@@ -51,7 +51,7 @@ abstract class Copy extends Arr {
    */
   final XNode copy(final XNode node, final QueryContext qc) throws QueryException {
     if(node.kind() == Kind.NAMESPACE) return new FNSpace(node.name(), node.string());
-    final StaticContext sc = info != null ? info.sc() : null;
+    final StaticContext sc = sc();
     if(sc == null || sc.preserveNS) return node.copy(qc);
     final MemData data = new MemData(qc.context.sharedMeta());
     new DataBuilder(data, qc).noPreserve().build(node);

@@ -138,8 +138,7 @@ public abstract class CNode extends Arr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final CNode cnode && computed == cnode.computed &&
-        nested == cnode.nested && preserveNS(info) == preserveNS(cnode.info) &&
-        inheritNS(info) == inheritNS(cnode.info) && super.equals(obj);
+        nested == cnode.nested && super.equals(obj);
   }
 
   /**

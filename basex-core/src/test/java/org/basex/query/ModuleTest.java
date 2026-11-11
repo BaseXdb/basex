@@ -218,6 +218,31 @@ public final class ModuleTest extends SandboxTest {
     query(imports + "(if(random:double() < 2) then a:e($c) else b:e($c))" + result, "xml");
   }
 
+  /** Tests inlined expressions of modules with different static contexts. */
+  @Test public void staticContexts() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    write(a, "module namespace a = 'a';\n"
+        + "declare default collation 'http://www.w3.org/2005/xpath-functions/collation/"
+        + "html-ascii-case-insensitive';\n"
+        + "declare base-uri 'http://a/';\n"
+        + "declare function a:cmp($x) { compare($x, 'A') };\n"
+        + "declare function a:eq($x) { $x eq 'A' };\n"
+        + "declare function a:switch($x) { switch($x) case 'A' return 1 default return 0 };\n"
+        + "declare function a:uri($x) { resolve-uri($x) };\n"
+        + "declare function a:base($x) { base-uri(element e { $x }) };");
+
+    final String query = "import module namespace a = 'a' at '" + a.path() + "';\n"
+        + "declare base-uri 'http://main/';\n"
+        + "declare option db:inlinelimit '100';\n"
+        + "let $x := string-join('a'[random:double() < 2]) return ";
+    query(query + "(compare($x, 'A'), a:cmp($x), compare($x, 'A'))", "1\n0\n1");
+    query(query + "($x eq 'A', a:eq($x))", "false\ntrue");
+    query(query + "(switch($x) case 'A' return 1 default return 0, a:switch($x))", "0\n1");
+    query(query + "(resolve-uri($x), a:uri($x))", "http://main/a\nhttp://a/a");
+    query(query + "(base-uri(element e { $x }), a:base($x))", "http://main/\nhttp://a/");
+  }
+
   /**
    * Tests a circular reference to a non-record type across mutually importing modules (GH-2635).
    * Module b references a:t before module a declares it, so the reference is resolved only after
