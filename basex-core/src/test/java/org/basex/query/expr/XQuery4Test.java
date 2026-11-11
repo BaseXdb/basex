@@ -53,6 +53,11 @@ public final class XQuery4Test extends SandboxTest {
     query("let $_ := '' let $m := { '': 1 } return $m?$_", 1);
 
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
+
+    // the key specifier is guarded by the existence of an input item
+    query("()?(1 idiv 0)", "");
+    query("[]?*?(1 idiv 0)", "");
+    error("[ 1 ]?(1 idiv 0)", DIVZERO_X);
   }
 
   /** Method call. */

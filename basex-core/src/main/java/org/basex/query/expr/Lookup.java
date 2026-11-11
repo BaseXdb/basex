@@ -39,6 +39,14 @@ public final class Lookup extends Arr {
     super(info, Types.ITEM_ZM, expr);
   }
 
+  @Override
+  public Expr compile(final CompileContext cc) throws QueryException {
+    // the key specifier is guarded by the existence of an input item
+    exprs[0] = exprs[0].compile(cc);
+    exprs[1] = cc.compileOrError(exprs[1], false);
+    return optimize(cc);
+  }
+
   /**
    * Checks if a map of the specified type may be a strict record that lacks the requested key.
    * @param mt map type
