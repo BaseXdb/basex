@@ -659,4 +659,12 @@ public final class JNodeTest extends SandboxTest {
     query("if({} => jtree()) { 1 }", 1);
     query("if({ 0: 0, false(): false() } => jtree()) { 1 }", 1);
   }
+
+  /** Node constructors. */
+  @Test public void constructors() {
+    query("<a>{ [ <b/> ]/1 }</a>", "<a><b/></a>");
+    query("<a>{ [ [ 1, 2 ] ]/1, 3 }</a>", "<a>1 2 3</a>");
+    query("document { jtree(<b/>) }", "<b/>");
+    error("<a>{ { 'x': {} }/x }</a>", CONSFUNC_X);
+  }
 }

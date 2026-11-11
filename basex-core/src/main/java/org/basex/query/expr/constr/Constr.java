@@ -100,6 +100,12 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item item, final QNmSet qnames) throws QueryException {
+    if(item instanceof final JNode jnode) {
+      for(final Item it : jnode.value) {
+        if(!add(it, qnames)) return false;
+      }
+      return true;
+    }
     if(item instanceof final XQArray array) {
       for(final Value value : array.members()) {
         for(final Item it : value) {
