@@ -2451,7 +2451,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    if(consume(TYPE)) eQName(sc.elemNS, QNAME_X);
+    if(wsConsumeWs(TYPE)) eQName(sc.elemNS, QNAME_X);
     consume(STRICT);
     consume(LAX);
     skipWs();
