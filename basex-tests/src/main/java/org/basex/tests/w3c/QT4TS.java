@@ -34,18 +34,18 @@ import org.basex.util.list.*;
 import org.basex.util.options.Options.*;
 
 /**
- * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
- * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
- * executed from the test suite directory.
+ * Driver for the QT4 test suite, located at {@code https://github.com/qt4cg/qt4tests}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class QT3TS extends Main {
-  /** EQName pattern. */
-  private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
+public final class QT4TS extends Main {
+  /** XML declaration pattern. */
+  private static final Pattern XML_DECL = Pattern.compile("^<\\?xml.*?>\r?\n?");
+  /** Newline pattern. */
+  private static final Pattern NEWLINES = Pattern.compile("\r\n|\r|\n");
   /** Sandbox for databases. */
-  private static final IOFile SANDPIT = new IOFile(Prop.TEMPDIR, "qt");
+  private static final IOFile SANDPIT = new IOFile(TEMPDIR, "qt");
 
   /** Sandbox of this instance. */
   private final IOFile sandpit;
@@ -78,12 +78,8 @@ public final class QT3TS extends Main {
 
   /** Current test set (can be {@code null}). */
   private TestSet current;
-  /** Current base URI. */
-  private String baseURI;
-  /** Current base directory. */
-  private String baseDir;
 
-  /** Slow queries flag. */
+  /** Slow queries (can be {@code null}). */
   private TreeMap<Long, String> slow;
   /** Query filter string. */
   private String single = "";
@@ -91,13 +87,13 @@ public final class QT3TS extends Main {
   private boolean verbose;
   /** Error code flag. */
   private boolean errors = true;
-  /** Also print ignored files. */
+  /** Also log ignored tests. */
   private boolean ignoring;
   /** All flag. */
   private boolean all;
 
   /** Database context. */
-  final Context ctx = new Context();
+  private final Context ctx = new Context();
   /** Global environments. */
   private final ArrayList<QT3Env> genvs = new ArrayList<>();
   /** Files of all test sets. */
@@ -114,7 +110,7 @@ public final class QT3TS extends Main {
    */
   public static void main(final String... args) throws Exception {
     try {
-      new QT3TS(args).run();
+      new QT4TS(args).run();
     } catch(final IOException ex) {
       Util.errln(ex);
       System.exit(1);
@@ -125,7 +121,7 @@ public final class QT3TS extends Main {
    * Constructor.
    * @param args command-line arguments
    */
-  QT3TS(final String[] args) {
+  QT4TS(final String[] args) {
     super(args);
     sandpit = SANDPIT;
   }
@@ -136,12 +132,11 @@ public final class QT3TS extends Main {
    * @param sandbox sandbox directory
    * @throws IOException I/O exception
    */
-  QT3TS(final String path, final String sandbox) throws IOException {
+  QT4TS(final String path, final String sandbox) throws IOException {
     super(new String[0]);
     sandpit = new IOFile(sandbox);
     basePath = new File(path).getCanonicalPath();
-    init();
-    catalog();
+    prepare();
   }
 
   /**
@@ -149,7 +144,7 @@ public final class QT3TS extends Main {
    * @param main main instance
    * @param id id of the worker
    */
-  private QT3TS(final QT3TS main, final int id) {
+  private QT4TS(final QT4TS main, final int id) {
     super(new String[0]);
     sandpit = new IOFile(SANDPIT, "worker" + id);
     basePath = main.basePath;
@@ -183,13 +178,12 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void run() throws Exception {
-    init();
     parseArgs();
 
     final Performance perf = new Performance();
 
-    final XdmValue doc = catalog();
-    final String version = asString("*:catalog/@version", doc);
+    final XdmValue doc = prepare();
+    final String version = XQuery.string("*:catalog/@version", doc, ctx);
     Util.println(NL + "QT Test Suite " + version);
     Util.println("Test directory: " + file(false, "."));
     Util.print("Parsing queries");
@@ -211,11 +205,11 @@ public final class QT3TS extends Main {
     // save log data
     Util.println(NL + "Writing log file...");
     try(PrintOutput po = new PrintOutput(new IOFile("tests.log"))) {
-      po.println("QT3TS RESULTS __________________________" + NL);
+      po.println("QT4TS RESULTS __________________________" + NL);
       po.println(result.toString());
       po.println("WRONG __________________________________" + NL);
       po.print(wrong.finish());
-      if(all || !single.isEmpty()) {
+      if(logCorrect()) {
         po.println("CORRECT ________________________________" + NL);
         po.print(right.finish());
       }
@@ -240,11 +234,19 @@ public final class QT3TS extends Main {
     if(slow != null && !slow.isEmpty()) {
       Util.println(NL + "Slow queries:");
       for(final Entry<Long, String> l : slow.entrySet()) {
-        Util.println("- " + -(l.getKey() / 1000000) + " ms: " + l.getValue());
+        Util.println("- " + Performance.formatNano(-l.getKey()) + ": " + l.getValue());
       }
     }
 
     close();
+  }
+
+  /**
+   * Checks if correct results are logged.
+   * @return result of check
+   */
+  private boolean logCorrect() {
+    return all || !single.isEmpty();
   }
 
   /**
@@ -257,11 +259,12 @@ public final class QT3TS extends Main {
   }
 
   /**
-   * Opens the catalog and loads its global environments and test set files.
+   * Initializes the context, resets the output directory of fn:put tests and opens the catalog.
    * @return catalog document
    * @throws BaseXException database exception
    */
-  private XdmValue catalog() throws BaseXException {
+  private XdmValue prepare() throws BaseXException {
+    init();
     // output directory of fn:put tests (results/ is reserved for test runs)
     results = new IOFile(file(false, "results/sandpit"));
     results.delete();
@@ -273,14 +276,6 @@ public final class QT3TS extends Main {
     for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
         ctx).context(doc)) setFiles.add(item.getString());
     return doc;
-  }
-
-  /**
-   * Returns the path to the test suite.
-   * @return path
-   */
-  String path() {
-    return basePath;
   }
 
   /**
@@ -299,11 +294,11 @@ public final class QT3TS extends Main {
     final int sets = setFiles.size();
     final byte[][][] logs = new byte[sets][][];
     final AtomicInteger next = new AtomicInteger();
-    final ArrayList<Future<QT3TS>> futures = new ArrayList<>(threads);
+    final ArrayList<Future<QT4TS>> futures = new ArrayList<>(threads);
     final ExecutorService pool = Executors.newFixedThreadPool(threads);
     try {
       for(int t = 0; t < threads; t++) {
-        final QT3TS worker = new QT3TS(this, t);
+        final QT4TS worker = new QT4TS(this, t);
         futures.add(pool.submit(() -> {
           for(int s; (s = next.getAndIncrement()) < sets;) {
             worker.testSet(setFiles.get(s));
@@ -317,8 +312,8 @@ public final class QT3TS extends Main {
           return worker;
         }));
       }
-      for(final Future<QT3TS> future : futures) {
-        final QT3TS worker = future.get();
+      for(final Future<QT4TS> future : futures) {
+        final QT4TS worker = future.get();
         total += worker.total;
         tested += worker.tested;
         correct += worker.correct;
@@ -346,7 +341,7 @@ public final class QT3TS extends Main {
       total += ts.cases.size();
       ignored += ts.cases.size();
     } else {
-      if(report != null) report.addSet(asString("@name", ts.set));
+      if(report != null) report.addSet(ts.name);
       for(final String test : ts.cases.keySet()) testCase(ts, test);
     }
   }
@@ -357,8 +352,8 @@ public final class QT3TS extends Main {
   final class TestSet {
     /** File name. */
     final String file;
-    /** Test set. */
-    final XdmValue set;
+    /** Name of the test set. */
+    final String name;
     /** Base URI. */
     final String uri;
     /** Base directory. */
@@ -380,7 +375,8 @@ public final class QT3TS extends Main {
     private TestSet(final String file) throws BaseXException {
       this.file = file;
       final XdmValue doc = new XQuery("doc('" + file(false, file) + "')", ctx).value();
-      set = new XQuery("*:test-set", ctx).context(doc).value();
+      final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
+      name = attr(set, "name");
       final IO base = IO.get(doc.getBaseURI());
       uri = base.path();
       dir = base.dir();
@@ -398,11 +394,11 @@ public final class QT3TS extends Main {
 
     /**
      * Checks if a test case is ignored.
-     * @param name name of test case
+     * @param test name of test case
      * @return result of check
      */
-    boolean ignored(final String name) {
-      return !supported || unsupported.contains(name);
+    boolean ignored(final String test) {
+      return !supported || unsupported.contains(test);
     }
   }
 
@@ -417,8 +413,6 @@ public final class QT3TS extends Main {
       current = new TestSet(name);
       setDatas = null;
       sourceDatas.clear();
-      baseURI = current.uri;
-      baseDir = current.dir;
     }
     return current;
   }
@@ -459,7 +453,7 @@ public final class QT3TS extends Main {
     final Outcome outcome = execute(name);
     if(slow != null && outcome.nanos > 100000000) slow.put(-outcome.nanos, name);
     if(outcome.ok) {
-      right.add(outcome.text).add(NL);
+      if(outcome.text != null) right.add(outcome.text).add(NL);
       correct++;
     } else {
       wrong.add(outcome.text).add(NL);
@@ -469,7 +463,7 @@ public final class QT3TS extends Main {
 
   /**
    * Test case outcome.
-   * @param text name, query, result (and expected result if wrong)
+   * @param text name, query, result (and expected result if wrong) (can be {@code null})
    * @param ok success flag
    * @param nanos run time
    */
@@ -483,21 +477,20 @@ public final class QT3TS extends Main {
    */
   Outcome execute(final String name) throws Exception {
     try {
-      return evaluate(current.cases.get(name), current.envs);
+      return evaluate(name);
     } catch(final IOException ex) {
       return new Outcome(token(name + NL + "Error : " + ex + NL), false, 0);
     }
   }
 
   /**
-   * Evaluates a test case.
-   * @param test node
-   * @param envs environments
+   * Evaluates a test case of the current test set.
+   * @param name name of test case
    * @return outcome
    * @throws Exception exception
    */
-  private Outcome evaluate(final XdmItem test, final ArrayList<QT3Env> envs) throws Exception {
-    final String name = attribute(test, "name");
+  private Outcome evaluate(final String name) throws Exception {
+    final XdmItem test = current.cases.get(name);
 
     // expected result
     final XdmItem result = child(test, "result");
@@ -512,10 +505,10 @@ public final class QT3TS extends Main {
     // parse local environment
     boolean base = true;
     if(env == null && ienv != null) {
-      final String e = attribute(ienv, "ref");
-      if(e != null && !e.isEmpty() && !e.equals("empty")) {
+      final String e = attr(ienv, "ref");
+      if(!e.isEmpty() && !e.equals("empty")) {
         // check if environment is defined in test-set
-        env = envs(envs, e);
+        env = envs(current.envs, e);
         // check if environment is defined in catalog
         if(env == null) {
           env = envs(genvs, e);
@@ -537,14 +530,15 @@ public final class QT3TS extends Main {
       queries.add(step(test, step, env, base, mutable, returned));
       if(returned.value == null) break;
     }
-    final String string = queries.toString();
-
     final long nanos = perf.nanoRuntime();
 
     final String exp = test(returned, expected);
+    // the log text is only needed for wrong results, or if correct results are logged
+    if(exp == null && !logCorrect()) return new Outcome(null, true, nanos);
+
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(QueryParser.removeComments(string, maxout)).add(NL);
+    tmp.add(QueryParser.removeComments(queries.toString(), maxout)).add(NL);
 
     boolean err = returned.value == null;
     String res;
@@ -585,15 +579,15 @@ public final class QT3TS extends Main {
       throws Exception {
 
     // retrieve query to be run
-    final String qfile = attribute(step, "file");
+    final String qfile = attr(step, "file");
     String string;
-    String qbase = baseURI;
-    if(qfile == null || qfile.isEmpty()) {
+    String qbase = current.uri;
+    if(qfile.isEmpty()) {
       // get query string
       string = step.getString();
     } else {
       // get query from file: the file supplies the static base URI
-      final IOFile io = new IOFile(baseDir, qfile);
+      final IOFile io = new IOFile(current.dir, qfile);
       string = string(io.read());
       qbase = io.path();
     }
@@ -626,10 +620,10 @@ public final class QT3TS extends Main {
     // (test cases modules-30, -31, -32, -33, -40, -41, -42, d1e78807j)
     final Map<String, IO> locations = new HashMap<>();
     for(final XdmItem module : children(test, "module")) {
-      final String uri = attribute(module, "uri"), location = attribute(module, "location");
       final String path = attribute(module, "file");
       if(path == null) continue;
-      final IOFile file = new IOFile(baseDir, path);
+      final String uri = attribute(module, "uri"), location = attribute(module, "location");
+      final IOFile file = new IOFile(current.dir, path);
       if(uri != null) query.addModule(uri, file.path());
       if(location != null) locations.put(location, file);
     }
@@ -643,10 +637,10 @@ public final class QT3TS extends Main {
         // bind documents (mutable documents are parsed once and shared by all steps)
         for(final HashMap<String, String> src : env.sources) {
           final String file = src.get(FILE), role = src.get(ROLE);
-          if(file ==  null) continue;
+          if(file == null) continue;
 
           final String path = file(base, file);
-          locations.put(src.get(URI), new IOFile(baseDir, file));
+          locations.put(src.get(URI), new IOFile(current.dir, file));
           // catalog checks: share the test sets instead of parsing them for each test
           if(new IOFile(path).eq(new IOFile(file(false, CATALOG)))) {
             query.qp().qc.resources.addDatabases(setDatas());
@@ -656,8 +650,9 @@ public final class QT3TS extends Main {
           final Data data = sourceDatas.get(key);
           if(data != null && data.modifications() == 0) {
             query.qp().qc.resources.addDatabases(List.of(data));
+          } else {
+            sourceDatas.put(key, query.addDocument(src.get(URI), path));
           }
-          else sourceDatas.put(key, query.addDocument(src.get(URI), path));
           if(role == null) continue;
 
           XdmValue doc = mutable.get(role);
@@ -677,13 +672,14 @@ public final class QT3TS extends Main {
           final String path = file(base, file);
           final String encoding = src.get(QT3Constants.ENCODING);
           query.addResource(uri, path, encoding);
-          if(encoding == null) locations.put(uri, new IOFile(path));
-          ft.put(uri, new IOFile(path));
+          final IOFile io = new IOFile(path);
+          if(encoding == null) locations.put(uri, io);
+          ft.put(uri, io);
         }
         if(!ft.isEmpty()) query.qp().qc.resources.ftmaps(ft, ft);
         // bind collections (from source files, or from a query producing arbitrary items)
         if(!env.collQuery.isEmpty()) {
-          final XQuery cq = new XQuery(env.collQuery, ctx).baseURI(baseURI);
+          final XQuery cq = new XQuery(env.collQuery, ctx).baseURI(current.uri);
           query.addCollection(env.collURI, cq.value());
         } else {
           query.addCollection(env.collURI, env.collSources.toArray());
@@ -731,7 +727,6 @@ public final class QT3TS extends Main {
     return string;
   }
 
-
   /**
    * Assigns the query environment.
    * @param query query
@@ -761,7 +756,7 @@ public final class QT3TS extends Main {
       }
       // directory with test files
       if(env.sandpit) {
-        final Path source = init ? Paths.get(baseURI.replaceAll("\\w+\\.xml$", "sandpit")) : null;
+        final Path source = init ? Paths.get(current.dir, "sandpit") : null;
         query.sandpit(source, sandpit);
       }
     }
@@ -773,8 +768,8 @@ public final class QT3TS extends Main {
    * @param in input string
    * @return result
    */
-  private String normSpecial(final String in) {
-    return in.replaceAll("^<\\?xml.*?>\r?\n?", "").replace("\n", "%0A").replace("\r", "%0D").
+  private static String normSpecial(final String in) {
+    return XML_DECL.matcher(in).replaceFirst("").replace("\n", "%0A").replace("\r", "%0D").
         replace("\t", "%09");
   }
 
@@ -888,6 +883,28 @@ public final class QT3TS extends Main {
   }
 
   /**
+   * Returns the value of an attribute of an element.
+   * @param elem element
+   * @param name attribute name
+   * @return value, or an empty string if the attribute does not exist
+   */
+  private static String attr(final XdmValue elem, final String name) {
+    final String value = attribute((XdmItem) elem, name);
+    return value != null ? value : "";
+  }
+
+  /**
+   * Checks if a boolean attribute of an element is true.
+   * @param elem element
+   * @param name attribute name
+   * @return result of check
+   */
+  private static boolean flag(final XdmValue elem, final String name) {
+    final String value = attr(elem, name);
+    return value.equals("true") || value.equals("1");
+  }
+
+  /**
    * Returns child elements.
    * @param node node
    * @param name local name (can be {@code null})
@@ -952,11 +969,11 @@ public final class QT3TS extends Main {
         msg = switch(type) {
           case "assert" -> assertQuery(result, expected);
           case "assert-count" -> assertCount(result, expected);
-          case "assert-deep-eq" -> assertDeepEq(result, expected);
+          case "assert-deep-eq" -> assertDeepEq(result, expected, true);
           case "assert-empty" -> assertEmpty(result);
           case "assert-eq" -> assertEq(result, expected);
           case "assert-false" -> assertBoolean(result, false);
-          case "assert-permutation" -> assertPermutation(result, expected);
+          case "assert-permutation" -> assertDeepEq(result, expected, false);
           case "assert-xml" -> assertXML(result, expected);
           case "serialization-matches" -> serializationMatches(result, expected);
           case "assert-string-value" -> assertStringValue(result, expected);
@@ -980,20 +997,14 @@ public final class QT3TS extends Main {
    * @return expected test suite result, or {@code null}
    */
   private String assertError(final QT3Result result, final XdmValue expected) {
-    final String exp = asString('@' + CODE, expected);
+    final String exp = attr(expected, CODE);
     if(result.xqerror == null) return exp;
     if(!errors || exp.equals("*")) return null;
 
-    final QNm resErr = result.xqerror.getException().qname();
-
-    String name = exp, uri = string(QueryText.ERROR_URI);
-    final Matcher m = BIND.matcher(exp);
-    if(m.find()) {
-      uri = m.group(1);
-      name = m.group(2);
-    }
-    final QNm expErr = new QNm(name, uri);
-    return expErr.eq(resErr) ? null : exp;
+    final byte[][] eqname = QNm.parseExpanded(token(exp), false);
+    final QNm expErr = eqname != null ? new QNm(eqname[0], eqname[1]) :
+      new QNm(exp, QueryText.ERROR_URI);
+    return expErr.eq(result.xqerror.getException().qname()) ? null : exp;
   }
 
   /**
@@ -1003,12 +1014,10 @@ public final class QT3TS extends Main {
    * @return expected test suite result, or {@code null}
    */
   private String not(final QT3Result result, final XdmValue exp) {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
-      final String msg = test(result, item);
-      if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
+    for(final XdmItem item : children((XdmItem) exp, null)) {
+      if(test(result, item) != null) return null;
     }
-    return tb.isEmpty() ? "not(...)" : null;
+    return "not(...)";
   }
 
   /**
@@ -1019,7 +1028,7 @@ public final class QT3TS extends Main {
    */
   private String allOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
+    for(final XdmItem item : children((XdmItem) exp, null)) {
       final String msg = test(result, item);
       if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
@@ -1034,7 +1043,7 @@ public final class QT3TS extends Main {
    */
   private String anyOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
+    for(final XdmItem item : children((XdmItem) exp, null)) {
       final String msg = test(result, item);
       if(msg == null) return null;
       tb.add(tb.isEmpty() ? "" : ", ").add(msg);
@@ -1053,7 +1062,7 @@ public final class QT3TS extends Main {
     try {
       final String query = "declare variable $result external; " + exp;
       // relative URIs are resolved against the test set
-      final XQuery xq = new XQuery(query, ctx).baseURI(baseURI);
+      final XQuery xq = new XQuery(query, ctx).baseURI(current.uri);
       return environment(xq, result.env).context(result.value).variable(
           "$result", result.value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
@@ -1095,25 +1104,17 @@ public final class QT3TS extends Main {
   }
 
   /**
-   * Tests deep equals.
+   * Tests deep equals or permutation.
    * @param result query result
    * @param expected expected result
+   * @param ordered compare in order
    * @return expected test suite result, or {@code null}
    */
-  private String assertDeepEq(final QT3Result result, final XdmValue expected) {
-    final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
-    return exp.deepEqual(result.value, true) ? null : exp.toString();
-  }
-
-  /**
-   * Tests permutation.
-   * @param result query result
-   * @param expected expected result
-   * @return expected test suite result, or {@code null}
-   */
-  private String assertPermutation(final QT3Result result, final XdmValue expected) {
-    final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
-    return exp.deepEqual(result.value, false) ? null : exp.toString();
+  private String assertDeepEq(final QT3Result result, final XdmValue expected,
+      final boolean ordered) {
+    final XQuery query = new XQuery(expected.getString(), ctx).baseURI(current.uri);
+    final XdmValue exp = environment(query, result.env).value();
+    return exp.deepEqual(result.value, ordered) ? null : exp.toString();
   }
 
   /**
@@ -1123,36 +1124,42 @@ public final class QT3TS extends Main {
    * @return expected test suite result, or {@code null}
    */
   private String assertXML(final QT3Result result, final XdmValue expected) {
-    final String file = asString("@file", expected);
-    final boolean normalizeSpace = asBoolean("@normalize-space=('true','1')", expected);
-    final boolean ignorePrefixes = asBoolean("@ignore-prefixes=('true','1')", expected);
+    final String file = attr(expected, "file");
+    final boolean normalizeSpace = flag(expected, "normalize-space");
+    final boolean ignorePrefixes = flag(expected, "ignore-prefixes");
 
     String expctd = expected.getString();
     try {
-      if(!file.isEmpty()) expctd = string(new IOFile(baseDir, file).read());
-      expctd = normNL(expctd);
+      if(!file.isEmpty()) expctd = string(new IOFile(current.dir, file).read());
+      // the XML declaration is not part of the data model
+      expctd = XML_DECL.matcher(normNL(expctd)).replaceFirst("");
       if(normalizeSpace) expctd = string(normalize(token(expctd)));
 
-      final XdmValue returned = result.value;
-      final String rslt = normNL(
-          asString("serialize(., { 'method': 'xml' })", returned));
+      final String rslt = normNL(serializeXML(result.value));
       if(expctd.equals(rslt)) return null;
-      final String rtrnd = normNL(
-          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': false() })",
-          returned));
-      if(expctd.equals(rtrnd)) return null;
 
       // include check for comments, processing instructions and namespaces
-      final StringList options = new StringList();
-      options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
-      options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
-      options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
+      final String options = " { '" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "': " +
+          !ignorePrefixes + "(), '" + DeepEqualOptions.COMMENTS.name() + "': true(), '" +
+          DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "': true() }";
       final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
-          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
-      return asBoolean(query, expected) ? null : expctd;
+          " <X>" + rslt + "</X>", options);
+      return new XQuery(query, ctx).value().getBoolean() ? null : expctd;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", expctd, ex);
     }
+  }
+
+  /**
+   * Serializes a value with the XML output method, as done by fn:serialize.
+   * @param value value
+   * @return serialized value
+   * @throws IOException I/O exception
+   */
+  private static String serializeXML(final XdmValue value) throws IOException {
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
+    return value.internal().serializeUnencoded(sopts).toString();
   }
 
   /**
@@ -1163,7 +1170,7 @@ public final class QT3TS extends Main {
    */
   private String serializationMatches(final QT3Result result, final XdmValue expected) {
     try {
-      final String flags = asString("@flags", expected);
+      final String flags = attr(expected, "flags");
       final XdmValue returned = XdmValue.get(Str.get(serialize(result)));
       final String query = "declare variable $returned external;"
           + "declare variable $expected external;"
@@ -1183,30 +1190,35 @@ public final class QT3TS extends Main {
    * @return expected test suite result, or {@code null}
    */
   private String assertSerializationError(final QT3Result result, final XdmValue expected) {
-    final String expCode = asString('@' + CODE, expected);
-    if(result.xqerror != null) {
-      if(!errors || expCode.equals("*")) return null;
-      final String resCode = string(result.xqerror.getException().qname().local());
-      if(resCode.equals(expCode)) return null;
+    final String expCode = attr(expected, CODE);
+    if(result.xqerror != null && matches(expCode, result.xqerror.getException().qname())) {
+      return null;
     }
 
     try {
       if(result.value != null) serialize(result);
       return expCode;
     } catch(final QueryException ex) {
-      if(!errors || expCode.equals("*")) return null;
-      final String resCode = string(ex.qname().local());
-      if(resCode.equals(expCode)) return null;
-      return Util.info("% (found: %)", expCode, ex);
+      return matches(expCode, ex.qname()) ? null : Util.info("% (found: %)", expCode, ex);
     } catch(final IOException ex) {
       return Util.info("% (found: %)", expCode, ex);
     }
   }
 
   /**
+   * Checks if an error code matches the expected code.
+   * @param code expected code
+   * @param qname error code
+   * @return result of check
+   */
+  private boolean matches(final String code, final QNm qname) {
+    return !errors || code.equals("*") || eq(qname.local(), token(code));
+  }
+
+  /**
    * Serializes values.
    * @param result query result
-   * @return expected test suite result, or {@code null}
+   * @return serialized result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
@@ -1214,7 +1226,7 @@ public final class QT3TS extends Main {
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = result.query.qp().serializer(ao)) {
-        for(final Item item : result.value.internal()) ser.serialize(item);
+        result.value.internal().serialize(ser);
       }
       return ao.toString();
     } catch(final QueryIOException ex) {
@@ -1231,17 +1243,12 @@ public final class QT3TS extends Main {
   private String assertStringValue(final QT3Result result, final XdmValue expected) {
     String exp = expected.getString();
     // normalize space
-    final boolean norm = asBoolean("@normalize-space=('true','1')", expected);
+    final boolean norm = flag(expected, "normalize-space");
     if(norm) exp = string(normalize(token(exp)));
 
-    final TokenBuilder tb = new TokenBuilder();
-    int c = 0;
-    for(final XdmItem item : result.value) {
-      if(c++ != 0) tb.add(' ');
-      tb.add(item.getString());
-    }
-
-    final String res = norm ? string(normalize(tb.finish())) : tb.toString();
+    final StringJoiner sj = new StringJoiner(" ");
+    for(final XdmItem item : result.value) sj.add(item.getString());
+    final String res = norm ? string(normalize(token(sj.toString()))) : sj.toString();
     return exp.equals(res) ? null : exp;
   }
 
@@ -1286,26 +1293,6 @@ public final class QT3TS extends Main {
     }
   }
 
-  /**
-   * Returns the string representation of a query result.
-   * @param query query string
-   * @param value optional context value
-   * @return expected test suite result, or {@code null}
-   */
-  String asString(final String query, final XdmValue value) {
-    return XQuery.string(query, value, ctx);
-  }
-
-  /**
-   * Returns the boolean representation of a query result.
-   * @param query query string
-   * @param value optional context value
-   * @return expected test suite result, or {@code null}
-   */
-  boolean asBoolean(final String query, final XdmValue value) {
-    final XdmValue val = new XQuery(query, ctx).context(value).value();
-    return val.size() != 0 && val.getBoolean();
-  }
 
   /**
    * Returns the path to a given file.
@@ -1313,8 +1300,8 @@ public final class QT3TS extends Main {
    * @param file file name
    * @return path to the file
    */
-  private String file(final boolean base, final String file) {
-    final String dir = base ? baseDir : basePath;
+  String file(final boolean base, final String file) {
+    final String dir = base ? current.dir : basePath;
     return dir == null ? file : new IOFile(dir, file).path();
   }
 
@@ -1334,7 +1321,7 @@ public final class QT3TS extends Main {
    * @return result
    */
   private static String normNL(final String in) {
-    return in.replaceAll("\r\n|\r|\n", NL);
+    return NEWLINES.matcher(in).replaceAll(NL);
   }
 
   @Override
@@ -1396,12 +1383,12 @@ public final class QT3TS extends Main {
 
   @Override
   public String usage() {
-    return " -v [pat]" + NL +
+    return " [options] [pat]" + NL +
         " [pat] perform tests starting with a pattern" + NL +
         " -a  save all tests" + NL +
         " -d  debugging mode" + NL +
         " -e  ignore error codes" + NL +
-        " -i  also save ignored files" + NL +
+        " -i  also save ignored tests" + NL +
         " -p  path to the test suite" + NL +
         " -r  generate report file" + NL +
         " -s  print slow queries" + NL +

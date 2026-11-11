@@ -36,7 +36,7 @@ public class QT4Test {
   private static final String TEST_SET = "qt4.test-set";
 
   /** Test suite driver (can be {@code null}). */
-  private static QT3TS driver;
+  private static QT4TS driver;
 
   /**
    * Creates the driver; skips all tests if the suite is missing.
@@ -54,7 +54,7 @@ public class QT4Test {
       assumeTrue(path != null, "QT4 test suite not found. Set " + PATH_ENV + ", or clone "
           + "https://github.com/qt4cg/qt4tests next to the root project.");
     }
-    driver = new QT3TS(path.toString(), Path.of("target", "qt4").toAbsolutePath().toString());
+    driver = new QT4TS(path.toString(), Path.of("target", "qt4").toAbsolutePath().toString());
   }
 
   /**
@@ -102,7 +102,7 @@ public class QT4Test {
         filter(file -> matcher == null || matcher.matches(Path.of(file))).sorted().toList();
     assertFalse(files.isEmpty(), "No QT4 test sets match " + TEST_SET + '=' + filter);
     return files.stream().map(file -> DynamicContainer.dynamicContainer(file,
-        Path.of(driver.path(), file).toUri(), Stream.of(file).flatMap(QT4Test::cases)));
+        Path.of(driver.file(false, file)).toUri(), Stream.of(file).flatMap(QT4Test::cases)));
   }
 
   /**
@@ -126,9 +126,9 @@ public class QT4Test {
    * @throws Exception exception
    */
   private static void run(final String file, final String name) throws Exception {
-    final QT3TS.TestSet set = driver.open(file);
+    final QT4TS.TestSet set = driver.open(file);
     assumeFalse(set.ignored(name), "Not supported by BaseX.");
-    final QT3TS.Outcome outcome = driver.execute(name);
+    final QT4TS.Outcome outcome = driver.execute(name);
     if(!outcome.ok()) fail(string(outcome.text()) + "File: " + set.uri);
   }
 

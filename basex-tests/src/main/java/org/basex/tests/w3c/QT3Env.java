@@ -14,7 +14,7 @@ import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.list.*;
 
 /**
- * Driver environment for the {@link QT3TS} test suite driver.
+ * Driver environment for the {@link QT4TS} test suite driver.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
