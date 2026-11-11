@@ -4051,6 +4051,20 @@ return
     query(func.args("&#x212A;.", "k.", "qi"), true);
     query(func.args("kx", "k.", "qi"), false);
 
+    // Unicode scripts: property values and short aliases, case-sensitive
+    query(func.args("ἀ", "\\p{Script=Greek}"), true);
+    query(func.args("ἀ", "^[\\p{sc=Grek}a]$"), true);
+    query(func.args("ἀ", "\\P{Script=Greek}"), false);
+    query(func.args("&#x10300;", "\\p{Script=Old_Italic}"), true);
+    error(func.args("a", "\\p{Script=greek}"), REGINVALID_X);
+    error(func.args("a", "\\p{script=Greek}"), REGINVALID_X);
+    // special names: camel case, additional aliases, script without characters
+    query(func.args("&#x1D800;", "\\p{Script=SignWriting}"), true);
+    error(func.args("a", "\\p{Script=Signwriting}"), REGINVALID_X);
+    query(func.args("&#x2C80;", "\\p{sc=Qaac}"), true);
+    query(func.args("&#x30A2;", "\\p{Script=Katakana_Or_Hiragana}"), false);
+    query(func.args("&#x30A2;", "^[^\\p{sc=Hrkt}]$"), true);
+
     query(func.args("babadad", "^((.)?a\\2)+$"), true);
     query(func.args("x", "(a)|\\1"), true);
 

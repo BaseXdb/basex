@@ -52,6 +52,7 @@ public final class Escape extends RegExp {
    * @return regular expression
    */
   public static RegExp get(final String esc) {
+    if(esc.startsWith("Script=", 3) || esc.startsWith("sc=", 3)) return script(esc);
     if(esc.startsWith("\\p{Is") || esc.startsWith("\\P{Is")) {
       final CharRange[] rng = MAP.get(esc);
       return rng != null ? new CharClass(new CharGroup(rng), null) : null;
@@ -100,11 +101,48 @@ public final class Escape extends RegExp {
    * @return array of regular expressions suitable for char groups
    */
   public static RegExp[] inGroup(final String esc) {
+    if(esc.startsWith("Script=", 3) || esc.startsWith("sc=", 3)) {
+      return new RegExp[] { script(esc) };
+    }
     if(esc.startsWith("\\p{Is") || esc.startsWith("\\P{Is")) {
       final CharRange[] rng = MAP.get(esc);
       if(rng != null) return rng;
     }
     return new RegExp[] { new Escape(java(esc)) };
+  }
+
+  /**
+   * Returns the Java name of a Unicode script.
+   * @param name value name or alias of the Unicode script property (title-cased)
+   * @return Java name, empty string for a script without characters (can be {@code null})
+   */
+  public static String javaScript(final String name) {
+    return switch(name) {
+      // unknown to Java
+      case "Katakana_Or_Hiragana", "Hrkt" -> "";
+      case "Qaac" -> "COPTIC";
+      case "Qaai" -> "INHERITED";
+      // the value name is SignWriting
+      case "Signwriting" -> null;
+      default -> {
+        try {
+          yield Character.UnicodeScript.forName(name).name();
+        } catch(final IllegalArgumentException ex) {
+          yield null;
+        }
+      }
+    };
+  }
+
+  /**
+   * Converts a Unicode script escape sequence to Java syntax.
+   * @param esc escape sequence
+   * @return escape sequence
+   */
+  private static Escape script(final String esc) {
+    final String name = javaScript(esc.substring(esc.indexOf('=') + 1, esc.length() - 1));
+    return new Escape(!name.isEmpty() ? esc.substring(0, 3) + "sc=" + name + '}' :
+      esc.charAt(1) == 'p' ? "[^\\x{0}-\\x{10FFFF}]" : "[\\x{0}-\\x{10FFFF}]");
   }
 
   @Override
