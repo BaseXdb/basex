@@ -73,10 +73,10 @@ public final class InspectStaticContext extends StandardFunc {
         yield StrSeq.get(tl);
       }
       case DECIMAL_FORMATS -> {
-        // enforce creation of default formatter
-        sctx.decFormat(QNm.EMPTY, info);
-        // loop through all formatters
         final MapBuilder mb = new MapBuilder();
+        if(!sctx.decFormats.contains(Token.EMPTY)) {
+          mb.put(Str.EMPTY, sctx.decFormat(QNm.EMPTY, info).toMap());
+        }
         for(final byte[] format : sctx.decFormats) {
           mb.put(Str.get(format), sctx.decFormats.get(format).toMap());
         }

@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import javax.xml.catalog.*;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
@@ -29,8 +31,10 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class StaticContext {
-  /** Decimal formats. */
+  /** Declared decimal formats. */
   public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
+  /** Lazily instantiated default and language-specific decimal formats. */
+  private final TokenObjectMap<DecFormatter> defaultFormats = new TokenObjectMap<>();
   /** Declared named item types. */
   public final QNmMap<TypeDecl> types = new QNmMap<>();
   /** Public named item types of all library modules of the query. */
@@ -255,10 +259,11 @@ public final class StaticContext {
       throws QueryException {
     final byte[] id = name.unique();
     DecFormatter df = decFormats.get(id);
+    if(df == null) df = defaultFormats.get(id);
     if(df == null) {
       // lazy instantiation of default decimal format
       df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id, info);
-      if(df != null) decFormats.put(id, df);
+      if(df != null) defaultFormats.put(id, df);
     }
     return df;
   }
@@ -281,6 +286,53 @@ public final class StaticContext {
   public Type type(final QNm name) {
     final TypeDecl td = typeDecl(name);
     return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final StaticContext sc &&
+        withdb == sc.withdb && defaultdb == sc.defaultdb && maxPerm == sc.maxPerm &&
+        elemNsFixed == sc.elemNsFixed && elemNsAny == sc.elemNsAny && strip == sc.strip &&
+        ordered == sc.ordered && orderGreatest == sc.orderGreatest && spaces == sc.spaces &&
+        preserveNS == sc.preserveNS && inheritNS == sc.inheritNS && global == sc.global &&
+        eq(elemNS, sc.elemNS) && eq(dirNS, sc.dirNS) && eq(funcNS, sc.funcNS) &&
+        baseURI.eq(sc.baseURI) && Objects.equals(contextType, sc.contextType) &&
+        Objects.equals(collation, sc.collation) && ns.list.equals(sc.ns.list) &&
+        imports.equals(sc.imports) && typesEqual(sc) && decFormatsEqual(sc);
+  }
+
+  /**
+   * Checks if the declared named item types of two static contexts are equal.
+   * @param sc static context to compare
+   * @return result of check
+   */
+  private boolean typesEqual(final StaticContext sc) {
+    if(types.size() != sc.types.size()) return false;
+    for(final QNm name : types) {
+      final TypeDecl td = sc.types.get(name);
+      if(td == null || !td.seqType.eq(types.get(name).seqType)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the decimal formats of two static contexts are equal.
+   * @param sc static context to compare
+   * @return result of check
+   */
+  private boolean decFormatsEqual(final StaticContext sc) {
+    if(decFormats.size() != sc.decFormats.size()) return false;
+    for(final byte[] id : decFormats) {
+      final DecFormatter df = sc.decFormats.get(id);
+      if(df == null || !df.options().toString().equals(decFormats.get(id).options().toString()))
+        return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return baseURI.hashCode();
   }
 
   @Override

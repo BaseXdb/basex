@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.util.*;
@@ -119,7 +121,8 @@ public abstract class Single extends ParseExpr {
    */
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final Single sngl && sc() == sngl.sc() && expr.equals(sngl.expr);
+    return obj instanceof final Single sngl && expr.equals(sngl.expr) &&
+        Objects.equals(sc(), sngl.sc());
   }
 
   @Override
