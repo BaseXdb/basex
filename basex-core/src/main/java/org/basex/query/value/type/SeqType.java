@@ -414,6 +414,20 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     final Type dt = TypeRef.deref(this.type);
+    // generalized atomic type: atomize first
+    if(!item.type.instanceOf(ANY_ATOMIC_TYPE) && dt.instanceOf(ANY_ATOMIC_TYPE)) {
+      final Value value = item.atomValue(qc, info);
+      if(value.isEmpty()) return value;
+      if(value instanceof final Item it) return coerce(it, name, qc, cc, info);
+
+      final ValueBuilder vb = new ValueBuilder(qc, value.size());
+      for(final Item it : value) {
+        final Value cast = coerce(it, name, qc, cc, info);
+        if(cast == null) return null;
+        vb.add(cast);
+      }
+      return vb.value();
+    }
     if(dt instanceof final ChoiceItemType cit) {
       // coerce to the first matching alternative
       for(final Type tp : cit.types) {
@@ -431,19 +445,7 @@ public final class SeqType {
       }
       return null;
     }
-    if(dt instanceof BasicType || dt instanceof EnumType) {
-      final Value value = item.atomValue(qc, info);
-      final long size = value.size();
-      if(size == 1) return coerceAtomic((Item) value, dt, qc, info);
-
-      final ValueBuilder vb = new ValueBuilder(qc, size);
-      for(final Item it : value) {
-        final Item cast = coerceAtomic(it, dt, qc, info);
-        if(cast == null) return null;
-        vb.add(cast);
-      }
-      return vb.value();
-    }
+    if(dt instanceof BasicType || dt instanceof EnumType) return coerceAtomic(item, dt, qc, info);
     if(item instanceof final FItem fitem) {
       if(fitem instanceof final XQArray array) {
         if(dt instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);

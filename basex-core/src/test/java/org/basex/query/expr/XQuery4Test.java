@@ -1309,5 +1309,11 @@ public final class XQuery4Test extends SandboxTest {
     query(func + "{ $x = 'b' }; local:f([ 'a', 'b' ])", true);
     query(func + "{ count(distinct-values($x)) }; local:f([ 'a', 'a' ])", 1);
     query(func + "{ string-join($x) }; local:f([ 'a', 'b' ])", "ab");
+
+    // choice of atomic types: atomization
+    query("fn($x as (xs:integer | xs:string)) { $x }(<a>5</a>) => type-of()", "xs:integer");
+    query("fn($x as (xs:string | xs:integer)*) { $x }([ 1, 'a' ])", "1\na");
+    error("fn($x as (xs:string | xs:integer)) { $x }({ 'a': 1 })", FIATOMIZE_X);
+    error("fn($x as (xs:string | xs:integer)) { $x }([ 1, 'a' ])", INVTYPE_X);
   }
 }

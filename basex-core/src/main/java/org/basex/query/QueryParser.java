@@ -2973,7 +2973,8 @@ public class QueryParser extends InputParser {
           final Expr first = single();
           add(el, check(first, INVMAPKEY));
           if(wsConsume(":")) {
-            if(first instanceof final Item item && !set.add(item)) throw error(MAPDUPLKEY_X, first);
+            if(first instanceof final Item item && !item.isEmpty() && !set.add(item))
+              throw error(MAPDUPLKEY_X, first);
             add(el, check(single(), INVMAPVAL));
           } else {
             add(el, Empty.UNDEFINED);

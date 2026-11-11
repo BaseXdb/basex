@@ -195,13 +195,13 @@ public enum Records {
   static {
     for(final Records record : values()) BUILT_IN.put(record.type.name(), record.type);
     // resolve (possibly recursive) forward references
-    for(final QNm name : Refs.MAP) Refs.MAP.get(name).resolve(BUILT_IN.get(name));
+    for(final QNm name : Refs.TYPES) Refs.TYPES.get(name).resolve(BUILT_IN.get(name));
   }
 
   /** References to built-in record types, created while the record types are being built. */
   private static final class Refs {
     /** Type references. */
-    private static final QNmMap<TypeRef> MAP = new QNmMap<>();
+    private static final QNmMap<TypeRef> TYPES = new QNmMap<>();
   }
 
   /** Record type. */
@@ -255,7 +255,7 @@ public enum Records {
    */
   private static SeqType ref(final String name, final Occ occ) {
     final QNm qnm = new QNm(name + "-record", FN_URI);
-    return Refs.MAP.computeIfAbsent(qnm, () -> new TypeRef(qnm, new InputInfo(name, 0, 0))).
+    return Refs.TYPES.computeIfAbsent(qnm, () -> new TypeRef(qnm, new InputInfo(name, 0, 0))).
         seqType(occ);
   }
 }

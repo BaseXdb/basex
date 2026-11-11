@@ -184,7 +184,7 @@ abstract class DbNew extends DbAccessFn {
       if(map.structSize() != 1) throw DB_PATH_X.get(info, map);
       final XQMap.Entry entry = map.entries().iterator().next();
       final Value value = entry.value();
-      if(!(value instanceof final Item type)) throw DB_PATH_X.get(info, map);
+      if(!(value instanceof final Item type) || type.isEmpty()) throw DB_PATH_X.get(info, map);
       return new PathSpec(toDbPath(toString(entry.key())), toEnum(type, ResourceType.class));
     }
     return new PathSpec(toDbPath(toString(item)), null);

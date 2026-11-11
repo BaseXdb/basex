@@ -610,6 +610,9 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, "x", " { 'a.txt': 'value', 'b': 'value' }"), DB_PATH_X);
     // error: empty path in the metadata map
     error(func.args(NAME, "x", " { '': 'value' }"), DB_PATH_X);
+    // error: no single resource type in the metadata map
+    error(func.args(NAME, "x", " { 'a': () }"), DB_PATH_X);
+    error(func.args(NAME, "x", " { 'a': ('value', 'value') }"), DB_PATH_X);
     // error: unknown resource type
     error(func.args(NAME, "x", " { 'a': 'unknown' }"), EXP_FOUND_X_X);
     // error: type 'binary' with a non-binary, non-string input
