@@ -20,7 +20,7 @@ public final class ArrayRemove extends ArrayFn {
   public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Expr positions = arg(1);
-    final Value pos = positions.atomValue(qc, info);
+    final Value pos = atomValue(positions, qc);
 
     // collect and sort positions and remove duplicates
     final LongList list = new LongList(pos.size());

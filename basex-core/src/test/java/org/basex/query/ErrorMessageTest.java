@@ -153,6 +153,27 @@ public final class ErrorMessageTest extends SandboxTest {
     errorMessage("let ${ $a } := 1 return $a", INVTYPE_X, "${ $a }: ");
   }
 
+  /** Atomization and cardinality errors of arguments name the parameter. */
+  @Test public void argumentName() {
+    errorMessage("highest((1, 2), { 'a': 1 })", FIATOMIZE_X, "$collation: atomic item required");
+    errorMessage("substring('abc', [ { 'a': 1 } ])", FIATOMIZE_X, "$start: ");
+    errorMessage("substring('abc', (1, 2))", INVTYPE_X, "$start: one item expected");
+    errorMessage("substring('abc', 1, (1, 2))", INVTYPE_X, "$length: one item expected");
+    errorMessage("round(1.5, 0, { 'a': 1 })", FIATOMIZE_X, "$mode: ");
+    errorMessage("bit:and(1, { 'a': 1 })", FIATOMIZE_X, "$value2: ");
+    errorMessage("data((1, fn() { 1 }))", FIATOMIZE_X, "$input: ");
+    errorMessage("array:remove([ 1 ], [ { 'a': 1 } ])", FIATOMIZE_X, "$positions: ");
+    errorMessage("fn($x as xs:string) { $x }(('a', { 'a': 1 }))", FIATOMIZE_X, "$x: ");
+    errorMessage("let $x as xs:string := { 'a': 1 } return $x", FIATOMIZE_X, "$x: ");
+    errorMessage("declare record local:r(a as xs:string); local:r({ 'a': 1 })", FIATOMIZE_X,
+        "$a: ");
+    errorMessage("{ 'a': 1 } + 1", FIATOMIZE_X, "Atomic item required");
+    query("substring('abc', ([], 2))", "bc");
+    // an inlined argument is reported at the call site
+    errorAt("declare function local:f($n) { let $m := { $n: 1 } return substring('abc', $m) };"
+        + " local:f(random:uuid())", FIATOMIZE_X, 68);
+  }
+
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
     error("declare function abc($j) { }; abc()", PARAMMISSING_X_X);

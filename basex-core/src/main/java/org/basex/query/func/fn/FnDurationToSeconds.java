@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 public final class FnDurationToSeconds extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     return value.isEmpty() ? value :
       Dec.get(((DTDur) checkType(value, BasicType.DAY_TIME_DURATION, qc)).dtd());
   }

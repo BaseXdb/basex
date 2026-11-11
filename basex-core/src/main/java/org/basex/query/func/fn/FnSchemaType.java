@@ -24,7 +24,7 @@ import org.basex.util.hash.*;
 public class FnSchemaType extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final QNm name = toQNm(arg(0).atomItem(qc, info));
+    final QNm name = toQNm(atomItem(arg(0), qc));
     Type type = get(name, true);
     if(type == null) type = ListType.get(name);
     return annotate(qc, info, type);

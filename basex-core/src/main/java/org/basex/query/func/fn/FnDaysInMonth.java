@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
 public final class FnDaysInMonth extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     if(value.isEmpty()) return Empty.VALUE;
 
     final ADate date = (ADate) Types.YEAR_MONTH_ZO.coerce(value, qc, info);

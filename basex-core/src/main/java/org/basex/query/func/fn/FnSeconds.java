@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 public final class FnSeconds extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     return value.isEmpty() ? value :
       new DTDur(checkType(value, BasicType.DECIMAL, qc).dec(info), info);
   }

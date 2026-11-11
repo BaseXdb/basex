@@ -21,7 +21,7 @@ public final class FnParseInteger extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
     final Expr radix = arg(1);
-    final Item rad = radix.atomItem(qc, info);
+    final Item rad = atomItem(radix, qc);
     if(value == null) return Empty.VALUE;
 
     final long rdx = rad.isEmpty() ? 10 : toLong(rad, radix);

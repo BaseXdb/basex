@@ -449,7 +449,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final ADate toGregorianOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, qc, info);
   }
 
@@ -478,7 +478,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final ADate toDateOrNull(final Expr expr, final BasicType type,
       final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toDate(item, type, expr, qc);
   }
 
@@ -507,7 +507,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final AStr toStr(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item value = expr.atomItem(qc, info);
+    final Item value = atomItem(expr, qc);
     return value instanceof final AStr str ? str : Str.get(toToken(value, expr));
   }
 
@@ -519,7 +519,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final AStr toZeroStr(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item value = expr.atomItem(qc, info);
+    final Item value = atomItem(expr, qc);
     return value.isEmpty() ? Str.EMPTY : value instanceof final AStr str ? str :
       Str.get(toToken(value, expr));
   }
@@ -544,7 +544,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Dur toDurOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     if(item.isEmpty()) return null;
     if(item instanceof final Dur dur) return dur;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
@@ -572,8 +572,28 @@ public abstract class StandardFunc extends Arr {
     if(found != 1) return super.argTypeError(item, type, expr);
 
     final SeqType st = types[Math.min(arg, tl - 1)];
-    final QNm name = definition.paramNames(arg + 1)[arg];
-    return typeError(item, mismatch ? st : type.seqType(), name, info);
+    return typeError(item, mismatch ? st : type.seqType(), paramName(arg), info);
+  }
+
+  @Override
+  protected final QNm argName(final Expr expr) {
+    int arg = -1;
+    final int al = exprs.length;
+    for(int a = 0; a < al; a++) {
+      if(exprs[a] != expr) continue;
+      if(arg != -1) return null;
+      arg = a;
+    }
+    return arg != -1 ? paramName(arg) : null;
+  }
+
+  /**
+   * Returns the name of the parameter at the specified position.
+   * @param arg argument position
+   * @return parameter name
+   */
+  private QNm paramName(final int arg) {
+    return definition.paramNames(arg + 1)[arg];
   }
 
   /**
@@ -890,7 +910,11 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
     Item item = expr.unwrappedItem(qc, info);
     if(!(item instanceof XNode)) {
-      item = item.atomItem(qc, info);
+      try {
+        item = item.atomItem(qc, info);
+      } catch(final QueryException ex) {
+        throw atomizeError(ex, item, argName(expr), info);
+      }
       if(item.isEmpty()) {
         if(empty) return null;
         throw argTypeError(item, BasicType.ITEM, expr);

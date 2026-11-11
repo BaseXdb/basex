@@ -33,7 +33,7 @@ abstract class UserFn extends StandardFunc {
   protected final StringList toPatterns(final Expr expr, final QueryContext qc)
       throws QueryException {
     final StringList patterns = new StringList();
-    for(final Item item : expr.atomValue(qc, info)) {
+    for(final Item item : atomValue(expr, qc)) {
       final String pattern = toString(item);
       if(!pattern.isEmpty() && !Databases.validPattern(pattern))
         throw USER_PATTERN_X.get(info, pattern);
@@ -99,7 +99,7 @@ abstract class UserFn extends StandardFunc {
       throws QueryException {
 
     final ArrayList<Perm> perms = new ArrayList<>();
-    for(final Item item : expr.atomValue(qc, info)) {
+    for(final Item item : atomValue(expr, qc)) {
       final String perm = toString(item);
       final Perm p = Enums.get(Perm.class, perm);
       if(p == null) throw USER_PERMISSION_X.get(info, perm);

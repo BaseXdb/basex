@@ -23,7 +23,7 @@ public final class FnData extends ContextFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return contextArg(qc).atomValue(qc, info);
+    return atomValue(contextArg(qc), qc);
   }
 
   @Override

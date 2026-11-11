@@ -22,7 +22,7 @@ public final class FnFormatNumber extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
-    Item number = value.atomItem(qc, info);
+    Item number = atomItem(value, qc);
     final byte[] picture = toToken(arg(1), qc);
     final Item options = arg(2).unwrappedItem(qc, info);
 

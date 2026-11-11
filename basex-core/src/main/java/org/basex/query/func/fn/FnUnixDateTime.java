@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
 public final class FnUnixDateTime extends StandardFunc {
   @Override
   public Dtm value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     return value.isEmpty() ? Dtm.ZERO : Dtm.get(toLong(value));
   }
 }

@@ -8,8 +8,10 @@ import java.math.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -820,7 +822,7 @@ public enum QueryError {
   REGGROUP_X(FORX, 4, "Unknown group name in replacement string: $<%>."),
 
   /** Error code. */
-  FIATOMIZE_X(FOTY, 13, "Atomic item required, function item found: %."),
+  FIATOMIZE_X(FOTY, 13, "%."),
   /** Error code. */
   FISTRING_X(FOTY, 14, "Function item has no string value: %."),
 
@@ -1877,6 +1879,56 @@ public enum QueryError {
     // add input expression
     if(expr != null && !ist.eq(Types.EMPTY_SEQUENCE_Z)) desc.add(": ").add(expr.toErrorString());
     return INVTYPE_X.get(info, desc);
+  }
+
+  /**
+   * Returns an exception for a function item that cannot be atomized.
+   * @param item function item
+   * @param name name (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException atomizeError(final FItem item, final QNm name,
+      final InputInfo info) {
+    final String msg = "atomic item required, function item found: " + item.toErrorString();
+    return FIATOMIZE_X.get(info, name != null ? Token.string(name.varString()) + ": " + msg :
+      Strings.capitalize(msg));
+  }
+
+  /**
+   * Returns an atomization exception with a parameter name, or the original exception.
+   * @param ex original exception
+   * @param value value that was atomized
+   * @param name name (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException atomizeError(final QueryException ex, final Value value,
+      final QNm name, final InputInfo info) {
+    final FItem item = name != null && ex.error() == FIATOMIZE_X ? functionItem(value) : null;
+    return item != null ? atomizeError(item, name, info) : ex;
+  }
+
+  /**
+   * Returns the first function item of a value that cannot be atomized.
+   * @param value value
+   * @return function item (can be {@code null})
+   */
+  private static FItem functionItem(final Value value) {
+    for(final Item item : value) {
+      if(item instanceof final XQArray array) {
+        for(final Value member : array.members()) {
+          final FItem fi = functionItem(member);
+          if(fi != null) return fi;
+        }
+      } else if(item instanceof final JNode jnode) {
+        final FItem fi = functionItem(jnode.value);
+        if(fi != null) return fi;
+      } else if(item instanceof final FItem fitem) {
+        return fitem;
+      }
+    }
+    return null;
   }
 
   /**

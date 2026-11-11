@@ -36,7 +36,7 @@ abstract class ProcFn extends StandardFunc {
     final String command = toString(arg(0), qc);
     final StringList args = new StringList().add(command);
     final Expr arguments = arg(1);
-    for(final Item item : arguments.atomValue(qc, info)) args.add(toString(item, arguments));
+    for(final Item item : atomValue(arguments, qc)) args.add(toString(item, arguments));
 
     // options
     final ProcOptions options = toOptions(arg(2), new ProcOptions(), qc);

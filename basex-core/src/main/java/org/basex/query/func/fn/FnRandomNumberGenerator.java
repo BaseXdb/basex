@@ -33,7 +33,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final Item seed = arg(0).atomItem(qc, info);
+    final Item seed = atomItem(arg(0), qc);
     return generator(seed.isEmpty() ? qc.dateTime().nano : seed.hashCode(), qc, info);
   }
 

@@ -287,12 +287,12 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw atomizeError(this, null, ii);
   }
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw atomizeError(this, null, ii);
   }
 
   @Override

@@ -51,7 +51,7 @@ public final class ProfRuntime extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item option = arg(0).atomItem(qc, info);
+    final Item option = atomItem(arg(0), qc);
     final Runtime rt = Runtime.getRuntime();
 
     if(option.isEmpty()) {

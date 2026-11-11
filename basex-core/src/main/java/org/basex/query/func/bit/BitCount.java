@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
 public final class BitCount extends BitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item = arg(0).atomItem(qc, info);
+    final Item item = atomItem(arg(0), qc);
     return item == Empty.VALUE ? Empty.VALUE : Itr.get(Long.bitCount(toLong(item, arg(0))));
   }
 }

@@ -18,7 +18,7 @@ public final class FnChar extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
-    final Item item = value.atomItem(qc, info);
+    final Item item = atomItem(value, qc);
 
     if(item instanceof Itr) {
       // codepoint integer

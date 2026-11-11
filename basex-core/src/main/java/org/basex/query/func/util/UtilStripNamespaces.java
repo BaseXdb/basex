@@ -20,7 +20,7 @@ public final class UtilStripNamespaces extends StandardFunc {
   public XNode value(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final Expr prefixes = arg(1);
-    final Value names = prefixes.atomValue(qc, info);
+    final Value names = atomValue(prefixes, qc);
 
     final TokenSet set = new TokenSet(names.size());
     for(final Item item : names) set.add(toToken(item, prefixes));

@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
 public final class BitShift extends BitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item = arg(0).atomItem(qc, info);
+    final Item item = atomItem(arg(0), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
 
     final long value = toLong(item, arg(0)), by = toLong(arg(1), qc);

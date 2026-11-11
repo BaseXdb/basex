@@ -56,7 +56,7 @@ public abstract class ContextFn extends StandardFunc {
   protected final Item atomArg(final QueryContext qc) throws QueryException {
     final Expr expr = contextArg(qc);
     return usesContext() && stringContext() ?
-      FnString.string(expr.unwrappedItem(qc, info), info) : expr.atomItem(qc, info);
+      FnString.string(expr.unwrappedItem(qc, info), info) : atomItem(expr, qc);
   }
 
   /**

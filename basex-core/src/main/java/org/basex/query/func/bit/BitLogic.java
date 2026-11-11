@@ -15,9 +15,9 @@ import org.basex.query.value.seq.*;
 abstract class BitLogic extends BitFn {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Item item1 = arg(0).atomItem(qc, info);
+    final Item item1 = atomItem(arg(0), qc);
     if(item1 == Empty.VALUE) return Empty.VALUE;
-    final Item item2 = arg(1).atomItem(qc, info);
+    final Item item2 = atomItem(arg(1), qc);
     if(item2 == Empty.VALUE) return Empty.VALUE;
     return Itr.get(combine(toLong(item1, arg(0)), toLong(item2, arg(1))));
   }

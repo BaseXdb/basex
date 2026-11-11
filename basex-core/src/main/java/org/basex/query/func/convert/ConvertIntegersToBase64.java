@@ -30,7 +30,7 @@ public class ConvertIntegersToBase64 extends StandardFunc {
    */
   final B64 bytesToB64(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
-    final Value value = input.atomValue(qc, info);
+    final Value value = atomValue(input, qc);
 
     // return internal byte array
     if(value instanceof final BytSeq bs && bs.type == BasicType.BYTE) return B64.get(bs.values());

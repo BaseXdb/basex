@@ -46,7 +46,7 @@ public final class FnItemsAt extends StandardFunc {
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
     final Expr at = arg(1);
-    final Item pos = guarded(() -> at.atomItem(qc, info), Empty.VALUE, qc);
+    final Item pos = guarded(() -> atomItem(at, qc), Empty.VALUE, qc);
     if(pos.isEmpty()) return Empty.VALUE;
     final long l = Pos.position(toNumber(pos, at)) - 1;
     return l < 0 ? Empty.VALUE : item(arg(0), l, qc, info);
@@ -100,7 +100,7 @@ public final class FnItemsAt extends StandardFunc {
       iter = at.atomIter(qc, info);
     } else {
       // only retrieve the input items up to the largest position (the input may be unbounded)
-      final Value positions = guarded(() -> at.atomValue(qc, info), Empty.VALUE, qc);
+      final Value positions = guarded(() -> atomValue(at, qc), Empty.VALUE, qc);
       final long max = guarded(() -> {
         if(positions instanceof final RangeSeq rs) return rs.max();
         long m = 0;

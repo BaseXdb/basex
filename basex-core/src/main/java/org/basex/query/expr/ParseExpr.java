@@ -341,7 +341,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toZeroToken(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? Token.EMPTY : toToken(item, expr);
   }
 
@@ -354,7 +354,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toTokenOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toToken(item, expr);
   }
 
@@ -378,7 +378,8 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toToken(final Item item, final Expr expr) throws QueryException {
     final Type type = item.type;
     if(type.isStringOrUntyped()) return item.string(info);
-    throw item instanceof FItem ? FIATOMIZE_X.get(info, item) : argTypeError(item, STRING, expr);
+    throw item instanceof final FItem fitem ? atomizeError(fitem, argName(expr), info) :
+      argTypeError(item, STRING, expr);
   }
 
   /**
@@ -422,7 +423,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final String toZeroString(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? "" : toString(item, expr);
   }
 
@@ -435,7 +436,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final String toStringOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toString(item, expr);
   }
 
@@ -447,7 +448,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Expr expr, final QueryContext qc) throws QueryException {
-    return toBoolean(expr.atomItem(qc, info), expr);
+    return toBoolean(atomItem(expr, qc), expr);
   }
 
   /**
@@ -459,7 +460,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final boolean toBooleanOrFalse(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return !item.isEmpty() && toBoolean(item, expr);
   }
 
@@ -472,7 +473,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Boolean toBooleanOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toBoolean(item, expr);
   }
 
@@ -508,7 +509,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double toDouble(final Expr expr, final QueryContext qc) throws QueryException {
-    return toDouble(expr.atomItem(qc, info), expr);
+    return toDouble(atomItem(expr, qc), expr);
   }
 
   /**
@@ -520,7 +521,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Double toDoubleOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toDouble(item, expr);
   }
 
@@ -555,7 +556,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANum toNumberOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toNumber(item, expr);
   }
 
@@ -590,7 +591,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final float toFloat(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     if(item.type.isNumberOrUntyped()) return item.flt(info);
     throw argTypeError(item, NUMERIC, expr);
   }
@@ -603,7 +604,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final long toLong(final Expr expr, final QueryContext qc) throws QueryException {
-    return toLong(expr.atomItem(qc, info), expr);
+    return toLong(atomItem(expr, qc), expr);
   }
 
   /**
@@ -614,7 +615,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Long toLongOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toLong(item, expr);
   }
 
@@ -782,9 +783,40 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item toAtomItem(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     if(item == Empty.VALUE) throw argTypeError(item, ITEM, expr);
     return item;
+  }
+
+  /**
+   * Evaluates an expression to an atomized item or an empty sequence.
+   * @param expr expression
+   * @param qc query context
+   * @return atomized item or {@link Empty#VALUE}
+   * @throws QueryException query exception
+   */
+  protected final Item atomItem(final Expr expr, final QueryContext qc) throws QueryException {
+    final Value atoms = atomValue(expr, qc);
+    if(atoms.size() > 1 && argName(expr) instanceof final QNm name) {
+      throw typeError(atoms, Types.ITEM_O, name, info);
+    }
+    return atoms.item(qc, expr.info(info));
+  }
+
+  /**
+   * Evaluates an expression to atomized items.
+   * @param expr expression
+   * @param qc query context
+   * @return atomized items
+   * @throws QueryException query exception
+   */
+  protected final Value atomValue(final Expr expr, final QueryContext qc) throws QueryException {
+    final Value value = expr.value(qc);
+    try {
+      return value.atomValue(qc, expr.info(info));
+    } catch(final QueryException ex) {
+      throw atomizeError(ex, value, argName(expr), info);
+    }
   }
 
   /**
@@ -835,7 +867,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Bin toBin(final Expr expr, final QueryContext qc) throws QueryException {
-    return toBin(expr.atomItem(qc, info));
+    return toBin(atomItem(expr, qc));
   }
 
   /**
@@ -857,7 +889,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Bin toBinOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toBin(item);
   }
 
@@ -869,7 +901,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toBytes(final Expr expr, final QueryContext qc) throws QueryException {
-    return toBytes(expr.atomItem(qc, info));
+    return toBytes(atomItem(expr, qc));
   }
 
   /**
@@ -914,7 +946,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final QNm toQNmOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    final Item item = atomItem(expr, qc);
     return item.isEmpty() ? null : toQNm(item, expr);
   }
 
@@ -1057,7 +1089,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkType(final Expr expr, final BasicType type, final QueryContext qc)
       throws QueryException {
-    return (Item) type.seqType().coerce(expr.atomItem(qc, info), qc, info);
+    return (Item) type.seqType().coerce(atomItem(expr, qc), qc, info);
   }
 
   /**
@@ -1095,5 +1127,14 @@ public abstract class ParseExpr extends Expr {
   protected QueryException argTypeError(final Item item, final Type type,
       @SuppressWarnings("unused") final Expr expr) {
     return type == NUMERIC ? numberError(this, item) : typeError(item, type, info);
+  }
+
+  /**
+   * Returns the name of the parameter to which an argument is bound.
+   * @param expr argument expression (can be {@code null})
+   * @return parameter name (can be {@code null})
+   */
+  protected QNm argName(@SuppressWarnings("unused") final Expr expr) {
+    return null;
   }
 }

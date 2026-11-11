@@ -26,7 +26,7 @@ abstract class FormatFn extends StandardFunc {
    */
   final Item formatDate(final BasicType tp, final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
-    final Item item = value.atomItem(qc, info);
+    final Item item = atomItem(value, qc);
     if(item == Empty.VALUE) return Empty.VALUE;
 
     final byte[] picture = toZeroToken(arg(1), qc);

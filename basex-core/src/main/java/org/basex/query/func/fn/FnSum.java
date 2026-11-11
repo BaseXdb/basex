@@ -33,7 +33,7 @@ public class FnSum extends NumericFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item item = sum(false, qc);
-    return item != null ? item : defined(1) ? arg(1).atomItem(qc, info) : Itr.ZERO;
+    return item != null ? item : defined(1) ? atomItem(arg(1), qc) : Itr.ZERO;
   }
 
   @Override

@@ -19,8 +19,8 @@ import org.basex.query.value.seq.*;
 public final class FnCompare extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value1 = arg(0).atomItem(qc, info);
-    final Item value2 = arg(1).atomItem(qc, info);
+    final Item value1 = atomItem(arg(0), qc);
+    final Item value2 = atomItem(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);
 
     if(value1.isEmpty() || value2.isEmpty()) return Empty.VALUE;

@@ -69,7 +69,7 @@ public class FnCollection extends Docs {
     QueryInput qi = queryInput;
     if(qi == null) {
       final Expr source = arg(0);
-      final Item uri = source.atomItem(qc, info);
+      final Item uri = atomItem(source, qc);
       if(!uri.isEmpty()) {
         qi = queryInput(toToken(uri, source));
         if(qi == null) throw INVCOLL_X.get(info, uri);

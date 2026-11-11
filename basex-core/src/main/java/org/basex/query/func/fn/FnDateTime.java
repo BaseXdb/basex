@@ -17,8 +17,8 @@ import org.basex.query.value.type.*;
 public final class FnDateTime extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item date = arg(0).atomItem(qc, info);
-    final Item time = arg(1).atomItem(qc, info);
+    final Item date = atomItem(arg(0), qc);
+    final Item time = atomItem(arg(1), qc);
     if(date.isEmpty() || time.isEmpty()) return Empty.VALUE;
 
     final Dat dat = date.type.isUntyped() ? new Dat(date.string(info), info) :

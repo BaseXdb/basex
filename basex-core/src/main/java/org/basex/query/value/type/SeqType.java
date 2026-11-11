@@ -416,7 +416,12 @@ public final class SeqType {
     final Type dt = TypeRef.deref(this.type);
     // generalized atomic type: atomize first
     if(!item.type.instanceOf(ANY_ATOMIC_TYPE) && dt.instanceOf(ANY_ATOMIC_TYPE)) {
-      final Value value = item.atomValue(qc, info);
+      final Value value;
+      try {
+        value = item.atomValue(qc, info);
+      } catch(final QueryException ex) {
+        throw atomizeError(ex, item, name, info);
+      }
       if(value.isEmpty()) return value;
       if(value instanceof final Item it) return coerce(it, name, qc, cc, info);
 

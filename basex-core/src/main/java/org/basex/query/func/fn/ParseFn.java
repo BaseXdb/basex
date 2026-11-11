@@ -91,7 +91,7 @@ public abstract class ParseFn extends StandardFunc {
    * @throws QueryException query exception
    */
   protected Value parse(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     if(value.isEmpty()) return Empty.VALUE;
 
     final IO io = new IOContent(toBytes(value));

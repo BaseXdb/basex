@@ -84,7 +84,7 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANum length(final QueryContext qc) throws QueryException {
-    final Item length = arg(2).atomItem(qc, info);
+    final Item length = atomItem(arg(2), qc);
     return length.isEmpty() ? null : round(toNumber(length, arg(2)));
   }
 

@@ -38,7 +38,7 @@ public class FtTokenize extends StandardFunc {
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final Expr value = arg(0);
-    final Item item = value.atomItem(qc, info);
+    final Item item = atomItem(value, qc);
     final FtLexerOptions options = options(1, FtLexerOptions::new, qc);
 
     final TokenList tl = new TokenList();

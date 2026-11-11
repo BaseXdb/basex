@@ -198,7 +198,7 @@ public class FnSubsequence extends StandardFunc {
    */
   private SeqRange range(final QueryContext qc) throws QueryException {
     final ANum first = toNumber(toAtomItem(arg(1), qc), arg(1)).round(0, mode(true));
-    final Item second = arg(2).atomItem(qc, info);
+    final Item second = atomItem(arg(2), qc);
     final long s = index(first, info), e = second.isEmpty() ? Long.MAX_VALUE :
       index(end(first, toNumber(second, arg(2)).round(0, mode(false))), info);
     if(s == -1 || e == -1 || s >= e) return EMPTY;

@@ -39,7 +39,7 @@ abstract class FileWriteFn extends FileFn {
 
     final Path path = toTarget(arg(0), qc);
     final Expr input = arg(1);
-    final Value value = input.atomValue(qc, info);
+    final Value value = atomValue(input, qc);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
     // UTF-16: write a single byte order mark, and only to empty files
     final boolean utf16 = encoding == Strings.UTF16;

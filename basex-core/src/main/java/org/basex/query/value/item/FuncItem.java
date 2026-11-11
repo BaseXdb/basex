@@ -270,17 +270,17 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(info, this);
+    throw atomizeError(this, null, info);
   }
 
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(info, this);
+    throw atomizeError(this, null, info);
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(info, this);
+    throw atomizeError(this, null, info);
   }
 
   @Override

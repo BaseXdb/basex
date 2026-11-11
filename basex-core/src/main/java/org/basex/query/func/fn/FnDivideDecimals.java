@@ -26,7 +26,7 @@ public final class FnDivideDecimals extends StandardFunc {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
     final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Expr precision = arg(2);
-    final Item prec = precision.atomItem(qc, info);
+    final Item prec = atomItem(precision, qc);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);
 
     final int scale = prec.isEmpty() ? 0 : (int) Math.max(-MAX_PRECISION,

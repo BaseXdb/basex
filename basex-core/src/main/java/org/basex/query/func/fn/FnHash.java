@@ -26,7 +26,7 @@ import org.basex.util.similarity.*;
 public final class FnHash extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Item value = atomItem(arg(0), qc);
     final String algorithm = toStringOrNull(arg(1), qc);
     return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));
   }

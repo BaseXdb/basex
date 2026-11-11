@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnNumber extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = contextArg(qc).atomItem(qc, info);
+    final Item value = atomItem(contextArg(qc), qc);
     if(value.isEmpty()) return Dbl.NAN;
     // invalid input: NaN is returned
     final Item cast = (Item) Types.DOUBLE_O.cast(value, false, qc, info);

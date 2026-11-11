@@ -74,7 +74,7 @@ abstract class ArchiveFn extends StandardFunc {
    * @throws IOException I/O exception
    */
   final Object toInput(final Expr expr, final QueryContext qc) throws QueryException, IOException {
-    final Item archive = expr.atomItem(qc, info);
+    final Item archive = atomItem(expr, qc);
     if(archive instanceof final Bin bin) {
       return bin instanceof final B64IOLazy lazy ? zipFile(lazy.input(), bin) : bin;
     }

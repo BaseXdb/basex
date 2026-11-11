@@ -26,7 +26,7 @@ public abstract class XQStruct extends FItem {
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw atomizeError(this, null, ii);
   }
 
   @Override

@@ -29,7 +29,7 @@ public final class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
-    final long count = toLong(arg(1).atomItem(qc, info), 0);
+    final long count = toLong(atomItem(arg(1), qc), 0);
 
     if(count == 0) return Empty.VALUE;
     if(count == 1) return input.value(qc);
@@ -66,7 +66,7 @@ public final class FnReplicate extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
-    final long count = toLong(arg(1).atomItem(qc, info), 0);
+    final long count = toLong(atomItem(arg(1), qc), 0);
     if(count == 0) return Empty.ITER;
     if(count == 1) return input.iter(qc);
 

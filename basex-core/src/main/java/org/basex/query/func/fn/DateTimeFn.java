@@ -34,8 +34,8 @@ abstract class DateTimeFn extends StandardFunc {
    */
   final Item adjust(final BasicType type, final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
-    final Item item = value.atomItem(qc, info);
-    final Item zone = arg(1).atomItem(qc, info);
+    final Item item = atomItem(value, qc);
+    final Item zone = atomItem(arg(1), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
 
     final ADate date = toDate(item, type, value, qc);
