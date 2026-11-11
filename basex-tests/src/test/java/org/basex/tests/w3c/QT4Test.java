@@ -1,5 +1,6 @@
 package org.basex.tests.w3c;
 
+import static org.basex.util.Token.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
@@ -8,7 +9,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.*;
 
-import org.basex.tests.bxapi.xdm.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.*;
 
@@ -35,7 +35,7 @@ public class QT4Test {
   /** System property with a test set glob. */
   private static final String TEST_SET = "qt4.test-set";
 
-  /** Test suite driver. */
+  /** Test suite driver (can be {@code null}). */
   private static QT3TS driver;
 
   /**
@@ -63,13 +63,12 @@ public class QT4Test {
    * @return result of check
    */
   private static boolean isSuite(final Path dir) {
-    return Files.isRegularFile(dir.resolve("catalog.xml"));
+    return Files.isRegularFile(dir.resolve(QT3Constants.CATALOG));
   }
 
   /**
-   * Looks for the suite in the ancestors of the working directory (the working directory is
-   * the root project or a module; worktrees inside the project are covered as well).
-   * @return suite directory, or {@code null}
+   * Looks for the suite in the ancestors of the working directory.
+   * @return suite directory (can be {@code null})
    */
   private static Path sibling() {
     for(Path dir = Path.of("").toAbsolutePath().getParent(); dir != null; dir = dir.getParent()) {
@@ -91,7 +90,7 @@ public class QT4Test {
   }
 
   /**
-   * Creates a container per selected test set. Children are read when the container is executed.
+   * Creates a container per selected test set.
    * @return containers
    */
   @TestFactory
@@ -113,9 +112,8 @@ public class QT4Test {
    */
   private static Stream<DynamicTest> cases(final String file) {
     try {
-      final QT3TS.TestSet set = driver.open(file);
-      return set.cases().stream().map(item -> DynamicTest.dynamicTest(QT3TS.name(item),
-          () -> run(set, item)));
+      return driver.open(file).cases.keySet().stream().map(name ->
+        DynamicTest.dynamicTest(name, () -> run(file, name)));
     } catch(final IOException ex) {
       throw new UncheckedIOException(ex);
     }
@@ -123,14 +121,15 @@ public class QT4Test {
 
   /**
    * Runs a test case.
-   * @param set test set
-   * @param item test case
+   * @param file test set file
+   * @param name name of test case
    * @throws Exception exception
    */
-  private static void run(final QT3TS.TestSet set, final XdmItem item) throws Exception {
-    assumeFalse(set.ignored(item), "Not supported by BaseX.");
-    final QT3TS.Outcome outcome = set.run(item);
-    if(outcome.expected() != null) fail(outcome.text() + "File: " + set.uri);
+  private static void run(final String file, final String name) throws Exception {
+    final QT3TS.TestSet set = driver.open(file);
+    assumeFalse(set.ignored(name), "Not supported by BaseX.");
+    final QT3TS.Outcome outcome = driver.execute(name);
+    if(!outcome.ok()) fail(string(outcome.text()) + "File: " + set.uri);
   }
 
 }
