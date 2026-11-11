@@ -74,6 +74,8 @@ public final class QT3TS extends Main {
   /** Number of ignored queries. */
   private int ignored;
 
+  /** Current test set. */
+  private TestSet current;
   /** Current base URI. */
   private String baseURI;
   /** Current base directory. */
@@ -127,6 +129,20 @@ public final class QT3TS extends Main {
   }
 
   /**
+   * Constructor for running single test cases (e.g., from JUnit).
+   * @param path path to the test suite
+   * @param sandbox sandbox directory
+   * @throws IOException I/O exception
+   */
+  QT3TS(final String path, final String sandbox) throws IOException {
+    super(new String[0]);
+    sandpit = new IOFile(sandbox);
+    basePath = new File(path).getCanonicalPath();
+    init();
+    catalog();
+  }
+
+  /**
    * Constructor for a worker that runs test sets in parallel.
    * @param main main instance
    * @param id id of the worker
@@ -168,24 +184,14 @@ public final class QT3TS extends Main {
     init();
     parseArgs();
 
-    // output directory of fn:put tests (results/ is reserved for test runs)
-    final IOFile results = new IOFile(file(false, "results/sandpit"));
-    results.delete();
-    results.md();
-
     final Performance perf = new Performance();
 
-    final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
+    final XdmValue doc = catalog();
     final String version = asString("*:catalog/@version", doc);
     Util.println(NL + "QT Test Suite " + version);
     Util.println("Test directory: " + file(false, "."));
     Util.print("Parsing queries");
 
-    for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
-      genvs.add(new QT3Env(ctx, ienv));
-
-    for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
-        ctx).context(doc)) setFiles.add(item.getString());
     // the report is built in the order of the tests
     if(threads == 1 || report != null) {
       for(final String file : setFiles) testSet(file);
@@ -236,8 +242,50 @@ public final class QT3TS extends Main {
       }
     }
 
+    close();
+  }
+
+  /**
+   * Closes the context and removes the sandbox.
+   */
+  void close() {
     ctx.close();
-    SANDPIT.delete();
+    sandpit.delete();
+  }
+
+  /**
+   * Opens the catalog and loads its global environments and test set files.
+   * @return catalog document
+   * @throws BaseXException database exception
+   */
+  private XdmValue catalog() throws BaseXException {
+    // output directory of fn:put tests (results/ is reserved for test runs)
+    final IOFile results = new IOFile(file(false, "results/sandpit"));
+    results.delete();
+    results.md();
+    final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
+    for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
+      genvs.add(new QT3Env(ctx, ienv));
+
+    for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
+        ctx).context(doc)) setFiles.add(item.getString());
+    return doc;
+  }
+
+  /**
+   * Returns the path to the test suite.
+   * @return path
+   */
+  String path() {
+    return basePath;
+  }
+
+  /**
+   * Returns the test set files.
+   * @return files
+   */
+  List<String> testSetFiles() {
+    return List.of(setFiles.toArray());
   }
 
   /**
@@ -290,37 +338,118 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    // release test sets shared by the previous test set
-    setDatas = null;
-    sourceDatas.clear();
-    final XdmValue doc = new XQuery("doc(' " + file(false, name) + "')", ctx).value();
-    final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
-    final IO base = IO.get(doc.getBaseURI());
-    baseURI = base.path();
-    baseDir = base.dir();
-
-    if(!supported(set)) {
-      final long n = new XQuery("count(*:test-case)", ctx).context(set).value().getInteger();
+    final TestSet ts = open(name);
+    if(!ts.supported) {
+      final long n = new XQuery("count(*:test-case)", ctx).context(ts.set).value().getInteger();
       total += n;
       ignored += n;
     } else {
-      // parse environment of test-set
-      final ArrayList<QT3Env> envs = new ArrayList<>();
-      for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
-        envs.add(new QT3Env(ctx, ienv));
-
-      if(report != null) report.addSet(asString("@name", set));
+      if(report != null) report.addSet(asString("@name", ts.set));
 
       // run all test cases
-      final Set<String> unsupported = unsupported(set);
-      for(final XdmItem its : new XQuery("*:test-case", ctx).context(set)) {
+      for(final XdmItem its : ts.cases()) {
         try {
-          testCase(its, envs, unsupported);
+          testCase(its, ts.envs, ts.unsupported);
         } catch(final IOException ex) {
           Util.debug(ex);
         }
       }
     }
+  }
+
+  /**
+   * A parsed test set.
+   */
+  final class TestSet {
+    /** Test set. */
+    final XdmValue set;
+    /** Base URI. */
+    final String uri;
+    /** Base directory. */
+    final String dir;
+    /** Supported flag. */
+    final boolean supported;
+    /** Environments (empty if unsupported). */
+    final ArrayList<QT3Env> envs = new ArrayList<>();
+    /** Unsupported test cases (empty if the test set is unsupported). */
+    final Set<String> unsupported;
+
+    /**
+     * Constructor.
+     * @param doc test set document
+     * @throws BaseXException database exception
+     */
+    private TestSet(final XdmValue doc) throws BaseXException {
+      set = new XQuery("*:test-set", ctx).context(doc).value();
+      final IO base = IO.get(doc.getBaseURI());
+      uri = base.path();
+      dir = base.dir();
+      supported = supported(set);
+      if(supported) {
+        for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
+          envs.add(new QT3Env(ctx, ienv));
+        unsupported = unsupported(set);
+      } else {
+        unsupported = Set.of();
+      }
+    }
+
+    /**
+     * Returns the test cases.
+     * @return test cases
+     */
+    ArrayList<XdmItem> cases() {
+      final ArrayList<XdmItem> list = new ArrayList<>();
+      for(final XdmItem item : new XQuery("*:test-case", ctx).context(set)) list.add(item);
+      return list;
+    }
+
+    /**
+     * Checks if a test case is ignored.
+     * @param test test case
+     * @return result of check
+     */
+    boolean ignored(final XdmItem test) {
+      return !supported || unsupported.contains(attribute(test, "name"));
+    }
+
+    /**
+     * Runs a test case.
+     * @param test test case
+     * @return outcome
+     * @throws Exception exception
+     */
+    Outcome run(final XdmItem test) throws Exception {
+      activate(this);
+      return execute(test, envs);
+    }
+  }
+
+  /**
+   * Opens a test set.
+   * @param name name of test set
+   * @return test set
+   * @throws BaseXException database exception
+   */
+  TestSet open(final String name) throws BaseXException {
+    final XdmValue doc = new XQuery("doc(' " + file(false, name) + "')", ctx).value();
+    final TestSet ts = new TestSet(doc);
+    activate(ts);
+    return ts;
+  }
+
+  /**
+   * Makes a test set current and releases the data of the previous one.
+   * @param ts test set
+   */
+  private void activate(final TestSet ts) {
+    if(current != ts) {
+      current = ts;
+      setDatas = null;
+      sourceDatas.clear();
+    }
+    baseURI = ts.uri;
+    baseDir = ts.dir;
   }
 
   /**
@@ -358,6 +487,35 @@ public final class QT3TS extends Main {
     }
 
     tested++;
+
+    final Outcome outcome = execute(test, envs);
+    if(slow != null && outcome.nanos > 100000000) slow.put(-outcome.nanos, name);
+    if(outcome.expected == null) {
+      right.add(outcome.text).add(NL);
+      correct++;
+    } else {
+      wrong.add(outcome.text).add(NL);
+    }
+    if(report != null) report.addTest(name, outcome.expected == null);
+  }
+
+  /**
+   * Test case outcome.
+   * @param text name, query, result (and expected result if wrong)
+   * @param expected expected result ({@code null} if correct)
+   * @param nanos run time
+   */
+  record Outcome(String text, String expected, long nanos) { }
+
+  /**
+   * Runs a test case.
+   * @param test node
+   * @param envs environments
+   * @return outcome
+   * @throws Exception exception
+   */
+  private Outcome execute(final XdmItem test, final ArrayList<QT3Env> envs) throws Exception {
+    final String name = attribute(test, "name");
 
     // expected result
     final XdmItem result = child(test, "result");
@@ -399,10 +557,7 @@ public final class QT3TS extends Main {
     }
     final String string = queries.toString();
 
-    if(slow != null) {
-      final long l = perf.nanoRuntime();
-      if(l > 100000000) slow.put(-l, name);
-    }
+    final long nanos = perf.nanoRuntime();
 
     final String exp = test(returned, expected);
     final TokenBuilder tmp = new TokenBuilder();
@@ -428,14 +583,8 @@ public final class QT3TS extends Main {
     }
 
     tmp.add(err ? "Error : " : "Result: ").add(normSpecial(res)).add(NL);
-    if(exp == null) {
-      tmp.add(NL);
-      right.add(tmp.finish());
-      correct++;
-    } else {
-      wrong.add(tmp.add("Expect: ").add(normSpecial(exp)).add(NL).add(NL).finish());
-    }
-    if(report != null) report.addTest(name, exp == null);
+    if(exp != null) tmp.add("Expect: ").add(normSpecial(exp)).add(NL);
+    return new Outcome(tmp.toString(), exp, nanos);
   }
 
   /**
@@ -754,6 +903,15 @@ public final class QT3TS extends Main {
   private static String attribute(final XdmItem node, final String name) {
     final byte[] value = ((XNode) node.internal()).attribute(new QNm(name));
     return value != null ? string(value) : null;
+  }
+
+  /**
+   * Returns the name of a test case.
+   * @param test test case
+   * @return name
+   */
+  static String name(final XdmItem test) {
+    return attribute(test, "name");
   }
 
   /**
