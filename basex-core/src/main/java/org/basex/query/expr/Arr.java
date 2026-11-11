@@ -232,7 +232,8 @@ public abstract class Arr extends ParseExpr {
 
           // 'a'[. = 'a' or . = 'b'] → 'a'[. = ('a', 'b')]
           // $v[. != 'a'][. != 'b'] → $v[not(. = ('a', 'b'))]
-          final Expr merged = expr1.mergeEbv(expr2, or, cc);
+          // only merge adjacent operands: later operands are guarded by their predecessors
+          final Expr merged = m == l + 1 ? expr1.mergeEbv(expr2, or, cc) : null;
           if(merged != null) {
             cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
             list.set(l, merged);
@@ -292,14 +293,21 @@ public abstract class Arr extends ParseExpr {
       return null;
 
     // check if expressions have common operands
+    // logical operands are guarded by their predecessors: only factor out leading operands
+    final boolean ordered = !(this instanceof Set);
     final Function<Expr, ExprList> entries = ex ->
       new ExprList().add(inverse.isInstance(ex) ? ex.args() : new Expr[] { ex });
     final int el = exprs.length;
     final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));
     for(int e = 1; e < el && !lefts.isEmpty(); e++) {
       final ExprList curr = entries.apply(exprs[e]);
-      for(int c = lefts.size() - 1; c >= 0; c--) {
-        if(!curr.contains(lefts.get(c))) lefts.remove(c);
+      if(ordered) {
+        final int m = Arrays.mismatch(lefts.list, 0, lefts.size(), curr.list, 0, curr.size());
+        if(m != -1) lefts.size(m);
+      } else {
+        for(int c = lefts.size() - 1; c >= 0; c--) {
+          if(!curr.contains(lefts.get(c))) lefts.remove(c);
+        }
       }
     }
     if(lefts.isEmpty()) return null;
@@ -311,7 +319,10 @@ public abstract class Arr extends ParseExpr {
     final Expr left = f.apply(true, lefts.toArray());
     final ExprList rights = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      final ExprList curr = entries.apply(expr).removeAll(lefts);
+      final ExprList all = entries.apply(expr);
+      final ExprList curr = ordered ?
+        new ExprList(Arrays.copyOfRange(all.list, lefts.size(), all.size())) :
+        all.removeAll(lefts);
       if(curr.isEmpty()) {
         // no additional tests: return common tests
         // A intersect (A union B) → A

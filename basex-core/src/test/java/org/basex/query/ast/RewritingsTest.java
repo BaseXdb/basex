@@ -193,13 +193,18 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Merge of consecutive operations. */
   @Test public void gh1778() {
-    check("(1 to 3)[. = 1 or . != 2 or . = 3 or . != 4]", "1\n2\n3", count(BytSeq.class, 2));
+    check("(1 to 3)[. = 1 or . = 3 or . != 2 or . != 4]", "1\n2\n3", count(BytSeq.class, 2));
+    // only merge adjacent operands (preserve guards)
+    check("(1 to 3)[. = 1 or . != 2 or . = 3 or . != 4]", "1\n2\n3", empty(BytSeq.class));
+    final String h = "declare %basex:inline(0) function h($e, $f) { ";
+    check(h + "$f = 1 or $e = 0 or $f = 10 div $e }; h(0, 2)", true);
+    check(h + "(1, 2)[. != $f][$e != 0][. != 10 div $e] }; h(0, 1)", "");
 
     check("for $n in (<a/>, <b/>, <c/>) " +
-        "where name($n) != 'a' where $n = '' where name($n) != 'b' " +
+        "where name($n) != 'a' where name($n) != 'b' where $n = '' " +
         "return $n", "<c/>", exists(NOT), exists(StrSeq.class));
     check("for $n in (<a/>, <b/>, <c/>) " +
-        "where name($n) != 'a' and $n = '' and name($n) != 'b' " +
+        "where name($n) != 'a' and name($n) != 'b' and $n = '' " +
         "return $n", "<c/>", exists(NOT), exists(StrSeq.class));
   }
 
@@ -591,12 +596,16 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Merge fn:empty and fn:exist functions. */
   @Test public void gh1829() {
+    // paths with constructor roots are guarded: no union
     check("exists(<a/>/a) or exists(<b/>/b)",
-        false, root(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
+        false, root(Or.class), empty(BOOLEAN), empty(Union.class));
+    check("declare %basex:inline(0) function local:f($a as element(), $b as element()) "
+        + "{ exists($a/a) or exists($b/b) }; local:f(<a/>, <b/>)",
+        false, exists(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
     check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) or exists($i[. = 2])",
         "true\ntrue", empty(Or.class), empty(EXISTS), root(DualMap.class));
 
-    check("<a/>/a or <b/>/b", false, root(EXISTS), empty(Or.class), exists(Union.class));
+    check("<a/>/a or <b/>/b", false, root(Or.class), empty(Union.class));
     check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
 
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
@@ -739,6 +748,18 @@ public final class RewritingsTest extends SandboxTest {
     // optimized: $a or $b
     check(gh1839("($a or $b) and ($a or $b or $c)"), "fftttttt",
         count(And.class, 0), count(Or.class, 1));
+
+    // no rewriting: common operands are not leading
+    check(gh1839("($a and $c) or ($b and $c)"), "ffftfftt",
+        count(And.class, 2), count(Or.class, 1));
+    check(gh1839("($a or $c) and ($b or $c)"), "ffttfttt",
+        count(And.class, 1), count(Or.class, 2));
+
+    // preserve guards
+    final String h = "declare %basex:inline(0) function h($e, $f) { ";
+    check(h + "($e != 0 and 10 div $e > 1) or ($f and 10 div $e > 1) }; h(0, false())", false);
+    check(h + "($e = 0 or 10 div $e > 1) and ($f or 10 div $e > 1) }; h(0, true())", true);
+    check(h + "(1, 2)[$e = 0 or 10 div $e > 1][$f or 10 div $e > 1] }; h(0, true())", "1\n2");
   }
 
   /**
@@ -2976,6 +2997,17 @@ public final class RewritingsTest extends SandboxTest {
         + "{ $x/b[xs:integer($p)] }; ";
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a/>, 'a')", "<b/>");
     query(f + "local:f(<a><b/></a>, '1'), local:f(<a><c/></a>, 'a')", "<b/>");
+  }
+
+  /** Guarded logical operands: merged operands must not raise errors. */
+  @Test public void guardedMergeEbv() {
+    final String f = "declare %basex:inline(0) function local:f($x, $e) ";
+    query(f + "{ $x = 1 or $x = 10 div $e }; local:f(1, 0)", true);
+    query(f + "{ $x != 1 and $x != 10 div $e }; local:f(1, 0)", false);
+    query(f + "{ $x/a or $e/b }; local:f(<x><a/></x>, 1)", true);
+    check(f + "{ $x = 1 or $x = $e }; local:f(1, 2)", true, empty(Or.class));
+    check("declare %basex:inline(0) function local:f($x as element(), $e as element()) "
+        + "{ $x/a or $e/b }; local:f(<x><a/></x>, <x/>)", true, exists(Union.class));
   }
 
   /** Inverted positional checks: bounds must not be empty. */

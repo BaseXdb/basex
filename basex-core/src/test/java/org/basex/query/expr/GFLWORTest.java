@@ -77,10 +77,10 @@ public final class GFLWORTest extends SandboxTest {
   @Test public void moveMid() {
     check("let $seq := ('a', 'b', 'c') " +
         "for $i in 1 to count($seq) " +
-        "for $j in $i + 1 to count($seq) " +
+        "for $j in 1 to count($seq) " +
         "let $a as xs:string := $seq[$i] " +
         "return concat($i, $j, $a, $a)",
-        "12aa\n13aa\n23bb",
+        "11aa\n12aa\n13aa\n21bb\n22bb\n23bb\n31cc\n32cc\n33cc",
         count(Let.class, 1),
         count(For.class, 1)
     );
@@ -173,8 +173,7 @@ public final class GFLWORTest extends SandboxTest {
         "for sliding window $w in 1 to 3 start at $p when true() only " +
         "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{ $w }</window>",
         "<window>1 2 3</window>",
-        "//For << //Window",
-        exists("For/*[ends-with(name(), 'Filter')]")
+        "//Window << //Where"
     );
   }
 
@@ -224,7 +223,7 @@ public final class GFLWORTest extends SandboxTest {
         "let $x := $len div 2 " +
         "return count($w) div ($x + $x)",
         "1\n1\n1\n1\n1\n1",
-        "//Let << //Window"
+        "//Window << //Arith[VarRef/@name = '$len']"
     );
   }
 
@@ -845,5 +844,21 @@ public final class GFLWORTest extends SandboxTest {
         "2\n2\n2");
     query(f + "for $a in (1, 2, 3) for $c in (0, 1 to $n) while $a != 2 "
         + "for $b in (0, 1 to $n) where $a = 3 return $a }; f(0)", "");
+  }
+
+  /** Clauses guarded by the existence of a tuple (qtspecs#3053). */
+  @Test public void guarded() {
+    final String f = "declare %basex:inline(0) function f($n, $e) { ";
+    query(f + "for $z in 1 to $n where 10 div $e return 0 }; f(0, 0)", "");
+    query(f + "for $z in 1 to $n return if(10 div $e) then 1 else () }; f(0, 0)", "");
+    query(f + "for $z in 1 to $n let $x := 10 div $e return ($x, $z, $x) }; f(0, 0)", "");
+    query(f + "for $z in 1 to $n let $x := 10 div $e return ($x, $z, $x) }; f(1, 5)", "2\n1\n2");
+    query("declare %basex:inline(0) function f($s as xs:integer+, $e) { "
+        + "for $z in $s let $y := $z * $z where $y = 99 and 10 div $e "
+        + "return ($y, $z, $y) }; f((1, 2), 0)", "");
+    query("declare %basex:inline(0) function h($e, $f) { for $i in (1, 2) where $i != $f "
+        + "where $e != 0 where $i != 10 div $e return $i }; h(0, 1)", "");
+    query("declare %basex:inline(0) function h($s) { let $a := $s where $a castable as xs:integer "
+        + "where xs:integer($a) > 1 return $a }; h('x')", "");
   }
 }

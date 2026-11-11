@@ -711,9 +711,9 @@ public final class GFLWOR extends ParseExpr {
       for(int d = c; --d >= 0;) {
         final Clause curr = clauses.get(d);
         if(!curr.skippable(let)) break;
-        // insert directly above the highest skippable 'for' or 'window' clause
+        // insert directly above the highest skippable 'for' clause
         // this guarantees that no unnecessary swaps occur
-        if(curr instanceof For || curr instanceof Window) insert = d;
+        if(curr instanceof For) insert = d;
       }
 
       // for $i in E let $x := F → let $x := F for $i in E
@@ -767,9 +767,7 @@ public final class GFLWOR extends ParseExpr {
         for(int j = c; --j >= 0;) {
           final Clause curr = clauses.get(j);
           if(curr.has(Flag.NDT) || !curr.skippable(clause)) break;
-          // where clauses are always moved to avoid unnecessary computations,
-          // but skipping other where clauses can cause infinite loops
-          if(!(curr instanceof FilterClause)) insert = j;
+          insert = j;
         }
         // for $a in A for $b in B where $a → for $a in A where $a for $b in B
         if(insert == -1) {
@@ -781,38 +779,39 @@ public final class GFLWOR extends ParseExpr {
           // it's safe to go on because clauses below the current one are never touched
         }
 
-        // rewrite clause
-        if(!clause.has(Flag.CTX)) {
-          for(int i = insert; --i >= 0;) {
-            final Clause before = clauses.get(i);
-            // skip clauses
-            if(cond(before, where) != null) continue;
-            // analyze for/let clauses, abort otherwise
-            if(before instanceof final ForLet fl) {
-              final Predicate<Expr> varRef = e -> e instanceof final VarRef vr && vr.var == fl.var;
-              final boolean let = before instanceof Let;
-              if(let && before.seqType().instanceOf(Types.XNODE_ZO) && varRef.test(expr)) {
-                // let $n := ZERO-OR-ONE-NODE where $n → for $n in ZERO-OR-ONE-NODE
-                // let $a := <a/>[text()] while $a → for $a in <a/>[text()]
-                clauses.set(i, ((Let) before).toFor(cc).optimize(cc));
-                clauses.remove(insert);
-                changed = true;
-                c--;
-              } else if(where && (!let || c + 1 == clauses.size() && (
-                varRef.test(rtrn) ||
-                rtrn instanceof final Filter filter && varRef.test(filter.root) ||
-                rtrn instanceof final Path path && varRef.test(path.root)
-              )) && fl.toPredicate(cc, expr)) {
-                // for $b in /a/b where $b/c → for $b in /a/b[c]
-                // let $a := 1 to 3 where $a > 1 return $a → let $a := (1 to 3)[. > 1] ...
-                // let $a := <a/> where $a = '' return $a/self::a → let $a := <a/>[. = ''] ...
-                optimized.add(fl);
-                clauses.remove(insert);
-                changed = true;
-                c--;
-              }
+        // rewrite clause (preceding where clauses are guards and must be rewritten as well)
+        int start = insert;
+        while(start > 0 && cond(clauses.get(start - 1), where) != null) start--;
+        if(start > 0 && clauses.get(start - 1) instanceof final ForLet fl &&
+            clauses.subList(start, insert + 1).stream().noneMatch(cl -> cl.has(Flag.CTX))) {
+          final Predicate<Expr> varRef = e -> e instanceof final VarRef vr && vr.var == fl.var;
+          final boolean let = fl instanceof Let;
+          if(let && fl.seqType().instanceOf(Types.XNODE_ZO) && varRef.test(expr)) {
+            // let $n := ZERO-OR-ONE-NODE where $n → for $n in ZERO-OR-ONE-NODE
+            // let $a := <a/>[text()] while $a → for $a in <a/>[text()]
+            clauses.set(start - 1, ((Let) fl).toFor(cc).optimize(cc));
+            clauses.remove(insert);
+            changed = true;
+            c--;
+          } else if(where && (!let || c + 1 == clauses.size() && (
+            varRef.test(rtrn) ||
+            rtrn instanceof final Filter filter && varRef.test(filter.root) ||
+            rtrn instanceof final Path path && varRef.test(path.root)
+          ))) {
+            // for $b in /a/b where $b/c → for $b in /a/b[c]
+            // let $a := 1 to 3 where $a > 1 return $a → let $a := (1 to 3)[. > 1] ...
+            // let $a := <a/> where $a = '' return $a/self::a → let $a := <a/>[. = ''] ...
+            // let $a := A where B where C return $a → let $a := A[B and C] return $a
+            final int size = insert - start + 1;
+            final ExprList list = new ExprList(size);
+            for(int i = start; i <= insert; i++) list.add(cond(clauses.get(i), true));
+            final Expr pred = size == 1 ? expr : new And(clause.info(), list.finish()).optimize(cc);
+            if(fl.toPredicate(cc, pred)) {
+              optimized.add(fl);
+              clauses.subList(start, insert + 1).clear();
+              changed = true;
+              c -= size;
             }
-            break;
           }
         }
       }

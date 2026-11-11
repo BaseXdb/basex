@@ -638,7 +638,7 @@ public final class FilterTest extends SandboxTest {
     check(iff + "[. > 4]", "5\n6", root(If.class));
     check(iff + "[2]", 4, root(If.class));
     check("for $a in (1, 2, 3)[. > <_>0</_>] return " + iff + "[$a = 3]", "3\n4\n5\n6",
-        root(If.class));
+        root(GFLWOR.class));
     check("(if(" + cond + ") then () else " + seq + ")[2]", "", root(If.class));
 
     final String let = "let $s := " + seq + " where count($s) > 1 return $s";

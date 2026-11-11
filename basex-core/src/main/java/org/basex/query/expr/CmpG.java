@@ -519,6 +519,9 @@ public class CmpG extends Cmp {
     final boolean not2 = NOT.is(expr);
     final Expr expr2 = not2 ? expr.arg(0) : expr;
     if(!(expr2 instanceof final CmpG cmp2)) return null;
+    // the second comparison is guarded by the first: its operand must not raise errors
+    final Expr exprR2 = cmp2.exprs[1];
+    if(!(exprR2 instanceof Value || exprR2 instanceof VarRef)) return null;
 
     // compare first and second comparison
     final CmpOp cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
@@ -526,7 +529,7 @@ public class CmpG extends Cmp {
       return null;
 
     // inverted order comparisons are only equivalent if no operand can be NaN
-    final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
+    final Expr exprL = exprs[0], exprR1 = exprs[1];
     if((not2 || !or) && !nanSafe(op, exprL, exprR1, exprR2)) return null;
 
     // function for creating new comparison

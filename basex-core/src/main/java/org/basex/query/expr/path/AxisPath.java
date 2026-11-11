@@ -1,5 +1,7 @@
 package org.basex.query.expr.path;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.util.*;
@@ -9,6 +11,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -142,7 +145,21 @@ public abstract class AxisPath extends Path {
   public final Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
     // $a/b or $c/d → $a/b | $c/d
-    return or && expr instanceof AxisPath ? new Union(info, this, expr).optimize(cc) : null;
+    return or && expr instanceof final AxisPath path && path.errorFree(root) ?
+      new Union(info, this, expr).optimize(cc) : null;
+  }
+
+  /**
+   * Checks if this path cannot raise errors if it is evaluated after a path with the given root.
+   * @param rt root of the preceding path (can be {@code null})
+   * @return result of check
+   */
+  private boolean errorFree(final Expr rt) {
+    for(final Expr step : steps) {
+      if(((Step) step).exprs.length != 0) return false;
+    }
+    return (root instanceof Value || root instanceof VarRef) &&
+      root.seqType().type instanceof NodeType || Objects.equals(root, rt);
   }
 
   @Override

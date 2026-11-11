@@ -182,12 +182,12 @@ public final class InlineTest extends SandboxTest {
         "//Let << //Window");
   }
 
-  /** An error raised while inlining into a FLWOR clause is reported at compile time. */
+  /** An error raised while inlining into a guarded FLWOR clause is only reported if a tuple exists. */
   @Test public void flworClauseError() {
     inline(true);
-    error("declare function local:f($s) { "
-        + "for $i in (1 to 1000000)[. < 1] let $x := xs:integer($s) return $x };"
-        + "count(local:f('z'))", FUNCCAST_X_X);
+    final String f = "declare function local:f($s) { for $i in (1 to 1000000)[. ";
+    query(f + "< 1] let $x := xs:integer($s) return $x }; count(local:f('z'))", 0);
+    error(f + "> 999999] let $x := xs:integer($s) return $x }; count(local:f('z'))", FUNCCAST_X_X);
   }
 
   /** Tests inlining into the clauses of a FLWOR expression. */

@@ -35,12 +35,6 @@ abstract sealed class FilterClause extends SingleClause permits Where, While {
   }
 
   @Override
-  final boolean skippable(final Clause cl) {
-    // only slide WHERE over WHERE clauses (LET: may filter out many items; WHILE: stops iteration)
-    return cl instanceof Where && this instanceof Where;
-  }
-
-  @Override
   public final void calcSize(final long[] minMax) {
     minMax[0] = 0;
     if(expr == Bln.FALSE) minMax[1] = 0;
