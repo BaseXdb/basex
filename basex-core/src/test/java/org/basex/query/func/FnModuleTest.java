@@ -5667,13 +5667,16 @@ return
     query(func.args("a.xml", "/db/[x]/b.xml"), "/db/[x]/a.xml");
     query(func.args("http://x/", "/db/path/b.xml"), "http://x/");
 
+    // non-hierarchical base URIs
+    query(func.args("a.html", "urn:doi:234567"), "urn:a.html");
+    query(func.args("#s", "urn:doi:234567"), "urn:doi:234567#s");
+    query(func.args("../x", "urn:doi:234567"), "urn:x");
+
     // invalid URI reference
     error(func.args(":", base), URIARG_X);
     // relative base URI
     error(func.args("a.html", "b.html"), URIARG_X);
     error(func.args("a.html", "//host/b.html"), URIARG_X);
-    // non-hierarchical base URI
-    error(func.args("a.html", "urn:doi:234567"), URIARG_X);
   }
 
   /** Tests the rewritings of arguments that only reorder or deduplicate their own input. */

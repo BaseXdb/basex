@@ -204,13 +204,13 @@ public final class UriParser {
     if(rf.scheme != null) {
       uri.scheme = rf.scheme;
       uri.authority = rf.authority;
-      uri.path = removeDots(rf.path);
+      uri.path = removeDots(rf.path, uri.scheme);
       uri.query = rf.query;
     } else {
       uri.scheme = bs.scheme;
       if(rf.authority != null) {
         uri.authority = rf.authority;
-        uri.path = removeDots(rf.path);
+        uri.path = removeDots(rf.path, uri.scheme);
         uri.query = rf.query;
       } else {
         uri.authority = bs.authority;
@@ -218,7 +218,8 @@ public final class UriParser {
           uri.path = bs.path;
           uri.query = rf.query != null ? rf.query : bs.query;
         } else {
-          uri.path = removeDots(Strings.startsWith(rf.path, '/') ? rf.path : bs.merge(rf.path));
+          uri.path = removeDots(Strings.startsWith(rf.path, '/') ? rf.path : bs.merge(rf.path),
+            uri.scheme);
           uri.query = rf.query;
         }
       }
@@ -229,13 +230,14 @@ public final class UriParser {
   /**
    * Removes dot segments from a path (RFC 3986, 5.2.4).
    * @param path path
+   * @param scheme scheme of the resolved URI (can be {@code null})
    * @return normalized path
    */
-  private static String removeDots(final String path) {
+  private static String removeDots(final String path, final String scheme) {
     final boolean absolute = Strings.startsWith(path, '/');
     final StringBuilder sb = new StringBuilder();
     String in = absolute ? path : '/' + path;
-    // parent references of a relative path that can be resolved against a subsequent base URI
+    // parent references of a relative URI that can be resolved against a subsequent base URI
     int dots = 0;
     while(!in.isEmpty()) {
       if(in.startsWith("/./")) {
@@ -255,7 +257,7 @@ public final class UriParser {
     }
     if(absolute) return sb.toString();
     final String result = sb.isEmpty() ? "" : sb.substring(1);
-    return dots == 0 ? result : "../".repeat(dots) + result;
+    return scheme == null && dots > 0 ? "../".repeat(dots) + result : result;
   }
 
   /**
