@@ -446,7 +446,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), JNODE_ROOT.seqType(), flag(CNS)),
   /** XQuery function. */
   JVALUE(FnJvalue::new, "jvalue(input?)",
-      params(JNODE_ZO), ITEM_ZM),
+      params(ITEM_ZO), ITEM_ZM),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language, node?)",
       params(STRING_ZO, XNODE_O), BOOLEAN_O),

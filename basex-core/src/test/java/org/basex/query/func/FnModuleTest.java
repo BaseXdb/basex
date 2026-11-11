@@ -3601,6 +3601,12 @@ return
     check("for $j in (" + JTREE.args(" { 'a': 1 }") + ", " + JTREE.args(" { 'a': 2 }") + ") " +
         "return $j/a ! " + func.args(), "1\n2", empty("*[@axis]"));
     check(maps + JTREE.args(" $m") + "/c/* ! " + func.args(), 2, exists(func));
+
+    // other items are returned unchanged
+    check(func.args(1), 1, root(Itr.class));
+    check(func.args(" <_/>"), "<_/>", empty(func));
+    check("('x', 'y')[" + func.args() + " = 'y']", "y", empty(func));
+    error(func.args(" (1, 2)"), INVTYPE_X);
   }
 
   /**
