@@ -104,6 +104,7 @@ public final class ErrorMessageTest extends SandboxTest {
     errorAt("1 instance of empty-sequence x", WRONGCHAR_X_X, 30);
     errorAt("for $x in 1 where return $x", UNEXPRETURN, 26);
     errorAt("for $x in", NOEXPR, 10);
+    errorAt("validate type xs:integer {<e>2026</e>}", IMPLVAL, 39);
   }
 
   /** Missing operands are reported with the operator. */
