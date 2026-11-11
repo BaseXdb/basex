@@ -109,7 +109,8 @@ public final class ExprType {
    */
   public ExprType assign(final SeqType st) {
     // xs:error has no instances and never returns, so its result size is unknown
-    if(st != seqType) asg(st, st.voidType() ? -1 : st.zero() ? 0 : st.one() ? 1 : -1);
+    final SeqType dt = st.deref();
+    if(dt != seqType) asg(dt, dt.voidType() ? -1 : dt.zero() ? 0 : dt.one() ? 1 : -1);
     return this;
   }
 
@@ -118,7 +119,7 @@ public final class ExprType {
    * @param type type
    */
   public void assign(final Type type) {
-    if(type != seqType.type) seqType = SeqType.get(type, seqType.occ);
+    if(type != seqType.type) seqType = SeqType.get(type, seqType.occ).deref();
   }
 
   /**
@@ -206,7 +207,7 @@ public final class ExprType {
    * @param sz result size
    */
   private void asg(final SeqType st, final long sz) {
-    seqType = st;
+    seqType = st.deref();
     size = sz;
   }
 

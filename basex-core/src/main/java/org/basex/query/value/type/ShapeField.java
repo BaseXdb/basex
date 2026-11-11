@@ -82,6 +82,14 @@ public final class ShapeField {
   }
 
   /**
+   * Indicates if this field can be omitted (it has an initializer or permits the empty sequence).
+   * @return result of check
+   */
+  public boolean optional() {
+    return init != null || !seqType.oneOrMore();
+  }
+
+  /**
    * Indicates if this field is fixed.
    * @return result of check
    */

@@ -607,6 +607,20 @@ public final class RecordTest extends SandboxTest {
         empty(func.className() + "[@shape]"));
   }
 
+  /** Fields of records referenced by name are accessed by position. */
+  @Test public void typeRefLookup() {
+    // built-in record type, resolved after parsing: the field type is known
+    check("declare %basex:inline(0) function local:f($r as fn:random-number-generator-record) "
+        + "{ $r?number instance of xs:double, $r?next()?number instance of xs:double }; "
+        + "local:f(random-number-generator(1))", "true\ntrue",
+        empty(Lookup.class), count(ShapeGet.class, 2), count(Bln.class, 1));
+    // recursive record type
+    check("declare record local:l(next as local:l?, v as xs:integer); "
+        + "declare %basex:inline(0) function local:f($l as local:l) { $l?next?v }; "
+        + "local:f(local:l(local:l((), 1), 2))", 1,
+        empty(Lookup.class), count(ShapeGet.class, 2));
+  }
+
   /** A field update coerced back to its record type is fused into the {@code but with} operator. */
   @Test public void typePutCoerce() {
     // map:put(R, FIELD, VALUE) coerce as RECORD  ->  R but with map:entry(FIELD, VALUE)
@@ -629,7 +643,7 @@ public final class RecordTest extends SandboxTest {
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
         "{\"a\":0,\"b\":2}", empty(ButWith.class));
-    // a chain of updates unrolls into but with operations, which merge and cover all fields
+    // a chain of updates unrolls into but with operations, which are folded into the constructor
     check(ab + "let $r as local:ab := local:ab(<a/>, 2) "
         + "let $s as local:ab := $r => map:put('a', 0) => map:put('b', 9) return $s",
         "{\"a\":0,\"b\":9}", empty(ButWith.class), empty(ShapeSet.class));
@@ -639,28 +653,26 @@ public final class RecordTest extends SandboxTest {
         + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X_X);
   }
 
-  /** Consecutive constant {@code but with} updates with disjoint keys are merged. */
-  @Test public void butWithMerge() {
-    // disjoint keys merge into one update
+  /** Chains of {@code but with} updates. */
+  @Test public void butWithChain() {
+    // updates of a non-deterministic record are not folded into the constructor
     check("declare record local:c(x, y, z); "
         + "local:c(<x>1</x>, <x>2</x>, 3) but with { 'x': 0 } but with { 'y': 0 }",
-        "{\"x\":0,\"y\":0,\"z\":3}", root(ButWith.class), count(ButWith.class, 1));
-    // ... and are kept if they cover all fields (records of extending types have more fields)
+        "{\"x\":0,\"y\":0,\"z\":3}", root(ButWith.class), count(ButWith.class, 2));
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 }",
-        "{\"x\":0,\"y\":0}", count(ButWith.class, 1));
-    // overlapping keys are not merged (the earlier value is still coerced), but use-last holds
+        "{\"x\":0,\"y\":0}", count(ButWith.class, 2));
+    // overlapping keys: use-last holds
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'x': 1 }",
         "{\"x\":1,\"y\":<x>2</x>}", count(ButWith.class, 2));
-    // only the disjoint pair collapses; the overlapping update stays separate
     check("declare record local:c(x, y, z); local:c(<x>1</x>, <x>2</x>, 3) "
         + "but with { 'x': 0 } but with { 'y': 0 } but with { 'x': 9 }",
-        "{\"x\":9,\"y\":0,\"z\":3}", count(ButWith.class, 2));
-    // non-constant updates with disjoint keys are merged as well
+        "{\"x\":9,\"y\":0,\"z\":3}", count(ButWith.class, 3));
     check("declare record local:c(x, y, z); "
         + "local:c(<x>1</x>, <x>2</x>, 3) but with { 'x': <n/> } but with { 'y': 0 }",
-        "{\"x\":<n/>,\"y\":0,\"z\":3}", count(ButWith.class, 1));
+        "{\"x\":<n/>,\"y\":0,\"z\":3}", count(ButWith.class, 2));
+    // updates of a deterministic record constructor are folded into it, one by one
     check("declare record local:c(x as xs:integer, y, z);\n"
         + "declare function local:f($c as local:c, $i, $j) as local:c {"
         + " $c => map:put('x', $i) => map:put('y', $j) };\n"
@@ -669,7 +681,7 @@ public final class RecordTest extends SandboxTest {
     // ... coercion errors are still raised
     error("declare record local:c(x as xs:integer, y, z); "
         + "local:c(1, 2, 3) but with { 'x': string(<_>y</_>) } but with { 'y': 0 }", INVTYPE_X);
-    // a record constructor coerces its arguments: not merged
+    // a record constructor as update
     check("declare record local:c(x, y, z); declare record local:d(x as xs:double); "
         + "local:c(1, 2, 3) but with local:d(<x>4</x>) but with { 'y': <y/> }",
         "{\"x\":4,\"y\":<y/>,\"z\":3}", count(ButWith.class, 2));
@@ -685,7 +697,7 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:c(x, y); "
         + "local:c(<x/>, 1) but with map:remove({ 'x': 0 }, string(<_>x</_>))",
         "{\"x\":<x/>,\"y\":1}");
-    // merging must not drop the shadowed value and mask its coercion error
+    // the shadowed value is still coerced
     error("declare record local:c(x as xs:integer); "
         + "local:c(1) but with { 'x': 'y' } but with { 'x': 3 }", INVTYPE_X);
   }

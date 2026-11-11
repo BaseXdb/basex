@@ -543,19 +543,9 @@ public final class SeqType {
     // void types (xs:error, xs:error+) are bottom types; two void occurrences are intersected
     if(voidType()) return st.voidType() ? get(type, occ.intersect(st.occ)) : this;
     if(st.voidType()) return st;
-    return intersect(st, TypeRef.deref(type).intersect(TypeRef.deref(st.type)));
-  }
-
-  /**
-   * Computes the intersection of two sequence types with the specified intersection of their
-   * item types.
-   * @param st second type
-   * @param tp intersection of the item types (can be {@code null})
-   * @return resulting type or {@code null}
-   */
-  SeqType intersect(final SeqType st, final Type tp) {
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
+    final Type tp = TypeRef.deref(type).intersect(TypeRef.deref(st.type));
     if(tp != null) return get(tp, oc);
     // disjoint item types: the empty sequence is the only common instance
     return oc.min == 0 ? Types.EMPTY_SEQUENCE_Z : null;
@@ -799,6 +789,15 @@ public final class SeqType {
     return type.instanceOf(target) && (!coerce || type == target || type == BasicType.ERROR ||
       !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)) ||
       RecordType.derives(type, target));
+  }
+
+  /**
+   * Returns this type with a resolved type reference replaced by the referenced type.
+   * @return sequence type
+   */
+  public SeqType deref() {
+    return type instanceof final TypeRef ref && !TypeRef.incomplete(ref) ? get(ref.deref(), occ) :
+      this;
   }
 
   /**

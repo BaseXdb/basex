@@ -157,11 +157,13 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
-    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
+    // recursive types are labeled: compared by name, not by structure
+    ((TypeRef) r1.type).resolve(new RecordType(fld1, r1Name, AnnList.EMPTY, null, null, null));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2, r2Name, AnnList.EMPTY, null, null, null));
 
-    assertTrue(r1.eq(r2));
-    assertTrue(r2.eq(r1));
+    assertTrue(r1.eq(r1));
+    assertFalse(r1.eq(r2));
+    assertFalse(r2.eq(r1));
     assertFalse(DATE_TIME_O.eq(DATE_TIME_STAMP_O));
     assertFalse(DATE_TIME_STAMP_O.eq(DATE_TIME_O));
   }
@@ -423,14 +425,16 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
-    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
+    // recursive types are labeled: compared by name, not by structure
+    ((TypeRef) r1.type).resolve(new RecordType(fld1, r1Name, AnnList.EMPTY, null, null, null));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2, r2Name, AnnList.EMPTY, null, null, null));
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
     assertTrue(RECORD_O.instanceOf(MAP_O));
-    assertTrue(r1.instanceOf(r2));
-    assertTrue(r2.instanceOf(r1));
+    assertTrue(r1.instanceOf(r1));
+    assertFalse(r1.instanceOf(r2));
+    assertFalse(r2.instanceOf(r1));
   }
 
   /**

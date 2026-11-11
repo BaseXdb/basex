@@ -1,6 +1,5 @@
 package org.basex.query.value.type;
 
-import static java.util.Collections.*;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
@@ -61,15 +60,6 @@ public class ShapeType extends MapType {
     }
     detached = d;
     global = d && g;
-  }
-
-  /**
-   * Returns a type of the same kind with the specified fields.
-   * @param map field declarations
-   * @return shape
-   */
-  public ShapeType with(final TokenObjectMap<ShapeField> map) {
-    return new ShapeType(map);
   }
 
   /**
@@ -169,20 +159,7 @@ public class ShapeType extends MapType {
       if(!st.eq(ost)) narrowed = true;
       map.put(fields.key(f), new ShapeField(st));
     }
-    return narrowed ? with(map) : this;
-  }
-
-  /**
-   * Adds a field to this shape.
-   * @param fieldName field name
-   * @param seqType sequence type of the field
-   * @return this shape
-   */
-  public ShapeType add(final String fieldName, final SeqType seqType) {
-    // the value type is not recomputed: only used to build recursive built-in records
-    fields.put(Token.token(fieldName), new ShapeField(seqType));
-    keys = null;
-    return this;
+    return narrowed ? new ShapeType(map) : this;
   }
 
   /**
@@ -317,33 +294,8 @@ public class ShapeType extends MapType {
     return global;
   }
 
-  /**
-   * Return the minimum number of fields that must be supplied to the constructor function.
-   * @return minimum number of fields
-   */
-  public final int minFields() {
-    int min = 0;
-    for(final ShapeField rf : fields.values()) {
-      // a field is an optional constructor parameter if it has an initializer, or if its type
-      // permits the empty sequence (in which case an omitted argument defaults to ())
-      if(rf.init() != null || !rf.seqType().oneOrMore()) return min;
-      ++min;
-    }
-    return min;
-  }
-
   @Override
   public final boolean eq(final Type type) {
-    return eq(type, emptySet());
-  }
-
-  /**
-   * Checks if this type is equal to the given one, including the field order.
-   * @param type other type
-   * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @return result of check
-   */
-  private boolean eq(final Type type, final Set<Pair> pairs) {
     if(this == type) return true;
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
@@ -352,22 +304,35 @@ public class ShapeType extends MapType {
     for(final byte[] key : fields) {
       final ShapeField f1 = fields.get(key), f2 = sh.fields.get(key);
       if(f1.isFixed() != f2.isFixed() || !Objects.equals(f1.init(), f2.init())) return false;
-      final SeqType st1 = f1.seqType(), st2 = f2.seqType();
-      if(st1.occ != st2.occ) return false;
-      final Type tp1 = TypeRef.deref(st1.type), tp2 = TypeRef.deref(st2.type);
-      if(tp1 instanceof final ShapeType sh1 && tp2 instanceof final ShapeType sh2) {
-        final Pair pair = new Pair(sh1, sh2);
-        if(!pairs.contains(pair) && !sh1.eq(sh2, pair.addTo(pairs))) return false;
-      } else if(!st1.eq(st2)) {
-        return false;
-      }
+      // labeled types with the same identity have the same field types
+      if(!labeled() && !f1.seqType().eq(f2.seqType())) return false;
     }
     return true;
   }
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return instanceOf(TypeRef.deref(type), emptySet());
+    final Type tp = TypeRef.deref(type);
+    if(this == tp || tp.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
+    if(tp instanceof final ChoiceItemType cit) {
+      for(final Type t : cit.types) {
+        if(instanceOf(t)) return true;
+      }
+      return false;
+    }
+    // record(*) is only matched by labeled record types
+    if(tp == Types.RECORD) return labeled();
+    if(tp instanceof final ShapeType sh) {
+      // labeled types: subtypes of the types they extend, never of simple types
+      if(sh.labeled()) return ancestor(sh) != null;
+      if(labeled() || !sameFields(sh)) return false;
+      // simple types are not recursive: cycles pass through labeled types
+      for(final byte[] key : sh.fields) {
+        if(!fields.get(key).seqType().instanceOf(sh.fields.get(key).seqType())) return false;
+      }
+      return true;
+    }
+    return super.instanceOf(tp);
   }
 
   /**
@@ -410,100 +375,37 @@ public class ShapeType extends MapType {
     return 0;
   }
 
-  /**
-   * Checks if the current type is an instance of the specified type.
-   * @param type type to be checked
-   * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @return result of check
-   */
-  private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
-    if(type instanceof final ChoiceItemType cit) {
-      for(final Type tp : cit.types) {
-        if(instanceOf(TypeRef.deref(tp), pairs)) return true;
-      }
-      return false;
-    }
-    // record(*) is only matched by labeled record types
-    if(type == Types.RECORD) return labeled();
-    if(type instanceof final ShapeType sh) {
-      // labeled types: subtypes of the types they extend, never of simple types
-      final ShapeType st = sh.labeled() ? ancestor(sh) : labeled() ? null : this;
-      if(st == null || !st.sameFields(sh)) return false;
-      for(final byte[] key : sh.fields) {
-        final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
-        if(fst != shfst) {
-          final Type ft = TypeRef.deref(fst.type), shft = TypeRef.deref(shfst.type);
-          if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2 &&
-              !fst.emptyType()) {
-            if(!fst.occ.instanceOf(shfst.occ)) return false;
-            final Pair pair = new Pair(sh1, sh2);
-            if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs))) return false;
-          } else if(!fst.instanceOf(shfst)) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return super.instanceOf(type);
-  }
-
   @Override
   public final Type union(final Type type) {
-    return type == this ? this : union(type, emptySet());
-  }
-
-  @Override
-  public final MapType union(final Type kt, final SeqType vt) {
-    return get(keyType().union(kt), valueType().union(vt));
-  }
-
-  /**
-   * Computes the union between this type and the given one, i.e. the least common ancestor of both
-   * types in the type hierarchy.
-   * @param type other type
-   * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @return union type
-   */
-  private Type union(final Type type, final Set<Pair> pairs) {
+    if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == Types.MAP) return Types.MAP;
     if(SeqType.kept(type, this, true)) return this;
     if(SeqType.kept(this, type, true)) return type;
 
     if(type instanceof final ShapeType sh) {
-      // labeled record types: closest common base type
-      if(labeled() && sh.labeled() && !sameIdentity(sh)) {
-        for(ShapeType st = base(); st != null; st = st.base()) {
+      if(labeled() && sh.labeled()) {
+        // labeled record types: closest common type in the extension chain
+        for(ShapeType st = this; st != null; st = st.base()) {
           if(sh.instanceOf(st)) return st;
         }
-      }
-      // records of derived types have additional fields: no common shape
-      if(sameIdentity(sh) && (!labeled() || sameOrder(sh)) && sameFields(sh)) {
+      } else if(!labeled() && !sh.labeled() && sameFields(sh)) {
         final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
-          final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
-          final Type ft = TypeRef.deref(fst.type), shft = TypeRef.deref(shfst.type);
-          final SeqType union;
-          if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2 &&
-              !fst.zero() && !shfst.zero()) {
-            final Pair pair = new Pair(sh1, sh2);
-            if(pairs.contains(pair)) return Types.MAP;
-            final Set<Pair> set = pair.addTo(pairs);
-            union = SeqType.get(sh1.union(sh2, set), fst.occ.union(shfst.occ));
-            set.remove(pair);
-          } else {
-            union = fst.union(shfst);
-          }
-          map.put(key, new ShapeField(union));
+          map.put(key, new ShapeField(fields.get(key).seqType().union(
+              sh.fields.get(key).seqType())));
         }
-        return with(map);
+        return new ShapeType(map);
       }
       // fallback (map supertype)
       return union(sh.keyType(), sh.valueType());
     }
     return super.union(type);
+  }
+
+  @Override
+  public final MapType union(final Type kt, final SeqType vt) {
+    return get(keyType().union(kt), valueType().union(vt));
   }
 
   /**
@@ -559,18 +461,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final Type intersect(final Type type) {
-    return type == this ? this : intersect(type, emptySet());
-  }
-
-  /**
-   * Computes the intersection between this type and the given one, i.e. the least specific type
-   * that is subtype of both types, or a supertype if {@code record(*)} is involved.
-   * If no such type exists, {@code null} is returned.
-   * @param type other type
-   * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @return intersection type or {@code null}
-   */
-  private Type intersect(final Type type, final Set<Pair> pairs) {
+    if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
@@ -579,23 +470,22 @@ public class ShapeType extends MapType {
       // record(*) and a simple record type: the simple type includes the intersection
       if(any()) return sh;
       if(sh.any()) return this;
-      // a record has a single label; records of derived types have additional fields
-      if(labeled() && sh.labeled() && !sameIdentity(sh)) return null;
+      // a record has a single label
+      if(labeled() && sh.labeled()) return null;
       if(!sameFields(sh)) {
         // labeled and simple type: records of derived types may have the additional fields
         if(labeled() == sh.labeled()) return null;
         return labeled() ? fieldsOf(sh) ? this : null : sh.fieldsOf(this) ? sh : null;
       }
-      final ShapeType st = sh.labeled() ? sh : this;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
-      for(final byte[] key : st.fields) {
-        final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
-            pairs);
+      for(final byte[] key : fields) {
+        final ShapeField rf = fields.get(key);
+        final SeqType is = rf.seqType().intersect(sh.fields.get(key).seqType());
         if(is == null) return null;
-        map.put(key, st.fields.get(key).with(is));
+        map.put(key, rf.with(is));
       }
       // the declared field types of a labeled record are needed for coercion
-      return st.labeled() ? st : st.with(map);
+      return labeled() ? this : sh.labeled() ? sh : new ShapeType(map);
     }
     if(type instanceof final MapType mt) {
       // record(*) has no fields to narrow, record() includes the empty map
@@ -604,34 +494,13 @@ public class ShapeType extends MapType {
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
         final ShapeField rf = fields.get(key);
-        final SeqType is = intersect(rf.seqType(), mt.valueType(), pairs);
+        final SeqType is = rf.seqType().intersect(mt.valueType());
         if(is == null) return null;
         map.put(key, rf.with(is));
       }
-      return labeled() ? this : with(map);
+      return labeled() ? this : new ShapeType(map);
     }
     return type instanceof final FuncType ft && callable(ft) ? this : null;
-  }
-
-  /**
-   * Returns the intersection between two sequence types.
-   * @param st1 first type
-   * @param st2 second type
-   * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @return intersection type or {@code null}
-   */
-  private static SeqType intersect(final SeqType st1, final SeqType st2, final Set<Pair> pairs) {
-    final Type t1 = TypeRef.deref(st1.type), t2 = TypeRef.deref(st2.type);
-    if(t1 instanceof final ShapeType sh1 && t2 instanceof final ShapeType sh2) {
-      final Pair pair = new Pair(sh1, sh2);
-      if(pairs.contains(pair)) return null;
-      // pairs of sibling fields are no cycles: remove the pair after the check
-      final Set<Pair> set = pair.addTo(pairs);
-      final Type it = sh1.intersect(sh2, set);
-      set.remove(pair);
-      return st1.intersect(st2, it);
-    }
-    return st1.intersect(st2);
   }
 
   /**
@@ -713,33 +582,5 @@ public class ShapeType extends MapType {
   public String toString() {
     return new QueryString().token(QueryText.RECORD).token('(').
         token(any() ? "*" : fieldNames(true)).token(')').toString();
-  }
-
-  /**
-   * An ordered pair of shapes.
-   * @param o1 first shape
-   * @param o2 second shape
-   */
-  private record Pair(ShapeType o1, ShapeType o2) {
-    /**
-     * Adds this {@code Pair} to the given set of {@code Pair}s, creating a new set if the given set
-     * is empty.
-     * @param pairs set of {@code Pair}s
-     * @return augmented set of pairs
-     */
-    public Set<Pair> addTo(final Set<Pair> pairs) {
-      if(pairs.isEmpty()) {
-        final Set<Pair> set = new HashSet<>();
-        set.add(this);
-        return set;
-      }
-      pairs.add(this);
-      return pairs;
-    }
-
-    @Override
-    public String toString() {
-      return new QueryString().token('[').token(o1).token(',').token(o2).token(']').toString();
-    }
   }
 }

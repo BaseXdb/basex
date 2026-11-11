@@ -52,11 +52,10 @@ public final class ShapeConstructor extends StandardFunc {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
-    final int fs = fields.size(), el = exprs.length;
+    final int fs = fields.size();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
-      final Expr expr = f < el ? exprs[f] : fields.value(f + 1).init();
-      final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
+      final Value value = exprs[f].value(qc);
       values[f] = typed[f] ? value : shapeType.coerce(f + 1, value, qc, info, null);
     }
     return shapeType.build(values, true, qc, info);
@@ -75,11 +74,8 @@ public final class ShapeConstructor extends StandardFunc {
     }
     // skip runtime coercion of values that already match the field type
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
-    final int fs = fields.size();
-    for(int f = 0; f < fs; f++) {
-      final ShapeField rf = fields.value(f + 1);
-      final Expr expr = f < el ? exprs[f] : rf.init();
-      typed[f] = expr != null && expr.seqType().coercible(rf.seqType());
+    for(int e = 0; e < el; e++) {
+      typed[e] = exprs[e].seqType().coercible(fields.value(e + 1).seqType());
     }
     return this;
   }
@@ -101,13 +97,11 @@ public final class ShapeConstructor extends StandardFunc {
 
   /**
    * Returns the field values supplied by the arguments of this call.
-   * @return field values (can be {@code null})
+   * @return field values
    */
   public TokenObjectMap<Expr> entries() {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int el = exprs.length;
-    // the arguments of anonymous shapes must be complete
-    if(!(shapeType instanceof RecordType) && el != fields.size()) return null;
     final TokenObjectMap<Expr> entries = new TokenObjectMap<>(el);
     for(int e = 0; e < el; e++) {
       // values of fixed fields are not supplied by the caller
@@ -140,12 +134,10 @@ public final class ShapeConstructor extends StandardFunc {
         if(rf.isFixed()) return null;
         args[f - 1] = expr;
         found++;
-      } else if(rf.init() != null) {
-        args[f - 1] = rf.init().copy(cc, new IntObjectMap<>());
-      } else if(rf.seqType().occ.min > 0) {
-        return null;
+      } else if(rf.optional()) {
+        args[f - 1] = rf.init() != null ? rf.init().copy(cc, new IntObjectMap<>()) : Empty.VALUE;
       } else {
-        args[f - 1] = Empty.VALUE;
+        return null;
       }
     }
     // reject undeclared keys
@@ -190,11 +182,10 @@ public final class ShapeConstructor extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder(name != null ? name.local() :
       Token.token(QueryText.MAP)).add('(');
     final TokenObjectMap<ShapeField> fields = sh.fields();
-    final int max = fields.size(), min = sh.minFields();
+    final int max = fields.size();
     for(int i = 1; i <= max; i++) {
       if(i > 1) tb.add(", ");
       tb.add(fields.key(i));
-      if(i > min) tb.add('?');
     }
     final String description = tb.add(')').toString();
 

@@ -1841,7 +1841,7 @@ public enum QueryError {
       if(est.type instanceof final ShapeType sh && !sh.any() && expr instanceof final XQMap map) {
         final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] field : fields) {
-          if(map.value(Str.get(field)) == null && fields.get(field).seqType().occ.min > 0) {
+          if(map.value(Str.get(field)) == null && !fields.get(field).optional()) {
             issue = Token.concat("Field ", QueryString.toQuoted(field, false), " of ", est.type,
               " missing");
             break;

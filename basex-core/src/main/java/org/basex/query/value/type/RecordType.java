@@ -103,6 +103,37 @@ public final class RecordType extends ShapeType {
     return record;
   }
 
+  /**
+   * Builds a record from field values that are overwritten by the coerced entries of a map.
+   * @param map map
+   * @param values field values (missing values are {@code null})
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @return record
+   * @throws QueryException query exception
+   */
+  public XQMap build(final XQMap map, final Value[] values, final QueryContext qc,
+      final InputInfo ii, final CompileContext cc) throws QueryException {
+    final TokenObjectMap<ShapeField> fields = fields();
+    map.forEach((key, value) -> {
+      qc.checkStop();
+      // undeclared keys and fixed fields are rejected
+      final int f = index(key);
+      if(f == 0 || fields.value(f).isFixed()) throw typeError(map, this, ii);
+      values[f - 1] = coerce(f, value, qc, ii, cc);
+    });
+    final int fs = values.length;
+    for(int f = 0; f < fs; f++) {
+      if(values[f] == null) {
+        final ShapeField rf = fields.value(f + 1);
+        if(!rf.optional()) throw typeError(map, this, ii);
+        values[f] = rf.init(qc);
+      }
+    }
+    return build(values, true, qc, ii);
+  }
+
   @Override
   public boolean labeled() {
     return true;
@@ -123,11 +154,6 @@ public final class RecordType extends ShapeType {
   @Override
   public boolean global() {
     return false;
-  }
-
-  @Override
-  public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns, identity, constraint, base);
   }
 
   @Override
@@ -160,15 +186,6 @@ public final class RecordType extends ShapeType {
     if(any()) return this;
     if(shape == null) shape = new ShapeType(fields());
     return shape;
-  }
-
-  @Override
-  public ShapeType add(final String fieldName, final SeqType seqType) {
-    shape = null;
-    detachedType = null;
-    inits = null;
-    slots = null;
-    return super.add(fieldName, seqType);
   }
 
   /**

@@ -449,33 +449,7 @@ public abstract class XQMap extends XQStruct {
     // record(*) is abstract: it is matched, but never constructed, by coercion
     if(rt.any()) throw typeError(this, rt, ii);
 
-    // map with the fields of the record type in the same order: access values by position
-    final TokenObjectMap<ShapeField> fields = rt.fields();
-    final boolean sameOrder = this instanceof XQShapeMap && rt.sameOrder((ShapeType) type);
-    if(!sameOrder) {
-      // reject undeclared keys
-      for(final Item key : keys()) {
-        if(rt.index(key) == 0) throw typeError(this, rt, ii);
-      }
-    }
-
-    // build record; a field that cannot be coerced is named in the error message
-    final int fs = fields.size();
-    final Value[] values = new Value[fs];
-    for(int f = 0; f < fs; f++) {
-      final ShapeField rf = fields.value(f + 1);
-      final Value value = sameOrder ? valueAt(f) : getOrNull(rt.key(f + 1));
-      if(value != null) {
-        // fixed fields must not be supplied
-        if(rf.isFixed()) throw typeError(this, rt, ii);
-        values[f] = rt.coerce(f + 1, value, qc, ii, cc);
-      } else if(rf.init() == null && rf.seqType().occ.min > 0) {
-        throw typeError(this, rt, ii);
-      } else {
-        values[f] = rf.init(qc);
-      }
-    }
-    return rt.build(values, true, qc, ii);
+    return rt.build(this, new Value[rt.fields().size()], qc, ii, cc);
   }
 
   /**
@@ -499,7 +473,7 @@ public abstract class XQMap extends XQStruct {
       if(f == 0) throw typeError(this, sh, ii);
       mb.put(sh.key(f), sh.coerce(f, value, qc, ii, cc));
     });
-    if(structSize() < fs && addMissing(sh, mb) != 0) throw typeError(this, sh, ii);
+    if(structSize() < fs && addMissing(sh, mb, qc) != 0) throw typeError(this, sh, ii);
     return mb.map();
   }
 
@@ -527,27 +501,30 @@ public abstract class XQMap extends XQStruct {
       mb.put(sh.key(f), cv);
       return true;
     })) return null;
-    final int f = addMissing(sh, mb);
+    final int f = addMissing(sh, mb, qc);
     if(f == 0) return mb.map();
     if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, fields.value(f).seqType());
     return null;
   }
 
   /**
-   * Adds empty entries for the fields of a simple record type that are missing in a map.
+   * Adds entries for the optional fields of a simple record type that are missing in a map.
    * @param sh simple record type
    * @param mb map builder
-   * @return {@code 0}, or the index of a missing field that does not permit the empty sequence
+   * @param qc query context
+   * @return {@code 0}, or the index of a missing field that cannot be omitted
    * @throws QueryException query exception
    */
-  private static int addMissing(final ShapeType sh, final MapBuilder mb) throws QueryException {
+  private static int addMissing(final ShapeType sh, final MapBuilder mb, final QueryContext qc)
+      throws QueryException {
     final TokenObjectMap<ShapeField> fields = sh.fields();
     final int fs = fields.size();
     for(int f = 1; f <= fs; f++) {
       final Str key = sh.key(f);
       if(mb.contains(key)) continue;
-      if(!fields.value(f).seqType().instance(Empty.VALUE)) return f;
-      mb.put(key, Empty.VALUE);
+      final ShapeField rf = fields.value(f);
+      if(!rf.optional()) return f;
+      mb.put(key, rf.init(qc));
     }
     return 0;
   }
@@ -610,10 +587,8 @@ public abstract class XQMap extends XQStruct {
         else if(instanceOf(rt, false)) cast = RecordType.derives(type, rt) ? rf.init(qc) : value;
         else if(error) throw typeError(this, rt, info);
         else cast = null;
-      } else if(rf.init() != null) {
+      } else if(rf.optional()) {
         cast = rf.init(qc);
-      } else if(ft.instance(Empty.VALUE)) {
-        cast = Empty.VALUE;
       } else {
         if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, ft);
         cast = null;

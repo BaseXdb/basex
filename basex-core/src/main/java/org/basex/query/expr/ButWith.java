@@ -1,17 +1,13 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -36,15 +32,6 @@ public final class ButWith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // RECORD but with { 'a': A } but with { 'b': B } → RECORD but with { 'a': A, 'b': B }
-    // (the intermediate record must not be subject to an integrity constraint)
-    if(exprs[0] instanceof final ButWith bw && bw.seqType().type instanceof final RecordType rt &&
-        !rt.any() && !constrained(rt, cc.qc) && disjoint(bw.exprs[1], exprs[1])) {
-      final Expr update = new CMap(info, new Expr[] { bw.exprs[1], Empty.UNDEFINED, exprs[1],
-        Empty.UNDEFINED }).optimize(cc);
-      exprs = new Expr[] { bw.exprs[0], update };
-      cc.info(OPTMERGE_X, this);
-    }
     // local:p(A, B) but with { 'b': C } → local:p(A, C)
     final Expr constr = constructor(cc);
     if(constr != null) return cc.replaceWith(this, constr);
@@ -60,21 +47,6 @@ public final class ButWith extends Arr {
       exprType.assign(st.with(Occ.EXACTLY_ONE));
     }
     return values(false, cc) ? cc.preEval(this) : this;
-  }
-
-  /**
-   * Checks if records of the specified or a derived type may have integrity constraints.
-   * @param rt record type
-   * @param qc query context
-   * @return result of check
-   */
-  private static boolean constrained(final RecordType rt, final QueryContext qc) {
-    if(rt.constrained()) return true;
-    for(final TypeDecl td : qc.typeDecls) {
-      if(td.seqType.type instanceof final RecordType dt && dt.constrained() &&
-          RecordType.derives(dt, rt)) return true;
-    }
-    return false;
   }
 
   /**
@@ -97,22 +69,6 @@ public final class ButWith extends Arr {
     final int es = entries.size();
     for(int e = 1; e <= es; e++) supplied.put(entries.key(e), entries.value(e));
     return ShapeConstructor.record(info, rt, supplied, cc);
-  }
-
-  /**
-   * Checks if two updates have statically known, disjoint string keys.
-   * @param update1 first update
-   * @param update2 second update
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean disjoint(final Expr update1, final Expr update2) throws QueryException {
-    final TokenObjectMap<Expr> entries1 = entries(update1), entries2 = entries(update2);
-    if(entries1 == null || entries2 == null) return false;
-    for(final byte[] key : entries2) {
-      if(entries1.contains(key)) return false;
-    }
-    return true;
   }
 
   /**
@@ -151,20 +107,13 @@ public final class ButWith extends Arr {
     if(update.structSize() == 0) return record;
 
     // compact record layout: access values by position, otherwise by key
-    final TokenObjectMap<ShapeField> fields = rt.fields();
-    final int fs = fields.size();
+    final int fs = rt.fields().size();
     final Value[] values = new Value[fs];
     final boolean sameOrder = record instanceof XQShapeMap;
     for(int f = 0; f < fs; f++) {
       values[f] = sameOrder ? record.valueAt(f) : record.getOrNull(rt.key(f + 1));
     }
-    update.forEach((key, value) -> {
-      final int i = rt.index(key);
-      // fixed fields cannot be updated
-      if(i == 0 || fields.value(i).isFixed()) throw typeError(update, rt, info);
-      values[i - 1] = rt.coerce(i, value, qc, info, null);
-    });
-    return rt.build(values, true, qc, info);
+    return rt.build(update, values, qc, info, null);
   }
 
   @Override
