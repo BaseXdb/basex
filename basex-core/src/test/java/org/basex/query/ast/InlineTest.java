@@ -182,7 +182,7 @@ public final class InlineTest extends SandboxTest {
         "//Let << //Window");
   }
 
-  /** An error raised while inlining into a guarded FLWOR clause is only reported if a tuple exists. */
+  /** Errors from inlining into a guarded FLWOR clause are only raised if a tuple exists. */
   @Test public void flworClauseError() {
     inline(true);
     final String f = "declare function local:f($s) { for $i in (1 to 1000000)[. ";
