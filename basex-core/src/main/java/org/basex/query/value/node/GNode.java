@@ -259,7 +259,7 @@ public abstract class GNode extends Item {
           GNode node = GNode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
-            if(!node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE)) {
+            if(node.isChild()) {
               for(final GNode nd : ir) {
                 if(nd.is(node)) break;
               }
