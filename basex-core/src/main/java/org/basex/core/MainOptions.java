@@ -367,9 +367,16 @@ public final class MainOptions extends Options {
 
   @Override
   public synchronized void assign(final String name, final String value) throws BaseXException {
-    // no plan stage: toggle query plan
-    final boolean toggle = value.isEmpty() && name.equalsIgnoreCase(XMLPLAN.name());
-    super.assign(name, toggle ? String.valueOf(planStage() == PlanStage.NONE) : value);
+    String val = value;
+    if(name.equalsIgnoreCase(XMLPLAN.name())) {
+      // no plan stage: toggle query plan
+      if(val.isEmpty()) {
+        val = String.valueOf(planStage() == PlanStage.NONE);
+      } else if(planStage(val) == null) {
+        throw new BaseXException(allowed(XMLPLAN, val, (Object[]) PlanStage.values()));
+      }
+    }
+    super.assign(name, val);
   }
 
   /**
@@ -377,11 +384,20 @@ public final class MainOptions extends Options {
    * @return stage
    */
   public PlanStage planStage() {
-    final String value = get(XMLPLAN).trim().toLowerCase(Locale.ENGLISH);
-    final Boolean enable = Strings.toBoolean(value);
-    if(enable != null) return enable ? PlanStage.OPTIMIZED : PlanStage.NONE;
-    final PlanStage stage = Enums.get(PlanStage.class, value);
+    final PlanStage stage = planStage(get(XMLPLAN));
     return stage != null ? stage : PlanStage.NONE;
+  }
+
+  /**
+   * Parses a query plan stage.
+   * @param value boolean or stage
+   * @return stage (can be {@code null})
+   */
+  private static PlanStage planStage(final String value) {
+    final String string = value.trim().toLowerCase(Locale.ENGLISH);
+    final Boolean enable = Strings.toBoolean(string);
+    if(enable != null) return enable ? PlanStage.OPTIMIZED : PlanStage.NONE;
+    return Enums.get(PlanStage.class, string);
   }
 
   /**

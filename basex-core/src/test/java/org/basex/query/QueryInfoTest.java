@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.query.QueryInfo.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -159,6 +160,9 @@ public final class QueryInfoTest extends SandboxTest {
       assertTrue(plan("1 + 2").contains("<Arith"));
       set(MainOptions.XMLPLAN, "compiled");
       assertTrue(plan("1 + 2").contains(">3<"));
+      assertFalse(new Set(MainOptions.XMLPLAN, "foo").run(context));
+      assertFalse(new Set(MainOptions.XMLPLAN, "parsed; XQUERY 1").run(context));
+      assertEquals("compiled", context.options.get(MainOptions.XMLPLAN));
     } finally {
       set(MainOptions.XMLPLAN, false);
     }
