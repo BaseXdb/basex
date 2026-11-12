@@ -13,7 +13,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Functions on binary data.
@@ -179,17 +178,12 @@ abstract class BinFn extends StandardFunc {
   /**
    * Returns digits in a string to be converted to a byte array.
    * @param qc query context
-   * @return normalized digits or {@code null}
+   * @return digits without separators and whitespace (can be {@code null})
    * @throws QueryException query exception
    */
   final byte[] toDigits(final QueryContext qc) throws QueryException {
     final byte[] string = toTokenOrNull(arg(0), qc);
-    if(string == null) return null;
-    final ByteList bl = new ByteList(string.length);
-    for(final byte b : string) {
-      if(!(b == '_' || ws(b))) bl.add(b);
-    }
-    return bl.finish();
+    return string != null ? digits(string) : null;
   }
 
   /**

@@ -111,7 +111,7 @@ public final class JsonParser {
     skipWs();
     if(!more()) return false;
     if(parsed && (wsPos != pos || wsLine == line)) {
-      throw error("Expected: newline, found: %", InputParser.asString(current));
+      throw error("Expected: newline, found: %", Strings.describe(current));
     }
     root();
     parsed = true;
@@ -343,7 +343,7 @@ public final class JsonParser {
    * @throws IOException I/O exception
    */
   private byte[] string() throws QueryException, IOException {
-    if(!consume('"')) throw error("Expected: string, found: %", InputParser.asString(current));
+    if(!consume('"')) throw error("Expected: string, found: %", Strings.describe(current));
     tb.reset();
     int high = 0; // cached high surrogate
     while(more()) {
@@ -376,10 +376,10 @@ public final class JsonParser {
               if(cp2 >= '0' && cp2 <= '9')      cp = 16 * cp + cp2      - '0';
               else if(cp2 >= 'a' && cp2 <= 'f') cp = 16 * cp + cp2 + 10 - 'a';
               else if(cp2 >= 'A' && cp2 <= 'F') cp = 16 * cp + cp2 + 10 - 'A';
-              else throw error("Illegal hexadecimal digit: %", InputParser.asString(cp2));
+              else throw error("Illegal hexadecimal digit: %", Strings.describe(cp2));
             }
           }
-          default -> throw error("Unknown character escape: %", InputParser.asString(cp));
+          default -> throw error("Unknown character escape: %", Strings.describe(cp));
         }
       } else if(!liberal && cp <= 0x1F) {
         throw error("Non-escaped control character: %", CTRL[cp]);
@@ -459,8 +459,9 @@ public final class JsonParser {
    */
   private boolean ws() {
     return switch(current) {
-      // '\u00A0': non-breaking space
-      case ' ', '\t', '\r', '\n', '\u00A0' -> true;
+      case ' ', '\t', '\r', '\n' -> true;
+      // non-breaking space: only accepted in liberal mode
+      case '\u00A0' -> liberal;
       default -> false;
     };
   }
@@ -479,7 +480,7 @@ public final class JsonParser {
       skipWs();
       return true;
     }
-    if(err) throw error("Expected: '%', found: %", ch, InputParser.asString(current));
+    if(err) throw error("Expected: '%', found: %", ch, Strings.describe(current));
     return false;
   }
 

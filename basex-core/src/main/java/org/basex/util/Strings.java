@@ -253,6 +253,16 @@ public final class Strings {
   }
 
   /**
+   * Returns a readable description of a code point.
+   * @param cp code point (negative for end of input)
+   * @return character, or its Unicode name if it is invisible or invalid
+   */
+  public static String describe(final int cp) {
+    return cp < 0 ? "END OF INPUT" : !XMLToken.valid10(cp) || Character.isSpaceChar(cp) ?
+      Character.getName(cp) : Character.toString(cp);
+  }
+
+  /**
    * Checks if a string starts with the specified character.
    * @param string string
    * @param ch character to be found

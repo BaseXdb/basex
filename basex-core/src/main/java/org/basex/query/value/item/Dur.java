@@ -91,7 +91,7 @@ public class Dur extends ADateDur {
    */
   private Dur(final byte[] value, final Type type, final InputInfo info) throws QueryException {
     this(type);
-    final String val = Token.string(value).trim();
+    final String val = Token.string(Token.trim(value));
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
       throw dateError(value, XDURR, info);

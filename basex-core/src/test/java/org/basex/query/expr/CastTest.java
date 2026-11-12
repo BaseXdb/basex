@@ -28,6 +28,13 @@ public final class CastTest extends SandboxTest {
     error("'x' cast as xs:integer?", FUNCCAST_X_X);
   }
 
+  /** Name characters of XML 1.0, 5th edition. */
+  @Test public void names() {
+    query("char(0x2F00) castable as xs:NCName", true);
+    query("char(0x2FEF) castable as xs:NCName", true);
+    query("char(0x2FF0) castable as xs:NCName", false);
+  }
+
   /** The cast target has no occurrence indicator: * and + are arithmetic operators. */
   @Test public void occurrenceIndicators() {
     query("2 cast as xs:integer * 3", 6);
@@ -386,5 +393,25 @@ public final class CastTest extends SandboxTest {
     error("xs:positiveInteger(0.5e0)", FUNCCAST_X_X_X);
     query("xs:unsignedLong(-0.5)", 0);
     query("xs:unsignedLong(9223372036854775807.9)", Long.MAX_VALUE);
+  }
+
+  /** Lexical forms: Java syntax and non-XML whitespace. */
+  @Test public void lexicalForms() {
+    query("xs:float(' 1.5e0 ')", 1.5);
+    query("xs:float('+INF')", "INF");
+    for(final String f : new String[] { "1f", "1d", "1.f", "0x1p3", "+NaN", "-NaN" }) {
+      query("'" + f + "' castable as xs:float", false);
+    }
+    for(final String[] tv : new String[][] {
+      { "float", "1" }, { "date", "2020-01-01" }, { "time", "12:00:00" },
+      { "dateTime", "2020-01-01T12:00:00" }, { "gYear", "2020" }, { "duration", "P1D" },
+      { "dayTimeDuration", "P1D" }, { "yearMonthDuration", "P1Y" }, { "base64Binary", "AA==" }
+    }) {
+      final String type = tv[0], value = tv[1];
+      query("'&#x9;" + value + "&#xa;' castable as xs:" + type, true);
+      query("(char(11) || '" + value + "') castable as xs:" + type, false);
+      query("('" + value + "' || char(12)) castable as xs:" + type, false);
+    }
+    query("('AA' || char(11) || '==') castable as xs:base64Binary", false);
   }
 }

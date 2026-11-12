@@ -63,7 +63,7 @@ public final class GDt extends ADate {
   public GDt(final byte[] date, final Type type, final InputInfo info) throws QueryException {
     super(type);
 
-    final String dt = Token.string(date).trim();
+    final String dt = Token.string(Token.trim(date));
     final int i = type(type);
     final Matcher mt = PATTERNS[i].matcher(dt);
     if(!mt.matches()) throw dateError(date, EXAMPLES[i], info);

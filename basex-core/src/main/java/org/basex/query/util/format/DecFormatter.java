@@ -123,7 +123,7 @@ public final class DecFormatter extends FormatUtil {
         } else if(option == DecFormatOptions.ZERO_DIGIT) {
           z = zeroes(cp);
           if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
-          if(z != cp) throw INVDECZERO_X.get(info, (char) cp);
+          if(z != cp) throw INVDECZERO_X.get(info, Strings.describe(cp));
         }
       } else if(option != DecFormatOptions.FORMAT_NAME) {
         // signs must have single character
@@ -137,7 +137,7 @@ public final class DecFormatter extends FormatUtil {
     for(int i = 0; i < 10; i++) is.add(zero + i);
     final int[] ss = { decimal, grouping, exponent, percent, permille, digit, pattern };
     for(final int s : ss) {
-      if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
+      if(!is.add(s)) throw DUPLDECFORM_X.get(info, Strings.describe(s));
     }
 
     // create auxiliary strings

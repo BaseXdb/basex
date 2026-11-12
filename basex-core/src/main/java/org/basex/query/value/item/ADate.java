@@ -117,7 +117,7 @@ public abstract class ADate extends ADateDur {
    * @throws QueryException query exception
    */
   final void date(final byte[] date, final String exp, final InputInfo info) throws QueryException {
-    final Matcher mt = DATE.matcher(Token.string(date).trim());
+    final Matcher mt = DATE.matcher(Token.string(Token.trim(date)));
     if(!mt.matches()) throw dateError(date, exp, info);
     year = toLong(mt.group(1), false, info);
     month = (byte) Strings.toInt(mt.group(3));
@@ -139,7 +139,7 @@ public abstract class ADate extends ADateDur {
    * @throws QueryException query exception
    */
   final void time(final byte[] time, final String exp, final InputInfo info) throws QueryException {
-    final Matcher mt = TIME.matcher(Token.string(time).trim());
+    final Matcher mt = TIME.matcher(Token.string(Token.trim(time)));
     if(!mt.matches()) throw dateError(time, exp, info);
 
     hour = (byte) Strings.toInt(mt.group(1));

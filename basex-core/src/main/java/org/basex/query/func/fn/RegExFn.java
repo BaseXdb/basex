@@ -114,14 +114,16 @@ public abstract class RegExFn extends StandardFunc {
     // process modifiers (case variants for the 'i' flag are added to the pattern)
     int flags = 0;
     boolean insensitive = false, strip = false, comments = false;
-    for(final byte mod : modifiers) {
+    final int ml = modifiers.length;
+    for(int m = 0; m < ml; m++) {
+      final byte mod = modifiers[m];
       if(mod == 'i') insensitive = true;
       else if(mod == 'm') flags |= MULTILINE | UNIX_LINES;
       else if(mod == 's') flags |= DOTALL;
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
       else if(mod == 'c') comments = true;
-      else throw REGFLAG_X.get(info, (char) mod);
+      else throw REGFLAG_X.get(info, Strings.describe(cp(modifiers, m)));
     }
 
     try {

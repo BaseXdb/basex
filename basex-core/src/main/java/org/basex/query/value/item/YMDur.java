@@ -69,7 +69,7 @@ public final class YMDur extends Dur {
    */
   public YMDur(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.YEAR_MONTH_DURATION);
-    final String val = Token.string(value).trim();
+    final String val = Token.string(Token.trim(value));
     final Matcher mt = YMD.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, info);
     yearMonth(value, mt, info);

@@ -10,13 +10,6 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 abstract class FormatUtil {
-  /** Zero digits, Unicode Category Nd. */
-  private static final int[] ZEROES = {
-    0x30, 0x660, 0x6F0, 0x7C0, 0x966, 0x9E6, 0xA66, 0xAE6, 0xB66, 0xBE6, 0xC66, 0xCE6,
-    0xD66, 0xE50, 0xED0, 0xF20, 0x1040, 0x1090, 0x17E0, 0x1810, 0x1946, 0x19D0, 0x1A80,
-    0x1A90, 0x1B50, 0x1BB0, 0x1C40, 0x1C50, 0xA620, 0xA8D0, 0xA900, 0xA9D0, 0xAA50,
-    0xABF0, 0xFF10, 0x104A0, 0x11066, 0x1D7CE, 0x1D7D8, 0x1D7E2, 0x1D7EC, 0x1D7F6
-  };
   /** Kanji digits. */
   static final int[] KANJI = {
     0x3007, 0x4e00, 0x4e8c, 0x4e09, 0x56db, 0x4e94, 0x516d, 0x4e03, 0x516b,
@@ -160,10 +153,9 @@ abstract class FormatUtil {
    * @return zero base
    */
   int zeroes(final int ch) {
-    for(final int zero : ZEROES) {
-      if(ch >= zero && ch <= zero + 9) return zero;
-    }
-    return -1;
+    // decimal digits (Unicode category Nd) are assigned in contiguous runs from 0 to 9
+    final int digit = Character.digit(ch, 10);
+    return digit == -1 ? -1 : ch - digit;
   }
 
   /**

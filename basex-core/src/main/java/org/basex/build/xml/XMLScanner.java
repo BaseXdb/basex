@@ -263,7 +263,7 @@ final class XMLScanner extends Job {
       scan = Scan.ATTRBT;
     } else {
       // undefined character...
-      throw error(CHARACTER, (char) c);
+      throw error(CHARACTER, Strings.describe(c));
     }
   }
 
@@ -292,7 +292,7 @@ final class XMLScanner extends Job {
     boolean wrong = false;
     int c = ch;
     while(c != quote) {
-      if(c == 0) throw error(ATTCLOSE, (char) 0);
+      if(c == 0) throw error(ATTCLOSE);
       wrong |= c == '\'' || c == '"';
       if(c == '<') throw error(wrong ? ATTCLOSE : ATTCHAR, '<');
       if(c == 0x09 || c == 0x0A) c = ' ';
@@ -437,7 +437,7 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
-    if(!s()) throw error(NOWS, (char) consume());
+    if(!s()) throw error(NOWS, Strings.describe(consume()));
   }
 
   /**
@@ -447,7 +447,7 @@ final class XMLScanner extends Job {
    */
   private void check(final char ch) throws IOException {
     final int c = consume();
-    if(c != ch) throw error(WRONGCHAR, ch, (char) c);
+    if(c != ch) throw error(WRONGCHAR, ch, Strings.describe(c));
   }
 
   /**
@@ -456,7 +456,7 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private void check(final byte[] t) throws IOException {
-    if(!consume(t)) throw error(WRONGCHAR, t, (char) consume());
+    if(!consume(t)) throw error(WRONGCHAR, t, Strings.describe(consume()));
   }
 
   /**
@@ -482,7 +482,7 @@ final class XMLScanner extends Job {
    */
   private int qu() throws IOException {
     final int qu = consume();
-    if(qu != '\'' && qu != '"') throw error(SCANQUOTE, (char) qu);
+    if(qu != '\'' && qu != '"') throw error(SCANQUOTE, Strings.describe(qu));
     return qu;
   }
 
@@ -718,7 +718,7 @@ final class XMLScanner extends Job {
         while((ch = nextChar()) != qu) tok.add(ch);
         return full ? input.io().merge(string(tok.finish())) : null;
       }
-      if(full) throw error(SCANQUOTE, (char) qu);
+      if(full) throw error(SCANQUOTE, Strings.describe(qu));
       prev(1);
     }
     return null;
@@ -763,7 +763,7 @@ final class XMLScanner extends Job {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isChar(ch) && !contains(PUBIDTOK, ch)) throw error(PUBID, (char) ch);
+      if(!isChar(ch) && !contains(PUBIDTOK, ch)) throw error(PUBID, Strings.describe(ch));
     }
   }
 

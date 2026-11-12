@@ -2453,6 +2453,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
         "America/New_York"), "2024-01-11-05:00");
 
+    // whitespace in variable markers: only XML whitespace is ignored
+    query(func.args(" xs:date('2020-01-01')", " '[M' || char(9) || '01]'"), "01");
+    error(func.args(" xs:date('2020-01-01')", " '[M' || char(11) || '01]'"), INVFDPATTERN_X);
+
     // week in month: the week belongs to the month of its Thursday
     query(func.args(" xs:date('2013-01-29')", "[w]"), 5);
     query(func.args(" xs:date('2013-02-01')", "[w]"), 5);
@@ -2486,6 +2490,10 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(11, "1"), "11");
     query(func.args(11, "001"), "011");
+
+    // zero digits of all Unicode digit families (here: Adlam, Chakma)
+    query(func.args(12, " char(0x1E950)"), "𞥑𞥒");
+    query(func.args(1234, " '#' || char(0x11136) || char(0x11136)"), "𑄷𑄸𑄹𑄺");
 
     query(func.args(1234, "16^xxxx"), "04d2");
     query(func.args(1234, "16^X"), "4D2");
@@ -3761,6 +3769,15 @@ return
   }
 
   /** Test method. */
+  @Test public void lang() {
+    final Function func = LANG;
+    query(func.args("en", " <a xml:lang='EN-us'/>"), true);
+    query(func.args("EN", " <a xml:lang='en'><b/></a>/b"), true);
+    query(func.args("en", " <a xml:lang='eng'/>"), false);
+    query(func.args("en", " <a xml:lang=' en '/>"), false);
+  }
+
+  /** Test method. */
   @Test public void location() {
     final Function func = LOCATION;
     // locations are only retained on request
@@ -3866,6 +3883,23 @@ return
     query(func.args("b", "[a-]"), false);
     query(func.args("a", "[A-\\\\]"), false);
     query(func.args("\\", "[A-\\\\]"), true);
+
+    // whitespace: only space, tab, newline and carriage return
+    query(func.args("&#x9;&#xa;&#xd; ", "^\\s+$"), true);
+    query(func.args("&#x9;&#xa;&#xd; ", "^[\\s]+$"), true);
+    final String vtff = " codepoints-to-string((11, 12))";
+    query(func.args(vtff, "^\\S+$"), true);
+    query(func.args(vtff, "^[\\S]+$"), true);
+    query(func.args(vtff, "[\\s]"), false);
+    query(func.args(vtff, "[a-[\\S]]"), false);
+
+    // block names: XSD and Unicode
+    query(func.args("&#x1F00;", "\\p{IsGreek}"), false);
+    query(func.args("&#x500;", "\\p{IsCyrillicSupplementary}"), true);
+    query(func.args("&#x1C80;", "\\p{IsCyrillicExtended-C}"), true);
+    query(func.args("&#x10D40;", "\\p{IsGaray}"), true);
+    query(func.args("&#x10D40;", "[\\P{IsGaray}]"), false);
+    error(func.args("a", "\\p{IsBadBlockName}"), REGINVALID_X);
 
     // multi-line mode: empty string, only newline characters separate lines
     query(func.args("", "^$", "m"), true);
@@ -4602,6 +4636,8 @@ return
     query(func.args("Sunday, 06-Nov-94 08:49:37 GMT"), "1994-11-06T08:49:37Z");
     query(func.args("Wed, 6 Jun 94 07:29:35 +0500"), "1994-06-06T07:29:35+05:00");
     query(func.args("1 Nov 1234 05:06:07.89 gmt"), "1234-11-01T05:06:07.89Z");
+    query(func.args("&#x9;1 Nov 1234 05:06:07 GMT&#xa;"), "1234-11-01T05:06:07Z");
+    error(func.args(" char(11) || '1 Nov 1234 05:06:07 GMT'"), IETF_PARSE_X_X_X);
 
     query(func.args("01-feb-3456 07:08:09 GMT"), "3456-02-01T07:08:09Z");
     query(func.args("01-FEB-3456 07:08:09 GMT"), "3456-02-01T07:08:09Z");
@@ -4649,6 +4685,8 @@ return
     error(func.args("1", 100), INTRADIX_X);
     error(func.args("abc", 10), INTINVALID_X_X);
     error(func.args("012", 2), INTINVALID_X_X);
+    query(func.args("&#x9;1 2&#xa;"), 12);
+    error(func.args(" char(11) || '1'"), INTINVALID_X_X);
 
     // integer limits
     query(func.args("9223372036854775807"), Long.MAX_VALUE);
@@ -4665,6 +4703,12 @@ return
   @Test public void parseJson() {
     final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
+
+    // whitespace: non-breaking space is only accepted in liberal mode
+    query(func.args("&#x9;1&#xa;"), 1);
+    error(func.args("&#xa0;1"), PARSE_JSON_X_X_X);
+    error(func.args(" char(11) || '1'"), PARSE_JSON_X_X_X);
+    query(func.args("&#xa0;1", " { 'liberal': true() }"), 1);
 
     // rejected option: error message contains the name, but not the default value
     error(func.args("1", " { 'json-lines': true() }"), INVALIDOPTION_X);
@@ -7571,6 +7615,10 @@ return
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
         + "<string key=''>í</string></map>", " { 'indent': false() }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
+
+    // numbers: only XML whitespace is trimmed
+    query(func.args(" <fn:number>&#x9;1&#xa;</fn:number>"), 1);
+    error(func.args(" <fn:number>{ char(11) }1</fn:number>"), INVALID_JSON_X);
   }
 
   /** Test method. */

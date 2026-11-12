@@ -51,8 +51,6 @@ public final class Token {
   public static final byte[] NEGATIVE_INF = token("-INF");
   /** Token 'Infinity'. */
   public static final byte[] POSITIVE_INFINITY = token("Infinity");
-  /** Token '-Infinity'. */
-  public static final byte[] NEGATIVE_INFINITY = token("-Infinity");
   /** Minimum long value. */
   public static final byte[] MIN_LONG = token("-9223372036854775808");
   /** Minimum integer. */
@@ -533,33 +531,86 @@ public final class Token {
    * @return resulting double value, or {@link Double#NaN} if the input is invalid
    */
   public static double toDouble(final byte[] token) {
-    final int tl = token.length;
-    int s = -1;
-    while(++s < tl && ws(token[s]));
-    if(s == tl) return Double.NaN;
-
-    // find end of value, reject invalid and trailing characters
-    int e = s;
-    for(; e < tl; e++) {
-      final byte b = token[e];
-      if(ws(b)) break;
-      if(!digit(b) && b != '+' && b != '-' && b != '.' && b != 'e' && b != 'E') return Double.NaN;
-    }
-    for(int p = e; p < tl; p++) {
-      if(!ws(token[p])) return Double.NaN;
-    }
+    final int s = start(token), e = end(token, s);
+    if(e == -1) return Double.NaN;
 
     // plain decimal value
     final double dec = toDecimal(token, s, e);
     if(!Double.isNaN(dec)) return dec;
 
-    // check if the value is a double
-    final int l = e - s;
-    if(l == 1) return Double.NaN;
+    final String number = number(token, s, e);
+    try {
+      return number != null ? Double.parseDouble(number) : Double.NaN;
+    } catch(final NumberFormatException ignore) {
+      return Double.NaN;
+    }
+  }
+
+  /**
+   * Converts the specified token into a float value.
+   * @param token token to be converted
+   * @return resulting float value, or {@link Float#NaN} if the input is invalid
+   */
+  public static float toFloat(final byte[] token) {
+    final int s = start(token), e = end(token, s);
+    if(e == -1) return Float.NaN;
+
+    final String number = number(token, s, e);
+    try {
+      return number != null ? Float.parseFloat(number) : Float.NaN;
+    } catch(final NumberFormatException ignore) {
+      return Float.NaN;
+    }
+  }
+
+  /**
+   * Returns the offset of the first non-whitespace character.
+   * @param token token
+   * @return offset, or the token length if the token only consists of whitespace
+   */
+  private static int start(final byte[] token) {
+    final int tl = token.length;
+    int s = -1;
+    while(++s < tl && ws(token[s]));
+    return s;
+  }
+
+  /**
+   * Returns the end offset of a numeric value that is only followed by whitespace.
+   * @param token token
+   * @param start start offset
+   * @return end offset, or {@code -1} if the value is empty or contains invalid characters
+   */
+  private static int end(final byte[] token, final int start) {
+    final int tl = token.length;
+    if(start == tl) return -1;
+    int e = start;
+    for(; e < tl; e++) {
+      final byte b = token[e];
+      if(ws(b)) break;
+      if(!digit(b) && b != '+' && b != '-' && b != '.' && b != 'e' && b != 'E') return -1;
+    }
+    for(int p = e; p < tl; p++) {
+      if(!ws(token[p])) return -1;
+    }
+    return e;
+  }
+
+  /**
+   * Converts a numeric value to a Java string, rejecting misplaced exponents, signs and dots.
+   * @param token token
+   * @param start start offset
+   * @param end end offset
+   * @return Java string (can be {@code null})
+   */
+  private static String number(final byte[] token, final int start, final int end) {
+    final int l = end - start;
+    // single character: must be a digit
+    if(l == 1 && !digit(token[start])) return null;
     final char[] str = new char[l];
     int sd = 0, se = 0;
     for(int p = 0; p < l; p++) {
-      char b = (char) token[s + p];
+      char b = (char) token[start + p];
       if(b == 'e' || b == 'E') {
         // 'e1', '1e', '1e1e1'
         b = p == 0 || p + 1 == l || ++se > 1 ? 0 : 'e';
@@ -570,16 +621,10 @@ public final class Token {
         // '1e.', '1.1.1',
         if(p > 0 && str[p - 1] == 'e' || ++sd > 1) b = 0;
       }
-      if(b == 0) return Double.NaN;
+      if(b == 0) return null;
       str[p] = b;
     }
-
-    // parse as double value
-    try {
-      return Double.parseDouble(new String(str));
-    } catch(final NumberFormatException ignore) {
-      return Double.NaN;
-    }
+    return new String(str);
   }
 
   /**
@@ -1221,6 +1266,26 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder(tl);
     forEachCp(token, cp -> { if(cp != ch) tb.add(cp); });
     return tb.finish();
+  }
+
+  /**
+   * Removes digit separators (underscores) and whitespace from a token.
+   * @param token token
+   * @return resulting token
+   */
+  public static byte[] digits(final byte[] token) {
+    int c = 0;
+    for(final byte b : token) {
+      if(b == '_' || ws(b)) c++;
+    }
+    if(c == 0) return token;
+
+    final byte[] tmp = new byte[token.length - c];
+    c = 0;
+    for(final byte b : token) {
+      if(b != '_' && !ws(b)) tmp[c++] = b;
+    }
+    return tmp;
   }
 
   /**

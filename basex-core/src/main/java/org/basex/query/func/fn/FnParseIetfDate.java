@@ -77,7 +77,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @param info input info (can be {@code null})
      */
     private DateParser(final byte[] input, final InputInfo info) {
-      super(string(lc(input)).trim());
+      super(string(trim(lc(input))));
       original = input;
       this.info = info;
     }

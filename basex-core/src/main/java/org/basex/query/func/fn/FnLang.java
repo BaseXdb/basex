@@ -30,7 +30,7 @@ public final class FnLang extends ContextFn {
       final BasicNodeIter atts = nd.attributeIter();
       for(GNode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
-          final byte[] ln = lc(normalize(at.string()));
+          final byte[] ln = lc(at.string());
           return startsWith(ln, lang) && (lang.length == ln.length || ln[lang.length] == '-');
         }
       }

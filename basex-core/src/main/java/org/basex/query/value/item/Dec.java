@@ -200,7 +200,7 @@ public final class Dec extends ANum {
       }
       // decimal conversion
       try {
-        return new BigDecimal(Token.string(value).trim());
+        return new BigDecimal(Token.string(Token.trim(value)));
       } catch(final NumberFormatException ex) {
         if(error) throw BasicType.DECIMAL.castError(value, info).cause(ex);
       }

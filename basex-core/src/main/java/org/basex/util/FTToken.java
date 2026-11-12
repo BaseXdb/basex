@@ -30,6 +30,7 @@ public final class FTToken {
    * @return result of check
    */
   public static boolean lod(final int cp) {
+    // character types depend on the Unicode version of the JDK (indexes may differ across JDKs)
     final int t = Character.getType(cp);
     return isLOD(t) || isCombining(t);
   }

@@ -104,7 +104,7 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
       } else if(eq(local, NUMBER)) {
         final byte[] value = value(iter, local);
         if(value == null) throw error("Element '%' has no value.", local);
-        final String string = Token.string(value).trim().
+        final String string = Token.string(Token.trim(value)).
             replaceAll("^\\+", "").
             replaceAll("^(-?)0+([\\d])", "$1$2").
             replaceAll("^(\\.)", "0$1").

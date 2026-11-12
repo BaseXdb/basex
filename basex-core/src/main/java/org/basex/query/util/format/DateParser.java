@@ -51,7 +51,7 @@ final class DateParser extends TokenParser {
     while(more()) {
       final int ch = next();
       if(ch == ']') return tb.finish();
-      if(!Character.isWhitespace(ch)) tb.add(ch);
+      if(!Token.ws(ch)) tb.add(ch);
     }
     throw PICDATE_X.get(info, token);
   }

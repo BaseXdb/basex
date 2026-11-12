@@ -68,7 +68,7 @@ public final class DTDur extends Dur {
   public DTDur(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.DAY_TIME_DURATION);
 
-    final String val = Token.string(value).trim();
+    final String val = Token.string(Token.trim(value));
     final Matcher mt = DTD.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
       throw dateError(value, XDTD, info);

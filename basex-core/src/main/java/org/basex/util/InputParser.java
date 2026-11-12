@@ -171,18 +171,7 @@ public class InputParser {
    * @return current character
    */
   protected final String currentAsString() {
-    return asString(more() ? current() : -1);
-  }
-
-  /**
-   * Returns a code point as string.
-   * @param cp code point (negative for end of input)
-   * @return string representation
-   */
-  public static String asString(final int cp) {
-    return cp < 0 ? "END OF INPUT" : !XMLToken.valid10(cp) || Character.isSpaceChar(cp) ?
-      Character.getName(cp) :
-      Character.toString(cp);
+    return Strings.describe(more() ? current() : -1);
   }
 
   /**
