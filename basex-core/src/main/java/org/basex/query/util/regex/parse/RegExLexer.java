@@ -38,7 +38,7 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
   /** Unicode category regex. */
   private static final Pattern CAT_REGEX = Pattern.compile("^L[ultmo]?|M[nce]?|N[dlo]?" +
       "|P[cdseifo]?|Z[slp]?|S[mcko]?|C[cfon]?|Is[a-zA-Z\\d\\-]+" +
-      "|(?:Script|sc)=([A-Z][a-z]*(?:_[A-Z][a-z]*)*|SignWriting)$");
+      "|Script(?:_Extensions)?=([A-Z][a-z]*(?:_[A-Z][a-z]*)*|SignWriting)$");
 
   /**
    * Constructor.

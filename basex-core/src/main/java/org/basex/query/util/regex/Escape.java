@@ -2,6 +2,8 @@ package org.basex.query.util.regex;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * Escape sequence.
  *
@@ -34,6 +36,98 @@ public final class Escape extends RegExp {
   private static final String DIGIT = "\\p{Nd}";
   /** Everything except digits. */
   private static final String NOT_DIGIT = "\\P{Nd}";
+  /** No characters. */
+  private static final String NONE = "[^\\x{0}-\\x{10FFFF}]";
+  /** All characters. */
+  private static final String ALL = "[\\x{0}-\\x{10FFFF}]";
+
+  /** Code point ranges with script extensions. */
+  private static final int[][] SCX_RANGES;
+  /** Java names of the script extensions of each range. */
+  private static final String[][] SCX_SCRIPTS;
+
+  static {
+    // script extensions (ScriptExtensions.txt, Unicode 16.0): code points and script aliases
+    final String[] scx = {
+      "00B7 Avst Cari Copt Dupl Elba Geor Glag Gong Goth Grek Hani Latn Lydi Mahj Perm Shaw",
+      "02BC Beng Cyrl Deva Latn Lisu Thai Toto", "02C7 Bopo Latn", "02C9-02CB Bopo Latn",
+      "02CD Latn Lisu", "02D7 Latn Thai", "02D9 Bopo Latn",
+      "0300 Cher Copt Cyrl Grek Latn Perm Sunu Tale",
+      "0301 Cher Cyrl Grek Latn Osge Sunu Tale Todr", "0302 Cher Cyrl Latn Tfng",
+      "0303 Glag Latn Sunu Syrc Thai",
+      "0304 Aghb Cher Copt Cyrl Goth Grek Latn Osge Syrc Tfng Todr",
+      "0305 Copt Elba Glag Goth Kana Latn", "0306 Cyrl Grek Latn Perm",
+      "0307 Copt Dupl Hebr Latn Perm Syrc Tale Tfng Todr",
+      "0308 Armn Cyrl Dupl Goth Grek Hebr Latn Perm Syrc Tale", "0309 Latn Tfng",
+      "030A Dupl Latn Syrc", "030B Cher Cyrl Latn Osge", "030C Cher Latn Tale", "030D Latn Sunu",
+      "030E Ethi Latn", "0310 Latn Sunu", "0311 Cyrl Latn Todr", "0313 Grek Latn Perm Todr",
+      "0320 Latn Syrc", "0323 Cher Dupl Kana Latn Syrc", "0324 Cher Dupl Latn Syrc",
+      "0325 Latn Syrc", "032D Latn Sunu Syrc", "032E Latn Syrc", "0330 Cher Latn Syrc",
+      "0331 Aghb Cher Goth Latn Sunu Thai", "0342 Grek", "0345 Grek", "0358 Latn Osge",
+      "035E Aghb Latn Todr", "0363-036F Latn", "0374-0375 Copt Grek", "0483 Cyrl Perm",
+      "0484 Cyrl Glag", "0485-0486 Cyrl Latn", "0487 Cyrl Glag", "0589 Armn Geor Glag",
+      "060C Arab Gara Nkoo Rohg Syrc Thaa Yezi", "061B Arab Gara Nkoo Rohg Syrc Thaa Yezi",
+      "061C Arab Syrc Thaa", "061F Adlm Arab Gara Nkoo Rohg Syrc Thaa Yezi",
+      "0640 Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc", "064B-0655 Arab Syrc",
+      "0660-0669 Arab Thaa Yezi", "0670 Arab Syrc", "06D4 Arab Rohg",
+      "0951 Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Shrd Taml Telu Tirh",
+      "0952 Beng Deva Gran Gujr Guru Knda Latn Mlym Orya Taml Telu Tirh",
+      "0964 Beng Deva Dogr Gong Gonm Gran Gujr Guru Knda Mahj Mlym Nand Onao Orya Sind Sinh " +
+        "Sylo Takr Taml Telu Tirh",
+      "0965 Beng Deva Dogr Gong Gonm Gran Gujr Gukh Guru Knda Limb Mahj Mlym Nand Onao Orya " +
+        "Sind Sinh Sylo Takr Taml Telu Tirh",
+      "0966-096F Deva Dogr Kthi Mahj", "09E6-09EF Beng Cakm Sylo", "0A66-0A6F Guru Mult",
+      "0AE6-0AEF Gujr Khoj", "0BE6-0BF3 Gran Taml", "0CE6-0CEF Knda Nand Tutg",
+      "1040-1049 Cakm Mymr Tale", "10FB Geor Glag Latn", "16EB-16ED Runr",
+      "1735-1736 Buhd Hano Tagb Tglg", "1802-1803 Mong Phag", "1805 Mong Phag",
+      "1CD0 Beng Deva Gran Knda", "1CD1 Deva", "1CD2 Beng Deva Gran Knda", "1CD3 Deva Gran Knda",
+      "1CD4 Deva", "1CD5-1CD6 Beng Deva", "1CD7 Deva Shrd", "1CD8 Beng Deva", "1CD9 Deva Shrd",
+      "1CDA Deva Knda Mlym Orya Taml Telu", "1CDB Deva", "1CDC-1CDD Deva Shrd", "1CDE-1CDF Deva",
+      "1CE0 Deva Shrd", "1CE1 Beng Deva", "1CE2-1CE8 Deva", "1CE9 Deva Nand", "1CEA Beng Deva",
+      "1CEB-1CEC Deva", "1CED Beng Deva", "1CEE-1CF1 Deva",
+      "1CF2 Beng Deva Gran Knda Mlym Nand Orya Sinh Telu Tirh Tutg", "1CF3 Deva Gran",
+      "1CF4 Deva Gran Knda Tutg", "1CF5-1CF6 Beng Deva", "1CF7 Beng", "1CF8-1CF9 Deva Gran",
+      "1CFA Nand", "1DC0-1DC1 Grek", "1DF8 Cyrl Latn Syrc", "1DFA Syrc", "202F Latn Mong Phag",
+      "204F Adlm Arab", "205A Cari Geor Glag Hung Lyci Orkh", "205D Cari Grek Hung Mero",
+      "20F0 Deva Gran Latn", "2E17 Copt Latn", "2E30 Avst Orkh",
+      "2E31 Avst Cari Geor Hung Kthi Lydi Samr", "2E3C Dupl", "2E41 Adlm Arab Hung",
+      "2E43 Cyrl Glag", "2FF0-2FFF Hani Tang", "3001 Bopo Hang Hani Hira Kana Mong Yiii",
+      "3002 Bopo Hang Hani Hira Kana Mong Phag Yiii", "3003 Bopo Hang Hani Hira Kana", "3006 Hani",
+      "3008-3009 Bopo Hang Hani Hira Kana Mong Tibt Yiii",
+      "300A-300B Bopo Hang Hani Hira Kana Lisu Mong Tibt Yiii",
+      "300C-3011 Bopo Hang Hani Hira Kana Yiii", "3013 Bopo Hang Hani Hira Kana",
+      "3014-301B Bopo Hang Hani Hira Kana Yiii", "301C-301F Bopo Hang Hani Hira Kana",
+      "302A-302D Bopo Hani", "3030 Bopo Hang Hani Hira Kana", "3031-3035 Hira Kana",
+      "3037 Bopo Hang Hani Hira Kana", "303C-303D Hani Hira Kana", "303E-303F Hani",
+      "3099-309C Hira Kana", "30A0 Hira Kana", "30FB Bopo Hang Hani Hira Kana Yiii",
+      "30FC Hira Kana", "3190-319F Hani", "31C0-31E5 Hani", "31EF Hani Tang", "3220-3247 Hani",
+      "3280-32B0 Hani", "32C0-32CB Hani", "32FF Hani", "3358-3370 Hani", "337B-337F Hani",
+      "33E0-33FE Hani", "A66F Cyrl Glag", "A700-A707 Hani Latn",
+      "A830-A832 Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Mlym Modi Nand Shrd Sind Takr Tirh Tutg",
+      "A833-A835 Deva Dogr Gujr Guru Khoj Knda Kthi Mahj Modi Nand Shrd Sind Takr Tirh Tutg",
+      "A836-A837 Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh",
+      "A838 Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Shrd Sind Takr Tirh",
+      "A839 Deva Dogr Gujr Guru Khoj Kthi Mahj Modi Sind Takr Tirh", "A8F1 Beng Deva Tutg",
+      "A8F3 Deva Taml", "A92E Kali Latn Mymr", "A9CF Bugi Java", "FD3E-FD3F Arab Nkoo",
+      "FDF2 Arab Thaa", "FDFD Arab Thaa", "FE45-FE46 Bopo Hang Hani Hira Kana",
+      "FF61-FF65 Bopo Hang Hani Hira Kana Yiii", "FF70 Hira Kana", "FF9E-FF9F Hira Kana",
+      "10100-10101 Cpmn Cprt Linb", "10102 Cprt Linb", "10107-10133 Cprt Lina Linb",
+      "10137-1013F Cprt Linb", "102E0-102FB Arab Copt", "10AF2 Mani Ougr", "11301 Gran Taml",
+      "11303 Gran Taml", "1133B-1133C Gran Taml", "11FD0-11FD1 Gran Taml", "11FD3 Gran Taml",
+      "1BCA0-1BCA3 Dupl", "1D360-1D371 Hani", "1F250-1F251 Hani"
+    };
+    final int sl = scx.length;
+    SCX_RANGES = new int[sl][];
+    SCX_SCRIPTS = new String[sl][];
+    for(int s = 0; s < sl; s++) {
+      final String[] entry = Strings.split(scx[s], ' '), cps = Strings.split(entry[0], '-');
+      SCX_RANGES[s] = new int[] {
+        Integer.parseInt(cps[0], 16), Integer.parseInt(cps[cps.length - 1], 16)
+      };
+      SCX_SCRIPTS[s] = Arrays.stream(entry, 1, entry.length).map(Escape::javaScript).
+        toArray(String[]::new);
+    }
+  }
 
   /** Image. */
   private final String img;
@@ -52,7 +146,7 @@ public final class Escape extends RegExp {
    * @return regular expression
    */
   public static RegExp get(final String esc) {
-    if(esc.startsWith("Script=", 3) || esc.startsWith("sc=", 3)) return script(esc);
+    if(isScript(esc)) return script(esc);
     if(esc.startsWith("\\p{Is") || esc.startsWith("\\P{Is")) {
       final CharRange[] rng = MAP.get(esc);
       return rng != null ? new CharClass(new CharGroup(rng), null) : null;
@@ -101,9 +195,7 @@ public final class Escape extends RegExp {
    * @return array of regular expressions suitable for char groups
    */
   public static RegExp[] inGroup(final String esc) {
-    if(esc.startsWith("Script=", 3) || esc.startsWith("sc=", 3)) {
-      return new RegExp[] { script(esc) };
-    }
+    if(isScript(esc)) return new RegExp[] { script(esc) };
     if(esc.startsWith("\\p{Is") || esc.startsWith("\\P{Is")) {
       final CharRange[] rng = MAP.get(esc);
       if(rng != null) return rng;
@@ -135,14 +227,55 @@ public final class Escape extends RegExp {
   }
 
   /**
-   * Converts a Unicode script escape sequence to Java syntax.
+   * Checks if the given escape sequence refers to a Unicode script or script extension.
+   * @param esc escape sequence
+   * @return result of check
+   */
+  private static boolean isScript(final String esc) {
+    return esc.startsWith("Script", 3);
+  }
+
+  /**
+   * Converts a Unicode script or script extension escape sequence to Java syntax.
    * @param esc escape sequence
    * @return escape sequence
    */
   private static Escape script(final String esc) {
     final String name = javaScript(esc.substring(esc.indexOf('=') + 1, esc.length() - 1));
-    return new Escape(!name.isEmpty() ? esc.substring(0, 3) + "sc=" + name + '}' :
-      esc.charAt(1) == 'p' ? "[^\\x{0}-\\x{10FFFF}]" : "[\\x{0}-\\x{10FFFF}]");
+    final boolean pos = esc.charAt(1) == 'p';
+    if(name.isEmpty()) return new Escape(pos ? NONE : ALL);
+    final boolean ext = esc.startsWith("Script_", 3);
+    if(!ext) return new Escape(esc.substring(0, 3) + "sc=" + name + '}');
+
+    // \p: script minus listed characters not extended by it, plus listed characters extended by it
+    final Character.UnicodeScript script = Character.UnicodeScript.valueOf(name);
+    final ArrayList<int[]> extended = new ArrayList<>(), excluded = new ArrayList<>();
+    for(int s = 0; s < SCX_RANGES.length; s++) {
+      final int[] rng = SCX_RANGES[s];
+      if(Strings.eq(name, SCX_SCRIPTS[s])) {
+        extended.add(rng);
+      } else {
+        for(int cp = rng[0]; cp <= rng[1]; cp++) {
+          if(Character.UnicodeScript.of(cp) == script) excluded.add(new int[] { cp, cp });
+        }
+      }
+    }
+    final String sub = guarded(excluded), add = guarded(extended);
+    String regex = "\\p{sc=" + name + '}';
+    if(!sub.isEmpty()) regex = '[' + regex + "&&[^" + sub + "]]";
+    if(!add.isEmpty()) regex = '[' + regex + add + ']';
+    return new Escape(pos ? regex : "[^" + regex + ']');
+  }
+
+  /**
+   * Serializes ascending code point ranges as a class guarded by their total range.
+   * @param ranges ranges
+   * @return class, or empty string if no ranges are given
+   */
+  private static String guarded(final List<int[]> ranges) {
+    if(ranges.isEmpty()) return "";
+    final int[][] total = { { ranges.get(0)[0], ranges.get(ranges.size() - 1)[1] } };
+    return '[' + serialize(total) + "&&[" + serialize(ranges.toArray(int[][]::new)) + "]]";
   }
 
   @Override

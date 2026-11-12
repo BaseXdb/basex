@@ -4053,7 +4053,7 @@ return
 
     // Unicode scripts: property values and short aliases, case-sensitive
     query(func.args("ἀ", "\\p{Script=Greek}"), true);
-    query(func.args("ἀ", "^[\\p{sc=Grek}a]$"), true);
+    query(func.args("ἀ", "^[\\p{Script=Grek}a]$"), true);
     query(func.args("ἀ", "\\P{Script=Greek}"), false);
     query(func.args("&#x10300;", "\\p{Script=Old_Italic}"), true);
     error(func.args("a", "\\p{Script=greek}"), REGINVALID_X);
@@ -4061,9 +4061,35 @@ return
     // special names: camel case, additional aliases, script without characters
     query(func.args("&#x1D800;", "\\p{Script=SignWriting}"), true);
     error(func.args("a", "\\p{Script=Signwriting}"), REGINVALID_X);
-    query(func.args("&#x2C80;", "\\p{sc=Qaac}"), true);
+    query(func.args("&#x2C80;", "\\p{Script=Qaac}"), true);
     query(func.args("&#x30A2;", "\\p{Script=Katakana_Or_Hiragana}"), false);
-    query(func.args("&#x30A2;", "^[^\\p{sc=Hrkt}]$"), true);
+    query(func.args("&#x30A2;", "^[^\\p{Script=Hrkt}]$"), true);
+    // Unicode script extensions: listed characters, fallback to script, negation, groups
+    query(func.args("&#x342;", "\\p{Script_Extensions=Grek}"), true);
+    query(func.args("&#x342;", "\\p{Script_Extensions=Greek}"), true);
+    query(func.args("&#x342;", "\\p{Script=Grek}"), false);
+    query(func.args("&#x342;", "\\P{Script_Extensions=Grek}"), false);
+    query(func.args("&#x342;", "\\p{Script_Extensions=Inherited}"), false);
+    query(func.args("&#x342;", "\\P{Script_Extensions=Inherited}"), true);
+    query(func.args("&#x342;", "\\p{Script=Inherited}"), true);
+    query(func.args("α", "\\p{Script_Extensions=Grek}"), true);
+    query(func.args("α", "\\P{Script_Extensions=Grek}"), false);
+    query(func.args("+", "\\p{Script_Extensions=Zyyy}"), true);
+    query(func.args("&#x3001;", "\\p{Script_Extensions=Common}"), false);
+    query(func.args("&#x3001;", "\\P{Script_Extensions=Common}"), true);
+    query(func.args("&#x3001;", "\\p{Script_Extensions=Hani}"), true);
+    query(func.args("&#x3001;", "\\P{Script_Extensions=Hani}"), false);
+    query(func.args("&#x3001;", "\\p{Script_Extensions=Arab}"), false);
+    query(func.args("&#x3001;", "\\P{Script_Extensions=Arab}"), true);
+    query(func.args("&#x342;", "^[^\\p{Script_Extensions=Grek}]$"), false);
+    query(func.args("a", "^[^\\p{Script_Extensions=Grek}]$"), true);
+    query(func.args("&#x3001;", "^[\\p{Script_Extensions=Hani}-[\\p{Script=Hani}]]$"), true);
+    query(func.args("中", "^[\\p{Script_Extensions=Hani}-[\\p{Script=Hani}]]$"), false);
+    query(func.args("&#x30A2;", "\\p{Script_Extensions=Hrkt}"), false);
+    error(func.args("a", "\\p{Script_Extensions=greek}"), REGINVALID_X);
+    error(func.args("a", "\\p{script_extensions=Greek}"), REGINVALID_X);
+    error(func.args("a", "\\p{sc=Greek}"), REGINVALID_X);
+    error(func.args("a", "\\p{scx=Greek}"), REGINVALID_X);
 
     query(func.args("babadad", "^((.)?a\\2)+$"), true);
     query(func.args("x", "(a)|\\1"), true);
