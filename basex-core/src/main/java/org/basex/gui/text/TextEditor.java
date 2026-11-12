@@ -764,9 +764,9 @@ public final class TextEditor {
    * @param p position to start completion from
    */
   void complete(final String value, final int p) {
-    // remove first underscore, which indicates the new cursor position
+    // remove the first vertical bar, which indicates the new cursor position
     String v = value;
-    final int car = v.indexOf('_');
+    final int car = v.indexOf('|');
     if(car != -1) v = v.substring(0, car) + v.substring(car + 1);
     // adopt current indentation
     final int ind = open();

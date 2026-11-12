@@ -212,12 +212,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
     }
     // add types with a mandatory argument: the cursor is placed inside the parentheses
     for(final String name : new String[] { ARRAY, ENUM, FUNCTION, MAP, RECORD }) {
-      TYPES.add(new Completion(name, name + "()", name + "(_)", false));
+      TYPES.add(new Completion(name, name + "()", name + "(|)", false));
     }
     // add functions (functions of the default namespace can also be called without prefix)
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
       if(Functions.HIDDEN.contains(fd.name)) continue;
-      final String args = '(' + fd.paramString() + ')', value = fd.params.length > 0 ? "(_)" : "()";
+      final String args = '(' + fd.paramString() + ')', value = fd.params.length > 0 ? "(|)" : "()";
       final boolean deflt = eq(fd.name.uri(), FN_URI);
       final String prefixed = string(fd.name.prefixId());
       final Signature signature = Signature.get(args);
@@ -232,7 +232,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // add annotations (annotations of the XQuery namespace are specified without prefix)
     for(final Annotation ann : Annotation.values()) {
       final String params = ann.paramString, args = params.isEmpty() ? "" : '(' + params + ')';
-      add(string(ann.name.prefixId(XQ_URI)), args, params.isEmpty() ? "" : "(_)",
+      add(string(ann.name.prefixId(XQ_URI)), args, params.isEmpty() ? "" : "(|)",
         annAbbrs, annNames, false);
     }
     // add the declarations of a prolog, which continue the keywords that introduce them
@@ -537,7 +537,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
         // the cursor is placed inside the parentheses if the function has parameters
         final String args = declaration.args();
         local.add(new Completion(name.toLowerCase(Locale.ENGLISH), name + args,
-          name + (args.length() > 2 ? "(_)" : "()"), false));
+          name + (args.length() > 2 ? "(|)" : "()"), false));
       }
     }
     local.addAll(candidates(context.variables, ""));

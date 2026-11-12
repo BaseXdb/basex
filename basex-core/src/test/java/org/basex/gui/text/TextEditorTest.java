@@ -339,9 +339,12 @@ public final class TextEditorTest {
     assertEquals("declare %public\ndeclare", complete("declare %pu\ndeclare", 11, "public"));
     // an empty completed string deletes no text
     assertEquals("declare %public\ndeclare", complete("declare %\ndeclare", 9, "public"));
-    // an underscore indicates the new cursor position
+    // a vertical bar indicates the new cursor position
     assertEquals("declare %rest:path()\ndeclare",
-      complete("declare %\ndeclare", 9, "rest:path(_)"));
+      complete("declare %\ndeclare", 9, "rest:path(|)"));
+    // underscores are inserted as they are
+    assertEquals("$param_1", complete("$pa", 3, "$param_1"));
+    assertEquals("my_fn()", complete("my", 2, "my_fn(|)"));
   }
 
   /**

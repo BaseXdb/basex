@@ -349,18 +349,18 @@ public final class SyntaxXQueryTest {
   /** Code completion snippets. */
   @Test public void snippets() {
     // main modules: no prefix
-    snippet("", "declare function _() {};");
-    snippet("declare variable $x := 1;", "declare function _() {};");
-    snippet("import module namespace m = 'uri';", "declare function _() {};");
+    snippet("", "declare function |() {};");
+    snippet("declare variable $x := 1;", "declare function |() {};");
+    snippet("import module namespace m = 'uri';", "declare function |() {};");
     // library modules: prefix of the module declaration
-    snippet("module namespace m = 'uri';", "declare function m:_() {};");
+    snippet("module namespace m = 'uri';", "declare function m:|() {};");
     snippet("module namespace m='uri'; declare function m:f() {};",
-      "declare function m:_() {};");
+      "declare function m:|() {};");
     // version declarations and comments are skipped
     snippet("xquery version '4.0'; module namespace m = 'uri';",
-      "declare function m:_() {};");
+      "declare function m:|() {};");
     snippet("(: module namespace x = 'uri' :) module namespace m = 'uri';",
-      "declare function m:_() {};");
+      "declare function m:|() {};");
   }
 
   /** Code completion for annotations. */
@@ -369,8 +369,8 @@ public final class SyntaxXQueryTest {
     completion("%_", "public", "public");
     completion("declare %_", "updating", "updating");
     // the cursor is placed inside the parentheses of an annotation with arguments
-    completion("declare %_", "rest:path", "rest:path(_)");
-    completion("declare %_", "unit:test", "unit:test(_)");
+    completion("declare %_", "rest:path", "rest:path(|)");
+    completion("declare %_", "unit:test", "unit:test(|)");
     // annotations are only proposed after a percent sign
     completion("declare _", "rest:path", null);
     // other candidates are skipped after a percent sign
@@ -380,22 +380,22 @@ public final class SyntaxXQueryTest {
   /** Code completion for the keywords of a prolog declaration. */
   @Test public void prolog() {
     // the syntax of the declaration is supplied
-    completion("declare _", "function", "function _() {};");
-    completion("declare _", "namespace", "namespace _ = '';");
-    completion("declare _", "base-uri", "base-uri '_';");
-    completion("module namespace m = 'uri'; declare _", "function", "function m:_() {};");
+    completion("declare _", "function", "function |() {};");
+    completion("declare _", "namespace", "namespace | = '';");
+    completion("declare _", "base-uri", "base-uri '|';");
+    completion("module namespace m = 'uri'; declare _", "function", "function m:|() {};");
     // the default keyword introduces further declarations
-    completion("declare _", "default", "default collation '_';");
-    completion("declare default _", "element", "element namespace '_';");
-    completion("declare default _", "order", "order empty _;");
-    completion("declare default _", "function", "function namespace '_';");
+    completion("declare _", "default", "default collation '|';");
+    completion("declare default _", "element", "element namespace '|';");
+    completion("declare default _", "order", "order empty |;");
+    completion("declare default _", "function", "function namespace '|';");
     // no candidates of the enclosing context
     completion("declare default _", "count", null);
     completion("declare default _", "variable", null);
     // the updating keyword and annotations are skipped
-    completion("declare updating _", "function", "function _() {};");
-    completion("declare %private _", "function", "function _() {};");
-    completion("declare %rest:path('a;b') _", "function", "function _() {};");
+    completion("declare updating _", "function", "function |() {};");
+    completion("declare %private _", "function", "function |() {};");
+    completion("declare %rest:path('a;b') _", "function", "function |() {};");
     // snippets, functions and types are no candidates
     completion("declare _", "for", null);
     completion("declare _", "count", null);
@@ -404,7 +404,7 @@ public final class SyntaxXQueryTest {
     completion("declare function _", "count", null);
     completion("declare variable _", "count", null);
     // the body of a function is no declaration
-    completion("declare function f() { _ };", "count", "count(_)");
+    completion("declare function f() { _ };", "count", "count(|)");
   }
 
   /** Code completion for the start of a prolog declaration. */
@@ -414,15 +414,15 @@ public final class SyntaxXQueryTest {
     completion("declare variable $x := 1; _", "declare", "declare ");
     completion("declare function f() { 1 }; _", "declare", "declare ");
     // declarations are proposed with the keyword that introduces them
-    completion("_", "contextvalue", "declare context value := _;");
-    completion("_", "base-uri", "declare base-uri '_';");
-    completion("_", "module", "module namespace _ = '';");
+    completion("_", "contextvalue", "declare context value := |;");
+    completion("_", "base-uri", "declare base-uri '|';");
+    completion("_", "module", "module namespace | = '';");
     // a declaration cannot follow an expression
     completion("let $a := 1 return _", "declare", null);
     completion("1, _", "contextvalue", null);
     completion("1, _", "module", null);
     // expression snippets are proposed in expressions
-    completion("1, _", "for", "for $_ in \nreturn");
+    completion("1, _", "for", "for $| in \nreturn");
     completion("declare function f() { _ };", "declare", null);
     completion("declare _", "declare", null);
     completion("'a', _", "declare", null);
@@ -436,12 +436,12 @@ public final class SyntaxXQueryTest {
     completion("declare variable $x as _", "xs:string", "xs:string");
     completion("1 instance of _", "element()", "element()");
     completion("1 cast as _", "xs:integer", "xs:integer");
-    completion("for $x as _", "map", "map(_)");
+    completion("for $x as _", "map", "map(|)");
     // no other candidates
     completion("declare variable $x as _", "count", null);
     completion("1 instance of _", "for", null);
     // a variable is no keyword
-    completion("let $as := 1 return $as _", "count", "count(_)");
+    completion("let $as := 1 return $as _", "count", "count(|)");
   }
 
   /** Code completion for lookups. */
@@ -522,8 +522,7 @@ public final class SyntaxXQueryTest {
     completion("_ let $a := 1 return $a", "$a", null);
     // semicolons in strings and comments end no declaration
     completion("let $a := 'x;y' return _", "$a", "$a");
-    completion("let $a := 1 (: ; :) return _", "$a", "$a");
-  }
+    completion("let $a := 1 (: ; :) return _", "$a", "$a");  }
 
   /** Candidates that are already typed are not proposed. */
   @Test public void typed() {
@@ -620,7 +619,7 @@ public final class SyntaxXQueryTest {
       "declare function x:hello($a) { $a };");
     try {
       final String imprt = "import module namespace m = 'x' at 'm.xqm'; ";
-      completion(imprt + '_', "m:hello", "m:hello(_)");
+      completion(imprt + '_', "m:hello", "m:hello(|)");
       completion(imprt + '_', "$m:v", "$m:v");
       completion(imprt + "m:hello(_", "a", "a := ");
       final Syntax syntax = new SyntaxXQuery();
@@ -654,7 +653,7 @@ public final class SyntaxXQueryTest {
     module.write("module namespace x = '" + uri + "';\n" +
       "declare function x:hello($a) { $a };");
     try {
-      completion("import module namespace r = '" + uri + "'; _", "r:hello", "r:hello(_)");
+      completion("import module namespace r = '" + uri + "'; _", "r:hello", "r:hello(|)");
       completion("import module namespace r = 'http://unknown'; _", "r:hello", null);
     } finally {
       module.delete();
