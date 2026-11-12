@@ -11,10 +11,7 @@ import java.util.function.*;
 import org.basex.util.*;
 
 /**
- * This abstract class specifies a single method for decoding input to codepoints.
- * The hand-written UTF-8/16/32 decoders avoid the detour via UTF-16 char arrays and
- * are faster than Java's default decoders; all other encodings are delegated to Java's
- * charset decoders.
+ * Decoder for input codepoints: UTF-8 is decoded by hand, all other encodings by Java's charset decoders.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -57,40 +54,7 @@ abstract class TextDecoder {
    * @throws IOException I/O exception
    */
   static TextDecoder get(final String encoding) throws IOException {
-    return switch(encoding) {
-      case UTF8 -> new UTF8();
-      case UTF32 -> new UTF32();
-      case UTF16LE -> new UTF16LE();
-      case UTF16, UTF16BE -> new UTF16BE();
-      default -> new Generic(encoding);
-    };
-  }
-
-  /**
-   * Reads a UTF-16 codepoint.
-   * @param ti text input
-   * @param be low/big endian
-   * @return codepoint
-   * @throws IOException I/O exception
-   */
-  final int readUTF16(final TextInput ti, final boolean be) throws IOException {
-    final int a = ti.readByte();
-    if(a < 0) return a;
-    final int b = ti.readByte();
-    if(b < 0) return invalid(true, (byte) a);
-
-    final int cp = be ? a << 8 | b : a | b << 8;
-    if(cp < 0xD800 || cp > 0xDFFF) return cp;
-    if(cp >= 0xDC00) return invalid(true, (byte) a, (byte) b);
-
-    final int c = ti.readByte();
-    if(c < 0) return invalid(true, (byte) a, (byte) b);
-    final int d = ti.readByte();
-    if(d < 0) return invalid(true, (byte) a, (byte) b, (byte) c);
-
-    final int l = be ? c << 8 | d : c | d << 8;
-    if(l < 0xDC00 || l > 0xDFFF) return invalid(true, (byte) a, (byte) b, (byte) c, (byte) d);
-    return 0x10000 + ((cp & 0x3FF) << 10) + (l & 0x3FF);
+    return encoding.equals(UTF8) ? new UTF8() : new Generic(encoding);
   }
 
   /**
@@ -125,18 +89,37 @@ abstract class TextDecoder {
 
     @Override
     int read(final TextInput ti) throws IOException {
-      int cp = ti.readByte();
+      final int cp = ti.readByte();
       if(cp < 0x80) return cp;
       if(cp < 0xC2 || cp > 0xF4) return invalid(false, (byte) cp);
       final int cl = Token.cl((byte) cp);
       final byte[] bytes = cpBytes;
       bytes[0] = (byte) cp;
       for(int c = 1; c < cl; c++) {
-        cp = ti.readByte();
-        bytes[c] = (byte) cp;
-        if(cp < 0x80 || cp > 0xBF) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));
+        final int b = ti.readByte();
+        if(b < 0) return invalid(true, Arrays.copyOf(bytes, c));
+        bytes[c] = (byte) b;
+        if(!continuation(cp, c, b)) {
+          // keep the byte: it may start the next character
+          ti.unreadByte();
+          return invalid(false, Arrays.copyOf(bytes, c + 1));
+        }
       }
       return Token.cp(bytes, 0);
+    }
+
+    /**
+     * Checks if a byte is a valid continuation byte (rejecting overlongs, surrogates, >U+10FFFF).
+     * @param first first byte of the sequence
+     * @param c position of the byte in the sequence
+     * @param b byte
+     * @return result of check
+     */
+    private static boolean continuation(final int first, final int c, final int b) {
+      final boolean second = c == 1;
+      final int min = second && first == 0xE0 ? 0xA0 : second && first == 0xF0 ? 0x90 : 0x80;
+      final int max = second && first == 0xED ? 0x9F : second && first == 0xF4 ? 0x8F : 0xBF;
+      return b >= min && b <= max;
     }
 
     @Override
@@ -154,60 +137,13 @@ abstract class TextDecoder {
           final int e = p + Token.cl(b);
           if(e > bl) return false;
           for(int c = p + 1; c < e; c++) {
-            if((bytes[c] & 0xC0) != 0x80) return false;
+            if(!continuation(cp, c - p, bytes[c] & 0xFF)) return false;
           }
           if(!XMLToken.valid11(Token.cp(bytes, p))) return false;
           p = e;
         }
       }
       return true;
-    }
-  }
-
-  /** UTF16LE Decoder. */
-  private static final class UTF16LE extends TextDecoder {
-    /** Constructor. */
-    UTF16LE() {
-      super(UTF16LE);
-    }
-
-    @Override
-    int read(final TextInput ti) throws IOException {
-      return readUTF16(ti, false);
-    }
-  }
-
-  /** UTF16BE Decoder. */
-  private static final class UTF16BE extends TextDecoder {
-    /** Constructor. */
-    UTF16BE() {
-      super(UTF16BE);
-    }
-
-    @Override
-    int read(final TextInput ti) throws IOException {
-      return readUTF16(ti, true);
-    }
-  }
-
-  /** UTF32 Decoder. */
-  private static final class UTF32 extends TextDecoder {
-    /** Constructor. */
-    UTF32() {
-      super(UTF32);
-    }
-
-    @Override
-    int read(final TextInput ti) throws IOException {
-      final int a = ti.readByte();
-      if(a < 0) return a;
-      final int b = ti.readByte();
-      if(b < 0) return invalid(true, (byte) a);
-      final int c = ti.readByte();
-      if(c < 0) return invalid(true, (byte) a, (byte) b);
-      final int d = ti.readByte();
-      if(d < 0) return invalid(true, (byte) a, (byte) b, (byte) c);
-      return a << 24 | b << 16 | c << 8 | d;
     }
   }
 

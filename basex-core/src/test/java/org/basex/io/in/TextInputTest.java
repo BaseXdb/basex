@@ -126,6 +126,39 @@ public final class TextInputTest {
     malformed(0xC2);
     // truncated three-byte sequence at end of input
     malformed(0xE2, 0x82);
+    // overlong encodings, surrogates, codepoints beyond U+10FFFF
+    malformed(0xE0, 0x81, 0x81);
+    malformed(0xE0, 0x80, 0xAF);
+    malformed(0xF0, 0x80, 0x81, 0x81);
+    malformed(0xED, 0xA0, 0x80);
+    malformed(0xF4, 0x90, 0x80, 0x80);
+  }
+
+  /**
+   * Test that malformed input does not swallow the next character.
+   * @throws IOException I/O exception
+   */
+  @Test public void resync() throws IOException {
+    final String r = cp(Token.REPLACEMENT);
+    decoded("UTF-8", r + 'A', bytes(0xC3, 0x41));
+    decoded("UTF-8", r + 'A', bytes(0xE2, 0x82, 0x41));
+    decoded("UTF-8", r.repeat(3) + 'A', bytes(0xE0, 0x80, 0xAF, 0x41));
+    // byte order mark
+    decoded("UTF-32", "A", bytes(0x00, 0x00, 0xFE, 0xFF, 0x00, 0x00, 0x00, 0x41));
+  }
+
+  /**
+   * Checks the decoded input (with fallback).
+   * @param enc encoding
+   * @param expected expected string
+   * @param data input bytes
+   * @throws IOException I/O exception
+   */
+  private static void decoded(final String enc, final String expected, final byte[] data)
+      throws IOException {
+    try(TextInput ti = new TextInput(new IOContent(data), enc)) {
+      assertEquals(expected, Token.string(ti.content()));
+    }
   }
 
   /**
@@ -138,14 +171,24 @@ public final class TextInputTest {
   }
 
   /**
+   * Converts integers to bytes.
+   * @param ints integers
+   * @return bytes
+   */
+  private static byte[] bytes(final int... ints) {
+    final byte[] bytes = new byte[ints.length];
+    for(int i = 0; i < ints.length; i++) bytes[i] = (byte) ints[i];
+    return bytes;
+  }
+
+  /**
    * Checks that malformed UTF-8 bytes yield a replacement character (with fallback)
    * and raise an exception (without fallback).
    * @param bytes malformed input bytes
    * @throws IOException I/O exception
    */
   private static void malformed(final int... bytes) throws IOException {
-    final byte[] data = new byte[bytes.length];
-    for(int b = 0; b < bytes.length; b++) data[b] = (byte) bytes[b];
+    final byte[] data = bytes(bytes);
 
     // with fallback: replacement character is returned
     try(TextInput ti = new TextInput(new IOContent(data), "UTF-8")) {
@@ -168,9 +211,7 @@ public final class TextInputTest {
    * @throws IOException I/O exception
    */
   private static void encoding(final String enc, final String input) throws IOException {
-    try(TextInput ti = new TextInput(new IOContent(input.getBytes(enc)), enc)) {
-      assertSame(ti.content(), Token.token(input));
-    }
+    decoded(enc, input, input.getBytes(enc));
   }
 
   /**

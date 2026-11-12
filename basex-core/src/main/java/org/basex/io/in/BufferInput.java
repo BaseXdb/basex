@@ -155,6 +155,13 @@ public class BufferInput extends InputStream {
   }
 
   /**
+   * Steps back to the byte that was returned by the last successful call of {@link #readByte()}.
+   */
+  final void unreadByte() {
+    bpos--;
+  }
+
+  /**
    * Reads a string from the input stream, suffixed by a {@code 0} byte.
    * @return string
    * @throws IOException I/O exception
