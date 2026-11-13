@@ -254,7 +254,7 @@ public final class EditorArea extends TextPanel {
     try {
       final byte[] text = getText();
       final boolean xquery = io.hasSuffix(IO.XQSUFFIXES);
-      final boolean library = xquery && QueryParser.isLibrary(Token.string(text));
+      final boolean library = xquery && AQueryParser.isLibrary(Token.string(text));
       io.write(text);
       view.project.save(io, rename, xquery, library);
       view.gui.saveOptions();

@@ -74,7 +74,7 @@ public final class ModuleLoader {
    * @return {@code true} if the package has been found
    * @throws QueryException query exception
    */
-  public boolean addImport(final String uri, final QueryParser qp, final InputInfo info)
+  public boolean addImport(final String uri, final AQueryParser qp, final InputInfo info)
       throws QueryException {
 
     // add Java repository package
@@ -254,7 +254,7 @@ public final class ModuleLoader {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private void addRepo(final String id, final QueryParser qp, final InputInfo info)
+  private void addRepo(final String id, final AQueryParser qp, final InputInfo info)
       throws QueryException {
 
     final HashMap<String, Parsed> parsed = new HashMap<>();

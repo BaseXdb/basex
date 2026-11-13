@@ -147,15 +147,18 @@ public final class QueryContext extends Job implements Closeable {
   /** Type references that could not be resolved within their module (resolved after parsing). */
   final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
   /** Map key types referencing a named type (checked after parsing). */
-  final ArrayList<QueryParser.DeferredRef> deferredMapKeys = new ArrayList<>();
+  final ArrayList<AQueryParser.DeferredRef> deferredMapKeys = new ArrayList<>();
   /** Cast target types referencing a named type (checked after parsing). */
-  final ArrayList<QueryParser.DeferredRef> deferredCastTargets = new ArrayList<>();
+  final ArrayList<AQueryParser.DeferredRef> deferredCastTargets = new ArrayList<>();
   /** Type declarations of all parsed modules. */
   public final ArrayList<TypeDecl> typeDecls = new ArrayList<>();
   /** Data for type constructors. */
-  public final ArrayList<QueryParser.TypeCnstr> typeCnstrs = new ArrayList<>();
+  public final ArrayList<AQueryParser.TypeCnstr> typeCnstrs = new ArrayList<>();
   /** Derived record types whose base types are declared in modules that are still parsed. */
-  final ArrayList<QueryParser.DerivedRecord> extensions = new ArrayList<>();
+  final ArrayList<AQueryParser.DerivedRecord> extensions = new ArrayList<>();
+
+  /** Query parser, which overrides the main option (can be {@code null}). */
+  public MainOptions.QueryParserType queryParser;
 
   /** Main module (root expression, can be {@code null}). */
   public MainModule main;
@@ -236,7 +239,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return QueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri, null);
+    return AQueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri, null);
   }
 
   /**
@@ -267,6 +270,14 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Returns the type of the query parser.
+   * @return query parser: the type that was assigned to this context, or the main option
+   */
+  MainOptions.QueryParserType queryParser() {
+    return queryParser != null ? queryParser : context.options.get(MainOptions.QUERYPARSER);
+  }
+
+  /**
    * Parses the specified query and assigns the root expression.
    * @param query query string
    * @param uri base URI (can be {@code null})
@@ -279,7 +290,7 @@ public final class QueryContext extends Job implements Closeable {
 
     return run(info.parsing, () -> {
       info.query = query;
-      main = new QueryParser(query, uri, this, sc).parseMain();
+      main = AQueryParser.get(queryParser(), query, uri, this, sc).parseMain();
       return main;
     });
   }
@@ -294,7 +305,7 @@ public final class QueryContext extends Job implements Closeable {
   public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     return run(info.parsing, () -> {
       info.query = query;
-      return new QueryParser(query, uri, this, null).parseLibrary(true);
+      return AQueryParser.get(queryParser(), query, uri, this, null).parseLibrary(true);
     });
   }
 
@@ -959,7 +970,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // parse target type
     final StaticContext sc = main != null ? main.sc : new StaticContext(this);
-    final SeqType st = new QueryParser(type, null, this, sc).parseSeqType();
+    final SeqType st = AQueryParser.parseSeqType(type, this, sc);
     if(st.eq(Types.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
     final Type tp = st.type;
 

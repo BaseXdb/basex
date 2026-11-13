@@ -538,7 +538,7 @@ public final class QT4TS extends Main {
 
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(QueryParser.removeComments(queries.toString(), maxout)).add(NL);
+    tmp.add(AQueryParser.removeComments(queries.toString(), maxout)).add(NL);
 
     boolean err = returned.value == null;
     String res;

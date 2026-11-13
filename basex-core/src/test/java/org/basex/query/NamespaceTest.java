@@ -148,7 +148,7 @@ public final class NamespaceTest extends SandboxTest {
     error("namespace xmlns { 'u' }", CNINV_X);
 
     error("declare copy-namespaces no-preserve no-inherit; 1", WRONGCHAR_X_X);
-    error("declare namespace = 'x'; 1", NONAME_X);
+    error("declare namespace = 'x'; 1", NONAME_X, SYNTAX_X);
   }
 
   /** Duplicate namespaces. */
