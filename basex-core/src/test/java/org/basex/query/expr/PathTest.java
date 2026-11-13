@@ -993,7 +993,7 @@ public final class PathTest extends SandboxTest {
     query("<a/>[./(@*)]", "");
     query("<_><x><x>A</x>B</x></_>//x/node()[last()] ! string()", "A\nB");
     query("<a><b/><b/></a>/b/last()", "2\n2");
-    error("<local:a/>/self::local :*", QUERYEND_X);
+    error("<local:a/>/self::local :*", QUERYEND_X, SYNTAX_X);
   }
 
   /** Identical nodes in mixed paths. */

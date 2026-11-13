@@ -632,7 +632,7 @@ public final class EditorView extends View {
       String input = string(text);
       if(action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT)) {
         // find main module if current file cannot be evaluated; return early if no module is found
-        if(!xquery || QueryParser.isLibrary(input)) {
+        if(!xquery || AQueryParser.isLibrary(input)) {
           final EditorArea ea = execEditor();
           if(ea == null) return;
           file = ea.file();

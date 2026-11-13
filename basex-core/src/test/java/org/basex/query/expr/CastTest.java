@@ -41,16 +41,16 @@ public final class CastTest extends SandboxTest {
     query("2 cast as xs:integer + 3", 5);
     query("2 cast as xs:integer? * 3", 6);
 
-    error("2 cast as xs:integer*", EXPECTAFTER_X_X);
-    error("2 cast as xs:integer+", EXPECTAFTER_X_X);
-    error("2 castable as xs:integer*", EXPECTAFTER_X_X);
+    error("2 cast as xs:integer*", EXPECTAFTER_X_X, INCOMPLETE);
+    error("2 cast as xs:integer+", EXPECTAFTER_X_X, INCOMPLETE);
+    error("2 castable as xs:integer*", EXPECTAFTER_X_X, INCOMPLETE);
   }
 
   /** item() is not a cast target, but it is accepted as a component type. */
   @Test public void items() {
-    error("<x/> cast as item()", SIMPLETYPE_X);
-    error("() cast as item()?", SIMPLETYPE_X);
-    error("1 castable as item()", SIMPLETYPE_X);
+    error("<x/> cast as item()", SIMPLETYPE_X, SYNTAX_X);
+    error("() cast as item()?", SIMPLETYPE_X, SYNTAX_X);
+    error("1 castable as item()", SIMPLETYPE_X, SYNTAX_X);
 
     // members that are instances of the component type are left unchanged
     query("([ <x/> ] cast as array(item())) instance of array(*)", true);
@@ -329,7 +329,7 @@ public final class CastTest extends SandboxTest {
     // top-level target types that are not eligible are static errors
     error("1 cast as xs:anyAtomicType", INVALIDCAST_X);
     error("1 cast as xs:NOTATION", INVALIDCAST_X);
-    error("1 cast as function(*)", INVALIDCAST_X);
+    error("1 cast as function(*)", INVALIDCAST_X, SYNTAX_X);
     error("1 castable as xs:anyAtomicType", INVALIDCAST_X);
     // a named type must resolve to an eligible type
     error("declare type local:f as fn(*); 1 cast as local:f", INVALIDCAST_X);

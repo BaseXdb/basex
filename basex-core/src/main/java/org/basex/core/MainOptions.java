@@ -153,6 +153,9 @@ public final class MainOptions extends Options {
   /** Unwrap Java object. */
   public static final EnumOption<WrapOptions> WRAPJAVA =
       new EnumOption<>("WRAPJAVA", WrapOptions.SOME);
+  /** Query parser. */
+  public static final EnumOption<QueryParserType> QUERYPARSER =
+      new EnumOption<>("QUERYPARSER", QueryParserType.REX);
 
   // Serialization
 
@@ -216,6 +219,18 @@ public final class MainOptions extends Options {
     /** Json. */ JSON,
     /** CSV.  */ CSV,
     /** RAW.  */ RAW;
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
+  }
+
+  /** Query parser. */
+  public enum QueryParserType {
+    /** Hand-written parser that processes the query string. */ MANUAL,
+    /** Parser that is driven by a syntax tree, which is created by the REx generated parser. */
+    REX;
 
     @Override
     public String toString() {

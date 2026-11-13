@@ -4,7 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.junit.jupiter.api.Test;
+import org.basex.core.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for query error messages.
@@ -13,6 +14,20 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class ErrorMessageTest extends SandboxTest {
+  /** Previous setting of the query parser. */
+  private static MainOptions.QueryParserType previous;
+
+  /** Selects the query parser that processes the query string. */
+  @BeforeAll public static void manualParser() {
+    previous = context.options.get(MainOptions.QUERYPARSER);
+    set(MainOptions.QUERYPARSER, MainOptions.QueryParserType.MANUAL);
+  }
+
+  /** Restores the query parser. */
+  @AfterAll public static void restoreParser() {
+    set(MainOptions.QUERYPARSER, previous);
+  }
+
   /** Unknown keyword parameter: hint to similar parameter name. */
   @Test public void unknownKeyword() {
     // Levenshtein match for typo

@@ -1194,11 +1194,11 @@ public final class UpdateTest extends SandboxTest {
     error("fn() {} instance of %private function(*)", ANNRESERVED_X);
 
     // annotations are only allowed for function tests
-    error("{} instance of %updating map(*)", NOANN);
-    error("[] instance of %updating array(*)", NOANN);
-    error("{} instance of %updating map(xs:string, item())", NOANN);
-    error("{} instance of %public record(*)", NOANN);
-    error("{} instance of %updating record(a)", NOANN);
+    error("{} instance of %updating map(*)", NOANN, SYNTAX_X);
+    error("[] instance of %updating array(*)", NOANN, SYNTAX_X);
+    error("{} instance of %updating map(xs:string, item())", NOANN, SYNTAX_X);
+    error("{} instance of %public record(*)", NOANN, WRONGCHAR_X_X);
+    error("{} instance of %updating record(a)", NOANN, WRONGCHAR_X_X);
 
     // coercion
     query(u + "let $f as %updating fn(*) := local:u#0 return updating $f()", "");

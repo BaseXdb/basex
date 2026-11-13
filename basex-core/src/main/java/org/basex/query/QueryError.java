@@ -988,6 +988,8 @@ public enum QueryError {
   /** Error code. */
   QUERYEND_X(XPST, 3, "Unexpected '%'."),
   /** Error code. */
+  SYNTAX_X(XPST, 3, "Syntax error%."),
+  /** Error code. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
   /** Error code. */
   MAINMOD(XPST, 3, "Library modules cannot be evaluated."),

@@ -18,13 +18,13 @@ public final class LocalVars {
   /** Stack of variable contexts. */
   private final ArrayList<VarContext> vars = new ArrayList<>();
   /** Query parser. */
-  private final QueryParser parser;
+  private final AQueryParser parser;
 
   /**
    * Constructor.
    * @param parser query parser
    */
-  public LocalVars(final QueryParser parser) {
+  public LocalVars(final AQueryParser parser) {
     this.parser = parser;
   }
 

@@ -1,0 +1,5062 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was generated on Fri Nov 13, 2026 07:22 (UTC+01) by REx v7.0 which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net> -->
+<!-- REx command line: -xmlonly -name XQuerySyntaxParser XQuery-Full-Text-Update-BaseX-40.ebnf -->
+<g:grammar xmlns:g="http://www.w3.org/2001/03/XPath/grammar">
+  <g:production name="Module">
+    <g:optional>
+      <g:ref name="VersionDecl"/>
+    </g:optional>
+    <g:choice>
+      <g:ref name="LibraryModule"/>
+      <g:ref name="MainModule"/>
+    </g:choice>
+    <g:ref name="EOF"/>
+  </g:production>
+  <g:production name="VersionDecl">
+    <g:string>xquery</g:string>
+    <g:choice>
+      <g:sequence>
+        <g:string>encoding</g:string>
+        <g:ref name="StringLiteral"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>version</g:string>
+        <g:ref name="StringLiteral"/>
+        <g:optional>
+          <g:string>encoding</g:string>
+          <g:ref name="StringLiteral"/>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+    <g:ref name="Separator"/>
+  </g:production>
+  <g:production name="Separator">
+    <g:string>;</g:string>
+  </g:production>
+  <g:production name="LibraryModule">
+    <g:ref name="ModuleDecl"/>
+    <g:ref name="Prolog"/>
+  </g:production>
+  <g:production name="ModuleDecl">
+    <g:string>module</g:string>
+    <g:string>namespace</g:string>
+    <g:ref name="NCName"/>
+    <g:string>=</g:string>
+    <g:ref name="URILiteral"/>
+    <g:ref name="Separator"/>
+  </g:production>
+  <g:production name="NCName">
+    <g:choice>
+      <g:ref name="UnreservedNCName"/>
+      <g:string>NaN</g:string>
+      <g:string>after</g:string>
+      <g:string>all</g:string>
+      <g:string>allowing</g:string>
+      <g:string>ancestor</g:string>
+      <g:string>ancestor-or-self</g:string>
+      <g:string>and</g:string>
+      <g:string>any</g:string>
+      <g:string>array</g:string>
+      <g:string>as</g:string>
+      <g:string>ascending</g:string>
+      <g:string>at</g:string>
+      <g:string>attribute</g:string>
+      <g:string>base-uri</g:string>
+      <g:string>before</g:string>
+      <g:string>boundary-space</g:string>
+      <g:string>but</g:string>
+      <g:string>by</g:string>
+      <g:string>case</g:string>
+      <g:string>cast</g:string>
+      <g:string>castable</g:string>
+      <g:string>catch</g:string>
+      <g:string>child</g:string>
+      <g:string>coerce</g:string>
+      <g:string>collation</g:string>
+      <g:string>comment</g:string>
+      <g:string>construction</g:string>
+      <g:string>contains</g:string>
+      <g:string>content</g:string>
+      <g:string>context</g:string>
+      <g:string>copy</g:string>
+      <g:string>copy-namespaces</g:string>
+      <g:string>count</g:string>
+      <g:string>decimal-format</g:string>
+      <g:string>decimal-separator</g:string>
+      <g:string>declare</g:string>
+      <g:string>default</g:string>
+      <g:string>delete</g:string>
+      <g:string>descendant</g:string>
+      <g:string>descendant-or-self</g:string>
+      <g:string>descending</g:string>
+      <g:string>diacritics</g:string>
+      <g:string>different</g:string>
+      <g:string>digit</g:string>
+      <g:string>distance</g:string>
+      <g:string>div</g:string>
+      <g:string>document</g:string>
+      <g:string>document-node</g:string>
+      <g:string>element</g:string>
+      <g:string>else</g:string>
+      <g:string>empty</g:string>
+      <g:string>empty-sequence</g:string>
+      <g:string>encoding</g:string>
+      <g:string>end</g:string>
+      <g:string>entire</g:string>
+      <g:string>enum</g:string>
+      <g:string>eq</g:string>
+      <g:string>errors</g:string>
+      <g:string>every</g:string>
+      <g:string>exactly</g:string>
+      <g:string>except</g:string>
+      <g:string>exponent-separator</g:string>
+      <g:string>extends</g:string>
+      <g:string>external</g:string>
+      <g:string>false</g:string>
+      <g:string>finally</g:string>
+      <g:string>first</g:string>
+      <g:string>fixed</g:string>
+      <g:string>fn</g:string>
+      <g:string>following</g:string>
+      <g:string>following-or-self</g:string>
+      <g:string>following-sibling</g:string>
+      <g:string>following-sibling-or-self</g:string>
+      <g:string>follows</g:string>
+      <g:string>follows-or-is</g:string>
+      <g:string>for</g:string>
+      <g:string>from</g:string>
+      <g:string>ft-option</g:string>
+      <g:string>ftand</g:string>
+      <g:string>ftnot</g:string>
+      <g:string>ftor</g:string>
+      <g:string>function</g:string>
+      <g:string>fuzzy</g:string>
+      <g:string>ge</g:string>
+      <g:string>greatest</g:string>
+      <g:string>group</g:string>
+      <g:string>grouping-separator</g:string>
+      <g:string>gt</g:string>
+      <g:string>idiv</g:string>
+      <g:string>if</g:string>
+      <g:string>import</g:string>
+      <g:string>in</g:string>
+      <g:string>infinity</g:string>
+      <g:string>inherit</g:string>
+      <g:string>insensitive</g:string>
+      <g:string>insert</g:string>
+      <g:string>instance</g:string>
+      <g:string>intersect</g:string>
+      <g:string>into</g:string>
+      <g:string>invoke</g:string>
+      <g:string>is</g:string>
+      <g:string>is-not</g:string>
+      <g:string>item</g:string>
+      <g:string>jnode</g:string>
+      <g:string>key</g:string>
+      <g:string>language</g:string>
+      <g:string>last</g:string>
+      <g:string>lax</g:string>
+      <g:string>le</g:string>
+      <g:string>least</g:string>
+      <g:string>let</g:string>
+      <g:string>levels</g:string>
+      <g:string>lowercase</g:string>
+      <g:string>lt</g:string>
+      <g:string>map</g:string>
+      <g:string>member</g:string>
+      <g:string>minus-sign</g:string>
+      <g:string>mod</g:string>
+      <g:string>modify</g:string>
+      <g:string>module</g:string>
+      <g:string>most</g:string>
+      <g:string>namespace</g:string>
+      <g:string>namespace-node</g:string>
+      <g:string>ne</g:string>
+      <g:string>next</g:string>
+      <g:string>no</g:string>
+      <g:string>no-inherit</g:string>
+      <g:string>no-preserve</g:string>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+      <g:string>not</g:string>
+      <g:string>occurs</g:string>
+      <g:string>of</g:string>
+      <g:string>only</g:string>
+      <g:string>option</g:string>
+      <g:string>or</g:string>
+      <g:string>order</g:string>
+      <g:string>ordered</g:string>
+      <g:string>ordering</g:string>
+      <g:string>otherwise</g:string>
+      <g:string>paragraph</g:string>
+      <g:string>paragraphs</g:string>
+      <g:string>parent</g:string>
+      <g:string>pattern-separator</g:string>
+      <g:string>per-mille</g:string>
+      <g:string>percent</g:string>
+      <g:string>phrase</g:string>
+      <g:string>precedes</g:string>
+      <g:string>precedes-or-is</g:string>
+      <g:string>preceding</g:string>
+      <g:string>preceding-or-self</g:string>
+      <g:string>preceding-sibling</g:string>
+      <g:string>preceding-sibling-or-self</g:string>
+      <g:string>preserve</g:string>
+      <g:string>previous</g:string>
+      <g:string>processing-instruction</g:string>
+      <g:string>record</g:string>
+      <g:string>relationship</g:string>
+      <g:string>rename</g:string>
+      <g:string>replace</g:string>
+      <g:string>return</g:string>
+      <g:string>revalidation</g:string>
+      <g:string>same</g:string>
+      <g:string>satisfies</g:string>
+      <g:string>schema</g:string>
+      <g:string>schema-attribute</g:string>
+      <g:string>schema-element</g:string>
+      <g:string>score</g:string>
+      <g:string>self</g:string>
+      <g:string>sensitive</g:string>
+      <g:string>sentence</g:string>
+      <g:string>sentences</g:string>
+      <g:string>skip</g:string>
+      <g:string>sliding</g:string>
+      <g:string>some</g:string>
+      <g:string>stable</g:string>
+      <g:string>start</g:string>
+      <g:string>stemming</g:string>
+      <g:string>stop</g:string>
+      <g:string>strict</g:string>
+      <g:string>strip</g:string>
+      <g:string>switch</g:string>
+      <g:string>text</g:string>
+      <g:string>then</g:string>
+      <g:string>thesaurus</g:string>
+      <g:string>times</g:string>
+      <g:string>to</g:string>
+      <g:string>trace</g:string>
+      <g:string>transform</g:string>
+      <g:string>treat</g:string>
+      <g:string>true</g:string>
+      <g:string>try</g:string>
+      <g:string>tumbling</g:string>
+      <g:string>type</g:string>
+      <g:string>typeswitch</g:string>
+      <g:string>union</g:string>
+      <g:string>unordered</g:string>
+      <g:string>update</g:string>
+      <g:string>updating</g:string>
+      <g:string>uppercase</g:string>
+      <g:string>using</g:string>
+      <g:string>validate</g:string>
+      <g:string>value</g:string>
+      <g:string>variable</g:string>
+      <g:string>version</g:string>
+      <g:string>weight</g:string>
+      <g:string>when</g:string>
+      <g:string>where</g:string>
+      <g:string>while</g:string>
+      <g:string>wildcards</g:string>
+      <g:string>window</g:string>
+      <g:string>with</g:string>
+      <g:string>without</g:string>
+      <g:string>word</g:string>
+      <g:string>words</g:string>
+      <g:string>xnode</g:string>
+      <g:string>xquery</g:string>
+      <g:string>zero-digit</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="URILiteral">
+    <g:ref name="StringLiteral"/>
+  </g:production>
+  <g:production name="Prolog">
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="DefaultNamespaceDecl"/>
+        <g:ref name="Setter"/>
+        <g:ref name="NamespaceDecl"/>
+        <g:ref name="Import"/>
+        <g:ref name="FTOptionDecl"/>
+      </g:choice>
+      <g:ref name="Separator"/>
+    </g:zeroOrMore>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="ContextValueDecl"/>
+        <g:ref name="VarDecl"/>
+        <g:ref name="FunctionDecl"/>
+        <g:ref name="ItemTypeDecl"/>
+        <g:ref name="LabeledRecordTypeDecl"/>
+        <g:ref name="OptionDecl"/>
+      </g:choice>
+      <g:ref name="Separator"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="DefaultNamespaceDecl">
+    <g:string>declare</g:string>
+    <g:optional>
+      <g:string>fixed</g:string>
+    </g:optional>
+    <g:string>default</g:string>
+    <g:choice>
+      <g:string>element</g:string>
+      <g:string>function</g:string>
+    </g:choice>
+    <g:string>namespace</g:string>
+    <g:ref name="URILiteral"/>
+  </g:production>
+  <g:production name="Setter">
+    <g:choice>
+      <g:ref name="BoundarySpaceDecl"/>
+      <g:ref name="DefaultCollationDecl"/>
+      <g:ref name="BaseURIDecl"/>
+      <g:ref name="ConstructionDecl"/>
+      <g:ref name="OrderingModeDecl"/>
+      <g:ref name="EmptyOrderDecl"/>
+      <g:ref name="RevalidationDecl"/>
+      <g:ref name="CopyNamespacesDecl"/>
+      <g:ref name="DecimalFormatDecl"/>
+    </g:choice>
+  </g:production>
+  <g:production name="BoundarySpaceDecl">
+    <g:string>declare</g:string>
+    <g:string>boundary-space</g:string>
+    <g:choice>
+      <g:string>preserve</g:string>
+      <g:string>strip</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="DefaultCollationDecl">
+    <g:string>declare</g:string>
+    <g:string>default</g:string>
+    <g:string>collation</g:string>
+    <g:ref name="URILiteral"/>
+  </g:production>
+  <g:production name="BaseURIDecl">
+    <g:string>declare</g:string>
+    <g:string>base-uri</g:string>
+    <g:ref name="URILiteral"/>
+  </g:production>
+  <g:production name="ConstructionDecl">
+    <g:string>declare</g:string>
+    <g:string>construction</g:string>
+    <g:choice>
+      <g:string>strip</g:string>
+      <g:string>preserve</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="OrderingModeDecl">
+    <g:string>declare</g:string>
+    <g:string>ordering</g:string>
+    <g:choice>
+      <g:string>ordered</g:string>
+      <g:string>unordered</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="EmptyOrderDecl">
+    <g:string>declare</g:string>
+    <g:string>default</g:string>
+    <g:string>order</g:string>
+    <g:string>empty</g:string>
+    <g:choice>
+      <g:string>greatest</g:string>
+      <g:string>least</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="RevalidationDecl">
+    <g:string>declare</g:string>
+    <g:string>revalidation</g:string>
+    <g:choice>
+      <g:string>strict</g:string>
+      <g:string>lax</g:string>
+      <g:string>skip</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="CopyNamespacesDecl">
+    <g:string>declare</g:string>
+    <g:string>copy-namespaces</g:string>
+    <g:ref name="PreserveMode"/>
+    <g:string>,</g:string>
+    <g:ref name="InheritMode"/>
+  </g:production>
+  <g:production name="PreserveMode">
+    <g:choice>
+      <g:string>preserve</g:string>
+      <g:string>no-preserve</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="InheritMode">
+    <g:choice>
+      <g:string>inherit</g:string>
+      <g:string>no-inherit</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="DecimalFormatDecl">
+    <g:string>declare</g:string>
+    <g:choice>
+      <g:sequence>
+        <g:string>decimal-format</g:string>
+        <g:ref name="EQName"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>default</g:string>
+        <g:string>decimal-format</g:string>
+      </g:sequence>
+    </g:choice>
+    <g:zeroOrMore>
+      <g:ref name="DFPropertyName"/>
+      <g:string>=</g:string>
+      <g:ref name="StringLiteral"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="EQName">
+    <g:choice>
+      <g:ref name="QName"/>
+      <g:ref name="URIQualifiedName"/>
+    </g:choice>
+  </g:production>
+  <g:production name="QName">
+    <g:choice>
+      <g:ref name="UnreservedFunctionQName"/>
+      <g:string>attribute</g:string>
+      <g:string>comment</g:string>
+      <g:string>document-node</g:string>
+      <g:string>element</g:string>
+      <g:string>namespace-node</g:string>
+      <g:string>node</g:string>
+      <g:string>processing-instruction</g:string>
+      <g:string>schema-attribute</g:string>
+      <g:string>schema-element</g:string>
+      <g:string>text</g:string>
+      <g:string>xnode</g:string>
+      <g:string>array</g:string>
+      <g:string>enum</g:string>
+      <g:string>fn</g:string>
+      <g:string>function</g:string>
+      <g:string>if</g:string>
+      <g:string>item</g:string>
+      <g:string>jnode</g:string>
+      <g:string>map</g:string>
+      <g:string>record</g:string>
+      <g:string>switch</g:string>
+      <g:string>type</g:string>
+      <g:string>typeswitch</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="UnreservedFunctionQName">
+    <g:choice>
+      <g:ref name="NonKeywordQName"/>
+      <g:string>NaN</g:string>
+      <g:string>after</g:string>
+      <g:string>all</g:string>
+      <g:string>allowing</g:string>
+      <g:string>ancestor</g:string>
+      <g:string>ancestor-or-self</g:string>
+      <g:string>and</g:string>
+      <g:string>any</g:string>
+      <g:string>as</g:string>
+      <g:string>ascending</g:string>
+      <g:string>at</g:string>
+      <g:string>base-uri</g:string>
+      <g:string>before</g:string>
+      <g:string>boundary-space</g:string>
+      <g:string>but</g:string>
+      <g:string>by</g:string>
+      <g:string>case</g:string>
+      <g:string>cast</g:string>
+      <g:string>castable</g:string>
+      <g:string>catch</g:string>
+      <g:string>child</g:string>
+      <g:string>coerce</g:string>
+      <g:string>collation</g:string>
+      <g:string>construction</g:string>
+      <g:string>contains</g:string>
+      <g:string>content</g:string>
+      <g:string>context</g:string>
+      <g:string>copy</g:string>
+      <g:string>copy-namespaces</g:string>
+      <g:string>count</g:string>
+      <g:string>decimal-format</g:string>
+      <g:string>decimal-separator</g:string>
+      <g:string>declare</g:string>
+      <g:string>default</g:string>
+      <g:string>delete</g:string>
+      <g:string>descendant</g:string>
+      <g:string>descendant-or-self</g:string>
+      <g:string>descending</g:string>
+      <g:string>diacritics</g:string>
+      <g:string>different</g:string>
+      <g:string>digit</g:string>
+      <g:string>distance</g:string>
+      <g:string>div</g:string>
+      <g:string>document</g:string>
+      <g:string>else</g:string>
+      <g:string>empty</g:string>
+      <g:string>empty-sequence</g:string>
+      <g:string>encoding</g:string>
+      <g:string>end</g:string>
+      <g:string>entire</g:string>
+      <g:string>eq</g:string>
+      <g:string>errors</g:string>
+      <g:string>every</g:string>
+      <g:string>exactly</g:string>
+      <g:string>except</g:string>
+      <g:string>exponent-separator</g:string>
+      <g:string>extends</g:string>
+      <g:string>external</g:string>
+      <g:string>false</g:string>
+      <g:string>finally</g:string>
+      <g:string>first</g:string>
+      <g:string>fixed</g:string>
+      <g:string>following</g:string>
+      <g:string>following-or-self</g:string>
+      <g:string>following-sibling</g:string>
+      <g:string>following-sibling-or-self</g:string>
+      <g:string>follows</g:string>
+      <g:string>follows-or-is</g:string>
+      <g:string>for</g:string>
+      <g:string>from</g:string>
+      <g:string>ft-option</g:string>
+      <g:string>ftand</g:string>
+      <g:string>ftnot</g:string>
+      <g:string>ftor</g:string>
+      <g:string>fuzzy</g:string>
+      <g:string>ge</g:string>
+      <g:string>greatest</g:string>
+      <g:string>group</g:string>
+      <g:string>grouping-separator</g:string>
+      <g:string>gt</g:string>
+      <g:string>idiv</g:string>
+      <g:string>import</g:string>
+      <g:string>in</g:string>
+      <g:string>infinity</g:string>
+      <g:string>inherit</g:string>
+      <g:string>insensitive</g:string>
+      <g:string>insert</g:string>
+      <g:string>instance</g:string>
+      <g:string>intersect</g:string>
+      <g:string>into</g:string>
+      <g:string>invoke</g:string>
+      <g:string>is</g:string>
+      <g:string>is-not</g:string>
+      <g:string>key</g:string>
+      <g:string>language</g:string>
+      <g:string>last</g:string>
+      <g:string>lax</g:string>
+      <g:string>le</g:string>
+      <g:string>least</g:string>
+      <g:string>let</g:string>
+      <g:string>levels</g:string>
+      <g:string>lowercase</g:string>
+      <g:string>lt</g:string>
+      <g:string>member</g:string>
+      <g:string>minus-sign</g:string>
+      <g:string>mod</g:string>
+      <g:string>modify</g:string>
+      <g:string>module</g:string>
+      <g:string>most</g:string>
+      <g:string>namespace</g:string>
+      <g:string>ne</g:string>
+      <g:string>next</g:string>
+      <g:string>no</g:string>
+      <g:string>no-inherit</g:string>
+      <g:string>no-preserve</g:string>
+      <g:string>nodes</g:string>
+      <g:string>not</g:string>
+      <g:string>occurs</g:string>
+      <g:string>of</g:string>
+      <g:string>only</g:string>
+      <g:string>option</g:string>
+      <g:string>or</g:string>
+      <g:string>order</g:string>
+      <g:string>ordered</g:string>
+      <g:string>ordering</g:string>
+      <g:string>otherwise</g:string>
+      <g:string>paragraph</g:string>
+      <g:string>paragraphs</g:string>
+      <g:string>parent</g:string>
+      <g:string>pattern-separator</g:string>
+      <g:string>per-mille</g:string>
+      <g:string>percent</g:string>
+      <g:string>phrase</g:string>
+      <g:string>precedes</g:string>
+      <g:string>precedes-or-is</g:string>
+      <g:string>preceding</g:string>
+      <g:string>preceding-or-self</g:string>
+      <g:string>preceding-sibling</g:string>
+      <g:string>preceding-sibling-or-self</g:string>
+      <g:string>preserve</g:string>
+      <g:string>previous</g:string>
+      <g:string>relationship</g:string>
+      <g:string>rename</g:string>
+      <g:string>replace</g:string>
+      <g:string>return</g:string>
+      <g:string>revalidation</g:string>
+      <g:string>same</g:string>
+      <g:string>satisfies</g:string>
+      <g:string>schema</g:string>
+      <g:string>score</g:string>
+      <g:string>self</g:string>
+      <g:string>sensitive</g:string>
+      <g:string>sentence</g:string>
+      <g:string>sentences</g:string>
+      <g:string>skip</g:string>
+      <g:string>sliding</g:string>
+      <g:string>some</g:string>
+      <g:string>stable</g:string>
+      <g:string>start</g:string>
+      <g:string>stemming</g:string>
+      <g:string>stop</g:string>
+      <g:string>strict</g:string>
+      <g:string>strip</g:string>
+      <g:string>then</g:string>
+      <g:string>thesaurus</g:string>
+      <g:string>times</g:string>
+      <g:string>to</g:string>
+      <g:string>trace</g:string>
+      <g:string>transform</g:string>
+      <g:string>treat</g:string>
+      <g:string>true</g:string>
+      <g:string>try</g:string>
+      <g:string>tumbling</g:string>
+      <g:string>union</g:string>
+      <g:string>unordered</g:string>
+      <g:string>update</g:string>
+      <g:string>updating</g:string>
+      <g:string>uppercase</g:string>
+      <g:string>using</g:string>
+      <g:string>validate</g:string>
+      <g:string>value</g:string>
+      <g:string>variable</g:string>
+      <g:string>version</g:string>
+      <g:string>weight</g:string>
+      <g:string>when</g:string>
+      <g:string>where</g:string>
+      <g:string>while</g:string>
+      <g:string>wildcards</g:string>
+      <g:string>window</g:string>
+      <g:string>with</g:string>
+      <g:string>without</g:string>
+      <g:string>word</g:string>
+      <g:string>words</g:string>
+      <g:string>xquery</g:string>
+      <g:string>zero-digit</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="DFPropertyName">
+    <g:choice>
+      <g:string>decimal-separator</g:string>
+      <g:string>grouping-separator</g:string>
+      <g:string>infinity</g:string>
+      <g:string>minus-sign</g:string>
+      <g:string>NaN</g:string>
+      <g:string>percent</g:string>
+      <g:string>per-mille</g:string>
+      <g:string>zero-digit</g:string>
+      <g:string>digit</g:string>
+      <g:string>pattern-separator</g:string>
+      <g:string>exponent-separator</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="NamespaceDecl">
+    <g:string>declare</g:string>
+    <g:string>namespace</g:string>
+    <g:ref name="NCName"/>
+    <g:string>=</g:string>
+    <g:ref name="URILiteral"/>
+  </g:production>
+  <g:production name="Import">
+    <g:choice>
+      <g:ref name="SchemaImport"/>
+      <g:ref name="ModuleImport"/>
+    </g:choice>
+  </g:production>
+  <g:production name="SchemaImport">
+    <g:string>import</g:string>
+    <g:string>schema</g:string>
+    <g:optional>
+      <g:ref name="SchemaPrefix"/>
+    </g:optional>
+    <g:ref name="URILiteral"/>
+    <g:optional>
+      <g:string>at</g:string>
+      <g:ref name="URILiteral"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="URILiteral"/>
+      </g:zeroOrMore>
+    </g:optional>
+  </g:production>
+  <g:production name="SchemaPrefix">
+    <g:choice>
+      <g:sequence>
+        <g:string>namespace</g:string>
+        <g:ref name="NCName"/>
+        <g:string>=</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:optional>
+          <g:string>fixed</g:string>
+        </g:optional>
+        <g:string>default</g:string>
+        <g:string>element</g:string>
+        <g:string>namespace</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="ModuleImport">
+    <g:string>import</g:string>
+    <g:string>module</g:string>
+    <g:optional>
+      <g:string>namespace</g:string>
+      <g:ref name="NCName"/>
+      <g:string>=</g:string>
+    </g:optional>
+    <g:ref name="URILiteral"/>
+    <g:optional>
+      <g:string>at</g:string>
+      <g:ref name="URILiteral"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="URILiteral"/>
+      </g:zeroOrMore>
+    </g:optional>
+  </g:production>
+  <g:production name="FTOptionDecl">
+    <g:string>declare</g:string>
+    <g:string>ft-option</g:string>
+    <g:ref name="FTMatchOptions"/>
+  </g:production>
+  <g:production name="FTMatchOptions">
+    <g:oneOrMore>
+      <g:string>using</g:string>
+      <g:ref name="FTMatchOption"/>
+    </g:oneOrMore>
+  </g:production>
+  <g:production name="FTMatchOption">
+    <g:choice>
+      <g:ref name="FTLanguageOption"/>
+      <g:ref name="FTWildCardOption"/>
+      <g:ref name="FTThesaurusOption"/>
+      <g:ref name="FTStemOption"/>
+      <g:ref name="FTCaseOption"/>
+      <g:ref name="FTDiacriticsOption"/>
+      <g:ref name="FTStopWordOption"/>
+      <g:ref name="FTExtensionOption"/>
+      <g:ref name="FTFuzzyOption"/>
+    </g:choice>
+  </g:production>
+  <g:production name="FTLanguageOption">
+    <g:string>language</g:string>
+    <g:ref name="StringLiteral"/>
+  </g:production>
+  <g:production name="FTWildCardOption">
+    <g:choice>
+      <g:string>wildcards</g:string>
+      <g:sequence>
+        <g:string>no</g:string>
+        <g:string>wildcards</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTThesaurusOption">
+    <g:choice>
+      <g:sequence>
+        <g:string>thesaurus</g:string>
+        <g:choice>
+          <g:ref name="FTThesaurusID"/>
+          <g:string>default</g:string>
+        </g:choice>
+      </g:sequence>
+      <g:sequence>
+        <g:string>thesaurus</g:string>
+        <g:string>(</g:string>
+        <g:choice>
+          <g:ref name="FTThesaurusID"/>
+          <g:string>default</g:string>
+        </g:choice>
+        <g:zeroOrMore>
+          <g:string>,</g:string>
+          <g:ref name="FTThesaurusID"/>
+        </g:zeroOrMore>
+        <g:string>)</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>no</g:string>
+        <g:string>thesaurus</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTThesaurusID">
+    <g:string>at</g:string>
+    <g:ref name="URILiteral"/>
+    <g:optional>
+      <g:string>relationship</g:string>
+      <g:ref name="StringLiteral"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="FTLiteralRange"/>
+      <g:string>levels</g:string>
+    </g:optional>
+  </g:production>
+  <g:production name="FTLiteralRange">
+    <g:choice>
+      <g:sequence>
+        <g:string>exactly</g:string>
+        <g:ref name="IntegerLiteral"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>least</g:string>
+        <g:ref name="IntegerLiteral"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>most</g:string>
+        <g:ref name="IntegerLiteral"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>from</g:string>
+        <g:ref name="IntegerLiteral"/>
+        <g:string>to</g:string>
+        <g:ref name="IntegerLiteral"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTStemOption">
+    <g:choice>
+      <g:string>stemming</g:string>
+      <g:sequence>
+        <g:string>no</g:string>
+        <g:string>stemming</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTCaseOption">
+    <g:choice>
+      <g:sequence>
+        <g:string>case</g:string>
+        <g:string>insensitive</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>case</g:string>
+        <g:string>sensitive</g:string>
+      </g:sequence>
+      <g:string>lowercase</g:string>
+      <g:string>uppercase</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="FTDiacriticsOption">
+    <g:choice>
+      <g:sequence>
+        <g:string>diacritics</g:string>
+        <g:string>insensitive</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>diacritics</g:string>
+        <g:string>sensitive</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTStopWordOption">
+    <g:choice>
+      <g:sequence>
+        <g:string>stop</g:string>
+        <g:string>words</g:string>
+        <g:ref name="FTStopWords"/>
+        <g:zeroOrMore>
+          <g:ref name="FTStopWordsInclExcl"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:sequence>
+        <g:string>stop</g:string>
+        <g:string>words</g:string>
+        <g:string>default</g:string>
+        <g:zeroOrMore>
+          <g:ref name="FTStopWordsInclExcl"/>
+        </g:zeroOrMore>
+      </g:sequence>
+      <g:sequence>
+        <g:string>no</g:string>
+        <g:string>stop</g:string>
+        <g:string>words</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTStopWords">
+    <g:choice>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:ref name="URILiteral"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>(</g:string>
+        <g:ref name="StringLiteral"/>
+        <g:zeroOrMore>
+          <g:string>,</g:string>
+          <g:ref name="StringLiteral"/>
+        </g:zeroOrMore>
+        <g:string>)</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTStopWordsInclExcl">
+    <g:choice>
+      <g:string>union</g:string>
+      <g:string>except</g:string>
+    </g:choice>
+    <g:ref name="FTStopWords"/>
+  </g:production>
+  <g:production name="FTExtensionOption">
+    <g:string>option</g:string>
+    <g:ref name="EQName"/>
+    <g:ref name="StringLiteral"/>
+  </g:production>
+  <g:production name="FTFuzzyOption">
+    <g:string>fuzzy</g:string>
+    <g:optional>
+      <g:ref name="IntegerLiteral"/>
+      <g:string>errors</g:string>
+    </g:optional>
+  </g:production>
+  <g:production name="ContextValueDecl">
+    <g:string>declare</g:string>
+    <g:string>context</g:string>
+    <g:choice>
+      <g:sequence>
+        <g:string>value</g:string>
+        <g:optional>
+          <g:string>as</g:string>
+          <g:ref name="SequenceType"/>
+        </g:optional>
+      </g:sequence>
+      <g:sequence>
+        <g:string>item</g:string>
+        <g:optional>
+          <g:string>as</g:string>
+          <g:ref name="ItemType"/>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+    <g:choice>
+      <g:sequence>
+        <g:string>:=</g:string>
+        <g:ref name="VarValue"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>external</g:string>
+        <g:optional>
+          <g:string>:=</g:string>
+          <g:ref name="VarDefaultValue"/>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="SequenceType">
+    <g:choice>
+      <g:sequence>
+        <g:string>empty-sequence</g:string>
+        <g:string>(</g:string>
+        <g:string>)</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:ref name="ItemType"/>
+        <g:orderedChoice>
+          <g:ref name="OccurrenceIndicator"/>
+          <g:sequence>
+          </g:sequence>
+        </g:orderedChoice>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="ItemType">
+    <g:choice>
+      <g:ref name="RegularItemType"/>
+      <g:ref name="FunctionType"/>
+      <g:ref name="TypeName"/>
+      <g:ref name="ChoiceItemType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="RegularItemType">
+    <g:choice>
+      <g:ref name="AnyItemType"/>
+      <g:ref name="XNodeType"/>
+      <g:ref name="GNodeType"/>
+      <g:ref name="JNodeType"/>
+      <g:ref name="MapType"/>
+      <g:ref name="ArrayType"/>
+      <g:ref name="RecordType"/>
+      <g:ref name="EnumerationType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AnyItemType">
+    <g:string>item</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="XNodeType">
+    <g:choice>
+      <g:ref name="DocumentNodeType"/>
+      <g:ref name="ElementNodeType"/>
+      <g:ref name="AttributeNodeType"/>
+      <g:ref name="SchemaElementNodeType"/>
+      <g:ref name="SchemaAttributeNodeType"/>
+      <g:ref name="ProcessingInstructionNodeType"/>
+      <g:ref name="CommentNodeType"/>
+      <g:ref name="TextNodeType"/>
+      <g:ref name="NamespaceNodeType"/>
+      <g:ref name="AnyXNodeType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="DocumentNodeType">
+    <g:string>document-node</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:choice>
+        <g:ref name="ElementNodeType"/>
+        <g:ref name="SchemaElementNodeType"/>
+        <g:ref name="NameTestUnion"/>
+      </g:choice>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="ElementNodeType">
+    <g:string>element</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="NameTestUnion"/>
+      <g:optional>
+        <g:string>,</g:string>
+        <g:ref name="TypeName"/>
+        <g:optional>
+          <g:string>?</g:string>
+        </g:optional>
+      </g:optional>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="NameTestUnion">
+    <g:ref name="NameTest"/>
+    <g:zeroOrMore>
+      <g:string>|</g:string>
+      <g:ref name="NameTest"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="NameTest">
+    <g:choice>
+      <g:ref name="EQName"/>
+      <g:ref name="Wildcard"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TypeName">
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="SchemaElementNodeType">
+    <g:string>schema-element</g:string>
+    <g:string>(</g:string>
+    <g:ref name="ElementName"/>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="ElementName">
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="AttributeNodeType">
+    <g:string>attribute</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="NameTestUnion"/>
+      <g:optional>
+        <g:string>,</g:string>
+        <g:ref name="TypeName"/>
+      </g:optional>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="SchemaAttributeNodeType">
+    <g:string>schema-attribute</g:string>
+    <g:string>(</g:string>
+    <g:ref name="AttributeName"/>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="AttributeName">
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="ProcessingInstructionNodeType">
+    <g:string>processing-instruction</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:choice>
+        <g:ref name="NCName"/>
+        <g:ref name="StringLiteral"/>
+      </g:choice>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="CommentNodeType">
+    <g:string>comment</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="TextNodeType">
+    <g:string>text</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="NamespaceNodeType">
+    <g:string>namespace-node</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="AnyXNodeType">
+    <g:string>xnode</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="GNodeType">
+    <g:string>node</g:string>
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="JNodeType">
+    <g:string>jnode</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:choice>
+        <g:string>*</g:string>
+        <g:ref name="JRootSelector"/>
+        <g:ref name="NCName"/>
+        <g:ref name="Constant"/>
+      </g:choice>
+      <g:optional>
+        <g:string>,</g:string>
+        <g:ref name="SequenceType"/>
+      </g:optional>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="JRootSelector">
+    <g:string>(</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="Constant">
+    <g:choice>
+      <g:ref name="StringLiteral"/>
+      <g:sequence>
+        <g:optional>
+          <g:string>-</g:string>
+        </g:optional>
+        <g:ref name="NumericLiteral"/>
+      </g:sequence>
+      <g:ref name="QNameLiteral"/>
+      <g:sequence>
+        <g:string>true</g:string>
+        <g:string>(</g:string>
+        <g:string>)</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>false</g:string>
+        <g:string>(</g:string>
+        <g:string>)</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="NumericLiteral">
+    <g:choice>
+      <g:ref name="IntegerLiteral"/>
+      <g:ref name="HexIntegerLiteral"/>
+      <g:ref name="BinaryIntegerLiteral"/>
+      <g:ref name="DecimalLiteral"/>
+      <g:ref name="DoubleLiteral"/>
+    </g:choice>
+  </g:production>
+  <g:production name="QNameLiteral">
+    <g:string>#</g:string>
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="MapType">
+    <g:choice>
+      <g:ref name="AnyMapType"/>
+      <g:ref name="TypedMapType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AnyMapType">
+    <g:string>map</g:string>
+    <g:string>(</g:string>
+    <g:string>*</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="TypedMapType">
+    <g:string>map</g:string>
+    <g:string>(</g:string>
+    <g:ref name="ItemType"/>
+    <g:string>,</g:string>
+    <g:ref name="SequenceType"/>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="ArrayType">
+    <g:choice>
+      <g:ref name="AnyArrayType"/>
+      <g:ref name="TypedArrayType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AnyArrayType">
+    <g:string>array</g:string>
+    <g:string>(</g:string>
+    <g:string>*</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="TypedArrayType">
+    <g:string>array</g:string>
+    <g:string>(</g:string>
+    <g:ref name="SequenceType"/>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="RecordType">
+    <g:choice>
+      <g:ref name="AnyRecordType"/>
+      <g:ref name="TypedRecordType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AnyRecordType">
+    <g:string>record</g:string>
+    <g:string>(</g:string>
+    <g:string>*</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="TypedRecordType">
+    <g:string>record</g:string>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="FieldDecl"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="FieldDecl"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="FieldDecl">
+    <g:ref name="FieldName"/>
+    <g:optional>
+      <g:string>as</g:string>
+      <g:ref name="SequenceType"/>
+    </g:optional>
+  </g:production>
+  <g:production name="FieldName">
+    <g:choice>
+      <g:ref name="NCName"/>
+      <g:ref name="StringLiteral"/>
+    </g:choice>
+  </g:production>
+  <g:production name="EnumerationType">
+    <g:string>enum</g:string>
+    <g:string>(</g:string>
+    <g:ref name="StringLiteral"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="StringLiteral"/>
+    </g:zeroOrMore>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="FunctionType">
+    <g:zeroOrMore>
+      <g:ref name="Annotation"/>
+    </g:zeroOrMore>
+    <g:choice>
+      <g:ref name="AnyFunctionType"/>
+      <g:ref name="TypedFunctionType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="Annotation">
+    <g:string>%</g:string>
+    <g:ref name="EQName"/>
+    <g:optional>
+      <g:string>(</g:string>
+      <g:ref name="Constant"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="Constant"/>
+      </g:zeroOrMore>
+      <g:string>)</g:string>
+    </g:optional>
+  </g:production>
+  <g:production name="AnyFunctionType">
+    <g:choice>
+      <g:string>function</g:string>
+      <g:string>fn</g:string>
+    </g:choice>
+    <g:string>(</g:string>
+    <g:string>*</g:string>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="TypedFunctionType">
+    <g:choice>
+      <g:string>function</g:string>
+      <g:string>fn</g:string>
+    </g:choice>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="TypedFunctionParam"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="TypedFunctionParam"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>)</g:string>
+    <g:string>as</g:string>
+    <g:ref name="SequenceType"/>
+  </g:production>
+  <g:production name="TypedFunctionParam">
+    <g:optional>
+      <g:string>$</g:string>
+      <g:ref name="EQName"/>
+      <g:string>as</g:string>
+    </g:optional>
+    <g:ref name="SequenceType"/>
+  </g:production>
+  <g:production name="ChoiceItemType">
+    <g:string>(</g:string>
+    <g:ref name="ItemType"/>
+    <g:zeroOrMore>
+      <g:string>|</g:string>
+      <g:ref name="ItemType"/>
+    </g:zeroOrMore>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="OccurrenceIndicator">
+    <g:choice>
+      <g:string>?</g:string>
+      <g:string>*</g:string>
+      <g:string>+</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="VarValue">
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="ExprSingle">
+    <g:choice>
+      <g:ref name="FLWORExpr"/>
+      <g:ref name="QuantifiedExpr"/>
+      <g:ref name="SwitchExpr"/>
+      <g:ref name="TypeswitchExpr"/>
+      <g:ref name="IfExpr"/>
+      <g:ref name="TryCatchExpr"/>
+      <g:ref name="OrExpr"/>
+      <g:ref name="InsertExpr"/>
+      <g:ref name="DeleteExpr"/>
+      <g:ref name="RenameExpr"/>
+      <g:ref name="ReplaceExpr"/>
+      <g:ref name="UpdatingFunctionCall"/>
+      <g:ref name="CopyModifyExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="FLWORExpr">
+    <g:ref name="InitialClause"/>
+    <g:zeroOrMore>
+      <g:ref name="IntermediateClause"/>
+    </g:zeroOrMore>
+    <g:ref name="ReturnClause"/>
+  </g:production>
+  <g:production name="InitialClause">
+    <g:choice>
+      <g:ref name="ForClause"/>
+      <g:ref name="LetClause"/>
+      <g:ref name="WindowClause"/>
+    </g:choice>
+  </g:production>
+  <g:production name="ForClause">
+    <g:string>for</g:string>
+    <g:ref name="ForBinding"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="ForBinding"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="ForBinding">
+    <g:choice>
+      <g:ref name="ForItemBinding"/>
+      <g:ref name="ForMemberBinding"/>
+      <g:ref name="ForEntryBinding"/>
+    </g:choice>
+  </g:production>
+  <g:production name="ForItemBinding">
+    <g:ref name="VarNameAndType"/>
+    <g:optional>
+      <g:ref name="AllowingEmpty"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="PositionalVar"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="FTScoreVar"/>
+    </g:optional>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="VarNameAndType">
+    <g:string>$</g:string>
+    <g:ref name="EQName"/>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+  </g:production>
+  <g:production name="TypeDeclaration">
+    <g:string>as</g:string>
+    <g:ref name="SequenceType"/>
+  </g:production>
+  <g:production name="AllowingEmpty">
+    <g:string>allowing</g:string>
+    <g:string>empty</g:string>
+  </g:production>
+  <g:production name="PositionalVar">
+    <g:string>at</g:string>
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="VarName">
+    <g:string>$</g:string>
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="FTScoreVar">
+    <g:string>score</g:string>
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="ForMemberBinding">
+    <g:string>member</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:optional>
+      <g:ref name="PositionalVar"/>
+    </g:optional>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="ForEntryBinding">
+    <g:choice>
+      <g:sequence>
+        <g:ref name="ForEntryKeyBinding"/>
+        <g:optional>
+          <g:ref name="ForEntryValueBinding"/>
+        </g:optional>
+      </g:sequence>
+      <g:ref name="ForEntryValueBinding"/>
+    </g:choice>
+    <g:optional>
+      <g:ref name="PositionalVar"/>
+    </g:optional>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="ForEntryKeyBinding">
+    <g:string>key</g:string>
+    <g:ref name="VarNameAndType"/>
+  </g:production>
+  <g:production name="ForEntryValueBinding">
+    <g:string>value</g:string>
+    <g:ref name="VarNameAndType"/>
+  </g:production>
+  <g:production name="LetClause">
+    <g:string>let</g:string>
+    <g:ref name="LetBinding"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="LetBinding"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="LetBinding">
+    <g:choice>
+      <g:ref name="LetValueBinding"/>
+      <g:ref name="LetSequenceBinding"/>
+      <g:ref name="LetArrayBinding"/>
+      <g:ref name="LetMapBinding"/>
+    </g:choice>
+  </g:production>
+  <g:production name="LetValueBinding">
+    <g:choice>
+      <g:ref name="VarNameAndType"/>
+      <g:ref name="FTScoreVar"/>
+    </g:choice>
+    <g:string>:=</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="LetSequenceBinding">
+    <g:string>$</g:string>
+    <g:string>(</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="VarNameAndType"/>
+    </g:zeroOrMore>
+    <g:string>)</g:string>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+    <g:string>:=</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="LetArrayBinding">
+    <g:string>$</g:string>
+    <g:string>[</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="VarNameAndType"/>
+    </g:zeroOrMore>
+    <g:string>]</g:string>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+    <g:string>:=</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="LetMapBinding">
+    <g:string>$</g:string>
+    <g:string>{</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="VarNameAndType"/>
+    </g:zeroOrMore>
+    <g:string>}</g:string>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+    <g:string>:=</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="WindowClause">
+    <g:string>for</g:string>
+    <g:choice>
+      <g:ref name="TumblingWindowClause"/>
+      <g:ref name="SlidingWindowClause"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TumblingWindowClause">
+    <g:string>tumbling</g:string>
+    <g:string>window</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+    <g:optional>
+      <g:ref name="WindowStartCondition"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="WindowEndCondition"/>
+    </g:optional>
+  </g:production>
+  <g:production name="WindowStartCondition">
+    <g:string>start</g:string>
+    <g:ref name="WindowVars"/>
+    <g:optional>
+      <g:string>when</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+  </g:production>
+  <g:production name="WindowVars">
+    <g:optional>
+      <g:ref name="CurrentVar"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="PositionalVar"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="PreviousVar"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="NextVar"/>
+    </g:optional>
+  </g:production>
+  <g:production name="CurrentVar">
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="PreviousVar">
+    <g:string>previous</g:string>
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="NextVar">
+    <g:string>next</g:string>
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="WindowEndCondition">
+    <g:optional>
+      <g:string>only</g:string>
+    </g:optional>
+    <g:string>end</g:string>
+    <g:ref name="WindowVars"/>
+    <g:optional>
+      <g:string>when</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+  </g:production>
+  <g:production name="SlidingWindowClause">
+    <g:string>sliding</g:string>
+    <g:string>window</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+    <g:optional>
+      <g:ref name="WindowStartCondition"/>
+    </g:optional>
+    <g:ref name="WindowEndCondition"/>
+  </g:production>
+  <g:production name="IntermediateClause">
+    <g:choice>
+      <g:ref name="InitialClause"/>
+      <g:ref name="WhereClause"/>
+      <g:ref name="WhileClause"/>
+      <g:ref name="GroupByClause"/>
+      <g:ref name="OrderByClause"/>
+      <g:ref name="CountClause"/>
+      <g:ref name="TraceClause"/>
+    </g:choice>
+  </g:production>
+  <g:production name="WhereClause">
+    <g:string>where</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="WhileClause">
+    <g:string>while</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="GroupByClause">
+    <g:string>group</g:string>
+    <g:string>by</g:string>
+    <g:ref name="GroupingSpec"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="GroupingSpec"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="GroupingSpec">
+    <g:ref name="VarName"/>
+    <g:optional>
+      <g:optional>
+        <g:ref name="TypeDeclaration"/>
+      </g:optional>
+      <g:string>:=</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+    <g:optional>
+      <g:string>collation</g:string>
+      <g:ref name="URILiteral"/>
+    </g:optional>
+  </g:production>
+  <g:production name="OrderByClause">
+    <g:optional>
+      <g:string>stable</g:string>
+    </g:optional>
+    <g:string>order</g:string>
+    <g:string>by</g:string>
+    <g:ref name="OrderSpec"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="OrderSpec"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="OrderSpec">
+    <g:ref name="ExprSingle"/>
+    <g:ref name="OrderModifier"/>
+  </g:production>
+  <g:production name="OrderModifier">
+    <g:optional>
+      <g:choice>
+        <g:string>ascending</g:string>
+        <g:string>descending</g:string>
+      </g:choice>
+    </g:optional>
+    <g:optional>
+      <g:string>empty</g:string>
+      <g:choice>
+        <g:string>greatest</g:string>
+        <g:string>least</g:string>
+      </g:choice>
+    </g:optional>
+    <g:optional>
+      <g:string>collation</g:string>
+      <g:ref name="URILiteral"/>
+    </g:optional>
+  </g:production>
+  <g:production name="CountClause">
+    <g:string>count</g:string>
+    <g:ref name="VarName"/>
+  </g:production>
+  <g:production name="TraceClause">
+    <g:string>trace</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="ReturnClause">
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="QuantifiedExpr">
+    <g:choice>
+      <g:string>some</g:string>
+      <g:string>every</g:string>
+    </g:choice>
+    <g:ref name="QuantifierBinding"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="QuantifierBinding"/>
+    </g:zeroOrMore>
+    <g:string>satisfies</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="QuantifierBinding">
+    <g:ref name="VarNameAndType"/>
+    <g:string>in</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="SwitchExpr">
+    <g:string>switch</g:string>
+    <g:ref name="SwitchComparand"/>
+    <g:choice>
+      <g:ref name="SwitchCases"/>
+      <g:ref name="BracedSwitchCases"/>
+    </g:choice>
+  </g:production>
+  <g:production name="SwitchComparand">
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="Expr"/>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="Expr">
+    <g:ref name="ExprSingle"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="SwitchCases">
+    <g:oneOrMore>
+      <g:ref name="SwitchCaseClause"/>
+    </g:oneOrMore>
+    <g:string>default</g:string>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="SwitchCaseClause">
+    <g:oneOrMore>
+      <g:string>case</g:string>
+      <g:ref name="SwitchCaseOperand"/>
+    </g:oneOrMore>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="SwitchCaseOperand">
+    <g:ref name="Expr"/>
+  </g:production>
+  <g:production name="BracedSwitchCases">
+    <g:string>{</g:string>
+    <g:ref name="SwitchCases"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="TypeswitchExpr">
+    <g:string>typeswitch</g:string>
+    <g:string>(</g:string>
+    <g:ref name="Expr"/>
+    <g:string>)</g:string>
+    <g:choice>
+      <g:ref name="TypeswitchCases"/>
+      <g:ref name="BracedTypeswitchCases"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TypeswitchCases">
+    <g:oneOrMore>
+      <g:ref name="CaseClause"/>
+    </g:oneOrMore>
+    <g:string>default</g:string>
+    <g:optional>
+      <g:ref name="VarName"/>
+    </g:optional>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="CaseClause">
+    <g:string>case</g:string>
+    <g:optional>
+      <g:ref name="VarName"/>
+      <g:string>as</g:string>
+    </g:optional>
+    <g:ref name="SequenceTypeUnion"/>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="SequenceTypeUnion">
+    <g:ref name="SequenceType"/>
+    <g:zeroOrMore>
+      <g:string>|</g:string>
+      <g:ref name="SequenceType"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="BracedTypeswitchCases">
+    <g:string>{</g:string>
+    <g:ref name="TypeswitchCases"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="IfExpr">
+    <g:string>if</g:string>
+    <g:string>(</g:string>
+    <g:ref name="Expr"/>
+    <g:string>)</g:string>
+    <g:choice>
+      <g:ref name="UnbracedActions"/>
+      <g:ref name="BracedActions"/>
+    </g:choice>
+  </g:production>
+  <g:production name="UnbracedActions">
+    <g:orderedChoice>
+      <g:sequence>
+        <g:string>then</g:string>
+        <g:ref name="ExprSingle"/>
+        <g:string>else</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>then</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:sequence>
+    </g:orderedChoice>
+  </g:production>
+  <g:production name="BracedActions">
+    <g:orderedChoice>
+      <g:sequence>
+        <g:ref name="EnclosedExpr"/>
+        <g:string>else</g:string>
+        <g:ref name="BracedElseAction"/>
+      </g:sequence>
+      <g:ref name="EnclosedExpr"/>
+    </g:orderedChoice>
+  </g:production>
+  <g:production name="EnclosedExpr">
+    <g:string>{</g:string>
+    <g:optional>
+      <g:ref name="Expr"/>
+    </g:optional>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="BracedElseAction">
+    <g:choice>
+      <g:sequence>
+        <g:string>if</g:string>
+        <g:string>(</g:string>
+        <g:ref name="Expr"/>
+        <g:string>)</g:string>
+        <g:ref name="BracedActions"/>
+      </g:sequence>
+      <g:ref name="EnclosedExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TryCatchExpr">
+    <g:ref name="TryClause"/>
+    <g:choice>
+      <g:sequence>
+        <g:oneOrMore>
+          <g:ref name="CatchClause"/>
+        </g:oneOrMore>
+        <g:optional>
+          <g:ref name="FinallyClause"/>
+        </g:optional>
+      </g:sequence>
+      <g:ref name="FinallyClause"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TryClause">
+    <g:string>try</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CatchClause">
+    <g:string>catch</g:string>
+    <g:ref name="NameTestUnion"/>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="FinallyClause">
+    <g:string>finally</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="OrExpr">
+    <g:ref name="AndExpr"/>
+    <g:zeroOrMore>
+      <g:string>or</g:string>
+      <g:ref name="AndExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="AndExpr">
+    <g:ref name="ComparisonExpr"/>
+    <g:zeroOrMore>
+      <g:string>and</g:string>
+      <g:ref name="ComparisonExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="ComparisonExpr">
+    <g:ref name="FTContainsExpr"/>
+    <g:optional>
+      <g:choice>
+        <g:ref name="ValueComp"/>
+        <g:ref name="GeneralComp"/>
+        <g:ref name="NodeComp"/>
+      </g:choice>
+      <g:ref name="FTContainsExpr"/>
+    </g:optional>
+  </g:production>
+  <g:production name="FTContainsExpr">
+    <g:ref name="OtherwiseExpr"/>
+    <g:optional>
+      <g:string>contains</g:string>
+      <g:string>text</g:string>
+      <g:ref name="FTSelection"/>
+      <g:optional>
+        <g:ref name="FTIgnoreOption"/>
+      </g:optional>
+    </g:optional>
+  </g:production>
+  <g:production name="OtherwiseExpr">
+    <g:ref name="StringConcatExpr"/>
+    <g:zeroOrMore>
+      <g:string>otherwise</g:string>
+      <g:ref name="StringConcatExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="StringConcatExpr">
+    <g:ref name="RangeExpr"/>
+    <g:zeroOrMore>
+      <g:string>||</g:string>
+      <g:ref name="RangeExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="RangeExpr">
+    <g:ref name="AdditiveExpr"/>
+    <g:optional>
+      <g:string>to</g:string>
+      <g:ref name="AdditiveExpr"/>
+    </g:optional>
+  </g:production>
+  <g:production name="AdditiveExpr">
+    <g:ref name="MultiplicativeExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>+</g:string>
+        <g:string>-</g:string>
+      </g:choice>
+      <g:ref name="MultiplicativeExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="MultiplicativeExpr">
+    <g:ref name="UnionExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>*</g:string>
+        <g:string>×</g:string>
+        <g:string>div</g:string>
+        <g:string>÷</g:string>
+        <g:string>idiv</g:string>
+        <g:string>mod</g:string>
+      </g:choice>
+      <g:ref name="UnionExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="UnionExpr">
+    <g:ref name="IntersectExceptExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>union</g:string>
+        <g:string>|</g:string>
+      </g:choice>
+      <g:ref name="IntersectExceptExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="IntersectExceptExpr">
+    <g:ref name="ButWithExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>intersect</g:string>
+        <g:string>except</g:string>
+      </g:choice>
+      <g:ref name="ButWithExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="ButWithExpr">
+    <g:ref name="InstanceofExpr"/>
+    <g:zeroOrMore>
+      <g:string>but</g:string>
+      <g:string>with</g:string>
+      <g:ref name="InstanceofExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="InstanceofExpr">
+    <g:ref name="TreatExpr"/>
+    <g:optional>
+      <g:string>instance</g:string>
+      <g:string>of</g:string>
+      <g:ref name="SequenceType"/>
+    </g:optional>
+  </g:production>
+  <g:production name="TreatExpr">
+    <g:ref name="CoerceExpr"/>
+    <g:optional>
+      <g:string>treat</g:string>
+      <g:string>as</g:string>
+      <g:ref name="SequenceType"/>
+    </g:optional>
+  </g:production>
+  <g:production name="CoerceExpr">
+    <g:ref name="CastableExpr"/>
+    <g:optional>
+      <g:string>coerce</g:string>
+      <g:string>as</g:string>
+      <g:ref name="SequenceType"/>
+    </g:optional>
+  </g:production>
+  <g:production name="CastableExpr">
+    <g:ref name="CastExpr"/>
+    <g:optional>
+      <g:string>castable</g:string>
+      <g:string>as</g:string>
+      <g:ref name="CastTarget"/>
+    </g:optional>
+  </g:production>
+  <g:production name="CastExpr">
+    <g:ref name="TransformWithExpr"/>
+    <g:optional>
+      <g:string>cast</g:string>
+      <g:string>as</g:string>
+      <g:ref name="CastTarget"/>
+    </g:optional>
+  </g:production>
+  <g:production name="TransformWithExpr">
+    <g:ref name="PipelineExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:sequence>
+          <g:string>transform</g:string>
+          <g:string>with</g:string>
+        </g:sequence>
+        <g:string>update</g:string>
+      </g:choice>
+      <g:string>{</g:string>
+      <g:optional>
+        <g:ref name="Expr"/>
+      </g:optional>
+      <g:string>}</g:string>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="PipelineExpr">
+    <g:ref name="ArrowExpr"/>
+    <g:zeroOrMore>
+      <g:string>-&gt;</g:string>
+      <g:ref name="ArrowExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="ArrowExpr">
+    <g:ref name="UnaryExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="SequenceArrowTarget"/>
+        <g:ref name="MappingArrowTarget"/>
+      </g:choice>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="UnaryExpr">
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>-</g:string>
+        <g:string>+</g:string>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:ref name="ValueExpr"/>
+  </g:production>
+  <g:production name="ValueExpr">
+    <g:choice>
+      <g:ref name="ValidateExpr"/>
+      <g:ref name="ExtensionExpr"/>
+      <g:ref name="SimpleMapExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="ValidateExpr">
+    <g:string>validate</g:string>
+    <g:optional>
+      <g:choice>
+        <g:ref name="ValidationMode"/>
+        <g:sequence>
+          <g:string>type</g:string>
+          <g:ref name="TypeName"/>
+        </g:sequence>
+      </g:choice>
+    </g:optional>
+    <g:string>{</g:string>
+    <g:ref name="Expr"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="ValidationMode">
+    <g:choice>
+      <g:string>lax</g:string>
+      <g:string>strict</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="ExtensionExpr">
+    <g:oneOrMore>
+      <g:ref name="Pragma"/>
+    </g:oneOrMore>
+    <g:string>{</g:string>
+    <g:optional>
+      <g:ref name="Expr"/>
+    </g:optional>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="Pragma" whitespace-spec="explicit">
+    <g:string>(#</g:string>
+    <g:ref name="S"/>
+    <g:ref name="EQName"/>
+    <g:optional>
+      <g:ref name="S"/>
+      <g:ref name="PragmaContents"/>
+    </g:optional>
+    <g:string>#)</g:string>
+  </g:production>
+  <g:production name="SimpleMapExpr">
+    <g:ref name="PathExpr"/>
+    <g:zeroOrMore>
+      <g:string>!</g:string>
+      <g:ref name="PathExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="PathExpr">
+    <g:choice>
+      <g:ref name="AbsolutePathExpr"/>
+      <g:ref name="RelativePathExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AbsolutePathExpr">
+    <g:choice>
+      <g:sequence>
+        <g:string>/</g:string>
+        <g:orderedChoice>
+          <g:ref name="RelativePathExpr"/>
+          <g:sequence>
+          </g:sequence>
+        </g:orderedChoice>
+      </g:sequence>
+      <g:sequence>
+        <g:string>//</g:string>
+        <g:ref name="RelativePathExpr"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="RelativePathExpr">
+    <g:ref name="StepExpr"/>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:string>/</g:string>
+        <g:string>//</g:string>
+      </g:choice>
+      <g:ref name="StepExpr"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="StepExpr">
+    <g:choice>
+      <g:ref name="PostfixExpr"/>
+      <g:ref name="AxisStep"/>
+    </g:choice>
+  </g:production>
+  <g:production name="PostfixExpr">
+    <g:choice>
+      <g:ref name="PrimaryExpr"/>
+      <g:ref name="FilterExpr"/>
+      <g:ref name="DynamicFunctionCall"/>
+      <g:ref name="LookupExpr"/>
+      <g:ref name="MethodCall"/>
+    </g:choice>
+  </g:production>
+  <g:production name="PrimaryExpr">
+    <g:choice>
+      <g:ref name="Literal"/>
+      <g:ref name="VarRef"/>
+      <g:ref name="ParenthesizedExpr"/>
+      <g:ref name="ContextValueRef"/>
+      <g:ref name="FunctionCall"/>
+      <g:ref name="OrderedExpr"/>
+      <g:ref name="UnorderedExpr"/>
+      <g:ref name="NodeConstructor"/>
+      <g:ref name="FunctionItemExpr"/>
+      <g:ref name="MapConstructor"/>
+      <g:ref name="ArrayConstructor"/>
+      <g:ref name="StringTemplate"/>
+      <g:ref name="StringConstructor"/>
+      <g:ref name="UnaryLookup"/>
+    </g:choice>
+  </g:production>
+  <g:production name="Literal">
+    <g:choice>
+      <g:ref name="NumericLiteral"/>
+      <g:ref name="StringLiteral"/>
+      <g:ref name="QNameLiteral"/>
+    </g:choice>
+  </g:production>
+  <g:production name="VarRef">
+    <g:string>$</g:string>
+    <g:ref name="EQName"/>
+  </g:production>
+  <g:production name="ParenthesizedExpr">
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="Expr"/>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="ContextValueRef">
+    <g:string>.</g:string>
+  </g:production>
+  <g:production name="FunctionCall">
+    <g:ref name="UnreservedFunctionEQName"/>
+    <g:ref name="ArgumentList"/>
+  </g:production>
+  <g:production name="UnreservedFunctionEQName">
+    <g:choice>
+      <g:ref name="UnreservedFunctionQName"/>
+      <g:ref name="URIQualifiedName"/>
+    </g:choice>
+  </g:production>
+  <g:production name="ArgumentList">
+    <g:string>(</g:string>
+    <g:optional>
+      <g:choice>
+        <g:sequence>
+          <g:ref name="PositionalArguments"/>
+          <g:optional>
+            <g:string>,</g:string>
+            <g:ref name="KeywordArguments"/>
+          </g:optional>
+        </g:sequence>
+        <g:ref name="KeywordArguments"/>
+      </g:choice>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="PositionalArguments">
+    <g:choice>
+      <g:ref name="Argument"/>
+      <g:sequence>
+        <g:ref name="PositionalArguments"/>
+        <g:string>,</g:string>
+        <g:ref name="Argument"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="Argument">
+    <g:choice>
+      <g:ref name="ExprSingle"/>
+      <g:ref name="ArgumentPlaceholder"/>
+    </g:choice>
+  </g:production>
+  <g:production name="ArgumentPlaceholder">
+    <g:string>?</g:string>
+  </g:production>
+  <g:production name="KeywordArguments">
+    <g:ref name="KeywordArgument"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="KeywordArgument"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="KeywordArgument">
+    <g:ref name="EQName"/>
+    <g:string>:=</g:string>
+    <g:ref name="Argument"/>
+  </g:production>
+  <g:production name="OrderedExpr">
+    <g:string>ordered</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="UnorderedExpr">
+    <g:string>unordered</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="NodeConstructor">
+    <g:choice>
+      <g:ref name="DirectConstructor"/>
+      <g:ref name="ComputedConstructor"/>
+    </g:choice>
+  </g:production>
+  <g:production name="DirectConstructor">
+    <g:choice>
+      <g:ref name="DirElemConstructor"/>
+      <g:ref name="DirCommentConstructor"/>
+      <g:ref name="DirPIConstructor"/>
+    </g:choice>
+  </g:production>
+  <g:production name="DirElemConstructor" whitespace-spec="explicit">
+    <g:string context="DirElemConstructor">&lt;</g:string>
+    <g:ref name="QName"/>
+    <g:ref name="DirAttributeList"/>
+    <g:choice>
+      <g:string>/&gt;</g:string>
+      <g:sequence>
+        <g:string>&gt;</g:string>
+        <g:zeroOrMore>
+          <g:ref name="DirElemContent"/>
+        </g:zeroOrMore>
+        <g:string>&lt;/</g:string>
+        <g:ref name="QName"/>
+        <g:optional>
+          <g:ref name="S"/>
+        </g:optional>
+        <g:string>&gt;</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="DirAttributeList" whitespace-spec="explicit">
+    <g:zeroOrMore>
+      <g:ref name="S"/>
+      <g:optional>
+        <g:ref name="QName"/>
+        <g:optional>
+          <g:ref name="S"/>
+        </g:optional>
+        <g:string>=</g:string>
+        <g:optional>
+          <g:ref name="S"/>
+        </g:optional>
+        <g:ref name="DirAttributeValue"/>
+      </g:optional>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="DirAttributeValue" whitespace-spec="explicit">
+    <g:choice>
+      <g:sequence>
+        <g:string>&quot;</g:string>
+        <g:zeroOrMore>
+          <g:choice>
+            <g:ref name="EscapeQuot"/>
+            <g:ref name="QuotAttrValueContent"/>
+          </g:choice>
+        </g:zeroOrMore>
+        <g:string>&quot;</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>'</g:string>
+        <g:zeroOrMore>
+          <g:choice>
+            <g:ref name="EscapeApos"/>
+            <g:ref name="AposAttrValueContent"/>
+          </g:choice>
+        </g:zeroOrMore>
+        <g:string>'</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="QuotAttrValueContent">
+    <g:choice>
+      <g:ref name="QuotAttrContentChar"/>
+      <g:ref name="CommonContent"/>
+    </g:choice>
+  </g:production>
+  <g:production name="CommonContent">
+    <g:choice>
+      <g:ref name="PredefinedEntityRef"/>
+      <g:ref name="CharRef"/>
+      <g:string>{{</g:string>
+      <g:string>}}</g:string>
+      <g:ref name="EnclosedExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AposAttrValueContent">
+    <g:choice>
+      <g:ref name="AposAttrContentChar"/>
+      <g:ref name="CommonContent"/>
+    </g:choice>
+  </g:production>
+  <g:production name="DirElemContent">
+    <g:choice>
+      <g:ref name="DirectConstructor"/>
+      <g:ref name="CDataSection"/>
+      <g:ref name="CommonContent"/>
+      <g:ref name="ElementContentChar"/>
+    </g:choice>
+  </g:production>
+  <g:production name="CDataSection" whitespace-spec="explicit">
+    <g:string>&lt;![CDATA[</g:string>
+    <g:ref name="CDataSectionContents"/>
+    <g:string>]]&gt;</g:string>
+  </g:production>
+  <g:production name="DirCommentConstructor" whitespace-spec="explicit">
+    <g:string>&lt;!--</g:string>
+    <g:ref name="DirCommentContents"/>
+    <g:string>--&gt;</g:string>
+  </g:production>
+  <g:production name="DirPIConstructor" whitespace-spec="explicit">
+    <g:string>&lt;?</g:string>
+    <g:ref name="PITarget"/>
+    <g:optional>
+      <g:ref name="S"/>
+      <g:ref name="DirPIContents"/>
+    </g:optional>
+    <g:string>?&gt;</g:string>
+  </g:production>
+  <g:production name="ComputedConstructor">
+    <g:choice>
+      <g:ref name="CompDocConstructor"/>
+      <g:ref name="CompElemConstructor"/>
+      <g:ref name="CompAttrConstructor"/>
+      <g:ref name="CompNamespaceConstructor"/>
+      <g:ref name="CompTextConstructor"/>
+      <g:ref name="CompCommentConstructor"/>
+      <g:ref name="CompPIConstructor"/>
+    </g:choice>
+  </g:production>
+  <g:production name="CompDocConstructor">
+    <g:string>document</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompElemConstructor">
+    <g:string>element</g:string>
+    <g:ref name="CompNodeName"/>
+    <g:ref name="EnclosedContentExpr"/>
+  </g:production>
+  <g:production name="CompNodeName">
+    <g:choice>
+      <g:ref name="QNameLiteral"/>
+      <g:ref name="EQName"/>
+      <g:sequence>
+        <g:string>{</g:string>
+        <g:ref name="Expr"/>
+        <g:string>}</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="EnclosedContentExpr">
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompAttrConstructor">
+    <g:string>attribute</g:string>
+    <g:ref name="CompNodeName"/>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompNamespaceConstructor">
+    <g:string>namespace</g:string>
+    <g:ref name="CompNodeNCName"/>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompNodeNCName">
+    <g:choice>
+      <g:ref name="MarkedNCName"/>
+      <g:ref name="NCName"/>
+      <g:sequence>
+        <g:string>{</g:string>
+        <g:ref name="Expr"/>
+        <g:string>}</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="MarkedNCName">
+    <g:string>#</g:string>
+    <g:ref name="NCName"/>
+  </g:production>
+  <g:production name="CompTextConstructor">
+    <g:string>text</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompCommentConstructor">
+    <g:string>comment</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="CompPIConstructor">
+    <g:string>processing-instruction</g:string>
+    <g:ref name="CompNodeNCName"/>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="FunctionItemExpr">
+    <g:choice>
+      <g:ref name="NamedFunctionRef"/>
+      <g:ref name="InlineFunctionExpr"/>
+    </g:choice>
+  </g:production>
+  <g:production name="NamedFunctionRef">
+    <g:ref name="UnreservedFunctionEQName"/>
+    <g:string>#</g:string>
+    <g:ref name="IntegerLiteral"/>
+  </g:production>
+  <g:production name="InlineFunctionExpr">
+    <g:zeroOrMore>
+      <g:ref name="Annotation"/>
+    </g:zeroOrMore>
+    <g:choice>
+      <g:string>function</g:string>
+      <g:string>fn</g:string>
+    </g:choice>
+    <g:optional>
+      <g:ref name="FunctionSignature"/>
+    </g:optional>
+    <g:ref name="FunctionBody"/>
+  </g:production>
+  <g:production name="FunctionSignature">
+    <g:string>(</g:string>
+    <g:ref name="ParamList"/>
+    <g:string>)</g:string>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+  </g:production>
+  <g:production name="ParamList">
+    <g:optional>
+      <g:ref name="VarNameAndType"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="VarNameAndType"/>
+      </g:zeroOrMore>
+    </g:optional>
+  </g:production>
+  <g:production name="FunctionBody">
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="MapConstructor">
+    <g:optional>
+      <g:string>map</g:string>
+    </g:optional>
+    <g:string>{</g:string>
+    <g:optional>
+      <g:ref name="MapConstructorEntry"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="MapConstructorEntry"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="MapConstructorEntry">
+    <g:ref name="ExprSingle"/>
+    <g:optional>
+      <g:string>:</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+  </g:production>
+  <g:production name="ArrayConstructor">
+    <g:choice>
+      <g:ref name="SquareArrayConstructor"/>
+      <g:ref name="CurlyArrayConstructor"/>
+    </g:choice>
+  </g:production>
+  <g:production name="SquareArrayConstructor">
+    <g:string>[</g:string>
+    <g:optional>
+      <g:ref name="ExprSingle"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>]</g:string>
+  </g:production>
+  <g:production name="CurlyArrayConstructor">
+    <g:string>array</g:string>
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="StringTemplate" whitespace-spec="explicit">
+    <g:string>`</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="StringTemplateFixedPart"/>
+        <g:ref name="StringTemplateVariablePart"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>`</g:string>
+  </g:production>
+  <g:production name="StringTemplateVariablePart">
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="StringConstructor" whitespace-spec="explicit">
+    <g:string>``[</g:string>
+    <g:ref name="StringConstructorContent"/>
+    <g:string>]``</g:string>
+  </g:production>
+  <g:production name="StringConstructorContent" whitespace-spec="explicit">
+    <g:ref name="StringConstructorChars"/>
+    <g:zeroOrMore>
+      <g:ref name="StringInterpolation"/>
+      <g:ref name="StringConstructorChars"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="StringInterpolation" whitespace-spec="explicit">
+    <g:string>`</g:string>
+    <g:ref name="EnclosedExpr"/>
+    <g:string>`</g:string>
+  </g:production>
+  <g:production name="UnaryLookup">
+    <g:ref name="Lookup"/>
+  </g:production>
+  <g:production name="Lookup">
+    <g:string>?</g:string>
+    <g:ref name="KeySpecifier"/>
+  </g:production>
+  <g:production name="KeySpecifier">
+    <g:choice>
+      <g:ref name="NCName"/>
+      <g:ref name="Literal"/>
+      <g:ref name="ContextValueRef"/>
+      <g:ref name="VarRef"/>
+      <g:ref name="ParenthesizedExpr"/>
+      <g:ref name="LookupWildcard"/>
+    </g:choice>
+  </g:production>
+  <g:production name="LookupWildcard">
+    <g:string>*</g:string>
+  </g:production>
+  <g:production name="FilterExpr">
+    <g:ref name="PostfixExpr"/>
+    <g:ref name="Predicate"/>
+  </g:production>
+  <g:production name="Predicate">
+    <g:string>[</g:string>
+    <g:ref name="Expr"/>
+    <g:string>]</g:string>
+  </g:production>
+  <g:production name="DynamicFunctionCall">
+    <g:ref name="PostfixExpr"/>
+    <g:ref name="PositionalArgumentList"/>
+  </g:production>
+  <g:production name="PositionalArgumentList">
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="PositionalArguments"/>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="LookupExpr">
+    <g:ref name="PostfixExpr"/>
+    <g:ref name="Lookup"/>
+  </g:production>
+  <g:production name="MethodCall">
+    <g:ref name="PostfixExpr"/>
+    <g:string>=?&gt;</g:string>
+    <g:ref name="NCName"/>
+    <g:ref name="PositionalArgumentList"/>
+  </g:production>
+  <g:production name="AxisStep">
+    <g:choice>
+      <g:ref name="AbbreviatedStep"/>
+      <g:ref name="FullStep"/>
+    </g:choice>
+    <g:zeroOrMore>
+      <g:ref name="Predicate"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="AbbreviatedStep">
+    <g:choice>
+      <g:string>..</g:string>
+      <g:sequence>
+        <g:string>@</g:string>
+        <g:ref name="NodeTest"/>
+      </g:sequence>
+      <g:ref name="SimpleNodeTest"/>
+    </g:choice>
+  </g:production>
+  <g:production name="NodeTest">
+    <g:choice>
+      <g:ref name="UnionNodeTest"/>
+      <g:ref name="SimpleNodeTest"/>
+      <g:ref name="DynamicNodeTest"/>
+    </g:choice>
+  </g:production>
+  <g:production name="UnionNodeTest">
+    <g:string>(</g:string>
+    <g:ref name="SimpleNodeTest"/>
+    <g:zeroOrMore>
+      <g:string>|</g:string>
+      <g:ref name="SimpleNodeTest"/>
+    </g:zeroOrMore>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="SimpleNodeTest">
+    <g:choice>
+      <g:ref name="TypeTest"/>
+      <g:ref name="Selector"/>
+    </g:choice>
+  </g:production>
+  <g:production name="TypeTest">
+    <g:choice>
+      <g:ref name="GNodeType"/>
+      <g:ref name="XNodeType"/>
+      <g:ref name="JNodeType"/>
+    </g:choice>
+  </g:production>
+  <g:production name="Selector">
+    <g:choice>
+      <g:ref name="EQName"/>
+      <g:ref name="Wildcard"/>
+    </g:choice>
+  </g:production>
+  <g:production name="DynamicNodeTest">
+    <g:ref name="EnclosedExpr"/>
+  </g:production>
+  <g:production name="FullStep">
+    <g:ref name="Axis"/>
+    <g:ref name="NodeTest"/>
+  </g:production>
+  <g:production name="Axis">
+    <g:choice>
+      <g:string>ancestor</g:string>
+      <g:string>ancestor-or-self</g:string>
+      <g:string>attribute</g:string>
+      <g:string>child</g:string>
+      <g:string>descendant</g:string>
+      <g:string>descendant-or-self</g:string>
+      <g:string>following</g:string>
+      <g:string>following-or-self</g:string>
+      <g:string>following-sibling</g:string>
+      <g:string>following-sibling-or-self</g:string>
+      <g:string>item</g:string>
+      <g:string>namespace</g:string>
+      <g:string>parent</g:string>
+      <g:string>preceding</g:string>
+      <g:string>preceding-or-self</g:string>
+      <g:string>preceding-sibling</g:string>
+      <g:string>preceding-sibling-or-self</g:string>
+      <g:string>self</g:string>
+    </g:choice>
+    <g:string>::</g:string>
+  </g:production>
+  <g:production name="SequenceArrowTarget">
+    <g:string>=&gt;</g:string>
+    <g:ref name="ArrowTarget"/>
+  </g:production>
+  <g:production name="ArrowTarget">
+    <g:choice>
+      <g:ref name="FunctionCall"/>
+      <g:ref name="RestrictedDynamicCall"/>
+    </g:choice>
+  </g:production>
+  <g:production name="RestrictedDynamicCall">
+    <g:choice>
+      <g:ref name="VarRef"/>
+      <g:ref name="ParenthesizedExpr"/>
+      <g:ref name="FunctionItemExpr"/>
+      <g:ref name="MapConstructor"/>
+      <g:ref name="ArrayConstructor"/>
+    </g:choice>
+    <g:ref name="PositionalArgumentList"/>
+  </g:production>
+  <g:production name="MappingArrowTarget">
+    <g:string>=!&gt;</g:string>
+    <g:ref name="ArrowTarget"/>
+  </g:production>
+  <g:production name="CastTarget">
+    <g:choice>
+      <g:ref name="TypeName"/>
+      <g:ref name="ChoiceItemType"/>
+      <g:ref name="EnumerationType"/>
+      <g:ref name="ArrayType"/>
+      <g:ref name="MapType"/>
+      <g:ref name="RecordType"/>
+    </g:choice>
+    <g:optional>
+      <g:string>?</g:string>
+    </g:optional>
+  </g:production>
+  <g:production name="FTSelection">
+    <g:ref name="FTOr"/>
+    <g:zeroOrMore>
+      <g:ref name="FTPosFilter"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="FTOr">
+    <g:ref name="FTAnd"/>
+    <g:zeroOrMore>
+      <g:string>ftor</g:string>
+      <g:ref name="FTAnd"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="FTAnd">
+    <g:ref name="FTMildNot"/>
+    <g:zeroOrMore>
+      <g:string>ftand</g:string>
+      <g:ref name="FTMildNot"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="FTMildNot">
+    <g:ref name="FTUnaryNot"/>
+    <g:zeroOrMore>
+      <g:string>not</g:string>
+      <g:string>in</g:string>
+      <g:ref name="FTUnaryNot"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="FTUnaryNot">
+    <g:optional>
+      <g:string>ftnot</g:string>
+    </g:optional>
+    <g:ref name="FTPrimaryWithOptions"/>
+  </g:production>
+  <g:production name="FTPrimaryWithOptions">
+    <g:ref name="FTPrimary"/>
+    <g:optional>
+      <g:ref name="FTMatchOptions"/>
+    </g:optional>
+    <g:optional>
+      <g:ref name="FTWeight"/>
+    </g:optional>
+  </g:production>
+  <g:production name="FTPrimary">
+    <g:choice>
+      <g:sequence>
+        <g:ref name="FTWords"/>
+        <g:optional>
+          <g:ref name="FTTimes"/>
+        </g:optional>
+      </g:sequence>
+      <g:sequence>
+        <g:string>(</g:string>
+        <g:ref name="FTSelection"/>
+        <g:string>)</g:string>
+      </g:sequence>
+      <g:ref name="FTExtensionSelection"/>
+    </g:choice>
+  </g:production>
+  <g:production name="FTWords">
+    <g:ref name="FTWordsValue"/>
+    <g:optional>
+      <g:ref name="FTAnyallOption"/>
+    </g:optional>
+  </g:production>
+  <g:production name="FTWordsValue">
+    <g:choice>
+      <g:ref name="StringLiteral"/>
+      <g:sequence>
+        <g:string>{</g:string>
+        <g:ref name="Expr"/>
+        <g:string>}</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTAnyallOption">
+    <g:choice>
+      <g:sequence>
+        <g:string>any</g:string>
+        <g:optional>
+          <g:string>word</g:string>
+        </g:optional>
+      </g:sequence>
+      <g:sequence>
+        <g:string>all</g:string>
+        <g:optional>
+          <g:string>words</g:string>
+        </g:optional>
+      </g:sequence>
+      <g:string>phrase</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="FTTimes">
+    <g:string>occurs</g:string>
+    <g:ref name="FTRange"/>
+    <g:string>times</g:string>
+  </g:production>
+  <g:production name="FTRange">
+    <g:choice>
+      <g:sequence>
+        <g:string>exactly</g:string>
+        <g:ref name="AdditiveExpr"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>least</g:string>
+        <g:ref name="AdditiveExpr"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>most</g:string>
+        <g:ref name="AdditiveExpr"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>from</g:string>
+        <g:ref name="AdditiveExpr"/>
+        <g:string>to</g:string>
+        <g:ref name="AdditiveExpr"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTExtensionSelection">
+    <g:oneOrMore>
+      <g:ref name="Pragma"/>
+    </g:oneOrMore>
+    <g:string>{</g:string>
+    <g:optional>
+      <g:ref name="FTSelection"/>
+    </g:optional>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="FTWeight">
+    <g:string>weight</g:string>
+    <g:string>{</g:string>
+    <g:ref name="Expr"/>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="FTPosFilter">
+    <g:choice>
+      <g:ref name="FTOrder"/>
+      <g:ref name="FTWindow"/>
+      <g:ref name="FTDistance"/>
+      <g:ref name="FTScope"/>
+      <g:ref name="FTContent"/>
+    </g:choice>
+  </g:production>
+  <g:production name="FTOrder">
+    <g:string>ordered</g:string>
+  </g:production>
+  <g:production name="FTWindow">
+    <g:string>window</g:string>
+    <g:ref name="AdditiveExpr"/>
+    <g:ref name="FTUnit"/>
+  </g:production>
+  <g:production name="FTUnit">
+    <g:choice>
+      <g:string>words</g:string>
+      <g:string>sentences</g:string>
+      <g:string>paragraphs</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="FTDistance">
+    <g:string>distance</g:string>
+    <g:ref name="FTRange"/>
+    <g:ref name="FTUnit"/>
+  </g:production>
+  <g:production name="FTScope">
+    <g:choice>
+      <g:string>same</g:string>
+      <g:string>different</g:string>
+    </g:choice>
+    <g:ref name="FTBigUnit"/>
+  </g:production>
+  <g:production name="FTBigUnit">
+    <g:choice>
+      <g:string>sentence</g:string>
+      <g:string>paragraph</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="FTContent">
+    <g:choice>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>start</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>at</g:string>
+        <g:string>end</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>entire</g:string>
+        <g:string>content</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FTIgnoreOption">
+    <g:string>without</g:string>
+    <g:string>content</g:string>
+    <g:ref name="UnionExpr"/>
+  </g:production>
+  <g:production name="ValueComp">
+    <g:choice>
+      <g:string>eq</g:string>
+      <g:string>ne</g:string>
+      <g:string>lt</g:string>
+      <g:string>le</g:string>
+      <g:string>gt</g:string>
+      <g:string>ge</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="GeneralComp">
+    <g:choice>
+      <g:string>=</g:string>
+      <g:string>!=</g:string>
+      <g:string context="GeneralComp">&lt;</g:string>
+      <g:string>&lt;=</g:string>
+      <g:string>&gt;</g:string>
+      <g:string>&gt;=</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="NodeComp">
+    <g:choice>
+      <g:string>is</g:string>
+      <g:string>is-not</g:string>
+      <g:ref name="NodePrecedes"/>
+      <g:ref name="NodeFollows"/>
+      <g:string>precedes-or-is</g:string>
+      <g:string>follows-or-is</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="NodePrecedes">
+    <g:choice>
+      <g:string>&lt;&lt;</g:string>
+      <g:string>precedes</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="NodeFollows">
+    <g:choice>
+      <g:string>&gt;&gt;</g:string>
+      <g:string>follows</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="InsertExpr">
+    <g:string>insert</g:string>
+    <g:choice>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+    </g:choice>
+    <g:ref name="SourceExpr"/>
+    <g:ref name="InsertExprTargetChoice"/>
+    <g:ref name="TargetExpr"/>
+  </g:production>
+  <g:production name="SourceExpr">
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="InsertExprTargetChoice">
+    <g:choice>
+      <g:sequence>
+        <g:optional>
+          <g:string>as</g:string>
+          <g:choice>
+            <g:string>first</g:string>
+            <g:string>last</g:string>
+          </g:choice>
+        </g:optional>
+        <g:string>into</g:string>
+      </g:sequence>
+      <g:string>after</g:string>
+      <g:string>before</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="TargetExpr">
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="DeleteExpr">
+    <g:string>delete</g:string>
+    <g:choice>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+    </g:choice>
+    <g:ref name="TargetExpr"/>
+  </g:production>
+  <g:production name="RenameExpr">
+    <g:string>rename</g:string>
+    <g:choice>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+    </g:choice>
+    <g:ref name="TargetExpr"/>
+    <g:string>as</g:string>
+    <g:ref name="NewNameExpr"/>
+  </g:production>
+  <g:production name="NewNameExpr">
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="ReplaceExpr">
+    <g:string>replace</g:string>
+    <g:optional>
+      <g:string>value</g:string>
+      <g:string>of</g:string>
+    </g:optional>
+    <g:choice>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+    </g:choice>
+    <g:ref name="TargetExpr"/>
+    <g:string>with</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="UpdatingFunctionCall">
+    <g:optional>
+      <g:string>invoke</g:string>
+    </g:optional>
+    <g:string>updating</g:string>
+    <g:ref name="PrimaryExpr"/>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="ExprSingle"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>)</g:string>
+  </g:production>
+  <g:production name="CopyModifyExpr">
+    <g:string>copy</g:string>
+    <g:ref name="VarName"/>
+    <g:string>:=</g:string>
+    <g:ref name="ExprSingle"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="VarName"/>
+      <g:string>:=</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:zeroOrMore>
+    <g:string>modify</g:string>
+    <g:ref name="ExprSingle"/>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="VarDefaultValue">
+    <g:ref name="ExprSingle"/>
+  </g:production>
+  <g:production name="VarDecl">
+    <g:string>declare</g:string>
+    <g:zeroOrMore>
+      <g:ref name="Annotation"/>
+    </g:zeroOrMore>
+    <g:string>variable</g:string>
+    <g:ref name="VarNameAndType"/>
+    <g:choice>
+      <g:sequence>
+        <g:string>:=</g:string>
+        <g:ref name="VarValue"/>
+      </g:sequence>
+      <g:sequence>
+        <g:string>external</g:string>
+        <g:optional>
+          <g:string>:=</g:string>
+          <g:ref name="VarDefaultValue"/>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FunctionDecl">
+    <g:string>declare</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="Annotation"/>
+        <g:ref name="CompatibilityAnnotation"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>function</g:string>
+    <g:ref name="UnreservedFunctionEQName"/>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="ParamListWithDefaults"/>
+    </g:optional>
+    <g:string>)</g:string>
+    <g:optional>
+      <g:ref name="TypeDeclaration"/>
+    </g:optional>
+    <g:choice>
+      <g:ref name="FunctionBody"/>
+      <g:string>external</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="CompatibilityAnnotation">
+    <g:string>updating</g:string>
+  </g:production>
+  <g:production name="ParamListWithDefaults">
+    <g:ref name="ParamWithDefault"/>
+    <g:zeroOrMore>
+      <g:string>,</g:string>
+      <g:ref name="ParamWithDefault"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="ParamWithDefault">
+    <g:ref name="VarNameAndType"/>
+    <g:optional>
+      <g:string>:=</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+  </g:production>
+  <g:production name="ItemTypeDecl">
+    <g:string>declare</g:string>
+    <g:zeroOrMore>
+      <g:ref name="Annotation"/>
+    </g:zeroOrMore>
+    <g:string>type</g:string>
+    <g:ref name="EQName"/>
+    <g:string>as</g:string>
+    <g:ref name="ItemType"/>
+  </g:production>
+  <g:production name="LabeledRecordTypeDecl">
+    <g:string>declare</g:string>
+    <g:zeroOrMore>
+      <g:ref name="Annotation"/>
+    </g:zeroOrMore>
+    <g:string>record</g:string>
+    <g:ref name="EQName"/>
+    <g:optional>
+      <g:string>extends</g:string>
+      <g:ref name="EQName"/>
+    </g:optional>
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="LabeledFieldDecl"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="LabeledFieldDecl"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>)</g:string>
+    <g:optional>
+      <g:string>where</g:string>
+      <g:ref name="ExprSingle"/>
+    </g:optional>
+  </g:production>
+  <g:production name="LabeledFieldDecl">
+    <g:choice>
+      <g:sequence>
+        <g:ref name="FieldNameAndType"/>
+        <g:optional>
+          <g:string>:=</g:string>
+          <g:ref name="ExprSingle"/>
+        </g:optional>
+      </g:sequence>
+      <g:sequence>
+        <g:string>%fixed</g:string>
+        <g:ref name="FieldNameAndType"/>
+        <g:string>:=</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="FieldNameAndType">
+    <g:ref name="NCName"/>
+    <g:optional>
+      <g:string>as</g:string>
+      <g:ref name="SequenceType"/>
+    </g:optional>
+  </g:production>
+  <g:production name="OptionDecl">
+    <g:string>declare</g:string>
+    <g:string>option</g:string>
+    <g:ref name="EQName"/>
+    <g:ref name="StringLiteral"/>
+  </g:production>
+  <g:production name="MainModule">
+    <g:ref name="Prolog"/>
+    <g:ref name="QueryBody"/>
+  </g:production>
+  <g:production name="QueryBody">
+    <g:ref name="Expr"/>
+  </g:production>
+  <g:production name="Whitespace" whitespace-spec="definition">
+    <g:choice>
+      <g:ref name="S" context="WS"/>
+      <g:ref name="Comment"/>
+    </g:choice>
+  </g:production>
+  <g:production name="Comment" whitespace-spec="explicit">
+    <g:string>(:</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="CommentContents"/>
+        <g:ref name="Comment"/>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>:)</g:string>
+  </g:production>
+  <g:production name="SequenceTypeEOF">
+    <g:ref name="SequenceType"/>
+    <g:ref name="EOF"/>
+  </g:production>
+  <?TOKENS?>
+  <g:production name="EOF">
+    <g:endOfFile/>
+  </g:production>
+  <g:production name="StringLiteral" whitespace-spec="explicit">
+    <g:choice>
+      <g:ref name="AposStringLiteral"/>
+      <g:ref name="QuotStringLiteral"/>
+    </g:choice>
+  </g:production>
+  <g:production name="AposStringLiteral" whitespace-spec="explicit">
+    <g:string>'</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="PredefinedEntityRef"/>
+        <g:ref name="CharRef"/>
+        <g:ref name="EscapeApos"/>
+        <g:complement>
+          <g:charClass>
+            <g:char>'</g:char>
+            <g:char>&amp;</g:char>
+          </g:charClass>
+        </g:complement>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>'</g:string>
+  </g:production>
+  <g:production name="PredefinedEntityRef" whitespace-spec="explicit">
+    <g:string>&amp;</g:string>
+    <g:choice>
+      <g:string>lt</g:string>
+      <g:string>gt</g:string>
+      <g:string>amp</g:string>
+      <g:string>quot</g:string>
+      <g:string>apos</g:string>
+    </g:choice>
+    <g:string>;</g:string>
+  </g:production>
+  <g:production name="CharRef">
+    <g:choice>
+      <g:sequence>
+        <g:string>&amp;#</g:string>
+        <g:oneOrMore>
+          <g:charClass>
+            <g:charRange minChar="0" maxChar="9"/>
+          </g:charClass>
+        </g:oneOrMore>
+        <g:string>;</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>&amp;#x</g:string>
+        <g:oneOrMore>
+          <g:charClass>
+            <g:charRange minChar="0" maxChar="9"/>
+            <g:charRange minChar="a" maxChar="f"/>
+            <g:charRange minChar="A" maxChar="F"/>
+          </g:charClass>
+        </g:oneOrMore>
+        <g:string>;</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="EscapeApos" whitespace-spec="explicit">
+    <g:string>''</g:string>
+  </g:production>
+  <g:production name="QuotStringLiteral" whitespace-spec="explicit">
+    <g:string>&quot;</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="PredefinedEntityRef"/>
+        <g:ref name="CharRef"/>
+        <g:ref name="EscapeQuot"/>
+        <g:complement>
+          <g:charClass>
+            <g:char>&quot;</g:char>
+            <g:char>&amp;</g:char>
+          </g:charClass>
+        </g:complement>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>&quot;</g:string>
+  </g:production>
+  <g:production name="EscapeQuot" whitespace-spec="explicit">
+    <g:string>&quot;&quot;</g:string>
+  </g:production>
+  <g:production name="UnreservedNCName">
+    <g:subtract>
+      <g:ref name="NCName"/>
+      <g:ref name="Keyword"/>
+    </g:subtract>
+  </g:production>
+  <g:production name="NCName">
+    <g:subtract>
+      <g:ref name="Name"/>
+      <g:sequence>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+        <g:string>:</g:string>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+      </g:sequence>
+    </g:subtract>
+  </g:production>
+  <g:production name="Name">
+    <g:ref name="NameStartChar"/>
+    <g:zeroOrMore>
+      <g:ref name="NameChar"/>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="NameStartChar">
+    <g:choice>
+      <g:string>:</g:string>
+      <g:charClass>
+        <g:charRange minChar="A" maxChar="Z"/>
+      </g:charClass>
+      <g:string>_</g:string>
+      <g:charClass>
+        <g:charRange minChar="a" maxChar="z"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="C0" maxValue="D6"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="D8" maxValue="F6"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="F8" maxValue="2FF"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="370" maxValue="37D"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="37F" maxValue="1FFF"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="200C" maxValue="200D"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="2070" maxValue="218F"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="2C00" maxValue="2FEF"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="3001" maxValue="D7FF"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="F900" maxValue="FDCF"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="FDF0" maxValue="FFFD"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="10000" maxValue="EFFFF"/>
+      </g:charClass>
+    </g:choice>
+  </g:production>
+  <g:production name="NameChar">
+    <g:choice>
+      <g:ref name="NameStartChar"/>
+      <g:string>-</g:string>
+      <g:string>.</g:string>
+      <g:charClass>
+        <g:charRange minChar="0" maxChar="9"/>
+      </g:charClass>
+      <g:charCode value="B7"/>
+      <g:charClass>
+        <g:charCodeRange minValue="300" maxValue="36F"/>
+      </g:charClass>
+      <g:charClass>
+        <g:charCodeRange minValue="203F" maxValue="2040"/>
+      </g:charClass>
+    </g:choice>
+  </g:production>
+  <g:production name="Char">
+    <g:charClass>
+      <g:charCode value="9"/>
+      <g:charCode value="A"/>
+      <g:charCode value="D"/>
+      <g:charCodeRange minValue="20" maxValue="D7FF"/>
+      <g:charCodeRange minValue="E000" maxValue="FFFD"/>
+      <g:charCodeRange minValue="10000" maxValue="10FFFF"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Keyword">
+    <g:choice>
+      <g:string>NaN</g:string>
+      <g:string>after</g:string>
+      <g:string>all</g:string>
+      <g:string>allowing</g:string>
+      <g:string>ancestor</g:string>
+      <g:string>ancestor-or-self</g:string>
+      <g:string>and</g:string>
+      <g:string>any</g:string>
+      <g:string>array</g:string>
+      <g:string>as</g:string>
+      <g:string>ascending</g:string>
+      <g:string>at</g:string>
+      <g:string>attribute</g:string>
+      <g:string>base-uri</g:string>
+      <g:string>before</g:string>
+      <g:string>boundary-space</g:string>
+      <g:string>but</g:string>
+      <g:string>by</g:string>
+      <g:string>case</g:string>
+      <g:string>cast</g:string>
+      <g:string>castable</g:string>
+      <g:string>catch</g:string>
+      <g:string>child</g:string>
+      <g:string>coerce</g:string>
+      <g:string>collation</g:string>
+      <g:string>comment</g:string>
+      <g:string>construction</g:string>
+      <g:string>contains</g:string>
+      <g:string>content</g:string>
+      <g:string>context</g:string>
+      <g:string>copy</g:string>
+      <g:string>copy-namespaces</g:string>
+      <g:string>count</g:string>
+      <g:string>decimal-format</g:string>
+      <g:string>decimal-separator</g:string>
+      <g:string>declare</g:string>
+      <g:string>default</g:string>
+      <g:string>delete</g:string>
+      <g:string>descendant</g:string>
+      <g:string>descendant-or-self</g:string>
+      <g:string>descending</g:string>
+      <g:string>diacritics</g:string>
+      <g:string>different</g:string>
+      <g:string>digit</g:string>
+      <g:string>distance</g:string>
+      <g:string>div</g:string>
+      <g:string>document</g:string>
+      <g:string>document-node</g:string>
+      <g:string>element</g:string>
+      <g:string>else</g:string>
+      <g:string>empty</g:string>
+      <g:string>empty-sequence</g:string>
+      <g:string>encoding</g:string>
+      <g:string>end</g:string>
+      <g:string>entire</g:string>
+      <g:string>enum</g:string>
+      <g:string>eq</g:string>
+      <g:string>errors</g:string>
+      <g:string>every</g:string>
+      <g:string>exactly</g:string>
+      <g:string>except</g:string>
+      <g:string>exponent-separator</g:string>
+      <g:string>extends</g:string>
+      <g:string>external</g:string>
+      <g:string>false</g:string>
+      <g:string>finally</g:string>
+      <g:string>first</g:string>
+      <g:string>fixed</g:string>
+      <g:string>fn</g:string>
+      <g:string>following</g:string>
+      <g:string>following-or-self</g:string>
+      <g:string>following-sibling</g:string>
+      <g:string>following-sibling-or-self</g:string>
+      <g:string>follows</g:string>
+      <g:string>follows-or-is</g:string>
+      <g:string>for</g:string>
+      <g:string>from</g:string>
+      <g:string>ft-option</g:string>
+      <g:string>ftand</g:string>
+      <g:string>ftnot</g:string>
+      <g:string>ftor</g:string>
+      <g:string>function</g:string>
+      <g:string>fuzzy</g:string>
+      <g:string>ge</g:string>
+      <g:string>greatest</g:string>
+      <g:string>group</g:string>
+      <g:string>grouping-separator</g:string>
+      <g:string>gt</g:string>
+      <g:string>idiv</g:string>
+      <g:string>if</g:string>
+      <g:string>import</g:string>
+      <g:string>in</g:string>
+      <g:string>infinity</g:string>
+      <g:string>inherit</g:string>
+      <g:string>insensitive</g:string>
+      <g:string>insert</g:string>
+      <g:string>instance</g:string>
+      <g:string>intersect</g:string>
+      <g:string>into</g:string>
+      <g:string>invoke</g:string>
+      <g:string>is</g:string>
+      <g:string>is-not</g:string>
+      <g:string>item</g:string>
+      <g:string>jnode</g:string>
+      <g:string>key</g:string>
+      <g:string>language</g:string>
+      <g:string>last</g:string>
+      <g:string>lax</g:string>
+      <g:string>le</g:string>
+      <g:string>least</g:string>
+      <g:string>let</g:string>
+      <g:string>levels</g:string>
+      <g:string>lowercase</g:string>
+      <g:string>lt</g:string>
+      <g:string>map</g:string>
+      <g:string>member</g:string>
+      <g:string>minus-sign</g:string>
+      <g:string>mod</g:string>
+      <g:string>modify</g:string>
+      <g:string>module</g:string>
+      <g:string>most</g:string>
+      <g:string>namespace</g:string>
+      <g:string>namespace-node</g:string>
+      <g:string>ne</g:string>
+      <g:string>next</g:string>
+      <g:string>no</g:string>
+      <g:string>no-inherit</g:string>
+      <g:string>no-preserve</g:string>
+      <g:string>node</g:string>
+      <g:string>nodes</g:string>
+      <g:string>not</g:string>
+      <g:string>occurs</g:string>
+      <g:string>of</g:string>
+      <g:string>only</g:string>
+      <g:string>option</g:string>
+      <g:string>or</g:string>
+      <g:string>order</g:string>
+      <g:string>ordered</g:string>
+      <g:string>ordering</g:string>
+      <g:string>otherwise</g:string>
+      <g:string>paragraph</g:string>
+      <g:string>paragraphs</g:string>
+      <g:string>parent</g:string>
+      <g:string>pattern-separator</g:string>
+      <g:string>per-mille</g:string>
+      <g:string>percent</g:string>
+      <g:string>phrase</g:string>
+      <g:string>precedes</g:string>
+      <g:string>precedes-or-is</g:string>
+      <g:string>preceding</g:string>
+      <g:string>preceding-or-self</g:string>
+      <g:string>preceding-sibling</g:string>
+      <g:string>preceding-sibling-or-self</g:string>
+      <g:string>preserve</g:string>
+      <g:string>previous</g:string>
+      <g:string>processing-instruction</g:string>
+      <g:string>record</g:string>
+      <g:string>relationship</g:string>
+      <g:string>rename</g:string>
+      <g:string>replace</g:string>
+      <g:string>return</g:string>
+      <g:string>revalidation</g:string>
+      <g:string>same</g:string>
+      <g:string>satisfies</g:string>
+      <g:string>schema</g:string>
+      <g:string>schema-attribute</g:string>
+      <g:string>schema-element</g:string>
+      <g:string>score</g:string>
+      <g:string>self</g:string>
+      <g:string>sensitive</g:string>
+      <g:string>sentence</g:string>
+      <g:string>sentences</g:string>
+      <g:string>skip</g:string>
+      <g:string>sliding</g:string>
+      <g:string>some</g:string>
+      <g:string>stable</g:string>
+      <g:string>start</g:string>
+      <g:string>stemming</g:string>
+      <g:string>stop</g:string>
+      <g:string>strict</g:string>
+      <g:string>strip</g:string>
+      <g:string>switch</g:string>
+      <g:string>text</g:string>
+      <g:string>then</g:string>
+      <g:string>thesaurus</g:string>
+      <g:string>times</g:string>
+      <g:string>to</g:string>
+      <g:string>trace</g:string>
+      <g:string>transform</g:string>
+      <g:string>treat</g:string>
+      <g:string>true</g:string>
+      <g:string>try</g:string>
+      <g:string>tumbling</g:string>
+      <g:string>type</g:string>
+      <g:string>typeswitch</g:string>
+      <g:string>union</g:string>
+      <g:string>unordered</g:string>
+      <g:string>update</g:string>
+      <g:string>updating</g:string>
+      <g:string>uppercase</g:string>
+      <g:string>using</g:string>
+      <g:string>validate</g:string>
+      <g:string>value</g:string>
+      <g:string>variable</g:string>
+      <g:string>version</g:string>
+      <g:string>weight</g:string>
+      <g:string>when</g:string>
+      <g:string>where</g:string>
+      <g:string>while</g:string>
+      <g:string>wildcards</g:string>
+      <g:string>window</g:string>
+      <g:string>with</g:string>
+      <g:string>without</g:string>
+      <g:string>word</g:string>
+      <g:string>words</g:string>
+      <g:string>xnode</g:string>
+      <g:string>xquery</g:string>
+      <g:string>zero-digit</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="URIQualifiedName" whitespace-spec="explicit">
+    <g:ref name="BracedURILiteral"/>
+    <g:optional>
+      <g:ref name="NCName"/>
+      <g:string>:</g:string>
+    </g:optional>
+    <g:ref name="NCName"/>
+  </g:production>
+  <g:production name="BracedURILiteral" whitespace-spec="explicit">
+    <g:string>Q</g:string>
+    <g:string>{</g:string>
+    <g:zeroOrMore>
+      <g:choice>
+        <g:ref name="PredefinedEntityRef"/>
+        <g:ref name="CharRef"/>
+        <g:complement>
+          <g:charClass>
+            <g:char>&amp;</g:char>
+            <g:char>{</g:char>
+            <g:char>}</g:char>
+          </g:charClass>
+        </g:complement>
+      </g:choice>
+    </g:zeroOrMore>
+    <g:string>}</g:string>
+  </g:production>
+  <g:production name="NonKeywordQName">
+    <g:subtract>
+      <g:ref name="QName"/>
+      <g:ref name="Keyword"/>
+    </g:subtract>
+  </g:production>
+  <g:production name="QName">
+    <g:choice>
+      <g:ref name="PrefixedName"/>
+      <g:ref name="UnprefixedName"/>
+    </g:choice>
+  </g:production>
+  <g:production name="PrefixedName">
+    <g:ref name="Prefix"/>
+    <g:string>:</g:string>
+    <g:ref name="LocalPart"/>
+  </g:production>
+  <g:production name="Prefix">
+    <g:ref name="NCName"/>
+  </g:production>
+  <g:production name="LocalPart">
+    <g:ref name="NCName"/>
+  </g:production>
+  <g:production name="UnprefixedName">
+    <g:ref name="LocalPart"/>
+  </g:production>
+  <g:production name="IntegerLiteral" whitespace-spec="explicit">
+    <g:ref name="Digits"/>
+  </g:production>
+  <g:production name="Digits" whitespace-spec="explicit">
+    <g:ref name="DecDigit"/>
+    <g:optional>
+      <g:zeroOrMore>
+        <g:choice>
+          <g:ref name="DecDigit"/>
+          <g:string>_</g:string>
+        </g:choice>
+      </g:zeroOrMore>
+      <g:ref name="DecDigit"/>
+    </g:optional>
+  </g:production>
+  <g:production name="DecDigit" whitespace-spec="explicit">
+    <g:charClass>
+      <g:charRange minChar="0" maxChar="9"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="Wildcard" whitespace-spec="explicit">
+    <g:choice>
+      <g:string>*</g:string>
+      <g:sequence>
+        <g:ref name="NCName"/>
+        <g:string>:*</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:string>*:</g:string>
+        <g:ref name="NCName"/>
+      </g:sequence>
+      <g:sequence>
+        <g:ref name="BracedURILiteral"/>
+        <g:string>*</g:string>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="HexIntegerLiteral" whitespace-spec="explicit">
+    <g:string>0x</g:string>
+    <g:ref name="HexDigits"/>
+  </g:production>
+  <g:production name="HexDigits" whitespace-spec="explicit">
+    <g:ref name="HexDigit"/>
+    <g:optional>
+      <g:zeroOrMore>
+        <g:choice>
+          <g:ref name="HexDigit"/>
+          <g:string>_</g:string>
+        </g:choice>
+      </g:zeroOrMore>
+      <g:ref name="HexDigit"/>
+    </g:optional>
+  </g:production>
+  <g:production name="HexDigit" whitespace-spec="explicit">
+    <g:charClass>
+      <g:charRange minChar="0" maxChar="9"/>
+      <g:charRange minChar="a" maxChar="f"/>
+      <g:charRange minChar="A" maxChar="F"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="BinaryIntegerLiteral" whitespace-spec="explicit">
+    <g:string>0b</g:string>
+    <g:ref name="BinaryDigits"/>
+  </g:production>
+  <g:production name="BinaryDigits" whitespace-spec="explicit">
+    <g:ref name="BinaryDigit"/>
+    <g:optional>
+      <g:zeroOrMore>
+        <g:choice>
+          <g:ref name="BinaryDigit"/>
+          <g:string>_</g:string>
+        </g:choice>
+      </g:zeroOrMore>
+      <g:ref name="BinaryDigit"/>
+    </g:optional>
+  </g:production>
+  <g:production name="BinaryDigit" whitespace-spec="explicit">
+    <g:charClass>
+      <g:charRange minChar="0" maxChar="1"/>
+    </g:charClass>
+  </g:production>
+  <g:production name="DecimalLiteral" whitespace-spec="explicit">
+    <g:choice>
+      <g:sequence>
+        <g:string>.</g:string>
+        <g:ref name="Digits"/>
+      </g:sequence>
+      <g:sequence>
+        <g:ref name="Digits"/>
+        <g:string>.</g:string>
+        <g:optional>
+          <g:ref name="Digits"/>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="DoubleLiteral" whitespace-spec="explicit">
+    <g:choice>
+      <g:sequence>
+        <g:string>.</g:string>
+        <g:ref name="Digits"/>
+      </g:sequence>
+      <g:sequence>
+        <g:ref name="Digits"/>
+        <g:optional>
+          <g:string>.</g:string>
+          <g:optional>
+            <g:ref name="Digits"/>
+          </g:optional>
+        </g:optional>
+      </g:sequence>
+    </g:choice>
+    <g:charClass>
+      <g:char>e</g:char>
+      <g:char>E</g:char>
+    </g:charClass>
+    <g:optional>
+      <g:charClass>
+        <g:char>+</g:char>
+        <g:charCode value="2D"/>
+      </g:charClass>
+    </g:optional>
+    <g:ref name="Digits"/>
+  </g:production>
+  <g:production name="S">
+    <g:oneOrMore>
+      <g:charClass>
+        <g:charCode value="20"/>
+        <g:charCode value="9"/>
+        <g:charCode value="D"/>
+        <g:charCode value="A"/>
+      </g:charClass>
+    </g:oneOrMore>
+  </g:production>
+  <g:production name="PragmaContents">
+    <g:context>
+      <g:subtract>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+        <g:sequence>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+          <g:string>#)</g:string>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+        </g:sequence>
+      </g:subtract>
+      <g:string>#</g:string>
+    </g:context>
+  </g:production>
+  <g:production name="QuotAttrContentChar">
+    <g:subtract>
+      <g:ref name="Char"/>
+      <g:charClass>
+        <g:char>&quot;</g:char>
+        <g:char>{</g:char>
+        <g:char>}</g:char>
+        <g:char>&lt;</g:char>
+        <g:char>&amp;</g:char>
+      </g:charClass>
+    </g:subtract>
+  </g:production>
+  <g:production name="AposAttrContentChar">
+    <g:subtract>
+      <g:ref name="Char"/>
+      <g:charClass>
+        <g:char>'</g:char>
+        <g:char>{</g:char>
+        <g:char>}</g:char>
+        <g:char>&lt;</g:char>
+        <g:char>&amp;</g:char>
+      </g:charClass>
+    </g:subtract>
+  </g:production>
+  <g:production name="ElementContentChar">
+    <g:subtract>
+      <g:ref name="Char"/>
+      <g:charClass>
+        <g:char>{</g:char>
+        <g:char>}</g:char>
+        <g:char>&lt;</g:char>
+        <g:char>&amp;</g:char>
+      </g:charClass>
+    </g:subtract>
+  </g:production>
+  <g:production name="CDataSectionContents">
+    <g:context>
+      <g:subtract>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+        <g:sequence>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+          <g:string>]]&gt;</g:string>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+        </g:sequence>
+      </g:subtract>
+      <g:string>]]</g:string>
+    </g:context>
+  </g:production>
+  <g:production name="DirCommentContents" whitespace-spec="explicit">
+    <g:zeroOrMore>
+      <g:choice>
+        <g:subtract>
+          <g:ref name="Char"/>
+          <g:string>-</g:string>
+        </g:subtract>
+        <g:sequence>
+          <g:string>-</g:string>
+          <g:subtract>
+            <g:ref name="Char"/>
+            <g:string>-</g:string>
+          </g:subtract>
+        </g:sequence>
+      </g:choice>
+    </g:zeroOrMore>
+  </g:production>
+  <g:production name="PITarget">
+    <g:subtract>
+      <g:ref name="NCName"/>
+      <g:sequence>
+        <g:choice>
+          <g:string>X</g:string>
+          <g:string>x</g:string>
+        </g:choice>
+        <g:choice>
+          <g:string>M</g:string>
+          <g:string>m</g:string>
+        </g:choice>
+        <g:choice>
+          <g:string>L</g:string>
+          <g:string>l</g:string>
+        </g:choice>
+      </g:sequence>
+    </g:subtract>
+  </g:production>
+  <g:production name="DirPIContents">
+    <g:context>
+      <g:subtract>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+        <g:sequence>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+          <g:string>?&gt;</g:string>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+        </g:sequence>
+      </g:subtract>
+      <g:string>?</g:string>
+    </g:context>
+  </g:production>
+  <g:production name="StringTemplateFixedPart" whitespace-spec="explicit">
+    <g:oneOrMore>
+      <g:choice>
+        <g:subtract>
+          <g:ref name="Char"/>
+          <g:choice>
+            <g:string>{</g:string>
+            <g:string>}</g:string>
+            <g:string>`</g:string>
+          </g:choice>
+        </g:subtract>
+        <g:string>{{</g:string>
+        <g:string>}}</g:string>
+        <g:string>``</g:string>
+      </g:choice>
+    </g:oneOrMore>
+  </g:production>
+  <g:production name="StringConstructorChars">
+    <g:context>
+      <g:subtract>
+        <g:zeroOrMore>
+          <g:ref name="Char"/>
+        </g:zeroOrMore>
+        <g:sequence>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+          <g:choice>
+            <g:string>`{</g:string>
+            <g:string>]``</g:string>
+          </g:choice>
+          <g:zeroOrMore>
+            <g:ref name="Char"/>
+          </g:zeroOrMore>
+        </g:sequence>
+      </g:subtract>
+      <g:choice>
+        <g:string>`{</g:string>
+        <g:string>]`</g:string>
+      </g:choice>
+    </g:context>
+  </g:production>
+  <g:production name="CommentContents" whitespace-spec="explicit">
+    <g:choice>
+      <g:context>
+        <g:subtract>
+          <g:subtract>
+            <g:oneOrMore>
+              <g:ref name="Char"/>
+            </g:oneOrMore>
+            <g:sequence>
+              <g:zeroOrMore>
+                <g:ref name="Char"/>
+              </g:zeroOrMore>
+              <g:choice>
+                <g:string>(:</g:string>
+                <g:string>:)</g:string>
+              </g:choice>
+              <g:zeroOrMore>
+                <g:ref name="Char"/>
+              </g:zeroOrMore>
+            </g:sequence>
+          </g:subtract>
+          <g:sequence>
+            <g:zeroOrMore>
+              <g:ref name="Char"/>
+            </g:zeroOrMore>
+            <g:string>(</g:string>
+          </g:sequence>
+        </g:subtract>
+        <g:string>:</g:string>
+      </g:context>
+      <g:context>
+        <g:subtract>
+          <g:oneOrMore>
+            <g:ref name="Char"/>
+          </g:oneOrMore>
+          <g:sequence>
+            <g:zeroOrMore>
+              <g:ref name="Char"/>
+            </g:zeroOrMore>
+            <g:choice>
+              <g:string>(:</g:string>
+              <g:string>:)</g:string>
+            </g:choice>
+            <g:zeroOrMore>
+              <g:ref name="Char"/>
+            </g:zeroOrMore>
+          </g:sequence>
+        </g:subtract>
+        <g:string>(</g:string>
+      </g:context>
+    </g:choice>
+  </g:production>
+  <g:production name="QNameOrKeywordDelimiter">
+    <g:choice>
+      <g:endOfFile/>
+      <g:string>:</g:string>
+      <g:subtract>
+        <g:ref name="Char"/>
+        <g:ref name="NameChar"/>
+      </g:subtract>
+    </g:choice>
+  </g:production>
+  <g:production name="NCNameDelimiter">
+    <g:choice>
+      <g:sequence>
+        <g:endOfFile/>
+        <g:endOfFile/>
+      </g:sequence>
+      <g:sequence>
+        <g:subtract>
+          <g:ref name="Char"/>
+          <g:ref name="NameChar"/>
+        </g:subtract>
+        <g:choice>
+          <g:endOfFile/>
+          <g:ref name="Char"/>
+        </g:choice>
+      </g:sequence>
+      <g:sequence>
+        <g:string>:</g:string>
+        <g:subtract>
+          <g:ref name="Char"/>
+          <g:ref name="NameStartChar"/>
+        </g:subtract>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:production name="NumericLiteralDelimiter">
+    <g:choice>
+      <g:ref name="QNameOrKeywordDelimiter"/>
+      <g:string>-</g:string>
+    </g:choice>
+  </g:production>
+  <g:production name="GeneralCompDelimiter">
+    <g:complement>
+      <g:charClass>
+        <g:char>?</g:char>
+      </g:charClass>
+    </g:complement>
+  </g:production>
+  <g:production name="DirElemConstructorDelimiter">
+    <g:ref name="QName"/>
+    <g:choice>
+      <g:sequence>
+        <g:ref name="S"/>
+        <g:ref name="QName"/>
+        <g:optional>
+          <g:ref name="S"/>
+        </g:optional>
+        <g:string>=</g:string>
+      </g:sequence>
+      <g:sequence>
+        <g:optional>
+          <g:ref name="S"/>
+        </g:optional>
+        <g:charClass>
+          <g:char>/</g:char>
+          <g:char>&gt;</g:char>
+        </g:charClass>
+      </g:sequence>
+    </g:choice>
+  </g:production>
+  <g:preference>
+    <g:ref name="Wildcard"/>
+    <g:string>*</g:string>
+  </g:preference>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:ref name="NonKeywordQName"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>NaN</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>after</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>all</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>allowing</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ancestor</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ancestor-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>and</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>any</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>array</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>as</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ascending</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>at</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>attribute</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>base-uri</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>before</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>boundary-space</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>but</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>by</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>case</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>cast</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>castable</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>catch</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>child</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>coerce</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>collation</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>comment</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>construction</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>contains</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>content</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>context</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>copy</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>copy-namespaces</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>count</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>decimal-format</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>decimal-separator</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>declare</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>default</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>delete</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>descendant</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>descendant-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>descending</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>diacritics</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>different</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>digit</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>distance</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>div</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>document</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>document-node</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>element</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>else</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>empty</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>empty-sequence</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>encoding</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>end</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>entire</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>enum</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>eq</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>errors</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>every</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>exactly</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>except</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>exponent-separator</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>extends</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>external</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>false</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>finally</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>first</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>fixed</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>fn</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>following</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>following-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>following-sibling</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>following-sibling-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>follows</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>follows-or-is</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>for</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>from</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ft-option</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ftand</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ftnot</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ftor</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>function</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>fuzzy</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ge</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>greatest</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>group</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>grouping-separator</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>gt</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>idiv</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>if</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>import</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>in</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>infinity</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>inherit</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>insensitive</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>insert</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>instance</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>intersect</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>into</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>invoke</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>is</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>is-not</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>item</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>jnode</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>key</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>language</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>last</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>lax</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>le</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>least</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>let</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>levels</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>lowercase</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>lt</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>map</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>member</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>minus-sign</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>mod</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>modify</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>module</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>most</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>namespace</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>namespace-node</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ne</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>next</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>no</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>no-inherit</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>no-preserve</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>node</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>nodes</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>not</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>occurs</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>of</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>only</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>option</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>or</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>order</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ordered</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>ordering</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>otherwise</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>paragraph</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>paragraphs</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>parent</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>pattern-separator</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>per-mille</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>percent</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>phrase</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>precedes</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>precedes-or-is</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>preceding</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>preceding-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>preceding-sibling</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>preceding-sibling-or-self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>preserve</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>previous</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>processing-instruction</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>record</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>relationship</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>rename</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>replace</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>return</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>revalidation</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>same</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>satisfies</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>schema</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>schema-attribute</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>schema-element</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>score</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>self</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>sensitive</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>sentence</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>sentences</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>skip</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>sliding</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>some</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>stable</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>start</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>stemming</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>stop</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>strict</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>strip</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>switch</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>text</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>then</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>thesaurus</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>times</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>to</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>trace</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>transform</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>treat</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>true</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>try</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>tumbling</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>type</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>typeswitch</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>union</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>unordered</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>update</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>updating</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>uppercase</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>using</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>validate</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>value</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>variable</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>version</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>weight</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>when</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>where</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>while</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>wildcards</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>window</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>with</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>without</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>word</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>words</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>xnode</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>xquery</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>zero-digit</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="QNameOrKeywordDelimiter"/>
+    <g:string>%fixed</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="Char"/>
+    <g:string>&lt;/</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="Char"/>
+    <g:string>&lt;&lt;</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="Char"/>
+    <g:string>&lt;=</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NCNameDelimiter"/>
+    <g:ref name="UnreservedNCName"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NumericLiteralDelimiter"/>
+    <g:ref name="DecimalLiteral"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NumericLiteralDelimiter"/>
+    <g:ref name="DoubleLiteral"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="NumericLiteralDelimiter"/>
+    <g:ref name="IntegerLiteral"/>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="GeneralCompDelimiter"/>
+    <g:string context="GeneralComp">&lt;</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="DirElemConstructorDelimiter"/>
+    <g:string context="DirElemConstructor">&lt;</g:string>
+  </g:delimiter>
+  <g:delimiter>
+    <g:ref name="S"/>
+    <g:string>(#</g:string>
+  </g:delimiter>
+</g:grammar>

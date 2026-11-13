@@ -33,9 +33,9 @@ public final class TypeTest extends SandboxTest {
     query("string(([1] cast as array(xs:integer))?1)", "1");
     query("string(({ 'a': '2' } cast as record(a as xs:integer))?a)", "2");
     query("true#0 castable as xs:string", false);
-    error("<x/> cast as item()", SIMPLETYPE_X);
+    error("<x/> cast as item()", SIMPLETYPE_X, SYNTAX_X);
 
-    error("1 castable as xs:integer()", SIMPLETYPE_X);
+    error("1 castable as xs:integer()", SIMPLETYPE_X, SYNTAX_X);
     error("1 castable as xml:integer", TYPEUNKNOWN_X);
     error("1 castable as integer", TYPEUNKNOWN_X);
     error("1 castable as xs:untyped", WHICHCAST_X);
@@ -44,7 +44,7 @@ public final class TypeTest extends SandboxTest {
     error("(42 cast as enum('42')) cast as enum('x')", FUNCCAST_X_X);
     error("42 cast as xs:error?", FUNCCAST_X_X);
     error("xs:error(42)", FUNCCAST_X_X);
-    error("1 cast as function(*)", INVALIDCAST_X);
+    error("1 cast as function(*)", INVALIDCAST_X, SYNTAX_X);
     // component types need not be eligible; the integer just fails to coerce to an array/map
     error("1 cast as array(element())", INVTYPE_X);
     error("1 cast as map(xs:anyAtomicType, xs:string)", INVTYPE_X);
@@ -157,7 +157,7 @@ public final class TypeTest extends SandboxTest {
     query("() instance of xs:error?", true);
 
     error("1 instance of xs:abcde", TYPEUNKNOWN_X);
-    error("1 instance of xs:string()", WHICHTYPE_X);
+    error("1 instance of xs:string()", WHICHTYPE_X, SYNTAX_X);
     error("1 instance of item", TYPEUNKNOWN_X);
   }
 

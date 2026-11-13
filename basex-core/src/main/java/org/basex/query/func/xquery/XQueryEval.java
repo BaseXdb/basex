@@ -42,6 +42,9 @@ public class XQueryEval extends StandardFunc {
     public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
+    /** Query parser (the default is the main option). */
+    public static final EnumOption<MainOptions.QueryParserType> QUERYPARSER =
+        new EnumOption<>("queryparser", MainOptions.QueryParserType.class);
   }
 
   @Override
@@ -85,6 +88,7 @@ public class XQueryEval extends StandardFunc {
     try(QueryContext qctx = new QueryContext(qc, null)) {
       qctx.user = new User(user, perm);
       qctx.maxPerm = perm(qc).min(limit != null ? limit : Perm.ADMIN);
+      qctx.queryParser = options.get(XQueryOptions.QUERYPARSER);
 
       // limit memory consumption
       final long mb = options.get(XQueryOptions.MEMORY);

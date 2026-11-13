@@ -48,7 +48,8 @@ final class QueryOptions {
    * @param parser query parser
    * @throws QueryException query exception
    */
-  void add(final String name, final String value, final QueryParser parser) throws QueryException {
+  void add(final String name, final String value, final AQueryParser parser)
+      throws QueryException {
     final String key = name.toUpperCase(Locale.ENGLISH);
     final MainOptions options = qc.context.options;
     final Option<?> option = options.option(key);

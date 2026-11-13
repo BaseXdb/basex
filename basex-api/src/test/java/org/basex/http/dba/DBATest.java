@@ -1983,8 +1983,8 @@ public final class DBATest extends WebappTest {
      */
     @Test public void invalidKeyKeepsLevel() throws IOException {
       add("", false, "'map'", "{ 'a': 1 }");
-      final String page = add("map", false, "1 +", "2");
-      assertTrue(page.contains("Expecting expression"), "invalid key not rejected");
+      final String page = add("map", false, "1 div 0", "2");
+      assertTrue(page.contains("cannot be divided by zero"), "invalid key not rejected");
       assertTrue(page.contains("data-path=\"map\""), "selection did not stay on the level");
     }
 

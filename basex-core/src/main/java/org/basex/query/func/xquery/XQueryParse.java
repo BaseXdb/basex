@@ -47,6 +47,9 @@ public final class XQueryParse extends StandardFunc {
     public static final BooleanOption PASS = new BooleanOption("pass", false);
     /** Query base-uri. */
     public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
+    /** Query parser (the default is the main option). */
+    public static final EnumOption<MainOptions.QueryParserType> QUERYPARSER =
+        new EnumOption<>("queryparser", MainOptions.QueryParserType.class);
   }
 
   @Override
@@ -61,6 +64,7 @@ public final class XQueryParse extends StandardFunc {
       // compilation may evaluate code: adopt the permissions of the calling code
       qctx.user = qc.user;
       qctx.maxPerm = perm(qc);
+      qctx.queryParser = options.get(XQueryOptions.QUERYPARSER);
       qctx.resolver = qc.resolver;
       final AModule module = qctx.parse(query.readString(),
           toBaseUri(query.path(), options, XQueryOptions.BASE_URI));
