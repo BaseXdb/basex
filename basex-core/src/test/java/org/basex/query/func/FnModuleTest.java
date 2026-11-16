@@ -2674,6 +2674,22 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FUNCTION_NAME;
     check(func.args(" true#0"), "#fn:true", root(QNm.class));
     check(func.args(" fn() { 1 }"), "", empty());
+
+    // partial function application (qtspecs#3082)
+    query(func.args(" count(?)"), "#fn:count");
+    query(func.args(" contains(?, ?)"), "#fn:contains");
+    query(func.args(" contains(substring := ?, value := ?)"), "");
+    query(func.args(" contains(value := ?, substring := ?)"), "#fn:contains");
+    query(func.args(" substring(?, start := ?, length := ?)"), "#fn:substring");
+    query(func.args(" contains('a', ?)"), "");
+    query("let $f := count#1 return " + func.args(" $f(?)"), "#fn:count");
+    query("for $f in (contains#2, starts-with#2) return " + func.args(" $f(?, ?)"),
+        "#fn:contains\n#fn:starts-with");
+    query("for $f in (contains#2, starts-with#2) return " + func.args(" $f('a', ?)"), "");
+    query("declare function local:f($x) { $x }; "
+        + "for $f in (local:f#1, local:f#1) return " + func.args(" $f(?)"), "#local:f\n#local:f");
+    query(func.args(" { 'a': 1 }(?)"), "");
+    query(func.args(" [ 1 ](?)"), "");
   }
 
   /** Test method. */

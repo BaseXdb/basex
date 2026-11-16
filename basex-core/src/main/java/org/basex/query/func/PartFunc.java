@@ -68,12 +68,12 @@ public final class PartFunc extends Arr {
 
         // all arguments are placeholders in the original order: return original function
         // local:f(?, ?) → local:f#2
-        if(named && placeholders == nargs && placeholderPerm == null) {
-          return cc.replaceWith(this, func);
-        }
+        final boolean all = placeholders == nargs && placeholderPerm == null;
+        if(named && all) return cc.replaceWith(this, func);
 
         // FUNC(?, ARG) → fn($param) { FUNC($param, ARG) }: makes the call inlineable
-        boolean rewrite = true;
+        // (dynamic application with placeholders only: the function name is retained at runtime)
+        boolean rewrite = !all;
         for(int e = 0; e < nargs && rewrite; e++) {
           rewrite = placeholder(exprs[e]) || exprs[e].seqType().instanceOf(ft.argTypes[e]);
         }
@@ -172,9 +172,9 @@ public final class PartFunc extends Arr {
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
     // all arguments are placeholders in the original order: return original function
-    // (dynamic application: only anonymous function items; names are dropped, maps/arrays wrapped)
+    // (dynamic application: maps, arrays and Java objects are wrapped)
     if(placeholders == nargs && placeholderPerm == null &&
-        (named || func instanceof FuncItem && func.funcName() == null)) return func;
+        (named || func instanceof FuncItem)) return func;
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
