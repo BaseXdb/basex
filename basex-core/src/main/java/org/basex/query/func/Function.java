@@ -796,7 +796,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, options(FnUnparsedTextAvailable.ParseOptions::new)), STRING_ZM,
       flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
-  UPDATE(FnUpdate::new, "update(value, select, actions?)",
+  UPDATE(FnUpdate::new, "update(value, select, actions)",
       params(NODE_OR_MAP_OR_ARRAY_O, NODE_STEP_O, UPDATE_ACTIONS_O),
       NODE_OR_MAP_OR_ARRAY_O, flag(HOF, CNS)),
   /** XQuery function. */

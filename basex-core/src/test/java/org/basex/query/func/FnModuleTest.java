@@ -7461,6 +7461,7 @@ return
   /** Test method. */
   @Test public void update() {
     final Function func = UPDATE;
+    final String delete = " { 'delete': () }";
     final String store = " { 'store': { 'books': [ { 'title': 'XQuery', 'price': 39.95 }, "
         + "{ 'title': 'JSON', 'price': 24.50, 'draft': true() } ], 'open': true() } }";
     final String xml = " <store open='true'><books>"
@@ -7472,14 +7473,14 @@ return
     check(func.args(" <a><b/></a>", " fn { if(. instance of element(a)) then b else () }",
         " { 'replace': <c/> }"), "<a><c/></a>", empty(Instance.class));
     // JSON nodes
-    query(func.args(store, " fn { .//draft }"), "{\"store\":{\"books\":["
+    query(func.args(store, " fn { .//draft }", delete), "{\"store\":{\"books\":["
         + "{\"title\":\"XQuery\",\"price\":39.95},{\"title\":\"JSON\",\"price\":24.5}],"
         + "\"open\":true()}}");
-    query(func.args(store, " fn { .//price }", " { 'value': fn { . * 2 } }"),
+    query(func.args(store, " fn { .//price }", " { 'replace-value': fn { . * 2 } }"),
         "{\"store\":{\"books\":["
         + "{\"title\":\"XQuery\",\"price\":79.9},"
         + "{\"title\":\"JSON\",\"price\":49,\"draft\":true()}],\"open\":true()}}");
-    query(func.args(store, " fn { .//price }", " { 'after': { 'currency': 'EUR' } }"),
+    query(func.args(store, " fn { .//price }", " { 'insert-after': { 'currency': 'EUR' } }"),
         "{\"store\":{\"books\":["
         + "{\"title\":\"XQuery\",\"price\":39.95,\"currency\":\"EUR\"},"
         + "{\"title\":\"JSON\",\"price\":24.5,\"currency\":\"EUR\",\"draft\":true()}],"
@@ -7488,16 +7489,26 @@ return
         "{\"store\":{\"items\":[{\"title\":\"XQuery\",\"price\":39.95},"
         + "{\"title\":\"JSON\",\"price\":24.5,\"draft\":true()}],\"open\":true()}}");
     query(func.args(store, " fn($n) { $n//price }",
-        " { 'value': fn { . * 2 }, 'after': { 'currency': 'EUR' } }"),
+        " { 'replace-value': fn { . * 2 }, 'insert-after': { 'currency': 'EUR' } }"),
         "{\"store\":{\"books\":[{\"title\":\"XQuery\",\"price\":79.9,\"currency\":\"EUR\"},"
         + "{\"title\":\"JSON\",\"price\":49,\"currency\":\"EUR\",\"draft\":true()}],"
         + "\"open\":true()}}");
     query(func.args(" { 'price': 39 }", " fn { .//price }",
-        " { 'rename': 'cost', 'value': fn { . * 2 } }"), "{\"cost\":78}");
+        " { 'rename': 'cost', 'replace-value': fn { . * 2 } }"), "{\"cost\":78}");
     query(func.args(" { 'a': 1 }", " fn { .//a }",
-        " { 'before': { 'b': 2 }, 'after': { 'c': 3 } }"), "{\"b\":2,\"a\":1,\"c\":3}");
-    // no actions: the node is retained
-    query(func.args(" [ 1, 2 ]", " fn { * }", " {}"), "[1,2]");
+        " { 'insert-before': { 'b': 2 }, 'insert-after': { 'c': 3 } }"),
+        "{\"b\":2,\"a\":1,\"c\":3}");
+    // at least one action must be supplied
+    error(func.args(" [ 1, 2 ]", " fn { * }", " {}"), UPNOACTIONS);
+    error(func.args(" [ 1, 2 ]", " fn { * }"), PARAMMISSING_X_X);
+    // explicit deletion, possibly combined with insertions
+    query(func.args(" [ 1, 2, 3 ]", " fn { *[. > 1] }", delete), "[1]");
+    query(func.args(" [ 1, 2 ]", " fn { * }", " { 'delete': fn { () } }"), "[]");
+    query(func.args(" <a><b/><c/></a>", " fn { b }",
+        " { 'delete': (), 'insert-before': <x/>, 'insert-after': <y/> }"),
+        "<a><x/><y/><c/></a>");
+    query(func.args(" [ 'a', 'b' ]", " fn { *[. = 'a'] }",
+        " { 'delete': (), 'insert-after': [ 'c' ] }"), "[\"c\",\"b\"]");
     // a map or an array supplies the children of the containing structure
     query(func.args(" { 'a': 1 }", " fn { .//a }", " { 'replace': { 'b': 9, 'c': 8 } }"),
         "{\"b\":9,\"c\":8}");
@@ -7507,33 +7518,35 @@ return
     query(func.args(" [ 1 ]", " fn { * }", " { 'replace': [ 9, 10 ] }"), "[9,10]");
     query(func.args(" [ 1 ]", " fn { * }", " { 'replace': ([ 2 ], [ 3 ]) }"), "[2,3]");
     // a new value is used as it stands
-    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " { 'value': [ 3, 4 ] }"), "[[3,4],2]");
-    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " { 'value': { 'k': 9 } }"),
+    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " { 'replace-value': [ 3, 4 ] }"),
+        "[[3,4],2]");
+    query(func.args(" [ 1, 2 ]", " fn { .//jnode(1) }", " { 'replace-value': { 'k': 9 } }"),
         "[{\"k\":9},2]");
-    query(func.args(" { 'a': 1 }", " fn { .//a }", " { 'value': { 'x': 2 } }"),
+    query(func.args(" { 'a': 1 }", " fn { .//a }", " { 'replace-value': { 'x': 2 } }"),
         "{\"a\":{\"x\":2}}");
-    query("array:get(" + func.args(" [ 1 ]", " fn { * }", " { 'value': (1, 2) }") + ", 1)",
+    query("array:get(" + func.args(" [ 1 ]", " fn { * }", " { 'replace-value': (1, 2) }") + ", 1)",
         "1\n2");
-    query(func.args(" [ 1, 2 ]", " fn { * }", " { 'value': {} }"), "[{},{}]");
+    query(func.args(" [ 1, 2 ]", " fn { * }", " { 'replace-value': {} }"), "[{},{}]");
     query(func.args(" [ { 'p': 2 }, { 'p': 5 } ]", " fn { * }",
-        " { 'value': fn { map:merge((jvalue(), { 't': jvalue()?p * 2 })) } }"),
+        " { 'replace-value': fn { map:merge((jvalue(), { 't': jvalue()?p * 2 })) } }"),
         "[{\"p\":2,\"t\":4},{\"p\":5,\"t\":10}]");
     // renaming
     query(func.args(" { 'node': { 'node': { 'node': 123 } } }", " fn { .//node }",
         " { 'rename': 'data' }"), "{\"data\":{\"data\":{\"data\":123}}}");
     query(func.args(" { 'a': 1 }", " fn { .//a }", " { 'rename': 1 }"), "{1:1}");
     // a supplied map or array is returned as a value, a JNode as a JNode
-    query(func.args(" [ 1 ]", " fn {}") + " instance of array(*)", true);
-    query(func.args(" jtree([ 1 ])", " fn {}") + " instance of jnode(())", true);
-    query(func.args(" jtree(1)", " fn {}") + " => jvalue()", 1);
+    query(func.args(" [ 1 ]", " fn {}", delete) + " instance of array(*)", true);
+    query(func.args(" jtree([ 1 ])", " fn {}", delete) + " instance of jnode(())", true);
+    query(func.args(" jtree(1)", " fn {}", delete) + " => jvalue()", 1);
     // the items of a sequence node
-    query(func.args(" jtree((44, 55, 66))", " fn { * }", " { 'value': 9 }") + " => jvalue()",
-        "9\n9\n9");
-    query(func.args(" jtree((44, 55, 66))", " fn { *[jkey() = 2] }") + " => jvalue()", "44\n66");
-    query("count(" + func.args(" jtree((44, 55))", " fn { * }") + " => jvalue())", 0);
-    query(func.args(" { 'x': (44, 55) }", " fn { .//x/* }", " { 'value': fn { . * 2 } }"),
+    query(func.args(" jtree((44, 55, 66))", " fn { * }", " { 'replace-value': 9 }") +
+        " => jvalue()", "9\n9\n9");
+    query(func.args(" jtree((44, 55, 66))", " fn { *[jkey() = 2] }", delete) + " => jvalue()",
+        "44\n66");
+    query("count(" + func.args(" jtree((44, 55))", " fn { * }", delete) + " => jvalue())", 0);
+    query(func.args(" { 'x': (44, 55) }", " fn { .//x/* }", " { 'replace-value': fn { . * 2 } }"),
         "{\"x\":(88,110)}");
-    query(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }", " { 'value': (8, 9) }")
+    query(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }", " { 'replace-value': (8, 9) }")
         + " => jvalue()", "8\n9\n2");
     // an item can be replaced by several items, its key is dropped
     query(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }",
@@ -7541,20 +7554,21 @@ return
     // map entries cannot replace sequence items, as their keys would be lost
     error(func.args(" jtree((1, 2))", " fn { *[jkey() = 1] }",
         " { 'replace': jtree({ 'a': 8 })/* }"), UPREPLACE_X_X);
-    error(func.args(" { 'x': (1, 2) }", " fn { .//x/* }", " { 'after': { 'a': 8 } }"),
+    error(func.args(" { 'x': (1, 2) }", " fn { .//x/* }", " { 'insert-after': { 'a': 8 } }"),
         UPREPLACE_X_X);
-    query(func.args(" { 'x': (1, 2) }", " fn { .//x/* }", " { 'after': [ { 'a': 8 } ] }"),
+    query(func.args(" { 'x': (1, 2) }", " fn { .//x/* }", " { 'insert-after': [ { 'a': 8 } ] }"),
         "{\"x\":(1,{\"a\":8},2,{\"a\":8})}");
     // the node passed to the functions retains its key
     query(func.args(" jtree((44, 55))", " fn { * }", " { 'replace': fn($n) { $n } }")
         + " => jvalue()", "44\n55");
-    query(func.args(" jtree((44, 55))", " fn { * }", " { 'value': fn($n) { jkey($n) } }")
+    query(func.args(" jtree((44, 55))", " fn { * }", " { 'replace-value': fn($n) { jkey($n) } }")
         + " => jvalue()", "1\n2");
-    query(func.args(" [ 44, 55 ]", " fn { * }", " { 'value': fn($n) { jkey($n) } }"), "[1,2]");
+    query(func.args(" [ 44, 55 ]", " fn { * }", " { 'replace-value': fn($n) { jkey($n) } }"),
+        "[1,2]");
 
     // XML nodes
     query(func.args(xml, " fn($n) { $n//price }",
-        " { 'value': fn { . * 2 }, 'after': <currency>EUR</currency> }"),
+        " { 'replace-value': fn { . * 2 }, 'insert-after': <currency>EUR</currency> }"),
         "<store open=\"true\"><books>"
         + "<book><title>XQuery</title><price cur=\"EUR\">79.9</price>"
         + "<currency>EUR</currency></book>"
@@ -7563,25 +7577,26 @@ return
     query(func.args(xml, " fn($n) { $n//books }", " { 'rename': #items }") + "/*/name()",
         "items");
     // a new value replaces the children, name and attributes are retained
-    query(func.args(" <a><b c='1'>x</b></a>", " fn { .//b }", " { 'value': 1 }"),
+    query(func.args(" <a><b c='1'>x</b></a>", " fn { .//b }", " { 'replace-value': 1 }"),
         "<a><b c=\"1\">1</b></a>");
     // atomized items are joined with spaces
-    query(func.args(" <e a='1'/>", " fn { .//@a }", " { 'value': (1, 2) }"), "<e a=\"1 2\"/>");
-    query(func.args(" <a><b/></a>", " fn { .//b }", " { 'value': (1, <x/>, [ 2 ]) }"),
+    query(func.args(" <e a='1'/>", " fn { .//@a }", " { 'replace-value': (1, 2) }"),
+        "<e a=\"1 2\"/>");
+    query(func.args(" <a><b/></a>", " fn { .//b }", " { 'replace-value': (1, <x/>, [ 2 ]) }"),
         "<a><b>1  2</b></a>");
-    query(func.args(" <a><b/></a>", " fn { b }", " { 'before': <x/>, 'after': (<y/>, <z/>) }"),
-        "<a><x/><b/><y/><z/></a>");
+    query(func.args(" <a><b/></a>", " fn { b }",
+        " { 'insert-before': <x/>, 'insert-after': (<y/>, <z/>) }"), "<a><x/><b/><y/><z/></a>");
     // actions are applied bottom-up
     query(func.args(" <a><b><b/></b></a>", " fn { .//b }", " { 'rename': #c }"),
         "<a><c><c/></c></a>");
     query(func.args(" document { <a><b/></a> }", " fn { .//b }", " { 'replace': <c/> }"),
         "<a><c/></a>");
     query(func.args(" <a><!--c--><?pi v?></a>",
-        " fn { .//comment() | .//processing-instruction() }", " { 'value': 'X' }"),
+        " fn { .//comment() | .//processing-instruction() }", " { 'replace-value': 'X' }"),
         "<a><!--X--><?pi X?></a>");
     // namespaces are retained
-    query(func.args(" <p:a xmlns:p='u'><p:b/></p:a>", " fn { .//*:b }", " { 'value': 'x' }"),
-        "<p:a xmlns:p=\"u\"><p:b>x</p:b></p:a>");
+    query(func.args(" <p:a xmlns:p='u'><p:b/></p:a>", " fn { .//*:b }",
+        " { 'replace-value': 'x' }"), "<p:a xmlns:p=\"u\"><p:b>x</p:b></p:a>");
     // a node supplied as a replacement is copied, the input is not modified
     query("let $x := <a><b/><c/></a> return (" +
         func.args(" $x", " fn { .//b }", " { 'replace': $x/c }") + ", $x/c/.. is $x)",
@@ -7607,37 +7622,47 @@ return
     query(func.args(" <a b='1'/>", " fn { @b }", " { 'rename': QName('urn:x', 'c') }") +
         "/@*/namespace-uri()", "urn:x");
     // in-scope namespaces of the updated node are retained
-    query("sort(in-scope-prefixes(" + func.args(" <a xmlns:p='u'><b/></a>/b", " fn {}") + "))",
-        "p\nxml");
-    query(func.args(" <a xmlns:p='u'><b><p:c/></b></a>/b", " fn { .//*:c }", " { 'value': 'x' }"),
-        "<b xmlns:p=\"u\"><p:c>x</p:c></b>");
+    query("sort(in-scope-prefixes(" + func.args(" <a xmlns:p='u'><b/></a>/b", " fn {}", delete) +
+        "))", "p\nxml");
+    query(func.args(" <a xmlns:p='u'><b><p:c/></b></a>/b", " fn { .//*:c }",
+        " { 'replace-value': 'x' }"), "<b xmlns:p=\"u\"><p:c>x</p:c></b>");
     // nodes of the result are in document order
     query("let $r := " + func.args(" <a x='1'><c/><d/></a>", " fn { c }", " { 'replace': <b/> }")
         + " return ($r << $r/b, string-join(($r/d | $r/@x | $r/b | $r) ! name(), ' '))",
         "true\na x b d");
 
-    error(func.args(" <e><a/></e>", " fn { <b/> }"), UPSELECT_X);
+    error(func.args(" <e><a/></e>", " fn { <b/> }", delete), UPSELECT_X);
     // the effective value cannot be replaced
     error(func.args(" { 'a': 1 }", " fn { . }", " { 'replace': fn { . } }"), UPSELECT_X);
-    error(func.args(" jtree(1)", " fn { . }", " { 'value': 2 }"), UPSELECT_X);
-    error(func.args(" document { <a/> }", " fn { . }"), UPSELECT_X);
+    error(func.args(" jtree(1)", " fn { . }", " { 'replace-value': 2 }"), UPSELECT_X);
+    error(func.args(" document { <a/> }", " fn { . }", delete), UPSELECT_X);
     error(func.args(" <a><b/></a>", " fn { . | b }", " { 'replace': <c/> }"), UPSELECT_X);
     // namespace nodes and item nodes have a parent, but are no attributes or children
-    error(func.args(" <a/>", " fn { namespace p { 'u' } }"), UPSELECT_X);
-    error(func.args(" [ 1 ]", " fn { .//item::* }", " { 'value': 9 }"), UPSELECT_X);
+    error(func.args(" <a/>", " fn { namespace p { 'u' } }", delete), UPSELECT_X);
+    error(func.args(" [ 1 ]", " fn { .//item::* }", " { 'replace-value': 9 }"), UPSELECT_X);
     // invalid actions
-    error(func.args(" <a/>", " fn { () }", " { 'delete': true() }"), INVTYPE_X);
+    error(func.args(" <a/>", " fn { () }", " { 'remove': () }"), INVTYPE_X);
     error(func.args(" <a/>", " fn { () }", 1), INVTYPE_X);
-    error(func.args(" <a/>", " fn { () }", " { 'replace': (), 'value': 1 }"), UPACTIONS);
-    error(func.args(" <a/>", " fn { () }", " { 'replace': (), 'rename': #a }"), UPACTIONS);
+    error(func.args(" <a/>", " fn { () }", " { 'replace': (), 'replace-value': 1 }"),
+        UPACTIONS_X_X);
+    error(func.args(" <a/>", " fn { () }", " { 'replace': (), 'rename': #a }"), UPACTIONS_X_X);
+    error(func.args(" <a/>", " fn { () }", " { 'delete': (), 'replace': () }"), UPACTIONS_X_X);
+    error(func.args(" <a/>", " fn { () }", " { 'delete': (), 'replace-value': 1 }"),
+        UPACTIONS_X_X);
+    error(func.args(" <a/>", " fn { () }", " { 'delete': (), 'rename': #a }"), UPACTIONS_X_X);
+    // the operand of a deletion must be empty
+    error(func.args(" <a><b/></a>", " fn { b }", " { 'delete': 1 }"), UPDELETE_X);
+    error(func.args(" <a><b/></a>", " fn { b }", " { 'delete': fn { . } }"), UPDELETE_X);
+    // operands are only checked for selected nodes
+    query(func.args(" <a/>", " fn { () }", " { 'delete': 1 }"), "<a/>");
     // invalid replacements
     error(func.args(" <e a='1' b='2'/>", " fn { .//@a }", " { 'replace': <x/> }"),
         UPREPLACE_X_X);
     error(func.args(" <e><a/></e>", " fn { .//a }", " { 'replace': { 'k': 1 } }"),
         UPREPLACE_X_X);
-    error(func.args(" <e><a/></e>", " fn { .//a }", " { 'after': namespace p { 'u' } }"),
+    error(func.args(" <e><a/></e>", " fn { .//a }", " { 'insert-after': namespace p { 'u' } }"),
         UPREPLACE_X_X);
-    error(func.args(" { 'a': 1 }", " fn { .//a }", " { 'before': <x/> }"), UPREPLACE_X_X);
+    error(func.args(" { 'a': 1 }", " fn { .//a }", " { 'insert-before': <x/> }"), UPREPLACE_X_X);
     error(func.args(" [ 1 ]", " fn { * }", " { 'replace': <a/> }"), UPREPLACE_X_X);
     error(func.args(" <a><b/></a>", " fn { b }", " { 'replace': jtree({ 'k': 1 }) }"),
         UPREPLACE_X_X);
@@ -7654,9 +7679,9 @@ return
         UPREPLACEATT_X);
     error(func.args(" <e a='1' b='2'/>", " fn { .//@b }", " { 'rename': #a }"), UPREPLACEATT_X);
     // function items as values
-    error(func.args(" <e><a/></e>", " fn { .//a }", " { 'value': fn { true#0 } }"),
+    error(func.args(" <e><a/></e>", " fn { .//a }", " { 'replace-value': fn { true#0 } }"),
         FIATOMIZE_X);
-    query(func.args(" [ 1 ]", " fn { .//jnode(1) }", " { 'value': fn { true#0 } }") +
+    query(func.args(" [ 1 ]", " fn { .//jnode(1) }", " { 'replace-value': fn { true#0 } }") +
         " => array:get(1) instance of fn(*)", true);
     // invalid renamings
     error(func.args(" [ 1 ]", " fn { * }", " { 'rename': 'a' }"), UPRENAME_X);
@@ -7674,9 +7699,10 @@ return
     query(func.args(" <a b=''/>", " fn { @b }", " { 'rename': #xml:space }"),
         "<a xml:space=\"\"/>");
     // invalid values
-    error(func.args(" <a><!--x--></a>", " fn { comment() }", " { 'value': 'x-' }"), UPVALUE_X_X);
-    error(func.args(" <a><?pi x?></a>", " fn { processing-instruction() }", " { 'value': '?>' }"),
+    error(func.args(" <a><!--x--></a>", " fn { comment() }", " { 'replace-value': 'x-' }"),
         UPVALUE_X_X);
+    error(func.args(" <a><?pi x?></a>", " fn { processing-instruction() }",
+        " { 'replace-value': '?>' }"), UPVALUE_X_X);
     error(func.args(" <a><?pi?></a>", " fn { processing-instruction() }", " { 'rename': #XmL }"),
         UPNAME_X_X);
     error(func.args(" <a><?pi?></a>", " fn { processing-instruction() }",
@@ -7687,7 +7713,7 @@ return
         "{\"b\":2}");
     // leading whitespace is retained in processing instructions, as in XQuery Update
     query(func.args(" <a><?pi v?></a>", " fn { .//processing-instruction() }",
-        " { 'value': '  y' }") + "//processing-instruction() ! string-length()", 3);
+        " { 'replace-value': '  y' }") + "//processing-instruction() ! string-length()", 3);
   }
 
   /** Test method. */
