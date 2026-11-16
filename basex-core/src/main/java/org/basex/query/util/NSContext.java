@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class references all statically known namespaces.
@@ -16,6 +17,8 @@ import org.basex.util.*;
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
   public final Atts list = new Atts();
+  /** URIs of the static namespaces, indexed by their prefixes. */
+  private final TokenObjectMap<byte[]> uris = new TokenObjectMap<>();
 
   /**
    * Validates and adds the specified namespace at parsing time.
@@ -29,7 +32,8 @@ public final class NSContext {
     if(eq(prefix, XML, XMLNS)) throw BINDXML_X.get(info, prefix);
     if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(info, uri, XML);
     if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(info, uri, XMLNS);
-    list.add(prefix, uri);
+    if(uris.put(prefix, uri) == null) list.add(prefix, uri);
+    else list.value(list.get(prefix), uri);
   }
 
   /**
@@ -37,12 +41,7 @@ public final class NSContext {
    * @param prefix namespace prefix
    */
   public void delete(final byte[] prefix) {
-    for(int s = list.size() - 1; s >= 0; s--) {
-      if(eq(prefix, list.name(s))) {
-        list.remove(s);
-        break;
-      }
-    }
+    if(uris.remove(prefix) != 0) list.remove(list.get(prefix));
   }
 
   /**
@@ -52,10 +51,7 @@ public final class NSContext {
    * @return URI or {@code null}
    */
   public byte[] resolveDeclared(final byte[] prefix) {
-    for(int s = list.size() - 1; s >= 0; s--) {
-      if(eq(list.name(s), prefix)) return list.value(s);
-    }
-    return null;
+    return uris.get(prefix);
   }
 
   /**

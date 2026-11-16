@@ -230,7 +230,7 @@ public class FnFoldLeft extends StandardFunc {
 
     // for $value in INPUT return ACTION
     // for $member in array:split(INPUT) let $value := array:items($member) return ACTION
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     Expr in = input;
     if(array) in = cc.function(Function._ARRAY_SPLIT, info, in);
     // fold-left: $result, X; fold-right: X, $result (integer sums are exact, order is irrelevant)

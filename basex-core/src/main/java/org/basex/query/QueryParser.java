@@ -128,10 +128,21 @@ public class QueryParser extends InputParser {
 
   /**
    * Namespaces of an element constructor.
-   * @param nspaces declared namespaces
+   * @param prefixes prefixes of declared and inherited namespaces
    * @param inherited inherited namespaces
    */
-  private record ConstrNS(Atts nspaces, Atts inherited) { }
+  private record ConstrNS(TokenSet prefixes, Atts inherited) {
+    /**
+     * Inherits namespaces whose prefixes are neither declared nor inherited yet.
+     * @param ns namespaces of an enclosing constructor
+     */
+    void inherit(final Atts ns) {
+      final int nl = ns.size();
+      for(int n = 0; n < nl; n++) {
+        if(prefixes.add(ns.name(n))) inherited.add(ns.name(n), ns.value(n));
+      }
+    }
+  }
 
   /**
    * Error hint for a keyword that was parsed as a name.
@@ -1499,7 +1510,7 @@ public class QueryParser extends InputParser {
    */
   private Expr flwor() throws QueryException {
     final int s = localVars.openScope();
-    final LinkedList<Clause> clauses = initialClause(null);
+    final ArrayList<Clause> clauses = initialClause(null);
     if(clauses == null) {
       final int p = pos;
       if(current('r') && wsConsumeWs(RETURN)) addHint(UNEXPRETURN);
@@ -1508,14 +1519,14 @@ public class QueryParser extends InputParser {
     }
 
     final TokenObjectMap<Var> curr = new TokenObjectMap<>();
-    int size;
+    int size = 0;
     do {
       do {
-        size = clauses.size();
-        initialClause(clauses);
-        for(final Clause clause : clauses) {
+        for(final Clause clause : clauses.subList(size, clauses.size())) {
           for(final Var var : clause.vars()) curr.put(var.name.unique(), var);
         }
+        size = clauses.size();
+        initialClause(clauses);
       } while(size < clauses.size());
 
       if(wsConsumeWs(WHERE)) {
@@ -1533,17 +1544,14 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(GROUP)) {
         wsCheck(BY);
         skipWs();
-        final GroupSpec[] specs = groupSpecs(clauses);
+        final GroupSpec[] specs = groupSpecs(curr);
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<>();
-        for(final GroupSpec spec : specs) curr.put(spec.var.name.unique(), spec.var);
-        VARS:
+        final HashSet<Var> grouping = new HashSet<>();
+        for(final GroupSpec spec : specs) grouping.add(spec.var);
         for(final Var var : curr.values()) {
-          for(final GroupSpec spec : specs) {
-            if(spec.var == var) continue VARS;
-          }
-          ng.add(new VarRef(specs[0].info(), var));
+          if(!grouping.contains(var)) ng.add(new VarRef(specs[0].info(), var));
         }
 
         // add new copies for all non-grouping variables
@@ -1588,7 +1596,7 @@ public class QueryParser extends InputParser {
     final Expr rtrn = operand(single(), RETURN);
     localVars.closeScope(s);
 
-    return new GFLWOR(clauses.peek().info(), clauses, rtrn);
+    return new GFLWOR(clauses.getFirst().info(), clauses, rtrn);
   }
 
   /**
@@ -1597,18 +1605,18 @@ public class QueryParser extends InputParser {
    * @return clauses
    * @throws QueryException query exception
    */
-  private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
-    LinkedList<Clause> cls = clauses;
+  private ArrayList<Clause> initialClause(final ArrayList<Clause> clauses) throws QueryException {
+    ArrayList<Clause> cls = clauses;
     // WindowClause
     if(wsConsumeWs(FOR, false, SLIDING, TUMBLING)) {
-      if(cls == null) cls = new LinkedList<>();
+      if(cls == null) cls = new ArrayList<>();
       cls.add(windowClause());
     } else {
       // ForClause / LetClause
       final boolean lt = wsConsumeWs(LET, true, "$", SCORE);
       final boolean fr = !lt && wsConsumeWs(FOR, true, "$", MEMBER, KEY, VALUEE);
       if(lt || fr) {
-        if(cls == null) cls = new LinkedList<>();
+        if(cls == null) cls = new ArrayList<>();
         if(lt) letClause(cls);
         else   forClause(cls);
       }
@@ -1621,7 +1629,7 @@ public class QueryParser extends InputParser {
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
-  private void forClause(final LinkedList<Clause> clauses) throws QueryException {
+  private void forClause(final ArrayList<Clause> clauses) throws QueryException {
     do {
       final Var member = wsConsumeWs(MEMBER) ? newVar() : null;
       final Var key = member == null && wsConsumeWs(KEY) ? newVar() : null;
@@ -1688,7 +1696,7 @@ public class QueryParser extends InputParser {
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
-  private void letClause(final LinkedList<Clause> clauses) throws QueryException {
+  private void letClause(final ArrayList<Clause> clauses) throws QueryException {
     do {
       if(wsConsumeWs(SCORE)) {
         letValueBinding(newVar(Types.DOUBLE_O), true, clauses);
@@ -1712,7 +1720,7 @@ public class QueryParser extends InputParser {
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
-  private void letValueBinding(final Var var, final boolean score, final LinkedList<Clause> clauses)
+  private void letValueBinding(final Var var, final boolean score, final ArrayList<Clause> clauses)
       throws QueryException {
 
     wsCheck(":=");
@@ -1726,7 +1734,7 @@ public class QueryParser extends InputParser {
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
-  private void letStructBinding(final InputInfo ii, final LinkedList<Clause> clauses)
+  private void letStructBinding(final InputInfo ii, final ArrayList<Clause> clauses)
       throws QueryException {
 
     final int startCp = consume();
@@ -1838,12 +1846,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "GroupingSpec" rule.
-   * @param cl preceding clauses
+   * @param curr variables declared by the FLWOR expression (grouping variables will be added)
    * @return new group specification
    * @throws QueryException query exception
    */
-  private GroupSpec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
+  private GroupSpec[] groupSpecs(final TokenObjectMap<Var> curr) throws QueryException {
     final ArrayList<GroupSpec> specs = new ArrayList<>();
+    final QNmMap<GroupSpec> names = new QNmMap<>();
     do {
       final Var var = newVar();
       final Expr by;
@@ -1854,20 +1863,18 @@ public class QueryParser extends InputParser {
       } else {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
-        if(ref == null || !Checks.any(cl, c -> c.declares(ref.var)) &&
-            !Checks.any(specs, s -> s.var == ref.var)) throw error(GVARNOTDEFINED_X, var);
+        if(ref == null || curr.get(var.name.unique()) != ref.var) {
+          throw error(GVARNOTDEFINED_X, var);
+        }
         by = ref;
       }
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(uriLiteral(),
           qc, info(), FLWORCOLL_X) : sc.collation;
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), by, coll);
-      for(int i = specs.size(); --i >= 0;) {
-        if(specs.get(i).var.name.eq(spec.var.name)) {
-          specs.get(i).occluded = true;
-          break;
-        }
-      }
+      curr.put(var.name.unique(), var);
+      final GroupSpec old = names.put(spec.var.name, spec);
+      if(old != null) old.occluded = true;
       specs.add(spec);
     } while(wsConsumeWs(","));
     return specs.toArray(GroupSpec[]::new);
@@ -1884,7 +1891,7 @@ public class QueryParser extends InputParser {
     if(!some && !every) return null;
 
     final int s = localVars.openScope();
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     do {
       final Var var = newVar();
       wsCheck(IN);
@@ -1896,7 +1903,7 @@ public class QueryParser extends InputParser {
     final Expr rtrn = Function.BOOLEAN.get(info(), check(single(), NOSOME));
     localVars.closeScope(s);
 
-    final InputInfo ii = clauses.peek().info();
+    final InputInfo ii = clauses.getFirst().info();
     final GFLWOR flwor = new GFLWOR(ii, clauses, rtrn);
     final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), CmpOp.EQ);
     return some ? cmp : Function.NOT.get(ii, cmp);
@@ -3461,6 +3468,7 @@ public class QueryParser extends InputParser {
     final int size = qc.ns.size(), cpos = constrNS.size();
     final byte[] nse = sc.elemNS, nsd = sc.dirNS;
     final Atts ns = new Atts();
+    final TokenSet prefixes = new TokenSet();
     final ExprList cont = new ExprList();
 
     // parse attributes
@@ -3507,7 +3515,7 @@ public class QueryParser extends InputParser {
                 sc.dirNS = uri;
                 if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
               }
-              if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+              if(!prefixes.add(prefix)) throw error(DUPLNSDEF_X, prefix);
               ns.add(prefix, uri);
             }
           } else {
@@ -3543,12 +3551,10 @@ public class QueryParser extends InputParser {
     }
 
     // check for duplicate attribute names
-    if(atts != null) {
-      final int as = atts.size();
-      for(int a = 0; a < as - 1; a++) {
-        for(int b = a + 1; b < as; b++) {
-          if(atts.get(a).eq(atts.get(b))) throw error(ATTDUPL_X, atts.get(a).prefixString());
-        }
+    if(atts != null && atts.size() > 1) {
+      final QNmSet names = new QNmSet();
+      for(final QNm att : atts) {
+        if(!names.add(att)) throw error(ATTDUPL_X, att.prefixString());
       }
     }
 
@@ -3557,18 +3563,12 @@ public class QueryParser extends InputParser {
     sc.dirNS = nsd;
 
     // propagate namespace declarations to enclosed constructors, register own namespaces
-    final int cs = constrNS.size(), nl = ns.size();
-    for(int c = cpos; c < cs; c++) {
-      final ConstrNS cns = constrNS.get(c);
-      for(int n = 0; n < nl; n++) {
-        final byte[] prefix = ns.name(n);
-        if(!cns.nspaces.contains(prefix) && !cns.inherited.contains(prefix)) {
-          cns.inherited.add(prefix, ns.value(n));
-        }
-      }
+    if(!ns.isEmpty()) {
+      final int cs = constrNS.size();
+      for(int c = cpos; c < cs; c++) constrNS.get(c).inherit(ns);
     }
     final Atts inherited = new Atts();
-    constrNS.add(new ConstrNS(ns, inherited));
+    constrNS.add(new ConstrNS(prefixes, inherited));
     return new CElem(info(), false, name, ns, inherited, cont.finish());
   }
 
@@ -4048,9 +4048,9 @@ public class QueryParser extends InputParser {
     skipWs();
     if(!current('{')) return null;
     // register namespaces, to be enriched by enclosing direct constructors
-    final Atts ns = new Atts(), inherited = new Atts();
-    constrNS.add(new ConstrNS(ns, inherited));
-    return new CElem(info(), true, name, ns, inherited, enclosedExpr());
+    final Atts inherited = new Atts();
+    constrNS.add(new ConstrNS(new TokenSet(), inherited));
+    return new CElem(info(), true, name, new Atts(), inherited, enclosedExpr());
   }
 
   /**

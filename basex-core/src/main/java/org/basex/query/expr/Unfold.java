@@ -115,7 +115,7 @@ public final class Unfold extends Arr {
     if(result == null) return null;
 
     // let $v := INIT, let $start := INIT
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     for(int v = 0; v < vl; v++) {
       if(v != c) clauses.add(new Let(vars[v], exprs[v]).optimize(cc));
     }
@@ -350,7 +350,7 @@ public final class Unfold extends Arr {
       final CompileContext cc) throws QueryException {
     final IntObjectMap<Var> vm = new IntObjectMap<>();
     final Clause[] cls = clauses.apply(cc.copy(var, vm));
-    return new GFLWOR(info, new LinkedList<>(Arrays.asList(cls)), expr.copy(cc, vm)).optimize(cc);
+    return new GFLWOR(info, new ArrayList<>(Arrays.asList(cls)), expr.copy(cc, vm)).optimize(cc);
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.List;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -267,14 +266,13 @@ public final class Window extends Clause {
 
   /**
    * Rewrites a sliding window with a fixed size to a loop over subsequences.
-   * @param clauses clauses
-   * @param p position of this clause
+   * @param iter iterator over the FLWOR clauses, positioned after this clause
    * @param unused checks if a variable is unused by the subsequent clauses
    * @param cc compilation context
    * @return success flag
    * @throws QueryException query exception
    */
-  boolean toSubsequence(final List<Clause> clauses, final int p, final Predicate<Var> unused,
+  boolean toSubsequence(final ListIterator<Clause> iter, final Predicate<Var> unused,
       final CompileContext cc) throws QueryException {
 
     // for sliding window $w in E start at $s when true() [only] end at $e when $e - $s = K
@@ -293,9 +291,9 @@ public final class Window extends Clause {
     final Expr sub = cc.function(Function.SUBSEQUENCE, info, new VarRef(info, in).optimize(cc),
         new VarRef(info, spos).optimize(cc), Itr.get(dist + 1));
 
-    clauses.set(p, new Let(in, expr).optimize(cc));
-    clauses.add(p + 1, new For(spos, range).optimize(cc));
-    clauses.add(p + 2, new Let(var, sub).optimize(cc));
+    iter.set(new Let(in, expr).optimize(cc));
+    iter.add(new For(spos, range).optimize(cc));
+    iter.add(new Let(var, sub).optimize(cc));
     return true;
   }
 

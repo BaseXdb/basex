@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
 import java.util.*;
-import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -165,29 +164,28 @@ public final class For extends ForLet {
 
   /**
    * Tries to convert this for loop into a let binding.
-   * @param clauses FLWOR clauses
-   * @param p position
+   * @param iter iterator over the FLWOR clauses, positioned after this clause
    * @param cc compilation context
    * @return {@code true} if the clause was converted, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean asLet(final List<Clause> clauses, final int p, final CompileContext cc)
+  boolean asLet(final ListIterator<Clause> iter, final CompileContext cc)
       throws QueryException {
 
     final SeqType st = expr.seqType();
     // for $x allowing empty in head(E) → let $x := head(E)
     if(empty && st.zeroOrOne() && pos == null && score == null && var.declType == null) {
-      clauses.set(p, new Let(var, expr).optimize(cc));
+      iter.set(new Let(var, expr).optimize(cc));
       return true;
     }
     if(!st.one()) return false;
     // for $x at $p in E → let $x := E let $p := 1  (E yields a single item)
-    clauses.set(p, new Let(var, expr).optimize(cc));
-    if(score != null) {
-      clauses.add(p + 1, new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
-    }
+    iter.set(new Let(var, expr).optimize(cc));
     if(pos != null) {
-      clauses.add(p + 1, new Let(pos, Itr.ONE).optimize(cc));
+      iter.add(new Let(pos, Itr.ONE).optimize(cc));
+    }
+    if(score != null) {
+      iter.add(new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
     }
     return true;
   }

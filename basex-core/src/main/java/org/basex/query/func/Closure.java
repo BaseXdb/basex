@@ -364,7 +364,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       body = expr;
     } else {
       // collect closure
-      final LinkedList<Clause> clauses = new LinkedList<>();
+      final ArrayList<Clause> clauses = new ArrayList<>();
       for(final Entry<Var, Expr> entry : global.entrySet()) {
         clauses.add(new Let(entry.getKey(), entry.getValue().value(qc)));
       }

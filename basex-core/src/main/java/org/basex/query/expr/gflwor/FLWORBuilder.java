@@ -118,7 +118,7 @@ public final class FLWORBuilder {
    */
   public Expr finish(final Expr input, final Expr cond, final boolean whl, final Expr rtrn)
       throws QueryException {
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     if(action != null) clauses.add(action);
     clauses.add(new For(item, pos, null, input, false).optimize(cc));
     if(cond != null) {

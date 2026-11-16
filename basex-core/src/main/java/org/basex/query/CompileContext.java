@@ -611,7 +611,7 @@ public final class CompileContext {
       final Expr body, final SeqType declType, final InputInfo info) throws QueryException {
 
     // create let bindings for all parameters and non-local variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     final IntObjectMap<Var> vm = new IntObjectMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
