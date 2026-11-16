@@ -956,8 +956,8 @@ public class QueryParser extends InputParser {
     }
     // parse supplied paths
     for(final byte[] pth : mi.paths) {
-      // modules pre-declared by the caller require no permissions
-      if(!mi.declared) checkExternal(string(pth), mi.info);
+      // modules pre-declared by the caller require no permissions, unless the code is untrusted
+      if(!mi.declared || !sc.maxPerm.has(Perm.ADMIN)) checkExternal(string(pth), mi.info);
       module(string(pth), string(uri), mi.info);
     }
   }
