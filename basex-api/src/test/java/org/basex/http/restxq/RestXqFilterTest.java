@@ -96,6 +96,8 @@ public final class RestXqFilterTest extends RestXqTest {
   @Test public void qualityFactor() throws Exception {
     register("declare %R:path('') %R:produces('text/plain;qs=5') function m:f() { 1 };");
     assertContains(get(500, ""), "Quality factor must be in the range 0-1: qs=5.");
+    register("declare %R:path('') %R:produces('text/plain;qs=x') function m:f() { 1 };");
+    assertContains(get(500, ""), "Quality factor must be in the range 0-1: qs=x.");
   }
 
   /**

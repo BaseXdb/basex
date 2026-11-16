@@ -186,17 +186,12 @@ public final class HTTPConnection implements ClientInfo {
       list.add(MediaType.ALL_ALL);
     } else {
       for(final String accept : accepts.split("\\s*,\\s*")) {
-        // check if quality factor was specified
         final MediaType type = new MediaType(accept);
-        final String q = type.parameter("q");
-        final double d = q != null ? toDouble(token(q)) : 1;
-        // only accept media types with valid double values
-        if(d > 0 && d <= 1) {
-          final StringBuilder sb = new StringBuilder();
+        final double d = type.qf("q");
+        if(d > 0) {
           final String main = type.main(), sub = type.sub();
-          sb.append(main.isEmpty() ? "*" : main).append('/');
-          sb.append(sub.isEmpty() ? "*" : sub).append("; q=").append(d);
-          list.add(new MediaType(sb.toString()));
+          list.add(new MediaType((main.isEmpty() ? "*" : main) + '/' +
+            (sub.isEmpty() ? "*" : sub) + "; q=" + d));
         }
       }
     }
