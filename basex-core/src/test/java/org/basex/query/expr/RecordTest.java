@@ -968,12 +968,11 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "fn($q as local:Q) { $q instance of local:Q }(local:P(1, 2))", true);
     // fn:type-of reports the label
     query(prolog + "local:P(1, 2) => type-of()",
-        "record(Q{http://www.w3.org/2005/xquery-local-functions}P)");
+        "Q{http://www.w3.org/2005/xquery-local-functions}P");
     query(prolog + "(local:P(1, 2), { 'x': 1, 'y': 2 }) => type-of()",
-        "(record(Q{http://www.w3.org/2005/xquery-local-functions}P)|map(*))+");
+        "(Q{http://www.w3.org/2005/xquery-local-functions}P|map(*))+");
     query("parse-uri('x:y') => type-of()",
-        "record(Q{http://www.w3.org/2005/xpath-functions}uri-structure-record)");
-
+        "Q{http://www.w3.org/2005/xpath-functions}uri-structure-record");
     // the type is identified by its declaration: records of other queries must be coerced
     query(prolog + _STORE_PUT.args("record", " local:P(1, 2)"));
     query(prolog + _STORE_GET.args("record") + " instance of local:P", false);

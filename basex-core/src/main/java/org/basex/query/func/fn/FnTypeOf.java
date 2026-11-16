@@ -32,7 +32,7 @@ public final class FnTypeOf extends ContextFn {
     for(final Value item : value) {
       Type type = item.type;
       if(type instanceof final RecordType rt && rt.name() != null) {
-        types.add(Token.concat("record(", rt.name().eqName(), ")"));
+        types.add(rt.name().eqName());
         continue;
       }
       if(type instanceof MapType) {
