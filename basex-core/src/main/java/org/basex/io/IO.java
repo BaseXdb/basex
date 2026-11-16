@@ -50,6 +50,8 @@ public abstract class IO {
   public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** Brotli file suffix. */
+  public static final String BRSUFFIX = ".br";
   /** TZSTD file suffix. */
   public static final String TZSTSUFFIX = ".tzst";
   /** ZSTD file suffix. */

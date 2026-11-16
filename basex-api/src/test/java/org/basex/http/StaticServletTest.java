@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.*;
 import java.net.http.*;
 import java.time.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -20,6 +21,10 @@ import org.junit.jupiter.api.*;
 public final class StaticServletTest extends HTTPTest {
   /** Contents of the served file. */
   private static final String CONTENT = "body { color: red }";
+  /** Contents of the precompressed file (dummy, not decoded by the client). */
+  private static final String BROTLI = "brotli";
+  /** Contents of the gzipped file (dummy, not decoded by the client). */
+  private static final String GZIP = "gzip";
 
   /**
    * Starts the HTTP server and creates a static resource.
@@ -31,6 +36,22 @@ public final class StaticServletTest extends HTTPTest {
       HTTPContext.get().context().soptions.get(StaticOptions.WEBPATH), "static");
     assertTrue(dir.md());
     new IOFile(dir, "test.css").write(CONTENT);
+    new IOFile(dir, "test.css.br").write(BROTLI);
+    new IOFile(dir, "test.css.gz").write(GZIP);
+  }
+
+  /**
+   * A precompressed sibling is returned if the client accepts its encoding.
+   * @throws Exception exception
+   */
+  @Test public void precompressed() throws Exception {
+    encoded("br", BROTLI, "br");
+    encoded("gzip", GZIP, "gzip");
+    encoded("gzip, deflate, br, zstd", BROTLI, "br");
+    encoded("BR;q=0.5", BROTLI, "br");
+    encoded("br;q=0, gzip", GZIP, "gzip");
+    encoded("deflate", CONTENT, "");
+    encoded(null, CONTENT, "");
   }
 
   /**
@@ -87,6 +108,24 @@ public final class StaticServletTest extends HTTPTest {
    */
   @Test public void malformedModified() throws Exception {
     assertEquals(200, send("yesterday").statusCode());
+  }
+
+  /**
+   * Requests the static test resource with the specified accepted encodings and checks the result.
+   * @param accept value of the {@code Accept-Encoding} header (can be {@code null})
+   * @param body expected body
+   * @param encoding expected content encoding (empty if none)
+   * @throws Exception exception
+   */
+  private static void encoded(final String accept, final String body, final String encoding)
+      throws Exception {
+    final Map<String, String> headers = accept != null ?
+      Map.of(HTTPText.ACCEPT_ENCODING, accept) : Map.of();
+    assertEquals(body, send(200, "GET", null, null, headers, "static/test.css"), accept);
+    assertEquals(encoding, Objects.toString(header(HTTPText.CONTENT_ENCODING), ""), accept);
+    assertEquals(HTTPText.ACCEPT_ENCODING, header(HTTPText.VARY));
+    final String type = header(HTTPText.CONTENT_TYPE);
+    assertTrue(type.startsWith("text/css"), type);
   }
 
   /**

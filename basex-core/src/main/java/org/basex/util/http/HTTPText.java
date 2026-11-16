@@ -14,6 +14,8 @@ import org.basex.query.value.item.*;
 public interface HTTPText {
   /** HTTP string. */
   String HTTP = "HTTP";
+  /** Default directory, relative to the web application. */
+  String STATIC_PATH = "static";
 
   /** WEB-INF directory. */
   String WEB_INF = "WEB-INF/";
@@ -63,11 +65,15 @@ public interface HTTPText {
   /** HTTP header string. */
   String ACCEPT = "Accept";
   /** HTTP header string. */
+  String ACCEPT_ENCODING = "Accept-Encoding";
+  /** HTTP header string. */
   String ALLOW = "Allow";
   /** HTTP header string. */
   String SET_COOKIE = "Set-Cookie";
   /** HTTP header string. */
   String COOKIE = "Cookie";
+  /** HTTP header string. */
+  String VARY = "Vary";
 
   /** Content-Disposition (lower case). */
   byte[] CONTENT_DISPOSITION = token("content-disposition");
@@ -89,10 +95,10 @@ public interface HTTPText {
   /** Auth. */
   String AUTH = "auth";
 
-  /** HTTP header: Accept-Encoding. */
-  String ACCEPT_ENCODING = "Accept-Encoding";
   /** Content encoding: gzip. */
   String GZIP = "gzip";
+  /** Content encoding: br. */
+  String BR = "br";
 
   /** QName. */
   QNm Q_REST_RESPONSE = new QNm(REST_PREFIX, "response", REST_URI);
