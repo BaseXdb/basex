@@ -42,7 +42,7 @@ public final class FnFilter extends StandardFunc {
     // for $item at $pos in INPUT where PREDICATE($item, $pos) return $item
     final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
     final Expr where = flwor.function(this, 1, false);
-    final Expr rtrn = flwor.ref(flwor.item);
+    final Expr rtrn = flwor.item();
     return flwor.finish(input, where, rtrn);
   }
 }
