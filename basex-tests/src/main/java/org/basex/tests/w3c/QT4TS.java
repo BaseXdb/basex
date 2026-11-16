@@ -796,7 +796,7 @@ public final class QT4TS extends Main {
     // reserved keywords in computed node constructors (supported by the BaseX parser)
     "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
     "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-26', " +
-    "'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
+    "'K2-ComputeConPI-16', 'K2-ComputeConPI-17', 'Constr-compelem-compname-30', " +
     "'K2-ForExprWithout-42a', 'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
     "'nscons-047', 'nscons-048', " +
     // use-character-maps can be declared in the prolog: BaseX supports a lexical string syntax
