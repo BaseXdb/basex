@@ -4463,7 +4463,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test schemaTest() throws QueryException {
-    throw error(SCHEMAINV_X, eQName(sc.elemNS, QNAME_X));
+    final QNm name = eQName(sc.elemNS, QNAME_X);
+    wsCheck(")");
+    throw error(SCHEMAINV_X, name);
   }
 
   /**
