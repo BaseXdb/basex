@@ -2,6 +2,7 @@ package org.basex.util.options;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.*;
@@ -10,12 +11,14 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.ft.*;
 import org.basex.query.func.xquery.XQueryEval.XQueryOptions;
 import org.basex.query.util.collation.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -57,6 +60,36 @@ public final class OptionsTest extends SandboxTest {
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }
+  }
+
+  /** Tests that invalid values of system properties are reported. */
+  @Test public void systemPropertyInvalid() {
+    final EnumOption<MainOptions.MainParser> name = MainOptions.PARSER;
+    final ArrayOutput ao = new ArrayOutput();
+    System.setProperty(Prop.DBPREFIX + name.name(), "JSON");
+    try {
+      System.setErr(new PrintStream(ao));
+      final MainOptions mopts = new MainOptions();
+      mopts.setSystem();
+      assertEquals(MainOptions.MainParser.XML, mopts.get(name));
+      assertTrue(ao.toString().contains("JSON"));
+
+      System.setProperty(Prop.DBPREFIX + name.name(), "json");
+      mopts.setSystem();
+      assertEquals(MainOptions.MainParser.JSON, mopts.get(name));
+    } finally {
+      System.setErr(ERR);
+      System.clearProperty(Prop.DBPREFIX + name.name());
+    }
+  }
+
+  /** Tests that invalid media-type parameters are ignored. */
+  @Test public void mediaTypeInvalid() {
+    final JsonParserOptions jopts = new JsonParserOptions();
+    jopts.assign(new MediaType("application/json; format=bogus; liberal=maybe; lax=yes"));
+    assertEquals(JsonOptions.JsonFormat.DIRECT, jopts.get(JsonOptions.FORMAT));
+    assertFalse(jopts.get(JsonParserOptions.LIBERAL));
+    assertTrue(jopts.get(JsonOptions.LAX));
   }
 
   /** Tests that option definitions cannot be modified. */
