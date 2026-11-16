@@ -35,6 +35,16 @@ public final class VarRef extends ParseExpr {
     assignType();
   }
 
+  /**
+   * Returns an optimized reference to the given variable.
+   * @param info input info (can be {@code null})
+   * @param var variable
+   * @return expression
+   */
+  public static Expr get(final InputInfo info, final Var var) {
+    return var.seqType().zero() ? Empty.VALUE : new VarRef(info, var);
+  }
+
   @Override
   public Expr compile(final CompileContext cc) {
     return optimize(cc);

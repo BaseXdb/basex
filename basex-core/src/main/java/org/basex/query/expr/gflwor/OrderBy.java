@@ -313,7 +313,7 @@ public final class OrderBy extends Clause {
     final VarScope vs = new VarScope();
     cc.pushScope(vs);
     try {
-      final Var param = vs.addNew(var.name, null, cc.qc, info);
+      final Var param = cc.var(var.name, null, info);
       final IntObjectMap<Var> vm = new IntObjectMap<>();
       vm.put(var.id, param);
       // atomize the key, reject multiple items

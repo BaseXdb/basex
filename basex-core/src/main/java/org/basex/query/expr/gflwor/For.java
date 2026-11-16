@@ -185,7 +185,7 @@ public final class For extends ForLet {
       iter.add(new Let(pos, Itr.ONE).optimize(cc));
     }
     if(score != null) {
-      iter.add(new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
+      iter.add(new Let(score, VarRef.get(info(), var), true).optimize(cc));
     }
     return true;
   }

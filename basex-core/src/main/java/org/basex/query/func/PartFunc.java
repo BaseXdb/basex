@@ -113,24 +113,24 @@ public final class PartFunc extends Arr {
     try {
       // the function and the supplied arguments are evaluated once, when the closure is created
       final HashMap<Var, Expr> global = new LinkedHashMap<>();
-      final Var fn = vs.addNew(new QNm(FUNCTION), func.seqType(), cc.qc, info);
+      final Var fn = cc.var(new QNm(FUNCTION), func.seqType(), info);
       global.put(fn, func);
 
       final Var[] params = new Var[placeholders];
       final Expr[] args = new Expr[nargs];
       for(int p = 0, e = 0; e < nargs; e++) {
         final QNm name = xqf != null ? xqf.paramName(e) : new QNm(ARG + (e + 1));
-        final Var var = vs.addNew(name, ft.argTypes[e], cc.qc, info);
+        final Var var = cc.var(name, ft.argTypes[e], info);
         if(placeholder(exprs[e])) {
           params[placeholderPerm == null ? p : placeholderPerm[p]] = var;
           ++p;
         } else {
           global.put(var, exprs[e]);
         }
-        args[e] = new VarRef(info, var).optimize(cc);
+        args[e] = VarRef.get(info, var);
       }
       final Expr call = new DynFuncCall(info, updating, false,
-          new VarRef(info, fn).optimize(cc), args).optimize(cc);
+          VarRef.get(info, fn), args).optimize(cc);
       closure = new Closure(info, call, params, anns, vs, global, ft.declType, null, false);
     } finally {
       cc.removeScope();

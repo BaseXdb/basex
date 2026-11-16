@@ -284,12 +284,12 @@ public final class Window extends Clause {
     final long dist = end.distance(spos);
     if(dist == -1 || !unused.test(end.onlyPos())) return false;
 
-    final Var in = cc.vs().addNew(new QNm("input"), null, cc.qc, info);
-    Expr max = cc.function(Function.COUNT, info, new VarRef(info, in).optimize(cc));
+    final Var in = cc.var("input", info);
+    Expr max = cc.function(Function.COUNT, info, VarRef.get(info, in));
     if(only) max = new Arith(info, max, Itr.get(dist), Calc.SUBTRACT).optimize(cc);
     final Expr range = new Range(info, Itr.ONE, max).optimize(cc);
-    final Expr sub = cc.function(Function.SUBSEQUENCE, info, new VarRef(info, in).optimize(cc),
-        new VarRef(info, spos).optimize(cc), Itr.get(dist + 1));
+    final Expr sub = cc.function(Function.SUBSEQUENCE, info, VarRef.get(info, in),
+        VarRef.get(info, spos), Itr.get(dist + 1));
 
     iter.set(new Let(in, expr).optimize(cc));
     iter.add(new For(spos, range).optimize(cc));

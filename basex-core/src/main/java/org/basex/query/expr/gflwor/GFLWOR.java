@@ -882,10 +882,10 @@ public final class GFLWOR extends ParseExpr {
         } else {
           // positions are shifted: ... → for $e at $q in E[position() >= M] let $p := $q + M - 1
           final InputInfo ii = pos.info();
-          final Var p = cc.vs().addNew(pos.pos.name, null, cc.qc, ii);
+          final Var p = cc.var(pos.pos.name, null, ii);
           final For fr = new For(pos.var, p, pos.score, pos.expr, false);
           fr.addPredicate(cc, pred);
-          final Expr add = new Arith(ii, new VarRef(ii, p).optimize(cc), Itr.get(cmp.min - 1),
+          final Expr add = new Arith(ii, VarRef.get(ii, p), Itr.get(cmp.min - 1),
               Calc.ADD).optimize(cc);
           clauses.set(c, fr.optimize(cc));
           clauses.add(c + 1, new Let(pos.pos, add).optimize(cc));
@@ -940,8 +940,7 @@ public final class GFLWOR extends ParseExpr {
         final Expr le = CmpIR.get(cc, ii, cmp.expr, Long.MIN_VALUE, cmp.max);
         clauses.set(d, new While(le, ii));
         if(cmp.min > 1) {
-          final Expr ge = CmpIR.get(cc, ii, new VarRef(ii, count.var).optimize(cc),
-              cmp.min, Long.MAX_VALUE);
+          final Expr ge = CmpIR.get(cc, ii, VarRef.get(ii, count.var), cmp.min, Long.MAX_VALUE);
           clauses.add(d + 1, new Where(ge, ii));
         }
         cc.info(QueryText.OPTREWRITE_X_X, (Supplier<?>) where::description, where);
@@ -1042,7 +1041,7 @@ public final class GFLWOR extends ParseExpr {
       if(clauses.size() > 1 && clauses.get(1) instanceof final Count cnt) {
         if(fst.pos != null) {
           // for $a at $p in E count $c → for $a at $p in E let $c := $p
-          final Expr ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
+          final Expr ref = VarRef.get(cnt.info(), fst.pos);
           clauses.set(1, new Let(cnt.var, ref).optimize(cc));
         } else {
           // for $a in E count $c → for $a at $c in E
