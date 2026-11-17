@@ -120,50 +120,6 @@ public abstract class AQueryParser extends InputParser {
     qc = qctx;
     sc = sctx != null ? sctx : new StaticContext(qctx);
     if(uri != null) sc.baseURI(uri);
-    Counts.add(this);
-  }
-
-  /**
-   * Counts the instantiations of the parsers. If the system property {@code queryparser.counts}
-   * is set, the counts are written to the standard error stream when the JVM exits.
-   */
-  private static final class Counts {
-    /** Names of the parsers. */
-    private static final String[] NAMES = { "manual", "rex" };
-    /** Counters. */
-    private static final java.util.concurrent.atomic.AtomicIntegerArray COUNTS =
-        new java.util.concurrent.atomic.AtomicIntegerArray(NAMES.length);
-
-    static {
-      if(System.getProperty("queryparser.counts") != null) {
-        Runtime.getRuntime().addShutdownHook(new Thread(Counts::log));
-      }
-    }
-
-    /**
-     * Counts an instantiation.
-     * @param parser parser
-     */
-    static void add(final AQueryParser parser) {
-      COUNTS.incrementAndGet(parser instanceof RExQueryParser ? 1 : 0);
-    }
-
-    /** Writes the counts as a Markdown table. */
-    private static void log() {
-      final String head = "Instantiation Count";
-      int width = "Parser".length();
-      for(final String name : NAMES) width = Math.max(width, name.length());
-      final StringBuilder sb = new StringBuilder(
-          String.format("%" + width + "s | %s |%n", "Parser", head));
-      sb.append("-".repeat(width)).append(":|").append("-".repeat(head.length() + 2)).append('|').
-        append(System.lineSeparator());
-      for(int n = 0; n < NAMES.length; n++) {
-        sb.append(String.format("%" + width + "s | %-" + head.length() + "d |%n", NAMES[n],
-            COUNTS.get(n)));
-      }
-      System.err.println();
-      System.err.print(sb);
-    }
   }
 
   /**
