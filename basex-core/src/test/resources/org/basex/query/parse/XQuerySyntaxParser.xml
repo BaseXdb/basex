@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This file was generated on Fri Nov 13, 2026 07:22 (UTC+01) by REx v7.0 which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net> -->
+<!-- This file was generated on Tue Nov 17, 2026 15:08 (UTC+01) by REx v7.0 which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net> -->
 <!-- REx command line: -xmlonly -name XQuerySyntaxParser XQuery-Full-Text-Update-BaseX-40.ebnf -->
 <g:grammar xmlns:g="http://www.w3.org/2001/03/XPath/grammar">
   <g:production name="Module">
