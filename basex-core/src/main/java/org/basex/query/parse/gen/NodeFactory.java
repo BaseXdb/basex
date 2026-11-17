@@ -308,8 +308,8 @@ public final class NodeFactory {
     };
   }
 
-  private static Nodes.AbbreviatedStep createAbbreviatedStep(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAbbreviatedStep(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isDot2 = false;
     boolean isAtSign = false;
     Node nodeTest = null;
@@ -328,8 +328,8 @@ public final class NodeFactory {
     return new Nodes.AbbreviatedStep(begin, end, isDot2, isAtSign, nodeTest, simpleNodeTest);
   }
 
-  private static Nodes.AbsolutePathExpr createAbsolutePathExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAbsolutePathExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isSlash = false;
     Node relativePathExpr = null;
     boolean isSlash2 = false;
@@ -346,8 +346,8 @@ public final class NodeFactory {
     return new Nodes.AbsolutePathExpr(begin, end, isSlash, relativePathExpr, isSlash2);
   }
 
-  private static Nodes.AdditiveExpr createAdditiveExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAdditiveExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -363,8 +363,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.AllowingEmpty createAllowingEmpty(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAllowingEmpty(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -375,8 +375,8 @@ public final class NodeFactory {
     return new Nodes.AllowingEmpty(begin, end);
   }
 
-  private static Nodes.AndExpr createAndExpr(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createAndExpr(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -392,7 +392,7 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.Annotation createAnnotation(final int begin, final int end, final Node[] st,
+  private static Node createAnnotation(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node eqName = null;
     int size = to - from;
@@ -410,8 +410,8 @@ public final class NodeFactory {
     return new Nodes.Annotation(begin, end, eqName, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.AnyArrayType createAnyArrayType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAnyArrayType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -422,8 +422,8 @@ public final class NodeFactory {
     return new Nodes.AnyArrayType(begin, end);
   }
 
-  private static Nodes.AnyFunctionType createAnyFunctionType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAnyFunctionType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isFunction = false;
     boolean isFn = false;
     for(int i = from; i < to; i++) {
@@ -438,8 +438,8 @@ public final class NodeFactory {
     return new Nodes.AnyFunctionType(begin, end, isFunction, isFn);
   }
 
-  private static Nodes.AnyItemType createAnyItemType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAnyItemType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -450,7 +450,7 @@ public final class NodeFactory {
     return new Nodes.AnyItemType(begin, end);
   }
 
-  private static Nodes.AnyMapType createAnyMapType(final int begin, final int end, final Node[] st,
+  private static Node createAnyMapType(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -462,8 +462,8 @@ public final class NodeFactory {
     return new Nodes.AnyMapType(begin, end);
   }
 
-  private static Nodes.AnyRecordType createAnyRecordType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAnyRecordType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -474,8 +474,8 @@ public final class NodeFactory {
     return new Nodes.AnyRecordType(begin, end);
   }
 
-  private static Nodes.AnyXNodeType createAnyXNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAnyXNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -486,8 +486,8 @@ public final class NodeFactory {
     return new Nodes.AnyXNodeType(begin, end);
   }
 
-  private static Nodes.ArgumentList createArgumentList(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createArgumentList(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.PositionalArguments positionalArguments = null;
     Nodes.KeywordArguments keywordArguments = null;
     for(int i = from; i < to; i++) {
@@ -502,8 +502,8 @@ public final class NodeFactory {
     return new Nodes.ArgumentList(begin, end, positionalArguments, keywordArguments);
   }
 
-  private static Nodes.ArgumentPlaceholder createArgumentPlaceholder(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createArgumentPlaceholder(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -514,7 +514,7 @@ public final class NodeFactory {
     return new Nodes.ArgumentPlaceholder(begin, end);
   }
 
-  private static Nodes.ArrowExpr createArrowExpr(final int begin, final int end, final Node[] st,
+  private static Node createArrowExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node unaryExpr = null;
     int size = to - from;
@@ -533,8 +533,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.AttributeNodeType createAttributeNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createAttributeNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.NameTestUnion nameTestUnion = null;
     Node typeName = null;
     for(int i = from; i < to; i++) {
@@ -549,8 +549,8 @@ public final class NodeFactory {
     return new Nodes.AttributeNodeType(begin, end, nameTestUnion, typeName);
   }
 
-  private static Nodes.Axis createAxis(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createAxis(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     boolean isAncestor = false;
     boolean isAncestorOrSelf = false;
     boolean isAttribute = false;
@@ -600,7 +600,7 @@ public final class NodeFactory {
         isPrecedingSibling, isPrecedingSiblingOrSelf, isSelf);
   }
 
-  private static Nodes.AxisStep createAxisStep(final int begin, final int end, final Node[] st,
+  private static Node createAxisStep(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.AbbreviatedStep abbreviatedStep = null;
     Nodes.FullStep fullStep = null;
@@ -621,8 +621,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.BaseURIDecl createBaseURIDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBaseURIDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node uriLiteral = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -635,8 +635,8 @@ public final class NodeFactory {
     return new Nodes.BaseURIDecl(begin, end, uriLiteral);
   }
 
-  private static Nodes.BoundarySpaceDecl createBoundarySpaceDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBoundarySpaceDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isPreserve = false;
     boolean isStrip = false;
     for(int i = from; i < to; i++) {
@@ -651,8 +651,8 @@ public final class NodeFactory {
     return new Nodes.BoundarySpaceDecl(begin, end, isPreserve, isStrip);
   }
 
-  private static Nodes.BracedActions createBracedActions(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBracedActions(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     boolean isElse = false;
     Nodes.BracedElseAction bracedElseAction = null;
@@ -669,8 +669,8 @@ public final class NodeFactory {
     return new Nodes.BracedActions(begin, end, enclosedExpr, isElse, bracedElseAction);
   }
 
-  private static Nodes.BracedElseAction createBracedElseAction(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBracedElseAction(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isIf = false;
     Node expr = null;
     Nodes.BracedActions bracedActions = null;
@@ -689,8 +689,8 @@ public final class NodeFactory {
     return new Nodes.BracedElseAction(begin, end, isIf, expr, bracedActions, enclosedExpr);
   }
 
-  private static Nodes.BracedSwitchCases createBracedSwitchCases(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBracedSwitchCases(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.SwitchCases switchCases = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -703,8 +703,8 @@ public final class NodeFactory {
     return new Nodes.BracedSwitchCases(begin, end, switchCases);
   }
 
-  private static Nodes.BracedTypeswitchCases createBracedTypeswitchCases(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createBracedTypeswitchCases(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TypeswitchCases typeswitchCases = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -717,8 +717,8 @@ public final class NodeFactory {
     return new Nodes.BracedTypeswitchCases(begin, end, typeswitchCases);
   }
 
-  private static Nodes.ButWithExpr createButWithExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createButWithExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -734,8 +734,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.CDataSection createCDataSection(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCDataSection(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal cDataSectionContents = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -748,7 +748,7 @@ public final class NodeFactory {
     return new Nodes.CDataSection(begin, end, cDataSectionContents);
   }
 
-  private static Nodes.CaseClause createCaseClause(final int begin, final int end, final Node[] st,
+  private static Node createCaseClause(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     boolean isAs = false;
@@ -768,7 +768,7 @@ public final class NodeFactory {
     return new Nodes.CaseClause(begin, end, varName, isAs, sequenceTypeUnion, exprSingle);
   }
 
-  private static Nodes.CastExpr createCastExpr(final int begin, final int end, final Node[] st,
+  private static Node createCastExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node transformWithExpr = null;
     boolean isCast = false;
@@ -788,7 +788,7 @@ public final class NodeFactory {
     return new Nodes.CastExpr(begin, end, transformWithExpr, isCast, isAs, castTarget);
   }
 
-  private static Nodes.CastTarget createCastTarget(final int begin, final int end, final Node[] st,
+  private static Node createCastTarget(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node typeName = null;
     Nodes.ChoiceItemType choiceItemType = null;
@@ -815,8 +815,8 @@ public final class NodeFactory {
         mapType, recordType, isQuestion);
   }
 
-  private static Nodes.CastableExpr createCastableExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCastableExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node castExpr = null;
     boolean isCastable = false;
     boolean isAs = false;
@@ -835,8 +835,8 @@ public final class NodeFactory {
     return new Nodes.CastableExpr(begin, end, castExpr, isCastable, isAs, castTarget);
   }
 
-  private static Nodes.CatchClause createCatchClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCatchClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.NameTestUnion nameTestUnion = null;
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
@@ -851,8 +851,8 @@ public final class NodeFactory {
     return new Nodes.CatchClause(begin, end, nameTestUnion, enclosedExpr);
   }
 
-  private static Nodes.ChoiceItemType createChoiceItemType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createChoiceItemType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -868,7 +868,7 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.CoerceExpr createCoerceExpr(final int begin, final int end, final Node[] st,
+  private static Node createCoerceExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node castableExpr = null;
     boolean isCoerce = false;
@@ -888,8 +888,8 @@ public final class NodeFactory {
     return new Nodes.CoerceExpr(begin, end, castableExpr, isCoerce, isAs, sequenceType);
   }
 
-  private static Nodes.Comment createComment(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createComment(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -905,8 +905,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.CommentNodeType createCommentNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCommentNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -917,8 +917,8 @@ public final class NodeFactory {
     return new Nodes.CommentNodeType(begin, end);
   }
 
-  private static Nodes.CompAttrConstructor createCompAttrConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompAttrConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.CompNodeName compNodeName = null;
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
@@ -933,8 +933,8 @@ public final class NodeFactory {
     return new Nodes.CompAttrConstructor(begin, end, compNodeName, enclosedExpr);
   }
 
-  private static Nodes.CompCommentConstructor createCompCommentConstructor(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompCommentConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -947,8 +947,8 @@ public final class NodeFactory {
     return new Nodes.CompCommentConstructor(begin, end, enclosedExpr);
   }
 
-  private static Nodes.CompDocConstructor createCompDocConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompDocConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -961,8 +961,8 @@ public final class NodeFactory {
     return new Nodes.CompDocConstructor(begin, end, enclosedExpr);
   }
 
-  private static Nodes.CompElemConstructor createCompElemConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompElemConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.CompNodeName compNodeName = null;
     Node enclosedContentExpr = null;
     for(int i = from; i < to; i++) {
@@ -977,8 +977,8 @@ public final class NodeFactory {
     return new Nodes.CompElemConstructor(begin, end, compNodeName, enclosedContentExpr);
   }
 
-  private static Nodes.CompNamespaceConstructor createCompNamespaceConstructor(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompNamespaceConstructor(final int begin, final int end,
+      final Node[] st, final int[] sy, final int from, final int to) {
     Nodes.CompNodeNCName compNodeNCName = null;
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
@@ -993,8 +993,8 @@ public final class NodeFactory {
     return new Nodes.CompNamespaceConstructor(begin, end, compNodeNCName, enclosedExpr);
   }
 
-  private static Nodes.CompNodeNCName createCompNodeNCName(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompNodeNCName(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.MarkedNCName markedNCName = null;
     Terminal ncName = null;
     Node expr = null;
@@ -1011,8 +1011,8 @@ public final class NodeFactory {
     return new Nodes.CompNodeNCName(begin, end, markedNCName, ncName, expr);
   }
 
-  private static Nodes.CompNodeName createCompNodeName(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompNodeName(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.QNameLiteral qNameLiteral = null;
     Node eqName = null;
     Node expr = null;
@@ -1029,8 +1029,8 @@ public final class NodeFactory {
     return new Nodes.CompNodeName(begin, end, qNameLiteral, eqName, expr);
   }
 
-  private static Nodes.CompPIConstructor createCompPIConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompPIConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.CompNodeNCName compNodeNCName = null;
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
@@ -1045,8 +1045,8 @@ public final class NodeFactory {
     return new Nodes.CompPIConstructor(begin, end, compNodeNCName, enclosedExpr);
   }
 
-  private static Nodes.CompTextConstructor createCompTextConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCompTextConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1059,8 +1059,8 @@ public final class NodeFactory {
     return new Nodes.CompTextConstructor(begin, end, enclosedExpr);
   }
 
-  private static Nodes.ComparisonExpr createComparisonExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createComparisonExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node ftContainsExpr = null;
     Node ftContainsExpr2 = null;
     Node valueComp = null;
@@ -1082,7 +1082,7 @@ public final class NodeFactory {
         generalComp, nodeComp);
   }
 
-  private static Nodes.Constant createConstant(final int begin, final int end, final Node[] st,
+  private static Node createConstant(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Terminal stringLiteral = null;
     boolean isMinus = false;
@@ -1107,8 +1107,8 @@ public final class NodeFactory {
         isTrue, isFalse);
   }
 
-  private static Nodes.ConstructionDecl createConstructionDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createConstructionDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isStrip = false;
     boolean isPreserve = false;
     for(int i = from; i < to; i++) {
@@ -1123,8 +1123,8 @@ public final class NodeFactory {
     return new Nodes.ConstructionDecl(begin, end, isStrip, isPreserve);
   }
 
-  private static Nodes.ContextValueDecl createContextValueDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createContextValueDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isValue = false;
     boolean isAs = false;
     Nodes.SequenceType sequenceType = null;
@@ -1152,8 +1152,8 @@ public final class NodeFactory {
         varValue, isExternal, varDefaultValue);
   }
 
-  private static Nodes.ContextValueRef createContextValueRef(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createContextValueRef(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -1164,8 +1164,8 @@ public final class NodeFactory {
     return new Nodes.ContextValueRef(begin, end);
   }
 
-  private static Nodes.CopyModifyExpr createCopyModifyExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCopyModifyExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1181,8 +1181,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.CopyNamespacesDecl createCopyNamespacesDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCopyNamespacesDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node preserveMode = null;
     Node inheritMode = null;
     for(int i = from; i < to; i++) {
@@ -1197,8 +1197,8 @@ public final class NodeFactory {
     return new Nodes.CopyNamespacesDecl(begin, end, preserveMode, inheritMode);
   }
 
-  private static Nodes.CountClause createCountClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCountClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1211,8 +1211,8 @@ public final class NodeFactory {
     return new Nodes.CountClause(begin, end, varName);
   }
 
-  private static Nodes.CurlyArrayConstructor createCurlyArrayConstructor(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createCurlyArrayConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1225,8 +1225,8 @@ public final class NodeFactory {
     return new Nodes.CurlyArrayConstructor(begin, end, enclosedExpr);
   }
 
-  private static Nodes.DecimalFormatDecl createDecimalFormatDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDecimalFormatDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     boolean isDefault = false;
     int size = to - from;
@@ -1246,8 +1246,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.DefaultCollationDecl createDefaultCollationDecl(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDefaultCollationDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node uriLiteral = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1260,8 +1260,8 @@ public final class NodeFactory {
     return new Nodes.DefaultCollationDecl(begin, end, uriLiteral);
   }
 
-  private static Nodes.DefaultNamespaceDecl createDefaultNamespaceDecl(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDefaultNamespaceDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isFixed = false;
     boolean isElement = false;
     boolean isFunction = false;
@@ -1280,7 +1280,7 @@ public final class NodeFactory {
     return new Nodes.DefaultNamespaceDecl(begin, end, isFixed, isElement, isFunction, uriLiteral);
   }
 
-  private static Nodes.DeleteExpr createDeleteExpr(final int begin, final int end, final Node[] st,
+  private static Node createDeleteExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isNode = false;
     boolean isNodes = false;
@@ -1298,8 +1298,8 @@ public final class NodeFactory {
     return new Nodes.DeleteExpr(begin, end, isNode, isNodes, targetExpr);
   }
 
-  private static Nodes.DirAttributeList createDirAttributeList(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDirAttributeList(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1315,8 +1315,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.DirAttributeValue createDirAttributeValue(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDirAttributeValue(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1333,8 +1333,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.DirCommentConstructor createDirCommentConstructor(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDirCommentConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal dirCommentContents = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1347,8 +1347,8 @@ public final class NodeFactory {
     return new Nodes.DirCommentConstructor(begin, end, dirCommentContents);
   }
 
-  private static Nodes.DirElemConstructor createDirElemConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDirElemConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal qName = null;
     Terminal qName2 = null;
     Nodes.DirAttributeList dirAttributeList = null;
@@ -1369,8 +1369,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.DirPIConstructor createDirPIConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDirPIConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal piTarget = null;
     Terminal dirPiContents = null;
     for(int i = from; i < to; i++) {
@@ -1385,8 +1385,8 @@ public final class NodeFactory {
     return new Nodes.DirPIConstructor(begin, end, piTarget, dirPiContents);
   }
 
-  private static Nodes.DocumentNodeType createDocumentNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDocumentNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ElementNodeType elementNodeType = null;
     Nodes.SchemaElementNodeType schemaElementNodeType = null;
     Nodes.NameTestUnion nameTestUnion = null;
@@ -1404,8 +1404,8 @@ public final class NodeFactory {
         nameTestUnion);
   }
 
-  private static Nodes.DynamicFunctionCall createDynamicFunctionCall(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createDynamicFunctionCall(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node postfixExpr = null;
     Nodes.PositionalArgumentList positionalArgumentList = null;
     for(int i = from; i < to; i++) {
@@ -1421,8 +1421,8 @@ public final class NodeFactory {
     return new Nodes.DynamicFunctionCall(begin, end, postfixExpr, positionalArgumentList);
   }
 
-  private static Nodes.ElementNodeType createElementNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createElementNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.NameTestUnion nameTestUnion = null;
     Node typeName = null;
     boolean isQuestion = false;
@@ -1439,8 +1439,8 @@ public final class NodeFactory {
     return new Nodes.ElementNodeType(begin, end, nameTestUnion, typeName, isQuestion);
   }
 
-  private static Nodes.EmptyOrderDecl createEmptyOrderDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createEmptyOrderDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isGreatest = false;
     boolean isLeast = false;
     for(int i = from; i < to; i++) {
@@ -1455,8 +1455,8 @@ public final class NodeFactory {
     return new Nodes.EmptyOrderDecl(begin, end, isGreatest, isLeast);
   }
 
-  private static Nodes.EnclosedExpr createEnclosedExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createEnclosedExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node expr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1469,8 +1469,8 @@ public final class NodeFactory {
     return new Nodes.EnclosedExpr(begin, end, expr);
   }
 
-  private static Nodes.EnumerationType createEnumerationType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createEnumerationType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Terminal[] ch = new Terminal[size];
     int n = 0;
@@ -1485,8 +1485,8 @@ public final class NodeFactory {
     return new Nodes.EnumerationType(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.Expr createExpr(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createExpr(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1501,8 +1501,8 @@ public final class NodeFactory {
     return new Nodes.Expr(begin, end, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ExtensionExpr createExtensionExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createExtensionExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node expr = null;
     int size = to - from;
     final Nodes.Pragma[] ch = new Nodes.Pragma[size];
@@ -1519,7 +1519,7 @@ public final class NodeFactory {
     return new Nodes.ExtensionExpr(begin, end, expr, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FLWORExpr createFLWORExpr(final int begin, final int end, final Node[] st,
+  private static Node createFLWORExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.InitialClause initialClause = null;
     Nodes.ReturnClause returnClause = null;
@@ -1540,8 +1540,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTAnd createFTAnd(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTAnd(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1556,8 +1556,8 @@ public final class NodeFactory {
     return new Nodes.FTAnd(begin, end, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTAnyallOption createFTAnyallOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTAnyallOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isAny = false;
     boolean isWord = false;
     boolean isAll = false;
@@ -1578,8 +1578,8 @@ public final class NodeFactory {
     return new Nodes.FTAnyallOption(begin, end, isAny, isWord, isAll, isWords, isPhrase);
   }
 
-  private static Nodes.FTCaseOption createFTCaseOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTCaseOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isCase = false;
     boolean isInsensitive = false;
     boolean isSensitive = false;
@@ -1601,8 +1601,8 @@ public final class NodeFactory {
         isUppercase);
   }
 
-  private static Nodes.FTContainsExpr createFTContainsExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTContainsExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node otherwiseExpr = null;
     boolean isContains = false;
     boolean isText = false;
@@ -1624,7 +1624,7 @@ public final class NodeFactory {
         ftIgnoreOption);
   }
 
-  private static Nodes.FTContent createFTContent(final int begin, final int end, final Node[] st,
+  private static Node createFTContent(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isAt = false;
     boolean isStart = false;
@@ -1646,8 +1646,8 @@ public final class NodeFactory {
     return new Nodes.FTContent(begin, end, isAt, isStart, isEnd, isEntire, isContent);
   }
 
-  private static Nodes.FTDiacriticsOption createFTDiacriticsOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTDiacriticsOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isInsensitive = false;
     boolean isSensitive = false;
     for(int i = from; i < to; i++) {
@@ -1662,7 +1662,7 @@ public final class NodeFactory {
     return new Nodes.FTDiacriticsOption(begin, end, isInsensitive, isSensitive);
   }
 
-  private static Nodes.FTDistance createFTDistance(final int begin, final int end, final Node[] st,
+  private static Node createFTDistance(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.FTRange ftRange = null;
     Node ftUnit = null;
@@ -1678,8 +1678,8 @@ public final class NodeFactory {
     return new Nodes.FTDistance(begin, end, ftRange, ftUnit);
   }
 
-  private static Nodes.FTExtensionOption createFTExtensionOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTExtensionOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Terminal stringLiteral = null;
     for(int i = from; i < to; i++) {
@@ -1694,8 +1694,8 @@ public final class NodeFactory {
     return new Nodes.FTExtensionOption(begin, end, eqName, stringLiteral);
   }
 
-  private static Nodes.FTExtensionSelection createFTExtensionSelection(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTExtensionSelection(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node ftSelection = null;
     int size = to - from;
     final Nodes.Pragma[] ch = new Nodes.Pragma[size];
@@ -1713,8 +1713,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTFuzzyOption createFTFuzzyOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTFuzzyOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal integerLiteral = null;
     boolean isErrors = false;
     for(int i = from; i < to; i++) {
@@ -1729,8 +1729,8 @@ public final class NodeFactory {
     return new Nodes.FTFuzzyOption(begin, end, integerLiteral, isErrors);
   }
 
-  private static Nodes.FTIgnoreOption createFTIgnoreOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTIgnoreOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node unionExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1743,8 +1743,8 @@ public final class NodeFactory {
     return new Nodes.FTIgnoreOption(begin, end, unionExpr);
   }
 
-  private static Nodes.FTLanguageOption createFTLanguageOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTLanguageOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal stringLiteral = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1757,8 +1757,8 @@ public final class NodeFactory {
     return new Nodes.FTLanguageOption(begin, end, stringLiteral);
   }
 
-  private static Nodes.FTLiteralRange createFTLiteralRange(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTLiteralRange(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isExactly = false;
     Terminal integerLiteral = null;
     Terminal integerLiteral2 = null;
@@ -1786,8 +1786,8 @@ public final class NodeFactory {
         isLeast, isMost, isFrom, isTo);
   }
 
-  private static Nodes.FTMatchOptions createFTMatchOptions(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTMatchOptions(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.FTMatchOption[] ch = new Nodes.FTMatchOption[size];
     int n = 0;
@@ -1802,7 +1802,7 @@ public final class NodeFactory {
     return new Nodes.FTMatchOptions(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTMildNot createFTMildNot(final int begin, final int end, final Node[] st,
+  private static Node createFTMildNot(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
@@ -1819,8 +1819,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.FTOptionDecl createFTOptionDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTOptionDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.FTMatchOptions ftMatchOptions = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1833,8 +1833,8 @@ public final class NodeFactory {
     return new Nodes.FTOptionDecl(begin, end, ftMatchOptions);
   }
 
-  private static Nodes.FTOr createFTOr(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTOr(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -1849,7 +1849,7 @@ public final class NodeFactory {
     return new Nodes.FTOr(begin, end, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTPrimary createFTPrimary(final int begin, final int end, final Node[] st,
+  private static Node createFTPrimary(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.FTWords ftWords = null;
     Nodes.FTTimes ftTimes = null;
@@ -1869,8 +1869,8 @@ public final class NodeFactory {
     return new Nodes.FTPrimary(begin, end, ftWords, ftTimes, ftSelection, ftExtensionSelection);
   }
 
-  private static Nodes.FTPrimaryWithOptions createFTPrimaryWithOptions(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTPrimaryWithOptions(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.FTPrimary ftPrimary = null;
     Nodes.FTMatchOptions ftMatchOptions = null;
     Nodes.FTWeight ftWeight = null;
@@ -1887,8 +1887,8 @@ public final class NodeFactory {
     return new Nodes.FTPrimaryWithOptions(begin, end, ftPrimary, ftMatchOptions, ftWeight);
   }
 
-  private static Nodes.FTRange createFTRange(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTRange(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     boolean isExactly = false;
     Node additiveExpr = null;
     Node additiveExpr2 = null;
@@ -1916,8 +1916,8 @@ public final class NodeFactory {
         isMost, isFrom, isTo);
   }
 
-  private static Nodes.FTScope createFTScope(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTScope(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     boolean isSame = false;
     boolean isDifferent = false;
     Node ftBigUnit = null;
@@ -1934,7 +1934,7 @@ public final class NodeFactory {
     return new Nodes.FTScope(begin, end, isSame, isDifferent, ftBigUnit);
   }
 
-  private static Nodes.FTScoreVar createFTScoreVar(final int begin, final int end, final Node[] st,
+  private static Node createFTScoreVar(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     for(int i = from; i < to; i++) {
@@ -1948,8 +1948,8 @@ public final class NodeFactory {
     return new Nodes.FTScoreVar(begin, end, varName);
   }
 
-  private static Nodes.FTSelection createFTSelection(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTSelection(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node ftOr = null;
     int size = to - from;
     final Node[] ch = new Node[size];
@@ -1967,8 +1967,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTStemOption createFTStemOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTStemOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isNo = false;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -1981,8 +1981,8 @@ public final class NodeFactory {
     return new Nodes.FTStemOption(begin, end, isNo);
   }
 
-  private static Nodes.FTStopWordOption createFTStopWordOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTStopWordOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.FTStopWords ftStopWords = null;
     boolean isDefault = false;
     boolean isNo = false;
@@ -2004,8 +2004,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTStopWords createFTStopWords(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTStopWords(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isAt = false;
     Node uriLiteral = null;
     int size = to - from;
@@ -2025,8 +2025,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTStopWordsInclExcl createFTStopWordsInclExcl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTStopWordsInclExcl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isUnion = false;
     boolean isExcept = false;
     Nodes.FTStopWords ftStopWords = null;
@@ -2043,8 +2043,8 @@ public final class NodeFactory {
     return new Nodes.FTStopWordsInclExcl(begin, end, isUnion, isExcept, ftStopWords);
   }
 
-  private static Nodes.FTThesaurusID createFTThesaurusID(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTThesaurusID(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node uriLiteral = null;
     boolean isRelationship = false;
     Terminal stringLiteral = null;
@@ -2066,8 +2066,8 @@ public final class NodeFactory {
         ftLiteralRange, isLevels);
   }
 
-  private static Nodes.FTThesaurusOption createFTThesaurusOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTThesaurusOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isDefault = false;
     boolean isNo = false;
     int size = to - from;
@@ -2087,8 +2087,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FTTimes createFTTimes(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTTimes(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Nodes.FTRange ftRange = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2101,7 +2101,7 @@ public final class NodeFactory {
     return new Nodes.FTTimes(begin, end, ftRange);
   }
 
-  private static Nodes.FTUnaryNot createFTUnaryNot(final int begin, final int end, final Node[] st,
+  private static Node createFTUnaryNot(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isFtnot = false;
     Node ftPrimaryWithOptions = null;
@@ -2117,7 +2117,7 @@ public final class NodeFactory {
     return new Nodes.FTUnaryNot(begin, end, isFtnot, ftPrimaryWithOptions);
   }
 
-  private static Nodes.FTWeight createFTWeight(final int begin, final int end, final Node[] st,
+  private static Node createFTWeight(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node expr = null;
     for(int i = from; i < to; i++) {
@@ -2131,8 +2131,8 @@ public final class NodeFactory {
     return new Nodes.FTWeight(begin, end, expr);
   }
 
-  private static Nodes.FTWildCardOption createFTWildCardOption(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTWildCardOption(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isNo = false;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2145,7 +2145,7 @@ public final class NodeFactory {
     return new Nodes.FTWildCardOption(begin, end, isNo);
   }
 
-  private static Nodes.FTWindow createFTWindow(final int begin, final int end, final Node[] st,
+  private static Node createFTWindow(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node additiveExpr = null;
     Node ftUnit = null;
@@ -2161,8 +2161,8 @@ public final class NodeFactory {
     return new Nodes.FTWindow(begin, end, additiveExpr, ftUnit);
   }
 
-  private static Nodes.FTWords createFTWords(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createFTWords(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Nodes.FTWordsValue ftWordsValue = null;
     Nodes.FTAnyallOption ftAnyallOption = null;
     for(int i = from; i < to; i++) {
@@ -2177,8 +2177,8 @@ public final class NodeFactory {
     return new Nodes.FTWords(begin, end, ftWordsValue, ftAnyallOption);
   }
 
-  private static Nodes.FTWordsValue createFTWordsValue(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFTWordsValue(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal stringLiteral = null;
     Node expr = null;
     for(int i = from; i < to; i++) {
@@ -2193,7 +2193,7 @@ public final class NodeFactory {
     return new Nodes.FTWordsValue(begin, end, stringLiteral, expr);
   }
 
-  private static Nodes.FieldDecl createFieldDecl(final int begin, final int end, final Node[] st,
+  private static Node createFieldDecl(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node fieldName = null;
     boolean isAs = false;
@@ -2211,8 +2211,8 @@ public final class NodeFactory {
     return new Nodes.FieldDecl(begin, end, fieldName, isAs, sequenceType);
   }
 
-  private static Nodes.FieldNameAndType createFieldNameAndType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFieldNameAndType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     boolean isAs = false;
     Nodes.SequenceType sequenceType = null;
@@ -2229,7 +2229,7 @@ public final class NodeFactory {
     return new Nodes.FieldNameAndType(begin, end, ncName, isAs, sequenceType);
   }
 
-  private static Nodes.FilterExpr createFilterExpr(final int begin, final int end, final Node[] st,
+  private static Node createFilterExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node postfixExpr = null;
     Nodes.Predicate predicate = null;
@@ -2245,8 +2245,8 @@ public final class NodeFactory {
     return new Nodes.FilterExpr(begin, end, postfixExpr, predicate);
   }
 
-  private static Nodes.FinallyClause createFinallyClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFinallyClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2259,7 +2259,7 @@ public final class NodeFactory {
     return new Nodes.FinallyClause(begin, end, enclosedExpr);
   }
 
-  private static Nodes.ForClause createForClause(final int begin, final int end, final Node[] st,
+  private static Node createForClause(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.ForBinding[] ch = new Nodes.ForBinding[size];
@@ -2275,8 +2275,8 @@ public final class NodeFactory {
     return new Nodes.ForClause(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ForEntryBinding createForEntryBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createForEntryBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ForEntryKeyBinding forEntryKeyBinding = null;
     Nodes.ForEntryValueBinding forEntryValueBinding = null;
     Nodes.PositionalVar positionalVar = null;
@@ -2298,8 +2298,8 @@ public final class NodeFactory {
         positionalVar, in, exprSingle);
   }
 
-  private static Nodes.ForEntryKeyBinding createForEntryKeyBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createForEntryKeyBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2312,8 +2312,8 @@ public final class NodeFactory {
     return new Nodes.ForEntryKeyBinding(begin, end, varNameAndType);
   }
 
-  private static Nodes.ForEntryValueBinding createForEntryValueBinding(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createForEntryValueBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2326,8 +2326,8 @@ public final class NodeFactory {
     return new Nodes.ForEntryValueBinding(begin, end, varNameAndType);
   }
 
-  private static Nodes.ForItemBinding createForItemBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createForItemBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Nodes.AllowingEmpty allowingEmpty = null;
     Nodes.PositionalVar positionalVar = null;
@@ -2351,8 +2351,8 @@ public final class NodeFactory {
         ftScoreVar, in, exprSingle);
   }
 
-  private static Nodes.ForMemberBinding createForMemberBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createForMemberBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Nodes.PositionalVar positionalVar = null;
     Terminal in = null;
@@ -2371,7 +2371,7 @@ public final class NodeFactory {
     return new Nodes.ForMemberBinding(begin, end, varNameAndType, positionalVar, in, exprSingle);
   }
 
-  private static Nodes.FullStep createFullStep(final int begin, final int end, final Node[] st,
+  private static Node createFullStep(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.Axis axis = null;
     Node nodeTest = null;
@@ -2387,8 +2387,8 @@ public final class NodeFactory {
     return new Nodes.FullStep(begin, end, axis, nodeTest);
   }
 
-  private static Nodes.FunctionCall createFunctionCall(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFunctionCall(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Nodes.ArgumentList argumentList = null;
     for(int i = from; i < to; i++) {
@@ -2403,8 +2403,8 @@ public final class NodeFactory {
     return new Nodes.FunctionCall(begin, end, eqName, argumentList);
   }
 
-  private static Nodes.FunctionDecl createFunctionDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFunctionDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Nodes.ParamListWithDefaults paramListWithDefaults = null;
     Nodes.TypeDeclaration typeDeclaration = null;
@@ -2430,8 +2430,8 @@ public final class NodeFactory {
         functionBody, isExternal, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.FunctionSignature createFunctionSignature(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFunctionSignature(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ParamList paramList = null;
     Nodes.TypeDeclaration typeDeclaration = null;
     for(int i = from; i < to; i++) {
@@ -2446,8 +2446,8 @@ public final class NodeFactory {
     return new Nodes.FunctionSignature(begin, end, paramList, typeDeclaration);
   }
 
-  private static Nodes.FunctionType createFunctionType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createFunctionType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.AnyFunctionType anyFunctionType = null;
     Nodes.TypedFunctionType typedFunctionType = null;
     int size = to - from;
@@ -2467,7 +2467,7 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.GNodeType createGNodeType(final int begin, final int end, final Node[] st,
+  private static Node createGNodeType(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2479,8 +2479,8 @@ public final class NodeFactory {
     return new Nodes.GNodeType(begin, end);
   }
 
-  private static Nodes.GroupByClause createGroupByClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createGroupByClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.GroupingSpec[] ch = new Nodes.GroupingSpec[size];
     int n = 0;
@@ -2495,8 +2495,8 @@ public final class NodeFactory {
     return new Nodes.GroupByClause(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.GroupingSpec createGroupingSpec(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createGroupingSpec(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     Nodes.TypeDeclaration typeDeclaration = null;
     Node exprSingle = null;
@@ -2518,8 +2518,8 @@ public final class NodeFactory {
         uriLiteral);
   }
 
-  private static Nodes.IfExpr createIfExpr(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createIfExpr(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Node expr = null;
     Nodes.UnbracedActions unbracedActions = null;
     Nodes.BracedActions bracedActions = null;
@@ -2536,8 +2536,8 @@ public final class NodeFactory {
     return new Nodes.IfExpr(begin, end, expr, unbracedActions, bracedActions);
   }
 
-  private static Nodes.InlineFunctionExpr createInlineFunctionExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createInlineFunctionExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isFunction = false;
     boolean isFn = false;
     Nodes.FunctionSignature functionSignature = null;
@@ -2561,7 +2561,7 @@ public final class NodeFactory {
         functionBody, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.InsertExpr createInsertExpr(final int begin, final int end, final Node[] st,
+  private static Node createInsertExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isNode = false;
     boolean isNodes = false;
@@ -2585,8 +2585,8 @@ public final class NodeFactory {
         targetExpr);
   }
 
-  private static Nodes.InsertExprTargetChoice createInsertExprTargetChoice(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createInsertExprTargetChoice(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isAs = false;
     boolean isFirst = false;
     boolean isLast = false;
@@ -2610,8 +2610,8 @@ public final class NodeFactory {
         isBefore);
   }
 
-  private static Nodes.InstanceofExpr createInstanceofExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createInstanceofExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node treatExpr = null;
     boolean isInstance = false;
     boolean isOf = false;
@@ -2630,8 +2630,8 @@ public final class NodeFactory {
     return new Nodes.InstanceofExpr(begin, end, treatExpr, isInstance, isOf, sequenceType);
   }
 
-  private static Nodes.IntersectExceptExpr createIntersectExceptExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createIntersectExceptExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -2647,8 +2647,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ItemTypeDecl createItemTypeDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createItemTypeDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Node itemType = null;
     int size = to - from;
@@ -2668,7 +2668,7 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.JNodeType createJNodeType(final int begin, final int end, final Node[] st,
+  private static Node createJNodeType(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isStar = false;
     Nodes.JRootSelector jRootSelector = null;
@@ -2690,8 +2690,8 @@ public final class NodeFactory {
     return new Nodes.JNodeType(begin, end, isStar, jRootSelector, ncName, constant, sequenceType);
   }
 
-  private static Nodes.JRootSelector createJRootSelector(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createJRootSelector(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -2702,8 +2702,8 @@ public final class NodeFactory {
     return new Nodes.JRootSelector(begin, end);
   }
 
-  private static Nodes.KeywordArgument createKeywordArgument(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createKeywordArgument(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Node argument = null;
     for(int i = from; i < to; i++) {
@@ -2718,8 +2718,8 @@ public final class NodeFactory {
     return new Nodes.KeywordArgument(begin, end, eqName, argument);
   }
 
-  private static Nodes.KeywordArguments createKeywordArguments(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createKeywordArguments(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.KeywordArgument[] ch = new Nodes.KeywordArgument[size];
     int n = 0;
@@ -2734,8 +2734,8 @@ public final class NodeFactory {
     return new Nodes.KeywordArguments(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LabeledFieldDecl createLabeledFieldDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLabeledFieldDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.FieldNameAndType fieldNameAndType = null;
     Node exprSingle = null;
     boolean isPercentFixed = false;
@@ -2752,8 +2752,8 @@ public final class NodeFactory {
     return new Nodes.LabeledFieldDecl(begin, end, fieldNameAndType, exprSingle, isPercentFixed);
   }
 
-  private static Nodes.LabeledRecordTypeDecl createLabeledRecordTypeDecl(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLabeledRecordTypeDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Node eqName2 = null;
     boolean isExtends = false;
@@ -2778,8 +2778,8 @@ public final class NodeFactory {
         exprSingle, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LetArrayBinding createLetArrayBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLetArrayBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TypeDeclaration typeDeclaration = null;
     Node exprSingle = null;
     int size = to - from;
@@ -2799,7 +2799,7 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LetClause createLetClause(final int begin, final int end, final Node[] st,
+  private static Node createLetClause(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.LetBinding[] ch = new Nodes.LetBinding[size];
@@ -2815,8 +2815,8 @@ public final class NodeFactory {
     return new Nodes.LetClause(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LetMapBinding createLetMapBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLetMapBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TypeDeclaration typeDeclaration = null;
     Node exprSingle = null;
     int size = to - from;
@@ -2836,8 +2836,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LetSequenceBinding createLetSequenceBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLetSequenceBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TypeDeclaration typeDeclaration = null;
     Node exprSingle = null;
     int size = to - from;
@@ -2857,8 +2857,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.LetValueBinding createLetValueBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLetValueBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Nodes.FTScoreVar ftScoreVar = null;
     Node exprSingle = null;
@@ -2875,8 +2875,8 @@ public final class NodeFactory {
     return new Nodes.LetValueBinding(begin, end, varNameAndType, ftScoreVar, exprSingle);
   }
 
-  private static Nodes.LibraryModule createLibraryModule(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createLibraryModule(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ModuleDecl moduleDecl = null;
     Nodes.Prolog prolog = null;
     for(int i = from; i < to; i++) {
@@ -2891,8 +2891,8 @@ public final class NodeFactory {
     return new Nodes.LibraryModule(begin, end, moduleDecl, prolog);
   }
 
-  private static Nodes.Lookup createLookup(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createLookup(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Node keySpecifier = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2905,7 +2905,7 @@ public final class NodeFactory {
     return new Nodes.Lookup(begin, end, keySpecifier);
   }
 
-  private static Nodes.LookupExpr createLookupExpr(final int begin, final int end, final Node[] st,
+  private static Node createLookupExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node postfixExpr = null;
     Nodes.Lookup lookup = null;
@@ -2921,7 +2921,7 @@ public final class NodeFactory {
     return new Nodes.LookupExpr(begin, end, postfixExpr, lookup);
   }
 
-  private static Nodes.MainModule createMainModule(final int begin, final int end, final Node[] st,
+  private static Node createMainModule(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.Prolog prolog = null;
     Node queryBody = null;
@@ -2937,8 +2937,8 @@ public final class NodeFactory {
     return new Nodes.MainModule(begin, end, prolog, queryBody);
   }
 
-  private static Nodes.MapConstructor createMapConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createMapConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isMap = false;
     int size = to - from;
     final Nodes.MapConstructorEntry[] ch = new Nodes.MapConstructorEntry[size];
@@ -2955,8 +2955,8 @@ public final class NodeFactory {
     return new Nodes.MapConstructor(begin, end, isMap, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.MapConstructorEntry createMapConstructorEntry(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createMapConstructorEntry(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     Node exprSingle2 = null;
     for(int i = from; i < to; i++) {
@@ -2970,8 +2970,8 @@ public final class NodeFactory {
     return new Nodes.MapConstructorEntry(begin, end, exprSingle, exprSingle2);
   }
 
-  private static Nodes.MappingArrowTarget createMappingArrowTarget(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createMappingArrowTarget(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ArrowTarget arrowTarget = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2984,8 +2984,8 @@ public final class NodeFactory {
     return new Nodes.MappingArrowTarget(begin, end, arrowTarget);
   }
 
-  private static Nodes.MarkedNCName createMarkedNCName(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createMarkedNCName(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -2998,7 +2998,7 @@ public final class NodeFactory {
     return new Nodes.MarkedNCName(begin, end, ncName);
   }
 
-  private static Nodes.MethodCall createMethodCall(final int begin, final int end, final Node[] st,
+  private static Node createMethodCall(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node postfixExpr = null;
     Terminal ncName = null;
@@ -3017,8 +3017,8 @@ public final class NodeFactory {
     return new Nodes.MethodCall(begin, end, postfixExpr, ncName, positionalArgumentList);
   }
 
-  private static Nodes.Module createModule(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createModule(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Nodes.VersionDecl versionDecl = null;
     Nodes.LibraryModule libraryModule = null;
     Nodes.MainModule mainModule = null;
@@ -3035,7 +3035,7 @@ public final class NodeFactory {
     return new Nodes.Module(begin, end, versionDecl, libraryModule, mainModule);
   }
 
-  private static Nodes.ModuleDecl createModuleDecl(final int begin, final int end, final Node[] st,
+  private static Node createModuleDecl(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     Node uriLiteral = null;
@@ -3051,8 +3051,8 @@ public final class NodeFactory {
     return new Nodes.ModuleDecl(begin, end, ncName, uriLiteral);
   }
 
-  private static Nodes.ModuleImport createModuleImport(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createModuleImport(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isNamespace = false;
     Terminal ncName = null;
     boolean isAt = false;
@@ -3074,8 +3074,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.MultiplicativeExpr createMultiplicativeExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createMultiplicativeExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3092,8 +3092,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.NameTestUnion createNameTestUnion(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createNameTestUnion(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3109,8 +3109,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.NamedFunctionRef createNamedFunctionRef(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createNamedFunctionRef(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Terminal integerLiteral = null;
     for(int i = from; i < to; i++) {
@@ -3125,8 +3125,8 @@ public final class NodeFactory {
     return new Nodes.NamedFunctionRef(begin, end, eqName, integerLiteral);
   }
 
-  private static Nodes.NamespaceDecl createNamespaceDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createNamespaceDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     Node uriLiteral = null;
     for(int i = from; i < to; i++) {
@@ -3141,8 +3141,8 @@ public final class NodeFactory {
     return new Nodes.NamespaceDecl(begin, end, ncName, uriLiteral);
   }
 
-  private static Nodes.NamespaceNodeType createNamespaceNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createNamespaceNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -3153,8 +3153,8 @@ public final class NodeFactory {
     return new Nodes.NamespaceNodeType(begin, end);
   }
 
-  private static Nodes.NextVar createNextVar(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createNextVar(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Nodes.VarName varName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3167,7 +3167,7 @@ public final class NodeFactory {
     return new Nodes.NextVar(begin, end, varName);
   }
 
-  private static Nodes.OptionDecl createOptionDecl(final int begin, final int end, final Node[] st,
+  private static Node createOptionDecl(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node eqName = null;
     Terminal stringLiteral = null;
@@ -3183,8 +3183,8 @@ public final class NodeFactory {
     return new Nodes.OptionDecl(begin, end, eqName, stringLiteral);
   }
 
-  private static Nodes.OrExpr createOrExpr(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createOrExpr(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3199,8 +3199,8 @@ public final class NodeFactory {
     return new Nodes.OrExpr(begin, end, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.OrderByClause createOrderByClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createOrderByClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isStable = false;
     int size = to - from;
     final Nodes.OrderSpec[] ch = new Nodes.OrderSpec[size];
@@ -3218,8 +3218,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.OrderModifier createOrderModifier(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createOrderModifier(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isAscending = false;
     boolean isDescending = false;
     boolean isEmpty = false;
@@ -3245,7 +3245,7 @@ public final class NodeFactory {
         isLeast, isCollation, uriLiteral);
   }
 
-  private static Nodes.OrderSpec createOrderSpec(final int begin, final int end, final Node[] st,
+  private static Node createOrderSpec(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     Nodes.OrderModifier orderModifier = null;
@@ -3261,8 +3261,8 @@ public final class NodeFactory {
     return new Nodes.OrderSpec(begin, end, exprSingle, orderModifier);
   }
 
-  private static Nodes.OrderedExpr createOrderedExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createOrderedExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3275,8 +3275,8 @@ public final class NodeFactory {
     return new Nodes.OrderedExpr(begin, end, enclosedExpr);
   }
 
-  private static Nodes.OrderingModeDecl createOrderingModeDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createOrderingModeDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isOrdered = false;
     boolean isUnordered = false;
     for(int i = from; i < to; i++) {
@@ -3291,8 +3291,8 @@ public final class NodeFactory {
     return new Nodes.OrderingModeDecl(begin, end, isOrdered, isUnordered);
   }
 
-  private static Nodes.OtherwiseExpr createOtherwiseExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createOtherwiseExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3308,7 +3308,7 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ParamList createParamList(final int begin, final int end, final Node[] st,
+  private static Node createParamList(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.VarNameAndType[] ch = new Nodes.VarNameAndType[size];
@@ -3324,8 +3324,8 @@ public final class NodeFactory {
     return new Nodes.ParamList(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ParamListWithDefaults createParamListWithDefaults(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createParamListWithDefaults(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.ParamWithDefault[] ch = new Nodes.ParamWithDefault[size];
     int n = 0;
@@ -3340,8 +3340,8 @@ public final class NodeFactory {
     return new Nodes.ParamListWithDefaults(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ParamWithDefault createParamWithDefault(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createParamWithDefault(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Node exprSingle = null;
     for(int i = from; i < to; i++) {
@@ -3356,8 +3356,8 @@ public final class NodeFactory {
     return new Nodes.ParamWithDefault(begin, end, varNameAndType, exprSingle);
   }
 
-  private static Nodes.ParenthesizedExpr createParenthesizedExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createParenthesizedExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node expr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3370,8 +3370,8 @@ public final class NodeFactory {
     return new Nodes.ParenthesizedExpr(begin, end, expr);
   }
 
-  private static Nodes.PipelineExpr createPipelineExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createPipelineExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3387,8 +3387,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.PositionalArgumentList createPositionalArgumentList(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createPositionalArgumentList(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.PositionalArguments positionalArguments = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3401,8 +3401,8 @@ public final class NodeFactory {
     return new Nodes.PositionalArgumentList(begin, end, positionalArguments);
   }
 
-  private static Nodes.PositionalArguments createPositionalArguments(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createPositionalArguments(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     for(int i = from; i < to; i++) {
       if(sy[i] == Sym.PositionalArguments && st[i] instanceof final Nodes.PositionalArguments p)
@@ -3426,8 +3426,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.PositionalVar createPositionalVar(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createPositionalVar(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3440,8 +3440,8 @@ public final class NodeFactory {
     return new Nodes.PositionalVar(begin, end, varName);
   }
 
-  private static Nodes.Pragma createPragma(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createPragma(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Node eqName = null;
     Terminal pragmaContents = null;
     for(int i = from; i < to; i++) {
@@ -3456,7 +3456,7 @@ public final class NodeFactory {
     return new Nodes.Pragma(begin, end, eqName, pragmaContents);
   }
 
-  private static Nodes.Predicate createPredicate(final int begin, final int end, final Node[] st,
+  private static Node createPredicate(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node expr = null;
     for(int i = from; i < to; i++) {
@@ -3470,8 +3470,8 @@ public final class NodeFactory {
     return new Nodes.Predicate(begin, end, expr);
   }
 
-  private static Nodes.PreviousVar createPreviousVar(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createPreviousVar(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3484,8 +3484,8 @@ public final class NodeFactory {
     return new Nodes.PreviousVar(begin, end, varName);
   }
 
-  private static Nodes.ProcessingInstructionNodeType createProcessingInstructionNodeType(final int
-      begin, final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createProcessingInstructionNodeType(final int begin, final int end,
+      final Node[] st, final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     Terminal stringLiteral = null;
     for(int i = from; i < to; i++) {
@@ -3500,8 +3500,8 @@ public final class NodeFactory {
     return new Nodes.ProcessingInstructionNodeType(begin, end, ncName, stringLiteral);
   }
 
-  private static Nodes.Prolog createProlog(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createProlog(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3518,8 +3518,8 @@ public final class NodeFactory {
     return new Nodes.Prolog(begin, end, n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.QNameLiteral createQNameLiteral(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createQNameLiteral(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3532,8 +3532,8 @@ public final class NodeFactory {
     return new Nodes.QNameLiteral(begin, end, eqName);
   }
 
-  private static Nodes.QuantifiedExpr createQuantifiedExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createQuantifiedExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isSome = false;
     boolean isEvery = false;
     Node exprSingle = null;
@@ -3555,8 +3555,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.QuantifierBinding createQuantifierBinding(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createQuantifierBinding(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Terminal in = null;
     Node exprSingle = null;
@@ -3573,7 +3573,7 @@ public final class NodeFactory {
     return new Nodes.QuantifierBinding(begin, end, varNameAndType, in, exprSingle);
   }
 
-  private static Nodes.RangeExpr createRangeExpr(final int begin, final int end, final Node[] st,
+  private static Node createRangeExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node additiveExpr = null;
     Node additiveExpr2 = null;
@@ -3591,8 +3591,8 @@ public final class NodeFactory {
     return new Nodes.RangeExpr(begin, end, additiveExpr, additiveExpr2, isTo);
   }
 
-  private static Nodes.RelativePathExpr createRelativePathExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createRelativePathExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3608,7 +3608,7 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.RenameExpr createRenameExpr(final int begin, final int end, final Node[] st,
+  private static Node createRenameExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     boolean isNode = false;
     boolean isNodes = false;
@@ -3628,8 +3628,8 @@ public final class NodeFactory {
     return new Nodes.RenameExpr(begin, end, isNode, isNodes, targetExpr, newNameExpr);
   }
 
-  private static Nodes.ReplaceExpr createReplaceExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createReplaceExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isValue = false;
     boolean isOf = false;
     boolean isNode = false;
@@ -3653,8 +3653,8 @@ public final class NodeFactory {
         exprSingle);
   }
 
-  private static Nodes.RestrictedDynamicCall createRestrictedDynamicCall(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createRestrictedDynamicCall(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarRef varRef = null;
     Nodes.ParenthesizedExpr parenthesizedExpr = null;
     Nodes.FunctionItemExpr functionItemExpr = null;
@@ -3679,8 +3679,8 @@ public final class NodeFactory {
         mapConstructor, arrayConstructor, positionalArgumentList);
   }
 
-  private static Nodes.ReturnClause createReturnClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createReturnClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3693,8 +3693,8 @@ public final class NodeFactory {
     return new Nodes.ReturnClause(begin, end, exprSingle);
   }
 
-  private static Nodes.RevalidationDecl createRevalidationDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createRevalidationDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isStrict = false;
     boolean isLax = false;
     boolean isSkip = false;
@@ -3711,8 +3711,8 @@ public final class NodeFactory {
     return new Nodes.RevalidationDecl(begin, end, isStrict, isLax, isSkip);
   }
 
-  private static Nodes.SchemaAttributeNodeType createSchemaAttributeNodeType(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSchemaAttributeNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node attributeName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3725,8 +3725,8 @@ public final class NodeFactory {
     return new Nodes.SchemaAttributeNodeType(begin, end, attributeName);
   }
 
-  private static Nodes.SchemaElementNodeType createSchemaElementNodeType(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSchemaElementNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node elementName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3739,8 +3739,8 @@ public final class NodeFactory {
     return new Nodes.SchemaElementNodeType(begin, end, elementName);
   }
 
-  private static Nodes.SchemaImport createSchemaImport(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSchemaImport(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.SchemaPrefix schemaPrefix = null;
     boolean isAt = false;
     int size = to - from;
@@ -3760,8 +3760,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.SchemaPrefix createSchemaPrefix(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSchemaPrefix(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Terminal ncName = null;
     boolean isFixed = false;
     boolean isDefault = false;
@@ -3780,8 +3780,8 @@ public final class NodeFactory {
     return new Nodes.SchemaPrefix(begin, end, ncName, isFixed, isDefault, isElement);
   }
 
-  private static Nodes.SequenceArrowTarget createSequenceArrowTarget(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSequenceArrowTarget(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.ArrowTarget arrowTarget = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3794,8 +3794,8 @@ public final class NodeFactory {
     return new Nodes.SequenceArrowTarget(begin, end, arrowTarget);
   }
 
-  private static Nodes.SequenceType createSequenceType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSequenceType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isEmptySequence = false;
     Node itemType = null;
     Node occurrenceIndicator = null;
@@ -3812,8 +3812,8 @@ public final class NodeFactory {
     return new Nodes.SequenceType(begin, end, isEmptySequence, itemType, occurrenceIndicator);
   }
 
-  private static Nodes.SequenceTypeUnion createSequenceTypeUnion(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSequenceTypeUnion(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.SequenceType[] ch = new Nodes.SequenceType[size];
     int n = 0;
@@ -3828,8 +3828,8 @@ public final class NodeFactory {
     return new Nodes.SequenceTypeUnion(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.SimpleMapExpr createSimpleMapExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSimpleMapExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3845,8 +3845,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.SlidingWindowClause createSlidingWindowClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSlidingWindowClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Terminal in = null;
     Node exprSingle = null;
@@ -3868,8 +3868,8 @@ public final class NodeFactory {
         windowStartCondition, windowEndCondition);
   }
 
-  private static Nodes.SquareArrayConstructor createSquareArrayConstructor(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSquareArrayConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3885,8 +3885,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.StringConcatExpr createStringConcatExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createStringConcatExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3902,8 +3902,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.StringConstructor createStringConstructor(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createStringConstructor(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.StringConstructorContent stringConstructorContent = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3917,8 +3917,8 @@ public final class NodeFactory {
     return new Nodes.StringConstructor(begin, end, stringConstructorContent);
   }
 
-  private static Nodes.StringConstructorContent createStringConstructorContent(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createStringConstructorContent(final int begin, final int end,
+      final Node[] st, final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3934,8 +3934,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.StringInterpolation createStringInterpolation(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createStringInterpolation(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -3948,8 +3948,8 @@ public final class NodeFactory {
     return new Nodes.StringInterpolation(begin, end, enclosedExpr);
   }
 
-  private static Nodes.StringTemplate createStringTemplate(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createStringTemplate(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -3965,8 +3965,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.SwitchCaseClause createSwitchCaseClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSwitchCaseClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     int size = to - from;
     final Node[] ch = new Node[size];
@@ -3984,8 +3984,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.SwitchCases createSwitchCases(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSwitchCases(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     int size = to - from;
     final Nodes.SwitchCaseClause[] ch = new Nodes.SwitchCaseClause[size];
@@ -4003,8 +4003,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.SwitchComparand createSwitchComparand(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createSwitchComparand(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node expr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4017,7 +4017,7 @@ public final class NodeFactory {
     return new Nodes.SwitchComparand(begin, end, expr);
   }
 
-  private static Nodes.SwitchExpr createSwitchExpr(final int begin, final int end, final Node[] st,
+  private static Node createSwitchExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.SwitchComparand switchComparand = null;
     Nodes.SwitchCases switchCases = null;
@@ -4035,8 +4035,8 @@ public final class NodeFactory {
     return new Nodes.SwitchExpr(begin, end, switchComparand, switchCases, bracedSwitchCases);
   }
 
-  private static Nodes.TextNodeType createTextNodeType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTextNodeType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
@@ -4047,8 +4047,8 @@ public final class NodeFactory {
     return new Nodes.TextNodeType(begin, end);
   }
 
-  private static Nodes.TraceClause createTraceClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTraceClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4061,8 +4061,8 @@ public final class NodeFactory {
     return new Nodes.TraceClause(begin, end, exprSingle);
   }
 
-  private static Nodes.TransformWithExpr createTransformWithExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTransformWithExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node pipelineExpr = null;
     int size = to - from;
     final Node[] ch = new Node[size];
@@ -4080,7 +4080,7 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.TreatExpr createTreatExpr(final int begin, final int end, final Node[] st,
+  private static Node createTreatExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node coerceExpr = null;
     boolean isTreat = false;
@@ -4100,8 +4100,8 @@ public final class NodeFactory {
     return new Nodes.TreatExpr(begin, end, coerceExpr, isTreat, isAs, sequenceType);
   }
 
-  private static Nodes.TryCatchExpr createTryCatchExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTryCatchExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TryClause tryClause = null;
     Nodes.FinallyClause finallyClause = null;
     int size = to - from;
@@ -4121,7 +4121,7 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.TryClause createTryClause(final int begin, final int end, final Node[] st,
+  private static Node createTryClause(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
@@ -4135,8 +4135,8 @@ public final class NodeFactory {
     return new Nodes.TryClause(begin, end, enclosedExpr);
   }
 
-  private static Nodes.TumblingWindowClause createTumblingWindowClause(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTumblingWindowClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Terminal in = null;
     Node exprSingle = null;
@@ -4158,8 +4158,8 @@ public final class NodeFactory {
         windowStartCondition, windowEndCondition);
   }
 
-  private static Nodes.TypeDeclaration createTypeDeclaration(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypeDeclaration(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.SequenceType sequenceType = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4172,8 +4172,8 @@ public final class NodeFactory {
     return new Nodes.TypeDeclaration(begin, end, sequenceType);
   }
 
-  private static Nodes.TypedArrayType createTypedArrayType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypedArrayType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.SequenceType sequenceType = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4186,8 +4186,8 @@ public final class NodeFactory {
     return new Nodes.TypedArrayType(begin, end, sequenceType);
   }
 
-  private static Nodes.TypedFunctionParam createTypedFunctionParam(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypedFunctionParam(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     boolean isAs = false;
     Nodes.SequenceType sequenceType = null;
@@ -4204,8 +4204,8 @@ public final class NodeFactory {
     return new Nodes.TypedFunctionParam(begin, end, eqName, isAs, sequenceType);
   }
 
-  private static Nodes.TypedFunctionType createTypedFunctionType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypedFunctionType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isFunction = false;
     boolean isFn = false;
     Nodes.SequenceType sequenceType = null;
@@ -4227,8 +4227,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.TypedMapType createTypedMapType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypedMapType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node itemType = null;
     Nodes.SequenceType sequenceType = null;
     for(int i = from; i < to; i++) {
@@ -4243,8 +4243,8 @@ public final class NodeFactory {
     return new Nodes.TypedMapType(begin, end, itemType, sequenceType);
   }
 
-  private static Nodes.TypedRecordType createTypedRecordType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypedRecordType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Nodes.FieldDecl[] ch = new Nodes.FieldDecl[size];
     int n = 0;
@@ -4259,8 +4259,8 @@ public final class NodeFactory {
     return new Nodes.TypedRecordType(begin, end, n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.TypeswitchCases createTypeswitchCases(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypeswitchCases(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.VarName varName = null;
     Node exprSingle = null;
     int size = to - from;
@@ -4280,8 +4280,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.TypeswitchExpr createTypeswitchExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createTypeswitchExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node expr = null;
     Nodes.TypeswitchCases typeswitchCases = null;
     Nodes.BracedTypeswitchCases bracedTypeswitchCases = null;
@@ -4298,7 +4298,7 @@ public final class NodeFactory {
     return new Nodes.TypeswitchExpr(begin, end, expr, typeswitchCases, bracedTypeswitchCases);
   }
 
-  private static Nodes.UnaryExpr createUnaryExpr(final int begin, final int end, final Node[] st,
+  private static Node createUnaryExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node valueExpr = null;
     int size = to - from;
@@ -4317,8 +4317,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.UnbracedActions createUnbracedActions(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createUnbracedActions(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     Node exprSingle2 = null;
     boolean isElse = false;
@@ -4334,7 +4334,7 @@ public final class NodeFactory {
     return new Nodes.UnbracedActions(begin, end, exprSingle, exprSingle2, isElse);
   }
 
-  private static Nodes.UnionExpr createUnionExpr(final int begin, final int end, final Node[] st,
+  private static Node createUnionExpr(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
@@ -4351,8 +4351,8 @@ public final class NodeFactory {
         n));
   }
 
-  private static Nodes.UnionNodeTest createUnionNodeTest(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createUnionNodeTest(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     int size = to - from;
     final Node[] ch = new Node[size];
     int n = 0;
@@ -4368,8 +4368,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.UnorderedExpr createUnorderedExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createUnorderedExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.EnclosedExpr enclosedExpr = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4382,8 +4382,8 @@ public final class NodeFactory {
     return new Nodes.UnorderedExpr(begin, end, enclosedExpr);
   }
 
-  private static Nodes.UpdatingFunctionCall createUpdatingFunctionCall(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createUpdatingFunctionCall(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isInvoke = false;
     Node primaryExpr = null;
     int size = to - from;
@@ -4403,8 +4403,8 @@ public final class NodeFactory {
         n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.ValidateExpr createValidateExpr(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createValidateExpr(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node validationMode = null;
     boolean isType = false;
     Node typeName = null;
@@ -4423,8 +4423,8 @@ public final class NodeFactory {
     return new Nodes.ValidateExpr(begin, end, validationMode, isType, typeName, expr);
   }
 
-  private static Nodes.VarDecl createVarDecl(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createVarDecl(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Nodes.VarNameAndType varNameAndType = null;
     Node varValue = null;
     boolean isExternal = false;
@@ -4448,8 +4448,8 @@ public final class NodeFactory {
         n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
-  private static Nodes.VarName createVarName(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createVarName(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Node eqName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4462,8 +4462,8 @@ public final class NodeFactory {
     return new Nodes.VarName(begin, end, eqName);
   }
 
-  private static Nodes.VarNameAndType createVarNameAndType(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createVarNameAndType(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node eqName = null;
     Nodes.TypeDeclaration typeDeclaration = null;
     for(int i = from; i < to; i++) {
@@ -4478,8 +4478,8 @@ public final class NodeFactory {
     return new Nodes.VarNameAndType(begin, end, eqName, typeDeclaration);
   }
 
-  private static Nodes.VarRef createVarRef(final int begin, final int end, final Node[] st,
-      final int[] sy, final int from, final int to) {
+  private static Node createVarRef(final int begin, final int end, final Node[] st, final int[] sy,
+      final int from, final int to) {
     Node eqName = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4492,8 +4492,8 @@ public final class NodeFactory {
     return new Nodes.VarRef(begin, end, eqName);
   }
 
-  private static Nodes.VersionDecl createVersionDecl(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createVersionDecl(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isEncoding = false;
     Terminal stringLiteral = null;
     Terminal stringLiteral2 = null;
@@ -4512,8 +4512,8 @@ public final class NodeFactory {
     return new Nodes.VersionDecl(begin, end, isEncoding, stringLiteral, stringLiteral2, isVersion);
   }
 
-  private static Nodes.WhereClause createWhereClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createWhereClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4526,8 +4526,8 @@ public final class NodeFactory {
     return new Nodes.WhereClause(begin, end, exprSingle);
   }
 
-  private static Nodes.WhileClause createWhileClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createWhileClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Node exprSingle = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
@@ -4540,7 +4540,7 @@ public final class NodeFactory {
     return new Nodes.WhileClause(begin, end, exprSingle);
   }
 
-  private static Nodes.Whitespace createWhitespace(final int begin, final int end, final Node[] st,
+  private static Node createWhitespace(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Nodes.Comment comment = null;
     for(int i = from; i < to; i++) {
@@ -4554,8 +4554,8 @@ public final class NodeFactory {
     return new Nodes.Whitespace(begin, end, comment);
   }
 
-  private static Nodes.WindowClause createWindowClause(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createWindowClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.TumblingWindowClause tumblingWindowClause = null;
     Nodes.SlidingWindowClause slidingWindowClause = null;
     for(int i = from; i < to; i++) {
@@ -4570,8 +4570,8 @@ public final class NodeFactory {
     return new Nodes.WindowClause(begin, end, tumblingWindowClause, slidingWindowClause);
   }
 
-  private static Nodes.WindowEndCondition createWindowEndCondition(final int begin, final int end,
-      final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createWindowEndCondition(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     boolean isOnly = false;
     Nodes.WindowVars windowVars = null;
     boolean isWhen = false;
@@ -4590,8 +4590,8 @@ public final class NodeFactory {
     return new Nodes.WindowEndCondition(begin, end, isOnly, windowVars, isWhen, exprSingle);
   }
 
-  private static Nodes.WindowStartCondition createWindowStartCondition(final int begin,
-      final int end, final Node[] st, final int[] sy, final int from, final int to) {
+  private static Node createWindowStartCondition(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
     Nodes.WindowVars windowVars = null;
     boolean isWhen = false;
     Node exprSingle = null;
@@ -4608,7 +4608,7 @@ public final class NodeFactory {
     return new Nodes.WindowStartCondition(begin, end, windowVars, isWhen, exprSingle);
   }
 
-  private static Nodes.WindowVars createWindowVars(final int begin, final int end, final Node[] st,
+  private static Node createWindowVars(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node currentVar = null;
     Nodes.PositionalVar positionalVar = null;

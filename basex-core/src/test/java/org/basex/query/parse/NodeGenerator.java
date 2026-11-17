@@ -942,7 +942,8 @@ public final class NodeGenerator {
    */
   private void create(final Shape shape, final StringBuilder sb) {
     final String name = shape.sym.name();
-    sb.append("\n  private static Nodes.").append(name).append(' ').append(method(shape.sym)).
+    // the return type is Node: with specific types, the verifier loads all node classes
+    sb.append("\n  private static Node ").append(method(shape.sym)).
       append("(final int begin, final int end, final Node[] st, final int[] sy, final int from, "
           + "final int to) {\n");
     final boolean list = FoldPolicy.LISTS.contains(shape.sym.symbol());

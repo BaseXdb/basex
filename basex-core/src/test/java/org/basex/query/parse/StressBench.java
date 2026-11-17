@@ -1,6 +1,7 @@
 package org.basex.query.parse;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.core.*;
 import org.basex.core.MainOptions.*;
@@ -33,15 +34,18 @@ public final class StressBench {
     final int rounds = args.length > 0 ? Integer.parseInt(args[0]) : 7;
     final int warmup = Math.min(rounds - 1, args.length > 1 ? Integer.parseInt(args[1]) : 2);
 
-    final String[][] cases = {
-      { "content run", "<a>" + "x".repeat(200_000) + "</a>" },
-      { "attribute run", "<a b='" + "x".repeat(200_000) + "'/>" },
-      { "alternating content", "<a>" + "x{1}".repeat(50_000) + "</a>" },
-      { "arguments", "concat(" + "1,".repeat(19_999) + "1)" },
-      { "nested arguments", "concat(".repeat(200) + "1" + ", 2)".repeat(200) },
-      { "operands", "1" + "+1".repeat(50_000) },
-      { "else if", "if(0) {0} else ".repeat(20_000) + "{1}" },
-    };
+    final String[][] cases = { { "content run", "<a>" + "x".repeat(200_000) + "</a>"},
+        { "attribute run", "<a b='" + "x".repeat(200_000) + "'/>"},
+        { "alternating content", "<a>" + "x{1}".repeat(50_000) + "</a>"},
+        { "arguments", "concat(" + "1,".repeat(19_999) + "1)"},
+        { "nested arguments", "concat(".repeat(200) + "1" + ", 2)".repeat(200)},
+        { "operands", "1" + "+1".repeat(50_000)},
+        { "else if", "if(0) {0} else ".repeat(20_000) + "{1}"},
+        { "function declarations",
+            IntStream.range(0, 5_000).mapToObj(
+                i -> "declare function local:f" + i + "($x) { $x };\n").collect(
+                    Collectors.joining())
+                + 1}};
 
     final String[] heads = new String[2 * types.length + 1];
     heads[0] = "Input";
