@@ -80,7 +80,7 @@ public final class MediaType implements Comparable<MediaType> {
   /** Subtype. */
   private final String sub;
   /** Parameters. */
-  private final LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
+  private final LinkedHashMap<String, String> parameters;
 
   /**
    * Constructor.
@@ -95,18 +95,26 @@ public final class MediaType implements Comparable<MediaType> {
     main = (s == -1 ? type : type.substring(0, s)).toLowerCase(Locale.ENGLISH);
     sub  = (s == -1 ? "" : type.substring(s + 1)).toLowerCase(Locale.ENGLISH);
 
-    // parse parameters (simplified version of RFC 2045; no support for comments, etc.)
-    if(p != -1) {
-      for(final String param : splitParams(string.substring(p + 1))) {
-        final String[] kv = Strings.split(param, '=', 2);
-        // attribute: trim whitespace, convert to lower case
-        final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
-        // value: trim whitespace, remove quotes and backslashed characters
-        String v = kv.length < 2 ? "" : kv[1].trim();
-        if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
-        parameters.put(k, v);
-      }
+    parameters = p == -1 ? new LinkedHashMap<>() : parameters(string.substring(p + 1));
+  }
+
+  /**
+   * Parses a parameter list (simplified version of RFC 2045; no support for comments, etc.).
+   * @param string parameter list (without the leading type)
+   * @return parameters with lower-case names
+   */
+  static LinkedHashMap<String, String> parameters(final String string) {
+    final LinkedHashMap<String, String> params = new LinkedHashMap<>();
+    for(final String param : splitParams(string)) {
+      final String[] kv = Strings.split(param, '=', 2);
+      // attribute: trim whitespace, convert to lower case
+      final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
+      // value: trim whitespace, remove quotes and backslashed characters
+      String v = kv.length < 2 ? "" : kv[1].trim();
+      if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
+      params.put(k, v);
     }
+    return params;
   }
 
   /**
@@ -169,6 +177,15 @@ public final class MediaType implements Comparable<MediaType> {
    */
   public String parameter(final String name) {
     return parameters.get(name);
+  }
+
+  /**
+   * Returns the value of the specified quality factor parameter.
+   * @param name name of parameter ({@code q} or {@code qs})
+   * @return quality factor, {@code 1} if the parameter is missing, {@code 0} if it is invalid
+   */
+  public double qf(final String name) {
+    return QualityFactor.get(parameters.get(name));
   }
 
   /**

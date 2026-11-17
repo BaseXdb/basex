@@ -400,14 +400,15 @@ public final class WebModules {
     double cQf = 0, sQf = 0;
     for(final RestXqFunction func : funcs) {
       for(final MediaType accept : accepts) {
+        final double qf = accept.qf("q");
         if(func.produces.isEmpty()) {
-          cQf = Math.max(cQf, qf(accept, "q"));
+          cQf = Math.max(cQf, qf);
           sQf = 1;
         } else {
           for(final MediaType produce : func.produces) {
             if(produce.matches(accept)) {
-              cQf = Math.max(cQf, qf(accept, "q"));
-              sQf = Math.max(sQf, qf(produce, "qs"));
+              cQf = Math.max(cQf, qf);
+              sQf = Math.max(sQf, produce.qf("qs"));
             }
           }
         }
@@ -430,26 +431,15 @@ public final class WebModules {
     for(int fl = funcs.size() - 1; fl >= 0; fl--) {
       final RestXqFunction func = funcs.get(fl);
       final Checks<MediaType> check = accept -> {
-        if(func.produces.isEmpty()) return qf(accept, "q") == clientQf;
+        if(func.produces.isEmpty()) return accept.qf("q") == clientQf;
 
         final Checks<MediaType> checkProduce = produce ->
-          produce.matches(accept) && qf(accept, "q") == clientQf &&
-          (serverQf == -1 || qf(produce, "qs") == serverQf);
+          produce.matches(accept) && accept.qf("q") == clientQf &&
+          (serverQf == -1 || produce.qf("qs") == serverQf);
         return Checks.any(func.produces, checkProduce);
       };
       if(!Checks.any(accepts, check)) funcs.remove(fl);
     }
-  }
-
-  /**
-   * Returns the quality factor of the specified media type.
-   * @param type media type
-   * @param factor quality factor string
-   * @return quality factor
-   */
-  private static double qf(final MediaType type, final String factor) {
-    final String qf = type.parameter(factor);
-    return qf != null ? toDouble(token(qf)) : 1;
   }
 
   /**

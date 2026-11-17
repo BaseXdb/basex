@@ -198,11 +198,7 @@ public final class RestXqFunction extends WebFunction {
     // check validity of quality factors
     for(final MediaType produce : produces) {
       final String qs = produce.parameter("qs");
-      if(qs != null) {
-        final double d = toDouble(token(qs));
-        // NaN will be included if negated condition is used...
-        if(d < 0 || d > 1) throw error(ERROR_QS_X, qs);
-      }
+      if(!QualityFactor.valid(qs)) throw error(ERROR_QS_X, qs);
     }
     return checkParsed(found, starts, declared);
   }

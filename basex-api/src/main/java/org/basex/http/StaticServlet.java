@@ -1,6 +1,7 @@
 package org.basex.http;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
+import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -20,8 +21,8 @@ import jakarta.servlet.*;
  * @author Christian Gruen
  */
 public final class StaticServlet extends BaseXServlet {
-  /** Default directory, relative to the web application. */
-  private static final String DEFAULT_PATH = "static";
+  /** Precompressed variants in the order of preference (content coding, file suffix). */
+  private static final String[][] VARIANTS = { { BR, IO.BRSUFFIX }, { GZIP, IO.GZSUFFIX } };
 
   /** Base directory. */
   private IOFile base;
@@ -30,7 +31,7 @@ public final class StaticServlet extends BaseXServlet {
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     final String path = config.getInitParameter("path");
-    final String dir = path != null ? path : DEFAULT_PATH;
+    final String dir = path != null ? path : STATIC_PATH;
     base = new File(dir).isAbsolute() ? new IOFile(dir) :
       new IOFile(HTTPContext.get().context().soptions.get(StaticOptions.WEBPATH), dir);
   }
@@ -47,15 +48,39 @@ public final class StaticServlet extends BaseXServlet {
     } catch(final InvalidPathException | NoSuchFileException ignore) {
       throw HTTPStatus.NOT_FOUND_X.get(path);
     }
-    if(attrs.isDirectory() || !source.toRealPath().startsWith(base.file().toPath().toRealPath())) {
+    final Path root = base.file().toPath().toRealPath();
+    if(attrs.isDirectory() || !source.toRealPath().startsWith(root)) {
       throw HTTPStatus.NOT_FOUND_X.get(path);
+    }
+
+    // choose the first precompressed variant accepted by the client
+    final String accept = conn.request.getHeader(ACCEPT_ENCODING);
+    Path send = source;
+    long size = attrs.size();
+    String encoding = null;
+    for(final String[] variant : VARIANTS) {
+      final Path sibling = source.resolveSibling(source.getFileName() + variant[1]);
+      final BasicFileAttributes sa;
+      try {
+        sa = Files.readAttributes(sibling, BasicFileAttributes.class);
+      } catch(final NoSuchFileException ignore) {
+        continue;
+      }
+      if(!sa.isRegularFile() || !sibling.toRealPath().startsWith(root)) continue;
+      conn.response.setHeader(VARY, ACCEPT_ENCODING);
+      if(QualityFactor.of(accept, variant[0]) > 0) {
+        send = sibling;
+        size = sa.size();
+        encoding = variant[0];
+        break;
+      }
     }
 
     // report unchanged resources; timestamps are sent with a granularity of seconds
     final long modified = attrs.lastModifiedTime().toMillis() / 1000 * 1000;
     long since;
     try {
-      since = conn.request.getDateHeader(HTTPText.IF_MODIFIED_SINCE);
+      since = conn.request.getDateHeader(IF_MODIFIED_SINCE);
     } catch(final IllegalArgumentException ex) {
       // malformed header: ignored
       Util.debug(ex);
@@ -68,9 +93,10 @@ public final class StaticServlet extends BaseXServlet {
     }
 
     conn.contentType(MediaType.get(file.path()), Strings.UTF8);
-    conn.response.setContentLengthLong(attrs.size());
-    conn.response.setDateHeader(HTTPText.LAST_MODIFIED, modified);
-    Files.copy(source, conn.response.getOutputStream());
+    if(encoding != null) conn.response.setHeader(CONTENT_ENCODING, encoding);
+    conn.response.setContentLengthLong(size);
+    conn.response.setDateHeader(LAST_MODIFIED, modified);
+    Files.copy(send, conn.response.getOutputStream());
     conn.log(SC_OK, "");
   }
 }

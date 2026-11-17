@@ -102,13 +102,18 @@ public final class RestXqModuleTest extends RestXqTest {
     final IOFile lib = new IOFile(path, "lib/lib.xqm"), mod = new IOFile(path, "m.xqm");
     // clear web directory
     register("declare %R:path('dummy') function m:dummy() { 'x' };");
+    // backdate files: rewrites within the file system's timestamp granularity are not detected
+    final long ts = System.currentTimeMillis();
     lib.write(ok);
     mod.write(header);
+    assertTrue(lib.file().setLastModified(ts - 120000));
+    assertTrue(mod.file().setLastModified(ts - 120000));
     assertEquals("all", get(200, "new/1"));
 
     // add function, break library
     mod.write(header + "declare %rest:path('/new/{$id}') function m:new($id) { lib:f() };");
     lib.write("module namespace lib = 'lib'; declare function lib:f() { 'x' ");
+    assertTrue(lib.file().setLastModified(ts - 60000));
     WebModules.get(context).init(true);
     assertContains(get(500, "new/1"), "lib.xqm");
 
