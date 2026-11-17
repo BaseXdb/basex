@@ -5,9 +5,9 @@ import java.util.*;
 
 import javax.xml.*;
 import javax.xml.parsers.*;
+import javax.xml.transform.*;
 import javax.xml.validation.*;
 
-import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -73,8 +73,6 @@ public final class XmlParser {
     final boolean xsdValidation = CommonOptions.STRICT.equals(
         options.get(MainOptions.XSDVALIDATION));
     final boolean trusted = options.allowExternal();
-    // schema locations are only followed if external resources may be accessed
-    final boolean xsiLocation = options.get(MainOptions.XSILOCATION) && trusted;
     final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
     f.setNamespaceAware(true);
     f.setValidating(dtdValidation);
@@ -83,7 +81,9 @@ public final class XmlParser {
       final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
       english(sf::setProperty);
       sf.setResourceResolver(options.resolver().lsResourceResolver());
-      f.setSchema(sf.newSchema());
+      // a schema without sources ignores schema location hints
+      f.setSchema(options.get(MainOptions.XSILOCATION) ? sf.newSchema() :
+          sf.newSchema(new Source[0]));
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
     // features are assigned to the reader: each factory feature creates a temporary parser
@@ -97,12 +97,6 @@ public final class XmlParser {
     english(xr::setProperty);
     if(trusted) {
       for(final String limit : LIMITS) xr.setProperty(limit, "0");
-    }
-    if(xsdValidation && !xsiLocation) {
-      xr.setEntityResolver((pubId, sysId) -> {
-        throw trusted ? new SAXException("External access not allowed: " + sysId) :
-          new TrustedViolationException(sysId);
-      });
     }
     return xr;
   }

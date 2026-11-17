@@ -684,6 +684,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(zip, " { 'match': 'a\\.xml' }") + "/*/name()", "a");
     query(func.args(NAME, " { 'match': 'b\\.xml', 'match-flags': '' }") + "/*/name()", "b");
     query("count(" + func.args(NAME, " { 'match': 'B\\.xml' }") + ")", 0);
+    query("count(" + func.args(NAME, " { 'match': (), 'form': () }") + ")", 2);
     error(func.args(NAME, " { 'match': '(' }"), REGINVALID_X);
     error(func.args(NAME, " { 'match': 'a', 'match-flags': '!' }"), REGFLAG_X);
 
@@ -1497,7 +1498,9 @@ public final class FnModuleTest extends SandboxTest {
         "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
         + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
     error(func.args(doc1, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': false(),"
-        + " 'trust-external': true() }"), IOERR_X);
+        + " 'trust-external': true() }"), XSDVALIDATIONERR_X);
+    error(func.args(doc1, " { 'xsd-validation': 'strict', 'trust-external': true() }"),
+        XSDVALIDATIONERR_X);
     error(func.args(doc2, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
         + " 'trust-external': true() }"), XSDVALIDATIONERR_X);
     error(func.args(doc1, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
@@ -1555,6 +1558,11 @@ public final class FnModuleTest extends SandboxTest {
         true);
     query(func.args(DOC, " { 'use-xsi-schema-location': true(), 'trust-external': false(), "
         + "'xsd-validation': 'strict' }"), false);
+    query(func.args(DOC, " { 'xsd-validation': 'lax' }"), false);
+    query(func.args(DOC, " { 'xsd-validation': 'type xs:integer' }"), false);
+    query(func.args(DOC, " { 'xsd-validation': 'strict', 'dtd-validation': true() }"), false);
+    query(func.args(DOC, " { 'intparse': true(), 'dtd-validation': true() }"), false);
+    error(func.args(DOC, " { 'xsd-validation': 'sporadic' }"), INVALIDXSDOPT_X);
   }
 
   /**
@@ -4445,6 +4453,8 @@ return
     query(func.args("42", " { 'heuristics': 'ICU' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
     query(func.args("42", " { 'method': 'tagsoup' }"), "<html><body>42</body></html>");
+    query(func.args(_BIN_ENCODE_STRING.args("42"), " { 'encoding': () }"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
     error(func.args("42", 42), INVTYPE_X);
@@ -4869,6 +4879,9 @@ return
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
         + " 'trust-external': false() }"), EXTERNALRESOURCE_X);
+    error(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " { 'xsd-validation': 'strict', 'trust-external': true() }"), XSDVALIDATIONERR_X);
 
     error(func.args(dtd + "<b>&amp;e;</b>",
         " { 'dtd-validation': true(), 'trust-external': true() }"), DTDVALIDATIONERR_X);
@@ -7514,6 +7527,7 @@ return
     query(func.args(coll, " { 'recursive': false() }") + " ! ends-with(., '/a.xml')", true);
     query(func.args(coll, " { 'match': 'b\\.xml$' }") + " ! ends-with(., '/sub/b.xml')", true);
     query("count(" + func.args(coll, " { 'form': 'directory' }") + ")", 2);
+    query("count(" + func.args(coll, " { 'form': (), 'match': () }") + ")", 2);
     error(func.args(coll, " { 'form': 'archive' }"), COLLFORM_X_X);
   }
 

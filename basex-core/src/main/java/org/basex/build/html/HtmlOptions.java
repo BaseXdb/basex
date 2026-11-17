@@ -1,6 +1,7 @@
 package org.basex.build.html;
 
 import org.basex.core.*;
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -42,7 +43,8 @@ public final class HtmlOptions extends Options {
   public static final StringOption DOCTYPE_PUBLIC = new StringOption("doctype-public");
 
   /** Common option: encoding. */
-  public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
+  public static final StringOption ENCODING =
+      new StringOption(CommonOptions.ENCODING, null, Types.STRING_ZO);
   /** Common option: method. */
   public static final EnumOption<HtmlParser.Method> METHOD =
       new EnumOption<>("method", HtmlParser.Method.class);
