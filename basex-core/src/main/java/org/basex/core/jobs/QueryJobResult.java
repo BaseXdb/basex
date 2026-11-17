@@ -1,5 +1,7 @@
 package org.basex.core.jobs;
 
+import java.util.concurrent.*;
+
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.map.*;
@@ -23,6 +25,8 @@ public final class QueryJobResult {
   public XQMap info;
   /** Evaluation time (ns). */
   public long time;
+  /** Timer for discarding the cached result (can be {@code null}). */
+  ScheduledFuture<?> timer;
 
   /**
    * Initializes the job result.

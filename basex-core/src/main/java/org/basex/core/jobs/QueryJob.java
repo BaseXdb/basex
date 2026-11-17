@@ -143,7 +143,7 @@ public final class QueryJob extends Job implements Runnable {
       if(!qjt.schedule()) {
         // a job that was never scheduled must leave no trace of its ID
         jobs.tasks.remove(id);
-        jobs.results.remove(id);
+        jobs.removeResult(id);
         throw JOBS_CLOSED.get(info);
       }
     }
@@ -335,7 +335,7 @@ public final class QueryJob extends Job implements Runnable {
         final QueryError error = state == JobState.TIMEOUT ? XQUERY_TIMEOUT :
           state == JobState.MEMORY ? XQUERY_MEMORY : null;
         if(error != null) result.exception = error.get(info);
-        else ctx.jobs.results.remove(id);
+        else ctx.jobs.removeResult(id);
       } catch(final QueryException ex) {
         result.exception = ex;
       } catch(final Throwable ex) {
@@ -360,7 +360,7 @@ public final class QueryJob extends Job implements Runnable {
         if(registered) result.time += perf.nanoRuntime();
         // an empty result is dropped, unless query information is attached to it
         if(result.value != null && result.value.isEmpty() && result.info == null)
-          ctx.jobs.results.remove(id);
+          ctx.jobs.removeResult(id);
         // a last run is listed for a while; before unregistering, so that no removal is undone
         if(remove && outcome != JobState.STOPPED && !ctx.jobs.results.containsKey(id)) {
           ctx.jobs.finish(JobSnapshot.get(jc, outcome, result.time / 1000000));
@@ -368,7 +368,7 @@ public final class QueryJob extends Job implements Runnable {
         try {
           // close and invalidate query after result has been assigned. order is important!
           if(cache) {
-            ctx.jobs.scheduleResult(this);
+            ctx.jobs.scheduleResult(id);
             state(JobState.CACHED);
           } else {
             state(JobState.SCHEDULED);

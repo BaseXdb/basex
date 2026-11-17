@@ -161,10 +161,24 @@ public final class JobPool {
 
   /**
    * Discards a result after the timeout.
-   * @param job job
+   * @param id job id
    */
-  void scheduleResult(final Job job) {
-    schedule(() -> results.remove(job.jc().id()), timeout);
+  void scheduleResult(final String id) {
+    results.computeIfPresent(id, (key, result) -> {
+      result.timer = schedule(() -> results.remove(key, result), timeout);
+      return result;
+    });
+  }
+
+  /**
+   * Removes a cached result and cancels its timer.
+   * @param id job id
+   * @return removed result (can be {@code null})
+   */
+  public QueryJobResult removeResult(final String id) {
+    final QueryJobResult result = results.remove(id);
+    if(result != null && result.timer != null) result.timer.cancel(false);
+    return result;
   }
 
   /**
@@ -377,7 +391,7 @@ public final class JobPool {
     final Job job = active.get(id);
     if(job != null) job.stop();
     // remove potentially cached result
-    results.remove(id);
+    removeResult(id);
     unfinish(id);
 
     notifyChange();

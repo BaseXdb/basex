@@ -35,7 +35,7 @@ public final class JobExecute extends JobEval {
       throw ex;
     }
 
-    final QueryJobResult result = pool.results.remove(id);
+    final QueryJobResult result = pool.removeResult(id);
     return result != null ? result.get() : Empty.VALUE;
   }
 
