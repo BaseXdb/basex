@@ -523,6 +523,11 @@ public final class ArithTest extends SandboxTest {
     error("xs:double(<_>9223372036854775808</_>) idiv 1", RANGE_X);
     error("xs:float(<_>9223372036854775808</_>) idiv 1", RANGE_X);
     query("xs:double(<_>-9223372036854775808</_>) idiv 1", Long.MIN_VALUE);
+    error("let $n := xs:float(<_>9223372036854775808</_>) return $n idiv 1", RANGE_X);
+    error("let $n := xs:decimal(<_>9223372036854775808</_>) return $n idiv 1", RANGE_X);
+    error("let $n := xs:decimal(<_>9223372036854775808</_>) return $n idiv 1.0", RANGE_X);
+    error("let $n := xs:double(<_>NaN</_>) return $n idiv 1", INVIDIV_X);
+    error("let $n := xs:float(<_>INF</_>) return $n idiv 1", INVIDIV_X);
 
     // unsigned long values beyond the integer range
     error("xs:unsignedLong('18446744073709551615')", INTRANGE_X);

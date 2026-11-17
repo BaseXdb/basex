@@ -324,7 +324,8 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       // $x idiv 1 → xs:integer($x)
-      if(expr2 instanceof final ANum num && num.dbl() == 1) {
+      if(expr1.seqType().type.instanceOf(INTEGER) && expr2 instanceof final ANum num &&
+          num.dbl() == 1) {
         return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
