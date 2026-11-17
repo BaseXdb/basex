@@ -12,25 +12,24 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * Convenience builder for rewriting an expression to a FLWOR expression.
+ * Builder for rewriting a higher-order function to a FLWOR expression that iterates over its input.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FLWORBuilder {
+  /** Let clauses preceding the for clause. */
+  private final ArrayList<Let> lets = new ArrayList<>();
   /** Compilation context. */
-  final CompileContext cc;
+  private final CompileContext cc;
   /** Input info. */
-  final InputInfo info;
+  private final InputInfo info;
   /** Arity. */
-  final int arity;
-
+  private final int arity;
   /** Item variable. */
-  public final Var item;
-  /** Pos variable. */
-  public final Var pos;
-  /** Let clause for the coerced function (can be {@code null}). */
-  private Let action;
+  private final Var item;
+  /** Positional variable (can be {@code null}). */
+  private Var pos;
 
   /**
    * Constructor.
@@ -42,17 +41,24 @@ public final class FLWORBuilder {
     this.arity = arity;
     this.cc = cc;
     this.info = info;
-    item = cc.vs().addNew(new QNm("item"), Types.ITEM_ZM, cc.qc, info);
-    pos = cc.vs().addNew(new QNm("pos"), Types.INTEGER_O, cc.qc, info);
+    item = cc.var("item", info);
   }
 
   /**
-   * Returns an optimized variable reference.
-   * @param var variable
+   * Returns an optimized reference to the item variable.
    * @return expression
    */
-  public Expr ref(final Var var) {
-    return new VarRef(info, var).optimize(cc);
+  public Expr item() {
+    return VarRef.get(info, item);
+  }
+
+  /**
+   * Returns an optimized reference to the positional variable.
+   * @return expression
+   */
+  public Expr pos() {
+    if(pos == null) pos = cc.var(new QNm("pos"), Types.INTEGER_O, info);
+    return VarRef.get(info, pos);
   }
 
   /**
@@ -61,8 +67,8 @@ public final class FLWORBuilder {
    */
   public Expr[] refs() {
     final ExprList args = new ExprList(arity);
-    if(arity > 0) args.add(ref(item));
-    if(arity > 1) args.add(ref(pos));
+    if(arity > 0) args.add(item());
+    if(arity > 1) args.add(pos());
     return args.finish();
   }
 
@@ -88,15 +94,15 @@ public final class FLWORBuilder {
           if(!(call instanceof DynFuncCall)) return call;
         }
       }
-      final Var var = cc.vs().addNew(new QNm("action"), null, cc.qc, info);
-      action = new Let(var, func).optimize(cc);
-      func = ref(var);
+      final Var var = cc.var("action", info);
+      lets.add(new Let(var, func).optimize(cc));
+      func = VarRef.get(info, var);
     }
     return new DynFuncCall(info, updating, false, func, refs()).optimize(cc);
   }
 
   /**
-   * Finalizes the GFLWOR expression.
+   * Finalizes the GFLWOR expression with an optional where clause.
    * @param input input expression
    * @param where where expression (can be {@code null})
    * @param rtrn return expression
@@ -104,26 +110,35 @@ public final class FLWORBuilder {
    * @throws QueryException query exception
    */
   public Expr finish(final Expr input, final Expr where, final Expr rtrn) throws QueryException {
-    return finish(input, where, false, rtrn);
+    return build(input, where == null ? null : new Where(where, info), rtrn);
   }
 
   /**
-   * Finalizes the GFLWOR expression with a where or while clause.
+   * Finalizes the GFLWOR expression with a while clause.
    * @param input input expression
-   * @param cond condition (can be {@code null})
-   * @param whl create while clause (instead of where clause)
+   * @param cond condition
    * @param rtrn return expression
    * @return expression
    * @throws QueryException query exception
    */
-  public Expr finish(final Expr input, final Expr cond, final boolean whl, final Expr rtrn)
+  public Expr finishWhile(final Expr input, final Expr cond, final Expr rtrn)
       throws QueryException {
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    if(action != null) clauses.add(action);
+    return build(input, new While(cond, info), rtrn);
+  }
+
+  /**
+   * Builds the GFLWOR expression.
+   * @param input input expression
+   * @param clause clause after the for clause (can be {@code null})
+   * @param rtrn return expression
+   * @return expression
+   * @throws QueryException query exception
+   */
+  private Expr build(final Expr input, final Clause clause, final Expr rtrn)
+      throws QueryException {
+    final ArrayList<Clause> clauses = new ArrayList<>(lets);
     clauses.add(new For(item, pos, null, input, false).optimize(cc));
-    if(cond != null) {
-      clauses.add((whl ? new While(cond, info) : new Where(cond, info)).optimize(cc));
-    }
+    if(clause != null) clauses.add(clause.optimize(cc));
     return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 }

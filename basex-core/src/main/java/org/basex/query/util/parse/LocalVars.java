@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -19,6 +20,8 @@ public final class LocalVars {
   private final ArrayList<VarContext> vars = new ArrayList<>();
   /** Query parser. */
   private final AQueryParser parser;
+  /** Names of undeclared static variables for which the local names have been recorded. */
+  private final QNmSet recorded = new QNmSet();
 
   /**
    * Constructor.
@@ -58,7 +61,7 @@ public final class LocalVars {
 
     // look up through the scopes until we find the declaring scope
     while(--l >= 0) {
-      var = vars.get(l).stack.get(name);
+      var = vars.get(l).get(name);
       if(var != null) break;
     }
 
@@ -89,9 +92,10 @@ public final class LocalVars {
     // local variable
     final VarRef ref = resolveLocal(name, info);
     if(ref != null) return ref;
-    // skip the in-scope snapshot when the static variable is already declared
+    // take the in-scope snapshot only for the first reference to an undeclared static variable
     final Variables vr = parser.qc.vars;
-    return vr.newRef(name, info, parser.sc.imports, vr.declared(name) ? null : inScopeNames());
+    return vr.newRef(name, info, parser.sc.imports,
+        vr.declared(name) || !recorded.add(name) ? null : inScopeNames());
   }
 
   /**
@@ -102,13 +106,13 @@ public final class LocalVars {
    */
   private QNm[] inScopeNames() {
     int n = 0;
-    for(final VarContext vc : vars) n += vc.stack.size();
+    for(final VarContext vc : vars) n += vc.size();
     if(n == 0) return null;
     final QNm[] names = new QNm[n];
     int i = 0;
     for(int v = vars.size() - 1; v >= 0; v--) {
-      final VarStack stack = vars.get(v).stack;
-      for(int s = stack.size() - 1; s >= 0; s--) names[i++] = stack.get(s).name;
+      final VarContext vc = vars.get(v);
+      for(int s = vc.size() - 1; s >= 0; s--) names[i++] = vc.get(s).name;
     }
     return names;
   }
@@ -138,7 +142,7 @@ public final class LocalVars {
    * @return marker for the current bindings
    */
   public int openScope() {
-    return vars.getLast().stack.size();
+    return vars.getLast().size();
   }
 
   /**
@@ -146,6 +150,6 @@ public final class LocalVars {
    * @param marker marker for the start of the sub-scope
    */
   public void closeScope(final int marker) {
-    vars.getLast().stack.size(marker);
+    vars.getLast().size(marker);
   }
 }

@@ -543,8 +543,8 @@ public class Options implements Iterable<Option<?>> {
   public synchronized void assign(final String name, final String value) throws BaseXException {
     if(meta.definitions.isEmpty()) {
       putFree(name, value);
-    } else {
-      assign(name, value, -1, true);
+    } else if(!assign(name, value, -1)) {
+      throw new BaseXException(similar(name));
     }
   }
 
@@ -772,7 +772,7 @@ public class Options implements Iterable<Option<?>> {
       if(name.startsWith(DBPREFIX)) {
         name = name.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
         try {
-          if(assign(name, value, -1, false)) {
+          if(assign(name, value, -1)) {
             Util.debugln(name + Text.COLS + value);
             // overwritten options will not be written to the options file
             if(persisted != null) {
@@ -790,14 +790,15 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses the specified options.
    * @param type media type
-   * @throws BaseXException database exception
    */
-  public final synchronized void assign(final MediaType type) throws BaseXException {
+  public final synchronized void assign(final MediaType type) {
     for(final Entry<String, String> entry : type.parameters()) {
+      final String name = entry.getKey(), value = entry.getValue();
       if(meta.definitions.isEmpty()) {
-        putFree(entry.getKey(), entry.getValue());
+        putFree(name, value);
       } else {
-        assign(entry.getKey(), entry.getValue(), -1, false);
+        final Option<?> option = meta.definitions.get(name);
+        if(option != null) assign(option, value, -1, v -> put(option, v), this);
       }
     }
   }
@@ -1043,7 +1044,7 @@ public class Options implements Iterable<Option<?>> {
 
           if(meta.definitions.containsKey(name)) {
             try {
-              assign(name, val, num, true);
+              assign(name, val, num);
             } catch(final BaseXException ex) {
               Util.errln(file + ": " + ex.getMessage());
             }
@@ -1176,20 +1177,16 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param index index of an array value (optional, can be {@code -1})
-   * @param error raise error if the option is unknown
-   * @return success flag
+   * @return {@code false} if the option is unknown
    * @throws BaseXException database exception
    */
-  private synchronized boolean assign(final String name, final String value, final int index,
-      final boolean error) throws BaseXException {
+  private synchronized boolean assign(final String name, final String value, final int index)
+      throws BaseXException {
 
     final Option<?> option = meta.definitions.get(name);
-    if(option == null) {
-      if(error) throw new BaseXException(similar(name));
-      return false;
-    }
+    if(option == null) return false;
     final String err = assign(option, value, index, v -> put(option, v), this);
-    if(error && err != null) throw new BaseXException(err);
+    if(err != null) throw new BaseXException(err);
 
     return true;
   }

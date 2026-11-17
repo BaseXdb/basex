@@ -363,6 +363,27 @@ public final class CompileContext {
   }
 
   /**
+   * Creates a new untyped variable in the current scope.
+   * @param name name of the variable
+   * @param info input info
+   * @return variable
+   */
+  public Var var(final String name, final InputInfo info) {
+    return var(new QNm(name), null, info);
+  }
+
+  /**
+   * Creates a new variable in the current scope.
+   * @param name name of the variable
+   * @param type declared type (can be {@code null})
+   * @param info input info
+   * @return variable
+   */
+  public Var var(final QNm name, final SeqType type, final InputInfo info) {
+    return vs().addNew(name, type, qc, info);
+  }
+
+  /**
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy (can be {@code null})
    * @param vm variable mapping (can be {@code null})
@@ -611,7 +632,7 @@ public final class CompileContext {
       final Expr body, final SeqType declType, final InputInfo info) throws QueryException {
 
     // create let bindings for all parameters and non-local variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     final IntObjectMap<Var> vm = new IntObjectMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {

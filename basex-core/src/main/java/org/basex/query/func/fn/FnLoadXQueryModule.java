@@ -127,7 +127,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
       } catch(final IOException ex) {
         throw WHICHMODFILE_X.get(info, src).cause(ex);
       } catch(final QueryException ex) {
-        throw MODULE_STATIC_ERROR_X_X.get(info, modUri, ex.getLocalizedMessage()).cause(ex);
+        throw ex.error() == EXTERNALRESOURCE_X ? ex :
+          MODULE_STATIC_ERROR_X_X.get(info, modUri, ex.getLocalizedMessage()).cause(ex);
       }
       try {
         mqc.vars.bindExternal(mqc, bindings, false);

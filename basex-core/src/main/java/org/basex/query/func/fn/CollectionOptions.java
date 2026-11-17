@@ -29,13 +29,13 @@ public final class CollectionOptions extends Options {
   /** Whether two calls with same URI and options return the same nodes. */
   public static final BooleanOption STABLE = new BooleanOption("stable", true);
   /** Kind of the resource identified by the collection URI. */
-  public static final StringOption FORM = new StringOption("form");
+  public static final StringOption FORM = new StringOption("form", null, STRING_ZO);
   /** Include resources of sub-collections. */
   public static final BooleanOption RECURSIVE = new BooleanOption("recursive", true);
   /** Skip resources that cannot be processed. */
   public static final BooleanOption IGNORE_ERRORS = new BooleanOption("ignore-errors", false);
   /** Regular expression for filtering resource URIs. */
-  public static final StringOption MATCH = new StringOption("match");
+  public static final StringOption MATCH = new StringOption("match", null, STRING_ZO);
   /** Flags for the regular expression. */
   public static final StringOption MATCH_FLAGS = new StringOption("match-flags", "");
   /** Mapping from file extensions to media types. */

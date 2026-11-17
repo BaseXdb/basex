@@ -158,10 +158,21 @@ public final class RExQueryParser extends AQueryParser {
 
   /**
    * Namespaces of an element constructor.
-   * @param nspaces declared namespaces
+   * @param prefixes prefixes of declared and inherited namespaces
    * @param inherited inherited namespaces
    */
-  private record ConstrNS(Atts nspaces, Atts inherited) { }
+  private record ConstrNS(TokenSet prefixes, Atts inherited) {
+    /**
+     * Inherits namespaces whose prefixes are neither declared nor inherited yet.
+     * @param ns namespaces of an enclosing constructor
+     */
+    void inherit(final Atts ns) {
+      final int nl = ns.size();
+      for(int n = 0; n < nl; n++) {
+        if(prefixes.add(ns.name(n))) inherited.add(ns.name(n), ns.value(n));
+      }
+    }
+  }
 
   /**
    * Parses the "MainModule" rule.
@@ -869,7 +880,8 @@ public final class RExQueryParser extends AQueryParser {
           ((SchemaElementNodeType) node).elementName() :
           ((SchemaAttributeNodeType) node).attributeName();
         final QNm qn = eQName(name, sc.elemNS);
-        pos = name.end();
+        // like the manual parser, report the error after the closing parenthesis
+        pos = node.end();
         throw error(SCHEMAINV_X, qn);
       }
       default -> null;
@@ -1875,13 +1887,13 @@ public final class RExQueryParser extends AQueryParser {
    */
   private Expr flwor(final FLWORExpr node) throws QueryException {
     final int s = localVars.openScope();
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     final TokenObjectMap<Var> curr = new TokenObjectMap<>();
     clause(node.initialClause(), clauses, curr);
     for(final Node clause : node.children()) clause(clause, clauses, curr);
     final Expr rtrn = single(node.returnClause().exprSingle());
     localVars.closeScope(s);
-    return new GFLWOR(clauses.peek().info(), clauses, rtrn);
+    return new GFLWOR(clauses.getFirst().info(), clauses, rtrn);
   }
 
   /**
@@ -1891,7 +1903,7 @@ public final class RExQueryParser extends AQueryParser {
    * @param curr variables that are currently in scope
    * @throws QueryException query exception
    */
-  private void clause(final Node clause, final LinkedList<Clause> clauses,
+  private void clause(final Node clause, final ArrayList<Clause> clauses,
       final TokenObjectMap<Var> curr) throws QueryException {
 
     final int size = clauses.size();
@@ -1921,7 +1933,7 @@ public final class RExQueryParser extends AQueryParser {
    * @param clauses clauses
    * @throws QueryException query exception
    */
-  private void forClause(final ForClause clause, final LinkedList<Clause> clauses)
+  private void forClause(final ForClause clause, final ArrayList<Clause> clauses)
       throws QueryException {
 
     for(final ForBinding binding : clause.children()) {
@@ -1978,7 +1990,7 @@ public final class RExQueryParser extends AQueryParser {
    * @param clauses clauses
    * @throws QueryException query exception
    */
-  private void letClause(final LetClause clause, final LinkedList<Clause> clauses)
+  private void letClause(final LetClause clause, final ArrayList<Clause> clauses)
       throws QueryException {
 
     for(final LetBinding binding : clause.children()) {
@@ -2000,7 +2012,7 @@ public final class RExQueryParser extends AQueryParser {
    * @param clauses clauses
    * @throws QueryException query exception
    */
-  private void letStructBinding(final LetBinding binding, final LinkedList<Clause> clauses)
+  private void letStructBinding(final LetBinding binding, final ArrayList<Clause> clauses)
       throws QueryException {
 
     final LetStructBinding lsb = switch(binding.sym()) {
@@ -2128,20 +2140,17 @@ public final class RExQueryParser extends AQueryParser {
    * @param curr variables that are currently in scope
    * @throws QueryException query exception
    */
-  private void groupBy(final GroupByClause clause, final LinkedList<Clause> clauses,
+  private void groupBy(final GroupByClause clause, final ArrayList<Clause> clauses,
       final TokenObjectMap<Var> curr) throws QueryException {
 
-    final GroupSpec[] specs = groupSpecs(clause, clauses);
+    final GroupSpec[] specs = groupSpecs(clause, curr);
 
     // find all non-grouping variables that aren't shadowed
     final ArrayList<VarRef> ng = new ArrayList<>();
-    for(final GroupSpec spec : specs) curr.put(spec.var.name.unique(), spec.var);
-    VARS:
+    final HashSet<Var> grouping = new HashSet<>();
+    for(final GroupSpec spec : specs) grouping.add(spec.var);
     for(final Var var : curr.values()) {
-      for(final GroupSpec spec : specs) {
-        if(spec.var == var) continue VARS;
-      }
-      ng.add(new VarRef(specs[0].info(), var));
+      if(!grouping.contains(var)) ng.add(new VarRef(specs[0].info(), var));
     }
 
     // add new copies for all non-grouping variables
@@ -2161,14 +2170,15 @@ public final class RExQueryParser extends AQueryParser {
   /**
    * Parses the "GroupingSpecList" rule.
    * @param clause clause
-   * @param cl preceding clauses
+   * @param curr variables declared by the FLWOR expression (grouping variables will be added)
    * @return group specifications
    * @throws QueryException query exception
    */
-  private GroupSpec[] groupSpecs(final GroupByClause clause, final LinkedList<Clause> cl)
+  private GroupSpec[] groupSpecs(final GroupByClause clause, final TokenObjectMap<Var> curr)
       throws QueryException {
 
     final ArrayList<GroupSpec> specs = new ArrayList<>();
+    final QNmMap<GroupSpec> names = new QNmMap<>();
     for(final GroupingSpec node : clause.children()) {
       final Var var = newVar(node.varName(), node.typeDeclaration(), null);
       final Expr expr;
@@ -2177,27 +2187,7 @@ public final class RExQueryParser extends AQueryParser {
       } else {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
-        boolean dec = false;
-        if(ref != null) {
-          // check preceding clauses
-          for(final Clause c : cl) {
-            if(c.declares(ref.var)) {
-              dec = true;
-              break;
-            }
-          }
-
-          // check other grouping variables
-          if(!dec) {
-            for(final GroupSpec spec : specs) {
-              if(spec.var == ref.var) {
-                dec = true;
-                break;
-              }
-            }
-          }
-        }
-        if(!dec) {
+        if(ref == null || curr.get(var.name.unique()) != ref.var) {
           pos = after(node.end());
           throw error(GVARNOTDEFINED_X, var);
         }
@@ -2208,9 +2198,9 @@ public final class RExQueryParser extends AQueryParser {
       final Collation coll = collation == null ? sc.collation :
         Collation.get(uriLiteral(collation), qc, infoAt(collation.end()), FLWORCOLL_X);
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), expr, coll);
-      for(final GroupSpec previous : specs) {
-        if(previous.var.name.eq(spec.var.name)) previous.occluded = true;
-      }
+      curr.put(var.name.unique(), var);
+      final GroupSpec old = names.put(spec.var.name, spec);
+      if(old != null) old.occluded = true;
       specs.add(spec);
     }
     return specs.toArray(GroupSpec[]::new);
@@ -2223,7 +2213,7 @@ public final class RExQueryParser extends AQueryParser {
    * @param curr variables that are currently in scope
    * @throws QueryException query exception
    */
-  private void orderBy(final OrderByClause clause, final LinkedList<Clause> clauses,
+  private void orderBy(final OrderByClause clause, final ArrayList<Clause> clauses,
       final TokenObjectMap<Var> curr) throws QueryException {
 
     final OrderSpec[] specs = clause.children();
@@ -2269,7 +2259,7 @@ public final class RExQueryParser extends AQueryParser {
    */
   private Expr quantified(final QuantifiedExpr quant) throws QueryException {
     final int s = localVars.openScope();
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     for(final QuantifierBinding binding : quant.children()) {
       final Var var = newVar(binding.varNameAndType(), null);
       final Expr expr = single(binding.exprSingle());
@@ -2280,7 +2270,7 @@ public final class RExQueryParser extends AQueryParser {
     localVars.closeScope(s);
 
     final boolean some = quant.isSome();
-    final InputInfo ii = clauses.peek().info();
+    final InputInfo ii = clauses.getFirst().info();
     final CmpG cmp = new CmpG(ii, new GFLWOR(ii, clauses, rtrn), Bln.get(some), CmpOp.EQ);
     return some ? cmp : Function.NOT.get(ii, cmp);
   }
@@ -3205,12 +3195,13 @@ public final class RExQueryParser extends AQueryParser {
     final int size = qc.ns.size(), cpos = constrNS.size();
     final byte[] nse = sc.elemNS, nsd = sc.dirNS;
     final Atts ns = new Atts();
+    final TokenSet prefixes = new TokenSet();
     final ExprList cont = new ExprList();
 
     // parse attributes: namespace declarations first, as they apply to the other attributes
     final DirAttributeList attributeList = node.dirAttributeList();
     final Node[] attrs = attributeList == null ? NONE : attributeList.children();
-    namespaceDecls(attrs, ns);
+    namespaceDecls(attrs, ns, prefixes);
     final ArrayList<QNm> atts = attributes(attrs, cont);
 
     // resolve element name
@@ -3259,14 +3250,12 @@ public final class RExQueryParser extends AQueryParser {
     }
 
     // check for duplicate attribute names
-    if(atts != null) {
-      final int as = atts.size();
-      for(int a = 0; a < as - 1; a++) {
-        for(int b = a + 1; b < as; b++) {
-          if(atts.get(a).eq(atts.get(b))) {
-            pos = node.end();
-            throw error(ATTDUPL_X, atts.get(a).prefixString());
-          }
+    if(atts != null && atts.size() > 1) {
+      final QNmSet names = new QNmSet();
+      for(final QNm att : atts) {
+        if(!names.add(att)) {
+          pos = node.end();
+          throw error(ATTDUPL_X, att.prefixString());
         }
       }
     }
@@ -3276,18 +3265,12 @@ public final class RExQueryParser extends AQueryParser {
     sc.dirNS = nsd;
 
     // propagate namespace declarations to enclosed constructors, register own namespaces
-    final int cs = constrNS.size(), nl = ns.size();
-    for(int c = cpos; c < cs; c++) {
-      final ConstrNS cns = constrNS.get(c);
-      for(int n = 0; n < nl; n++) {
-        final byte[] prefix = ns.name(n);
-        if(!cns.nspaces.contains(prefix) && !cns.inherited.contains(prefix)) {
-          cns.inherited.add(prefix, ns.value(n));
-        }
-      }
+    if(!ns.isEmpty()) {
+      final int cs = constrNS.size();
+      for(int c = cpos; c < cs; c++) constrNS.get(c).inherit(ns);
     }
     final Atts inherited = new Atts();
-    constrNS.add(new ConstrNS(ns, inherited));
+    constrNS.add(new ConstrNS(prefixes, inherited));
     return new CElem(infoAt(node.end()), false, name, ns, inherited, cont.finish());
   }
 
@@ -3304,9 +3287,11 @@ public final class RExQueryParser extends AQueryParser {
    * Processes the namespace declarations among the attributes of a direct element constructor.
    * @param attrs names and values of the attributes
    * @param ns declared namespaces
+   * @param prefixes prefixes of the declared namespaces
    * @throws QueryException query exception
    */
-  private void namespaceDecls(final Node[] attrs, final Atts ns) throws QueryException {
+  private void namespaceDecls(final Node[] attrs, final Atts ns, final TokenSet prefixes)
+      throws QueryException {
     boolean xmlDecl = false;
     for(int a = 0; a < attrs.length; a += 2) {
       final byte[] atn = token(text(attrs[a]));
@@ -3334,7 +3319,7 @@ public final class RExQueryParser extends AQueryParser {
         sc.dirNS = uri;
         if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
       }
-      if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+      if(!prefixes.add(prefix)) throw error(DUPLNSDEF_X, prefix);
       ns.add(prefix, uri);
     }
   }
@@ -3448,9 +3433,10 @@ public final class RExQueryParser extends AQueryParser {
         final Expr name = compName(elem.compNodeName(), sc.elemNS);
         final InputInfo ii = info(elem.enclosedContentExpr());
         // register namespaces, to be enriched by enclosing direct constructors
-        final Atts ns = new Atts(), inherited = new Atts();
-        constrNS.add(new ConstrNS(ns, inherited));
-        yield new CElem(ii, true, name, ns, inherited, enclosedExpr(elem.enclosedContentExpr()));
+        final Atts inherited = new Atts();
+        constrNS.add(new ConstrNS(new TokenSet(), inherited));
+        yield new CElem(ii, true, name, new Atts(), inherited,
+            enclosedExpr(elem.enclosedContentExpr()));
       }
       case final CompAttrConstructor attr -> {
         final Expr name = compName(attr.compNodeName(), null);

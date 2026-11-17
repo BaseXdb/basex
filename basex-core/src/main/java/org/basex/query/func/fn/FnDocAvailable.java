@@ -20,7 +20,7 @@ public class FnDocAvailable extends Docs {
   /** Possible failures. */
   private static final EnumSet<QueryError> ERRORS = EnumSet.of(BASEX_DBPATH1_X, BASEX_DBPATH2_X,
       IOERR_X, WHICHRES_X, RESDIR_X, INVDOC_X, DTDVALIDATIONERR_X, XSDVALIDATIONERR_X,
-      EXTERNALRESOURCE_X);
+      EXTERNALRESOURCE_X, NODTDVALIDATION, NOSCHEMAAWARENESS_X, NOXSDVALIDATION_X, NOXSDANDDTD_X);
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

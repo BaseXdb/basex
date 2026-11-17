@@ -115,7 +115,7 @@ public final class Unfold extends Arr {
     if(result == null) return null;
 
     // let $v := INIT, let $start := INIT
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     for(int v = 0; v < vl; v++) {
       if(v != c) clauses.add(new Let(vars[v], exprs[v]).optimize(cc));
     }
@@ -202,8 +202,7 @@ public final class Unfold extends Arr {
    */
   private Expr items(final Expr expr, final Var var, final Var start, final boolean reverse,
       final CompileContext cc) throws QueryException {
-    final Var item = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
-    final Var pos = cc.vs().addNew(new QNm("pos"), null, cc.qc, info);
+    final Var item = cc.var("item", info), pos = cc.var("pos", info);
     Expr seq = ref(start, 0, cc), next = ref(pos, 1, cc);
     if(reverse) {
       seq = cc.function(Function.REVERSE, info, seq);
@@ -269,7 +268,7 @@ public final class Unfold extends Arr {
     if(!incl && op != (up ? CmpOp.LT : CmpOp.GT)) return null;
 
     // final value: max(($start, $end)), min(($start, $end - 1)), ...
-    final Var end = cc.vs().addNew(new QNm("end"), null, cc.qc, info);
+    final Var end = cc.var("end", info);
     final Expr fnl = cc.function(up ? Function.MAX : Function.MIN, info, List.get(cc, info,
         ref(start, 0, cc), ref(end, incl ? delta : 0, cc)));
     // if the base expression equals the step results, the final value is included in the range
@@ -317,7 +316,7 @@ public final class Unfold extends Arr {
    */
   private Expr ref(final Var var, final long add, final CompileContext cc)
       throws QueryException {
-    final Expr ref = new VarRef(info, var).optimize(cc);
+    final Expr ref = VarRef.get(info, var);
     return add == 0 ? ref : new Arith(info, ref, Itr.get(add), Calc.ADD).optimize(cc);
   }
 
@@ -350,7 +349,7 @@ public final class Unfold extends Arr {
       final CompileContext cc) throws QueryException {
     final IntObjectMap<Var> vm = new IntObjectMap<>();
     final Clause[] cls = clauses.apply(cc.copy(var, vm));
-    return new GFLWOR(info, new LinkedList<>(Arrays.asList(cls)), expr.copy(cc, vm)).optimize(cc);
+    return new GFLWOR(info, new ArrayList<>(Arrays.asList(cls)), expr.copy(cc, vm)).optimize(cc);
   }
 
   /**

@@ -2,8 +2,6 @@ package org.basex.query.func.job;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -29,11 +27,11 @@ public final class JobResult extends StandardFunc {
     final String id = toString(arg(0), qc);
     final ResultOptions options = toOptions(arg(1), new ResultOptions(), qc);
 
-    final Map<String, QueryJobResult> results = qc.context.jobs.results;
-    final QueryJobResult result = results.get(id);
+    final JobPool jobs = qc.context.jobs;
+    final QueryJobResult result = jobs.results.get(id);
     if(result == null) return Empty.VALUE;
     if(result.value == null && result.exception == null) throw JOBS_RUNNING_X.get(info, id);
-    if(!options.get(ResultOptions.KEEP)) results.remove(id);
+    if(!options.get(ResultOptions.KEEP)) jobs.removeResult(id);
     return result.get();
   }
 }

@@ -199,7 +199,7 @@ public class FnFoldLeft extends StandardFunc {
     final Var[] vars = new Var[arity];
     final Expr[] refs = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      vars[a] = cc.vs().addNew(fe.paramName(a), null, cc.qc, info);
+      vars[a] = cc.var(fe.paramName(a), null, info);
       vars[a].refineType(types[a], cc);
       refs[a] = new VarRef(info, vars[a]);
     }
@@ -230,15 +230,15 @@ public class FnFoldLeft extends StandardFunc {
 
     // for $value in INPUT return ACTION
     // for $member in array:split(INPUT) let $value := array:items($member) return ACTION
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final ArrayList<Clause> clauses = new ArrayList<>();
     Expr in = input;
     if(array) in = cc.function(Function._ARRAY_SPLIT, info, in);
     // fold-left: $result, X; fold-right: X, $result (integer sums are exact, order is irrelevant)
     if(op != Op.ADD && left != uf.first()) in = cc.function(Function.REVERSE, info, in);
     if(array) {
-      final Var member = cc.vs().addNew(new QNm("member"), null, cc.qc, info);
+      final Var member = cc.var("member", info);
       clauses.add(new For(member, in).optimize(cc));
-      final Expr items = cc.function(Function._ARRAY_ITEMS, info, new VarRef(info, member));
+      final Expr items = cc.function(Function._ARRAY_ITEMS, info, VarRef.get(info, member));
       clauses.add(new Let(value, items).optimize(cc));
     } else {
       clauses.add(new For(value, in).optimize(cc));

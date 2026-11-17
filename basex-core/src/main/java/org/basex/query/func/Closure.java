@@ -199,7 +199,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               final Var var2 = cc.copy(expr2.getKey(), null);
               if(add == null) add = new LinkedHashMap<>();
               add.put(var2, expr2.getValue());
-              expr2.setValue(new VarRef(cl.info, var2).optimize(cc));
+              expr2.setValue(VarRef.get(cl.info, var2));
             }
             inline = cl;
           }
@@ -261,7 +261,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       param.refineType(argTypes[a], cc);
       // propagate a narrowed parameter type into the body
       if(!param.seqType().eq(before)) {
-        final InlineContext ic = new InlineContext(param, new VarRef(info, param).optimize(cc), cc);
+        final InlineContext ic = new InlineContext(param, VarRef.get(info, param), cc);
         if(ic.inlineable(copy.expr)) {
           cc.pushScope(copy.vs, copy.anns);
           try {
@@ -364,7 +364,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       body = expr;
     } else {
       // collect closure
-      final LinkedList<Clause> clauses = new LinkedList<>();
+      final ArrayList<Clause> clauses = new ArrayList<>();
       for(final Entry<Var, Expr> entry : global.entrySet()) {
         clauses.add(new Let(entry.getKey(), entry.getValue().value(qc)));
       }

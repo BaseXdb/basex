@@ -312,13 +312,13 @@ public final class SAXHandler extends DefaultHandler2 {
     /**
      * Creates an exception for a blocked DTD or external entity.
      * @param resource blocked resource identifier
-     * @param validation DTD validation flag
+     * @param required external access is required regardless of the 'dtd' option
      * @return exception
      */
     public static TrustedViolationException entity(final String resource,
-        final boolean validation) {
+        final boolean required) {
       return new TrustedViolationException(resource + "; enable 'trust-external'" +
-          (validation ? "" : " or disable 'dtd'"));
+          (required ? "" : " or disable 'dtd'"));
     }
 
     /**

@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -47,7 +46,7 @@ public abstract class RecursiveUnfolding extends Unfolding {
     super(acc, supported, func.info);
     this.func = func;
     this.vars = vars;
-    flag = cc.vs().addNew(new QNm("recur"), null, cc.qc, info);
+    flag = cc.var("recur", info);
   }
 
   /**
@@ -108,7 +107,7 @@ public abstract class RecursiveUnfolding extends Unfolding {
         acc = var;
       } else {
         list.add(var);
-        init.add(new VarRef(ii, param).optimize(cc));
+        init.add(VarRef.get(ii, param));
       }
     }
 
@@ -120,8 +119,7 @@ public abstract class RecursiveUnfolding extends Unfolding {
 
     if(uf.suffix != null) uf.suffix.refineType(uf.suffixType, cc);
     final Expr unfold = new Unfold(ii, init.finish(), vars, uf.flag, uf.suffix, step).optimize(cc);
-    return uf.reduce(acc != null ? new VarRef(ii, func.params[accPos]).optimize(cc) : null,
-        unfold, cc);
+    return uf.reduce(acc != null ? VarRef.get(ii, func.params[accPos]) : null, unfold, cc);
   }
 
   /**
@@ -186,7 +184,7 @@ public abstract class RecursiveUnfolding extends Unfolding {
       final CompileContext cc) {
     final ExprList list = new ExprList(args.length + 2).add(prefix).add(args);
     if(sfx != null) {
-      if(suffix == null) suffix = cc.vs().addNew(new QNm("suffix"), null, cc.qc, info);
+      if(suffix == null) suffix = cc.var("suffix", info);
       suffixType = suffixType == null ? sfx.seqType() : suffixType.union(sfx.seqType());
       list.add(sfx);
     }

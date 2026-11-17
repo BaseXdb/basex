@@ -101,7 +101,7 @@ public abstract class FItem extends Item implements XQFunction {
     final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
       vars[a] = vs.addNew(paramName(a), argTypes[a], qc, info);
-      args[a] = new VarRef(info, vars[a]).optimize(cc);
+      args[a] = VarRef.get(info, vars[a]);
     }
     for(int a = arity; a < nargs; a++) {
       vars[a] = vs.addNew(QNm.EMPTY, argTypes[a], qc, info);

@@ -61,13 +61,16 @@ public final class SAXWrapper extends SingleParser {
       if(!allowExternal && options.get(MainOptions.XINCLUDE))
         throw new TrustedViolationException("xinclude");
 
+      // schema location hints are resolved via the entity resolver, regardless of 'dtd'
+      final boolean required = dtdValidation || options.get(MainOptions.XSILOCATION) &&
+          CommonOptions.STRICT.equals(options.get(MainOptions.XSDVALIDATION));
       final EntityResolver er = options.resolver().entityResolver();
-      if(!allowExternal && (dtd || dtdValidation)) {
+      if(!allowExternal && (dtd || required)) {
         // block external resource access, unless the resource is mapped by a catalog
         reader.setEntityResolver((pubId, sysId) -> {
           final InputSource mapped = mapped(er, pubId, sysId);
           if(mapped == null) throw TrustedViolationException.entity(
-              sysId != null ? sysId : pubId != null ? pubId : "", dtdValidation);
+              sysId != null ? sysId : pubId != null ? pubId : "", required);
           saxh.resource = mapped.getSystemId();
           return mapped;
         });
