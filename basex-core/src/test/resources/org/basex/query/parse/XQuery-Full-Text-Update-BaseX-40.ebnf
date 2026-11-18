@@ -1,6 +1,6 @@
 /* XQuery 4.0: An XML Query Language
  * version https://qt4cg.org/specifications/xquery-40/
- * extracted from https://qt4cg.org/specifications/xquery-40/xquery-40.html on Wed Nov 11, 2026, 15:07 (UTC+01)
+ * extracted from https://qt4cg.org/specifications/xquery-40/xquery-40.html on Wed Nov 18, 2026, 17:29 (UTC+01)
  * with references to https://www.w3.org/TR/REC-xml/ resolved and inlined
  * with references to https://www.w3.org/TR/REC-xml-names/ resolved and inlined
  * with productions from https://www.w3.org/TR/xquery-update-30/ added
@@ -8,7 +8,7 @@
  * augmented with BaseX extensions
  * reordered into depth-first order
  * adapted for REx by rexify-xquery-40.xq
- * fetched from https://github.com/GuntherRademacher/rex-parser-generator, commit c0f0c0b1eee84604e932344d2e97fd71f96254a8
+ * fetched from https://github.com/GuntherRademacher/rex-parser-generator, commit 14440c68b20704498d2eda751cc5a364b10d4fa4
  * extended by RExRemake with the rule SequenceTypeEOF
  */
 
@@ -1259,7 +1259,7 @@ LabeledRecordTypeDecl
          ::= 'declare' Annotation* 'record' EQName ( 'extends' EQName )? '(' ( LabeledFieldDecl ( ',' LabeledFieldDecl )* )? ')' ( 'where' ExprSingle )?
 LabeledFieldDecl
          ::= FieldNameAndType ( ':=' ExprSingle )?
-           | '%fixed' FieldNameAndType ':=' ExprSingle
+           | '%' 'fixed' FieldNameAndType ':=' ExprSingle
 FieldNameAndType
          ::= NCName ( 'as' SequenceType )?
 OptionDecl
@@ -1650,7 +1650,7 @@ DirElemConstructorDelimiter
          ::= QName ( S QName S? '=' | S? [/>] )
 '*'       << Wildcard
 QNameOrKeywordDelimiter
-          \\ NonKeywordQName 'NaN' 'after' 'all' 'allowing' 'ancestor' 'ancestor-or-self' 'and' 'any' 'array' 'as' 'ascending' 'at' 'attribute' 'base-uri' 'before' 'boundary-space' 'but' 'by' 'case' 'cast' 'castable' 'catch' 'child' 'coerce' 'collation' 'comment' 'construction' 'contains' 'content' 'context' 'copy' 'copy-namespaces' 'count' 'decimal-format' 'decimal-separator' 'declare' 'default' 'delete' 'descendant' 'descendant-or-self' 'descending' 'diacritics' 'different' 'digit' 'distance' 'div' 'document' 'document-node' 'element' 'else' 'empty' 'empty-sequence' 'encoding' 'end' 'entire' 'enum' 'eq' 'errors' 'every' 'exactly' 'except' 'exponent-separator' 'extends' 'external' 'false' 'finally' 'first' 'fixed' 'fn' 'following' 'following-or-self' 'following-sibling' 'following-sibling-or-self' 'follows' 'follows-or-is' 'for' 'from' 'ft-option' 'ftand' 'ftnot' 'ftor' 'function' 'fuzzy' 'ge' 'greatest' 'group' 'grouping-separator' 'gt' 'idiv' 'if' 'import' 'in' 'infinity' 'inherit' 'insensitive' 'insert' 'instance' 'intersect' 'into' 'invoke' 'is' 'is-not' 'item' 'jnode' 'key' 'language' 'last' 'lax' 'le' 'least' 'let' 'levels' 'lowercase' 'lt' 'map' 'member' 'minus-sign' 'mod' 'modify' 'module' 'most' 'namespace' 'namespace-node' 'ne' 'next' 'no' 'no-inherit' 'no-preserve' 'node' 'nodes' 'not' 'occurs' 'of' 'only' 'option' 'or' 'order' 'ordered' 'ordering' 'otherwise' 'paragraph' 'paragraphs' 'parent' 'pattern-separator' 'per-mille' 'percent' 'phrase' 'precedes' 'precedes-or-is' 'preceding' 'preceding-or-self' 'preceding-sibling' 'preceding-sibling-or-self' 'preserve' 'previous' 'processing-instruction' 'record' 'relationship' 'rename' 'replace' 'return' 'revalidation' 'same' 'satisfies' 'schema' 'schema-attribute' 'schema-element' 'score' 'self' 'sensitive' 'sentence' 'sentences' 'skip' 'sliding' 'some' 'stable' 'start' 'stemming' 'stop' 'strict' 'strip' 'switch' 'text' 'then' 'thesaurus' 'times' 'to' 'trace' 'transform' 'treat' 'true' 'try' 'tumbling' 'type' 'typeswitch' 'union' 'unordered' 'update' 'updating' 'uppercase' 'using' 'validate' 'value' 'variable' 'version' 'weight' 'when' 'where' 'while' 'wildcards' 'window' 'with' 'without' 'word' 'words' 'xnode' 'xquery' 'zero-digit' '%fixed'
+          \\ NonKeywordQName 'NaN' 'after' 'all' 'allowing' 'ancestor' 'ancestor-or-self' 'and' 'any' 'array' 'as' 'ascending' 'at' 'attribute' 'base-uri' 'before' 'boundary-space' 'but' 'by' 'case' 'cast' 'castable' 'catch' 'child' 'coerce' 'collation' 'comment' 'construction' 'contains' 'content' 'context' 'copy' 'copy-namespaces' 'count' 'decimal-format' 'decimal-separator' 'declare' 'default' 'delete' 'descendant' 'descendant-or-self' 'descending' 'diacritics' 'different' 'digit' 'distance' 'div' 'document' 'document-node' 'element' 'else' 'empty' 'empty-sequence' 'encoding' 'end' 'entire' 'enum' 'eq' 'errors' 'every' 'exactly' 'except' 'exponent-separator' 'extends' 'external' 'false' 'finally' 'first' 'fixed' 'fn' 'following' 'following-or-self' 'following-sibling' 'following-sibling-or-self' 'follows' 'follows-or-is' 'for' 'from' 'ft-option' 'ftand' 'ftnot' 'ftor' 'function' 'fuzzy' 'ge' 'greatest' 'group' 'grouping-separator' 'gt' 'idiv' 'if' 'import' 'in' 'infinity' 'inherit' 'insensitive' 'insert' 'instance' 'intersect' 'into' 'invoke' 'is' 'is-not' 'item' 'jnode' 'key' 'language' 'last' 'lax' 'le' 'least' 'let' 'levels' 'lowercase' 'lt' 'map' 'member' 'minus-sign' 'mod' 'modify' 'module' 'most' 'namespace' 'namespace-node' 'ne' 'next' 'no' 'no-inherit' 'no-preserve' 'node' 'nodes' 'not' 'occurs' 'of' 'only' 'option' 'or' 'order' 'ordered' 'ordering' 'otherwise' 'paragraph' 'paragraphs' 'parent' 'pattern-separator' 'per-mille' 'percent' 'phrase' 'precedes' 'precedes-or-is' 'preceding' 'preceding-or-self' 'preceding-sibling' 'preceding-sibling-or-self' 'preserve' 'previous' 'processing-instruction' 'record' 'relationship' 'rename' 'replace' 'return' 'revalidation' 'same' 'satisfies' 'schema' 'schema-attribute' 'schema-element' 'score' 'self' 'sensitive' 'sentence' 'sentences' 'skip' 'sliding' 'some' 'stable' 'start' 'stemming' 'stop' 'strict' 'strip' 'switch' 'text' 'then' 'thesaurus' 'times' 'to' 'trace' 'transform' 'treat' 'true' 'try' 'tumbling' 'type' 'typeswitch' 'union' 'unordered' 'update' 'updating' 'uppercase' 'using' 'validate' 'value' 'variable' 'version' 'weight' 'when' 'where' 'while' 'wildcards' 'window' 'with' 'without' 'word' 'words' 'xnode' 'xquery' 'zero-digit'
 Char      \\ '</' '<<' '<='
 NCNameDelimiter
           \\ UnreservedNCName

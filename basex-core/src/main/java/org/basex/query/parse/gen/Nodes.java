@@ -1269,11 +1269,11 @@ public final class Nodes {
   }
 
   /**
-   * LabeledFieldDecl ::= (FieldNameAndType [':=' ExprSingle] | '%fixed' FieldNameAndType ':='
+   * LabeledFieldDecl ::= (FieldNameAndType [':=' ExprSingle] | '%' 'fixed' FieldNameAndType ':='
    * ExprSingle)
    */
   public record LabeledFieldDecl(int begin, int end, Nodes.FieldNameAndType fieldNameAndType,
-      Node exprSingle, boolean isPercentFixed) implements Node {
+      Node exprSingle, boolean isFixed) implements Node {
     @Override
     public int sym() {
       return Sym.LabeledFieldDecl;

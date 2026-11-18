@@ -273,7 +273,7 @@ public final class RExErrorMessageTest extends SandboxTest {
     try {
       eval(query);
     } catch(final QueryException ex) {
-      assertSame(code, ex.error(), ex.getLocalizedMessage());
+      assertEquals(code.qname(), ex.qname(), ex.getLocalizedMessage());
       return ex;
     } catch(final Exception ex) {
       return fail(ex);

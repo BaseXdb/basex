@@ -857,14 +857,9 @@ public final class RExQueryParser extends AQueryParser {
    * @throws QueryException query exception
    */
   private SeqType functionType(final Nodes.FunctionType node) throws QueryException {
-    // only %updating is relevant for function tests; other non-reserved ones are ignored
+    // only %updating is relevant for function tests; other annotations are ignored
     final AnnList anns = annotations(node.children()).check(false, false);
     final boolean updating = anns.contains(Annotation.UPDATING);
-    for(final Ann ann : anns) {
-      if(ann.definition == Annotation.PUBLIC || ann.definition == Annotation.PRIVATE) {
-        throw ANNRESERVED_X.get(ann.info, ann);
-      }
-    }
     if(node.anyFunctionType() != null) {
       return (updating ? Types.UPDATING_FUNCTION : Types.FUNCTION).seqType();
     }
@@ -1790,13 +1785,13 @@ public final class RExQueryParser extends AQueryParser {
         final QNm vn = new QNm(concat(qn.string(), cpToken('?'), name), qn.uri());
         init = qc.vars.declareField(new Var(vn, seqType, qc, fi), expr, vs);
         // fixed fields are not parameters of the constructor function
-        if(!field.isPercentFixed()) defaults = true;
+        if(!field.isFixed()) defaults = true;
       } else if(defaults) {
         pos = after(field.end());
         throw error(PARAMOPTIONAL_X, name);
       }
       if(seqType == null) untyped.add(name);
-      fields.put(name, new ShapeField(seqType, init, field.isPercentFixed()));
+      fields.put(name, new ShapeField(seqType, init, field.isFixed()));
     }
     // the integrity constraint is a focus function, bound to a variable like a field initializer
     Expr constraint = null;

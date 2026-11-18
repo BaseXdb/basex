@@ -2738,18 +2738,18 @@ public final class NodeFactory {
       final int[] sy, final int from, final int to) {
     Nodes.FieldNameAndType fieldNameAndType = null;
     Node exprSingle = null;
-    boolean isPercentFixed = false;
+    boolean isFixed = false;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
         case Sym.FieldNameAndType -> fieldNameAndType = (Nodes.FieldNameAndType) c;
         case Sym.ExprSingle -> exprSingle = c;
-        case Sym.PERCENT_FIXED -> isPercentFixed = true;
+        case Sym.FIXED -> isFixed = true;
         default -> { }
       }
     }
-    return new Nodes.LabeledFieldDecl(begin, end, fieldNameAndType, exprSingle, isPercentFixed);
+    return new Nodes.LabeledFieldDecl(begin, end, fieldNameAndType, exprSingle, isFixed);
   }
 
   private static Node createLabeledRecordTypeDecl(final int begin, final int end, final Node[] st,
