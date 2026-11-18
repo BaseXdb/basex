@@ -1911,7 +1911,9 @@ public class QueryParser extends AQueryParser {
     consume(LAX);
     skipWs();
     if(current('{')) {
-      enclosedExpr();
+      wsCheck("{");
+      check(expr(), NOEXPR);
+      wsCheck("}");
       throw error(IMPLVAL);
     }
     pos = p;
