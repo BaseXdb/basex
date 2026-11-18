@@ -2463,7 +2463,9 @@ public class QueryParser extends InputParser {
     consume(LAX);
     skipWs();
     if(current('{')) {
-      enclosedExpr();
+      wsCheck("{");
+      check(expr(), NOEXPR);
+      wsCheck("}");
       throw error(IMPLVAL);
     }
     pos = p;
