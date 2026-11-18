@@ -278,7 +278,7 @@ public final class QueryContext extends Job implements Closeable {
       throws QueryException {
 
     return run(info.parsing, () -> {
-      info.query = query;
+      if(parent == null) info.query = query;
       main = new QueryParser(query, uri, this, sc).parseMain();
       return main;
     });
@@ -293,7 +293,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     return run(info.parsing, () -> {
-      info.query = query;
+      if(parent == null) info.query = query;
       return new QueryParser(query, uri, this, null).parseLibrary(true);
     });
   }
