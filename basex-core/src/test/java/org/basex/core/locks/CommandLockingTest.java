@@ -195,6 +195,19 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(record + "[ " + map + " ] coerce as array(local:r)"), false, NAME_LIST);
     ckDBs(new XQuery(record + "declare record local:s(r as local:r); "
         + "{ 'r': " + map + " } coerce as local:s"), false, NAME_LIST);
+    // values: no compile-time evaluation before locking
+    ckDBs(new XQuery(record + "{} castable as local:r"), false, NAME_LIST);
+    ckDBs(new XQuery(record + "let $r as local:r := {} return $r"), false, NAME_LIST);
+    ckDBs(new XQuery(record + "declare function local:f($r as local:r) { $r }; local:f({})"),
+        false, NAME_LIST);
+    ckDBs(new XQuery(record + "declare variable $r as local:r := {}; $r"), false, NAME_LIST);
+    ckDBs(new XQuery(record + "let $r := {} return fn() as local:r { $r }()"), false,
+        NAME_LIST);
+    // integrity constraints
+    final String constr = "declare record local:c(a) where exists(" + DOC.args(NAME) + "); ";
+    ckDBs(new XQuery(constr + "{ 'a': 1 } cast as local:c"), false, NAME_LIST);
+    ckDBs(new XQuery(constr + "local:c(1)"), false, NAME_LIST);
+    ckDBs(new XQuery(constr + "local:c(1) but with { 'a': 2 }"), false, NAME_LIST);
   }
 
   /** Tests read and write locks of updating queries. */

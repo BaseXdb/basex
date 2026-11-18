@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-final class StaticVarRef extends ParseExpr {
+public final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   public final QNm name;
   /** Referenced variable (can be {@code null}). */
@@ -56,6 +56,14 @@ final class StaticVarRef extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return var.value(qc);
+  }
+
+  /**
+   * Indicates if the referenced variable is bound to a value.
+   * @return result of check
+   */
+  public boolean constant() {
+    return var != null && var.expr instanceof Value;
   }
 
   @Override

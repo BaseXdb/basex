@@ -1112,8 +1112,8 @@ public final class XQuery4Test extends SandboxTest {
     // an interpretation that the static input type rules out must not raise an error
     check("<a>x</a>/data()", "x", empty(SelectorStep.class), empty(If.class));
     check("<a><b/></a>/name()", "a", empty(SelectorStep.class), empty(If.class));
-    error("{ 'a': 1 }/data()", NOCTX_X);
-    error("[ 1 ]/string()", NOCTX_X);
+    error("{ 'a': 1 }/data()", SELECTORCTX_X);
+    error("[ 1 ]/string()", SELECTORCTX_X);
     // the selector is evaluated even if the JNode has no children
     error("{ 'a': <xml><w/></xml> }/a/jvalue()", SELECTORCTX_X);
     error("{ 'a': <xml><w/></xml> }/a/jvalue()//w", SELECTORCTX_X);

@@ -65,7 +65,8 @@ public final class StaticVar extends StaticDecl {
 
       // dynamic compilation, eager evaluation: pre-evaluate deterministic expressions
       // (record fields: only if used)
-      if(!field && (expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT))) {
+      if(!field && (expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT)) &&
+          cc.evaluable(declType)) {
         try {
           if(value == null) value = compute(cc.qc, cc);
           cc.replaceWith(expr, value);

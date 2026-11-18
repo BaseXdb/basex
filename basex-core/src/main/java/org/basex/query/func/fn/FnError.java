@@ -22,11 +22,12 @@ public final class FnError extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    if(cause != null) throw cause.copy();
     final QNm code = toQNmOrNull(arg(0), qc);
     final String description = toStringOrNull(arg(1), qc);
     final Value value = defined(2) ? arg(2).value(qc) : null;
     throw new QueryException(info, code != null ? code : FUNERR1.qname(),
-      description != null ? description : FUNERR1.message()).value(value).cause(cause);
+      description != null ? description : FUNERR1.message()).value(value);
   }
 
   @Override

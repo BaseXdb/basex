@@ -101,7 +101,7 @@ public final class Let extends ForLet {
       expr = tc.expr;
     }
     // coerce at compile time
-    if(expr instanceof final Value value) {
+    if(expr instanceof final Value value && cc.evaluable(var.declType)) {
       expr = var.checkType(value, cc.qc, cc);
     } else if(!scoring && var.declType != null &&
         !expr.seqType().coercible(var.declType)) {
