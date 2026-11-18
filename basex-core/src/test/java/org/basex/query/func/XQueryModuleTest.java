@@ -220,7 +220,7 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     query(func.args("1"), 1);
     query(func.args("1 + 2"), 3);
-    error(func.args("1+"), EXPECTAFTER_X_X, INCOMPLETE);
+    error(func.args("1+"), EXPECTAFTER_X_X);
     error("declare variable $a := 1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
 
@@ -673,7 +673,7 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
 
     // supplied option
     error(eval ? func.args(query, empty, manual) : func.args(query, manual), FUNCARG_X);
-    error(eval ? func.args(query, empty, rex) : func.args(query, rex), SYNTAX_X);
+    error(eval ? func.args(query, empty, rex) : func.args(query, rex), WRONGCHAR_X_X);
     error(eval ? func.args(query, empty, " { 'queryparser': 'unknown' }") :
       func.args(query, " { 'queryparser': 'unknown' }"), INVALIDOPTIONVALUE_X);
 
@@ -683,7 +683,7 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
       set(MainOptions.QUERYPARSER, MainOptions.QueryParserType.MANUAL);
       error(func.args(query), FUNCARG_X);
       set(MainOptions.QUERYPARSER, MainOptions.QueryParserType.REX);
-      error(func.args(query), SYNTAX_X);
+      error(func.args(query), WRONGCHAR_X_X);
       error(eval ? func.args(query, empty, manual) : func.args(query, manual), FUNCARG_X);
     } finally {
       set(MainOptions.QUERYPARSER, type);
@@ -733,7 +733,7 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);
 
-    error(func.args("1+"), EXPECTAFTER_X_X, INCOMPLETE);
+    error(func.args("1+"), EXPECTAFTER_X_X);
     query("\n\ntry {" + func.args("1 +",
         " { 'pass': true() }") + "} catch * { $err:line-number }", 1);
 

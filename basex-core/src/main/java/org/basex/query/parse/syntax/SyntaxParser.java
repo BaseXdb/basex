@@ -29,10 +29,18 @@ public final class SyntaxParser {
    * @param input code points of the query, with normalized line endings
    * @return syntax tree
    * @throws ParseException if the query is not accepted by the grammar
+   * @throws TagMismatch if an element with different start and end tags was parsed before
    */
   public static SyntaxTree parse(final int[] input) throws ParseException {
     final TreeBuilder builder = new TreeBuilder(input);
-    new XQuerySyntaxParser(input, builder).parse_Module();
+    try {
+      new XQuerySyntaxParser(input, builder).parse_Module();
+    } catch(final ParseException ex) {
+      // different tags are reported first
+      final Nodes.DirElemConstructor mismatch = builder.mismatch();
+      if(mismatch != null) throw new TagMismatch(mismatch);
+      throw ex;
+    }
     return builder.finish();
   }
 

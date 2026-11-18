@@ -59,78 +59,82 @@ public final class RExErrorMessageTest extends SandboxTest {
 
   /** Incomplete argument list: report the missing token if it is the only one that is valid. */
   @Test public void incompleteArgumentList() {
-    error("true(", INCOMPLETE);
+    error("true(", WRONGCHAR_X_X);
     error("true(1", WRONGCHAR_X_X);
-    error("true(1 2)", SYNTAX_X);
+    error("true(1 2)", WRONGCHAR_X_X);
     error("true(1,", INCOMPLETE);
-    error("true(,", SYNTAX_X);
+    error("true(,", WRONGCHAR_X_X);
   }
 
   /** Keyword used as QName prefix does not trigger an alternative error. */
   @Test public void keywordPrefix() {
-    error("{ 'a': 2 } => map:keys() ! 1", SYNTAX_X);
-    error("[ 1 ] => array:size() ! 1", SYNTAX_X);
-    error("<a/>/attribute::b ! 1 1", SYNTAX_X);
+    error("{ 'a': 2 } => map:keys() ! 1", QUERYEND_X);
+    error("[ 1 ] => array:size() ! 1", QUERYEND_X);
+    error("<a/>/attribute::b ! 1 1", QUERYEND_X);
   }
 
   /** Keyword parsed as a name: the error is reported at the token that follows the keyword. */
   @Test public void keywordHint() {
-    errorAt("for x in 1 return x", SYNTAX_X, 5);
-    errorAt("let x := 1 return x", SYNTAX_X, 5);
-    errorAt("for $x in 1 where if group by $x retrun $x", SYNTAX_X, 34);
-    errorAt("return 1", SYNTAX_X, 8);
-    errorAt("copy x := <a/> modify () return x", SYNTAX_X, 6);
-    errorAt("delete $x", SYNTAX_X, 8);
-    errorAt("insert $a into $b", SYNTAX_X, 8);
-    errorAt("rename $a as 'b'", SYNTAX_X, 8);
-    errorAt("replace $a with $b", SYNTAX_X, 9);
+    errorAt("for x in 1 return x", EXPECTAFTER_X_X, 5);
+    errorAt("let x := 1 return x", EXPECTAFTER_X_X, 5);
+    errorAt("for $x in 1 where if group by $x retrun $x", FLWORRETURN, 34);
+    errorAt("return 1", UNEXPRETURN, 8);
+    errorAt("copy x := <a/> modify () return x", EXPECTAFTER_X_X, 6);
+    errorAt("delete $x", EXPECTAFTER_X_X, 8);
+    errorAt("insert $a into $b", EXPECTAFTER_X_X, 8);
+    errorAt("rename $a as 'b'", EXPECTAFTER_X_X, 8);
+    errorAt("replace $a with $b", EXPECTAFTER_X_X, 9);
     errorAt("element a 1", WRONGCHAR_X_X, 11);
     errorAt("element { 1 }", WRONGCHAR_X_X, 14);
     errorAt("attribute a 1", WRONGCHAR_X_X, 13);
-    errorAt("text 1", SYNTAX_X, 6);
-    errorAt("comment 'x' 1", SYNTAX_X, 9);
-    errorAt("function $x { $x }", SYNTAX_X, 10);
-    errorAt("fn $x { $x }", SYNTAX_X, 4);
+    errorAt("text 1", EXPECTAFTER_X_X, 6);
+    errorAt("comment 'x' 1", EXPECTAFTER_X_X, 9);
+    errorAt("function $x { $x }", EXPECTAFTER_X_X, 10);
+    errorAt("fn $x { $x }", EXPECTAFTER_X_X, 4);
   }
 
   /** No hint for keywords that are parsed successfully or not followed by an operand. */
   @Test public void noKeywordHint() {
-    errorAt("if/a 1", SYNTAX_X, 6);
-    errorAt("if/child::a 1", SYNTAX_X, 13);
-    errorAt("for $x in 1 count $c retrun $x", SYNTAX_X, 22);
-    errorAt("map { } 1", SYNTAX_X, 9);
-    errorAt("1 instance of empty-sequence() 2", SYNTAX_X, 32);
-    errorAt("<a/>/text = 1 2", SYNTAX_X, 15);
-    errorAt("<a/>/functions 1", SYNTAX_X, 16);
-    errorAt("fn:abs(1) 2", SYNTAX_X, 11);
-    errorAt("<a/>/element(a) 1", SYNTAX_X, 17);
-    error("{ { }?a : 1 } 2", SYNTAX_X);
-    error("<local:a/>/self::local :*", SYNTAX_X);
+    errorAt("if/a 1", QUERYEND_X, 7);
+    errorAt("if/child::a 1", QUERYEND_X, 14);
+    errorAt("for $x in 1 count $c retrun $x", FLWORRETURN, 22);
+    errorAt("map { } 1", QUERYEND_X, 10);
+    errorAt("1 instance of empty-sequence() 2", QUERYEND_X, 33);
+    errorAt("<a/>/text = 1 2", QUERYEND_X, 16);
+    errorAt("<a/>/functions 1", QUERYEND_X, 17);
+    errorAt("fn:abs(1) 2", QUERYEND_X, 12);
+    errorAt("<a/>/element(a) 1", QUERYEND_X, 18);
+    error("{ { }?a : 1 } 2", QUERYEND_X);
+    error("<local:a/>/self::local :*", QUERYEND_X);
   }
 
   /** Common mistakes are reported at the offending token. */
   @Test public void commonMistakes() {
-    errorAt("1; 2", SYNTAX_X, 2);
-    errorAt("1 = 1 ? 2 : 3", SYNTAX_X, 11);
-    errorAt("1 == 2", SYNTAX_X, 4);
-    errorAt("(1 && 2)", SYNTAX_X, 4);
+    errorAt("1; 2", QUERYSEMI, 3);
+    errorAt("1 = 1 ? 2 : 3", QUERYEND_X, 12);
+    errorAt("1 == 2", EXPECTAFTER_X_X, 4);
+    errorAt("(1 && 2)", WRONGCHAR_X_X, 4);
     errorAt("try { 1 } catch { 2 }", SYNTAX_X, 17);
     errorAt("if (1) 2 else 3", WRONGCHAR_X_X, 8);
     errorAt("insert node $a in $b", SYNTAX_X, 16);
-    errorAt("1 instance of empty-sequence x", SYNTAX_X, 30);
-    errorAt("for $x in 1 where return $x", SYNTAX_X, 26);
+    errorAt("1 instance of empty-sequence x", QUERYEND_X, 31);
+    errorAt("for $x in 1 where return $x", FLWORRETURN, 26);
     errorAt("for $x in", INCOMPLETE, 10);
   }
 
-  /** Missing operands are reported as incomplete expressions. */
+  /** Missing operands are reported at the operator, if the parser can tell. */
   @Test public void missingOperand() {
-    for(final String op : new String[] { "!", "to", "||", "+", "div", "=", "eq", "is", ",", "and",
-        "or", "otherwise", "->" }) {
+    for(final String op : new String[] { "!", "to", "||", "+", "div", "=", "eq", "is", "and",
+        "or" }) {
+      errorMessage("1 " + op, EXPECTAFTER_X_X, "Expecting expression after '" + op + "'");
+    }
+    for(final String op : new String[] { ",", "otherwise", "->" }) {
       errorMessage("1 " + op, INCOMPLETE, "Incomplete expression");
     }
-    errorMessage("some x in 1 satisfies x", SYNTAX_X, "found 'x'");
-    errorMessage("switch 1 case 1 return 2 default return 3", SYNTAX_X, "found '1'");
-    errorMessage("map a", SYNTAX_X, "found 'a'");
+    errorMessage("some x in 1 satisfies x", EXPECTAFTER_X_X, "Expecting '$' after 'some'");
+    errorMessage("switch 1 case 1 return 2 default return 3", EXPECTAFTER_X_X,
+        "Expecting '(' after 'switch'");
+    errorMessage("map a", EXPECTAFTER_X_X, "Expecting '{' after 'map'");
     errorMessage("for $x in 1 count c return 1", WRONGCHAR_X_X, "Expecting '$', found 'c'");
   }
 

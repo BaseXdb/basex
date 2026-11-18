@@ -79,8 +79,8 @@ public final class DocTest extends SandboxTest {
     pre("/*/*/*/*", 17, 19);
     pre("./.", 0);
     pre("node()/node()[last()]", 24);
-    error("./", STEPMISS_X, INCOMPLETE);
-    error("html/", STEPMISS_X, INCOMPLETE);
+    error("./", STEPMISS_X, EXPECTAFTER_X_X);
+    error("html/", STEPMISS_X, EXPECTAFTER_X_X);
   }
 
   /** Parent and following steps. */
@@ -103,8 +103,8 @@ public final class DocTest extends SandboxTest {
     pre(".//li", 20, 22);
     pre("/descendant-or-self::*[last()]/text()", 23);
     pre("/descendant::*[last()]/text()", 23);
-    error("//", STEPMISS_X, INCOMPLETE);
-    error("///", STEPMISS_X, SYNTAX_X);
+    error("//", STEPMISS_X, EXPECTAFTER_X_X);
+    error("///", STEPMISS_X, EXPECTAFTER_X_X);
   }
 
   /** Ancestor steps. */

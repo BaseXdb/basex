@@ -97,6 +97,27 @@ public final class RExQueryParser extends AQueryParser {
 
   /** Maximum number of expected tokens that are listed in a syntax error. */
   private static final int MAX_EXPECTED = 3;
+  /** Maximum offset up to which the continuations of a syntax error are tried. */
+  private static final int MAX_PROBE = 20_000;
+  /** Operators that are followed by an operand. */
+  private static final Set<String> OPERATORS = Set.of("+", "-", "*", "|", "||", "!", "!=", "=",
+      "<=", ">=", "<<", ">>", "=>", "->", "/", "//", ":=", "and", "or", "to", "eq", "ne", "lt",
+      "le", "gt", "ge", "is", "union", "intersect", "except", "div", "idiv", "mod");
+
+  /** Keywords that are parsed as names, by the tokens that must follow them. */
+  private static final Map<String, String> KEYWORD_HINTS = new HashMap<>();
+
+  static {
+    final String[][] keywords = {
+      { "'$'", "for", "let", "some", "every", "copy" }, { "'node'", "delete", "insert", "rename" },
+      { "'node' or 'value of'", "replace" }, { "'('", "switch", "typeswitch", "if" },
+      { "name and '{'", "element", "attribute", "processing-instruction", "namespace" },
+      { "'{'", "text", "comment", "document", "map", "array" }, { "'(' or '{'", "function", "fn" }
+    };
+    for(final String[] k : keywords) {
+      for(int i = 1; i < k.length; i++) KEYWORD_HINTS.put(k[i], k[0]);
+    }
+  }
 
   /** Declarations of the second part of the prolog, which can refer to imported modules. */
   private static final BitSet DECLARATIONS = Sym.set(Sym.ContextValueDecl, Sym.VarDecl,
@@ -293,12 +314,19 @@ public final class RExQueryParser extends AQueryParser {
       return (Nodes.Module) tree.root();
     } catch(final ParseException ex) {
       throw syntaxError(ex);
+    } catch(final TagMismatch ex) {
+      // reported before a later syntax error, as by the manual parser
+      final Nodes.DirElemConstructor elem = ex.element();
+      pos = elem.end();
+      throw error(TAGWRONG_X_X, token(text(elem.qName())), token(text(elem.qName2())));
     }
   }
 
   /**
    * Maps a syntax error of the generated parser to a query error, which is positioned at the
-   * start of the offending token.
+   * start of the offending token. The messages are those of the hand-written parser as far as
+   * possible. The parser reports more tokens than are possible (merged states): the possible
+   * ones are found by parsing the input up to the error, followed by the token.
    * @param ex exception of the generated parser
    * @return query error
    */
@@ -312,22 +340,157 @@ public final class RExQueryParser extends AQueryParser {
       return error(KEYSPEC_X, QueryError.similar(found(), "otherwise"));
     }
 
-    // a few expected tokens are reported as in hand-written checks, if all of them are literals
-    // (whitespace and comments are allowed wherever whitespace is)
-    final ArrayList<String> tokens = new ArrayList<>();
-    boolean literals = true;
+    // expected tokens: literals and others (whitespace and comments are always allowed)
+    final ArrayList<String> tokens = new ArrayList<>(), others = new ArrayList<>();
     for(final String t : XQuerySyntaxParser.getExpectedTokenSet(ex)) {
       if(t.equals("S") || t.equals("'(:'")) continue;
-      literals = t.length() > 2 && t.charAt(0) == '\'' && tokens.size() < MAX_EXPECTED;
-      if(!literals) break;
-      tokens.add(t.substring(1, t.length() - 1).replace("''", "'"));
+      if(t.length() > 2 && t.charAt(0) == '\'') {
+        tokens.add(t.substring(1, t.length() - 1).replace("''", "'"));
+      } else {
+        others.add(t);
+      }
     }
-    if(literals && !tokens.isEmpty()) {
+    try {
+      lexical(others);
+    } catch(final QueryException qe) {
+      return qe;
+    }
+    pos = ex.getBegin();
+    // the input up to the offending token is a complete module
+    if(pos > 0 && accepts(Arrays.copyOf(input, pos), false)) {
+      // a keyword was parsed as a name, and an operand follows
+      final String last = lastToken();
+      final int cp = current();
+      if(XMLToken.isNCStartChar(cp) || digit(cp) || quote(cp) || cp == '$' || cp == '{') {
+        if(last.equals(RETURN)) return error(UNEXPRETURN);
+        final String follow = KEYWORD_HINTS.get(last);
+        if(follow != null) return error(EXPECTAFTER_X_X, follow, last);
+      }
+      if(cp == '(') return error(EXPREMPTY);
+      final String rest = remaining();
+      pos++;
+      return rest.startsWith(";") ? error(QUERYSEMI) : error(QUERYEND_X, rest);
+    }
+
+    if(tokens.contains(":=") && (current('=') || current(':'))) {
+      return error(WRONGCHAR_X_X, ":=", found());
+    }
+    // incomplete FLWOR expression
+    if(tokens.contains(RETURN) && tokens.size() > 1 && accepts(append(RETURN + " 1"), false)) {
+      return error(FLWORRETURN);
+    }
+    final String last = lastToken();
+    if(OPERATORS.contains(last) && accepts(append("1"), true)) {
+      return error(EXPECTAFTER_X_X, "expression", last);
+    }
+    // the innermost open parenthesis, bracket or brace (keywords are also valid names)
+    String closing = null;
+    int count = 0;
+    for(final String delimiter : new String[] { ")", "]", "}" }) {
+      if(tokens.contains(delimiter) && pos <= MAX_PROBE && accepts(append(delimiter), true)) {
+        closing = delimiter;
+        count++;
+      }
+    }
+    if(count == 1) return error(WRONGCHAR_X_X, closing, found());
+    if(tokens.isEmpty() && others.equals(Arrays.asList("StringLiteral"))) {
+      return error(NOQUOTE_X, found());
+    }
+    if(tokens.equals(Arrays.asList(":)")) && others.equals(Arrays.asList("CommentContents"))) {
+      pos = length;
+      return error(COMCLOSE);
+    }
+    if(others.isEmpty() && !tokens.isEmpty() && tokens.size() <= MAX_EXPECTED) {
       return error(WRONGCHAR_X_X, String.join("' or '", tokens), found());
     }
     // the input ends before the expression is complete
     final byte[] t = found();
     return t == EMPTY ? error(INCOMPLETE) : error(SYNTAX_X, t);
+  }
+
+  /**
+   * Raises the lexical errors of the hand-written parser at the current position: invalid
+   * entities and incomplete numbers. Changes the position.
+   * @param others expected tokens that are no literals
+   * @throws QueryException query exception
+   */
+  private void lexical(final ArrayList<String> others) throws QueryException {
+    final int quote = current();
+    if(current('&') && others.contains("PredefinedEntityRef")) {
+      entity(new TokenBuilder());
+    } else if(quote == '"' || quote == '\'') {
+      // string literal: entities are replaced, a doubled quote is an escaped quote
+      final TokenBuilder tb = new TokenBuilder();
+      for(pos++; pos < length;) {
+        if(input[pos] != quote) entity(tb);
+        else if(pos + 1 < length && input[pos + 1] == quote) pos += 2;
+        else break;
+      }
+    } else if(digit(quote) && others.contains("IntegerLiteral")) {
+      int e = pos;
+      while(e < length && digit(input[e])) e++;
+      if(e < length && input[e] == '.') for(e++; e < length && digit(input[e]); e++);
+      if(e < length && (input[e] == 'e' || input[e] == 'E')) {
+        e++;
+        if(e < length && (input[e] == '+' || input[e] == '-')) e++;
+        if(e == length || !digit(input[e])) numberError(e);
+        while(e < length && digit(input[e])) e++;
+      }
+      if(e < length && XMLToken.isNCStartChar(input[e])) numberError(e);
+    }
+  }
+
+  /**
+   * Raises an error for an incomplete number.
+   * @param end end of the number
+   * @throws QueryException query exception
+   */
+  private void numberError(final int end) throws QueryException {
+    final String number = substring(pos, end).toString();
+    pos = end;
+    throw error(NUMBER_X, number);
+  }
+
+  /**
+   * Checks if the generated parser accepts a query.
+   * @param query code points
+   * @param prefix also accept a query that is too short
+   * @return result of check
+   */
+  private static boolean accepts(final int[] query, final boolean prefix) {
+    try {
+      new XQuerySyntaxParser(query, null).parse_Module();
+      return true;
+    } catch(final ParseException ex) {
+      return prefix && ex.getBegin() >= query.length;
+    }
+  }
+
+  /**
+   * Returns the input up to the current position, followed by a token.
+   * @param continuation token to append
+   * @return code points
+   */
+  private int[] append(final String continuation) {
+    final int[] text = (" " + continuation).codePoints().toArray();
+    final int[] query = Arrays.copyOf(input, pos + text.length);
+    System.arraycopy(text, 0, query, pos, text.length);
+    return query;
+  }
+
+  /**
+   * Returns the token before the current position: a name, or symbols.
+   * @return token (can be empty)
+   */
+  private String lastToken() {
+    int end = pos;
+    while(end > 0 && input[end - 1] <= ' ') end--;
+    int start = end;
+    final boolean name = start > 0 && XMLToken.isNCChar(input[start - 1]);
+    while(start > 0 && input[start - 1] > ' ' && XMLToken.isNCChar(input[start - 1]) == name) {
+      start--;
+    }
+    return new String(input, start, end - start);
   }
 
   /**

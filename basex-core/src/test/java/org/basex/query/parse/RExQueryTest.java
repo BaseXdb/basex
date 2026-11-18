@@ -521,21 +521,36 @@ public final class RExQueryTest {
 
   /** Syntax errors are mapped to XPST0003, positioned at the offending token. */
   @Test public void syntaxErrors() {
-    error("1 +", QueryError.INCOMPLETE, 1, 4);
-    error("1 + , 2", QueryError.SYNTAX_X, 1, 5);
+    error("1 +", QueryError.EXPECTAFTER_X_X, 1, 4);
+    error("1 + , 2", QueryError.EXPECTAFTER_X_X, 1, 5);
     error("(1", QueryError.WRONGCHAR_X_X, 1, 3);
     error("<a>", QueryError.INCOMPLETE, 1, 4);
-    error("1\n  +\n  )", QueryError.SYNTAX_X, 3, 3);
+    error("1\n  +\n  )", QueryError.EXPECTAFTER_X_X, 3, 3);
     error("f(1,", QueryError.INCOMPLETE, 1, 5);
     // Elvis operator: key specifier expected
     error("1 ?: 2", QueryError.KEYSPEC_X, 1, 4);
     error("map { } ? :a", QueryError.KEYSPEC_X, 1, 11);
     // a character that cannot start a token
-    error("1 + §", QueryError.SYNTAX_X, 1, 5);
+    error("1 + §", QueryError.EXPECTAFTER_X_X, 1, 5);
     // non-BMP characters count once
-    error("\"😀\" + , 2", QueryError.SYNTAX_X, 1, 7);
+    error("\"😀\" + , 2", QueryError.EXPECTAFTER_X_X, 1, 7);
     // syntax errors are reported before semantic errors, even if these occur earlier in the query
-    error("$p:x + , 2", QueryError.SYNTAX_X, 1, 8);
+    error("$p:x + , 2", QueryError.EXPECTAFTER_X_X, 1, 8);
+    // messages of the traditional parser for frequent mistakes
+    error("for $x in 1 retrun $x", QueryError.FLWORRETURN, 1, 13);
+    error("let $x = 1 return $x", QueryError.WRONGCHAR_X_X, 1, 8);
+    // different start and end tags are reported before a later syntax error
+    error("<a><b></a>, 1 +", QueryError.TAGWRONG_X_X, 1, 11);
+    error("1 2", QueryError.QUERYEND_X, 1, 4);
+    error("(1 !", QueryError.EXPECTAFTER_X_X, 1, 5);
+    error("(1, 2 !", QueryError.EXPECTAFTER_X_X, 1, 8);
+    error("declare namespace p = ; 1", QueryError.NOQUOTE_X, 1, 23);
+    error("10div 3", QueryError.NUMBER_X, 1, 3);
+    error("\"a &foo;\"", QueryError.INVENTITY_X, 1, 5);
+    // valid numbers are no incomplete numbers
+    error("if(1) 1_000 else 2", QueryError.WRONGCHAR_X_X, 1, 7);
+    error("if(1) 0xff else 2", QueryError.WRONGCHAR_X_X, 1, 7);
+    error("if(1) 0b10 else 2", QueryError.WRONGCHAR_X_X, 1, 7);
   }
 
   /** The error code is XPST0003 for all syntax errors. */

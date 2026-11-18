@@ -83,6 +83,8 @@ final class TreeBuilder implements BottomUpEventHandler {
 
   /** Input. */
   private final int[] input;
+  /** First element with different start and end tags (can be {@code null}). */
+  private Nodes.DirElemConstructor mismatch;
   /** Nodes and placeholders. */
   private Node[] nodes = new Node[64];
   /** Symbols. */
@@ -237,8 +239,35 @@ final class TreeBuilder implements BottomUpEventHandler {
     } else if(retained == 1 && (flags & FOLD) != 0) {
       push(only, kind);
     } else {
-      push(NodeFactory.create(kind, begin, end, nodes, syms, from, from + entries), kind);
+      final Node node = NodeFactory.create(kind, begin, end, nodes, syms, from, from + entries);
+      if(kind == Sym.DirElemConstructor && mismatch == null &&
+          node instanceof final Nodes.DirElemConstructor elem && !sameTags(elem)) mismatch = elem;
+      push(node, kind);
     }
+  }
+
+  /**
+   * Returns the first element with different start and end tags.
+   * @return element (can be {@code null})
+   */
+  Nodes.DirElemConstructor mismatch() {
+    return mismatch;
+  }
+
+  /**
+   * Checks if an element has the same start and end tag.
+   * @param elem element
+   * @return result of check
+   */
+  private boolean sameTags(final Nodes.DirElemConstructor elem) {
+    final Terminal start = elem.qName(), end = elem.qName2();
+    if(end == null) return true;
+    final int length = start.end - start.begin;
+    if(end.end - end.begin != length) return false;
+    for(int i = 0; i < length; i++) {
+      if(input[start.begin + i] != input[end.begin + i]) return false;
+    }
+    return true;
   }
 
   /**
