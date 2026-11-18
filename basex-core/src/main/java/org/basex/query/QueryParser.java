@@ -4275,16 +4275,9 @@ public class QueryParser extends InputParser {
       // function type
       type = FuncType.get(name);
       if(type != null) {
-        // only %updating is relevant for function tests; other non-reserved ones are ignored
+        // only %updating is relevant for function tests; other annotations are ignored
         st = functionTest(anns.contains(Annotation.UPDATING), type).seqType();
         function = type == Types.FUNCTION;
-        if(function) {
-          for(final Ann ann : anns) {
-            if(ann.definition == Annotation.PUBLIC || ann.definition == Annotation.PRIVATE) {
-              throw error(ANNRESERVED_X, ann.info, ann);
-            }
-          }
-        }
       } else {
         final Kind kind = Kind.get(name);
         if(kind == Kind.JNODE) {
