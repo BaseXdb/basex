@@ -84,7 +84,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) {
-        final IO src = info.sc().location(loc, uri);
+        final IO src = info.sc().location(loc, uri, info);
         if(src == null) throw WHICHMODFILE_X.get(info, loc);
         if(src.isExternal() && !provided) checkPerm(qc, Perm.ADMIN);
         srcs.add(src);

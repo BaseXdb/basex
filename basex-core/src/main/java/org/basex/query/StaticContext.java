@@ -1,5 +1,6 @@
 package org.basex.query;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -188,7 +189,7 @@ public final class StaticContext {
    * @return resulting path
    */
   public IO resolve(final String path) {
-    return resolve(path, null);
+    return resolve(path, (String) null);
   }
 
   /**
@@ -199,8 +200,11 @@ public final class StaticContext {
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
-    final IO io = resolveCustom(path, uri);
-    return io != null ? io : resolveDefault(path);
+    try {
+      return resolve(path, uri, null);
+    } catch(final QueryException ex) {
+      throw new QueryRTException(ex);
+    }
   }
 
   /**
@@ -210,7 +214,49 @@ public final class StaticContext {
    * @return io reference, or {@code null} if the location cannot be resolved
    */
   public IO location(final String path, final String uri) {
-    final IO io = resolveCustom(path, uri);
+    try {
+      return location(path, uri, null);
+    } catch(final QueryException ex) {
+      throw new QueryRTException(ex);
+    }
+  }
+
+  /**
+   * Resolves the specified path against the base URI.
+   * @param path to be resolved
+   * @param info input info (can be {@code null})
+   * @return resulting path
+   * @throws QueryException query exception
+   */
+  public IO resolve(final String path, final InputInfo info) throws QueryException {
+    return resolve(path, null, info);
+  }
+
+  /**
+   * Resolves the specified path with the custom URI resolver, or against the base URI.
+   * @param path to be resolved
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
+   * @param info input info (can be {@code null})
+   * @return resulting path
+   * @throws QueryException query exception
+   */
+  private IO resolve(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    final IO io = resolveCustom(path, uri, info);
+    return io != null ? io : resolveDefault(path);
+  }
+
+  /**
+   * Returns an IO reference for the specified resource location.
+   * @param path location
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
+   * @param info input info (can be {@code null})
+   * @return io reference, or {@code null} if the location cannot be resolved
+   * @throws QueryException query exception
+   */
+  public IO location(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    final IO io = resolveCustom(path, uri, info);
     if(io != null) return io;
     // strings that are neither locations nor XML fragments cannot be resolved
     final IO dflt = resolveDefault(path);
@@ -221,10 +267,20 @@ public final class StaticContext {
    * Resolves the specified path with the custom URI resolver.
    * @param path file path
    * @param uri module namespace (can be {@code null})
+   * @param info input info (can be {@code null})
    * @return io reference, or {@code null} if no custom resolver exists or applies
+   * @throws QueryException query exception
    */
-  private IO resolveCustom(final String path, final String uri) {
-    return resolver != null ? resolver.resolve(path, uri, baseURI) : null;
+  private IO resolveCustom(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    if(resolver == null) return null;
+    try {
+      return resolver.resolve(path, uri, baseURI);
+    } catch(final QueryException ex) {
+      throw ex.info() == null ? ex.info(info) : ex;
+    } catch(final RuntimeException ex) {
+      throw IOERR_X.get(info, ex);
+    }
   }
 
   /**
@@ -232,7 +288,7 @@ public final class StaticContext {
    * @param path file path
    * @return io reference
    */
-  private IO resolveDefault(final String path) {
+  public IO resolveDefault(final String path) {
     final IO base = baseIO();
     // try to resolve the path against the XML catalog resolver
     if(uriResolver != null) {

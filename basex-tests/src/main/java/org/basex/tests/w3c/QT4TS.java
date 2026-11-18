@@ -701,15 +701,10 @@ public final class QT4TS extends Main {
 
       if(!locations.isEmpty()) {
         final QueryProcessor qp = query.qp();
-        qp.uriResolver(new UriResolver() {
-          @Override
-          public IO resolve(final String path, final String uri, final Uri bas) {
-            qp.uriResolver(null);
-            final IO io = qp.sc.resolve(path, uri);
-            qp.uriResolver(this);
-            final IO file = locations.get(io.path());
-            return file == null ? io : file;
-          }
+        qp.uriResolver((path, uri, bas) -> {
+          final IO io = qp.sc.resolveDefault(path);
+          final IO file = locations.get(io.path());
+          return file == null ? io : file;
         });
       }
 

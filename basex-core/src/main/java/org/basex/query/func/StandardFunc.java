@@ -688,7 +688,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final String uri, final boolean content) throws QueryException {
-    final IO io = sc().location(uri, null);
+    final IO io = sc().location(uri, null, info);
     if(io == null) throw RESURI_X.get(info, uri);
     if(io instanceof IOContent && io.path().isEmpty()) {
       if(!content) throw RESURI_X.get(info, uri);

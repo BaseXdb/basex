@@ -72,8 +72,14 @@ public abstract class Docs extends DynamicFn {
       if(item.isEmpty()) return value(cc.qc);
       // target is a database or not a remote URL
       queryInput = queryInput(toToken(item));
-      if(queryInput == null || sc().withdb && queryInput.dbExists(cc.qc.context.soptions) ||
-          !(queryInput.io() instanceof IOUrl)) return value(cc.qc);
+      if(queryInput == null || sc().withdb && queryInput.dbExists(cc.qc.context.soptions)) {
+        return value(cc.qc);
+      }
+      try {
+        if(!(queryInput.io(info) instanceof IOUrl)) return value(cc.qc);
+      } catch(final QueryException ex) {
+        return value(cc.qc);
+      }
     }
     return this;
   }

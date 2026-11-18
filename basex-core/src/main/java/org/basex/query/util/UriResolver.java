@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -17,6 +18,7 @@ public interface UriResolver {
    * @param uri URI (can be {@code null})
    * @param base base URI (can be {@code null})
    * @return reference to resources, or {@code null} to apply the default resolution
+   * @throws QueryException query exception
    */
-  IO resolve(String path, String uri, Uri base);
+  IO resolve(String path, String uri, Uri base) throws QueryException;
 }

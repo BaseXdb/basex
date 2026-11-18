@@ -286,8 +286,8 @@ public final class QueryResources {
     final boolean db = withdb && (form == null || form.equals(CollectionOptions.DATABASE));
     if(form != null && !switch(form) {
       case CollectionOptions.DATABASE -> withdb && qi.dbExists(context.soptions);
-      case CollectionOptions.DIRECTORY -> qi.io() instanceof final IOFile dir && dir.isDir();
-      case CollectionOptions.ARCHIVE -> qi.io() instanceof final IO io && io.isArchive();
+      case CollectionOptions.DIRECTORY -> qi.io(info) instanceof final IOFile dir && dir.isDir();
+      case CollectionOptions.ARCHIVE -> qi.io(info) instanceof final IO io && io.isArchive();
       default -> false;
     }) throw COLLFORM_X_X.get(info, form, qi.original);
 
@@ -296,7 +296,7 @@ public final class QueryResources {
     if(value != null) return value;
 
     // list files of a directory without parsing them
-    if(uris && qi.io() instanceof final IOFile dir && dir.isDir()) {
+    if(uris && qi.io(info) instanceof final IOFile dir && dir.isDir()) {
       checkAccess(dir, qi.original, qc, info);
       final String key = dir.path() + ';' + key(docOpts, options);
       final Value cached = dirs.get(key);
@@ -329,7 +329,7 @@ public final class QueryResources {
   public ArrayList<IOFile> others(final QueryInput qi, final DocOptions docOpts,
       final CollectionOptions options, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(!(qi.io() instanceof final IOFile dir && dir.isDir()) ||
+    if(!(qi.io(info) instanceof final IOFile dir && dir.isDir()) ||
         CollectionOptions.DATABASE.equals(options.get(CollectionOptions.FORM))) {
       return new ArrayList<>(0);
     }
@@ -365,7 +365,7 @@ public final class QueryResources {
       }
 
       // check currently opened collections (required for tests)
-      if(!qi.dbExists(context.soptions) && qi.io() instanceof final IO io) {
+      if(!qi.dbExists(context.soptions) && qi.io(info) instanceof final IO io) {
         final String path = io.path();
         final int cs = colls.size();
         for(int c = 0; c < cs; c++) {
@@ -469,11 +469,14 @@ public final class QueryResources {
    * Returns the document path of a textual resource and its encoding. Only required for test APIs.
    * @param path resource path
    * @param sc static context
+   * @param info input info (can be {@code null})
    * @return path and encoding or {@code null}
+   * @throws QueryException query exception
    */
-  public String[] text(final String path, final StaticContext sc) {
+  public String[] text(final String path, final StaticContext sc, final InputInfo info)
+      throws QueryException {
     if(texts == null) return null;
-    final IO io = sc.resolve(path);
+    final IO io = sc.resolve(path, info);
     final String[] resource = texts.get(io.path());
     return resource != null ? resource : texts.get(io.name());
   }
@@ -482,22 +485,28 @@ public final class QueryResources {
    * Returns stop words. Called during parsing, and only required for test APIs.
    * @param path resource path
    * @param sc static context
+   * @param info input info (can be {@code null})
    * @return file reference
+   * @throws QueryException query exception
    */
-  IO stopWords(final String path, final StaticContext sc) {
+  IO stopWords(final String path, final StaticContext sc, final InputInfo info)
+      throws QueryException {
     final IO io = stop != null ? stop.get(path) : null;
-    return io != null ? io : sc.resolve(path);
+    return io != null ? io : sc.resolve(path, info);
   }
 
   /**
    * Returns a thesaurus file. Called during parsing, and only required for Test APIs.
    * @param path resource path
    * @param sc static context
+   * @param info input info (can be {@code null})
    * @return file reference
+   * @throws QueryException query exception
    */
-  IO thesaurus(final String path, final StaticContext sc) {
+  IO thesaurus(final String path, final StaticContext sc, final InputInfo info)
+      throws QueryException {
     final IO io = thes != null ? thes.get(path) : null;
-    return io != null ? io : sc.resolve(path);
+    return io != null ? io : sc.resolve(path, info);
   }
 
   /**
@@ -606,7 +615,7 @@ public final class QueryResources {
         // compare input path (skipped for existing databases, which take precedence)
         final String original = data.meta.original;
         if(!original.isEmpty() && !(withdb && qi.dbExists(context.soptions)) &&
-            qi.io() instanceof final IO io && original(data).eq(io) &&
+            qi.io(info) instanceof final IO io && original(data).eq(io) &&
             key.equals(data.meta.docOpts)) {
           checkTrusted(io, qi.original, qc, info);
           // reset database path: indicates that database includes all files of the original path
@@ -742,7 +751,7 @@ public final class QueryResources {
       final CollectionOptions collOpts, final QueryContext qc, final InputInfo info,
       final boolean single, final boolean allowExternal) throws QueryException {
 
-    final IO io = input.io();
+    final IO io = input.io(info);
     if(io == null) throw WHICHRES_X.get(info, input.original);
     checkAccess(io, input.original, qc, info);
 
