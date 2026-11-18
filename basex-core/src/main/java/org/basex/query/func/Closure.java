@@ -95,7 +95,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.params = params;
     this.anns = anns;
     this.vs = vs;
-    this.global = global == null ? new HashMap<>() : new LinkedHashMap<>(global);
+    this.global = global == null ? new LinkedHashMap<>() : new LinkedHashMap<>(global);
     props = new FlagCache(flag -> {
       for(final Expr ex : this.global.values()) {
         if(ex.has(flag)) return true;
