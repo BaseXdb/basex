@@ -24,8 +24,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JNode extends GNode {
-  /** Index of an item node (sorts after all children of its parent). */
-  private static final int ITEM = Integer.MAX_VALUE;
+  /** Index of an item node (sorts before all children of its parent). */
+  private static final int ITEM = Integer.MIN_VALUE;
 
   /** Key ({@link Empty#VALUE} for root node). */
   public final Item key;

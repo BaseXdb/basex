@@ -400,19 +400,21 @@ public final class CompileContext {
   /**
    * Pre-evaluates the specified expression.
    * @param expr expression
-   * @return optimized expression
-   * @throws QueryException query exception
+   * @return value, or {@code fn:error} instance if evaluation fails
    */
-  public Value preEval(final Expr expr) throws QueryException {
-    final Value value;
+  public Expr preEval(final Expr expr) {
+    // dynamic errors are only raised if the expression is evaluated at runtime
+    Expr result;
     try {
-      value = expr.value(qc);
+      result = expr.value(qc);
+    } catch(final QueryException ex) {
+      result = FnError.get(ex);
     } catch(final StackOverflowError | ArraySizeException ex) {
-      throw QueryError.limitError(ex, expr.info());
+      result = FnError.get(QueryError.limitError(ex, expr.info()));
     }
     // discard caches of the evaluated expression
     qc.caches.remove(expr);
-    return (Value) replaceWith(expr, value);
+    return replaceWith(expr, result, result instanceof Value);
   }
 
   /**

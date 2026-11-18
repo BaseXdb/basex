@@ -225,15 +225,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // - no query focus needs to be captured
     // - the closure is empty, so we don't lose variables
     // - the result size is not too large
-    if(cc.dynamic && !(focus && expr.has(Flag.CTX)) && global.isEmpty() &&
-        !cc.largeResult(expr)) {
-      try {
-        return cc.preEval(this);
-      } catch(final QueryException ex) {
-        expr = FnError.get(ex);
-      }
-    }
-    return this;
+    return cc.dynamic && !(focus && expr.has(Flag.CTX)) && global.isEmpty() &&
+        !cc.largeResult(expr) ? cc.preEval(this) : this;
   }
 
   @Override

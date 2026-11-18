@@ -161,9 +161,8 @@ final class TaskContext {
    * the same map that a try/catch clause exposes as {@code $err:map}.
    * @param ex caught exception
    * @return record
-   * @throws QueryException query exception
    */
-  XQMap error(final QueryException ex) throws QueryException {
+  XQMap error(final QueryException ex) {
     return XQMap.get(Str.get("error"), ex.map());
   }
 

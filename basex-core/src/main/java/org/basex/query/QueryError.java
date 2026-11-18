@@ -601,13 +601,13 @@ public enum QueryError {
   /** Error code. */
   INVCODE_X(FOCH, 1, "Character not permitted in a string: %."),
   /** Error code. */
+  CHARINV_X(FOCH, 1, "Invalid name, glyph or codepoint value: %."),
+  /** Error code. */
   WHICHCOLL_X(FOCH, 2, "%"),
   /** Error code. */
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
-  /** Error code. */
-  CHARINV_X(FOCH, 5, "Invalid name, glyph or codepoint value: %."),
 
   /** Error code. */
   CSV_ERROR_X(FOCV, 1, "CSV processing error: %."),

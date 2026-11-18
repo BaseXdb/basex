@@ -83,7 +83,9 @@ public final class List extends Arr {
     exprType.assign(st != null ? st : Types.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
 
     // pre-evaluate list; skip expressions with large result sizes
-    return values(true, cc) ? cc.preEval(this).shrink(cc.qc) : this;
+    if(!values(true, cc)) return this;
+    final Expr expr = cc.preEval(this);
+    return expr instanceof final Value value ? value.shrink(cc.qc) : expr;
   }
 
   /**

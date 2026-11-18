@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -16,6 +17,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -25,36 +27,13 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
+  /** Index of the first error value that depends on the error location. */
+  public static final int LOCATION = 4;
   /** Static exception. */
   static final QueryException ERROR = new QueryException("") {
     @Override
     public synchronized Throwable fillInStackTrace() { return this; }
   };
-
-  /** Error Strings. */
-  private static final String[] NAMES = {
-    "code", "description", "value", "module", "line-number",
-    "column-number", "additional", "stack-trace", "map"
-  };
-  /** Index of the first error value that depends on the error location. */
-  public static final int LOCATION = 4;
-  /** Error types. */
-  private static final SeqType[] TYPES = {
-      Types.QNAME_O, Types.STRING_ZO, Types.ITEM_ZM, Types.STRING_ZO, Types.INTEGER_ZO,
-      Types.INTEGER_ZO, Types.ITEM_ZM, Types.STRING_O, Types.MAP_O
-  };
-  /** Error QNames. */
-  private static final QNm[] QNAMES = new QNm[NAMES.length];
-  /** Error string items. */
-  private static final Str[] STRINGS = new Str[NAMES.length];
-
-  static {
-    for(int n = NAMES.length - 1; n >= 0; n--) {
-      final String name = NAMES[n];
-      QNAMES[n] = new QNm(ERR_PREFIX, name, ERROR_URI);
-      STRINGS[n] = Str.get(name);
-    }
-  }
 
   /** Stack. */
   private final ArrayList<InputInfo> stack = new ArrayList<>();
@@ -368,11 +347,15 @@ public class QueryException extends Exception {
    * @return variables
    */
   public static Var[] variables(final QueryContext qc, final InputInfo info) {
-    final int vl = QNAMES.length;
-    final Var[] vars = new Var[vl];
-    for(int v = 0; v < vl; v++) {
-      vars[v] = new Var(QNAMES[v], TYPES[v], qc, info);
+    final RecordType record = Records.ERROR_DETAILS.get();
+    final TokenObjectMap<ShapeField> fields = record.fields();
+    final int fs = fields.size();
+    final Var[] vars = new Var[fs + 1];
+    for(int f = 1; f <= fs; f++) {
+      final QNm name = new QNm(ERR_PREFIX, fields.key(f), ERROR_URI);
+      vars[f - 1] = new Var(name, fields.value(f).seqType(), qc, info);
     }
+    vars[fs] = new Var(new QNm(ERR_PREFIX, "map", ERROR_URI), record.seqType(), qc, info);
     return vars;
   }
 
@@ -380,26 +363,23 @@ public class QueryException extends Exception {
    * Returns an array with values for this exception, optionally omitting the location values.
    * @param location include the values from index {@link #LOCATION} onward
    * @return values
-   * @throws QueryException query exception
    */
-  public ValueList values(final boolean location) throws QueryException {
+  public ValueList values(final boolean location) {
     final ValueList list = new ValueList();
     list.add(qname());
     list.add(Str.get(getLocalizedMessage()));
     list.add(value() != null ? value() : Empty.VALUE);
     list.add(path() != null ? Str.get(path()) : Empty.VALUE);
-    if(!location) return list;
-
-    final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(location(info)).add('\n');
-    for(final InputInfo ii : stack) tb.add(location(ii)).add('\n');
-    final Str trace = Str.get(tb.finish());
-
-    list.add(line() != 0 ? Itr.get(line()) : Empty.VALUE);
-    list.add(column() != 0 ? Itr.get(column()) : Empty.VALUE);
-    list.add(Empty.VALUE);
-    list.add(trace);
-    list.add(map(list));
+    if(location) {
+      list.add(line() != 0 ? Itr.get(line()) : Empty.VALUE);
+      list.add(column() != 0 ? Itr.get(column()) : Empty.VALUE);
+      final TokenBuilder trace = new TokenBuilder();
+      if(info != null) trace.add(location(info)).add('\n');
+      for(final InputInfo ii : stack) trace.add(location(ii)).add('\n');
+      list.add(Str.get(trace.finish()));
+      list.add(Empty.VALUE);
+      list.add(XQMap.get(Records.ERROR_DETAILS.get(), list.toArray()));
+    }
     return list;
   }
 
@@ -407,26 +387,9 @@ public class QueryException extends Exception {
    * Returns a map with values for this exception. This is the same map that a try/catch clause
    * exposes as {@code $err:map} (the last entry of the value list).
    * @return values
-   * @throws QueryException query exception
    */
-  public XQMap map() throws QueryException {
+  public XQMap map() {
     return (XQMap) values(true).peek();
-  }
-
-  /**
-   * Returns a map with all catch values.
-   * @param values error values
-   * @return map
-   * @throws QueryException query exception
-   */
-  private static XQMap map(final ValueList values) throws QueryException {
-    final MapBuilder mb = new MapBuilder();
-    int v = 0;
-    for(final Value value : values) {
-      if(!value.isEmpty()) mb.put(STRINGS[v], value);
-      v++;
-    }
-    return mb.map();
   }
 
   /**

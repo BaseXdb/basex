@@ -851,8 +851,8 @@ public class QueryParser extends AQueryParser {
     if(!wsConsume(")")) {
       boolean defaults = false;
       do {
-        final boolean fixed = wsConsumeWs('%' + FIXED);
-        if(!fixed && wsConsume("%")) throw error(WRONGCHAR_X_X, FIXED, found());
+        final boolean fixed = wsConsume("%");
+        if(fixed && !wsConsumeWs(FIXED)) throw error(WRONGCHAR_X_X, FIXED, found());
         final InputInfo fi = info();
         skipWs();
         final byte[] name = ncName(NONCNAME_X, false);
@@ -3537,16 +3537,9 @@ public class QueryParser extends AQueryParser {
       // function type
       type = FuncType.get(name);
       if(type != null) {
-        // only %updating is relevant for function tests; other non-reserved ones are ignored
+        // only %updating is relevant for function tests; other annotations are ignored
         st = functionTest(anns.contains(Annotation.UPDATING), type).seqType();
         function = type == Types.FUNCTION;
-        if(function) {
-          for(final Ann ann : anns) {
-            if(ann.definition == Annotation.PUBLIC || ann.definition == Annotation.PRIVATE) {
-              throw error(ANNRESERVED_X, ann.info, ann);
-            }
-          }
-        }
       } else {
         final Kind kind = Kind.get(name);
         if(kind == Kind.JNODE) {

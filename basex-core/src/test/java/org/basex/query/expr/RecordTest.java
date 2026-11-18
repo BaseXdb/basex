@@ -1256,7 +1256,8 @@ public final class RecordTest extends SandboxTest {
 
     // syntax
     error("declare record local:s(%fixed a); 1", WRONGCHAR_X_X);
-    error("declare record local:s(% fixed a := 1); 1", WRONGCHAR_X_X);
+    query("declare record local:s(% fixed a := 1); local:s()?a", 1);
+    query("declare record local:s(%(::)fixed a := 1); local:s()?a", 1);
     error("declare record local:s(%fixeda := 1); 1", WRONGCHAR_X_X);
     error("declare record local:s(%static a := 1); 1", WRONGCHAR_X_X);
     query("declare record local:s(%fixed(::)fixed := 1); local:s()?fixed", 1);

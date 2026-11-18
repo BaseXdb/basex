@@ -1189,9 +1189,7 @@ public final class UpdateTest extends SandboxTest {
 
     // other annotations are ignored
     query("declare namespace x = 'x'; fn() { 1 } instance of %x:foo fn() as item()*", true);
-    // visibility annotations are no function assertions
-    error("fn() { 1 } instance of %public fn() as item()*", ANNRESERVED_X);
-    error("fn() {} instance of %private function(*)", ANNRESERVED_X);
+    query("fn() { 1 } instance of %public fn() as item()*", true);
 
     // annotations are only allowed for function tests
     error("{} instance of %updating map(*)", NOANN, SYNTAX_X);

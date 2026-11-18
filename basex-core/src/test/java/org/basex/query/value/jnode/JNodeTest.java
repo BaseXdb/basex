@@ -540,8 +540,15 @@ public final class JNodeTest extends SandboxTest {
     query("jtree({ 'c': [ 44 ] })/c ! (generate-id(item::*) = generate-id(.))", false);
     query("jtree({ 'c': [ 44 ] })/c ! (generate-id(item::*) = generate-id(jnode(1)))", false);
     query("jtree({ 'c': [ 44 ] })/c ! (item::* >> .)", true);
-    query("jtree({ 'c': [ 44 ] })/c ! (item::* >> jnode(1))", true);
-    query("jtree({ 'c': [ 44 ] })/c ! count(item::*/(following-sibling::*, following::*))", 0);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::* << jnode(1))", true);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::*/1 << jnode(1))", true);
+    query("jtree({ 'c': [ 44 ] })/c ! ((jnode(1), item::*) ! jvalue())", "44\n[44]");
+    query("jtree({ 'c': [ 44 ] })/c ! ((jnode(1) | item::*) ! jvalue())", "[44]\n44");
+    // like attributes, item nodes have no siblings, and the children of the parent follow them
+    query("jtree({ 'c': [ 44 ] })/c ! count(item::*/following-sibling::*)", 0);
+    query("jtree({ 'c': [ 44 ], 'd': 1 })/c/item::*/following::* ! jvalue()", "44\n1");
+    query("jtree({ 'c': [ 44 ] })/c ! (item::*/following::* is jnode(1))", true);
+    query("jtree({ 'c': [ 44 ] })/c/jnode(1)/preceding::* => count()", 0);
     query("jtree({ 'c': [ 44 ] })/c/item::*/ancestor::* => count()", 2);
     query("jtree({ 'c': [ 44 ] })/c//item::* => count()", 2);
     query("jtree({ 'c': [ 44 ] })//* => count()", 2);
@@ -658,5 +665,13 @@ public final class JNodeTest extends SandboxTest {
 
     query("if({} => jtree()) { 1 }", 1);
     query("if({ 0: 0, false(): false() } => jtree()) { 1 }", 1);
+  }
+
+  /** Node constructors. */
+  @Test public void constructors() {
+    query("<a>{ [ <b/> ]/1 }</a>", "<a><b/></a>");
+    query("<a>{ [ [ 1, 2 ] ]/1, 3 }</a>", "<a>1 2 3</a>");
+    query("document { jtree(<b/>) }", "<b/>");
+    error("<a>{ { 'x': {} }/x }</a>", CONSFUNC_X);
   }
 }

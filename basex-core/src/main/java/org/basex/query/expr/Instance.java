@@ -39,7 +39,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     // check value
     if(expr instanceof Value) return cc.preEval(this);
 
