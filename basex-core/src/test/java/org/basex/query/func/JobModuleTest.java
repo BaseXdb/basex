@@ -1075,6 +1075,18 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void resultErrorStack() {
+    final Function func = _JOB_RESULT;
+    final String id = query(_JOB_EVAL.args("error()", " ()", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    // repeated errors do not share their stack
+    query("declare namespace x = 'x'; declare %basex:inline(0) function x:f() { "
+        + func.args(id, " { 'keep': true() }") + " }; count(distinct-values("
+        + "for $i in 1 to 3 return try { x:f() } catch * { $err:stack-trace }))", 1);
+    query(_JOB_REMOVE.args(id));
+  }
+
+  /** Test method. */
   @Test public void resultError() {
     final Function func = _JOB_RESULT;
     final String id = query(_JOB_EVAL.args("db:get('db')", " ()", " { 'cache': true() }"));

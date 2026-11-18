@@ -60,7 +60,7 @@ public final class QueryJobResult {
    * @throws QueryException query exception
    */
   public Value get() throws QueryException {
-    if(exception != null) throw exception;
+    if(exception != null) throw exception.copy();
     return value != null ? value : Empty.VALUE;
   }
 

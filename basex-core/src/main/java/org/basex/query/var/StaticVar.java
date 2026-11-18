@@ -122,17 +122,6 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Returns a copy of an error that was raised in another context.
-   * @param error original error
-   * @return query exception
-   */
-  QueryException error(final QueryException error) {
-    final QueryException ex = new QueryException(error.info(), error.qname(),
-        error.getLocalizedMessage()).value(error.value());
-    return lazy ? ex.notCatchable() : ex;
-  }
-
-  /**
    * Ensures that the variable expression is not updating.
    * @throws QueryException query exception
    */
