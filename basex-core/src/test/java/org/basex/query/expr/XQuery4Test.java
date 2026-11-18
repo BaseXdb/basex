@@ -701,8 +701,8 @@ public final class XQuery4Test extends SandboxTest {
     // a non-deterministic variable referenced twice keeps a single, shared value
     query("declare variable $x := random:integer(); ($x, $x)[1] = ($x, $x)[2]", true);
 
-    // deterministic global variables stay eager: still pre-evaluated even if folded away
-    error("declare variable $x := 1 idiv 0; if(<a/>/b) then $x else 1", DIVZERO_X);
+    // errors of unevaluated global variables are not raised (qtspecs#3054)
+    query("declare variable $x := 1 idiv 0; if(<a/>/b) then $x else 1", 1);
   }
 
   /** Guarded expressions: positions are guarded by a non-empty input. */
@@ -1304,6 +1304,21 @@ public final class XQuery4Test extends SandboxTest {
     error("reverse(error())", FUNERR1);
     error("string(error())", FUNERR1);
     error("duplicate-values(error())", FUNERR1);
+    error("error()/a", FUNERR1);
+    error("error()/descendant::text()", FUNERR1);
+    error("boolean(normalize-space(error()))", FUNERR1);
+  }
+
+  /** Dynamic errors are not raised during static analysis (qtspecs#3054). */
+  @Test public void staticDynamicErrors() {
+    for(final String query : new String[] { "let $x := 1 div 0 return 2", "head((1, 1 div 0))",
+        "(1 div 0) instance of xs:error", "(1 div 0) castable as xs:error",
+        "matches('X', '[') instance of xs:boolean", "[ 1 div 0 ]", "{ 1: 1 div 0 }" }) {
+      query(_XQUERY_PARSE.args(query, " { 'compile': true() }") + " => name()", "MainModule");
+    }
+    query("head((1, 1 div 0))", 1);
+    error("1 div 0", DIVZERO_X);
+    error("matches('X', '[')", REGINVALID_X);
   }
 
   /** Choice item types. */

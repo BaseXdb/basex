@@ -543,6 +543,8 @@ public abstract class Step extends Preds {
    * @return node type, or {@code null} if the input yields no nodes
    */
   private static NodeType nodeType(final Type type) {
+    // xs:error is a subtype of every type, but yields no nodes
+    if(TypeRef.deref(type) == BasicType.ERROR) return null;
     return type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.get(Empty.VALUE, type.seqType()) :
       type instanceof final NodeType nt ? nt : null;
   }

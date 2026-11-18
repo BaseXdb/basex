@@ -48,7 +48,7 @@ public final class ShapeGet extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     exprType.assign(type.fields().value(index).seqType());
     return expr instanceof Value ? cc.preEval(this) : this;
   }

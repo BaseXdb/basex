@@ -40,8 +40,9 @@ public final class FuncItemTest extends SandboxTest {
     query("string('00' ! function-lookup(xs:QName('xs:hexBinary'), 0)())", "00");
     // the body of an inline function is evaluated without a focus
     error("let $f := fn() { . } return (1, 2)[$f()]", NOCTX_X);
-    // errors are raised when the function item is created, not when it is called
-    error("23 ! xs:error#0", FUNCCAST_X_X);
+    // errors are raised when the function item is called (qtspecs#3054)
+    query("(23 ! xs:error#0) => count()", 1);
+    error("(23 ! xs:error#0)()", FUNCCAST_X_X);
   }
 
   /** Checks that captured focuses are compared by fn:deep-equal. */
