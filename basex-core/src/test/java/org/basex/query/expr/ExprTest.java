@@ -612,7 +612,7 @@ public final class ExprTest extends SandboxTest {
         root(Str.class));
 
     // error tests must be namespace-qualified
-    error("try { 1+'' } catch XPTY0004 { 1 }", NONUMBER_X_X);
+    error("try { 1+'' } catch XPTY0004 { 1 }", CALCTYPE_X_X_X_X_X);
     query("try { 1+'' } catch err:XPTY0004 { 1 }", 1);
     query("try { 1+'' } catch *:XPTY0004 { 1 }", 1);
     query("try { 1+'' } catch err:* { 1 }", 1);
