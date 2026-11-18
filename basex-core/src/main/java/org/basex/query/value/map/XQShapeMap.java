@@ -65,17 +65,8 @@ public abstract class XQShapeMap extends XQMap {
     final SeqType st = value.seqType();
     final ShapeType tp = st.instanceOf(fields().value(index + 1).seqType()) ? sh.shape() :
       sh.put(fields().key(index + 1), st);
-    return value == valueAt(index) && tp == type ? this : putAt(tp, index, value);
-  }
+    if(value == valueAt(index) && tp == type) return this;
 
-  /**
-   * Returns a map with a replaced value.
-   * @param tp shape of the new map
-   * @param index index of the value
-   * @param value new value
-   * @return new map
-   */
-  XQMap putAt(final ShapeType tp, final int index, final Value value) {
     final Value[] values = values();
     values[index] = value;
     return get(tp, values);

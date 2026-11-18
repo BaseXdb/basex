@@ -890,8 +890,6 @@ public final class RecordTest extends SandboxTest {
       try(QueryProcessor qp = new QueryProcessor(prolog + query, context)) {
         final Value value = qp.value();
         final XQMap r1 = (XQMap) value.itemAt(0), r2 = (XQMap) value.itemAt(1);
-        assertInstanceOf(XQRecordMap.class, r1, query);
-        assertInstanceOf(XQRecordMap.class, r2, query);
         for(int f = 1; f <= 3; f++) assertSame(r1.valueAt(f), r2.valueAt(f), query);
       }
     }

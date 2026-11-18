@@ -23,8 +23,6 @@ import org.basex.util.hash.*;
 public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
-  /** No fixed fields. */
-  private static final int[] NO_SLOTS = {};
 
   /** Record name ({@code null} for {@code record(*)}). */
   private final QNm name;
@@ -44,8 +42,6 @@ public final class RecordType extends ShapeType {
   private volatile RecordType detachedType;
   /** Initializers and constraints of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
-  /** Storage slots of the fields (can be {@code null}). */
-  private volatile int[] slots;
 
   /**
    * Constructor for the abstract record type {@code record(*)}.
@@ -93,7 +89,7 @@ public final class RecordType extends ShapeType {
   public XQMap build(final Value[] values, final boolean error, final QueryContext qc,
       final InputInfo ii) throws QueryException {
     // the labeled candidate record is the focus of the integrity constraints of all base types
-    final XQMap record = XQRecordMap.get(this, values, qc);
+    final XQMap record = XQMap.get(this, values);
     for(final Expr constr : constraints) {
       if(!((FItem) constr.item(qc, ii)).invoke(qc, ii, record).ebv(qc, ii)) {
         if(error) throw RECORDCONSTRAINT_X_X.get(ii, this, record);
@@ -186,24 +182,6 @@ public final class RecordType extends ShapeType {
     if(any()) return this;
     if(shape == null) shape = new ShapeType(fields());
     return shape;
-  }
-
-  /**
-   * Returns the storage slots of the fields: an instance slot, or {@code -1} for fixed fields.
-   * @return slots, or {@code null} if the record has no fixed fields
-   */
-  public int[] slots() {
-    int[] s = slots;
-    if(s == null) {
-      final TokenObjectMap<ShapeField> fields = fields();
-      final int fs = fields.size();
-      s = new int[fs];
-      int i = 0;
-      for(int f = 0; f < fs; f++) s[f] = fields.value(f + 1).isFixed() ? -1 : i++;
-      if(i == fs) s = NO_SLOTS;
-      slots = s;
-    }
-    return s == NO_SLOTS ? null : s;
   }
 
   @Override
