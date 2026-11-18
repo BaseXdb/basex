@@ -2,3 +2,5 @@
 */etc/* text eol=lf
 *.sh text eol=lf
 *.bat text eol=crlf
+# JavaCC output: normalize platform-dependent line endings
+basex-core/src/main/java/org/basex/query/util/regex/parse/*.java text eol=lf
