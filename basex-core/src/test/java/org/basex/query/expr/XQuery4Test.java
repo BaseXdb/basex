@@ -607,7 +607,10 @@ public final class XQuery4Test extends SandboxTest {
     query("try { 1 + <_/> } catch * { $err:map?line-number }", 1);
     query("try { 1 + <_/> } catch * { boolean($err:map?stack-trace) }", true);
     query("try { 1 + <_/> } catch * { $err:map?value }", "");
-    query("try { 1 + <_/> } catch * { map:size($err:map) }", 6);
+    query("try { 1 + <_/> } catch * { map:size($err:map) }", 8);
+    query("try { 1 + <_/> } catch * { $err:map instance of fn:error-details-record }", true);
+    query("try { 1 + <_/> } catch * { map:keys($err:map) }",
+        "code\ndescription\nvalue\nmodule\nline-number\ncolumn-number\nstack-trace\nadditional");
 
     query("try { error((), (), 1) } catch * { $err:map?value }", 1);
     query("try { error(xs:QName('a')) } catch * { $err:map?code }", "#a");

@@ -68,6 +68,17 @@ public enum Records {
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string").
         seqType(Occ.ZERO_OR_ONE))),
   /** Record definition. */
+  ERROR_DETAILS(FN_URI, "error-details",
+    field("code", Types.QNAME_O),
+    field("description", Types.STRING_ZO),
+    field("value", Types.ITEM_ZM),
+    field("module", Types.STRING_ZO),
+    field("line-number", Types.INTEGER_ZO),
+    field("column-number", Types.INTEGER_ZO),
+    field("stack-trace", Types.STRING_ZO),
+    field("additional", Types.ITEM_ZM)
+  ),
+  /** Record definition. */
   HTTP_AUTH(HTTP_URI, "auth",
     field("username", Types.STRING_O),
     field("password", Types.STRING_O),

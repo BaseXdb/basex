@@ -129,9 +129,8 @@ public final class Catch extends Single {
    * Returns the error values, including the location values only if they are referenced.
    * @param ex caught exception
    * @return values
-   * @throws QueryException query exception
    */
-  private ValueList values(final QueryException ex) throws QueryException {
+  private ValueList values(final QueryException ex) {
     return ex.values(used.length() > QueryException.LOCATION);
   }
 
