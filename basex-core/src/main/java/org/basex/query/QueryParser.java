@@ -1188,8 +1188,8 @@ public class QueryParser extends InputParser {
     if(!wsConsume(")")) {
       boolean defaults = false;
       do {
-        final boolean fixed = wsConsumeWs('%' + FIXED);
-        if(!fixed && wsConsume("%")) throw error(WRONGCHAR_X_X, FIXED, found());
+        final boolean fixed = wsConsume("%");
+        if(fixed && !wsConsumeWs(FIXED)) throw error(WRONGCHAR_X_X, FIXED, found());
         final InputInfo fi = info();
         skipWs();
         final byte[] name = ncName(NONCNAME_X, false);
