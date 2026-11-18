@@ -57,6 +57,8 @@ public final class StaticContext {
   public byte[] dirNS;
   /** Default function namespace. */
   public byte[] funcNS;
+  /** Module path reported in errors, overriding the static base URI (can be {@code null}). */
+  public String modulePath;
   /** Name of module (not assigned for main module). */
   public QNm module;
   /** URIs of modules loaded by the current file. */

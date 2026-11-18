@@ -280,7 +280,7 @@ public class QueryParser extends InputParser {
    */
   private void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    path = baseIO == null ? null : baseIO.path();
+    path = sc.modulePath != null ? sc.modulePath : baseIO == null ? null : baseIO.path();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters

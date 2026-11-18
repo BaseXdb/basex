@@ -1689,7 +1689,8 @@ public final class DBATest extends WebappTest {
       final JobOptions options = new JobOptions();
       options.set(JobOptions.ID, ID);
       options.set(JobOptions.INTERVAL, "P1D");
-      services().register(new QueryJobSpec(options, new HashMap<>(), new IOContent("1"), null));
+      services().register(new QueryJobSpec(options, new HashMap<>(), new IOContent("1"), null,
+          null));
     }
 
     /**

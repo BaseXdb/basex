@@ -263,6 +263,13 @@ public final class XQueryModuleTest extends SandboxTest {
         func.args("static-base-uri()", " {}", " { 'base-uri': 'b.xq' }"), "http://x.x/a/b.xq");
     query("declare base-uri 'http://x.x/a/'; " +
         func.args("static-base-uri()", " {}", " { 'base-uri': 'urn:x' }"), "urn:x");
+
+    // errors: an inherited base URI is not reported as module
+    query("declare base-uri 'http://x.x/a/'; try {" + func.args("error()", " {}",
+        " { 'pass': true() }") + "} catch * { $err:module }", "");
+    query("declare base-uri 'http://x.x/a/'; try {" + func.args("error()", " {}",
+        " { 'base-uri': 'b.xq', 'pass': true() }") + "} catch * { $err:module }",
+        "http://x.x/a/b.xq");
   }
 
   /** Test method. */
@@ -711,6 +718,9 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query("declare base-uri 'http://x.x/a/'; try {" + func.args("1 +",
         " { 'base-uri': 'b.xq', 'pass': true() }") + "} catch * { $err:module }",
         "http://x.x/a/b.xq");
+    // an inherited base URI is not reported as module
+    query("declare base-uri 'http://x.x/a/'; try {" + func.args("1 +",
+        " { 'pass': true() }") + "} catch * { $err:module }", "");
 
     // queries
     query(func.args(" xs:anyURI('src/test/resources/input.xq')") + "/name()", "MainModule");

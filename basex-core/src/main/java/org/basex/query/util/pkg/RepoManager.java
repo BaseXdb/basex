@@ -346,7 +346,7 @@ public final class RepoManager {
 
     // parse module to find namespace URI, write file to rewritten URI file path
     try(QueryContext qc = new QueryContext(context)) {
-      final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
+      final byte[] uri = qc.parseLibrary(string(content), path, null).sc.module.uri();
       return write(xqTarget(string(uri)), content);
     }
   }

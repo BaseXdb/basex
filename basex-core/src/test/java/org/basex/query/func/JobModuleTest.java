@@ -392,7 +392,7 @@ public final class JobModuleTest extends SandboxTest {
       options.set(JobOptions.ID, "SERVICE" + c);
       options.set(JobOptions.START, "PT1H");
       final QueryJobSpec spec = new QueryJobSpec(options, new HashMap<>(),
-          new IOContent("1"), null);
+          new IOContent("1"), null, null);
       final Thread thread = new Thread(() -> {
         try {
           latch.await();
@@ -1005,6 +1005,15 @@ public final class JobModuleTest extends SandboxTest {
       }
       Performance.sleep(10);
     }
+
+    // errors: an inherited base URI is not reported as module
+    query("declare base-uri 'http://x.x/a/'; let $q := " +
+        _JOB_EVAL.args("error()", " ()", " { 'cache': true() }") + " return (" +
+        _JOB_WAIT.args(" $q") + ", try { " + func.args(" $q") + " } catch * { $err:module })", "");
+    query("declare base-uri 'http://x.x/a/'; let $q := " +
+        _JOB_EVAL.args("error()", " ()", " { 'cache': true(), 'base-uri': 'b.xq' }") +
+        " return (" + _JOB_WAIT.args(" $q") + ", try { " + func.args(" $q") +
+        " } catch * { $err:module })", "http://x.x/a/b.xq");
   }
 
   /** Test method. */

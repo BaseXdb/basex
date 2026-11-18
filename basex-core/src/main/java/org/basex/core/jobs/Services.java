@@ -118,7 +118,8 @@ public final class Services {
       if(qname.eq(Q_JOB)) {
         final JobOptions opts = options(child);
         if(opts != null) {
-          list.add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string()), null));
+          final IOContent query = new IOContent(child.string());
+          list.add(new QueryJobSpec(opts, new HashMap<>(), query, null, null));
         }
       } else {
         Util.errln("%: invalid element <%/>.", file, qname);
