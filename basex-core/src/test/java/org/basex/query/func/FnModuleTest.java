@@ -4683,6 +4683,11 @@ return
     error(func.args("Wed, 99 Jun 94 07:29:35. GMT"), IETF_PARSE_X_X_X);
     error(func.args("Wed, 99 Jun 94 07:29:35 0500"), IETF_PARSE_X_X_X);
     error(func.args("Wed, 99 Jun 94 07:29:35 +0500"), IETF_INV_X);
+
+    query("try { " + func.args("x") + " } catch * { $err:description }",
+        "Invalid input (day, or name of month expected, 'x' found): 'x'.");
+    query("try { " + func.args("Wed, 1 Nov") + " } catch * { $err:description }",
+        "Invalid input ('-' expected, 'END OF INPUT' found): 'Wed, 1 Nov'.");
   }
 
   /** Test method. */
