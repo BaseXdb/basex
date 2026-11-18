@@ -46,6 +46,18 @@ public final class RepoModuleTest extends SandboxTest {
     // delete by name and version
     query(func.args(PKG3ID));
     assertFalse(dir(dir));
+
+    // package name without dots
+    final String xar = new IOFile(sandbox(), "u1.xar").path();
+    query(_FILE_WRITE_BINARY.args(xar, _ARCHIVE_CREATE.args(
+        " ('expath-pkg.xml', 'u1/u1.xqm')",
+        " ('<package xmlns=\"http://expath.org/ns/pkg\" name=\"http://u1-pkg\" version=\"1.0\" " +
+        "abbrev=\"u1\" spec=\"1.0\"><xquery><namespace>u1</namespace><file>u1.xqm</file>" +
+        "</xquery></package>', 'module namespace u1 = \"u1\"; declare function u1:f() { 1 };')")));
+    query(_REPO_INSTALL.args(xar));
+    assertTrue(dir("http-u1-pkg-1.0"));
+    query(func.args("http://u1-pkg"));
+    assertFalse(dir("http-u1-pkg-1.0"));
   }
 
   /** Test method. */

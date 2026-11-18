@@ -139,6 +139,9 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(LANG.args(NAME, DOC.args(NAME))), false, NAME_LIST);
 
+    ckDBs(new XQuery(LOAD_XQUERY_MODULE.args("m", " { 'content': 'module namespace m=\"m\";' }")),
+        false, null);
+
     ckDBs(new XQuery(PARSE_XML.args(" <foo/>")), true, NONE);
     ckDBs(new XQuery(PARSE_XML_FRAGMENT.args(" <foo/>")), true, NONE);
 

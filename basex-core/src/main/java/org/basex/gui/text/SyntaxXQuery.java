@@ -490,7 +490,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   @Override
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     final Context context = new Context(pos);
     final ArrayList<Declaration> declarations = scan(text, context);
     // snippets adopt the namespace prefix of a library module
@@ -604,7 +604,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   @Override
   String outline(final byte[] text, final Definition definition,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     final String name = definition.name();
     if(!name.startsWith("$")) {
       // functions are outlined if they are called or referenced, even if they are built-in
@@ -618,15 +618,14 @@ final class SyntaxXQuery extends SyntaxMarkup {
     if(location == null) return definition.found() ? outline(text, definition.pos()) : null;
 
     // variable of an imported module
-    final IOFile file = modules.apply(null, location);
-    if(file == null) return null;
-    for(final Declaration declaration : module(file)) {
-      if(declaration.local().equals(name)) {
-        try {
-          return outline(file.read(), declaration.pos());
-        } catch(final IOException ex) {
-          Util.debug(ex);
-          return null;
+    for(final IOFile file : modules.apply(null, location)) {
+      for(final Declaration declaration : module(file)) {
+        if(declaration.local().equals(name)) {
+          try {
+            return outline(file.read(), declaration.pos());
+          } catch(final IOException ex) {
+            Util.debug(ex);
+          }
         }
       }
     }
@@ -703,17 +702,17 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   @Override
   ArrayList<Declaration> imported(final byte[] text,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     final ArrayList<Declaration> list = new ArrayList<>();
     final Matcher m = MODULE_IMPORT.matcher(string(text));
     while(m.find()) {
-      final IOFile file = modules.apply(group(m, 2), group(m, 4));
-      if(file == null) continue;
       final String prefix = m.group(1) + ':';
-      for(final Declaration declaration : module(file)) {
-        final String local = declaration.local(), name = local.startsWith("$") ?
-          '$' + prefix + local.substring(1) : prefix + local;
-        list.add(new Declaration(name, declaration.args(), -1, declaration.line()));
+      for(final IOFile file : modules.apply(group(m, 2), group(m, 4))) {
+        for(final Declaration declaration : module(file)) {
+          final String local = declaration.local(), name = local.startsWith("$") ?
+            '$' + prefix + local.substring(1) : prefix + local;
+          list.add(new Declaration(name, declaration.args(), -1, declaration.line()));
+        }
       }
     }
     return list;

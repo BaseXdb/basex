@@ -429,10 +429,10 @@ public final class QueryResources {
   }
 
   /**
-   * Returns the module loader. Called during parsing.
+   * Returns the module loader.
    * @return module loader
    */
-  public ModuleLoader modules() {
+  public synchronized ModuleLoader modules() {
     if(modules == null) modules = new ModuleLoader(context);
     return modules;
   }

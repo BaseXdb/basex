@@ -230,6 +230,25 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
+   * Tests loading modules from a package with fn:load-xquery-module.
+   */
+  @Test public void loadXQueryModule() {
+    query("load-xquery-module('ns1')?functions(QName('ns1', 'test2'))(0)()", "pkg2mod1");
+    query("load-xquery-module('ns3')?functions(QName('ns3', 'test'))(0)()", "pkg2mod2");
+  }
+
+  /**
+   * Tests resolving the module files of a package.
+   */
+  @Test public void files() {
+    final ArrayList<IOFile> files = ModuleLoader.files(context, "ns3");
+    assertEquals(1, files.size());
+    assertEquals("pkg2mod2.xql", files.get(0).name());
+    assertTrue(files.get(0).exists());
+    assertTrue(ModuleLoader.files(context, "unknown").isEmpty());
+  }
+
+  /**
    * Tests package installation.
    */
   @Test public void repoInstall() {

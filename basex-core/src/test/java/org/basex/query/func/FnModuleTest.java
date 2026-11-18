@@ -3667,6 +3667,15 @@ return
     query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare function m:f() { function-lookup(#fn:unparsed-text, 1) };' }") + call, "");
 
+    // modules imported by previously loaded modules are skipped
+    final IOFile amod = new IOFile(sandbox(), "a.xqm"), bmod = new IOFile(sandbox(), "b.xqm");
+    write(amod, "module namespace m = 'm'; import module namespace m2 = 'm' at 'b.xqm'; "
+        + "declare function m:a() { m2:b() };");
+    write(bmod, "module namespace m = 'm'; declare function m:b() { 1 };");
+    query("let $f := " + func.args("m", " { 'location-hints': ('" + amod.path() + "', '"
+        + bmod.path() + "'), 'trusted': true() }")
+        + "?functions return (map:size($f), $f?#Q{m}a?0())", "2\n1");
+
     // advanced and caching tests
     // run simple HTTP server for module hosting
     final int port = 62626;
