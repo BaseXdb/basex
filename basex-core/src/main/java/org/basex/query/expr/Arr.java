@@ -384,8 +384,7 @@ public abstract class Arr extends ParseExpr {
    */
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final Arr arr && Arrays.equals(exprs, arr.exprs) &&
-        Objects.equals(sc(), arr.sc());
+    return obj instanceof final Arr arr && sc() == arr.sc() && Arrays.equals(exprs, arr.exprs);
   }
 
   @Override

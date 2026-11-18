@@ -1304,13 +1304,10 @@ public final class FnModuleTest extends SandboxTest {
     // references to a recursive function
     query("declare function local:f($n) { if($n le 1) then 1 else $n * local:f($n - 1) }; " +
         func.args(" local:f#1", " local:f#1"), true);
-    // static contexts are compared by value
-    query(func.args(" xquery:eval('not#1')", " not#1"), true);
+    // functions with different static contexts
     query(func.args(" xquery:eval('declare boundary-space preserve; not#1')", " not#1"), false);
     query(func.args(" xquery:eval('declare base-uri \"x:/\"; static-base-uri#0')",
         " static-base-uri#0"), false);
-    query(func.args(" foot(xquery:eval('format-number(1, \"#\", \"de\"), format-number#2'))",
-        " format-number#2"), true);
     query(func.args(" xquery:eval('declare decimal-format x percent=\"!\"; format-number#2')",
         " format-number#2"), false);
     // an items-equal callback that returns an empty sequence falls back to the default rules
