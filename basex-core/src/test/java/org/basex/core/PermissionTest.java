@@ -145,6 +145,10 @@ public final class PermissionTest extends SandboxTest {
     // higher-order standard functions: no permission required
     ok(new XQuery("fn:apply(fn($x) { $x + 1 }, [1])"), testSession);
     ok(new XQuery("fn:function-lookup(xs:QName('fn:abs'), 1)(-1)"), testSession);
+    // functions of the query: no permission required; compiling a source requires admin
+    ok(new XQuery("declare function local:f() { 1 }; " + _INSPECT_FUNCTIONS.args() + "()"),
+        testSession);
+    no(new XQuery(_INSPECT_FUNCTIONS.args("src/test/resources/hello.xqm")), testSession);
     no(new XQuery("for $n in " + _DB_GET.args(NAME) + "//xml return delete node $n"), testSession);
 
     no(new XQuery(_DB_OPTIMIZE.args(NAME)), testSession);

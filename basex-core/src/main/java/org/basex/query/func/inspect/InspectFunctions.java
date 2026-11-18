@@ -83,8 +83,8 @@ public final class InspectFunctions extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    // locked resources cannot be detected statically
-    return visitor.unknownLocks() && super.accept(visitor);
+    // locked resources of compiled sources cannot be detected statically
+    return (defined(0) ? visitor.unknownLocks() : visitor.staticFuncs()) && super.accept(visitor);
   }
 
   /**

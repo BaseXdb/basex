@@ -480,7 +480,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param jobLocks locks to be extended
    */
   private void addLocks(final Locks jobLocks) {
-    final LockVisitor visitor = new LockVisitor(jobLocks, updating, contextValue == null);
+    final LockVisitor visitor = new LockVisitor(jobLocks, functions, updating,
+        contextValue == null);
 
     // locks in main module (can be null if parsing failed)
     boolean local = main == null || main.visit(visitor);
