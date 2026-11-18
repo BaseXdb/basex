@@ -117,6 +117,11 @@ public final class ButWith extends Arr {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && visitor.declared(seqType());
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new ButWith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }

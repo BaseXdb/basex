@@ -94,6 +94,14 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
+   * Indicates if initializing expressions of record fields have been declared.
+   * @return result of check
+   */
+  public boolean fields() {
+    return !fields.isEmpty();
+  }
+
+  /**
    * Ensures that none of the variable expressions is updating.
    * @throws QueryException query exception
    */

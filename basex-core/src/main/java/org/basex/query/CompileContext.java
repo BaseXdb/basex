@@ -283,6 +283,20 @@ public final class CompileContext {
   }
 
   /**
+   * Indicates if values of the specified type can be built at compile time.
+   * @param st type (can be {@code null})
+   * @return result of check
+   */
+  public boolean evaluable(final SeqType st) {
+    if(st == null || dynamicContext() || !qc.vars.fields()) return true;
+    // record initializers and constraints may access databases, which are not locked yet
+    for(final Expr init : RecordType.inits(st.type)) {
+      if(!(init instanceof final StaticVarRef ref && ref.constant())) return false;
+    }
+    return true;
+  }
+
+  /**
    * Pushes the current query focus onto the stack and, if possible, assigns a new dummy item.
    * @param expr focus expression (can be {@code null})
    * @param item focus single item
@@ -403,6 +417,7 @@ public final class CompileContext {
    * @return value, or {@code fn:error} instance if evaluation fails
    */
   public Expr preEval(final Expr expr) {
+    if(!evaluable(expr.seqType())) return expr;
     // dynamic errors are only raised if the expression is evaluated at runtime
     Expr result;
     try {

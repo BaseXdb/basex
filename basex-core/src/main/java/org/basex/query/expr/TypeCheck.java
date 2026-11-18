@@ -114,7 +114,7 @@ public final class TypeCheck extends Single {
     }
 
     // pre-evaluate; embedded function items are coerced with the compilation context
-    if(cc.values(true, expr)) {
+    if(cc.values(true, expr) && cc.evaluable(st)) {
       return cc.replaceWith(this, st.coerce((Value) expr, cc.qc, info, name, cc));
     }
 

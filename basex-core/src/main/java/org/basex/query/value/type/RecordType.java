@@ -215,7 +215,9 @@ public final class RecordType extends ShapeType {
   public static Expr[] inits(final Type type) {
     final RecordType rt = type instanceof final RecordType r ? r : null;
     if(rt != null && rt.inits != null) return rt.inits;
-    if(!(type instanceof FType || type instanceof ChoiceItemType || type instanceof TypeRef)) {
+    // query-independent types cannot reference declared records
+    if(type.global() ||
+        !(type instanceof FType || type instanceof ChoiceItemType || type instanceof TypeRef)) {
       return NO_INITS;
     }
     final Collector collector = new Collector();

@@ -39,7 +39,7 @@ public final class Castable extends Convert {
     final Expr arg = simplify(st, cc);
     if(arg != null) return new Castable(info, arg, seqType).optimize(cc);
 
-    return expr instanceof Value ? cc.preEval(this) : this;
+    return expr instanceof Value && cc.evaluable(seqType) ? cc.preEval(this) : this;
   }
 
   @Override

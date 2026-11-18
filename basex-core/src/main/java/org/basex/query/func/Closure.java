@@ -185,7 +185,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
         Expr inline = null;
         // let $a := 1 return fn() { $a } → fn() { 1 }
-        if(ex instanceof final Value value) {
+        if(ex instanceof final Value value && cc.evaluable(var.declType)) {
           // values are always inlined into the closure
           inline = var.checkType(value, cc.qc, cc);
         } else if(ex instanceof final Closure cl) {
@@ -366,20 +366,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // the let clauses of a closure do not change the type of the function body
     final SeqType argType = expr.seqType();
-    final Expr checked;
+    Expr checked;
     if(declType == null || argType.coercible(declType)) {
       // return type is already correct
       checked = body;
     } else if(body instanceof final Value value) {
-      // we can type check immediately
-      checked = declType.coerce(value, qc, info, name, null);
-    } else {
-      // check at each call: reject impossible arities
-      if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&
-          !body.has(Flag.NDT)) {
-        throw typeError(body, declType, name, info);
+      // we can type check immediately; errors are raised when the function is called
+      try {
+        checked = declType.coerce(value, qc, info, name, null);
+      } catch(final QueryException ex) {
+        checked = FnError.get(ex);
       }
-      checked = new TypeCheck(info, body, declType);
+    } else {
+      checked = new TypeCheck(info, body, declType, name);
     }
 
     return new FuncItem(info, checked, params, anns, funcType(), vs.stackSize(), name,

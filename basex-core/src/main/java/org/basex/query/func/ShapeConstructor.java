@@ -145,6 +145,11 @@ public final class ShapeConstructor extends StandardFunc {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && visitor.declared(shapeType.seqType());
+  }
+
+  @Override
   public ShapeType exactShape() {
     // constructed records have no additional fields
     return shapeType.shape();
