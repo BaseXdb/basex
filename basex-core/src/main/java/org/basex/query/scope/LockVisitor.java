@@ -22,6 +22,8 @@ public final class LockVisitor extends ASTVisitor {
   private final IdentityHashMap<Scope, Object> scopes = new IdentityHashMap<>();
   /** Reference to the read and write locks. */
   private final Locks locks;
+  /** Static functions of the query. */
+  private final StaticFuncs funcs;
   /** Updating query. */
   private final boolean updating;
   /** Focus level. */
@@ -33,12 +35,15 @@ public final class LockVisitor extends ASTVisitor {
 
   /**
    * Constructor.
-   * @param locks read and write locks
+   * @param locks    read and write locks
+   * @param funcs    static functions of the query
    * @param updating updating query
-   * @param root root flag
+   * @param root     root flag
    */
-  public LockVisitor(final Locks locks, final boolean updating, final boolean root) {
+  public LockVisitor(final Locks locks, final StaticFuncs funcs, final boolean updating,
+      final boolean root) {
     this.locks = locks;
+    this.funcs = funcs;
     this.updating = updating;
     level = root ? 0 : 1;
   }
@@ -108,6 +113,14 @@ public final class LockVisitor extends ASTVisitor {
   public boolean staticFuncCall(final StaticFuncCall call) {
     final StaticFunc func = call.func();
     return func == null || cached(func) || visit(func, true);
+  }
+
+  @Override
+  public boolean staticFuncs() {
+    for(final StaticFunc func : funcs) {
+      if(!cached(func) && !visit(func, true)) return false;
+    }
+    return true;
   }
 
   @Override

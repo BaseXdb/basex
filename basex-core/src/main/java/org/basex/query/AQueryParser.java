@@ -180,7 +180,7 @@ public abstract class AQueryParser extends InputParser {
    */
   final void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    path = baseIO == null ? null : baseIO.path();
+    path = sc.modulePath != null ? sc.modulePath : baseIO == null ? null : baseIO.path();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -374,7 +374,7 @@ public abstract class AQueryParser extends InputParser {
   public final void module(final String pth, final String uri, final InputInfo info)
       throws QueryException {
 
-    final IO io = sc.location(pth, uri);
+    final IO io = sc.location(pth, uri, info);
     if(io == null) throw error(WHICHMODFILE_X, info, pth);
     final byte[] tPath = token(qc.modulePath(io));
 

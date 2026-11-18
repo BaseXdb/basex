@@ -24,6 +24,8 @@ public final class QueryJobSpec {
   final String query;
   /** Simple query without URI. */
   final boolean simple;
+  /** Module path reported in errors (can be {@code null}). */
+  final String path;
   /** URI resolver of the calling module (can be {@code null}); discarded after job was started. */
   UriResolver resolver;
   /** Function to be invoked instead of the query; discarded after the job was started. */
@@ -37,13 +39,15 @@ public final class QueryJobSpec {
    * @param bindings variable bindings
    * @param content query content
    * @param resolver URI resolver of the calling module (can be {@code null})
+   * @param path module path reported in errors (can be {@code null})
    */
   public QueryJobSpec(final JobOptions options, final HashMap<String, Value> bindings,
-      final IOContent content, final UriResolver resolver) {
+      final IOContent content, final UriResolver resolver, final String path) {
     this.options = options;
     this.bindings = bindings;
     // a scheduled job outlives the application it was started from, which may be replaced meanwhile
     this.resolver = scheduled(options) ? null : resolver;
+    this.path = path;
     query = content.toString();
     simple = content.url().isEmpty();
   }
@@ -67,6 +71,7 @@ public final class QueryJobSpec {
     resolver = null;
     query = function.funcIdentity();
     simple = true;
+    path = null;
   }
 
   /**

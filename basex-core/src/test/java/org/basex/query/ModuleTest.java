@@ -3,10 +3,13 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +22,11 @@ import org.junit.jupiter.api.Test;
 public final class ModuleTest extends SandboxTest {
   /** Test XQuery module file. */
   private static final String XQMFILE = "src/test/resources/hello.xqm";
+  /** Error raised by a failing URI resolver. */
+  private static final IllegalStateException RESOLVER_ERROR =
+      new IllegalStateException("Resolver failed");
+  /** Failing URI resolver. */
+  private static final UriResolver FAILING = (path, uri, base) -> { throw RESOLVER_ERROR; };
 
   /**
    * Imports a built-in module.
@@ -169,6 +177,105 @@ public final class ModuleTest extends SandboxTest {
       assertEquals("<file/>", qp.value().serialize().toString());
     }
     execute(new DropDB(NAME));
+  }
+
+  /**
+   * Wraps exceptions raised by a URI resolver.
+   */
+  @Test public void uriResolverError() {
+    for(final String query : new String[] { "import module namespace m='uri' at 'x.xq'; m:f()",
+        "load-xquery-module('uri', { 'location-hints': 'x.xq' })", "doc('x.xml')",
+        "unparsed-text('x.txt')" }) {
+      assertSame(RESOLVER_ERROR, resolverError(query, FAILING, IOERR_X).getCause(), query);
+    }
+    // failing document resolutions are not repeated
+    final AtomicInteger calls = new AtomicInteger();
+    resolverError("doc('x.xml')", failing(calls), IOERR_X);
+    assertEquals(1, calls.get());
+    // errors raised by the resolver itself are passed on, enriched with the input info
+    resolverError("doc('x.xml')", (path, uri, base) -> { throw WHICHRES_X.get(null, path); },
+      WHICHRES_X);
+  }
+
+  /**
+   * Keeps the public resolution methods without input info, which may be called by external code.
+   */
+  @Test public void uriResolverCompatibility() {
+    try(QueryProcessor qp = new QueryProcessor("()", context)) {
+      final StaticContext sc = qp.sc;
+      assertEquals("x.xml", sc.resolve("x.xml").name());
+      assertEquals("x.xml", sc.resolve("x.xml", "uri").name());
+      assertEquals("x.xml", sc.location("x.xml", "uri").name());
+      // resolver errors are wrapped in unchecked exceptions
+      qp.uriResolver(FAILING);
+      final QueryRTException ex = assertThrows(QueryRTException.class, () -> sc.resolve("x.xml"));
+      error("resolve", ex.getCause(), IOERR_X);
+      assertSame(RESOLVER_ERROR, ex.getCause().getCause());
+      assertThrows(QueryRTException.class, () -> sc.resolve("x.xml", "uri"));
+      assertThrows(QueryRTException.class, () -> sc.location("x.xml", "uri"));
+    }
+  }
+
+  /**
+   * Treats resources as unavailable if the URI resolver fails.
+   * @throws Exception exception
+   */
+  @Test public void uriResolverDocAvailable() throws Exception {
+    try(QueryProcessor qp = new QueryProcessor("doc-available('x.xml')", context)) {
+      qp.uriResolver(FAILING);
+      assertEquals("false", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Raises repeated URI resolver errors with separate stacks.
+   * @throws Exception exception
+   */
+  @Test public void uriResolverStack() throws Exception {
+    final String query = "declare namespace x = 'x'; "
+        + "declare %basex:inline(0) function x:f() { doc('x.xml', { 'stable': false() }) }; "
+        + "count(distinct-values("
+        + "for $i in 1 to 3 return try { x:f() } catch * { $err:stack-trace }))";
+    final AtomicInteger calls = new AtomicInteger();
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.uriResolver(failing(calls));
+      qp.parse();
+      // lock detection assigns the query input that is reused at runtime
+      qp.addLocks();
+      assertEquals("1", qp.value().serialize().toString());
+    }
+    // a single call proves that the cached error was raised repeatedly
+    assertEquals(1, calls.get());
+  }
+
+  /**
+   * Evaluates a query with a URI resolver and checks the raised error.
+   * @param query query
+   * @param resolver URI resolver
+   * @param error expected error
+   * @return raised exception
+   */
+  private static QueryException resolverError(final String query, final UriResolver resolver,
+      final QueryError error) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.uriResolver(resolver);
+      final QueryException ex = assertThrows(QueryException.class, qp::value, query);
+      error(query, ex, error);
+      assertNotEquals(0, ex.line(), query);
+      return ex;
+    }
+  }
+
+  /**
+   * Returns a failing URI resolver that counts its calls.
+   * @param calls call counter
+   * @return URI resolver
+   */
+  private static UriResolver failing(final AtomicInteger calls) {
+    return (path, uri, base) -> {
+      calls.incrementAndGet();
+      throw RESOLVER_ERROR;
+    };
   }
 
   /** Tests type import. */

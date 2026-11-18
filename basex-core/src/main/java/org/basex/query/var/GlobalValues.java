@@ -42,7 +42,7 @@ public final class GlobalValues {
   Value value(final StaticVar var, final QueryContext qc) throws QueryException {
     // evaluated variables are returned without locking
     final Global global = globals.get(var);
-    if(global != null && global.result != null) return result(var, global.result);
+    if(global != null && global.result != null) return result(global.result);
 
     final Value cached = acquire(var, qc);
     if(cached != null) return cached;
@@ -68,7 +68,7 @@ public final class GlobalValues {
       throws QueryException {
     while(true) {
       final Global global = globals.getOrDefault(var, FREE);
-      if(global.result != null) return result(var, global.result);
+      if(global.result != null) return result(global.result);
       if(global.context == null) {
         // variable is not being evaluated: take ownership
         globals.put(var, new Global(qc, null));
@@ -102,17 +102,16 @@ public final class GlobalValues {
 
   /**
    * Returns the result of a finished evaluation, or rethrows the error that was raised.
-   * @param var static variable
    * @param result value, or raised error
    * @return value
    * @throws QueryException query exception
    */
-  private static Value result(final StaticVar var, final Object result) throws QueryException {
+  private static Value result(final Object result) throws QueryException {
     return switch(result) {
       case final Value value -> value;
       case final RuntimeException ex -> throw ex;
       case final Error ex -> throw ex;
-      default -> throw var.error((QueryException) result);
+      default -> throw ((QueryException) result).copy();
     };
   }
 

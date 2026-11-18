@@ -34,7 +34,7 @@ public final class FnPut extends StandardFunc {
     final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(node, qc);
 
-    final String path = sc().resolve(string(uri.string())).path();
+    final String path = sc().resolve(string(uri.string()), info).path();
     updates.add(new Put(target.pre(), target.data(), path, options, info), qc);
     return Empty.VALUE;
   }

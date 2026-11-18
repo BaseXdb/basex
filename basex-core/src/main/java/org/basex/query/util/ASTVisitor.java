@@ -105,6 +105,14 @@ public abstract class ASTVisitor {
   }
 
   /**
+   * Notifies the visitor that all static functions may be invoked without a static call.
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean staticFuncs() {
+    return true;
+  }
+
+  /**
    * Notifies the visitor of a function item.
    * @param func function item
    * @return if more expressions should be visited ({@code true} by default)

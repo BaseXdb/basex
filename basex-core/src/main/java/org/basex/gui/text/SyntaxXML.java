@@ -45,7 +45,7 @@ public final class SyntaxXML extends SyntaxMarkup {
 
   @Override
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     elements = new TokenSet();
     attributes = new TokenSet();
 

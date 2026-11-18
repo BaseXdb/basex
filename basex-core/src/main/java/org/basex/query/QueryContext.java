@@ -239,7 +239,20 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return AQueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri, null);
+    return parse(query, uri, null);
+  }
+
+  /**
+   * Parses the specified query.
+   * @param query query string
+   * @param uri base URI (can be {@code null})
+   * @param sc static context (can be {@code null})
+   * @return module
+   * @throws QueryException query exception
+   */
+  public AModule parse(final String query, final String uri, final StaticContext sc)
+      throws QueryException {
+    return AQueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
   }
 
   /**
@@ -289,7 +302,7 @@ public final class QueryContext extends Job implements Closeable {
       throws QueryException {
 
     return run(info.parsing, () -> {
-      info.query = query;
+      if(parent == null) info.query = query;
       main = AQueryParser.get(queryParser(), query, uri, this, sc).parseMain();
       return main;
     });
@@ -299,13 +312,15 @@ public final class QueryContext extends Job implements Closeable {
    * Parses the specified module.
    * @param query query string
    * @param uri base URI (can be {@code null})
+   * @param sc static context (can be {@code null})
    * @return library module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
+  public LibraryModule parseLibrary(final String query, final String uri, final StaticContext sc)
+      throws QueryException {
     return run(info.parsing, () -> {
-      info.query = query;
-      return AQueryParser.get(queryParser(), query, uri, this, null).parseLibrary(true);
+      if(parent == null) info.query = query;
+      return AQueryParser.get(queryParser(), query, uri, this, sc).parseLibrary(true);
     });
   }
 
@@ -491,7 +506,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param jobLocks locks to be extended
    */
   private void addLocks(final Locks jobLocks) {
-    final LockVisitor visitor = new LockVisitor(jobLocks, updating, contextValue == null);
+    final LockVisitor visitor = new LockVisitor(jobLocks, functions, updating,
+        contextValue == null);
 
     // locks in main module (can be null if parsing failed)
     boolean local = main == null || main.visit(visitor);

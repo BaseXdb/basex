@@ -105,8 +105,8 @@ public class XQueryEval extends StandardFunc {
         if(function != null) {
           qctx.assign(function, args);
         } else {
-          final StaticContext sctx = new StaticContext(qctx);
-          sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
+          final StaticContext sctx = toStaticContext(qctx, query.url(), options,
+              XQueryOptions.BASE_URI);
           for(final Entry<String, Value> binding : bindings.entrySet()) {
             qctx.bind(binding.getKey(), binding.getValue(), null, sctx);
           }
@@ -139,11 +139,9 @@ public class XQueryEval extends StandardFunc {
         final QueryError error = ex.error();
         final QueryException qe = error(ex, error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X :
           error == BASEX_OVERFLOW ? XQUERY_UNEXPECTED_X : null);
-        // pass on error info: assign (possibly empty) path of module which caused the error
-        InputInfo ii = ex.info();
-        if(pass && ii == null) ii = new InputInfo(query.path(), 1, 1);
-        throw qe.info(pass ? ii.path().equals(info.path()) ?
-          new InputInfo(query.path(), ii.line(), ii.column(), ii.decl()) : ii : info);
+        // pass on error info of the module which caused the error
+        final InputInfo ii = ex.info();
+        throw qe.info(pass ? ii != null ? ii : new InputInfo(query.path(), 1, 1) : info);
       } catch(final StackOverflowError ex) {
         throw XQUERY_UNEXPECTED_X.get(info, ex);
       } finally {

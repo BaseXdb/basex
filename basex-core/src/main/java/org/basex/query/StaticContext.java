@@ -1,8 +1,7 @@
 package org.basex.query;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-
-import java.util.*;
 
 import javax.xml.catalog.*;
 import javax.xml.transform.*;
@@ -31,10 +30,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class StaticContext {
-  /** Declared decimal formats. */
+  /** Decimal formats. */
   public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
-  /** Lazily instantiated default and language-specific decimal formats. */
-  private final TokenObjectMap<DecFormatter> defaultFormats = new TokenObjectMap<>();
   /** Declared named item types. */
   public final QNmMap<TypeDecl> types = new QNmMap<>();
   /** Public named item types of all library modules of the query. */
@@ -60,6 +57,8 @@ public final class StaticContext {
   public byte[] dirNS;
   /** Default function namespace. */
   public byte[] funcNS;
+  /** Module path reported in errors, overriding the static base URI (can be {@code null}). */
+  public String modulePath;
   /** Name of module (not assigned for main module). */
   public QNm module;
   /** URIs of modules loaded by the current file. */
@@ -188,7 +187,7 @@ public final class StaticContext {
    * @return resulting path
    */
   public IO resolve(final String path) {
-    return resolve(path, null);
+    return resolve(path, (String) null);
   }
 
   /**
@@ -199,8 +198,11 @@ public final class StaticContext {
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
-    final IO io = resolveCustom(path, uri);
-    return io != null ? io : resolveDefault(path);
+    try {
+      return resolve(path, uri, null);
+    } catch(final QueryException ex) {
+      throw new QueryRTException(ex);
+    }
   }
 
   /**
@@ -210,7 +212,49 @@ public final class StaticContext {
    * @return io reference, or {@code null} if the location cannot be resolved
    */
   public IO location(final String path, final String uri) {
-    final IO io = resolveCustom(path, uri);
+    try {
+      return location(path, uri, null);
+    } catch(final QueryException ex) {
+      throw new QueryRTException(ex);
+    }
+  }
+
+  /**
+   * Resolves the specified path against the base URI.
+   * @param path to be resolved
+   * @param info input info (can be {@code null})
+   * @return resulting path
+   * @throws QueryException query exception
+   */
+  public IO resolve(final String path, final InputInfo info) throws QueryException {
+    return resolve(path, null, info);
+  }
+
+  /**
+   * Resolves the specified path with the custom URI resolver, or against the base URI.
+   * @param path to be resolved
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
+   * @param info input info (can be {@code null})
+   * @return resulting path
+   * @throws QueryException query exception
+   */
+  private IO resolve(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    final IO io = resolveCustom(path, uri, info);
+    return io != null ? io : resolveDefault(path);
+  }
+
+  /**
+   * Returns an IO reference for the specified resource location.
+   * @param path location
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
+   * @param info input info (can be {@code null})
+   * @return io reference, or {@code null} if the location cannot be resolved
+   * @throws QueryException query exception
+   */
+  public IO location(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    final IO io = resolveCustom(path, uri, info);
     if(io != null) return io;
     // strings that are neither locations nor XML fragments cannot be resolved
     final IO dflt = resolveDefault(path);
@@ -221,10 +265,20 @@ public final class StaticContext {
    * Resolves the specified path with the custom URI resolver.
    * @param path file path
    * @param uri module namespace (can be {@code null})
+   * @param info input info (can be {@code null})
    * @return io reference, or {@code null} if no custom resolver exists or applies
+   * @throws QueryException query exception
    */
-  private IO resolveCustom(final String path, final String uri) {
-    return resolver != null ? resolver.resolve(path, uri, baseURI) : null;
+  private IO resolveCustom(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+    if(resolver == null) return null;
+    try {
+      return resolver.resolve(path, uri, baseURI);
+    } catch(final QueryException ex) {
+      throw ex.info() == null ? ex.info(info) : ex;
+    } catch(final RuntimeException ex) {
+      throw IOERR_X.get(info, ex);
+    }
   }
 
   /**
@@ -232,7 +286,7 @@ public final class StaticContext {
    * @param path file path
    * @return io reference
    */
-  private IO resolveDefault(final String path) {
+  public IO resolveDefault(final String path) {
     final IO base = baseIO();
     // try to resolve the path against the XML catalog resolver
     if(uriResolver != null) {
@@ -259,11 +313,10 @@ public final class StaticContext {
       throws QueryException {
     final byte[] id = name.unique();
     DecFormatter df = decFormats.get(id);
-    if(df == null) df = defaultFormats.get(id);
     if(df == null) {
       // lazy instantiation of default decimal format
       df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id, info);
-      if(df != null) defaultFormats.put(id, df);
+      if(df != null) decFormats.put(id, df);
     }
     return df;
   }
@@ -286,53 +339,6 @@ public final class StaticContext {
   public Type type(final QNm name) {
     final TypeDecl td = typeDecl(name);
     return td != null ? td.seqType.type : Records.BUILT_IN.get(name);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final StaticContext sc &&
-        withdb == sc.withdb && defaultdb == sc.defaultdb && maxPerm == sc.maxPerm &&
-        elemNsFixed == sc.elemNsFixed && elemNsAny == sc.elemNsAny && strip == sc.strip &&
-        ordered == sc.ordered && orderGreatest == sc.orderGreatest && spaces == sc.spaces &&
-        preserveNS == sc.preserveNS && inheritNS == sc.inheritNS && global == sc.global &&
-        eq(elemNS, sc.elemNS) && eq(dirNS, sc.dirNS) && eq(funcNS, sc.funcNS) &&
-        baseURI.eq(sc.baseURI) && Objects.equals(contextType, sc.contextType) &&
-        Objects.equals(collation, sc.collation) && ns.list.equals(sc.ns.list) &&
-        imports.equals(sc.imports) && typesEqual(sc) && decFormatsEqual(sc);
-  }
-
-  /**
-   * Checks if the declared named item types of two static contexts are equal.
-   * @param sc static context to compare
-   * @return result of check
-   */
-  private boolean typesEqual(final StaticContext sc) {
-    if(types.size() != sc.types.size()) return false;
-    for(final QNm name : types) {
-      final TypeDecl td = sc.types.get(name);
-      if(td == null || !td.seqType.eq(types.get(name).seqType)) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the decimal formats of two static contexts are equal.
-   * @param sc static context to compare
-   * @return result of check
-   */
-  private boolean decFormatsEqual(final StaticContext sc) {
-    if(decFormats.size() != sc.decFormats.size()) return false;
-    for(final byte[] id : decFormats) {
-      final DecFormatter df = sc.decFormats.get(id);
-      if(df == null || !df.options().toString().equals(decFormats.get(id).options().toString()))
-        return false;
-    }
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return baseURI.hashCode();
   }
 
   @Override

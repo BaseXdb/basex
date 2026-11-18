@@ -1749,7 +1749,7 @@ public enum Function implements AFunction {
       INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions::new, "functions(source?)",
-      params(STRING_ZO), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI, Perm.ADMIN),
+      params(STRING_ZO), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule::new, "module(source)",
       params(STRING_O), NodeType.get(InspectModule.Q_MODULE).seqType(), flag(NDT), INSPECT_URI,

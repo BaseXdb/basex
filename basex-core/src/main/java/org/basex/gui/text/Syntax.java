@@ -338,7 +338,7 @@ abstract class Syntax {
    */
   @SuppressWarnings("unused")
   ArrayList<Declaration> imported(final byte[] text,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     return new ArrayList<>();
   }
 
@@ -350,7 +350,7 @@ abstract class Syntax {
    * @return signature, or {@code null} if the function is unknown
    */
   final Signature signature(final byte[] text, final String name,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     // built-in functions take precedence; declarations are merged from the matching arities
     final Signature signature = signature(name);
     if(signature != null) return signature;
@@ -416,7 +416,7 @@ abstract class Syntax {
    */
   @SuppressWarnings("unused")
   String outline(final byte[] text, final Definition definition,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     return null;
   }
 
@@ -474,7 +474,7 @@ abstract class Syntax {
    */
   @SuppressWarnings("unused")
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos,
-      final BiFunction<String, String, IOFile> modules) {
+      final BiFunction<String, String, ArrayList<IOFile>> modules) {
     return new ArrayList<>();
   }
 

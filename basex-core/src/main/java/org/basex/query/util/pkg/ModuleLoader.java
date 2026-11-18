@@ -37,6 +37,8 @@ public final class ModuleLoader {
   private final ArrayList<Loader> loaders = new ArrayList<>();
   /** Resolved classes. */
   private final HashMap<String, Class<?>> resolved = new HashMap<>();
+  /** Module files loaded from the repository, indexed by URI. */
+  private final HashMap<String, ArrayList<IOFile>> loaded = new HashMap<>();
 
   /**
    * Constructor.
@@ -50,7 +52,7 @@ public final class ModuleLoader {
    * Closes opened jar files, and calls close method of {@link QueryModule} instances
    * implementing {@link QueryResource}.
    */
-  public void close() {
+  public synchronized void close() {
     for(final Object jm : javaModules) {
       if(jm instanceof final QueryResource qr) {
         try {
@@ -64,6 +66,7 @@ public final class ModuleLoader {
     for(final Loader l : loaders) l.release();
     loaders.clear();
     resolved.clear();
+    loaded.clear();
   }
 
   /**
@@ -74,8 +77,8 @@ public final class ModuleLoader {
    * @return {@code true} if the package has been found
    * @throws QueryException query exception
    */
-  public boolean addImport(final String uri, final AQueryParser qp, final InputInfo info)
-      throws QueryException {
+  public synchronized boolean addImport(final String uri, final AQueryParser qp,
+      final InputInfo info) throws QueryException {
 
     // add Java repository package
     final boolean java = uri.startsWith(JAVA_PREFIX_COLON);
@@ -84,17 +87,9 @@ public final class ModuleLoader {
       className = uri.substring(JAVA_PREFIX_COLON.length());
     } else {
       // no "java:" prefix: check EXPath repositories
-      Version ver = null;
-      String id = null;
-      for(final Pkg pkg : context.repo.pkgs(uri)) {
-        final Version v = new Version(pkg.version);
-        if(ver == null || v.compareTo(ver) > 0) {
-          ver = v;
-          id = pkg.id();
-        }
-      }
-      if(id != null) {
-        addRepo(id, qp, info);
+      final Pkg pkg = pkg(context.repo, uri);
+      if(pkg != null) {
+        packages(context, pkg.id(), this, (file, u) -> qp.module(file.path(), u, info), info);
         return true;
       }
       // check XQuery modules
@@ -135,6 +130,83 @@ public final class ModuleLoader {
   }
 
   /**
+   * Returns the files of the XQuery modules with the specified URI in the repository,
+   * and adds the class loaders of an EXPath package that defines the URI.
+   * @param uri module URI
+   * @param info input info (can be {@code null})
+   * @return module files (empty if none exist)
+   * @throws QueryException query exception
+   */
+  public synchronized ArrayList<IOFile> load(final String uri, final InputInfo info)
+      throws QueryException {
+    final ArrayList<IOFile> cached = loaded.get(uri);
+    if(cached != null) return cached;
+
+    final ArrayList<IOFile> files = files(context, uri, this, info);
+    loaded.put(uri, files);
+    return files;
+  }
+
+  /**
+   * Returns the files of the XQuery modules with the specified URI in the repository.
+   * @param context database context
+   * @param uri module URI
+   * @return module files (empty if none exist)
+   */
+  public static ArrayList<IOFile> files(final Context context, final String uri) {
+    try {
+      return files(context, uri, null, null);
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      return new ArrayList<>();
+    }
+  }
+
+  /**
+   * Returns the files of the XQuery modules with the specified URI in the repository.
+   * @param context database context
+   * @param uri module URI
+   * @param loader module loader that adds the class loaders of packages (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return module files (empty if none exist)
+   * @throws QueryException query exception
+   */
+  private static ArrayList<IOFile> files(final Context context, final String uri,
+      final ModuleLoader loader, final InputInfo info) throws QueryException {
+    final ArrayList<IOFile> files = new ArrayList<>();
+    final Pkg pkg = pkg(context.repo, uri);
+    if(pkg != null) {
+      // components of package dependencies may define the same URI
+      packages(context, pkg.id(), loader, (file, u) -> {
+        if(u.equals(uri)) files.add(file);
+      }, info);
+    } else {
+      final IOFile file = file(context.soptions.repoPath(), uri);
+      if(file != null) files.add(file);
+    }
+    return files;
+  }
+
+  /**
+   * Returns the latest version of an EXPath package that defines the specified URI.
+   * @param repo package repository
+   * @param uri module URI
+   * @return package (can be {@code null})
+   */
+  private static Pkg pkg(final EXPathRepo repo, final String uri) {
+    Version ver = null;
+    Pkg latest = null;
+    for(final Pkg pkg : repo.pkgs(uri)) {
+      final Version v = new Version(pkg.version);
+      if(ver == null || v.compareTo(ver) > 0) {
+        ver = v;
+        latest = pkg;
+      }
+    }
+    return latest;
+  }
+
+  /**
    * Returns the file of an XQuery module in the repository.
    * @param repo repository path
    * @param uri module URI
@@ -167,7 +239,7 @@ public final class ModuleLoader {
    * @return found class
    * @throws ClassNotFoundException class not found exception
    */
-  public Class<?> findClass(final String name) throws ClassNotFoundException {
+  public synchronized Class<?> findClass(final String name) throws ClassNotFoundException {
     Class<?> c = resolved.get(name);
     if(c != null) return c;
     try {
@@ -191,7 +263,7 @@ public final class ModuleLoader {
    * @param clz class to be found
    * @return instance or {@code null}
    */
-  public Object findModule(final String clz) {
+  public synchronized Object findModule(final String clz) {
     for(final Object mod : javaModules) {
       if(mod.getClass().getName().equals(clz)) return mod;
     }
@@ -244,18 +316,24 @@ public final class ModuleLoader {
    * @throws IOException I/O exception
    */
   private void addLoader(final List<String> urls) throws IOException {
-    if(!urls.isEmpty()) loaders.add(ClassLoaderCache.acquire(urls));
+    if(urls.isEmpty()) return;
+    // a cached loader is registered only once
+    final Loader loader = ClassLoaderCache.acquire(urls);
+    if(loaders.contains(loader)) loader.release();
+    else loaders.add(loader);
   }
 
   /**
-   * Adds a package and the packages it depends on from the package repository.
+   * Visits a package and the packages it depends on from the package repository.
+   * @param context database context
    * @param id package ID
-   * @param qp query parser
+   * @param loader module loader that adds the class loaders of packages (can be {@code null})
+   * @param module action for the file and URI of each module component
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private void addRepo(final String id, final AQueryParser qp, final InputInfo info)
-      throws QueryException {
+  private static void packages(final Context context, final String id, final ModuleLoader loader,
+      final QueryBiConsumer<IOFile, String> module, final InputInfo info) throws QueryException {
 
     final HashMap<String, Parsed> parsed = new HashMap<>();
     new Cycles<String>() {
@@ -266,11 +344,13 @@ public final class ModuleLoader {
         if(pkg == null) throw REPO_NOTFOUND_X.get(info, pkgId);
         final IOFile pkgPath = context.repo.path(pkg.path());
         final IOFile modDir = pkg.modDir(pkgPath);
-        try {
-          addLoader(pkgUrls(pkgPath, modDir, info));
-        } catch(final Throwable th) {
-          final Throwable t = Util.rootException(th);
-          throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
+        if(loader != null) {
+          try {
+            loader.addLoader(pkgUrls(pkgPath, modDir, info));
+          } catch(final Throwable th) {
+            final Throwable t = Util.rootException(th);
+            throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
+          }
         }
         parsed.put(pkgId, new Parsed(pkg, modDir));
 
@@ -290,7 +370,7 @@ public final class ModuleLoader {
       protected void finish(final String pkgId) throws QueryException {
         final Parsed p = parsed.get(pkgId);
         for(final PkgComponent comp : p.pkg.comps) {
-          qp.module(new IOFile(p.modDir, comp.file).path(), comp.uri, info);
+          module.accept(new IOFile(p.modDir, comp.file), comp.uri);
         }
       }
 

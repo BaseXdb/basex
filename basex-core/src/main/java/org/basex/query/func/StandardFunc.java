@@ -688,7 +688,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final String uri, final boolean content) throws QueryException {
-    final IO io = sc().location(uri, null);
+    final IO io = sc().location(uri, null, info);
     if(io == null) throw RESURI_X.get(info, uri);
     if(io instanceof IOContent && io.path().isEmpty()) {
       if(!content) throw RESURI_X.get(info, uri);
@@ -755,7 +755,8 @@ public abstract class StandardFunc extends Arr {
     }
 
     final IOContent content = toContent(item, qc);
-    options.set(JobOptions.BASE_URI, toBaseUri(content.url(), options, JobOptions.BASE_URI));
+    final String uri = toBaseUri(content.url(), options, JobOptions.BASE_URI);
+    options.set(JobOptions.BASE_URI, uri != null ? uri : string(sc().baseURI().string()));
     final HashMap<String, Value> bindings = toBindings(args, qc);
     if(service) {
       if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
@@ -775,7 +776,7 @@ public abstract class StandardFunc extends Arr {
     for(final Entry<String, Value> binding : bindings.entrySet()) {
       binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
-    return new QueryJobSpec(options, bindings, content, qc.resolver);
+    return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "");
   }
 
   /**
@@ -847,17 +848,35 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a base URI for the given path and the associated option.
+   * Returns the base URI for the given path and the associated option.
    * @param path custom path (can be {@code null})
    * @param options options
    * @param option base-uri option
-   * @return base URI
+   * @return base URI, or {@code null} if it is inherited (can be {@code null})
    */
-  protected final String toBaseUri(final String path, final Options options,
+  private String toBaseUri(final String path, final Options options,
       final StringOption option) {
     final String base = options.get(option);
     return base != null && !base.isEmpty() ? resolveUri(base) :
-      path != null && !path.isEmpty() ? path : string(sc().baseURI().string());
+      path != null && !path.isEmpty() ? path : null;
+  }
+
+  /**
+   * Creates the static context of a query with its base URI and module path.
+   * @param qctx query context
+   * @param path custom path (can be {@code null})
+   * @param options options
+   * @param option base-uri option
+   * @return static context
+   */
+  protected final StaticContext toStaticContext(final QueryContext qctx, final String path,
+      final Options options, final StringOption option) {
+    final StaticContext sctx = new StaticContext(qctx);
+    final String uri = toBaseUri(path, options, option);
+    sctx.baseURI(uri != null ? uri : string(sc().baseURI().string()));
+    // an inherited base URI is not reported as module path
+    if(uri == null) sctx.modulePath = "";
+    return sctx;
   }
 
   /**

@@ -392,7 +392,7 @@ public final class JobModuleTest extends SandboxTest {
       options.set(JobOptions.ID, "SERVICE" + c);
       options.set(JobOptions.START, "PT1H");
       final QueryJobSpec spec = new QueryJobSpec(options, new HashMap<>(),
-          new IOContent("1"), null);
+          new IOContent("1"), null, null);
       final Thread thread = new Thread(() -> {
         try {
           latch.await();
@@ -1005,6 +1005,15 @@ public final class JobModuleTest extends SandboxTest {
       }
       Performance.sleep(10);
     }
+
+    // errors: an inherited base URI is not reported as module
+    query("declare base-uri 'http://x.x/a/'; let $q := " +
+        _JOB_EVAL.args("error()", " ()", " { 'cache': true() }") + " return (" +
+        _JOB_WAIT.args(" $q") + ", try { " + func.args(" $q") + " } catch * { $err:module })", "");
+    query("declare base-uri 'http://x.x/a/'; let $q := " +
+        _JOB_EVAL.args("error()", " ()", " { 'cache': true(), 'base-uri': 'b.xq' }") +
+        " return (" + _JOB_WAIT.args(" $q") + ", try { " + func.args(" $q") +
+        " } catch * { $err:module })", "http://x.x/a/b.xq");
   }
 
   /** Test method. */
@@ -1072,6 +1081,18 @@ public final class JobModuleTest extends SandboxTest {
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
     query(func.args(id, " { 'keep': false() }"), "");
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
+  }
+
+  /** Test method. */
+  @Test public void resultErrorStack() {
+    final Function func = _JOB_RESULT;
+    final String id = query(_JOB_EVAL.args("error()", " ()", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    // repeated errors do not share their stack
+    query("declare namespace x = 'x'; declare %basex:inline(0) function x:f() { "
+        + func.args(id, " { 'keep': true() }") + " }; count(distinct-values("
+        + "for $i in 1 to 3 return try { x:f() } catch * { $err:stack-trace }))", 1);
+    query(_JOB_REMOVE.args(id));
   }
 
   /** Test method. */

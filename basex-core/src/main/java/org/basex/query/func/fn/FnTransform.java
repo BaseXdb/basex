@@ -343,7 +343,7 @@ public final class FnTransform extends StandardFunc {
     // preserve the requested base URI, which is lost if the location is remapped to a local file
     if(location != null) {
       final String base = options.get(STYLESHEET_BASE_URI);
-      final String uri = base != null ? sc().resolve(base).url() :
+      final String uri = base != null ? sc().resolve(base, info).url() :
         Uri.get(location).isAbsolute() ? location : io.url();
       if(!uri.equals(io.url())) {
         try {
@@ -370,7 +370,7 @@ public final class FnTransform extends StandardFunc {
 
     if(location != null) return toIO(location, false);
     final String base = options.get(STYLESHEET_BASE_URI);
-    final Uri uri = base != null ? Uri.get(sc().resolve(base).url()) : sc().baseURI();
+    final Uri uri = base != null ? Uri.get(sc().resolve(base, info).url()) : sc().baseURI();
     if(text != null) return new IOContent(text, string(uri.string()));
     if(node != null) return Xslt.io(node, base != null ? uri : node.baseURI(uri, true, info), info);
     return null;
@@ -400,7 +400,7 @@ public final class FnTransform extends StandardFunc {
    */
   IOFile file(final String uri) throws QueryException {
     if(uri == null) throw TRANSFORM_OPTIONS_X.get(info, "No base output URI supplied.");
-    if(sc().resolve(uri) instanceof final IOFile file) return file;
+    if(sc().resolve(uri, info) instanceof final IOFile file) return file;
     throw TRANSFORM_OPTIONS_X.get(info, "Base output URI is not writable: " + uri + '.');
   }
 

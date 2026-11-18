@@ -17,6 +17,8 @@ public final class QueryInput {
   private final StaticContext sc;
   /** Input reference (can be {@code null}). */
   private IO io;
+  /** Resolution error (can be {@code null}). */
+  private QueryException error;
   /** Indicates if the input reference has been resolved. */
   private boolean resolved;
   /** Indicates if the input points to an existing database (can be {@code null}). */
@@ -51,13 +53,20 @@ public final class QueryInput {
 
   /**
    * Returns the input reference, which is resolved on first access.
+   * @param info input info (can be {@code null})
    * @return input reference ({@code null} if the input cannot be resolved)
+   * @throws QueryException query exception
    */
-  public IO io() {
+  public IO io(final InputInfo info) throws QueryException {
     if(!resolved) {
-      io = sc.location(original, null);
       resolved = true;
+      try {
+        io = sc.location(original, null, info);
+      } catch(final QueryException ex) {
+        error = ex;
+      }
     }
+    if(error != null) throw error.copy();
     return io;
   }
 

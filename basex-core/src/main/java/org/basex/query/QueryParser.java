@@ -4207,7 +4207,7 @@ public class QueryParser extends AQueryParser {
       // optional: resolve URI reference
       final String location = string(stringLiteral());
       checkExternal(location, info());
-      final IO fl = qc.resources.stopWords(location, sc);
+      final IO fl = qc.resources.stopWords(location, sc, info());
       try {
         sw.read(fl, except);
       } catch(final IOException ex) {
@@ -4232,7 +4232,7 @@ public class QueryParser extends AQueryParser {
     final String db = Databases.validName(location) &&
         qc.context.soptions.dbExists(location) ? location : null;
     if(db == null) checkExternal(location, info());
-    final IO fl = qc.resources.thesaurus(location, sc);
+    final IO fl = qc.resources.thesaurus(location, sc, info());
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true, Itr.ZERO);
     long min = 0, max = ThesAccessor.LEVELS;

@@ -16,9 +16,9 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
-import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -78,13 +78,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
         } else {
-          final IOFile file = ModuleLoader.file(qc.context.soptions.repoPath(), uri);
-          if(file != null) locs.add(file.path());
+          for(final IOFile file : qc.resources.modules().load(uri, info)) locs.add(file.path());
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) {
-        final IO src = info.sc().location(loc, uri);
+        final IO src = info.sc().location(loc, uri, info);
         if(src == null) throw WHICHMODFILE_X.get(info, loc);
         if(src.isExternal() && !provided) checkPerm(qc, Perm.ADMIN);
         srcs.add(src);
@@ -119,6 +118,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
       mqc.finalContext = true;
     }
     for(final IO src : srcs) {
+      // skip modules that were imported by a previously loaded module
+      final byte[] parsed = mqc.modParsed.get(Token.token(mqc.modulePath(src)));
+      if(parsed != null) {
+        if(!Token.eq(modUri, parsed)) throw MODULE_FOUND_OTHER_X_X.get(info, modUri, src.path());
+        continue;
+      }
       final AModule lib;
       try {
         final String path = src.path(), content = src.readString();
@@ -189,6 +194,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
         variables.map(), functions.map());
     if(modCache != null) modCache.put(cacheKey, map);
     return map;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    // locked resources cannot be detected statically
+    return visitor.unknownLocks() && super.accept(visitor);
   }
 
   /**

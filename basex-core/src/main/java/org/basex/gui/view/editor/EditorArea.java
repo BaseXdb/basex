@@ -5,6 +5,7 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -282,17 +283,19 @@ public final class EditorArea extends TextPanel {
 
   @Override
   protected void definition(final String location, final String name) {
-    final IOFile module = module(null, location);
-    if(module == null) return;
-    final EditorArea edit = view.open(module);
-    if(edit != null) edit.gotoDeclaration(name);
+    for(final IOFile module : module(null, location)) {
+      final EditorArea edit = view.open(module);
+      if(edit != null) edit.gotoDeclaration(name);
+    }
   }
 
   @Override
-  protected IOFile module(final String uri, final String location) {
+  protected ArrayList<IOFile> module(final String uri, final String location) {
     // a location is resolved against the directory of the edited file, a URI in the repository
-    if(location == null) return ModuleLoader.file(gui.context.soptions.repoPath(), uri);
-    return file.merge(location) instanceof final IOFile module && module.exists() ? module : null;
+    if(location == null) return ModuleLoader.files(gui.context, uri);
+    final ArrayList<IOFile> modules = new ArrayList<>();
+    if(file.merge(location) instanceof final IOFile module && module.exists()) modules.add(module);
+    return modules;
   }
 
   /**

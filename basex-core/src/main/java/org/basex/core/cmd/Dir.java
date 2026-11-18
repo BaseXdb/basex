@@ -51,7 +51,7 @@ public final class Dir extends Command {
     final long ds = docs.size();
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);
-      String name = string(substring(data.text(pre, true), path.length()));
+      String name = string(data.text(pre, true)).substring(path.length());
       final int i = name.indexOf('/');
       final boolean dir = i >= 0;
       if(dir) name = name.substring(0, i);

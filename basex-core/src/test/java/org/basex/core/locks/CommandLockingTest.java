@@ -139,6 +139,9 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(LANG.args(NAME, DOC.args(NAME))), false, NAME_LIST);
 
+    ckDBs(new XQuery(LOAD_XQUERY_MODULE.args("m", " { 'content': 'module namespace m=\"m\";' }")),
+        false, null);
+
     ckDBs(new XQuery(PARSE_XML.args(" <foo/>")), true, NONE);
     ckDBs(new XQuery(PARSE_XML_FRAGMENT.args(" <foo/>")), true, NONE);
 
@@ -256,6 +259,13 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("declare function local:a($a) { " +
         "if($a = 0) then " + DOC.args(NAME) + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
+
+    // functions returned by inspect:functions are locked even if they are not called
+    ckDBs(new XQuery("declare function local:a() { " + DOC.args(NAME) + " };" +
+        _INSPECT_FUNCTIONS.args()), false, NAME_LIST);
+    ckDBs(new XQuery("declare function local:a() { " + _INSPECT_FUNCTIONS.args() + ", " +
+        DOC.args(NAME) + " }; local:a()"), false, NAME_LIST);
+    ckDBs(new XQuery(_INSPECT_FUNCTIONS.args(FILE)), false, null);
   }
 
   /** Tests locked databases in XQuery java function calls. */

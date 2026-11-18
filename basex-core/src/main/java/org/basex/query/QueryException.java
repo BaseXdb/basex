@@ -115,6 +115,23 @@ public class QueryException extends Exception {
     }
   }
 
+  /**
+   * Copy constructor.
+   * @param ex exception to be copied
+   */
+  private QueryException(final QueryException ex) {
+    super(ex.getLocalizedMessage());
+    cause(ex.getCause());
+    name = ex.name;
+    value = ex.value;
+    output = ex.output;
+    error = ex.error;
+    info = ex.info;
+    markedCol = ex.markedCol;
+    catchable = ex.catchable;
+    initializer = ex.initializer;
+  }
+
   @Override
   public synchronized Throwable fillInStackTrace() {
     return Prop.debug ? super.fillInStackTrace() : this;
@@ -334,6 +351,14 @@ public class QueryException extends Exception {
   public final QueryException initializer() {
     if(this != ERROR) initializer = true;
     return this;
+  }
+
+  /**
+   * Returns a copy of this exception with an empty stack.
+   * @return copy
+   */
+  public final QueryException copy() {
+    return new QueryException(this);
   }
 
   /**

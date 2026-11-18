@@ -3966,7 +3966,7 @@ public final class RExQueryParser extends AQueryParser {
       final String location = string(stringLiteral(node.uriLiteral()));
       pos = node.uriLiteral().end();
       checkExternal(location, info());
-      final IO fl = qc.resources.stopWords(location, sc);
+      final IO fl = qc.resources.stopWords(location, sc, info());
       try {
         sw.read(fl, except);
       } catch(final IOException ex) {
@@ -3991,7 +3991,7 @@ public final class RExQueryParser extends AQueryParser {
         qc.context.soptions.dbExists(location) ? location : null;
     pos = node.uriLiteral().end();
     if(db == null) checkExternal(location, info());
-    final IO fl = qc.resources.thesaurus(location, sc);
+    final IO fl = qc.resources.thesaurus(location, sc, info());
     final byte[] rel = node.stringLiteral() == null ? EMPTY : stringLiteral(node.stringLiteral());
     final FTLiteralRange range = node.ftLiteralRange();
     long min = 0, max = ThesAccessor.LEVELS;

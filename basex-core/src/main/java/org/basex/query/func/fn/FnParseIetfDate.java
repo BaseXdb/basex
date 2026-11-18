@@ -390,7 +390,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @return error
      */
     private QueryException error(final String msg) {
-      return QueryError.IETF_PARSE_X_X_X.get(info, msg, current(), original);
+      return QueryError.IETF_PARSE_X_X_X.get(info, msg, currentAsString(), original);
     }
 
     /**

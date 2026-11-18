@@ -40,7 +40,7 @@ public final class DbDir extends DbList {
     final long ds = docs.size(), ts = data.meta.time;
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);
-      String nm = string(substring(data.text(pre, true), path.length()));
+      String nm = string(data.text(pre, true)).substring(path.length());
       final int i = nm.indexOf('/');
       final boolean dir = i >= 0;
       if(dir) nm = nm.substring(0, i);

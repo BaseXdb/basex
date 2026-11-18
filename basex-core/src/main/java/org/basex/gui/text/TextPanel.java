@@ -1520,11 +1520,11 @@ public class TextPanel extends BaseXPanel {
    * Resolves an imported module.
    * @param uri URI of the module
    * @param location location of the module (can be {@code null})
-   * @return module file, or {@code null} if it does not exist
+   * @return module files (empty if none exist)
    */
   @SuppressWarnings("unused")
-  protected IOFile module(final String uri, final String location) {
-    return null;
+  protected ArrayList<IOFile> module(final String uri, final String location) {
+    return new ArrayList<>();
   }
 
   /**

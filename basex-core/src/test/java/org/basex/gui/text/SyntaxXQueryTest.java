@@ -625,8 +625,8 @@ public final class SyntaxXQueryTest {
       final Syntax syntax = new SyntaxXQuery();
       syntax.init(PLAIN);
       final byte[] text = Token.token(imprt + "m:hello($m:v)");
-      final BiFunction<String, String, IOFile> modules = (uri, location) ->
-        new IOFile(dir, location);
+      final BiFunction<String, String, ArrayList<IOFile>> modules = (uri, location) ->
+        new ArrayList<>(Collections.singletonList(new IOFile(dir, location)));
       assertEquals("(a)", syntax.signature(text, "m:hello", modules).args());
       final int f = imprt.length() + 2, v = f + 8;
       assertEquals("m:hello(a)", syntax.outline(text, syntax.definition(text, f), modules));
@@ -723,8 +723,11 @@ public final class SyntaxXQueryTest {
 
     final int pos = query.indexOf('_');
     return syntax.completions(Token.token(query.substring(0, pos) + query.substring(pos + 1)), pos,
-      (uri, location) -> location != null ? new IOFile(Sandbox.sandbox(), location) :
-        ModuleLoader.file(Sandbox.sandbox(), uri));
+      (uri, location) -> {
+        final IOFile file = location != null ? new IOFile(Sandbox.sandbox(), location) :
+          ModuleLoader.file(Sandbox.sandbox(), uri);
+        return file != null ? new ArrayList<>(Collections.singletonList(file)) : new ArrayList<>();
+      });
   }
 
   /**

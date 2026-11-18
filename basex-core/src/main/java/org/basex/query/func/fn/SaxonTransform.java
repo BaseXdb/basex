@@ -210,7 +210,7 @@ public final class SaxonTransform {
 
     try {
       final String uri = options.get(BASE_OUTPUT_URI);
-      if(uri != null) transformer.setBaseOutputURI(func.sc().resolve(uri).url());
+      if(uri != null) transformer.setBaseOutputURI(func.sc().resolve(uri, func.info()).url());
       final Value context = options.get(GLOBAL_CONTEXT_ITEM);
       if(context != null && !context.isEmpty())
         transformer.setGlobalContextItem(item((Item) context));

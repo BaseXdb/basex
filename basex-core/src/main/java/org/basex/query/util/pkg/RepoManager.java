@@ -154,23 +154,22 @@ public final class RepoManager {
           // check if package to be deleted participates in a dependency
           final String dep = dependency(pkg);
           if(dep != null) throw REPO_DELETE_X_X.get(info, dep, name);
-          // delete files in main-memory repository
-          repo.delete(pkg);
-        }
+        } else {
+          // delete directory with extracted jars
+          final String className = Strings.uriToClasspath(pkg.name().replaceAll("^.*\\.", ""));
+          final IOFile extDir = pkgFile.parent().resolve('.' + className);
+          if(!extDir.delete()) throw REPO_DELETE_X.get(info, extDir);
 
-        // delete directory with extracted jars
-        final String className = Strings.uriToClasspath(pkg.name().replaceAll("^.*\\.", ""));
-        final IOFile extDir = pkgFile.parent().resolve('.' + className);
-        if(!extDir.delete()) throw REPO_DELETE_X.get(info, extDir);
-
-        if(pkg.type() == PkgType.COMBINED) {
-          // delete associated JAR file
-          final IOFile jarFile = pkgFile.parent().resolve(className + IO.JARSUFFIX);
-          if(!jarFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
+          if(pkg.type() == PkgType.COMBINED) {
+            // delete associated JAR file
+            final IOFile jarFile = pkgFile.parent().resolve(className + IO.JARSUFFIX);
+            if(!jarFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
+          }
         }
 
         // delete package directory or file
         if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
+        if(isExpath) repo.delete(pkg);
 
         deleted = true;
       }
@@ -347,7 +346,7 @@ public final class RepoManager {
 
     // parse module to find namespace URI, write file to rewritten URI file path
     try(QueryContext qc = new QueryContext(context)) {
-      final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
+      final byte[] uri = qc.parseLibrary(string(content), path, null).sc.module.uri();
       return write(xqTarget(string(uri)), content);
     }
   }

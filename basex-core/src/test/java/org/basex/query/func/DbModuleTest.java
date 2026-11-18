@@ -754,6 +754,10 @@ public final class DbModuleTest extends SandboxTest {
 
     query(func.args(NAME, "test"), "");
     error(func.args("notAvailable", ""), DB_GET2_X);
+
+    // non-ASCII directory names
+    query(_DB_ADD.args(NAME, " <a/>", "pathö/a§.xml"));
+    query(func.args(NAME, "pathö") + "/string()", "a§.xml");
   }
 
   /** Test method. */
