@@ -57,6 +57,8 @@ final class TaskContext {
   final int parallel;
   /** Timeout in milliseconds ({@code 0}: no timeout). */
   final long timeout;
+  /** Parties: the caller and the running branches. */
+  private final Phaser running = new Phaser(1);
 
   /**
    * Constructor.
@@ -87,11 +89,18 @@ final class TaskContext {
    */
   Value branch(final QueryFunction<QueryContext, Value> fn, final boolean cache)
       throws QueryException {
+    // branches that start after the evaluation has finished are rejected
+    if(running.register() < 0) {
+      group.checkStop();
+      throw Util.notExpected();
+    }
     // grouped under the job of all branches, with the dynamic namespaces of the original query
     try(QueryContext bqc = new QueryContext(group, qc.ns); Binding bound = bqc.bind()) {
       final Value value = fn.apply(bqc);
       if(cache) value.cache(false, info);
       return value;
+    } finally {
+      running.arriveAndDeregister();
     }
   }
 
@@ -134,13 +143,7 @@ final class TaskContext {
           }
         });
       }
-      try {
-        return first.get();
-      } finally {
-        // cancel the losing branches, unless cancellation is already in progress (e.g. a timeout),
-        // whose job state must be preserved
-        if(!group.stopped()) group.stop();
-      }
+      return first.get();
     });
   }
 
@@ -192,6 +195,10 @@ final class TaskContext {
       throw XQUERY_UNEXPECTED_X.get(info, e);
     } finally {
       if(timer != null) timer.cancel(false);
+      // cancel remaining branches, unless already stopped (e.g. a timeout state must be preserved)
+      if(!group.stopped()) group.stop();
+      // resources of the query must not be released before the remaining branches have finished
+      running.awaitAdvance(running.arriveAndDeregister());
       if(dedicated) pool.shutdown();
       group.close();
     }

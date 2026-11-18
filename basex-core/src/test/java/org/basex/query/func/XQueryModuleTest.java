@@ -468,6 +468,10 @@ xquery:fork-join(
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': 60 }") + " => count()", 2);
     // a non-positive timeout is treated as "no timeout"
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': -1 }") + " => count()", 2);
+    // an error is raised after the remaining branches have finished
+    query("prof:track(try { " + func.args(" (fn() { Q{java:java.lang.Thread}sleep(xs:long(100)), " +
+        "error() }, fn() { Q{java:java.lang.Thread}sleep(xs:long(500)) })") +
+        " } catch * { })?time >= 500", true);
   }
 
   /** Test method. */
@@ -611,6 +615,9 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
         XQUERY_TIMEOUT);
     // a single function with a timeout is canceled, too (no direct-invoke shortcut)
     error(func.args(" fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"), XQUERY_TIMEOUT);
+    // the result is returned after the losing branches have finished
+    query("prof:track(" + func.args(" (fn() { Q{java:java.lang.Thread}sleep(xs:long(100)), 1 }, " +
+        "fn() { Q{java:java.lang.Thread}sleep(xs:long(500)) })") + ")?time >= 500", true);
     // errors
     error(func.args(" error#0"), FUNERR1);
     error(func.args(" count#1"), INVARITY_X_X);
