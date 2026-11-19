@@ -26,7 +26,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  protected boolean assignable(final Type tp) {
+  protected boolean accepts(final Type tp) {
     return false;
   }
 

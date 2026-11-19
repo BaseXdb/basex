@@ -72,6 +72,17 @@ public enum ListType implements Type {
   }
 
   @Override
+  public final boolean attachable() {
+    return false;
+  }
+
+  @Override
+  public final Type toAttachable() {
+    // values of list types are sequences of atomic items
+    return type;
+  }
+
+  @Override
   public final Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
 

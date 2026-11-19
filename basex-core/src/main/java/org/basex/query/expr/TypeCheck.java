@@ -67,7 +67,7 @@ public final class TypeCheck extends Single {
     }
 
     final SeqType et = expr.seqType(), nst = et.with(st.occ);
-    cardinality = nst.coercible(st);
+    cardinality = nst.keptBy(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
     if(!et.mayBeWrapped() || !atomic) {
@@ -100,14 +100,14 @@ public final class TypeCheck extends Single {
     }
 
     // remove redundant type check
-    if(expr instanceof final TypeCheck tc && st.coercible(et)) {
+    if(expr instanceof final TypeCheck tc && st.keptBy(et)) {
       // (E coerce as xs:integer) coerce as xs:int → E coerce as xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }
 
     // skip check if return type is correct
     //   (E coerce as fn(xs:int) as item()*) coerce as fn(xs:int) as item()* → inner check
-    if(et.coercible(st) || expr instanceof TypeCheck && et.eq(st)) {
+    if(et.keptBy(st) || expr instanceof TypeCheck && et.eq(st)) {
       // (1, 3) coerce as xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
@@ -165,7 +165,7 @@ public final class TypeCheck extends Single {
    * @return resulting expression, or {@code null} if no type check is necessary
    */
   public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
-    return ex.seqType().coercible(st) ? null : get(info, ex, st, name, cc);
+    return ex.seqType().keptBy(st) ? null : get(info, ex, st, name, cc);
   }
 
   /**

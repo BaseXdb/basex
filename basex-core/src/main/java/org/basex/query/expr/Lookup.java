@@ -87,7 +87,7 @@ public final class Lookup extends Arr {
 
     // derive type from input expression
     final SeqType kt = keys.seqType();
-    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
+    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).memberType();
     Occ occ = st.occ;
     if(is != 1 || keys == Str.WILDCARD || kt.atomOcc() != Occ.EXACTLY_ONE) {
       // key is wildcard, or expressions yield no single item

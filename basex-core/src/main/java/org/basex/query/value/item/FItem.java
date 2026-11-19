@@ -138,7 +138,7 @@ public abstract class FItem extends Item implements XQFunction {
       Expr body = cc != null ? call.optimize(unlimited, cc) : call;
 
       // add type check if return types differ
-      if(declType != null && !body.seqType().coercible(declType)) {
+      if(declType != null && !body.seqType().keptBy(declType)) {
         body = new TypeCheck(ii, body, declType);
         if(cc != null) body = body.optimize(cc);
       }

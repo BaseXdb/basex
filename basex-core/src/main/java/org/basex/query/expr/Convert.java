@@ -34,7 +34,7 @@ abstract class Convert extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // only atomizing casts benefit from string simplification (not item(), arrays, maps, records)
-    final Type dt = TypeRef.deref(seqType.type);
+    final Type dt = seqType.type.deref();
     if(dt != BasicType.ITEM && !(dt instanceof FType)) {
       // xs:integer(string($string)) → xs:integer($string)
       expr = expr.simplifyFor(Simplify.STRING, cc);

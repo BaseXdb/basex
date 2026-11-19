@@ -109,7 +109,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean instanceOf(final Type tp, final boolean coerce) {
     // the type of a function item is exact: functions of the same type are kept
-    return SeqType.kept(type, tp, coerce);
+    return SeqType.keptExact(type, tp, coerce);
   }
 
   @Override

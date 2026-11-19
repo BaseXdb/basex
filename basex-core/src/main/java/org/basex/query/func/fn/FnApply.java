@@ -50,7 +50,7 @@ public class FnApply extends StandardFunc {
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
-          Arrays.fill(ast, aat.valueType());
+          Arrays.fill(ast, aat.memberType());
           arg(0, arg -> arg.refineFunc(cc, ast));
         }
       }

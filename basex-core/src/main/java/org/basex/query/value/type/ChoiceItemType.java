@@ -57,7 +57,7 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return false;
   }
 
@@ -116,7 +116,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    final Type target = TypeRef.deref(type);
+    final Type target = type.deref();
     if(target instanceof final ChoiceItemType ct) {
       for(final Type tp : types) {
         if(!ct.hasInstance(tp)) return false;
@@ -140,7 +140,7 @@ public final class ChoiceItemType implements Type {
     final Type norm = expand(type);
     if(norm instanceof final ChoiceItemType ct) return ct.instanceOf(this);
     for(final Type tp : types) {
-      if(norm.instanceOf(TypeRef.deref(tp))) return true;
+      if(norm.instanceOf(tp.deref())) return true;
     }
     return false;
   }
@@ -152,7 +152,7 @@ public final class ChoiceItemType implements Type {
    * @return expanded type
    */
   private static Type expand(final Type type) {
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     if(tp == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
     if(tp == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
     if(tp == BasicType.ITEM) return Types.ITEM_EXPANSION;

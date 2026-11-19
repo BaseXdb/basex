@@ -30,7 +30,7 @@ public final class ArrayGet extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     if(array.seqType().type instanceof final ArrayType at) {
-      final SeqType st = at.valueType();
+      final SeqType st = at.memberType();
       // combine result type with return type of fallback function
       exprType.assign(defined(2) ? st.union(arg(2).seqType()) : st);
     }

@@ -37,7 +37,7 @@ public final class ArraySort extends ArraySortBy {
 
     if(array.seqType().type instanceof final ArrayType at) {
       if(defined(2)) {
-        arg(2, arg -> arg.refineFunc(cc, at.valueType()));
+        arg(2, arg -> arg.refineFunc(cc, at.memberType()));
       } else if(!defined(1)) {
         if(size == 1) {
           // array:sort([ MEMBER ]) → [ MEMBER ]

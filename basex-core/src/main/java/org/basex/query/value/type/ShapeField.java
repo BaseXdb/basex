@@ -54,7 +54,7 @@ public final class ShapeField {
    * Returns a field without initializing expression.
    * @return field
    */
-  public ShapeField detach() {
+  public ShapeField toStandalone() {
     return init == null ? this : new ShapeField(seqType, null, fixed);
   }
 

@@ -87,7 +87,7 @@ public abstract class XQShapeMap extends XQMap {
   }
 
   @Override
-  protected final boolean assignable(final Type tp) {
+  protected final boolean accepts(final Type tp) {
     // the keys are supplied by the shape: the field order must be preserved
     return tp instanceof final ShapeType sh && sh.sameOrder(shape());
   }
@@ -113,13 +113,13 @@ public abstract class XQShapeMap extends XQMap {
       qc.checkStop();
       values[v] = values[v].materialize(test, funcs, ii, qc);
     }
-    return get(shape().detach(), values);
+    return get(shape().toStandalone(), values);
   }
 
   @Override
   public final boolean materialized(final Predicate<Data> test, final boolean funcs,
       final InputInfo ii) throws QueryException {
-    return shape().detached() && valuesMaterialized(test, funcs, ii);
+    return shape().standalone() && valuesMaterialized(test, funcs, ii);
   }
 
   @Override

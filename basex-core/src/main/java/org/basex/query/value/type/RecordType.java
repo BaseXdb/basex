@@ -15,7 +15,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Labeled record type: a shape that is assigned to its records as type annotation (label).
+ * Labeled record type: a shape that is attached to its records as type annotation (label).
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -39,7 +39,7 @@ public final class RecordType extends ShapeType {
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
   /** Type without initializing expressions and integrity constraints (can be {@code null}). */
-  private volatile RecordType detachedType;
+  private volatile RecordType standaloneType;
   /** Initializers and constraints of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
 
@@ -81,8 +81,8 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public boolean detached() {
-    return !constrained() && super.detached();
+  public boolean standalone() {
+    return !constrained() && super.standalone();
   }
 
   @Override
@@ -138,7 +138,7 @@ public final class RecordType extends ShapeType {
   @Override
   public boolean matches(final XQMap map, final boolean coerce) {
     // the map must be a record with a matching label
-    return map.type instanceof final RecordType rt && SeqType.kept(rt, this, coerce);
+    return map.type instanceof final RecordType rt && SeqType.keptExact(rt, this, coerce);
   }
 
   @Override
@@ -164,8 +164,8 @@ public final class RecordType extends ShapeType {
    * @return result of check
    */
   public static boolean derives(final Type type, final Type target) {
-    return TypeRef.deref(type) instanceof final RecordType rt && rt.base != null &&
-        TypeRef.deref(target) instanceof final RecordType tt && rt.base.ancestor(tt) != null;
+    return type.deref() instanceof final RecordType rt && rt.base != null &&
+        target.deref() instanceof final RecordType tt && rt.base.ancestor(tt) != null;
   }
 
   /**
@@ -185,15 +185,15 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public RecordType detach() {
-    if(detached()) return this;
-    RecordType dt = detachedType;
-    if(dt == null) {
-      dt = new RecordType(detachedFields(), name, anns, identity, null,
-        base != null ? base.detach() : null);
-      detachedType = dt;
+  public RecordType toStandalone() {
+    if(standalone()) return this;
+    RecordType rt = standaloneType;
+    if(rt == null) {
+      rt = new RecordType(standaloneFields(), name, anns, identity, null,
+        base != null ? base.toStandalone() : null);
+      standaloneType = rt;
     }
-    return dt;
+    return rt;
   }
 
   @Override
@@ -260,7 +260,7 @@ public final class RecordType extends ShapeType {
           }
         }
         case final MapType mt -> collect(mt.valueType().type);
-        case final ArrayType at -> collect(at.valueType().type);
+        case final ArrayType at -> collect(at.memberType().type);
         case final FuncType ft -> {
           collect(ft.declType.type);
           if(ft.argTypes != null) {

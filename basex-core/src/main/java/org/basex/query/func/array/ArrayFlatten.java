@@ -83,7 +83,7 @@ public final class ArrayFlatten extends ArrayFn {
    * @return result type
    */
   private static Type type(final Type type) {
-    return type instanceof final ArrayType at ? type(at.valueType().type) : type;
+    return type instanceof final ArrayType at ? type(at.memberType().type) : type;
   }
 
   /**

@@ -830,7 +830,7 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:e(); "
         + "declare %basex:inline(0) function local:f() as map(*) { local:e() }; "
         + "map:empty(local:f())", true);
-    // coerced empty record: same runtime type, reached via the coercion path
+    // coerced empty record: same attached type, reached via the coercion path
     query("declare record local:e(); "
         + "declare %basex:inline(0) function local:f($x as local:e) as map(*) { $x }; "
         + "map:empty(local:f({}))", true);
@@ -854,10 +854,10 @@ public final class RecordTest extends SandboxTest {
   }
 
   /**
-   * Materialized records with field initializers share their detached type.
+   * Materialized records with field initializers share their standalone type.
    * @throws QueryException query exception
    */
-  @Test public void detachedType() throws QueryException {
+  @Test public void standaloneType() throws QueryException {
     try(QueryProcessor qp = new QueryProcessor(
         "declare record local:r(a, b := 1); (local:r(1), local:r(2))", context)) {
       final Value value = qp.value();

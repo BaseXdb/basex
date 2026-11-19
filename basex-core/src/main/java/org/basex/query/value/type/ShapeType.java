@@ -31,8 +31,8 @@ public class ShapeType extends MapType {
   /** Field names as string items (can be {@code null}). */
   private volatile Str[] keys;
   /** Indicates if the fields are free of initializing expressions. */
-  private final boolean detached;
-  /** Indicates if the shape is detached and its field types are independent of a query. */
+  private final boolean standalone;
+  /** Indicates if the shape is standalone and its field types are independent of a query. */
   private final boolean global;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
@@ -53,13 +53,13 @@ public class ShapeType extends MapType {
   ShapeType(final TokenObjectMap<ShapeField> fields, final SeqType valueType) {
     super(BasicType.STRING, valueType);
     this.fields = fields;
-    boolean d = true, g = true;
+    boolean s = true, g = true;
     for(final ShapeField rf : fields.values()) {
-      d &= rf.init() == null;
+      s &= rf.init() == null;
       g &= rf.seqType().type.global();
     }
-    detached = d;
-    global = d && g;
+    standalone = s;
+    global = s && g;
   }
 
   /**
@@ -92,8 +92,8 @@ public class ShapeType extends MapType {
       return null;
     }
     // shapes with query-scoped components must not be cached: they would be retained forever
-    // (field instead of detached(): derived shapes have no integrity constraint)
-    if(detached && (seqType == null || seqType.type.global())) {
+    // (field instead of standalone(): derived shapes have no integrity constraint)
+    if(standalone && (seqType == null || seqType.type.global())) {
       if(derived == null) derived = new ConcurrentHashMap<>();
       // do not cache shapes that are derived from arbitrarily many field names
       if(derived.size() < MAX_DERIVED) {
@@ -223,7 +223,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this is a labeled record type, which is assigned to its records as label.
+   * Indicates if this is a labeled record type, which is attached to its records as label.
    * @return result of check
    */
   public boolean labeled() {
@@ -285,7 +285,7 @@ public class ShapeType extends MapType {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return true;
   }
 
@@ -312,7 +312,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     if(this == tp || tp.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
     if(tp instanceof final ChoiceItemType cit) {
       for(final Type t : cit.types) {
@@ -380,8 +380,8 @@ public class ShapeType extends MapType {
     if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == Types.MAP) return Types.MAP;
-    if(SeqType.kept(type, this, true)) return this;
-    if(SeqType.kept(this, type, true)) return type;
+    if(SeqType.keptExact(type, this, true)) return this;
+    if(SeqType.keptExact(this, type, true)) return type;
 
     if(type instanceof final ShapeType sh) {
       if(labeled() && sh.labeled()) {
@@ -517,8 +517,8 @@ public class ShapeType extends MapType {
    * references to the query in which it was declared.
    * @return result of check
    */
-  public boolean detached() {
-    return detached;
+  public boolean standalone() {
+    return standalone;
   }
 
   /**
@@ -540,17 +540,17 @@ public class ShapeType extends MapType {
    * Returns a version of this shape that can be attached to a materialized value.
    * @return shape without initializing expressions and integrity constraints
    */
-  public ShapeType detach() {
-    return detached() ? this : new ShapeType(detachedFields());
+  public ShapeType toStandalone() {
+    return standalone() ? this : new ShapeType(standaloneFields());
   }
 
   /**
    * Returns the fields of this shape without their initializing expressions.
    * @return fields
    */
-  final TokenObjectMap<ShapeField> detachedFields() {
+  final TokenObjectMap<ShapeField> standaloneFields() {
     final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.size());
-    for(final byte[] key : fields) map.put(key, fields.get(key).detach());
+    for(final byte[] key : fields) map.put(key, fields.get(key).toStandalone());
     return map;
   }
 

@@ -111,15 +111,15 @@ public abstract class XQStruct extends FItem {
    */
   public final void refineType(final Type tp) {
     final Type refined = type.intersect(tp);
-    if(refined != null && refined.assignable() && assignable(refined)) type = refined;
+    if(refined != null && refined.attachable() && accepts(refined)) type = refined;
   }
 
   /**
-   * Checks if the specified type can be assigned to this structure.
+   * Checks if the specified type can be attached to this structure.
    * @param tp type
    * @return result of check
    */
-  protected boolean assignable(@SuppressWarnings("unused") final Type tp) {
+  protected boolean accepts(@SuppressWarnings("unused") final Type tp) {
     return true;
   }
 }

@@ -440,7 +440,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private static boolean cnstrType(final Type type) {
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     return tp.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
         !tp.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION);
   }
@@ -1275,8 +1275,7 @@ public class QueryParser extends InputParser {
       qc.extensions.add(dr);
       return;
     }
-    tp = TypeRef.deref(tp);
-    if(!(tp instanceof final RecordType ext) || ext.any()) {
+    if(!(tp != null && tp.deref() instanceof final RecordType ext) || ext.any()) {
       throw RECORDBASE_X.get(rd.info, rd.base.prefixString());
     }
     // inherited fields come first; redeclared fixed fields keep their position
@@ -4209,7 +4208,7 @@ public class QueryParser extends InputParser {
   private static void checkCastTarget(final Type type, final boolean atomic,
       final InputInfo ii) throws QueryException {
     if(TypeRef.unresolved(type)) return;
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     // choice item type: all alternatives must be generalized atomic types
     if(tp instanceof final ChoiceItemType cit) {
       for(final Type alt : cit.types) checkCastTarget(alt, true, ii);

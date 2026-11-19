@@ -29,7 +29,7 @@ public final class ArrayAppend extends ArrayFn {
     if(array == XQArray.empty()) return cc.function(_UTIL_ARRAY_MEMBER, info, add);
 
     if(array.seqType().type instanceof final ArrayType at) {
-      exprType.assign(ArrayType.get(at.valueType().union(add.seqType())));
+      exprType.assign(ArrayType.get(at.memberType().union(add.seqType())));
     }
     return this;
   }

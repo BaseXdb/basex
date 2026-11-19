@@ -35,15 +35,6 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Dereferences a type: returns the referenced type of a {@link TypeRef}, or the type itself.
-   * @param type type
-   * @return dereferenced type
-   */
-  public static Type deref(final Type type) {
-    return type instanceof final TypeRef ref ? ref.deref() : type;
-  }
-
-  /**
    * Resolves this reference to the specified type (in place).
    * @param tp referenced type
    */
@@ -77,7 +68,7 @@ public final class TypeRef implements Type {
    */
   public static boolean eq(final Type type1, final Type type2) {
     return unresolved(type1) || unresolved(type2) ? type1 == type2 :
-      deref(type1).eq(deref(type2));
+      type1.deref().eq(type2.deref());
   }
 
   /**
@@ -103,14 +94,9 @@ public final class TypeRef implements Type {
     return info;
   }
 
-  /**
-   * Returns the referenced type, following chained references.
-   * @return referenced type
-   */
+  @Override
   public Type deref() {
-    Type tp = type;
-    while(tp instanceof final TypeRef ref) tp = ref.type;
-    return tp;
+    return type.deref();
   }
 
   @Override
@@ -119,8 +105,13 @@ public final class TypeRef implements Type {
   }
 
   @Override
-  public boolean assignable() {
-    return deref().assignable();
+  public boolean attachable() {
+    return deref().attachable();
+  }
+
+  @Override
+  public Type toAttachable() {
+    return deref().toAttachable();
   }
 
   @Override
@@ -158,17 +149,17 @@ public final class TypeRef implements Type {
 
   @Override
   public boolean instanceOf(final Type tp) {
-    return deref().instanceOf(deref(tp));
+    return deref().instanceOf(tp.deref());
   }
 
   @Override
   public Type union(final Type tp) {
-    return deref().union(deref(tp));
+    return deref().union(tp.deref());
   }
 
   @Override
   public Type intersect(final Type tp) {
-    return deref().intersect(deref(tp));
+    return deref().intersect(tp.deref());
   }
 
   @Override

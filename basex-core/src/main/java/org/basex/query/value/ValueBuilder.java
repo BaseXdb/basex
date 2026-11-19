@@ -155,7 +155,7 @@ public final class ValueBuilder {
    * @return value
    */
   public Value value(final Expr expr) {
-    return expr != null ? value(SeqType.runtime(expr.seqType().type)) : value();
+    return expr != null ? value(expr.seqType().type.toAttachable()) : value();
   }
 
   /**

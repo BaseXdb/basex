@@ -33,7 +33,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  protected boolean assignable(final Type tp) {
+  protected boolean accepts(final Type tp) {
     return this != EMPTY;
   }
 

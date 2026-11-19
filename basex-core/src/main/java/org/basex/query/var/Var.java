@@ -191,7 +191,7 @@ public final class Var extends ExprInfo {
       if(declType.occ.intersect(st.occ) == null) {
         throw typeError(declType, st, null, name, info);
       }
-      if(!st.coercible(declType)) {
+      if(!st.keptBy(declType)) {
         // coercion may change the items: only their number is kept, unless arrays are atomized
         final SeqType dt = exprType.seqType();
         final Occ occ = dt.occ.intersect(st.occ);
@@ -242,7 +242,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st) {
-    if(declType != null && !st.coercible(declType)) return declType.coercible(st);
+    if(declType != null && !st.keptBy(declType)) return declType.keptBy(st);
     declType = st;
     return true;
   }

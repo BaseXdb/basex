@@ -75,8 +75,8 @@ public class MapType extends FType {
   }
 
   @Override
-  public boolean assignable() {
-    return keyType.assignable() && valueType.type.assignable();
+  public boolean attachable() {
+    return keyType.attachable() && valueType.type.attachable();
   }
 
   @Override
@@ -124,8 +124,8 @@ public class MapType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType || type instanceof ShapeType) return type.union(this);
-    if(SeqType.kept(type, this, true)) return this;
-    if(SeqType.kept(this, type, true)) return type;
+    if(SeqType.keptExact(type, this, true)) return this;
+    if(SeqType.keptExact(this, type, true)) return type;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
     return type instanceof ArrayType ? FUNCTION :
            type instanceof FuncType ? type.union(this) : BasicType.ITEM;

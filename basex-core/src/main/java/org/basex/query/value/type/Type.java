@@ -401,20 +401,37 @@ public interface Type {
   }
 
   /**
-   * Checks if this type can be assigned to a sequence as its runtime type.
+   * Checks if this type can be attached to a value.
    * @return result of check
    */
-  default boolean assignable() {
+  default boolean attachable() {
     return true;
   }
 
   /**
-   * Checks if this type can be assigned as runtime type to a value that matches it.
+   * Checks if this type can be attached to a value that matches it.
    * @param coerce item coercion
    * @return result of check
    */
-  default boolean assignable(final boolean coerce) {
-    return assignable() && (coerce || !coercive());
+  default boolean attachable(final boolean coerce) {
+    return attachable() && (coerce || !coercive());
+  }
+
+  /**
+   * Returns the type that can be attached to values of this type.
+   * @return attachable type
+   */
+  default Type toAttachable() {
+    // (xs:int | xs:string), enum('a') or array((A | B)) are never attached
+    return attachable() ? this : BasicType.ITEM;
+  }
+
+  /**
+   * Dereferences this type.
+   * @return referenced type of a type reference, or this type
+   */
+  default Type deref() {
+    return this;
   }
 
   /**

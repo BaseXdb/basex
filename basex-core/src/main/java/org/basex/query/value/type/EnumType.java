@@ -129,7 +129,7 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return false;
   }
 

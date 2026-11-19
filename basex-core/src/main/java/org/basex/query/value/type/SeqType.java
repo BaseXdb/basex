@@ -172,7 +172,7 @@ public final class SeqType {
     if(size == 0) return true;
 
     // try shortcut (type of value may be specific enough)
-    final Type dt = TypeRef.deref(type), vt = TypeRef.deref(value.type);
+    final Type dt = type.deref(), vt = value.type.deref();
     if(keptStatic(vt, dt, coerce)) return true;
     // check single item
     if(size == 1) return dt.instance((Item) value, coerce);
@@ -181,7 +181,7 @@ public final class SeqType {
       if(!dt.instance(item, coerce)) return false;
     }
     // remember the more specific type to skip subsequent checks
-    if(dt.assignable(coerce) && dt.instanceOf(vt)) value.type = dt;
+    if(dt.attachable(coerce) && dt.instanceOf(vt)) value.type = dt;
     return true;
   }
 
@@ -207,7 +207,7 @@ public final class SeqType {
   public Value cast(final Value value, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    final Type dt = TypeRef.deref(type);
+    final Type dt = type.deref();
 
     // item(): identity, only check the cardinality of the input
     if(dt == ITEM) return occ.check(value.size()) ? value : castError(value, error, info);
@@ -236,7 +236,7 @@ public final class SeqType {
         if(cast == null) return castError(value, error, info);
         vb.add(cast);
       }
-      return vb.value(runtime(dt));
+      return vb.value(dt.toAttachable());
     }
 
     // generalized atomic type, list type, union type, enumeration type: atomize, then cast
@@ -260,18 +260,7 @@ public final class SeqType {
       if(cast == null) return null;
       vb.add(cast);
     }
-    return vb.value(runtime(dt instanceof final ListType lt ? lt.atomic() : dt));
-  }
-
-  /**
-   * Returns the dereferenced type if it can be assigned to values, or {@code item()} otherwise.
-   * @param type static type
-   * @return runtime type
-   */
-  public static Type runtime(final Type type) {
-    // (xs:int | xs:string), enum('a') or array((A | B)) never become runtime types
-    final Type tp = TypeRef.deref(type);
-    return tp.assignable() ? tp : ITEM;
+    return vb.value(dt.toAttachable());
   }
 
   /**
@@ -305,7 +294,7 @@ public final class SeqType {
         return null;
       }
     }
-    final Value result = vb.value(runtime(type));
+    final Value result = vb.value(type.toAttachable());
     return occ.check(result.size()) ? result : castError(value, error, info);
   }
 
@@ -316,7 +305,7 @@ public final class SeqType {
    */
   public static boolean castTarget(final Type type) {
     // xs:short, array(xs:integer), (xs:int | xs:string): true; xs:anyAtomicType, element(): false
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     // item(); array, map, record types (their component types are checked while casting)
     if(tp == ITEM || tp instanceof ArrayType || tp instanceof MapType) return true;
     // choice item type: all alternatives must be eligible
@@ -359,7 +348,7 @@ public final class SeqType {
   private Value castItem(final Item item, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    final Type dt = TypeRef.deref(type);
+    final Type dt = type.deref();
     if(item.type.eq(dt)) return item;
 
     // enable light-weight error handling (copy: the original may be used by other threads)
@@ -409,7 +398,7 @@ public final class SeqType {
       if(val == null) throw typeError(value, this, name, info);
       vb.add(val);
     }
-    final Value val = vb.value(runtime(type));
+    final Value val = vb.value(type.toAttachable());
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
@@ -427,7 +416,7 @@ public final class SeqType {
   private Value coerce(final Item item, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    final Type dt = TypeRef.deref(type);
+    final Type dt = type.deref();
     // generalized atomic type: atomize first
     if(!item.type.instanceOf(ANY_ATOMIC_TYPE) && dt.instanceOf(ANY_ATOMIC_TYPE)) {
       final Value value;
@@ -533,7 +522,7 @@ public final class SeqType {
     if(this == st) return this;
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type :
-      TypeRef.deref(type).union(TypeRef.deref(st.type));
+      type.deref().union(st.type.deref());
     final Occ oc = occ.union(st.occ);
     return get(tp, oc);
   }
@@ -566,7 +555,7 @@ public final class SeqType {
     if(st.voidType()) return st;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    final Type tp = TypeRef.deref(type).intersect(TypeRef.deref(st.type));
+    final Type tp = type.deref().intersect(st.type.deref());
     if(tp != null) return get(tp, oc);
     // disjoint item types: the empty sequence is the only common instance
     return oc.min == 0 ? Types.EMPTY_SEQUENCE_Z : null;
@@ -609,7 +598,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean voidType() {
-    return TypeRef.deref(type) == ERROR && oneOrMore();
+    return type.deref() == ERROR && oneOrMore();
   }
 
   /**
@@ -617,7 +606,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean emptyType() {
-    return zero() || TypeRef.deref(type) == ERROR && !oneOrMore();
+    return zero() || type.deref() == ERROR && !oneOrMore();
   }
 
   /**
@@ -625,7 +614,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean itemless() {
-    return zero() || TypeRef.deref(type) == ERROR;
+    return zero() || type.deref() == ERROR;
   }
 
   /**
@@ -724,12 +713,12 @@ public final class SeqType {
    * @return type
    */
   private static Type matched(final Type type) {
-    final Type tp = TypeRef.deref(type);
-    // matching records may have another record type: no record type can be assigned
+    final Type tp = type.deref();
+    // matching records may have another record type: no record type can be attached
     if(tp instanceof final ShapeType sh) return sh.labeled() ? Types.RECORD : type;
     if(tp instanceof final ArrayType at) {
-      final SeqType vt = at.valueType(), mvt = vt.matched();
-      return mvt == vt ? type : ArrayType.get(mvt);
+      final SeqType st = at.memberType(), mst = st.matched();
+      return mst == st ? type : ArrayType.get(mst);
     }
     if(tp instanceof final MapType mt) {
       final SeqType vt = mt.valueType(), mvt = vt.matched();
@@ -764,7 +753,7 @@ public final class SeqType {
     // empty category (empty-sequence(), xs:error?, xs:error*): subtype of every optional type
     if(emptyType()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
-    return TypeRef.deref(type).instanceOf(TypeRef.deref(st.type));
+    return type.deref().instanceOf(st.type.deref());
   }
 
   /**
@@ -772,7 +761,7 @@ public final class SeqType {
    * @param st sequence type to check
    * @return result of check
    */
-  public boolean coercible(final SeqType st) {
+  public boolean keptBy(final SeqType st) {
     // identical records are kept, typed functions are always wrapped
     return instanceOf(st) && (!st.type.coercive() || keptStatic(type, st.type, true));
   }
@@ -785,7 +774,7 @@ public final class SeqType {
   public boolean refines(final SeqType st) {
     // inferred function types are upper bounds and must not be enforced
     // inferred xs:integer for xs:decimal: true; inferred fn(xs:integer) for fn(*): false
-    return coercible(st) && !type.wraps();
+    return keptBy(st) && !type.wraps();
   }
 
   /**
@@ -798,7 +787,7 @@ public final class SeqType {
   public static boolean keptStatic(final Type type, final Type target, final boolean coerce) {
     // static function types are upper bounds: functions of the same type may still be wrapped
     // fn(xs:integer) → fn(xs:integer): false (an fn(xs:decimal) item would be wrapped)
-    return !(coerce && target.wraps()) && kept(type, target, coerce);
+    return !(coerce && target.wraps()) && keptExact(type, target, coerce);
   }
 
   /**
@@ -808,10 +797,10 @@ public final class SeqType {
    * @param coerce coercion
    * @return result of check
    */
-  public static boolean kept(final Type type, final Type target, final boolean coerce) {
+  public static boolean keptExact(final Type type, final Type target, final boolean coerce) {
     // xs:integer → xs:decimal, R → R: true; fn(xs:decimal) → fn(xs:integer): false (wrapped)
     return type == target || type.instanceOf(target) && (!coerce || type == ERROR ||
-      !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)) ||
+      !target.coercive() || type.deref().eq(target.deref()) ||
       RecordType.derives(type, target));
   }
 
