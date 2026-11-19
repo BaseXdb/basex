@@ -203,16 +203,15 @@ public final class Unfold extends Arr {
   private Expr items(final Expr expr, final Var var, final Var start, final boolean reverse,
       final CompileContext cc) throws QueryException {
     final Var item = cc.var("item", info), pos = cc.var("pos", info);
-    Expr seq = ref(start, 0, cc), next = ref(pos, 1, cc);
-    if(reverse) {
-      seq = cc.function(Function.REVERSE, info, seq);
-      next = new Arith(info, cc.function(Function.COUNT, info, ref(start, 0, cc)),
-          ref(pos, -2, cc), Calc.SUBTRACT).optimize(cc);
-    }
+    Expr seq = ref(start, 0, cc);
+    if(reverse) seq = cc.function(Function.REVERSE, info, seq);
+    final Clause fr = new For(item, pos, null, seq, false).optimize(cc);
+    final Expr next = reverse ?
+      new Arith(info, cc.function(Function.COUNT, info, ref(start, 0, cc)),
+        ref(pos, -2, cc), Calc.SUBTRACT).optimize(cc) : ref(pos, 1, cc);
     // the first item is bound separately: head($s) can be rewritten to $i
     final Expr rest = List.get(cc, info, ref(item, 0, cc),
         cc.function(Function.SUBSEQUENCE, info, ref(start, 0, cc), next));
-    final Clause fr = new For(item, pos, null, seq, false).optimize(cc);
     // for $i at $p in $start let $s := ($i, subsequence($start, $p + 1)) return E
     return loop(expr, var, s -> new Clause[] { fr, new Let(s, rest).optimize(cc) }, cc);
   }

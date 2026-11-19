@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -122,6 +123,42 @@ public abstract class CNode extends Arr {
       skipCopy = true;
       for(final Expr expr : exprs) expr.skipCopy();
     }
+  }
+
+  @Override
+  public final boolean parentless() {
+    return true;
+  }
+
+  /**
+   * Returns the occurrence indicator of the child or attribute nodes created by the contents
+   * that match the specified test.
+   * @param test test
+   * @param attributes attribute or child nodes
+   * @return occurrence indicator (can be {@code null})
+   */
+  final Occ contentOcc(final Test test, final boolean attributes) {
+    // text nodes are merged or dropped if empty: only consider non-empty atomic contents
+    final boolean text = !attributes && test.subsumes(NodeType.TEXT) == Boolean.TRUE;
+    Occ match = null;
+    int inputs = 0;
+    for(final Expr expr : exprs) {
+      final SeqType st = expr.seqType();
+      final Type type = st.type;
+      if(st.zero() || (attributes ? type.intersect(NodeType.ATTRIBUTE) == null :
+        type.instanceOf(NodeType.ATTRIBUTE) || type.instanceOf(NodeType.NAMESPACE))) continue;
+      inputs++;
+      if(match == null && st.oneOrMore()) {
+        final boolean node = type instanceof NodeType;
+        final boolean matches = node ? type.kind().oneOf(Kind.ELEMENT, Kind.ATTRIBUTE,
+          Kind.COMMENT, Kind.PROCESSING_INSTRUCTION) && test.subsumes(type) == Boolean.TRUE :
+          text && (expr instanceof final Str str ? str.string().length > 0 :
+          type.isNumber() || type == BasicType.BOOLEAN);
+        if(matches) match = !node || st.one() ? Occ.EXACTLY_ONE : Occ.ONE_OR_MORE;
+      }
+      if(match != null && inputs > 1) return Occ.ONE_OR_MORE;
+    }
+    return inputs == 0 ? Occ.ZERO : match;
   }
 
   @Override

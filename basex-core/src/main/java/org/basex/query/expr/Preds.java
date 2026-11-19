@@ -196,6 +196,11 @@ public abstract class Preds extends Arr {
     final long max = maxSize(size == -1 ? Long.MAX_VALUE : size);
     // predicates will return no results (keep empty input: may raise a type error)
     if(size != 0 && max == 0) return true;
+    // no predicates: adopt type of root
+    if(exprs.length == 0) {
+      exprType.assign(root.seqType(), size);
+      return false;
+    }
     // resulting size will be unknown for any non-positional filter
     final boolean exact = size != -1 && positional();
 

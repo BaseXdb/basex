@@ -361,14 +361,6 @@ public final class CompileContext {
   }
 
   /**
-   * Indicates if the query focus is nested.
-   * @return result of check
-   */
-  public boolean nestedFocus() {
-    return !focuses.isEmpty();
-  }
-
-  /**
    * Returns the current variable scope.
    * @return variable scope
    */
@@ -473,7 +465,7 @@ public final class CompileContext {
    * @param refine refine type
    * @return optimized expression
    */
-  private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
+  public Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     if(result != expr) {
       info("%", (Supplier<String>) () -> {
         final String exprDesc = expr.description(), resDesc = result.description();

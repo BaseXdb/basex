@@ -84,7 +84,7 @@ public enum Calc {
       if(type1 == DATE || type2 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION ||
          type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
-      return numType(type1, type2);
+      return numOperandType(type1, type2);
     }
 
     @Override
@@ -154,7 +154,7 @@ public enum Calc {
       if(type1.instanceOf(DATE_TIME)) return type1;
       if(type1 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
-      return numType(type1, type2);
+      return numOperandType(type1, type2);
     }
 
     @Override
@@ -494,6 +494,20 @@ public enum Calc {
       return type1.instanceOf(INTEGER) && type2.instanceOf(INTEGER) ? INTEGER : DECIMAL;
     }
     return (dec1 || type1 == FLOAT) && (dec2 || type2 == FLOAT) ? FLOAT : NUMERIC;
+  }
+
+  /**
+   * Returns the static type of an addition or subtraction with a possibly unknown operand type.
+   * @param type1 type of first operand
+   * @param type2 type of second operand
+   * @return result type
+   */
+  private static Type numOperandType(final Type type1, final Type type2) {
+    final Type type = numType(type1, type2);
+    if(type != ANY_ATOMIC_TYPE) return type;
+    // untyped operands are cast to doubles, numbers can only be combined with numbers
+    return type1.isUntyped() || type2.isUntyped() ? DOUBLE :
+      type1.isNumber() || type2.isNumber() ? NUMERIC : type;
   }
 
   /**

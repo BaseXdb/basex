@@ -23,15 +23,21 @@ public final class FnRoot extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Value value = cc.qc.focus.value;
-    final Expr expr;
-    if(defined(0)) {
-      expr = arg(0);
-      // root($document) → $document
-      if(expr.seqType().instanceOf(Types.DOCUMENT_ZO)) return expr;
-    } else {
-      expr = value;
+    final Expr expr = defined(0) ? arg(0) : value;
+    if(expr != null) {
+      // root($document) → $document, root(<a/>) → <a/>, <a/>/root() → <a/>/.
+      final SeqType st = expr.seqType();
+      if(st.zeroOrOne() && (st.type instanceof final NodeType nt && nt.root() ||
+          expr.parentless())) {
+        return defined(0) ? expr : ContextValue.get(cc, info);
+      }
     }
     exprType.data(expr);
     return optFirst(true, false, value);
+  }
+
+  @Override
+  public boolean parentless() {
+    return true;
   }
 }

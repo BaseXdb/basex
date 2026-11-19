@@ -164,20 +164,21 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Value value, final boolean coerce) {
-    final Type dt = TypeRef.deref(this.type);
+    // coerce: a map is an instance of fn(xs:string) as item()* only without coercion (wrapped)
+
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
     if(size == 0) return true;
 
     // try shortcut (type of value may be specific enough)
-    final Type vt = TypeRef.deref(value.type);
+    final Type dt = TypeRef.deref(type), vt = TypeRef.deref(value.type);
     if(keptStatic(vt, dt, coerce)) return true;
     // check single item
-    if(size == 1) return instance((Item) value, coerce);
+    if(size == 1) return dt.instance((Item) value, coerce);
     // check each item
     for(final Item item : value) {
-      if(!instance(item, coerce)) return false;
+      if(!dt.instance(item, coerce)) return false;
     }
     // remember the more specific type to skip subsequent checks
     if(dt.assignable(coerce) && dt.instanceOf(vt)) value.type = dt;
@@ -235,7 +236,7 @@ public final class SeqType {
         if(cast == null) return castError(value, error, info);
         vb.add(cast);
       }
-      return vb.value(dt);
+      return vb.value(runtime(dt));
     }
 
     // generalized atomic type, list type, union type, enumeration type: atomize, then cast
@@ -259,7 +260,18 @@ public final class SeqType {
       if(cast == null) return null;
       vb.add(cast);
     }
-    return vb.value(dt instanceof final ListType lt ? lt.atomic() : dt);
+    return vb.value(runtime(dt instanceof final ListType lt ? lt.atomic() : dt));
+  }
+
+  /**
+   * Returns the dereferenced type if it can be assigned to values, or {@code item()} otherwise.
+   * @param type static type
+   * @return runtime type
+   */
+  public static Type runtime(final Type type) {
+    // (xs:int | xs:string), enum('a') or array((A | B)) never become runtime types
+    final Type tp = TypeRef.deref(type);
+    return tp.assignable() ? tp : ITEM;
   }
 
   /**
@@ -277,12 +289,13 @@ public final class SeqType {
 
     // items that match the item type are preserved, all others are cast one by one
     final SeqType st = with(EXACTLY_ONE);
+    final boolean castable = castTarget(type);
     final ValueBuilder vb = new ValueBuilder(qc, value.size());
     for(final Item item : value) {
       qc.checkStop();
       if(instance(item, false)) {
         vb.add(item);
-      } else if(castTarget(type)) {
+      } else if(castable) {
         final Value cast = st.cast(item, error, qc, info);
         if(cast == null) return null;
         vb.add(cast);
@@ -292,7 +305,7 @@ public final class SeqType {
         return null;
       }
     }
-    final Value result = vb.value(TypeRef.deref(type));
+    final Value result = vb.value(runtime(type));
     return occ.check(result.size()) ? result : castError(value, error, info);
   }
 
@@ -302,6 +315,7 @@ public final class SeqType {
    * @return result of check
    */
   public static boolean castTarget(final Type type) {
+    // xs:short, array(xs:integer), (xs:int | xs:string): true; xs:anyAtomicType, element(): false
     final Type tp = TypeRef.deref(type);
     // item(); array, map, record types (their component types are checked while casting)
     if(tp == ITEM || tp instanceof ArrayType || tp instanceof MapType) return true;
@@ -345,7 +359,7 @@ public final class SeqType {
   private Value castItem(final Item item, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    final Type dt = TypeRef.deref(this.type);
+    final Type dt = TypeRef.deref(type);
     if(item.type.eq(dt)) return item;
 
     // enable light-weight error handling (copy: the original may be used by other threads)
@@ -395,7 +409,7 @@ public final class SeqType {
       if(val == null) throw typeError(value, this, name, info);
       vb.add(val);
     }
-    final Value val = vb.value(TypeRef.deref(type));
+    final Value val = vb.value(runtime(type));
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
@@ -413,7 +427,7 @@ public final class SeqType {
   private Value coerce(final Item item, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    final Type dt = TypeRef.deref(this.type);
+    final Type dt = TypeRef.deref(type);
     // generalized atomic type: atomize first
     if(!item.type.instanceOf(ANY_ATOMIC_TYPE) && dt.instanceOf(ANY_ATOMIC_TYPE)) {
       final Value value;
@@ -498,7 +512,7 @@ public final class SeqType {
     ) {
       // item will be cast
     } else if(!tp.union(at).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
-      // item will be relabeled: remember old type for future comparison
+      // item will be relabeled (3 → xs:short): remember old item for comparison
       relabel = item;
     } else {
       return null;
@@ -595,7 +609,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean voidType() {
-    return TypeRef.deref(type) == BasicType.ERROR && oneOrMore();
+    return TypeRef.deref(type) == ERROR && oneOrMore();
   }
 
   /**
@@ -603,7 +617,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean emptyType() {
-    return zero() || TypeRef.deref(type) == BasicType.ERROR && !oneOrMore();
+    return zero() || TypeRef.deref(type) == ERROR && !oneOrMore();
   }
 
   /**
@@ -611,7 +625,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean itemless() {
-    return zero() || TypeRef.deref(type) == BasicType.ERROR;
+    return zero() || TypeRef.deref(type) == ERROR;
   }
 
   /**
@@ -644,6 +658,7 @@ public final class SeqType {
    * @return occurrence indicator
    */
   public Occ atomOcc() {
+    // array(xs:integer): one item, which may atomize to any number of items
     return mayBeWrapped() ? Occ.ZERO_OR_MORE : occ;
   }
 
@@ -678,9 +693,8 @@ public final class SeqType {
     if(zero()) return false;
     return switch(check) {
       case NUMBER -> type instanceof BasicType ?
-        type.isNumber() || type.oneOf(BasicType.ITEM, BasicType.ANY_ATOMIC_TYPE) :
-        type.intersect(BasicType.NUMERIC) != null;
-      case FUNCTION -> type == BasicType.ITEM || type instanceof FType;
+        type.isNumber() || type.oneOf(ITEM, ANY_ATOMIC_TYPE) : type.intersect(NUMERIC) != null;
+      case FUNCTION -> type == ITEM || type instanceof FType;
       case WRAPPED -> mayBe(Check.JNODE) || mayBe(Types.FUNCTION);
       case JNODE -> mayBe(NodeType.JNODE);
     };
@@ -692,7 +706,7 @@ public final class SeqType {
    * @return result of check
    */
   private boolean mayBe(final Type tp) {
-    return type instanceof BasicType ? type == BasicType.ITEM : type.intersect(tp) != null;
+    return type instanceof BasicType ? type == ITEM : type.intersect(tp) != null;
   }
 
   /**
@@ -770,6 +784,7 @@ public final class SeqType {
    */
   public boolean refines(final SeqType st) {
     // inferred function types are upper bounds and must not be enforced
+    // inferred xs:integer for xs:decimal: true; inferred fn(xs:integer) for fn(*): false
     return coercible(st) && !type.wraps();
   }
 
@@ -782,6 +797,7 @@ public final class SeqType {
    */
   public static boolean keptStatic(final Type type, final Type target, final boolean coerce) {
     // static function types are upper bounds: functions of the same type may still be wrapped
+    // fn(xs:integer) → fn(xs:integer): false (an fn(xs:decimal) item would be wrapped)
     return !(coerce && target.wraps()) && kept(type, target, coerce);
   }
 
@@ -793,7 +809,8 @@ public final class SeqType {
    * @return result of check
    */
   public static boolean kept(final Type type, final Type target, final boolean coerce) {
-    return type.instanceOf(target) && (!coerce || type == target || type == BasicType.ERROR ||
+    // xs:integer → xs:decimal, R → R: true; fn(xs:decimal) → fn(xs:integer): false (wrapped)
+    return type == target || type.instanceOf(target) && (!coerce || type == ERROR ||
       !target.coercive() || TypeRef.deref(type).eq(TypeRef.deref(target)) ||
       RecordType.derives(type, target));
   }

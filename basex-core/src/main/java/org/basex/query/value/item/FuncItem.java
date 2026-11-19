@@ -102,7 +102,7 @@ public final class FuncItem extends FItem implements Scope {
     this.anns = anns;
     this.stackSize = stackSize;
     this.name = name;
-    this.focus = focus;
+    this.focus = simple ? null : focus;
     this.simple = simple;
   }
 

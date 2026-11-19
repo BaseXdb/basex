@@ -29,6 +29,8 @@ public final class PathTest extends SandboxTest {
   private static final String LI1 = "<li>Exercise 1</li>";
   /** Second result. */
   private static final String LI2 = "<li>Exercise 2</li>";
+  /** Element whose contents are unknown at compile time. */
+  private static final String A = opaque("<a/>");
 
   /** Creates a database. */
   @BeforeEach public void setUp() {
@@ -346,38 +348,38 @@ public final class PathTest extends SandboxTest {
     query(el + "/descendant-or-self::(text()|*|comment()) ! string()", "et\ne\ne\nt\nc");
 
     check(el + "/child::(text()|text()) ! string()", "t",
-        type(IterStep.class, "text()*"));
+        type(IterStep.class, "text()+"));
     check(el + "/child::(text()|e|text()) ! string()", "e\nt",
-        type(IterStep.class, "(text()|element(e))*"));
+        type(IterStep.class, "(text()|element(e))+"));
   }
 
   /** Refine node tests. */
   @Test public void gh2464() {
     String[] tests = { empty(Instance.class), type(IterPath.class, "xnode()*"),
         "//IterStep/@test = 'xnode()'" };
-    check("<a/>/node()[self::node()]", "", tests);
-    check("<a/>/node()[. instance of node()]", "", tests);
+    check(A + "/node()[self::node()]", "", tests);
+    check(A + "/node()[. instance of node()]", "", tests);
 
     tests = new String[] { empty(Instance.class), type(IterPath.class, "element()*"),
         "//IterStep/@test = '*'" };
-    check("<a/>/node()[self::*]", "", tests);
-    check("<a/>/node()[. instance of element()]", "", tests);
-    check("<a/>/*[. instance of element()]", "", tests);
+    check(A + "/node()[self::*]", "", tests);
+    check(A + "/node()[. instance of element()]", "", tests);
+    check(A + "/*[. instance of element()]", "", tests);
 
     tests = new String[] { empty(Instance.class), type(IterPath.class, "element(a)*"),
         "//IterStep/@test = 'a'" };
-    check("<a/>/node()[self::a]", "", tests);
-    check("<a/>/node()[. instance of element(a)]", "", tests);
-    check("<a/>/*[. instance of element(a)]", "", tests);
-    check("<a/>/*[. instance of element(a)]", "", tests);
-    check("<a/>/a[. instance of element(a)]", "", tests);
-    check("<a/>/*[node-name() = #a]", "", tests);
-    check("<a/>/a[node-name() = #a]", "", tests);
+    check(A + "/node()[self::a]", "", tests);
+    check(A + "/node()[. instance of element(a)]", "", tests);
+    check(A + "/*[. instance of element(a)]", "", tests);
+    check(A + "/*[. instance of element(a)]", "", tests);
+    check(A + "/a[. instance of element(a)]", "", tests);
+    check(A + "/*[node-name() = #a]", "", tests);
+    check(A + "/a[node-name() = #a]", "", tests);
 
-    check("<a/>/.[element()]", "", "//IterStep/@test = '*'");
-    check("<a/>/.[*]", "", "//IterStep/@test = '*'");
-    check("<a/>/.[a]", "", "//IterStep/@test = 'a'");
-    check("<a/>/.[element(a)]", "", "//IterStep/@test = 'a'");
+    check(A + "/.[element()]", "", "//IterStep/@test = '*'");
+    check(A + "/.[*]", "", "//IterStep/@test = '*'");
+    check(A + "/.[a]", "", "//IterStep/@test = 'a'");
+    check(A + "/.[element(a)]", "", "//IterStep/@test = 'a'");
   }
 
   /** Instance checks: document-node(...). */
@@ -425,6 +427,17 @@ public final class PathTest extends SandboxTest {
 
   /** Static subtyping of named document tests (child tests, not only the node kind). */
   @Test public void docTest() {
+    check("document { <a/> }", "<a/>", type(CDoc.class, "document-node(element(a))"));
+    check("document { <!--x-->, <a/>, <?pi?> }", "<!--x--><a/><?pi?>",
+        type(CDoc.class, "document-node(element(a))"));
+    check("document { <a/>, <b/> }", "<a/><b/>", type(CDoc.class, "document-node()"));
+    final String docs = "for $d in (document { <a/> }, document { <a><b/></a> }) return ";
+    check(docs + "$d/*", "<a/>\n<a><b/></a>", type(IterStep.class, "element(a)"));
+    check(docs + "$d/node()", "<a/>\n<a><b/></a>", type(IterStep.class, "xnode()+"));
+    check(docs + "$d/b", "", empty(IterStep.class));
+    check(docs + "$d/descendant::a", "<a/>\n<a><b/></a>", type(IterStep.class, "element(a)+"));
+    check("document { (<a/>, <b/>) => items-at(" + _RANDOM_INTEGER.args(2) + " + 1) }", null,
+        type(CDoc.class, "document-node()"));
     // instance-of check via a typed argument (not a value): static instanceOf/intersect apply
     final String f = "declare function local:f($n as %type) as xs:boolean { $n instance of %of };"
         + " local:f(document { <a/> })";
@@ -472,8 +485,9 @@ public final class PathTest extends SandboxTest {
   @Test public void descendantOrSelf() {
     check("document { <a/> }/descendant-or-self::a", "<a/>",
         exists("IterStep[@axis = 'descendant']"));
-    check("<a/>/ancestor-or-self::document-node()", "",
+    check("<a><b/></a>/b/ancestor-or-self::document-node()", "",
         exists("IterStep[@axis = 'ancestor']"));
+    check("<a/>/ancestor-or-self::document-node()", "", empty());
     check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
         exists("IterStep[@axis = 'descendant']"));
     check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
@@ -587,33 +601,33 @@ public final class PathTest extends SandboxTest {
     check("document { <a/>, <b/> }/a[self::a | self::b]", "<a/>", count(IterStep.class, 1));
 
     // merge self steps of predicates with the enclosing step
-    check("<a/>/*[self::b]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[self::b and true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[self::b]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[self::b and true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
   }
 
   /** Combined kind tests. */
   @Test public void combinedKindTests() {
     // merge identical steps, rewrite to iterative path
-    check("<a/>/(* | *)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(*, *)",  "", root(IterPath.class), empty(List.class));
+    check(A + "/(* | *)", "", root(IterPath.class), empty(Union.class));
+    check(A + "/(*, *)",  "", root(IterPath.class), empty(List.class));
 
     // rewrite to single union node test, rewrite to iterative path
-    check("<a/>/(a | b)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)",  "", root(IterPath.class), empty(List.class));
+    check(A + "/(a | b)", "", root(IterPath.class), empty(Union.class));
+    check(A + "/(a, b)",  "", root(IterPath.class), empty(List.class));
 
     // merge descendant-or-self step, rewrite to iterative path
-    check("<a/>//(a | b)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)",   "", root(IterPath.class), empty(List.class));
+    check(A + "//(a | b)", "", root(IterPath.class), empty(Union.class));
+    check(A + "/(a, b)",   "", root(IterPath.class), empty(List.class));
 
     // rewrite to single union node test, rewrite to iterative path
-    check("<a/>/(a | b)[text()]", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)[text()]",  "", root(IterPath.class), empty(List.class));
+    check(A + "/(a | b)[text()]", "", root(IterPath.class), empty(Union.class));
+    check(A + "/(a, b)[text()]",  "", root(IterPath.class), empty(List.class));
     check("<_><a>x</a><b/></_>/(a, b)[text()]", "<a>x</a>",
         root(IterPath.class), empty(List.class));
 
     // rewrite to union expression
-    check("<a/>/(*, @*)", "", root(MixedPath.class), exists(Union.class));
+    check(A + "/(*, @*)", "", root(MixedPath.class), exists(Union.class));
   }
 
   /** Rewrite name tests to self steps. */
@@ -650,7 +664,7 @@ public final class PathTest extends SandboxTest {
         root(IterPath.class));
     check("let $x := 'g' return <g/> ! self::*[local-name() = $x]", "<g/>",
         root(CElem.class));
-    check("let $x := 'g' return <g/> ! *[local-name() = $x]", "",
+    check("let $x := 'g' return" + A + " ! *[local-name() = $x]", "",
         root(IterPath.class));
   }
 
@@ -715,7 +729,9 @@ public final class PathTest extends SandboxTest {
     check("<e a='A'/>/attribute::attribute()", "a=\"A\"", exists(IterPath.class));
     check("<e a='A'/>/ancestor::text()", "", empty());
     check("<e a='A'/>/parent::text()", "", empty());
-    check("<e a='A'/>/parent::*", "", exists(IterPath.class));
+    check("<e a='A'/>/parent::*", "", empty());
+    check("<x><e a='A'/></x>/e/parent::*", "<x><e a=\"A\"/></x>",
+        exists("IterStep[@axis = 'parent']"));
     check("attribute a { 0 }/child::attribute()", "", empty());
     check("<e a='A'/>/attribute::a/child::attribute()", "", empty());
 
@@ -743,8 +759,8 @@ public final class PathTest extends SandboxTest {
     check("text { 0 }/child::node()", "", empty());
     check("attribute a { 0 }/following-sibling::node()", "", empty());
     check("attribute a { 0 }/preceding-sibling::node()", "", empty());
-    check("comment {}/following-sibling::node()", "", exists(IterPath.class));
-    check("comment {}/preceding-sibling::node()", "", exists(IterStep.class));
+    check("comment {}/following-sibling::node()", "", empty());
+    check("comment {}/preceding-sibling::node()", "", empty());
 
     check("attribute a { 0 }/child::node()", "", empty());
     check("attribute a { 0 }/descendant::*", "", empty());
@@ -926,16 +942,16 @@ public final class PathTest extends SandboxTest {
 
   /** Rewrite lists to unions. */
   @Test public void listToUnion() {
-    check("<a/>[b, text()]", "", count(SingleIterPath.class, 1),
+    check(A + "[b, text()]", "", count(SingleIterPath.class, 1),
         type(IterStep.class, "(element(b)|text())*"));
 
     // union expression will be further rewritten to single path
-    check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b | c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b | c) = (b | c)]", "", empty(List.class), count(SingleIterPath.class, 2));
+    check(A + "[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
+    check(A + "[(b | c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
+    check(A + "[(b | c) = (b | c)]", "", empty(List.class), count(SingleIterPath.class, 2));
 
     // list in the root of a path expression
-    check("<a/>[(b, c)/d]", "", empty(List.class), count(IterPath.class, 1));
+    check(A + "[(b, c)/d]", "", empty(List.class), count(IterPath.class, 1));
 
     // do not rewrite paths that yield no nodes
     check("(<a/>, <b/>)/name()", "a\nb", exists(List.class));
@@ -944,21 +960,21 @@ public final class PathTest extends SandboxTest {
 
   /** Remove redundant paths and predicates. */
   @Test public void redundantPaths() {
-    check("<a/>/*[*]/*", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[*]/*", "", count(IterPath.class, 1), empty(SingleIterPath.class));
     check("<a>X</a>/text()[..]/..", "<a>X</a>", empty(SingleIterPath.class));
 
     // no rewriting
-    check("<a/>/*[*]/text()", "", count(IterPath.class, 1), exists(SingleIterPath.class));
+    check(A + "/*[*]/text()", "", count(IterPath.class, 1), exists(SingleIterPath.class));
 
-    check("<a/>/*[a]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a/b]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[a]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[a]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[a/b]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check(A + "/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
 
     // GH-2193: Bug on child node selection
     query("<X><a><b><c/></b><d/></a></X>/*[*/*]/*", "<b><c/></b>\n<d/>");
-    check("<X/>/*[a/b]/a", "", count(IterPath.class, 2));
-    check("<X/>/*[a/b]/a/c", "", count(IterPath.class, 2));
+    check(A + "/*[a/b]/a", "", count(IterPath.class, 2));
+    check(A + "/*[a/b]/a/c", "", count(IterPath.class, 2));
   }
 
   /** Check existence of paths in predicates. */
@@ -1045,8 +1061,8 @@ public final class PathTest extends SandboxTest {
   @Test public void simpleMapToPath() {
     execute(new CreateDB(NAME, "<xml><a/></xml>"));
     check("/xml ! a", "<a/>", root(IterPath.class));
-    check("<a/> ! a ! b ! c ! d ! e", "", root(IterPath.class), empty(IterMap.class));
-    check("<a/> ! a ! descendant::x", "", root(DualIterMap.class), exists(IterPath.class));
+    check(A + " ! a ! b ! c ! d ! e", "", root(IterPath.class), empty(IterMap.class));
+    check(A + " ! a ! descendant::x", "", root(DualIterMap.class), exists(IterPath.class));
   }
 
   /** Optimize inlined path steps. */
@@ -1089,8 +1105,13 @@ public final class PathTest extends SandboxTest {
     error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVTYPE_X);
 
     // axis followed by attribute step
-    check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()*"));
-    check("<x/>/../@*", null, type("IterStep[@axis = 'parent']", "element()?"));
+    check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()+"));
+    check("<x><y/></x>/y/ancestor-or-self::*", "<x><y/></x>\n<y/>",
+        type("IterStep[@axis = 'ancestor-or-self']", "element()+"));
+    check("<x/>/ancestor-or-self::*", "<x/>", root(CElem.class));
+    check("<x><y/></x>/y/../@*", null, type("IterStep[@axis = 'parent']", "element()?"));
+    check("<x a='1'/>/@a/..", "<x a=\"1\"/>", type("IterStep[@axis = 'parent']", "element()?"));
+    check("<x a='1'/>/@a/parent::text()", "", empty());
 
     // steps with zero or one results
     check("<a/>/*[1]/*[1]", "", type(IterPath.class, "element()?"));
@@ -1107,8 +1128,8 @@ public final class PathTest extends SandboxTest {
         iterative);
     check("jtree({ 'A': [ { 'B': 1 }, { 'B': 2 } ], 'C': { 'B': 3 } })/*"
         + "/(if (self::jnode(*, array(*))) then * else .)/B ! jvalue()", "1\n2\n3", iterative);
-    check("head(<a>{ (1 to 100000) ! <b/> }</a>/(if (b) then b else .)) ! name()", "b",
-        iterative);
+    check("head(<a>{ (1 to" + wrap(100000) + ") ! <b/> }</a>/(if (b) then b else .)) ! name()",
+        "b", iterative);
     check("<a><b t='x'><c/></b><b t='y' z=''/><b/></a>/b/(switch (@t) case 'x' return * "
         + "case 'y' return @z default return .) ! name()", "c\nz\nb", iterative);
     check("<a><b><c/></b><d z=''/><e/></a>/*/(typeswitch (.) case element(b) return * "

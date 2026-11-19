@@ -48,7 +48,7 @@ public final class MapBuild extends MapMerge {
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
     final boolean fiKey = keys instanceof FuncItem || keys instanceof Closure;
-    Type kt = fiKey || keys.size() == 0 ? s1t.type : BasicType.ITEM;
+    Type kt = fiKey || keys.size() == 0 ? s1t.type : returnType(keys).type;
     if(fiKey) {
       arg(1, arg -> arg.refineFunc(cc, s1t));
       kt = arg(1).funcType().refinedType.type;
@@ -56,13 +56,23 @@ public final class MapBuild extends MapMerge {
     kt = kt.atomic();
 
     final boolean fiValue = value instanceof FuncItem || value instanceof Closure;
-    SeqType vt = fiValue || value.size() == 0 ? s1t : Types.ITEM_ZM;
+    SeqType vt = fiValue || value.size() == 0 ? s1t : returnType(value);
     if(fiValue) {
       arg(2, arg -> arg.refineFunc(cc, s1t));
       vt = arg(2).funcType().refinedType;
     }
     assignType(kt, vt, cc);
     return this;
+  }
+
+  /**
+   * Returns the return type of a function argument.
+   * @param func function
+   * @return return type
+   */
+  private static SeqType returnType(final Expr func) {
+    final FuncType ft = func.funcType();
+    return ft != null ? ft.refinedType : Types.ITEM_ZM;
   }
 
   @Override

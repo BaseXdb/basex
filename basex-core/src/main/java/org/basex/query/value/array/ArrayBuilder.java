@@ -82,7 +82,7 @@ public final class ArrayBuilder {
    * @return array
    */
   public XQArray array(final Expr expr) {
-    return expr.seqType().type instanceof final ArrayType at ? array(at) : array();
+    return SeqType.runtime(expr.seqType().type) instanceof final ArrayType at ? array(at) : array();
   }
 
   /**

@@ -10,6 +10,7 @@ import java.util.zip.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -29,6 +30,11 @@ public final class FnHash extends StandardFunc {
     final Item value = atomItem(arg(0), qc);
     final String algorithm = toStringOrNull(arg(1), qc);
     return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 
   /**

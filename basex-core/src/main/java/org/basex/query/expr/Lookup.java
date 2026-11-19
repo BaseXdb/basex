@@ -135,8 +135,8 @@ public final class Lookup extends Arr {
       if(is == 1) return rewrite.apply(inputs, keys);
       // focus-dependent key:  INPUTS?KEY → for $item in INPUTS return REWRITE($item, KEY)
       if(keys.has(Flag.CTX)) {
-        final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
-        return flwor.finish(inputs, null, rewrite.apply(flwor.item(), keys));
+        final FLWORBuilder flwor = new FLWORBuilder(inputs, 1, cc, info);
+        return flwor.finish(null, rewrite.apply(flwor.item(), keys));
       }
       // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
       return SimpleMap.get(cc, info, inputs,
@@ -149,11 +149,11 @@ public final class Lookup extends Arr {
       if(is == 1) return SimpleMap.get(cc, info, keys,
           cc.get(keys, true, () -> rewrite.apply(inputs, ContextValue.get(cc, info))));
       // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
-      final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
+      final FLWORBuilder flwor = new FLWORBuilder(inputs, 1, cc, info);
       final Expr next = cc.get(keys, true, () ->
         rewrite.apply(flwor.item(), ContextValue.get(cc, info)));
       final Expr rtrn = SimpleMap.get(cc, info, keys, next);
-      return flwor.finish(inputs, null, rtrn);
+      return flwor.finish(null, rtrn);
     }
     return this;
   }

@@ -259,7 +259,10 @@ public final class Window extends Clause {
 
   @Override
   public Clause optimize(final CompileContext cc) throws QueryException {
-    exprType.assign(expr.seqType().union(Occ.ZERO));
+    // windows are never empty
+    final SeqType st = expr.seqType();
+    final Occ occ = st.occ.intersect(Occ.ONE_OR_MORE);
+    exprType.assign(occ != null ? st.with(occ) : st);
     var.refineType(seqType(), cc);
     return this;
   }
@@ -285,13 +288,13 @@ public final class Window extends Clause {
     if(dist == -1 || !unused.test(end.onlyPos())) return false;
 
     final Var in = cc.var("input", info);
+    iter.set(new Let(in, expr).optimize(cc));
     Expr max = cc.function(Function.COUNT, info, VarRef.get(info, in));
     if(only) max = new Arith(info, max, Itr.get(dist), Calc.SUBTRACT).optimize(cc);
     final Expr range = new Range(info, Itr.ONE, max).optimize(cc);
     final Expr sub = cc.function(Function.SUBSEQUENCE, info, VarRef.get(info, in),
         VarRef.get(info, spos), Itr.get(dist + 1));
 
-    iter.set(new Let(in, expr).optimize(cc));
     iter.add(new For(spos, range).optimize(cc));
     iter.add(new Let(var, sub).optimize(cc));
     return true;
@@ -348,9 +351,10 @@ public final class Window extends Clause {
 
   @Override
   public void calcSize(final long[] minMax) {
-    // number of results cannot be anticipated
-    minMax[0] = 0;
-    minMax[1] = expr.seqType().zero() ? 0 : -1;
+    // number of results cannot be anticipated, unless each item may start a window
+    final SeqType st = expr.seqType();
+    if(start.expr != Bln.TRUE || only || !st.oneOrMore()) minMax[0] = 0;
+    minMax[1] = st.zero() ? 0 : -1;
   }
 
   @Override

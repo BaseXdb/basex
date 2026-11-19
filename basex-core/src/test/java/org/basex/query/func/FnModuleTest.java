@@ -431,7 +431,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ()"), false, empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" <a>A</a>/text()"), true, exists(EXISTS));
+    check(func.args(opaque("<a>A</a>") + "/text()"), true, exists(EXISTS));
     // function is replaced by its argument (argument yields no result)
     check("(false(), true())[" + func.args(" .") + "]", true, empty(func));
     // no replacement
@@ -1397,6 +1397,8 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" 1 to 100_000_000") + ')', 100000000);
     check(func.args(" void(1)"), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(BytSeq.class));
+    check(func.args(" one-or-more((1 to 6)[. > 2]) ! (. mod 2)"), "1\n0",
+        type(func, "xs:integer+"));
 
     // remove duplicate expressions
     check(func.args(" (1, <_/>, 1)"), "1\n", count(Itr.class, 1));
@@ -1767,6 +1769,11 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void elementToMap() {
     final Function func = Function.ELEMENT_TO_MAP;
+    check("for $a in (<a/>, <a/>) return " + func.args(" $a") + " => map:size()", "1\n1",
+        type(func, "map(xs:string, item()?)"));
+    // plans may skip the root element
+    query("exists(" + func.args(" <a/>", " { 'plan': { 'a': { 'layout': 'deep-skip' } } }") + ')',
+        false);
     query(func.args(" <a>10</a>") + "?a instance of xs:integer", true);
     query(func.args(" <a>10.0</a>") + "?a instance of xs:decimal", true);
     query(func.args(" <a>10e0</a>") + "?a instance of xs:double", true);
@@ -2003,6 +2010,9 @@ public final class FnModuleTest extends SandboxTest {
         exists(IterFilter.class));
     check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
+    check(func.args(" (1 to 6)[. > 2]", " (fn($x) { $x > 3 }, fn($x) { $x >= 4 })" +
+        " => items-at(" + _RANDOM_INTEGER.args(2) + " + 1)"), "4\n5\n6", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:integer*"));
 
     check(func.args(9, " { 9: true() }"), 9);
     check(func.args(9, " { 9: false() }"), null);
@@ -2362,6 +2372,9 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(5, " op('*')"), 5);
     query(func.args(" reverse(1 to 6)", " op('*')"), "6\n10\n12\n12\n10\n6");
+    check(func.args(" 1 to 2", " (string#1, fn($x) { string($x) }) => items-at(" +
+        _RANDOM_INTEGER.args(2) + " + 1)"), "1\n2", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:string+"));
 
     inline(true);
     // pre-compute result size
@@ -2715,6 +2728,9 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void hash() {
     final Function func = HASH;
+    check("for $a in (<_>a</_>, <_>a</_>) return string(" + func.args(" $a") + ')',
+        "0CC175B9C0F1B6A831C399E269772661\n0CC175B9C0F1B6A831C399E269772661",
+        type(func, "xs:hexBinary"));
     query("string(" + func.args(" ()") + ")", "");
     query("string(" + func.args("") + ")", "D41D8CD98F00B204E9800998ECF8427E");
     query("string(" + func.args("", " ()") + ")", "D41D8CD98F00B204E9800998ECF8427E");
@@ -3124,6 +3140,8 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void innermost() {
     final Function func = INNERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+    check(func.args(" one-or-more((<a><b/></a>, <b/>)[. = ''])"), "<a><b/></a>\n<b/>",
+        type(func, "element(a|b)+"));
   }
 
   /** Test method. */
@@ -3482,10 +3500,10 @@ return
     // value types of child JNodes
     final String maps = "for $m in ({ 'a': [ 1, 2 ] }, { 'a': [ 3 ] }) return ";
     check(maps + "$m/a", "{\"a\":[1,2]}\n{\"a\":[3]}",
-        type("*[@axis = 'child']", "jnode(a, array(xs:integer))*"));
+        type("*[@axis = 'child']", "jnode(a, array(xs:integer))"));
     check(maps + COUNT.args(" $m/a/*"), "2\n1", exists("*[@type = 'jnode(*, xs:integer)*']"));
     check(maps + "$m/a/* ! " + JVALUE.args(), "1\n2\n3", type(JVALUE, "xs:integer"));
-    check(maps + JVALUE.args(" $m/a"), "[1,2]\n[3]", type(JVALUE, "array(xs:integer)?"));
+    check(maps + JVALUE.args(" $m/a"), "[1,2]\n[3]", type(JVALUE, "array(xs:integer)"));
     check(maps + "$m/a/self::jnode(*, array(*)) ! " + JVALUE.args(), "[1,2]\n[3]",
         empty("*[@axis]"));
     check(maps + "$m/a/self::jnode(*, map(*))", "", empty());
@@ -4168,6 +4186,17 @@ return
   }
 
   /** Test method. */
+  @Test public void monthFromDateTime() {
+    final Function func = MONTH_FROM_DATETIME;
+    final String dates = "for $d in (<_>2000-02-03</_>, <_>2001-03-04</_>) return ";
+    check(dates + func.args(" xs:date($d)"), "2\n3", type(func, "xs:integer"));
+    check(dates + func.args(" dateTime(xs:date($d), xs:time('00:00:00'))"), "2\n3",
+        type(func, "xs:integer"));
+    check(dates + func.args(" xs:gYear(substring($d, 1, 4))"), "", type(func, "xs:integer?"));
+    check(dates + func.args(" $d"), "2\n3", type(func, "xs:integer?"));
+  }
+
+  /** Test method. */
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
@@ -4178,6 +4207,13 @@ return
 
     error(func.args("p ", " <e/>"), INVTYPE_X);
     error(func.args("p:q", " <e/>"), INVTYPE_X);
+  }
+
+  /** Test method. */
+  @Test public void nilled() {
+    final Function func = NILLED;
+    check(func.args(" <a/>"), false, type(func, "xs:boolean"));
+    check(func.args(" (<a/>, text { 'a' })[. = '']"), false, type(func, "xs:boolean?"));
   }
 
   /** Test method. */
@@ -4307,7 +4343,7 @@ return
 
     check(func.args(" empty((1, 2)[. = 1])"), true, root(Bln.class));
     check(func.args(" exists((1, 2)[. = 1])"), false, root(Bln.class));
-    check(func.args(" <a/>/text()"), true, exists(EMPTY));
+    check(func.args(opaque("<a/>") + "/text()"), true, exists(EMPTY));
     // function is replaced with fn:boolean
     check(func.args(func.args(" ((1, 2)[. = 1])")), true, exists(BOOLEAN));
 
@@ -4404,6 +4440,8 @@ return
   @Test public void outermost() {
     final Function func = OUTERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+    check(func.args(" (<a><b/></a>, <b/>)[. = '']"), "<a><b/></a>\n<b/>",
+        type(func, "element(a|b)*"));
   }
 
   /** Test method. */
@@ -6591,7 +6629,7 @@ return
     query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
 
     // GH-2315
-    check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
+    check("(1 to 6) ! " + func.args(opaque("<a/>") + "/*", " .", 1), "", root(_UTIL_RANGE));
 
     // large offsets and lengths (no integer overflow)
     query(func.args(" 1 to 2000", 2000, 9223372036854775807L), 2000);
@@ -6792,6 +6830,11 @@ return
   @Test public void sum() {
     final Function func = SUM;
     query(func.args(1), 1);
+    check(func.args(" (1 to 6)[. > 2]"), 18, type(func, "xs:integer"));
+    check(func.args(" (1 to 6)[. > 2]", " ()"), 18, type(func, "xs:integer?"));
+    // empty input yields the integer 0
+    check(func.args(" (1 to 6)[. > 6] ! xs:double(.)"), 0, type(func, "xs:numeric"));
+    query(func.args(" (1 to 6)[. > 6] ! xs:double(.)") + " instance of xs:double?", false);
     query(func.args(" 1 to 10"), 55);
     query(func.args(" 1 to 3037000499"), 4611686016981624750L);
     query(func.args(" 1 to 3037000500"), 4611686020018625250L);
@@ -6936,6 +6979,9 @@ return
     final Function func = TAKE_WHILE;
 
     query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
+    check(func.args(" (1 to 6)[. > 2]", " (fn($x) { $x < 5 }, fn($x) { $x <= 4 })" +
+        " => items-at(" + _RANDOM_INTEGER.args(2) + " + 1)"), "3\n4", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:integer*"));
 
     // closure
     check("for $a in (1 to 2)[. > 0] return " +

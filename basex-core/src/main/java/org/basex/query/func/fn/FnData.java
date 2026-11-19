@@ -28,7 +28,6 @@ public final class FnData extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = usesContext();
     final Expr input = contextArg(cc);
 
     if(input != null) {
@@ -39,7 +38,7 @@ public final class FnData extends ContextFn {
       if(type == st.type) {
         // data('x') → 'x'
         // $string[data() = 'a'] → $string[. = 'a']
-        return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
+        return contextExpr(input, cc);
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
       if(type != null) exprType.assign(type.seqType(st.atomOcc()), input.atomSize());

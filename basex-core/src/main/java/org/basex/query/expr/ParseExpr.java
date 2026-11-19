@@ -1080,8 +1080,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Value coerce(final Value value, final SeqType type, final Expr expr,
       final QueryContext qc) throws QueryException {
-    return type.instance(value, true) ? value :
-      type.coerce(value, qc, info, argName(expr), null);
+    return type.coerce(value, qc, info, argName(expr), null);
   }
 
   /**

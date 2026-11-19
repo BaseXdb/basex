@@ -333,10 +333,15 @@ public final class GFLWOR extends ParseExpr {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
     if(ret && minMax[1] != 0) {
-      final long size = rtrn.size();
-      minMax[0] *= Math.max(size, 0);
-      if(minMax[1] > 0) minMax[1] = size >= 0 ? minMax[1] * size : -1;
-      else if(size == 0) minMax[1] = 0;
+      long min = rtrn.size(), max = min;
+      if(min < 0) {
+        final SeqType st = rtrn.seqType();
+        min = st.occ.min;
+        max = st.zeroOrOne() ? 1 : -1;
+      }
+      minMax[0] *= min;
+      if(minMax[1] > 0) minMax[1] = max >= 0 ? minMax[1] * max : -1;
+      else if(max == 0) minMax[1] = 0;
     }
     return minMax;
   }

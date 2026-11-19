@@ -792,6 +792,17 @@ public final class GFLWORTest extends SandboxTest {
         empty(While.class));
   }
 
+  /** Static types of windows. */
+  @Test public void windowType() {
+    final String input = "(1 to 6)[. > 3]";
+    // windows are never empty
+    check("for tumbling window $w in " + input + " start when true() return head($w)",
+        "4\n5\n6", type(Window.class, "xs:integer+"), type(GFLWOR.class, "xs:integer*"));
+    // each item starts a window
+    check("for tumbling window $w in one-or-more(" + input + ") start when true() " +
+        "return head($w)", "4\n5\n6", type(GFLWOR.class, "xs:integer+"));
+  }
+
   /** Sliding windows with a fixed size. */
   @Test public void windowToSubsequence() {
     final String window = "for sliding window $w in (2, 4, 6, 8, 10, 12) start at $s when true() ";

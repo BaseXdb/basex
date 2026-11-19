@@ -467,6 +467,26 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Indicates if the nodes returned by this expression have no parent.
+   * @return result of check
+   */
+  public boolean parentless() {
+    return false;
+  }
+
+  /**
+   * Returns the occurrence indicator of the child or attribute nodes of the returned node that
+   * match the specified test.
+   * @param test test
+   * @param attributes attribute or child nodes
+   * @return occurrence indicator (can be {@code null})
+   */
+  public Occ childOcc(@SuppressWarnings("unused") final Test test,
+      @SuppressWarnings("unused") final boolean attributes) {
+    return null;
+  }
+
+  /**
    * Indicates if this expression is <i>navigational</i>: a context reference, an axis step, or a
    * (syntactic) combination thereof. Used by the path operator to decide whether a step navigates
    * to nodes or is rewritten to a dynamic selector for JNode navigation.

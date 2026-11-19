@@ -119,6 +119,7 @@ public final class ProfModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void type() {
     final Function func = _PROF_TYPE;
+    check(func.args(" (1 to 6)[. > 4]"), "5\n6", type(func, "xs:integer*"));
     query(func.args(" ()"), "");
     query(func.args(1), 1);
     query(func.args(" (1, 2, 3)"), "1\n2\n3");

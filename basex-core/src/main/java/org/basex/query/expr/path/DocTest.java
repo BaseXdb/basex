@@ -22,6 +22,14 @@ public final class DocTest extends Test {
     this.child = child;
   }
 
+  /**
+   * Returns the child test.
+   * @return child test
+   */
+  public Test child() {
+    return child;
+  }
+
   @Override
   public Test copy() {
     return new DocTest(child);

@@ -1,0 +1,28 @@
+(: external variables of the static type soundness test :)
+declare variable $i as xs:integer external;
+declare variable $io as xs:integer? external;
+declare variable $is as xs:integer* external;
+declare variable $ip as xs:integer+ external;
+declare variable $dc as xs:decimal external;
+declare variable $d as xs:double external;
+declare variable $s as xs:string external;
+declare variable $so as xs:string? external;
+declare variable $ss as xs:string* external;
+declare variable $u as xs:untypedAtomic external;
+declare variable $x external;
+declare variable $e as element(a) external;
+declare variable $es as element(a)* external;
+declare variable $doc as document-node(element(a)) external;
+declare variable $a as array(xs:integer) external;
+declare variable $as as array(xs:string)* external;
+declare variable $m as map(xs:string, xs:integer) external;
+declare variable $r as record(a as xs:integer, b as xs:string) external;
+declare variable $f as fn(xs:integer) as xs:string external;
+declare variable $g as fn(xs:integer) as xs:boolean external;
+declare variable $h as fn(xs:integer, xs:integer) as xs:integer external;
+declare variable $b as xs:boolean external;
+declare variable $dt as xs:date external;
+declare variable $dto as xs:date? external;
+declare variable $dtm as xs:dateTime external;
+declare variable $dur as xs:dayTimeDuration external;
+declare variable $ym as xs:yearMonthDuration external;

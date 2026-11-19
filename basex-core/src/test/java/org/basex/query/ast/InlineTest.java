@@ -255,4 +255,17 @@ public final class InlineTest extends SandboxTest {
     query("declare function local:f($a) as item()+ { data($a) }; local:f(<_/>)", "");
     query("declare function local:f($a) as item()* { data($a) }; local:f(<_/>)", "");
   }
+
+  /** Static functions that are only referenced by function items in coerced values. */
+  @Test public void funcItemsInCoercedValues() {
+    final String g = "declare %basex:inline(0) function local:g() { random:integer(1) }; ";
+    // enough items to prevent unrolling
+    final String strings = "'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'";
+    check(g + "let $s as (xs:string | fn() as xs:integer)* := (" + strings +
+        ", fn() { local:g() }) return sum($s ! (if(. instance of fn(*)) then .() else 0))", 0,
+        root(StaticFunc.class));
+    check(g + "let $a as array((xs:string | fn() as xs:integer)*) := [ ('a', 'b'), " + strings +
+        ", fn() { local:g() } ] return array:size($a[random:integer(1) = 0])", 14,
+        root(StaticFunc.class));
+  }
 }

@@ -924,7 +924,7 @@ public final class XQuery4Test extends SandboxTest {
   /** Path extensions: dynamic node test {expr}. */
   @Test public void pathSelector() {
     check("<a><b/></a>/self::{#a}", "<a><b/></a>", root(CElem.class));
-    check("<a><b/></a>/child::{#b}", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/child::{#b}", "<b/>", type(IterStep.class, "element(b)"));
     check("<a><b/></a>/descendant-or-self::{#b}", "<b/>", type(IterStep.class, "element(b)*"));
     check("<a><b/></a>/child::{#c}", "", type(IterStep.class, "element(c)*"));
     check("<a><b/></a>/child::{()}", "", empty());
@@ -933,18 +933,18 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/child::{#c, 1}", "", exists(SelectorStep.class));
 
     check("<a><b/><c/></a>/child::{#c, #b}", "<b/>\n<c/>",
-        type(IterStep.class, "element(c|b)*"));
+        type(IterStep.class, "element(c|b)+"));
     check("let $names := (#c, #b) return <a><b/><c/></a>/child::{$names}", "<b/>\n<c/>",
-        type(IterStep.class, "element(c|b)*"));
+        type(IterStep.class, "element(c|b)+"));
 
     check("<a><b/><c/></a>/(c | child::{#b})", "<b/>\n<c/>",
-        type(IterStep.class, "element(c|b)*"));
+        type(IterStep.class, "element(c|b)+"));
     check("<a><b/><c/></a>/child::{xs:QName('c')}", "<c/>",
-        type(IterStep.class, "element(c)*"));
+        type(IterStep.class, "element(c)+"));
     check("<a><b/><c/></a>/child::{xs:QName(<?_ c?>)}", "<c/>",
         exists(SelectorStep.class));
     check("let $name := #b return <a><b/><c/></a>/child::{$name}", "<b/>",
-        type(IterStep.class, "element(b)*"));
+        type(IterStep.class, "element(b)+"));
 
     // match local name against string values
     check("<a><b/></a>/child::{'b'}", "<b/>", exists(SelectorStep.class));
@@ -965,7 +965,7 @@ public final class XQuery4Test extends SandboxTest {
 
     // attribute axis
     check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(SelectorStep.class));
-    check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
+    check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)"));
     check("string(<x a='1' b='2'/>/@{#a})", "1", root(STRING));
 
     // selector must survive step merging (descendant-or-self::node()/self::{E});

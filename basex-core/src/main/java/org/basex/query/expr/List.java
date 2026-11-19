@@ -283,7 +283,7 @@ public final class List extends Arr {
    */
   public Expr toUnion(final CompileContext cc) throws QueryException {
     return seqType().type instanceof NodeType ?
-      cc.replaceWith(this, new Union(info, exprs)).optimize(cc) : this;
+      cc.replaceWith(this, new Union(info, exprs), false).optimize(cc) : this;
   }
 
   /**

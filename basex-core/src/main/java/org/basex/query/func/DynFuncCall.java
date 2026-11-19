@@ -118,7 +118,9 @@ public final class DynFuncCall extends FuncCall {
       if(!updating && ft.updating()) {
         throw FUNCUP_X.get(info, func);
       }
-      exprType.assign(ft.refinedType);
+      // each function item is invoked: (abs#1, round#1)(1) → (1, 1)
+      final SeqType rt = ft.refinedType;
+      exprType.assign(rt.with(func.seqType().occ.multiply(rt.occ)));
     }
 
     if(struct) {

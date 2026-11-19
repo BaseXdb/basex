@@ -174,8 +174,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // no root, no nesting: assign context value (can be null)
-    if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
+    // no root, no dummy: assign context value (can be null)
+    if(root == null && !(cc.qc.focus.value instanceof Dummy)) root = cc.qc.focus.value;
 
     // remove redundant steps, find empty steps
     Expr expr = cleanSteps(cc);
@@ -213,13 +213,12 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr;
 
     // choose the best path implementation (dummy will be used for type checking)
-    final Expr input = root == null && rt instanceof Dummy ? rt : root;
-    final Expr path = copyType(get(info, input, steps));
+    final Expr path = copyType(get(info, rt, steps));
     if(path instanceof final AxisPath ap) {
       ap.optimize();
     } else if(path instanceof final MixedPath mp) {
       // a/(if (@x) then * else .): not checked when parsed, as steps may be incomplete
-      mp.iterative = iterative(input, mp.steps);
+      mp.iterative = iterative(rt, mp.steps);
     }
     return path;
   }
@@ -308,8 +307,8 @@ public abstract class Path extends ParseExpr {
   private Expr splitPredicates(final CompileContext cc) throws QueryException {
     // for $o in O return db:get('db')/a/b[@id > $o/@r] → (db:get('db')/a/b)[@id > $o/@r]
     final int last = steps.length - 1;
-    if(!(root instanceof Value) || root instanceof Dummy ||
-        !(steps[last] instanceof final Step step) || step.mayBePositional()) return this;
+    if(!(root instanceof Value) || !(steps[last] instanceof final Step step) ||
+        step.mayBePositional()) return this;
 
     final Expr[] preds = step.exprs;
     final int p = Checks.index(preds, Expr::hasFreeVars);
@@ -430,17 +429,16 @@ public abstract class Path extends ParseExpr {
       Expr step = steps[s];
       final Expr prev = list.isEmpty() ? cc.focusOr(root) : list.peek();
       if(prev != null) {
-        final SeqType seqType = prev.seqType();
-        final Type pt = seqType.type;
+        final Type pt = prev.seqType().type;
         // $node/./a → $node/a, a/self::node()/b → a/b
         if(pt instanceof NodeType && (step instanceof ContextValue ||
-            step instanceof final Step stp && stp.remove(seqType))) {
+            step instanceof final Step stp && stp.remove(prev))) {
           removed = true;
           continue;
         }
         // $doc/following-or-self::x → $doc/self::x, $array/descendant::* → $array/child::*
         if(step instanceof final Step stp) {
-          final Axis axis = stp.axis(seqType);
+          final Axis axis = stp.axis(prev);
           if(axis != null && axis != stp.axis) {
             step = Step.get(cc, prev, stp.info(info), axis, stp.test, stp.selector, stp.exprs);
             cc.info(QueryText.OPTREWRITE_X_X, stp.axis, step);
@@ -500,7 +498,8 @@ public abstract class Path extends ParseExpr {
       Expr prev = rt;
       for(final Expr step : steps) {
         if(step instanceof final Step stp) {
-          if(stp.empty(prev.seqType())) return true;
+          // constructed nodes have no parent: <a/>/.. → ()
+          if(stp.empty(prev)) return true;
           // later steps must not discard a failing selector
           if(stp.selectorMayFail()) return false;
         }

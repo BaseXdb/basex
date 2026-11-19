@@ -58,6 +58,12 @@ public final class FuncItemTest extends SandboxTest {
         + "return function-lookup($n, 0) instance of fn() as xs:integer", true);
   }
 
+  /** Dynamic call of multiple function items. */
+  @Test public void multipleFunctions() {
+    check("(abs#1, round#1)[" + _RANDOM_INTEGER.args(1) + " = 0](2)", "2\n2",
+        type(DynFuncCall.class, "xs:numeric*"));
+  }
+
   /** Coercion error in a function call: the variable stack must stay intact. */
   @Test public void coercionError() {
     query("declare function local:x($x as xs:integer) { $x }; "

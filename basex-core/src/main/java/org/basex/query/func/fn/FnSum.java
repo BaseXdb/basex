@@ -10,6 +10,7 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -47,8 +48,11 @@ public class FnSum extends NumericFn {
       // no default value
       if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
       if(!st.mayBeWrapped()) {
-        final SeqType ost = optType(values);
-        if(ost != null) exprType.assign(ost);
+        // empty input: integer zero
+        final Type type = sumType(values);
+        if(type != null) {
+          exprType.assign(st.oneOrMore() ? type : type.union(INTEGER), Occ.EXACTLY_ONE);
+        }
       }
     } else if(st.zero()) {
       if(zero == Empty.VALUE || stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) {
@@ -58,7 +62,8 @@ public class FnSum extends NumericFn {
       // sum($nonempty, $zero) → sum($nonempty)  (default value unused)
       if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
       final SeqType ost = optType(values), zst = optType(zero);
-      final Type type = ost != null && zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
+      final Type type = ost == null ? ANY_ATOMIC_TYPE : stZero.zero() ? ost.type :
+        zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
       final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
       exprType.assign(type, occ);
     }
@@ -179,6 +184,25 @@ public class FnSum extends NumericFn {
     final Expr count = new Arith(info, cc.function(Function.COUNT, info,
         input.copy(cc, new IntObjectMap<>())), num, Calc.MULTIPLY).optimize(cc);
     return new Arith(info, pos == 0 ? sum : count, pos == 0 ? count : sum, calc).optimize(cc);
+  }
+
+  /**
+   * Returns the numeric type of the summed values.
+   * @param values values
+   * @return type (can be {@code null})
+   */
+  static Type sumType(final Expr values) {
+    final SeqType st = optType(values);
+    if(st == null) return null;
+    if(!(values instanceof final List list)) return st.type;
+    // sum(($int, $dbl)) → xs:double: non-empty operands are promoted
+    Type type = null;
+    for(final Expr expr : list.args()) {
+      final SeqType ost = optType(expr);
+      if(ost == null || !ost.oneOrMore()) return st.type;
+      type = type == null ? ost.type : Calc.ADD.type(type, ost.type);
+    }
+    return type;
   }
 
   /**

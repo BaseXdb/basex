@@ -50,6 +50,15 @@ public final class RewritingsTest extends SandboxTest {
     check("sum(" + _DB_GET.args(NAME) + ")", 3, empty(_DB_GET));
   }
 
+  /** Static types of additions and subtractions with operands of unknown type. */
+  @Test public void arithUnknownOperand() {
+    final String input = "for $x in (1, <a>2</a>, [ 3 ]) return ";
+    check(input + "$x + 1", "2\n3\n4", type(Arith.class, "xs:numeric?"));
+    check(input + "1 - $x", "0\n-1\n-2", type(Arith.class, "xs:numeric?"));
+    check(input + "xs:untypedAtomic('1') + $x", "2\n3\n4", type(Arith.class, "xs:double?"));
+    check(input + "$x * 1", "1\n2\n3", type(Arith.class, "xs:anyAtomicType?"));
+  }
+
   /** Casts. */
   @Test public void gh1795() {
     check("for $n in 1 to 3 return xs:integer($n)[. = 1]", 1, empty(Cast.class));
@@ -117,7 +126,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>/<a/>", "<a/>", root(CElem.class));
     check("(<a/>/{ 1:2 })?1", 2, root(Itr.class));
     check("<a/>/self::a/count(.)", 1, root(Itr.class));
-    check("<a/>/a/count(.)", "", root(DualMap.class));
+    check(opaque("<a/>") + "/a/count(.)", "", root(DualMap.class));
 
     // no rewriting possible
     check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
@@ -250,9 +259,9 @@ public final class RewritingsTest extends SandboxTest {
     check("<x>A</x>[string(.) = 'A']", "<x>A</x>", empty(STRING));
     check("<A>A</A> ! string() = data(<A>B</A>)", false, empty(STRING));
 
-    check("max(<_>1</_> ! string(@a))", "", root(STRING));
+    check("max(" + opaque("<_>1</_>") + " ! string(@a))", "", root(STRING));
     check("max((<_>1</_>, <_>2</_>) ! string(@a))", "", root(MAX));
-    check("min(<_ _='A'/>/@_ ! string())", "A", root(MIN));
+    check("min(" + opaque("<_ _='A'/>") + "/@_ ! string())", "A", root(MIN));
 
     check("string(" + wrap(1) + "[.= 1]) =" + wrap(1), true, exists(STRING));
   }
@@ -429,7 +438,7 @@ public final class RewritingsTest extends SandboxTest {
     // rewritings in comparisons
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
-    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
+    check("let $a :=" + opaque("<_>A</_>") + " return $a ! text() = $a ! text()", true,
         root(Pipeline.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
@@ -597,7 +606,8 @@ public final class RewritingsTest extends SandboxTest {
   /** Merge fn:empty and fn:exist functions. */
   @Test public void gh1829() {
     // paths with constructor roots are guarded: no union
-    check("exists(<a/>/a) or exists(<b/>/b)",
+    final String a = opaque("<a/>"), b = opaque("<b/>");
+    check("exists(" + a + "/a) or exists(" + b + "/b)",
         false, root(Or.class), empty(BOOLEAN), empty(Union.class));
     check("declare %basex:inline(0) function local:f($a as element(), $b as element()) "
         + "{ exists($a/a) or exists($b/b) }; local:f(<a/>, <b/>)",
@@ -605,11 +615,11 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) or exists($i[. = 2])",
         "true\ntrue", empty(Or.class), empty(EXISTS), root(DualMap.class));
 
-    check("<a/>/a or <b/>/b", false, root(Or.class), empty(Union.class));
-    check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
+    check(a + "/a or " + b + "/b", false, root(Or.class), empty(Union.class));
+    check(a + "[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
 
-    check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
-    check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
+    check(a + "[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
+    check(a + "[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'i'], $a[. = 'j']))]", "<a/>\n<a/>",
         root(DualMap.class), exists(NOT), empty(If.class));
 
@@ -634,13 +644,13 @@ public final class RewritingsTest extends SandboxTest {
         false, root(Bln.class));
 
     // no rewritings
-    check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class), empty(EXISTS));
+    check("exists(" + a + "/a) and exists(" + b + "/b)", false, exists(And.class), empty(EXISTS));
     check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) and exists($i[. = 2])",
         "false\nfalse", empty(And.class), empty(EXISTS), root(DualMap.class));
-    check("<a/>/a and <b/>/b", false, exists(And.class));
-    check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
+    check(a + "/a and " + b + "/b", false, exists(And.class));
+    check(a + "[a and b]", "", count(SingleIterPath.class, 2));
 
-    check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
+    check(a + "[empty(b) or empty(c)]", "<a/>", exists(Or.class));
 
     final String e1 = " tokenize(" + wrap("a b") + ')', e2 = " tokenize(" + wrap("") + ')';
     check(EMPTY.args(e1)  + " and " + EMPTY.args(e2),  false, root(EMPTY));
@@ -932,7 +942,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Reoptimize newly created fn:boolean instances. */
   @Test public void gh1856() {
-    check("if(<a/>/text()) then true() else false()", false, root(EXISTS));
+    check("if(" + opaque("<a/>") + "/text()) then true() else false()", false, root(EXISTS));
   }
 
   /** Enforce index pragma, full-text. */
@@ -1137,7 +1147,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Inline cast expressions. */
   @Test public void gh1901() {
     check("<a id='x'/>/@id ! xs:string(.)", "x", root(Cast.class));
-    check("<_/>/@id ! data()", "", root(DATA));
+    check(opaque("<_/>") + "/@id ! data()", "", root(DATA));
     check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
     check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
   }
@@ -1239,9 +1249,10 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1914() {
     check("<a/>/(self::* | self::a)", "<a/>", root(CElem.class));
 
-    check("<a/>/(* | a)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
+    final String a = opaque("<a/>");
+    check(a + "/(* | a)", "", type(IterStep.class, "element()*"));
+    check(a + "/(a | *)", "", type(IterStep.class, "element()*"));
+    check(a + "/(a | * | b)", "", type(IterStep.class, "element()*"));
 
     check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "element(a|b)+"));
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a|b)+"));
@@ -1859,7 +1870,8 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[b[@c eq '']]", "", empty(CmpV.class));
     check("<a><b c=''/></a>[b[@c eq '']] => count()", 1, empty(CmpV.class));
 
-    check("boolean(<a b=''/>[@b eq ''])", true, empty(CmpV.class), root(CmpSimpleG.class));
+    check("boolean(" + opaque("<a b=''/>") + "[@b eq ''])", true, empty(CmpV.class),
+        root(CmpSimpleG.class));
   }
 
   /** Comparisons with boolean lists. */
@@ -1872,8 +1884,10 @@ public final class RewritingsTest extends SandboxTest {
         root(DualMap.class), exists(And.class));
 
     unroll(true);
-    check("some $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(Or.class));
-    check("every $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(And.class));
+    final String e = opaque("<_/>");
+    check("some $i in 1 to 2 satisfies contains(" + e + "/*, string($i))", false, exists(Or.class));
+    check("every $i in 1 to 2 satisfies contains(" + e + "/*, string($i))", false,
+        exists(And.class));
 
     check("let $a := <a><b>1</b><c>2</c></a> "
         + "where every $b in (1, 2) satisfies $a/* = $b "
@@ -2095,11 +2109,12 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Simple maps and comparisons. */
   @Test public void gh2078() {
-    check("<_ c='1'/>/(every $c in @c satisfies contains($c, '1'))", true, root(NOT));
-    check("<_ c='1'/>/(some $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
-    check("<_ c='1'/>/((@c ! contains(., '1')) = true())", true, root(BOOLEAN));
-    check("<_ c='1'/>/(@c ! contains(., '1')) = true()", true, root(BOOLEAN));
-    check("(<_ c='1'/>/@c ! contains(., '1')) = true()", true, root(BOOLEAN));
+    final String c = opaque("<_ c='1'/>");
+    check(c + "/(every $c in @c satisfies contains($c, '1'))", true, root(NOT));
+    check(c + "/(some $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
+    check(c + "/((@c ! contains(., '1')) = true())", true, root(BOOLEAN));
+    check(c + "/(@c ! contains(., '1')) = true()", true, root(BOOLEAN));
+    check("(" + c + "/@c ! contains(., '1')) = true()", true, root(BOOLEAN));
 
     check("<xml>Ukraine</xml>[some $text in text() satisfies $text = 'Ukraine']",
         "<xml>Ukraine</xml>", count(CmpG.class, 1), empty(GFLWOR.class));
@@ -2148,10 +2163,11 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Rewrite value to general comparison. */
   @Test public void gh2082() {
-    check("<a/>/@a eq ''", "", exists(CmpV.class));
-    check("boolean(<a/>/@a eq '')", false, exists(CmpSimpleG.class));
-    check("<e a=''/>[@a eq ''] ! name()", "e", exists(CmpSimpleG.class));
-    check("<e a=''/>[@a ne ''] ! name()", "", exists(CmpSimpleG.class));
+    final String a = opaque("<a/>"), e = opaque("<e a=''/>");
+    check(a + "/@a eq ''", "", exists(CmpV.class));
+    check("boolean(" + a + "/@a eq '')", false, exists(CmpSimpleG.class));
+    check(e + "[@a eq ''] ! name()", "e", exists(CmpSimpleG.class));
+    check(e + "[@a ne ''] ! name()", "", exists(CmpSimpleG.class));
 
     execute(new CreateDB(NAME, "<e a='a'/>"));
     check("/e[@a eq 'a'] ! name()", "e", exists(ValueAccess.class));
@@ -2267,7 +2283,7 @@ public final class RewritingsTest extends SandboxTest {
         exists(IterPath.class), exists(SingleIterPath.class));
 
     // GH-2215: Unexpected exception, mapping double attributes
-    check("boolean((<a/> ! (a, b)))", false, exists(IterPath.class));
+    check("boolean((" + opaque("<a/>") + " ! (a, b)))", false, exists(IterPath.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 
@@ -2300,17 +2316,18 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Simple map, if expressions. */
   @Test public void gh2175() {
-    check("<a>A</a> ! (if(<b>B</b>/text()) then 1 else ())",
+    final String a = opaque("<a>A</a>"), b = opaque("<b>B</b>");
+    check(a + " ! (if(" + b + "/text()) then 1 else ())",
         1, root(If.class));
-    check("<a>A</a> ! (if(text()) then 1 else ())",
+    check(a + " ! (if(text()) then 1 else ())",
         1, root(If.class));
-    check("<a>A</a> ! (if(<b>B</b>/text()) then . else ())",
+    check(a + " ! (if(" + b + "/text()) then . else ())",
         "<a>A</a>", root(If.class));
-    check("<a>A</a> ! (if(text()) then . else ())",
+    check(a + " ! (if(text()) then . else ())",
         "<a>A</a>", root(IterFilter.class), empty(If.class));
-    check("<a>A</a> ! (if(text()) then data() else ())",
+    check(a + " ! (if(text()) then data() else ())",
         "A", root(DATA), empty(If.class));
-    check("<a>A</a> ! (if(text()) then string() else ())",
+    check(a + " ! (if(text()) then string() else ())",
         "A", root(DualMap.class), empty(If.class));
   }
 
@@ -2464,14 +2481,15 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Boolean comparisons in simple maps. */
   @Test public void gh2271() {
-    check("<a/>/@* ! true() = true()", false, root(EXISTS));
-    check("<a b='x'/>/@* ! true() = true()", true, root(EXISTS));
-    check("<a b='x'/>/@* ! true() != false()", true, root(EXISTS));
+    check(opaque("<a/>") + "/@* ! true() = true()", false, root(EXISTS));
+    final String a = opaque("<a b='x'/>");
+    check(a + "/@* ! true() = true()", true, root(EXISTS));
+    check(a + "/@* ! true() != false()", true, root(EXISTS));
 
-    check("<a b='x'/>/@* ! true() = false()", false, root(Bln.class));
-    check("<a b='x'/>/@* ! true() != true()", false, root(Bln.class));
-    check("<a b='x'/>/@* ! false() = true()", false, root(Bln.class));
-    check("<a b='x'/>/@* ! false() != false()", false, root(Bln.class));
+    check(a + "/@* ! true() = false()", false, root(Bln.class));
+    check(a + "/@* ! true() != true()", false, root(Bln.class));
+    check(a + "/@* ! false() = true()", false, root(Bln.class));
+    check(a + "/@* ! false() != false()", false, root(Bln.class));
   }
 
   /** Database optimization: Enabling UPDINDEX. */
@@ -2508,7 +2526,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // GH-2460
     check("<a><b/>x</a>/node()[. instance of element()]", "<b/>", type(IterPath.class,
-        "element()*"));
+        "element()+"));
   }
 
   /** Include data reference in equality check. */
@@ -3131,5 +3149,13 @@ public final class RewritingsTest extends SandboxTest {
     // first operand, or preceding operands with single items
     check(input + "$s ! (if(position() > 1) then . else ())", 2, empty(If.class));
     check(input + "head($s) ! $s ! (if(position() > 1) then . else ())", 2, empty(If.class));
+  }
+
+  /** List rewritten to union: the result size of the list must not be adopted. */
+  @Test public void listToUnion() {
+    query("let $x := <x/> return count(($x, $x) | ())", 1);
+    query("let $x := parse-xml('<x/>') return count(distinct-ordered-nodes(($x, $x, $x)))", 1);
+    query("let $j := jtree({ 'a': 1 }) let $x := parse-xml('<x/>') "
+        + "return count(($j, $x, $j/a, $x) | ())", 3);
   }
 }

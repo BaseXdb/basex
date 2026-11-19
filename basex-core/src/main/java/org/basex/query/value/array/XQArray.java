@@ -340,7 +340,7 @@ public abstract class XQArray extends XQStruct {
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
     for(final Value value : members()) ab.add(at.valueType().coerce(value, qc, ii, null, cc));
-    return ab.array(at);
+    return at.assignable() ? ab.array(at) : ab.array();
   }
 
   /**
@@ -362,7 +362,7 @@ public abstract class XQArray extends XQStruct {
       if(cast == null) return null;
       ab.add(cast);
     }
-    return ab.array(at);
+    return at.assignable() ? ab.array(at) : ab.array();
   }
 
   @Override

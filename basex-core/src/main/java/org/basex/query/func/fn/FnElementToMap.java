@@ -28,6 +28,7 @@ public final class FnElementToMap extends PlanFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     optOptions(1, ElementsOptions::new, cc);
-    return this;
+    // plans may skip the root element: element-to-map(<a/>, { 'plan': ... }) → ()
+    return optFirst(!defined(1), false, null);
   }
 }

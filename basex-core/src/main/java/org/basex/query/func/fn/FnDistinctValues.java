@@ -81,8 +81,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
         if(st.atomOcc().max <= 1)
           return type == st.type ? values : cc.function(DATA, info, exprs);
       }
-      // assign atomic type of argument
-      exprType.assign(type);
+      // assign atomic type of argument; non-empty input yields a non-empty result
+      exprType.assign(type, st.atomOcc().union(Occ.ONE_OR_MORE));
     }
     return this;
   }

@@ -24,6 +24,8 @@ public final class FLWORBuilder {
   private final CompileContext cc;
   /** Input info. */
   private final InputInfo info;
+  /** Input expression. */
+  private final Expr input;
   /** Arity. */
   private final int arity;
   /** Item variable. */
@@ -33,15 +35,21 @@ public final class FLWORBuilder {
 
   /**
    * Constructor.
+   * @param input input expression
    * @param arity arity
    * @param cc compilation context
    * @param info input info
+   * @throws QueryException query exception
    */
-  public FLWORBuilder(final int arity, final CompileContext cc, final InputInfo info) {
+  public FLWORBuilder(final Expr input, final int arity, final CompileContext cc,
+      final InputInfo info) throws QueryException {
+    this.input = input;
     this.arity = arity;
     this.cc = cc;
     this.info = info;
     item = cc.var("item", info);
+    // type the variable before references are created
+    item.refineType(input.seqType().with(Occ.EXACTLY_ONE), cc);
   }
 
   /**
@@ -103,39 +111,34 @@ public final class FLWORBuilder {
 
   /**
    * Finalizes the GFLWOR expression with an optional where clause.
-   * @param input input expression
    * @param where where expression (can be {@code null})
    * @param rtrn return expression
    * @return expression
    * @throws QueryException query exception
    */
-  public Expr finish(final Expr input, final Expr where, final Expr rtrn) throws QueryException {
-    return build(input, where == null ? null : new Where(where, info), rtrn);
+  public Expr finish(final Expr where, final Expr rtrn) throws QueryException {
+    return build(where == null ? null : new Where(where, info), rtrn);
   }
 
   /**
    * Finalizes the GFLWOR expression with a while clause.
-   * @param input input expression
    * @param cond condition
    * @param rtrn return expression
    * @return expression
    * @throws QueryException query exception
    */
-  public Expr finishWhile(final Expr input, final Expr cond, final Expr rtrn)
-      throws QueryException {
-    return build(input, new While(cond, info), rtrn);
+  public Expr finishWhile(final Expr cond, final Expr rtrn) throws QueryException {
+    return build(new While(cond, info), rtrn);
   }
 
   /**
    * Builds the GFLWOR expression.
-   * @param input input expression
    * @param clause clause after the for clause (can be {@code null})
    * @param rtrn return expression
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr build(final Expr input, final Clause clause, final Expr rtrn)
-      throws QueryException {
+  private Expr build(final Clause clause, final Expr rtrn) throws QueryException {
     final ArrayList<Clause> clauses = new ArrayList<>(lets);
     clauses.add(new For(item, pos, null, input, false).optimize(cc));
     if(clause != null) clauses.add(clause.optimize(cc));

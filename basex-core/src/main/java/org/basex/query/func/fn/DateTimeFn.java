@@ -58,4 +58,17 @@ abstract class DateTimeFn extends StandardFunc {
   protected boolean mayBeEmpty() {
     return false;
   }
+
+  /**
+   * Checks if the static type of the first argument is an instance of one of the specified types.
+   * @param types types
+   * @return result of check
+   */
+  protected final boolean argType(final Type... types) {
+    final Type type = arg(0).seqType().type;
+    for(final Type tp : types) {
+      if(type.instanceOf(tp)) return true;
+    }
+    return false;
+  }
 }
