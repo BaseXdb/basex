@@ -77,15 +77,15 @@ public final class DBNew {
   /**
    * Inserts all documents to be added to a temporary database.
    * @param name name of database
-   * @param create create new database
+   * @param target target database (can be {@code null})
    * @return resulting data clip (can be {@code null})
    * @throws QueryException query exception
    */
-  public DataClip prepare(final String name, final boolean create) throws QueryException {
+  public DataClip prepare(final String name, final Data target) throws QueryException {
     if(inputs.isEmpty()) return null;
     try {
       // temporary instance will be dropped when the updates have been applied or have failed
-      final Data data = build(name, create);
+      final Data data = build(name, target);
       clip = new DataClip(data).context(qc.context);
       qc.updates().register(clip);
       for(final NewInput input : inputs) {
@@ -118,11 +118,12 @@ public final class DBNew {
   /**
    * Creates a temporary database instance with the contents of all inputs.
    * @param name name of database
-   * @param create create new database
+   * @param target target database (can be {@code null})
    * @return database
    * @throws IOException I/O exception
    */
-  private Data build(final String name, final boolean create) throws IOException {
+  private Data build(final String name, final Data target) throws IOException {
+    final boolean create = target == null;
     // binary and value resources, and raw files of new databases, require an on-disk instance
     boolean disk = false;
     final List<Parser> parsers = new ArrayList<>();
@@ -146,7 +147,7 @@ public final class DBNew {
     final Builder builder = disk ? new DiskBuilder(dbName, parser, sopts, mopts) :
       mopts.get(MainOptions.MAINMEM) ? new MemBuilder(name, parser) :
       new SpillBuilder(name, parser, sopts);
-    builder.binariesDir(sopts.dbPath(dbName));
+    if(create || !target.inMemory()) builder.binariesDir(sopts.dbPath(dbName));
     try {
       return qc.pushJob(builder).build();
     } finally {

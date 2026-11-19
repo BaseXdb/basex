@@ -68,6 +68,18 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void addMainMem() {
+    final Function func = _DB_ADD;
+    execute(new DropDB(NAME));
+    set(MainOptions.MAINMEM, true);
+    execute(new CreateDB(NAME, XML));
+    error(func.args(NAME, " xs:base64Binary('AQID')", "b.bin"), DB_MAINMEM_X);
+    error(func.args(NAME, 123, "v"), DB_MAINMEM_X);
+    error(func.args(NAME, XML, "r.xml", " { 'parser': 'raw' }"), UPDBERROR_X);
+    assertFalse(context.soptions.dbPath(NAME).exists());
+  }
+
+  /** Test method. */
   @Test public void add() {
     final Function func = _DB_ADD;
     query("count(" + COLLECTION.args(NAME) + ")", 1);

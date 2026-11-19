@@ -56,6 +56,9 @@ public final class DBAdd extends DBUpdate {
     final MainOptions mopts = dbopts.mainOptions();
     newDocs = new DBNew(qc, mopts, info, inputs);
     for(final NewInput input : inputs) {
+      if(input.type != ResourceType.XML && data.inMemory()) {
+        throw DB_MAINMEM_X.get(info, data.meta.name);
+      }
       paths(input.type).add(pathKey(input));
     }
   }
@@ -88,7 +91,7 @@ public final class DBAdd extends DBUpdate {
   @Override
   public void prepare() throws QueryException {
     size = newDocs.inputs.size();
-    clip = newDocs.prepare(data.meta.name, false);
+    clip = newDocs.prepare(data.meta.name, data);
   }
 
   @Override

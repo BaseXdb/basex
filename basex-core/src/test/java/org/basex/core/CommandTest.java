@@ -77,6 +77,18 @@ public class CommandTest extends SandboxTest {
     ok(new Add("test.xml", "<x>te est</x>"));
   }
 
+  /** Command test. */
+  @Test public final void addBinaryMainMem() {
+    ok(new Set(MainOptions.MAINMEM, true));
+    ok(new Set(MainOptions.PARSER, MainOptions.MainParser.RAW));
+    ok(new CreateDB(NAME));
+    final IOException ex = assertThrows(IOException.class,
+        () -> session.execute(new Add(FN, FILE)));
+    assertEquals(Text.NO_MAINMEM, ex.getMessage());
+    ok(new Set(MainOptions.PARSER, MainOptions.MainParser.XML));
+    ok(new Set(MainOptions.MAINMEM, false));
+  }
+
   /** Create Backup Test.
    * Using glob Syntax. */
   @Test public final void alterBackup() {

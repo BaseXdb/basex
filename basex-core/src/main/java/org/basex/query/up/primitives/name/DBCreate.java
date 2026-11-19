@@ -49,7 +49,7 @@ public final class DBCreate extends NameUpdate {
 
   @Override
   public void prepare() throws QueryException {
-    clip = newDocs.prepare(name, true);
+    clip = newDocs.prepare(name, null);
   }
 
   @Override

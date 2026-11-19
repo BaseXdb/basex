@@ -45,7 +45,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void prepare(final MemData memData, final QueryContext qc) throws QueryException {
-    clip = newDocs.prepare(data.meta.name, false);
+    clip = newDocs.prepare(data.meta.name, data);
   }
 
   @Override
