@@ -66,7 +66,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_OVERFLOW(BASEX, "overflow", "Stack Overflow: Try tail recursion?"),
   /** Error code. */
-  BASEX_NESTED(BASEX, "overflow", "Value is too deeply nested to be serialized."),
+  BASEX_NESTED(BASEX, "overflow", "Value is too deeply nested."),
   /** Error code. */
   BASEX_PERMISSION_X_X(BASEX, "permission", "No % permission: %."),
   /** Error code. */

@@ -554,7 +554,7 @@ public abstract class StandardFunc extends Arr {
     if(found != 1) return super.argTypeError(item, type, expr);
 
     final SeqType st = types[Math.min(arg, tl - 1)];
-    return typeError(item, mismatch ? st : type.seqType(), paramName(arg), info);
+    return typeError(item, mismatch ? st : type.seqType(), definition.paramName(arg), info);
   }
 
   @Override
@@ -566,16 +566,7 @@ public abstract class StandardFunc extends Arr {
       if(arg != -1) return null;
       arg = a;
     }
-    return arg != -1 ? paramName(arg) : null;
-  }
-
-  /**
-   * Returns the name of the parameter at the specified position.
-   * @param arg argument position
-   * @return parameter name
-   */
-  private QNm paramName(final int arg) {
-    return definition.paramNames(arg + 1)[arg];
+    return arg != -1 ? definition.paramName(arg) : null;
   }
 
   /**
@@ -772,6 +763,21 @@ public abstract class StandardFunc extends Arr {
       binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
     return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "");
+  }
+
+  /**
+   * Returns a materialized, compact version of the specified value.
+   * @param value value
+   * @param qc query context
+   * @return compact value
+   * @throws QueryException query exception
+   */
+  protected final Value compact(final Value value, final QueryContext qc) throws QueryException {
+    try {
+      return value.materialize(n -> false, info, qc).shrink(qc);
+    } catch(final StackOverflowError ex) {
+      throw BASEX_NESTED.get(info).cause(ex);
+    }
   }
 
   /**
@@ -1350,13 +1356,12 @@ public abstract class StandardFunc extends Arr {
       plan.add(plan.create(this, NAME, name), args());
     } else {
       final int al = args().length;
-      final QNm[] names = definition.paramNames(al);
       final ExprList args = new ExprList(al - undefined);
       final StringList nms = new StringList(al - undefined);
       for(int a = 0; a < al; a++) {
         if(defined(a)) {
           args.add(arg(a));
-          nms.add(names[a].toString());
+          nms.add(definition.paramName(a).toString());
         }
       }
       plan.add(plan.create(this, NAME, name, ARG, String.join(", ", nms.finish())), args.finish());
@@ -1371,12 +1376,11 @@ public abstract class StandardFunc extends Arr {
       qs.token(name).params(args());
     } else {
       final int al = args().length;
-      final QNm[] names = definition.paramNames(al);
       final Object[] args = new Object[al - undefined];
       boolean gap = false;
       for(int a = 0, b = 0; a < al; a++) {
         if(defined(a)) {
-          args[b++] = gap ? names[a] + " := " + arg(a) : arg(a);
+          args[b++] = gap ? definition.paramName(a) + " := " + arg(a) : arg(a);
         } else {
           gap = true;
         }

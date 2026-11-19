@@ -188,6 +188,11 @@ public final class StoreModuleTest extends SandboxTest {
     error(func.args("key", " [ fn() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("key", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("key", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
+
+    error(func.args("key", " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })"),
+        BASEX_NESTED);
+    error(func.args("key", " fold-left(1 to 100_000, {}, fn($m, $_) { { 'a': $m } })"),
+        BASEX_NESTED);
   }
 
   /** Test method. */

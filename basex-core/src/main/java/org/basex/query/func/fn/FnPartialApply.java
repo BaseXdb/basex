@@ -54,8 +54,7 @@ public final class FnPartialApply extends StandardFunc {
       final long index = toLong(arg.key());
       if(index >= 1 && index <= arity) {
         final int i = (int) index - 1;
-        funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i),
-            null);
+        funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i), null);
         --placeholders;
       }
     }

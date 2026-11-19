@@ -173,15 +173,19 @@ public final class FuncDefinition {
    */
   QNm[] paramNames(final int arity) {
     final QNm[] qnames = new QNm[arity];
-    final int nl = params.length;
-    Array.copy(params, Math.min(arity, nl), qnames);
-    if(arity > nl) {
-      final String nm = Token.string(params[nl - 1].local());
-      for(int n = nl; n < arity; n++) {
-        qnames[n] = new QNm(nm + (n - nl + 1), "");
-      }
-    }
+    for(int a = 0; a < arity; a++) qnames[a] = paramName(a);
     return qnames;
+  }
+
+  /**
+   * Returns the name of the parameter at the specified position.
+   * @param arg argument position
+   * @return parameter name
+   */
+  QNm paramName(final int arg) {
+    final int nl = params.length;
+    return arg < nl ? params[arg] :
+      new QNm(Token.string(params[nl - 1].local()) + (arg - nl + 1), "");
   }
 
   /**

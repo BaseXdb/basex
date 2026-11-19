@@ -184,7 +184,7 @@ public final class DBNew {
       }
     } else {
       try(DataOutput out = new DataOutput(file)) {
-        Stores.write(out, input.value);
+        Stores.write(out, input.value, info);
       }
     }
   }

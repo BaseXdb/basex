@@ -250,6 +250,11 @@ public final class CacheModuleTest extends SandboxTest {
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("error", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("error", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
+
+    error(func.args("error", " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })"),
+        BASEX_NESTED);
+    error(func.args("error", " fold-left(1 to 100_000, {}, fn($m, $_) { { 'a': $m } })"),
+        BASEX_NESTED);
   }
 
   /** Lazy items in sequences and arrays. */

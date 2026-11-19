@@ -1377,6 +1377,8 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);
     error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), DB_PATH_X);
+    error(func.args(NAME, " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })", "deep"),
+        BASEX_NESTED);
   }
 
   /** Put operations only replace resources at the exact path. */
