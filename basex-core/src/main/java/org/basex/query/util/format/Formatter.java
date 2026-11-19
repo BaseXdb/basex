@@ -26,14 +26,6 @@ import org.basex.util.list.*;
 public abstract class Formatter extends FormatUtil {
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
-  /** Token: n. */
-  private static final byte[] N = cpToken('n');
-  /** Token: 1. */
-  private static final byte[] ONE = cpToken('1');
-  /** Presentation modifier: two digits. */
-  private static final byte[] TWO_DIGITS = token("01");
-  /** Presentation modifier: timezone. */
-  private static final byte[] ZONE_DIGITS = token("01:01");
   /** Default digit pattern of a timezone component. */
   private static final byte[] ZONE_PATTERN = token("00");
   /** Components that are not available in times. */
@@ -146,15 +138,16 @@ public abstract class Formatter extends FormatUtil {
    * Formats the specified date.
    * @param dt date to be formatted
    * @param languageTag language tag
-   * @param picture picture
+   * @param picture parsed picture
    * @param calendar calendar (can be {@code null})
    * @param place place
    * @param info input info (can be {@code null})
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate dt, final byte[] languageTag, final byte[] picture,
-      final byte[] calendar, final byte[] place, final InputInfo info) throws QueryException {
+  public final byte[] formatDate(final ADate dt, final byte[] languageTag,
+      final DatePicture picture, final byte[] calendar, final byte[] place, final InputInfo info)
+      throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
@@ -178,25 +171,17 @@ public abstract class Formatter extends FormatUtil {
         !time && rules.isDaylightSavings(instant), TimeZone.SHORT, locale));
     }
 
-    final DateParser dp = new DateParser(info, picture);
-    while(dp.more()) {
-      final int ch = dp.literal();
-      if(ch != -1) {
-        // print literal
-        tb.add(ch);
-      } else {
-        // retrieve and format variable marker
-        final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE_X.get(info, picture);
-        tb.add(component(marker, date, zone, cal == 0, info));
-      }
+    final DateFormat[] formats = picture.formats;
+    final int fl = formats.length;
+    for(int f = 0; f < fl; f++) {
+      tb.add(picture.literals[f]).add(component(formats[f], date, zone, cal == 0, info));
     }
-    return tb.finish();
+    return tb.add(picture.literals[fl]).finish();
   }
 
   /**
    * Formats a variable marker of a date picture.
-   * @param marker variable marker
+   * @param fp date format of the variable marker
    * @param date date
    * @param zone timezone name (can be {@code null})
    * @param iso ISO calendar
@@ -204,19 +189,17 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted component
    * @throws QueryException query exception
    */
-  private byte[] component(final byte[] marker, final ADate date, final byte[] zone,
+  private byte[] component(final DateFormat fp, final ADate date, final byte[] zone,
       final boolean iso, final InputInfo info) throws QueryException {
 
     // reject components that are not available in the supplied value
-    final int comp = ch(marker, 0);
+    final int comp = fp.comp;
     final Type type = date.type;
     final byte[] rejected = type == BasicType.DATE ? TIME_COMPONENTS :
       type == BasicType.TIME ? DATE_COMPONENTS : EMPTY;
-    if(indexOf(rejected, comp) != -1) throw PICINVCOMP_X_X_X.get(info, marker, type, date);
+    if(indexOf(rejected, comp) != -1) throw PICINVCOMP_X_X_X.get(info, fp.marker, type, date);
 
-    // evaluate component, choose default presentation modifier
-    byte[] pres = ONE;
-    BigDecimal frac = null;
+    // evaluate component
     long num = 0;
     switch(comp) {
       case 'Y' -> {
@@ -231,10 +214,7 @@ public abstract class Formatter extends FormatUtil {
         for(int m = (int) date.mon(); --m >= 1;) num += ADate.daysOfMonth(year, m);
         num += date.day();
       }
-      case 'F' -> {
-        num = date.toLocalDate().getDayOfWeek().getValue();
-        pres = N;
-      }
+      case 'F' -> num = date.toLocalDate().getDayOfWeek().getValue();
       case 'W' -> num = date.toLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
       case 'w' -> {
         // week in month: the week belongs to the month of its Thursday
@@ -246,40 +226,20 @@ public abstract class Formatter extends FormatUtil {
         num = date.hour() % 12;
         if(num == 0) num = 12;
       }
-      case 'P' -> {
-        num = date.hour() / 12;
-        pres = N;
-      }
-      case 'm' -> {
-        num = date.minute();
-        pres = TWO_DIGITS;
-      }
-      case 's' -> {
-        num = date.seconds().intValue();
-        pres = TWO_DIGITS;
-      }
-      case 'f' -> frac = date.seconds().remainder(BigDecimal.ONE);
-      case 'Z', 'z' -> {
-        num = date.tz();
-        pres = ZONE_DIGITS;
-      }
-      case 'C' -> pres = N;
-      case 'E' -> {
-        num = date.yea();
-        pres = N;
-      }
-      default -> throw INVCOMPSPEC_X.get(info, marker);
+      case 'P' -> num = date.hour() / 12;
+      case 'm' -> num = date.minute();
+      case 's' -> num = date.seconds().intValue();
+      case 'Z', 'z' -> num = date.tz();
+      case 'E' -> num = date.yea();
     }
 
-    // parse presentation modifier(s) and width modifier
-    final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
-    if(comp == 'Y') num = year(num, fp);
+    if(comp == 'Y' && fp.yearModulus != 0) num %= fp.yearModulus;
     // ISO calendar: era is a minus sign for negative years
     if(comp == 'E' && iso) return num < 0 ? cpToken('-') : EMPTY;
 
     if(comp == 'Z' || comp == 'z') {
       // output timezone (as name if requested via 'N' and a place is known)
-      final byte[] tz = fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp, marker);
+      final byte[] tz = fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp);
       // pad to minimum width; the representation is never shortened
       return tz.length == 0 ? tz : format(tz, fp.min, Integer.MAX_VALUE);
     }
@@ -290,25 +250,16 @@ public abstract class Formatter extends FormatUtil {
         case 'F' -> abbreviation(day((int) num - 1), fp.max);
         case 'P' -> ampm(num == 0);
         case 'C' -> calendar();
-        case 'E' -> era(num);
-        default -> null;
+        default -> era(num);
       };
-      if(name != null) {
-        if(fp.cs == Case.LOWER) name = lc(name);
-        else if(fp.cs == Case.UPPER) name = uc(name);
-        else name = tc(name);
-        // names are abbreviated to the maximum width and padded to the minimum width
-        return format(name, fp.min, fp.max);
-      }
-      // fallback representation
-      fp.first = '0';
-      fp.primary = ONE;
-    } else if(frac != null) {
-      return formatFrac(frac, fp);
+      if(fp.cs == Case.LOWER) name = lc(name);
+      else if(fp.cs == Case.UPPER) name = uc(name);
+      else name = tc(name);
+      // names are abbreviated to the maximum width and padded to the minimum width
+      return format(name, fp.min, fp.max);
     }
-    // integer-valued component: minimum width is enforced, maximum width is ignored
-    fp.max = Integer.MAX_VALUE;
-    return formatInt(num, fp);
+    return fp.fraction ? formatFrac(date.seconds().remainder(BigDecimal.ONE), fp) :
+      formatInt(num, fp);
   }
 
   /**
@@ -336,61 +287,22 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Reduces a year to the number of digits requested by the format
-   * (see: Formatting the Year Component).
-   * @param year year
-   * @param fp date format
-   * @return reduced year
-   */
-  private long year(final long year, final DateFormat fp) {
-    int n = fp.max;
-    if(n == Integer.MAX_VALUE && zeroes(fp.first) != -1) {
-      // decimal-digit-pattern: number of mandatory and optional digit signs, if 2 or more
-      final int w = digits(fp.primary, false) + digits(fp.primary, true);
-      if(w > 1) n = w;
-    }
-    if(n < 1 || n > 18) return year;
-    long p = 1;
-    while(n-- > 0) p *= 10;
-    return year % p;
-  }
-
-  /**
-   * Counts the digit signs of a presentation modifier.
-   * @param primary primary format token
-   * @param optional count optional ({@code #}) instead of mandatory digit signs
-   * @return number of digit signs
-   */
-  private int digits(final byte[] primary, final boolean optional) {
-    int count = 0;
-    for(final TokenParser tp = new TokenParser(primary); tp.more();) {
-      final int cp = tp.next();
-      if(optional ? cp == '#' : zeroes(cp) != -1) ++count;
-    }
-    return count;
-  }
-
-  /**
    * Returns the formatted fractional part of a decimal number.
    * @param num number
    * @param fp date format
    * @return formatted number
    */
   private byte[] formatFrac(final BigDecimal num, final DateFormat fp) {
-    String s = num.toString().replace("0.", "").replaceAll("0+$", "");
+    // digits of the fraction, without trailing zeroes
+    final String plain = num.stripTrailingZeros().toPlainString();
+    final int dot = plain.indexOf('.');
+    String s = dot == -1 ? "" : plain.substring(dot + 1);
 
-    // count optional and mandatory digit signs
-    int od = digits(fp.primary, true);
-    final int md = digits(fp.primary, false);
-
-    // calculate number of target digits, including trailing zeroes
+    // calculate number of target digits (optional and mandatory digit signs), including zeroes
+    int od = fp.optional;
     final int sl = s.length();
-    int fl = md + od;
+    int fl = fp.mandatory + od;
     if(fl == 1) fl = sl;
-
-    // adjust min/max with mandatory digit count
-    fp.max = Math.max(fp.max, md);
-    fp.min = Math.max(fp.min, md);
 
     // adjust number of target digits
     fl = Math.max(fl, fp.min);
@@ -485,15 +397,12 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Returns a formatted timezone.
    * @param num timezone (minutes)
-   * @param fp format parser
-   * @param marker variable marker
+   * @param fp date format
    * @return string representation
    * @throws QueryException query exception
    */
-  private byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
-      throws QueryException {
-
-    final boolean uc = ch(marker, 0) == 'Z', mil = uc && ch(marker, 1) == 'Z';
+  private byte[] formatZone(final int num, final DateFormat fp) throws QueryException {
+    final boolean uc = fp.comp == 'Z', mil = uc && ch(fp.marker, 1) == 'Z';
     // ignore values without timezone. exception: military timezone
     if(num == Short.MAX_VALUE) return mil ? cpToken('J') : EMPTY;
     // military timezone: single letter, restricted to full hours
