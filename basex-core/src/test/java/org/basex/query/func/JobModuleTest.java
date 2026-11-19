@@ -754,13 +754,19 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void deadlock() {
     final Function func = _JOB_EXECUTE;
     query(_DB_CREATE.args("db"));
-    query(_DB_CREATE.args("db2"));
+    query(_DB_CREATE.args("db2", " <a/>", "a.xml"));
     try {
       // caller holds no locks: job may lock freely
       query(func.args("db:optimize('db')"), "");
       // job only reads what the caller reads: no deadlock
       query(_DB_GET.args("db") + ", " + func.args("count(db:get('db'))"));
       query(_DB_GET.args("db") + ", " + func.args("count(db:get(string(<a>db</a>)))"));
+      // bound nodes are copied to main memory: no locks
+      final String bound = "declare variable $n external; $n";
+      query(_DB_GET.args("db") + ", " + func.args(bound, " { 'n': <a/> update { } }"), "<a/>");
+      query(func.args(bound, " { 'n': " + _DB_GET.args("db2", "a.xml") + "/a }"), "<a/>");
+      query(_DB_GET.args("db") + ", " + func.args(" fn($n) { $n }", " [ <a/> update { } ]"),
+          "<a/>");
       // caller holds a global read lock: job may read any database
       query(_DB_GET.args(" db:list()[1]") + ", " + func.args("count(db:get('db2'))"));
       // job writes: deadlock
