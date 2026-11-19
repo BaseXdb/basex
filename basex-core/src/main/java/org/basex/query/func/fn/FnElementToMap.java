@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
 public final class FnElementToMap extends PlanFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
+    final Item node = (Item) coerce(arg(0), Types.DOCUMENT_OR_ELEMENT_ZO, qc);
     final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(node.isEmpty()) return Empty.VALUE;
 

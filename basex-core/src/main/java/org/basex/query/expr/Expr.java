@@ -245,8 +245,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the data reference bound to this expression. This method is currently overridden
-   * by {@link DBNode}, {@link DBNodeSeq}, {@link AxisPath} and {@link VarRef}.
+   * Returns the data reference bound to this expression.
    * @return data reference (can be {@code null})
    */
   public Data data() {
@@ -557,7 +556,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared in this expression,
    *         {@code false} otherwise
    */
-  public boolean hasFreeVars() {
+  public final boolean hasFreeVars() {
     final Var[] vars = freeVars();
     return vars == null || vars.length != 0;
   }

@@ -31,7 +31,7 @@ public class SqlExecutePrepared extends SqlExecute {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
-    final Item params = arg(1).item(qc, info);
+    final Item params = arg(1).unwrappedItem(qc, info);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
     final boolean keys = jdbc(qc).generatedKeys(ps);
@@ -65,7 +65,7 @@ public class SqlExecutePrepared extends SqlExecute {
     if(params instanceof final XQArray array) {
       setParameters(array, ps, qc);
     } else if(!params.isEmpty()) {
-      final XNode prms = toElem(params, qc);
+      final XNode prms = toElem(params, arg(1));
       if(!prms.qname().eq(Q_PARAMETERS)) throw UNKNOWNOPTION_X.get(info, prms.qname().local());
       setParameters(prms.childIter(), ps);
     }

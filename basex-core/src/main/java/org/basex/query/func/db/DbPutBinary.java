@@ -20,7 +20,7 @@ public final class DbPutBinary extends DbNew {
     final Data data = toData(qc);
     final Item input = arg(1).unwrappedItem(qc, info);
     final String path = toDbPath(arg(2), qc);
-    final Object source = toBinarySource(input, qc);
+    final Object source = toBinarySource(input, arg(1), qc);
     putFile(data, path, ResourceType.BINARY, new DBPutBinary(data, source, path, info),
         toEmptyMap(arg(3), qc), qc);
     return Empty.VALUE;

@@ -1232,12 +1232,6 @@ public enum QueryError {
   /** Error code. */
   EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
   /** Error code. */
-  BINARY_X(XPTY, 4, "Binary expected, % found."),
-  /** Error code. */
-  STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
-  /** Error code. */
-  STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
-  /** Error code. */
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** Error code. */
   ELM_X_X_X(XPTY, 4, "element(%) expected, % found: %."),

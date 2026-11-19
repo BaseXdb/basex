@@ -36,7 +36,7 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(exprs);
+    checkNoUp(exprs);
   }
 
   @Override

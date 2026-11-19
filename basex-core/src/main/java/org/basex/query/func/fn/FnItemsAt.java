@@ -144,9 +144,9 @@ public final class FnItemsAt extends StandardFunc {
     if(!ast.mayBeWrapped()) {
       if(ast.zeroOrOne()) occ = Occ.ZERO_OR_ONE;
 
-      if(at instanceof Item) {
+      if(at instanceof final Item item) {
         // check for fractional or negative number
-        final long l = Pos.position(toNumber((Item) at)) - 1;
+        final long l = Pos.position(toNumber(item, at)) - 1;
         // items-at(E, 0) → ()
         if(l < 0) return Empty.VALUE;
         // single expression with static position: items-at($x, 1) → $x, items-at($x, 2) → ()

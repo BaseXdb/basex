@@ -181,14 +181,14 @@ public final class PartFunc extends Arr {
     for(int e = 0; e < nargs; e++) {
       final Expr expr = exprs[e];
       args[e] = placeholder(expr) ? Empty.UNDEFINED :
-        ft.argTypes[e].coerce(expr.value(qc), qc, info);
+        ft.argTypes[e].coerce(expr.value(qc), qc, info, func.paramName(e), null);
     }
     return func.partial(args, placeholderPerm, qc, cc, info);
   }
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
+    checkNoUp(Arrays.copyOf(exprs, exprs.length - 1));
   }
 
   @Override

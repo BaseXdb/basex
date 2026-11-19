@@ -39,8 +39,9 @@ public abstract class ParseHtml extends ParseFn {
   @Override
   protected final Value parse(final QueryContext qc) throws QueryException {
     final Item value = atomItem(arg(0), qc);
-    return value.isEmpty() ? Empty.VALUE :
-      parse(new IOContent(toBytes(value), "", value instanceof Bin ? null : Strings.UTF8), qc);
+    if(value.isEmpty()) return Empty.VALUE;
+    final String encoding = value instanceof Bin ? null : Strings.UTF8;
+    return parse(new IOContent(toBytes(value, arg(0)), "", encoding), qc);
   }
 
   /**

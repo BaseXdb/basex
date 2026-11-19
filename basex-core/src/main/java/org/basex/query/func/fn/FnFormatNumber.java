@@ -9,7 +9,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -27,10 +26,7 @@ public final class FnFormatNumber extends StandardFunc {
     final Item options = arg(2).unwrappedItem(qc, info);
 
     // check input
-    final Type type = number.type;
-    if(number.isEmpty()) number = Dbl.NAN;
-    else if(type.isUntyped()) number = Dbl.get(number.dbl(info));
-    else if(!type.isNumberOrUntyped()) throw argTypeError(number, BasicType.NUMERIC, value);
+    number = number.isEmpty() ? Dbl.NAN : toNumber(number, value);
 
     // find decimal-format name
     DecFormatOptions dfo = null;
@@ -39,7 +35,7 @@ public final class FnFormatNumber extends StandardFunc {
       dfo = toOptions(options, new DecFormatOptions(), qc);
       name = dfo.get(DecFormatOptions.FORMAT_NAME);
     } else {
-      name = toStringOrNull(options, qc);
+      name = toStringOrNull(options, arg(2), qc);
     }
 
     // create formatter, based on decimal-format name

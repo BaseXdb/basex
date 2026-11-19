@@ -38,10 +38,10 @@ abstract class DateTimeFn extends StandardFunc {
     final Item zone = atomItem(arg(1), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
 
-    final ADate date = toDate(item, type, value, qc);
+    final ADate date = (ADate) coerce(item, type, value, qc);
     final boolean empty = zone.isEmpty(), undefined = defined(1) && empty;
     // without a zone argument, the implicit timezone of the query is assigned
-    final DTDur dur = !empty ? (DTDur) checkType(zone, DAY_TIME_DURATION, qc) :
+    final DTDur dur = !empty ? (DTDur) coerce(zone, DAY_TIME_DURATION, arg(1), qc) :
       undefined ? null : new DTDur(0, qc.dateTime().zone);
     return date.timeZone(dur, undefined, info);
   }

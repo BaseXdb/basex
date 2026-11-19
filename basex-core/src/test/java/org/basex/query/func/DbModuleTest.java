@@ -205,9 +205,9 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, " (<a/>, <b/>)", "only-one.xml"), DB_ARGS_X_X);
 
     // error: type 'binary' with a non-binary, non-string input
-    error(func.args(NAME, " xs:date('2026-05-13')", " { 'x.bin': 'binary' }"), STRBIN_X_X);
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'x.bin': 'binary' }"), INVTYPE_X);
     // error: type 'xml' with a binary literal
-    error(func.args(NAME, " xs:hexBinary('41')", " { 'x.xml': 'xml' }"), STRNOD_X_X);
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'x.xml': 'xml' }"), INVTYPE_X);
     // error: empty path for binary
     error(func.args(NAME, " xs:hexBinary('41')", " { '': 'binary' }"), DB_PATH_X);
     // error: empty path for value
@@ -628,9 +628,9 @@ public final class DbModuleTest extends SandboxTest {
     // error: unknown resource type
     error(func.args(NAME, "x", " { 'a': 'unknown' }"), EXP_FOUND_X_X);
     // error: type 'binary' with a non-binary, non-string input
-    error(func.args(NAME, " xs:date('2026-05-13')", " { 'a': 'binary' }"), STRBIN_X_X);
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'a': 'binary' }"), INVTYPE_X);
     // error: type 'xml' with a binary literal
-    error(func.args(NAME, " xs:hexBinary('41')", " { 'a': 'xml' }"), STRNOD_X_X);
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'a': 'xml' }"), INVTYPE_X);
     // error: duplicate binary path within a single call
     error(func.args(NAME,
         " (xs:hexBinary('41'), xs:hexBinary('42'))",
@@ -1322,7 +1322,7 @@ public final class DbModuleTest extends SandboxTest {
     // string input: interpreted as URI of an existing file
     error(func.args(NAME, "no-such-file.bin", "errPath"), WHICHRES_X);
     // non-string/non-binary atomic inputs rejected
-    error(func.args(NAME, 123, "errType"), STRBIN_X_X);
+    error(func.args(NAME, 123, "errType"), INVTYPE_X);
 
     // store the same path twice during the same query
     error(func.args(NAME, " xs:hexBinary('41')", "b") + ',' +

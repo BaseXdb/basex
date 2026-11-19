@@ -122,7 +122,7 @@ public abstract class SortFn extends StandardFunc {
     final boolean[] invert = new boolean[ms];
     int m = 0;
     for(final Item item : maps) {
-      final XQMap map = toRecord(item, keyRecord(), qc);
+      final XQMap map = (XQMap) coerce(item, keyRecord().seqType(), arg(1), qc);
       final Value key = map.get(KEY);
       if(!key.isEmpty()) keys[m] = toFunction(key, 1, qc);
       collations[m] = toCollation(map.get(COLLATION), qc);
@@ -372,12 +372,12 @@ public abstract class SortFn extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final void sort(final ValueList values, final QueryContext qc) throws QueryException {
-    final Value comparators = arg(1).value(qc);
+    final Value comparators = arg(1).unwrappedValue(qc);
     if(comparators.isEmpty()) throw typeError(comparators, Types.ITEM_OM, info);
 
     final FItem[] cmps = new FItem[(int) comparators.size()];
     int c = 0;
-    for(final Item item : comparators) cmps[c++] = toFunction(item, 2, qc);
+    for(final Item item : comparators) cmps[c++] = toFunction(item, arg(1), 2);
 
     final Comparator<Value> comparator = (value1, value2) -> {
       try {

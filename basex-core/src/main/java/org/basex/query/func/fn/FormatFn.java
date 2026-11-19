@@ -35,7 +35,7 @@ abstract class FormatFn extends StandardFunc {
     if(calendar != null) calendar = trim(calendar);
     final byte[] place = toZeroToken(arg(4), qc);
 
-    final ADate date = toDate(item, tp, value, qc);
+    final ADate date = (ADate) coerce(item, tp, value, qc);
     final Formatter form = Formatter.get(language);
     return Str.get(form.formatDate(date, language, picture, calendar, place, info));
   }

@@ -52,7 +52,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {
         for(final Item item : entries) {
-          final IOFile file = new IOFile(root, toString(item, qc));
+          final IOFile file = new IOFile(root, toString(atomItem(item, arg(2), qc), arg(2)));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
           add(new SimpleEntry<>(item, new B64IOLazy(file, FILE_NOT_FOUND_X)), out, method, dir, qc);

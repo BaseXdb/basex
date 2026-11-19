@@ -58,7 +58,7 @@ public final class FnBuildDateTime extends DateTimeFn {
     final Item value = arg(0).item(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 
-    final XQMap map = toRecord(value, Records.DATETIME.get(), qc);
+    final XQMap map = (XQMap) coerce(value, Records.DATETIME.get().seqType(), arg(0), qc);
     final Long       year    = get(map, YEAR, item -> item.itr(null));
     final Long       month   = get(map, MONTH, item -> item.itr(null));
     final Long       day     = get(map, DAY, item -> item.itr(null));

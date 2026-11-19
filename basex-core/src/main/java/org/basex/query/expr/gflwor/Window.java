@@ -343,9 +343,7 @@ public final class Window extends Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoUp(expr);
-    checkNoUp(start);
-    checkNoUp(end);
+    checkNoUp(expr, start, end);
   }
 
   @Override

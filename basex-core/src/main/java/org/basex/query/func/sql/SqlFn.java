@@ -106,6 +106,6 @@ abstract class SqlFn extends StandardFunc {
    * @throws QueryException query exception
    */
   private Uri id(final QueryContext qc) throws QueryException {
-    return (Uri) checkType(arg(0), BasicType.ANY_URI, qc);
+    return (Uri) coerce(arg(0), BasicType.ANY_URI, qc);
   }
 }

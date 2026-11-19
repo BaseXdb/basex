@@ -4462,7 +4462,7 @@ return
     query(func.args(_BIN_ENCODE_STRING.args("42"), " { 'encoding': () }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
 
-    error(func.args(42), STRBIN_X_X);
+    error(func.args(42), INVTYPE_X);
     error(func.args("42", 42), INVTYPE_X);
     error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
     error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTIONVALUE_X);

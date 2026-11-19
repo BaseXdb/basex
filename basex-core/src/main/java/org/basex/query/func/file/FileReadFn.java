@@ -47,7 +47,7 @@ abstract class FileReadFn extends FileFn {
     if(options instanceof final XQMap map) {
       toOptions(map, po, qc);
     } else {
-      po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
+      po.set(ParseOptions.ENCODING, toStringOrNull(options, arg(1), qc));
     }
     toEncodingOrNull(po.get(ParseOptions.ENCODING), FILE_UNKNOWN_ENCODING_X);
 

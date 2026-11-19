@@ -94,7 +94,7 @@ public abstract class ParseFn extends StandardFunc {
     final Item value = atomItem(arg(0), qc);
     if(value.isEmpty()) return Empty.VALUE;
 
-    final IO io = new IOContent(toBytes(value));
+    final IO io = new IOContent(toBytes(value, arg(0)));
     try(TextInput ti = nl() ? new NewlineInput(io) : new TextInput(io)) {
       return parse(ti.fallback(false), options(qc), qc);
     } catch(final DecodingException ex) {

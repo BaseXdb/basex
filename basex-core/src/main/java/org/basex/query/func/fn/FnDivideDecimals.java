@@ -23,8 +23,8 @@ public final class FnDivideDecimals extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
-    final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
+    final BigDecimal value = coerce(arg(0), BasicType.DECIMAL, qc).dec(info);
+    final BigDecimal divisor = coerce(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Expr precision = arg(2);
     final Item prec = atomItem(precision, qc);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);

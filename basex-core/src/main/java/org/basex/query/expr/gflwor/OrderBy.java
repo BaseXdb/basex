@@ -405,7 +405,7 @@ public final class OrderBy extends Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(keys);
+    checkNoUp(keys);
   }
 
   @Override

@@ -14,7 +14,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -73,7 +72,7 @@ public class XsltTransform extends StandardFunc {
   private Source source(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
     return item instanceof final XNode node ? Xslt.source(node, sc().baseURI(), info) :
-      io(item).streamSource();
+      toIO(item, expr).streamSource();
   }
 
   /**
@@ -86,18 +85,6 @@ public class XsltTransform extends StandardFunc {
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
     return item instanceof final XNode node ?
-      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : io(item);
-  }
-
-  /**
-   * Converts an item (URI string, string content) to an input reference.
-   * @param item item
-   * @return input reference
-   * @throws QueryException query exception
-   */
-  private IO io(final Item item) throws QueryException {
-    final Type type = item.type;
-    if(type.isStringOrUntyped()) return toIO(toString(item), true);
-    throw STRNOD_X_X.get(info, type, item);
+      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : toIO(item, expr);
   }
 }

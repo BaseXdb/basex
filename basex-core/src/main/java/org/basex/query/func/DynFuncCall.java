@@ -256,7 +256,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
+    checkNoUp(Arrays.copyOf(exprs, exprs.length - 1));
     body().checkUp();
   }
 

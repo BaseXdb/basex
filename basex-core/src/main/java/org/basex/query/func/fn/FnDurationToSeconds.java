@@ -16,6 +16,6 @@ public final class FnDurationToSeconds extends DateTimeFn {
   public Value value(final QueryContext qc) throws QueryException {
     final Item value = atomItem(arg(0), qc);
     return value.isEmpty() ? value :
-      Dec.get(((DTDur) checkType(value, BasicType.DAY_TIME_DURATION, qc)).dtd());
+      Dec.get(((DTDur) coerce(value, BasicType.DAY_TIME_DURATION, arg(0), qc)).dtd());
   }
 }

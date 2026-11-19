@@ -64,7 +64,7 @@ public class MapMerge extends MapFn {
     if(first == null) return XQMap.empty();
 
     // single input: return single map
-    XQMap mp = toMap(first);
+    XQMap mp = toMap(first, arg(0));
     Item current = qc.next(maps);
     if(current == null) return mp.unannotated();
 
@@ -74,7 +74,7 @@ public class MapMerge extends MapFn {
     if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {
-      for(final Entry entry : toMap(current).entries()) {
+      for(final Entry entry : toMap(current, arg(0)).entries()) {
         final Item key = entry.key();
         final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
         final Value val = dups.merge(key, old, entry.value(), qc);

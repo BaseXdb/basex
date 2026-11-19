@@ -89,7 +89,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry last-modified='2020'>X</archive:entry>", ""),
         ARCHIVE_TIMESTAMP_X);
     // content must be string or binary
-    error(func.args(" <archive:entry>X</archive:entry>", " 123"), STRBIN_X_X);
+    error(func.args(" <archive:entry>X</archive:entry>", " 123"), INVTYPE_X);
     // wrong encoding
     error(func.args(" <archive:entry encoding='x'>X</archive:entry>", ""), ARCHIVE_ENCODE1_X);
     // errors while converting a string

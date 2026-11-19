@@ -48,7 +48,7 @@ public final class ProfModuleTest extends SandboxTest {
 
     check(func.args(1536), "1.5 kB", root(Str.class));
 
-    error(func.args(" 'x'"), NONUMBER_X_X);
+    error(func.args(" 'x'"), INVTYPE_X);
   }
 
   /** Test method. */

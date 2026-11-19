@@ -74,7 +74,7 @@ abstract class DbNew extends DbAccessFn {
       case XML    -> fillXmlInput(ni, input, path, qc);
       case VALUE  -> ni.value = input;
       case BINARY -> {
-        final Object source = toBinarySource(input, qc);
+        final Object source = toBinarySource(input, arg(1), qc);
         if(source instanceof final Bin bin) ni.value = bin;
         else ni.io = (IO) source;
       }
@@ -113,7 +113,7 @@ abstract class DbNew extends DbAccessFn {
       return;
     }
 
-    if(!input.type.isStringOrUntyped()) throw STRNOD_X_X.get(info, input.type, input);
+    if(!input.type.isStringOrUntyped()) throw argTypeError(input, Types.STRING_OR_NODE, arg(1));
 
     final String string = string(input.string(info));
     final IO io = IO.get(string);
@@ -187,7 +187,7 @@ abstract class DbNew extends DbAccessFn {
       if(!(value instanceof final Item type) || type.isEmpty()) throw DB_PATH_X.get(info, map);
       return new PathSpec(toDbPath(toString(entry.key())), toEnum(type, ResourceType.class));
     }
-    return new PathSpec(toDbPath(toString(item)), null);
+    return new PathSpec(toDbPath(toString(item, arg(2))), null);
   }
 
   /**

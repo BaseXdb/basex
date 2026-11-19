@@ -9,9 +9,11 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -34,7 +36,7 @@ abstract class UserFn extends StandardFunc {
       throws QueryException {
     final StringList patterns = new StringList();
     for(final Item item : atomValue(expr, qc)) {
-      final String pattern = toString(item);
+      final String pattern = toString(item, expr);
       if(!pattern.isEmpty() && !Databases.validPattern(pattern))
         throw USER_PATTERN_X.get(info, pattern);
       patterns.add(pattern);
@@ -100,13 +102,26 @@ abstract class UserFn extends StandardFunc {
 
     final ArrayList<Perm> perms = new ArrayList<>();
     for(final Item item : atomValue(expr, qc)) {
-      final String perm = toString(item);
+      final String perm = toString(item, expr);
       final Perm p = Enums.get(Perm.class, perm);
       if(p == null) throw USER_PERMISSION_X.get(info, perm);
       perms.add(p);
     }
     if(perms.isEmpty()) perms.add(Perm.NONE);
     return perms;
+  }
+
+  /**
+   * Evaluates an expression to a user info element.
+   * @param expr expression
+   * @param qc query context
+   * @return element
+   * @throws QueryException query exception
+   */
+  protected final XNode toInfo(final Expr expr, final QueryContext qc) throws QueryException {
+    final XNode node = toElem(expr, qc);
+    if(NameTest.get(UserText.Q_INFO).matches(node)) return node;
+    throw ELM_X_X_X.get(info, UserText.Q_INFO.prefixId(), node.type, node);
   }
 
   /**

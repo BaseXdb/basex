@@ -450,22 +450,7 @@ public abstract class StandardFunc extends Arr {
   protected final ADate toGregorianOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = atomItem(expr, qc);
-    return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, qc, info);
-  }
-
-  /**
-   * Converts an item to a date of the specified type.
-   * @param item item
-   * @param type expected type
-   * @param expr expression that yielded the item
-   * @param qc query context
-   * @return date
-   * @throws QueryException query exception
-   */
-  protected final ADate toDate(final Item item, final BasicType type, final Expr expr,
-      final QueryContext qc) throws QueryException {
-    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, info) :
-      checkType(item, type, expr));
+    return item.isEmpty() ? null : (ADate) coerce(item, Types.GREGORIAN_ZO, expr, qc);
   }
 
   /**
@@ -479,7 +464,7 @@ public abstract class StandardFunc extends Arr {
   protected final ADate toDateOrNull(final Expr expr, final BasicType type,
       final QueryContext qc) throws QueryException {
     final Item item = atomItem(expr, qc);
-    return item.isEmpty() ? null : toDate(item, type, expr, qc);
+    return item.isEmpty() ? null : (ADate) coerce(item, type, expr, qc);
   }
 
   /**
@@ -545,10 +530,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Dur toDurOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = atomItem(expr, qc);
-    if(item.isEmpty()) return null;
-    if(item instanceof final Dur dur) return dur;
-    if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw argTypeError(item, BasicType.DURATION, expr);
+    return item.isEmpty() ? null : (Dur) coerce(item, BasicType.DURATION, expr, qc);
   }
 
   @Override
@@ -702,6 +684,18 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Converts a string item (URI or string content) to an input reference.
+   * @param item item
+   * @param expr expression that yielded the item
+   * @return IO reference
+   * @throws QueryException query exception
+   */
+  protected final IO toIO(final Item item, final Expr expr) throws QueryException {
+    if(item.type.isStringOrUntyped()) return toIO(toString(item), true);
+    throw argTypeError(item, Types.STRING_OR_NODE, expr);
+  }
+
+  /**
    * Evaluates an expression to an input resource.
    * @param expr expression (xs:anyURI with URI or xs:string with content)
    * @param qc query context
@@ -710,20 +704,21 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return toContent(toAtomItem(expr, qc), qc);
+    return toContent(toAtomItem(expr, qc), expr, qc);
   }
 
   /**
    * Returns an input resource.
    * @param item item
+   * @param expr expression that yielded the item (can be {@code null})
    * @param qc query context
    * @return input resource
    * @throws QueryException query exception
    */
-  protected final IOContent toContent(final Item item, final QueryContext qc)
+  protected final IOContent toContent(final Item item, final Expr expr, final QueryContext qc)
       throws QueryException {
     return item instanceof Uri ? toContent(string(item.string(info)), qc) :
-      new IOContent(toToken(item));
+      new IOContent(toToken(item, expr));
   }
 
   /**
@@ -741,7 +736,7 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final Item item = query.unwrappedItem(qc, info);
-    final FuncItem function = toInvocable(item);
+    final FuncItem function = toInvocable(item, query);
     if(function != null) {
       // a service is written to disk, and a scheduled job outlives the query that created it
       if(service || QueryJobSpec.scheduled(options)) throw JOBS_FUNCTION.get(info);
@@ -754,7 +749,7 @@ public abstract class StandardFunc extends Arr {
           function.materialize(TransferVisitor.SHAREABLE, true, info, qc), values);
     }
 
-    final IOContent content = toContent(item, qc);
+    final IOContent content = toContent(item, query, qc);
     final String uri = toBaseUri(content.url(), options, JobOptions.BASE_URI);
     options.set(JobOptions.BASE_URI, uri != null ? uri : string(sc().baseURI().string()));
     final HashMap<String, Value> bindings = toBindings(args, qc);
@@ -796,13 +791,14 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns a function item that can be invoked as query.
    * @param item item
+   * @param expr expression that yielded the item
    * @return function item, or {@code null} if the item is no function
    * @throws QueryException query exception
    */
-  protected final FuncItem toInvocable(final Item item) throws QueryException {
+  protected final FuncItem toInvocable(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final FuncItem function) return function;
     // maps and arrays are function items, but they are no queries either
-    if(item instanceof FItem) throw typeError(item, Types.QUERY_SPEC_O, info);
+    if(item instanceof FItem) throw argTypeError(item, Types.QUERY_SPEC_O.type, expr);
     return null;
   }
 
@@ -1075,7 +1071,7 @@ public abstract class StandardFunc extends Arr {
 
     final HashMap<String, Value> hm = new HashMap<>();
     toEmptyMap(expr, qc).forEach((key, value) -> {
-      final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).unique();
+      final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key, expr).unique();
       hm.put(string(k), value);
     });
     return hm;
@@ -1116,7 +1112,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(expr, BasicType.DATE_TIME, qc);
+    final Dtm dtm = (Dtm) coerce(expr, BasicType.DATE_TIME, qc);
     try {
       return dtm.toInstant(qc).toEpochMilli();
     } catch(final ArithmeticException | DateTimeException ex) {
@@ -1146,7 +1142,7 @@ public abstract class StandardFunc extends Arr {
   protected final FItem toFunctionOrNull(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
     final Item item = expr.unwrappedItem(qc, info);
-    return item.isEmpty() ? null : checkArity(toFunction(item, qc), nargs, false);
+    return item.isEmpty() ? null : toFunction(item, expr, nargs);
   }
 
   /**
@@ -1160,6 +1156,19 @@ public abstract class StandardFunc extends Arr {
   protected final FItem toFunction(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
     return toFunction(expr, nargs, false, qc);
+  }
+
+  /**
+   * Converts an item to a non-updating function item.
+   * @param item item to be converted
+   * @param expr expression that yielded the item
+   * @param nargs maximum number of supplied arguments
+   * @return function item
+   * @throws QueryException query exception
+   */
+  protected final FItem toFunction(final Item item, final Expr expr, final int nargs)
+      throws QueryException {
+    return checkArity(toFunction(item, expr), nargs, false);
   }
 
   /**

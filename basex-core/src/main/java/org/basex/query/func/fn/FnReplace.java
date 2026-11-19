@@ -42,7 +42,7 @@ public final class FnReplace extends RegExFn {
     final byte[] flags = toZeroToken(arg(3), qc);
 
     final boolean func = rep instanceof FItem;
-    final FItem action = func ? toFunction(rep, 2, qc) : null;
+    final FItem action = func ? toFunction(rep, replacement, 2) : null;
     final byte[] replace = func ? null : rep.isEmpty() ? EMPTY : toToken(rep, replacement);
 
     // shortcut for literal replacements

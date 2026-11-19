@@ -45,14 +45,14 @@ public final class FnHash extends StandardFunc {
     final String alg = algorithm != null ? algorithm.trim().toUpperCase(Locale.ENGLISH) : "MD5";
     if(alg.equals("CRC-32")) {
       final CRC32 crc = new CRC32();
-      crc.update(toBytes(value));
+      crc.update(toBytes(value, arg(0)));
       final byte[] result = new byte[4];
       for(int i = result.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
         result[i] = (byte) c;
       return result;
     }
 
-    if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value));
+    if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value, arg(0)));
 
     final MessageDigest md;
     try {
@@ -78,6 +78,6 @@ public final class FnHash extends StandardFunc {
       }
     }
     // non-streaming item, string
-    return md.digest(toBytes(value));
+    return md.digest(toBytes(value, arg(0)));
   }
 }

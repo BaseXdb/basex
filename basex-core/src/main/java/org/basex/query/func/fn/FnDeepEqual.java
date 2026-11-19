@@ -57,7 +57,7 @@ public final class FnDeepEqual extends StandardFunc {
     if(item instanceof XQMap) {
       toOptions(item, opts, qc);
     } else {
-      opts.set(DeepEqualOptions.COLLATION, toStringOrNull(item, qc));
+      opts.set(DeepEqualOptions.COLLATION, toStringOrNull(item, arg(2), qc));
     }
     return opts;
   }

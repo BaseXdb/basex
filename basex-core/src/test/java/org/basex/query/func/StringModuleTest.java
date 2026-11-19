@@ -342,7 +342,7 @@ public final class StringModuleTest extends SandboxTest {
 
     // the measure must return a number
     error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { () } }"), INVTYPE_X);
-    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { 'x' } }"), NONUMBER_X_X);
+    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { 'x' } }"), INVTYPE_X);
   }
 
   /** Test method. */

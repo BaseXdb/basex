@@ -78,7 +78,7 @@ public class FnParseXmlFragment extends Docs {
     final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ?
       resolveUri(uri) : string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
-    final IO io = new IOContent(toBytes(value), baseURI, encoding);
+    final IO io = new IOContent(toBytes(value, arg(0)), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options, qc.context.options).
         allowExternal(trustExternal(options, qc));

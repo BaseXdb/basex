@@ -320,8 +320,8 @@ public final class GroupBy extends Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(preExpr);
-    checkNoneUp(specs);
+    checkNoUp(preExpr);
+    checkNoUp(specs);
   }
 
   @Override

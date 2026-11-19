@@ -21,8 +21,6 @@ public final class FnPartialApply extends StandardFunc {
   /** The type of parameter "arguments". */
   private static final SeqType ARGS_TYPE = MapType.get(BasicType.INTEGER,
       Types.ITEM_ZM).seqType();
-  /** The name of parameter "arguments". */
-  private static final QNm ARGS_NAME = new QNm("arguments");
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
@@ -44,8 +42,7 @@ public final class FnPartialApply extends StandardFunc {
    */
   private Value value(final QueryContext qc, final CompileContext cc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
-    final XQMap arguments = toMap(ARGS_TYPE.coerce(arg(1).value(qc), qc, info, ARGS_NAME, null),
-        qc);
+    final XQMap arguments = (XQMap) coerce(arg(1), ARGS_TYPE, qc);
     final int arity = function.arity();
     if(arity == 0 || arguments == XQMap.empty()) return function;
 

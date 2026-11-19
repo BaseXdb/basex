@@ -24,7 +24,7 @@ public final class SqlExecuteBatch extends SqlExecutePrepared {
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       // add one batch per parameter set (array or <sql:parameters/> element)
-      for(final Item params : arg(1).value(qc)) {
+      for(final Item params : arg(1).unwrappedValue(qc)) {
         // clear previous values so an under-specified set cannot inherit stale parameters
         ps.clearParameters();
         bind(params, ps, qc);

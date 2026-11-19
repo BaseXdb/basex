@@ -66,7 +66,7 @@ public abstract class WsFn extends StandardFunc {
    */
   final Item message(final QueryContext qc) throws QueryException {
     final Item message = arg(0).item(qc, info);
-    if(message.isEmpty()) throw typeError(message, BasicType.ITEM, info);
+    if(message.isEmpty()) throw argTypeError(message, BasicType.ITEM, arg(0));
     return message;
   }
 }

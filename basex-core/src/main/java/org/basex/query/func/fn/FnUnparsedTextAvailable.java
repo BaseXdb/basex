@@ -86,7 +86,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
     if(options instanceof final XQMap map) {
       toOptions(map, po, qc);
     } else {
-      po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
+      po.set(ParseOptions.ENCODING, toStringOrNull(options, arg(1), qc));
     }
     return po;
   }

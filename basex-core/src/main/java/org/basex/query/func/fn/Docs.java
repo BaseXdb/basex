@@ -71,7 +71,7 @@ public abstract class Docs extends DynamicFn {
       final Item item = value.atomItem(cc.qc, info);
       if(item.isEmpty()) return value(cc.qc);
       // target is a database or not a remote URL
-      queryInput = queryInput(toToken(item));
+      queryInput = queryInput(toToken(item, arg(0)));
       if(queryInput == null || sc().withdb && queryInput.dbExists(cc.qc.context.soptions)) {
         return value(cc.qc);
       }

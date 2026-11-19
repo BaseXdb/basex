@@ -27,7 +27,7 @@ public final class XQueryForkAny extends StandardFunc {
 
     final ArrayList<FItem> list = new ArrayList<>(Seq.initialCapacity(size));
     for(final Item function : functions) {
-      list.add(checkUp(toFunction(function, 0, qc), false));
+      list.add(checkUp(toFunction(function, arg(0), 0), false));
     }
 
     return new TaskContext(options, qc, info).invokeAny(list);

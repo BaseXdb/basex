@@ -78,7 +78,7 @@ abstract class ArchiveFn extends StandardFunc {
     if(archive instanceof final Bin bin) {
       return bin instanceof final B64IOLazy lazy ? zipFile(lazy.input(), bin) : bin;
     }
-    if(!archive.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, archive.seqType(), archive);
+    if(!archive.type.isStringOrUntyped()) throw argTypeError(archive, Types.STRING_OR_BINARY, expr);
 
     final IO io = toIO(archive, qc);
     return zipFile(io, new B64IOLazy(io, FILE_IO_ERROR_X));

@@ -44,7 +44,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(min, max);
+    checkNoUp(min, max);
     super.checkUp();
   }
 

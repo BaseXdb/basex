@@ -29,7 +29,7 @@ public final class XQueryForkJoin extends StandardFunc {
     final Value[] noargs = {};
     final ArrayList<Call> calls = new ArrayList<>(Seq.initialCapacity(size));
     for(final Item function : functions) {
-      calls.add(new Call(checkUp(toFunction(function, 0, qc), false), noargs));
+      calls.add(new Call(checkUp(toFunction(function, arg(0), 0), false), noargs));
     }
 
     final TaskContext tc = new TaskContext(options, qc, info);

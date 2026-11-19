@@ -39,7 +39,7 @@ public abstract class Arr extends ParseExpr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(exprs);
+    checkNoUp(exprs);
   }
 
   @Override

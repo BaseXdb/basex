@@ -17,7 +17,7 @@ public final class BitTest extends BitFn {
     final Item item = atomItem(arg(0), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
 
-    final long value = toLong(item, arg(0)), index = toLong(atomItem(arg(1), qc), 0);
+    final long value = toLong(item, arg(0)), index = toLong(arg(1), 0, qc);
     return Bln.get((value >> Math.min(index, Long.SIZE - 1) & 1) != 0);
   }
 }
