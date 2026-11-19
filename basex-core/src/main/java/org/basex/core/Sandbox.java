@@ -131,9 +131,8 @@ public abstract class Sandbox {
    * @param pre expected pre values
    */
   protected static void pre(final String query, final int... pre) {
-    final StringBuilder sb = new StringBuilder();
-    for(final int p : pre) sb.append(sb.isEmpty() ? "" : "\n").append(p);
-    query("db:node-pre(" + query + ")", sb);
+    query("db:node-pre(" + query + ")",
+      IntStream.of(pre).mapToObj(Integer::toString).collect(Collectors.joining("\n")));
   }
 
   /**
@@ -150,7 +149,6 @@ public abstract class Sandbox {
       Util.errln(query.strip());
       Util.errln(res.replace('\n', ','));
     }
-    //assertEquals(exp, res, "\n" + query + "\n" + (plan == null ? "" : serialize(plan)));
     if(!exp.equals(res)) {
       fail("\n" + query + "\n[EXPECT] " + exp + "\n[RESULT] " + res +
           (plan == null ? "" : "\n" + serialize(plan)));
@@ -243,29 +241,21 @@ public abstract class Sandbox {
   protected static void error(final String query, final QueryException ex,
       final QueryError... errors) {
 
-    boolean found = false;
     final QueryError err = ex.error();
-    for(final QueryError e : errors) found |= err != null ? err == e : e.qname().eq(ex.qname());
-
-    if(!found) {
-      final TokenBuilder tb = new TokenBuilder().add('\n');
-      if(query != null) tb.add("Query: ").add(query).add('\n');
-      tb.add("Error(s): ");
-      if(err != null) {
-        Util.stack(ex);
-        int c = 0;
-        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
-        tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')');
-      } else {
-        int c = 0;
-        for(final QueryError er : errors) {
-          if(c++ > 0) tb.add('/');
-          tb.add(er.qname().local());
-        }
-        tb.add("\nResult: ").add(ex.qname().string());
-      }
-      fail(tb.toString());
+    final String expected, result;
+    if(err != null) {
+      if(Arrays.asList(errors).contains(err)) return;
+      Util.stack(ex);
+      expected = Arrays.stream(errors).map(QueryError::name).collect(Collectors.joining("/"));
+      result = err.name() + " (" + ex.getLocalizedMessage() + ')';
+    } else {
+      final QNm name = ex.qname();
+      if(Arrays.stream(errors).anyMatch(e -> e.eq(name))) return;
+      expected = Arrays.stream(errors).map(QueryError::toString).collect(Collectors.joining("/"));
+      result = Token.string(name.string());
     }
+    fail('\n' + (query != null ? "Query: " + query + '\n' : "") + "Error(s): " + expected +
+      "\nResult: " + result);
   }
 
   /**
@@ -591,11 +581,7 @@ public abstract class Sandbox {
     context.close();
     Prop.clear();
     // cleanup: remove project specific system properties
-    final Properties props = System.getProperties();
-    for(final Object key : props.keySet()) {
-      final String path = key.toString();
-      if(path.startsWith(Prop.DBPREFIX)) props.remove(key);
-    }
+    System.getProperties().keySet().removeIf(key -> key.toString().startsWith(Prop.DBPREFIX));
     if(!sandbox().delete()) fail("Sandbox could not be deleted.");
   }
 
@@ -686,6 +672,15 @@ public abstract class Sandbox {
    */
   public static String wrap(final Object value) {
     return " data(attribute _ { '" + value + "' })";
+  }
+
+  /**
+   * Returns a node copy string whose contents and parent are unknown at compile time.
+   * @param node node constructor
+   * @return query string
+   */
+  public static String opaque(final String node) {
+    return " (" + node + " update {})";
   }
 
   /**
