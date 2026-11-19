@@ -257,7 +257,7 @@ public final class QueryInfo {
     if(!optimize.isEmpty()) map.put(OPTIMIZATION, new Section(false, optimize.entries()));
     if(!compile.isEmpty()) map.put(COMPILATION, new Section(false, compile.entries()));
     if(query != null) {
-      map.put(QUERY, text(QueryParser.removeComments(query, Integer.MAX_VALUE)));
+      map.put(QUERY, text(AQueryParser.removeComments(query, Integer.MAX_VALUE)));
     }
     // the plan is included if it was serialized while the query was compiled
     if(queryPlan != null) map.put(PLAN, text(queryPlan));

@@ -399,7 +399,7 @@ public final class XQuery4Test extends SandboxTest {
     error("fn { $arg }(2)", VARUNDEF_X);
 
     error("2 ! 256 =!> xs:byte()", FUNCCAST_X_X_X);
-    error("1 =!> if()", RESERVED_X);
+    error("1 =!> if()", RESERVED_X, SYNTAX_X);
     error("0 =!> unknown()", WHICHFUNC_X);
     error("0 =!> unknown(?)", WHICHFUNC_X);
     error("0 =!> local:unknown()", WHICHFUNC_X);
@@ -481,10 +481,10 @@ public final class XQuery4Test extends SandboxTest {
     query("if(0) {} else if(0) {} else { 1 }", 1);
     query("if(0) {} else if(0) {} else if(0) {} else if(0) {} else { 1 }", 1);
 
-    error("if() {}", NOIF);
+    error("if() {}", NOIF, SYNTAX_X);
     error("if(0) {} else", WRONGCHAR_X_X);
     error("if(0) {} else ()", WRONGCHAR_X_X);
-    error("if(0) {} else if() {}", NOIF);
+    error("if(0) {} else if() {}", NOIF, SYNTAX_X);
     error("if(0) {} else if(0) then", WRONGCHAR_X_X);
     error("if(0) {} else if(0) {} else", WRONGCHAR_X_X);
   }
@@ -503,11 +503,13 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(x := 1, y := 1)", 2);
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(1, y := 1)", 2);
     // GH-2463
-    error("declare function local:inc($x) { }; local:inc(,)", FUNCARG_X);
-    error("declare function local:inc($x) { }; local:inc(x := 0,)", FUNCARG_X);
-    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y)", FUNCARG_X);
-    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := )", FUNCARG_X);
-    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := 0,)", FUNCARG_X);
+    error("declare function local:inc($x) { }; local:inc(,)", FUNCARG_X, WRONGCHAR_X_X);
+    error("declare function local:inc($x) { }; local:inc(x := 0,)", FUNCARG_X, SYNTAX_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y)", FUNCARG_X, WRONGCHAR_X_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := )", FUNCARG_X,
+        EXPECTAFTER_X_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := 0,)",
+        FUNCARG_X, SYNTAX_X);
   }
 
   /** String templates. */
@@ -520,7 +522,7 @@ public final class XQuery4Test extends SandboxTest {
 
     error("`{`", INCOMPLETE);
     error("```", INCOMPLETE);
-    error("`}`", WRONGCHAR_X_X);
+    error("`}`", WRONGCHAR_X_X, SYNTAX_X);
   }
 
   /** Switch expression. */
@@ -591,11 +593,11 @@ public final class XQuery4Test extends SandboxTest {
     error("6.7e_8", NUMBER_X);
 
     error("0b_0", NUMBER_X);
-    error("0b1_", NUMBER_X);
+    error("0b1_", NUMBER_X, QUERYEND_X);
     error("0x_2", NUMBER_X);
-    error("0x3_", NUMBER_X);
-    error("0x3_", NUMBER_X);
-    error("0x4_", NUMBER_X);
+    error("0x3_", NUMBER_X, QUERYEND_X);
+    error("0x3_", NUMBER_X, QUERYEND_X);
+    error("0x4_", NUMBER_X, QUERYEND_X);
     error("5.6_", NUMBER_X);
     error("7.8e9_", NUMBER_X);
   }

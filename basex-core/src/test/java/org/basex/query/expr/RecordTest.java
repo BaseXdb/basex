@@ -140,7 +140,7 @@ public final class RecordTest extends SandboxTest {
     query("{ 'b': 2 } cast as record(a, b) instance of record(*)", false);
 
     // labeled record types: field names are NCNames, %constructor is no longer recognized
-    error("declare record local:r('a'); 1", NONCNAME_X);
+    error("declare record local:r('a'); 1", NONCNAME_X, WRONGCHAR_X_X);
     error("declare %constructor record local:r(a); 1", ANNRESERVED_X);
   }
 
@@ -1268,8 +1268,8 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:s(%fixed a := 1); "
         + "declare record local:t extends local:s(%fixed a := 2, b); local:t(3)",
         "{\"a\":2,\"b\":3}");
-    error("declare record local:s('a'); 1", NONCNAME_X);
-    error("declare record local:s(1); 1", NONCNAME_X);
+    error("declare record local:s('a'); 1", NONCNAME_X, WRONGCHAR_X_X);
+    error("declare record local:s(1); 1", NONCNAME_X, WRONGCHAR_X_X);
     error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
   }
 
@@ -1322,7 +1322,7 @@ public final class RecordTest extends SandboxTest {
         CIRCVAR_X);
 
     // syntax
-    error("declare record local:s(a) where; 1", NOEXPR);
+    error("declare record local:s(a) where; 1", NOEXPR, SYNTAX_X);
   }
 
   /**

@@ -26,7 +26,7 @@ public final class FnFormatNumberTest extends SandboxTest {
     // character specified twice
     error("declare default decimal-format percent=','; 1", DUPLDECFORM_X);
     // unknown decimal-format property
-    error("declare default decimal-format xxx='x'; 1", FORMPROP_X);
+    error("declare default decimal-format xxx='x'; 1", FORMPROP_X, SYNTAX_X);
     // invalid decimal-format property
     error("declare default decimal-format zero-digit='x'; 1", INVDECFORM_X_X);
     error("declare default decimal-format percent='xxx'; 1", INVDECFORM_X_X);

@@ -77,7 +77,7 @@ public final class ModuleLoader {
    * @return {@code true} if the package has been found
    * @throws QueryException query exception
    */
-  public synchronized boolean addImport(final String uri, final QueryParser qp,
+  public synchronized boolean addImport(final String uri, final AQueryParser qp,
       final InputInfo info) throws QueryException {
 
     // add Java repository package

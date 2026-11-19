@@ -666,6 +666,45 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
   }
 
   /** Test method. */
+  @Test public void evalQueryParser() {
+    queryParser(_XQUERY_EVAL);
+  }
+
+  /** Test method. */
+  @Test public void parseQueryParser() {
+    queryParser(_XQUERY_PARSE);
+  }
+
+  /**
+   * Tests the {@code queryparser} option.
+   * @param func function
+   */
+  private static void queryParser(final Function func) {
+    final String query = "true(,";
+    final String empty = " {}";
+    final boolean eval = func == _XQUERY_EVAL;
+    final String manual = " { 'queryparser': 'manual' }", rex = " { 'queryparser': 'rex' }";
+
+    // supplied option
+    error(eval ? func.args(query, empty, manual) : func.args(query, manual), FUNCARG_X);
+    error(eval ? func.args(query, empty, rex) : func.args(query, rex), WRONGCHAR_X_X);
+    error(eval ? func.args(query, empty, " { 'queryparser': 'unknown' }") :
+      func.args(query, " { 'queryparser': 'unknown' }"), INVALIDOPTIONVALUE_X);
+
+    // default: option of the calling context
+    final MainOptions.QueryParserType type = context.options.get(MainOptions.QUERYPARSER);
+    try {
+      set(MainOptions.QUERYPARSER, MainOptions.QueryParserType.MANUAL);
+      error(func.args(query), FUNCARG_X);
+      set(MainOptions.QUERYPARSER, MainOptions.QueryParserType.REX);
+      error(func.args(query), WRONGCHAR_X_X);
+      error(eval ? func.args(query, empty, manual) : func.args(query, manual), FUNCARG_X);
+    } finally {
+      set(MainOptions.QUERYPARSER, type);
+    }
+  }
+
+  /** Test method. */
   @Test public void parse() {
     final Function func = _XQUERY_PARSE;
     // queries
