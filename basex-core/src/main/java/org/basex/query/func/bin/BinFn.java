@@ -183,7 +183,7 @@ abstract class BinFn extends StandardFunc {
    */
   final byte[] toDigits(final QueryContext qc) throws QueryException {
     final byte[] string = toTokenOrNull(arg(0), qc);
-    return string != null ? digits(string) : null;
+    return string != null ? deleteSeparators(string) : null;
   }
 
   /**

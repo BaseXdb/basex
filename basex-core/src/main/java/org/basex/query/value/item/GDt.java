@@ -114,11 +114,11 @@ public final class GDt extends ADate {
       tb.add('-');
     } else {
       if(year < 0) tb.add('-');
-      prefix(tb, Math.abs(yea()), 4);
+      tb.addLong(Math.abs(yea()), 4);
     }
     if(has(MON) || has(DAY)) tb.add('-');
-    if(has(MON)) prefix(tb, month, 2);
-    if(has(DAY)) prefix(tb.add('-'), day, 2);
+    if(has(MON)) tb.addLong(month, 2);
+    if(has(DAY)) tb.add('-').addLong(day, 2);
 
     zone(tb);
     return tb.finish();

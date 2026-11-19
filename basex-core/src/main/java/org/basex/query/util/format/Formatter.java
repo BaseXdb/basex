@@ -654,8 +654,12 @@ public abstract class Formatter extends FormatUtil {
    * @return number character sequence
    */
   private byte[] number(final long num, final FormatParser fp, final int first) {
-    final byte[] n = number(token(num, fp.radix), fp, first);
-    return concat(n, suffix(num, fp.numType));
+    if(num >= 0 && digit(fp.primary)) {
+      // decimal digit pattern without separators: pad with leading zeroes
+      return new TokenBuilder().addLong(num, Math.max(fp.primary.length, fp.min)).
+          add(suffix(num, fp.numType)).finish();
+    }
+    return concat(number(token(num, fp.radix), fp, first), suffix(num, fp.numType));
   }
 
   /**

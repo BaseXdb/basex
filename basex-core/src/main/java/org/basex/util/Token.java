@@ -1269,11 +1269,11 @@ public final class Token {
   }
 
   /**
-   * Removes digit separators (underscores) and whitespace from a token.
+   * Deletes digit separators (underscores) and whitespace from a token.
    * @param token token
    * @return resulting token
    */
-  public static byte[] digits(final byte[] token) {
+  public static byte[] deleteSeparators(final byte[] token) {
     int c = 0;
     for(final byte b : token) {
       if(b == '_' || ws(b)) c++;
@@ -1352,6 +1352,18 @@ public final class Token {
    */
   public static boolean digit(final int ch) {
     return ch >= '0' && ch <= '9';
+  }
+
+  /**
+   * Checks if the specified token has only digits (0 - 9).
+   * @param token token
+   * @return result of check
+   */
+  public static boolean digit(final byte[] token) {
+    for(final byte b : token) {
+      if(!digit(b)) return false;
+    }
+    return true;
   }
 
   /**

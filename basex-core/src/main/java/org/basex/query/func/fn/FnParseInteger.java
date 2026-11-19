@@ -27,7 +27,7 @@ public final class FnParseInteger extends StandardFunc {
     final long rdx = rad.isEmpty() ? 10 : toLong(rad, radix);
     if(rdx < 2 || rdx > 36) throw INTRADIX_X.get(info, rdx);
 
-    final byte[] digits = Token.digits(value);
+    final byte[] digits = Token.deleteSeparators(value);
     final int dl = digits.length;
     final byte first = dl > 0 ? digits[0] : 0;
     final boolean neg = first == '-';

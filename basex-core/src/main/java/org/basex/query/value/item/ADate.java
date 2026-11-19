@@ -401,18 +401,11 @@ public abstract class ADate extends ADateDur {
     final boolean ymd = has(YEA);
     if(ymd) {
       if(year < 0) tb.add('-');
-      prefix(tb, Math.abs(yea()), 4);
-      tb.add('-');
-      prefix(tb, mon(), 2);
-      tb.add('-');
-      prefix(tb, day(), 2);
+      tb.addLong(Math.abs(yea()), 4).add('-').addLong(mon(), 2).add('-').addLong(day(), 2);
     }
     if(has(HRS)) {
       if(ymd) tb.add('T');
-      prefix(tb, hour(), 2);
-      tb.add(':');
-      prefix(tb, minute(), 2);
-      tb.add(':');
+      tb.addLong(hour(), 2).add(':').addLong(minute(), 2).add(':');
       if(seconds.compareTo(BigDecimal.TEN) < 0) tb.add('0');
       tb.add(Token.chopNumber(Token.token(seconds().abs().toPlainString())));
     }
@@ -427,18 +420,6 @@ public abstract class ADate extends ADateDur {
   void zone(final TokenBuilder tb) {
     // the offset ID is the XSD lexical form: 'Z', or +/-HH:MM
     if(has(ZON)) tb.add(ZoneOffset.ofTotalSeconds(tz * 60).getId());
-  }
-
-  /**
-   * Prefixes the specified number of zero digits before a number.
-   * @param tb token builder
-   * @param number number to be printed
-   * @param zero maximum number of zero digits
-   */
-  static void prefix(final TokenBuilder tb, final long number, final int zero) {
-    final byte[] t = Token.token(number);
-    for(int i = t.length; i < zero; i++) tb.add('0');
-    tb.add(t);
   }
 
   @Override
