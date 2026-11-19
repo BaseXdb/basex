@@ -71,39 +71,21 @@ public abstract class ADateDur extends Item {
   }
 
   /**
-   * Date and durations: converts the specified string to an integer value.
-   * Throws an exception if the value is invalid.
-   * @param string string to be converted
-   * @param dur duration
+   * Date and durations: converts a scanned substring to an integer value.
+   * @param ds date scanner
+   * @param start start position
+   * @param end end position (exclusive)
    * @param info input info (can be {@code null})
    * @return long value
    * @throws QueryException query exception
    */
-  final long toLong(final String string, final boolean dur, final InputInfo info)
+  final long toLong(final DateScanner ds, final int start, final int end, final InputInfo info)
       throws QueryException {
-    try {
-      return Long.parseLong(string);
-    } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, string).cause(ex);
+    final long v = ds.integer(start, end);
+    if(v == Long.MIN_VALUE) {
+      throw (this instanceof Dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type,
+          ds.string(start, end));
     }
-  }
-
-  /**
-   * Date and durations: converts the specified string to a decimal value.
-   * Throws an exception if the value is invalid.
-   * @param string string to be converted
-   * @param dur duration
-   * @param info input info (can be {@code null})
-   * @return decimal
-   * @throws QueryException query exception
-   */
-  final BigDecimal toDecimal(final String string, final boolean dur, final InputInfo info)
-      throws QueryException {
-
-    try {
-      return new BigDecimal(string);
-    } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, string).cause(ex);
-    }
+    return v;
   }
 }

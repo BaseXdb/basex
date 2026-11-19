@@ -30,7 +30,7 @@ public final class Tim extends ADate {
    */
   public Tim(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.TIME);
-    time(value, XTIME, info);
+    parse(value, false, true, XTIME, info);
     clean();
   }
 

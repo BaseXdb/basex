@@ -162,9 +162,9 @@ public final class QueryJob extends Job implements Runnable {
     // integer
     if(string.matches("^\\d+$")) return Itr.get(Itr.parse(token(string), info));
     // dayTimeDuration
-    if(Dur.DTD.matcher(string).matches()) return new DTDur(token(string), info);
-    // time
-    if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), info);
+    if(string.startsWith("P") || string.startsWith("-P")) return new DTDur(token(string), info);
+    // time (a dateTime starts with a year of four or more digits)
+    if(string.length() > 2 && string.charAt(2) == ':') return new Tim(token(string), info);
     // dateTime
     return new Dtm(token(string), BasicType.DATE_TIME, info);
   }

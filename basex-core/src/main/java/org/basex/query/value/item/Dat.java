@@ -30,7 +30,7 @@ public final class Dat extends ADate {
    */
   public Dat(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.DATE);
-    date(value, XDATE, info);
+    parse(value, true, false, XDATE, info);
   }
 
   /**

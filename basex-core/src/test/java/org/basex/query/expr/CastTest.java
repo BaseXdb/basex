@@ -414,4 +414,23 @@ public final class CastTest extends SandboxTest {
     }
     query("('AA' || char(11) || '==') castable as xs:base64Binary", false);
   }
+
+  /** Lexical forms of date, time and duration values. */
+  @Test public void dateTimeForms() {
+    query("xs:dateTime(' -0044-03-15T24:00:00+14:00 ')", "-0044-03-16T00:00:00+14:00");
+    query("xs:time('23:59:59.50Z')", "23:59:59.5Z");
+    query("xs:duration('-P1Y2M3DT4H5M6.70S')", "-P1Y2M3DT4H5M6.7S");
+    query("xs:dayTimeDuration('PT9223372036854775807S')", "P106751991167300DT15H30M7S");
+    query("xs:gMonthDay('--02-29Z')", "--02-29Z");
+
+    error("xs:dateTime('2000-01-01ZT10:00:00')", DATEFORMAT_X_X_X);
+    error("xs:dateTime('2000-01-01 T10:00:00')", DATEFORMAT_X_X_X);
+    error("xs:dateTime('2000-01-01T 10:00:00')", DATEFORMAT_X_X_X);
+    error("xs:duration('PTS')", DATEFORMAT_X_X_X);
+    error("xs:duration('PT1HS')", DATEFORMAT_X_X_X);
+    error("xs:duration('PT1.5M')", DATEFORMAT_X_X_X);
+    error("xs:dayTimeDuration('P1T2H')", DATEFORMAT_X_X_X);
+    error("xs:yearMonthDuration('P1Y1D')", DATEFORMAT_X_X_X);
+    error("xs:duration('PT1S') * 1e30", SECDURRANGE_X);
+  }
 }

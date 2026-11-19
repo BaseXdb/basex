@@ -69,10 +69,7 @@ public final class Dtm extends ADate {
    */
   public Dtm(final byte[] dateTime, final Type type, final InputInfo info) throws QueryException {
     super(type);
-    final int i = Token.indexOf(dateTime, 'T');
-    if(i == -1) throw dateError(dateTime, XDTM, info);
-    date(Token.substring(dateTime, 0, i), XDTM, info);
-    time(Token.substring(dateTime, i + 1), XDTM, info);
+    parse(dateTime, true, true, XDTM, info);
     if(type == BasicType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, dateTime);
   }
 
@@ -148,26 +145,7 @@ public final class Dtm extends ADate {
   }
 
   /**
-   * Constructs a Gregorian value from the supplied component values.
-   *
-   * <p>This method assumes that all component combinations and value ranges
-   * have already been validated by the caller. In particular, it does not
-   * verify:</p>
-   * <ul>
-   *   <li>that the combination of components matches the target type,</li>
-   *   <li>that the component values are within their lexical or calendar ranges,</li>
-   *   <li>that a timezone is present when required (e.g., for {@code xs:dateTimeStamp}).</li>
-   * </ul>
-   *
-   * <p>Components must be supplied in their lexical representation:
-   * month 1–12, day 1–31, hours 0–23, minutes 0–59, seconds in [0–60).
-   * For BC years, pass a negative year or 0 (for year 0). Undefined components must
-   * be {@code null}.</p>
-   *
-   * <p>This method is intended as a low-level construction helper for
-   * {@link org.basex.query.func.fn.FnBuildDateTime}, which performs all
-   * required validation and determines the appropriate target type.</p>
-   *
+   * Constructs a date/time value from components that have already been validated.
    * @param targetType target type
    * @param year year (can be {@code null})
    * @param month month (1–12, can be {@code null})

@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
-import java.util.regex.*;
 
 import javax.xml.datatype.*;
 
@@ -21,21 +20,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {
-  /** Pattern for one or more digits. */
-  static final String DP = "(\\d+)";
-
-  /** YearMonth pattern. */
-  public static final Pattern YMD = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
-  /** DayTime pattern. */
-  public static final Pattern DTD = Pattern.compile(
-      "(-?)P(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(\\.\\d+)?)S)?)?");
-  /** Duration pattern. */
-  public static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP +
-      "M)?(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(?:\\d*\\.\\d+)?)?S)?)?");
-
   /** Number of months. */
   long months;
-  /** Seconds and milliseconds. {@code null}: undefined. */
+  /** Seconds and fractional seconds, within the range of a long value. */
   BigDecimal seconds;
 
   /**
@@ -63,7 +50,7 @@ public class Dur extends ADateDur {
   public Dur(final Dur dur) {
     this(BasicType.DURATION);
     months = dur.months;
-    seconds = dur.totalSeconds();
+    seconds = dur.seconds;
   }
 
   /**
@@ -79,7 +66,8 @@ public class Dur extends ADateDur {
     this(BasicType.DURATION);
     checkFactor(factor, mult, type, info);
     months = scaleMonths(dur.months, factor, mult, info);
-    seconds = scaleSeconds(dur.totalSeconds(), factor, mult);
+    seconds = scaleSeconds(dur.seconds, factor, mult);
+    checkSeconds(info);
   }
 
   /**
@@ -91,51 +79,63 @@ public class Dur extends ADateDur {
    */
   private Dur(final byte[] value, final Type type, final InputInfo info) throws QueryException {
     this(type);
-    final String val = Token.string(Token.trim(value));
-    final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
-      throw dateError(value, XDURR, info);
-    yearMonth(value, mt, info);
-    dayTime(value, mt, 6, info);
+    final DateScanner ds = new DateScanner(value);
+    if(!ds.duration(0, 3, true)) throw dateError(value, XDURR, info);
+    yearMonth(value, ds, info);
+    dayTime(value, ds, info);
   }
 
   /**
    * Initializes the yearMonth component.
-   * @param vl value
-   * @param mt matcher
+   * @param value value
+   * @param ds date scanner
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void yearMonth(final byte[] vl, final Matcher mt, final InputInfo info)
+  final void yearMonth(final byte[] value, final DateScanner ds, final InputInfo info)
       throws QueryException {
-    final long y = mt.group(2) != null ? toLong(mt.group(3), true, info) : 0;
-    final long m = mt.group(4) != null ? toLong(mt.group(5), true, info) : 0;
-    if(y > (Long.MAX_VALUE - m) / 12) throw DURRANGE_X_X.get(info, type, vl);
+    final long y = component(ds, 0, info), m = component(ds, 1, info);
+    if(y > (Long.MAX_VALUE - m) / 12) throw DURRANGE_X_X.get(info, type, value);
     months = y * 12 + m;
-    if(!mt.group(1).isEmpty()) months = -months;
+    if(ds.neg) months = -months;
   }
 
   /**
    * Initializes the dayTime component.
    * @param value value
-   * @param match matcher
-   * @param pos first matching position
+   * @param ds date scanner
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void dayTime(final byte[] value, final Matcher match, final int pos, final InputInfo info)
+  final void dayTime(final byte[] value, final DateScanner ds, final InputInfo info)
       throws QueryException {
-
-    final long d = match.group(pos) != null ? toLong(match.group(pos + 1), true, info) : 0;
-    final long h = match.group(pos + 3) != null ? toLong(match.group(pos + 4), true, info) : 0;
-    final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, info) : 0;
-    final BigDecimal s = match.group(pos + 7) != null ?
-      toDecimal(match.group(pos + 8), true, info) : BigDecimal.ZERO;
-    seconds = s.add(BigDecimal.valueOf(d).multiply(BD_864000)).
-        add(BigDecimal.valueOf(h).multiply(BD_3600)).
-        add(BigDecimal.valueOf(m).multiply(BD_60));
-    if(!match.group(1).isEmpty()) seconds = seconds.negate();
+    final long d = component(ds, 2, info), h = component(ds, 3, info), m = component(ds, 4, info);
+    final int s = ds.starts[5];
+    final BigDecimal sc = s != -1 ? ds.decimal(s, ds.ends[5]) : BigDecimal.ZERO;
+    try {
+      // all components are non-negative: an overflow exceeds the supported range
+      final long dhm = Math.addExact(Math.addExact(Math.multiplyExact(d, 86400),
+          Math.multiplyExact(h, 3600)), Math.multiplyExact(m, 60));
+      seconds = sc.add(BigDecimal.valueOf(dhm));
+    } catch(final ArithmeticException ex) {
+      throw DURRANGE_X_X.get(info, type, value).cause(ex);
+    }
+    if(ds.neg) seconds = seconds.negate();
     if(!secondsInRange()) throw DURRANGE_X_X.get(info, type, value);
+  }
+
+  /**
+   * Returns the value of an integer duration component.
+   * @param ds date scanner
+   * @param c component offset
+   * @param info input info (can be {@code null})
+   * @return value, or {@code 0} if the component is undefined
+   * @throws QueryException query exception
+   */
+  private long component(final DateScanner ds, final int c, final InputInfo info)
+      throws QueryException {
+    final int s = ds.starts[c];
+    return s == -1 ? 0 : toLong(ds, s, ds.ends[c], info);
   }
 
   @Override
@@ -150,7 +150,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final long day() {
-    return seconds.divideToIntegralValue(BD_864000).longValue();
+    return seconds.longValue() / 86400;
   }
 
   @Override
@@ -165,16 +165,9 @@ public class Dur extends ADateDur {
 
   @Override
   public final BigDecimal seconds() {
-    return seconds.remainder(BD_60);
-  }
-
-  /**
-   * Returns the total number of seconds, or zero if the component is undefined
-   * (a duration with no time part, such as {@code P1Y}).
-   * @return seconds
-   */
-  final BigDecimal totalSeconds() {
-    return seconds == null ? BigDecimal.ZERO : seconds;
+    final long i = seconds.longValue(), r = i % 60;
+    return i == r ? seconds : seconds.scale() <= 0 ? BigDecimal.valueOf(r) :
+      seconds.subtract(BigDecimal.valueOf(i - r));
   }
 
   /**
@@ -183,6 +176,15 @@ public class Dur extends ADateDur {
    */
   final boolean secondsInRange() {
     return seconds.abs().compareTo(BD_MAXLONG) <= 0;
+  }
+
+  /**
+   * Checks if the seconds are within the supported range.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  final void checkSeconds(final InputInfo info) throws QueryException {
+    if(!secondsInRange()) throw SECDURRANGE_X.get(info, seconds.doubleValue());
   }
 
   /**
@@ -202,7 +204,7 @@ public class Dur extends ADateDur {
    * @return time
    */
   private long tim() {
-    return seconds.remainder(BD_864000).longValue();
+    return seconds.longValue() % 86400;
   }
 
   @Override
@@ -240,15 +242,18 @@ public class Dur extends ADateDur {
    * @param tb token builder
    */
   final void time(final TokenBuilder tb) {
-    if(seconds.remainder(BD_864000).signum() == 0) return;
-    tb.add('T');
-    final long h = hour();
-    if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
-    final long m = minute();
-    if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
+    final long t = tim();
     final BigDecimal sc = seconds();
+    if(t == 0 && sc.signum() == 0) return;
+    tb.add('T');
+    final long h = t / 3600;
+    if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
+    final long m = t % 3600 / 60;
+    if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
     if(sc.signum() == 0) return;
-    tb.add(Token.chopNumber(Token.token(sc.abs().toPlainString()))).add('S');
+    if(sc.scale() <= 0) tb.addLong(Math.abs(sc.longValue()));
+    else tb.add(Token.chopNumber(Token.token(sc.abs().toPlainString())));
+    tb.add('S');
   }
 
   @Override

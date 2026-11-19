@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.math.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
@@ -69,10 +68,9 @@ public final class YMDur extends Dur {
    */
   public YMDur(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.YEAR_MONTH_DURATION);
-    final String val = Token.string(Token.trim(value));
-    final Matcher mt = YMD.matcher(val);
-    if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, info);
-    yearMonth(value, mt, info);
+    final DateScanner ds = new DateScanner(value);
+    if(!ds.duration(0, 2, false)) throw dateError(value, XYMD, info);
+    yearMonth(value, ds, info);
     seconds = BigDecimal.ZERO;
   }
 
