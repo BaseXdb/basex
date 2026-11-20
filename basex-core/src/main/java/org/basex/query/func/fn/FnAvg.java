@@ -28,11 +28,8 @@ public final class FnAvg extends FnSum {
     expr = opt(true, cc);
     if(expr != null) return expr;
 
-    final SeqType st = arg(0).seqType();
-    if(!st.mayBeWrapped()) {
-      final Type type = sumType(arg(0));
-      exprType.assign(Calc.DIVIDE.type(type != null ? type : st.type, BasicType.INTEGER));
-    }
+    final Type sum = sumType(arg(0)), type = sum != null ? sum : arg(0).seqType().atomType();
+    exprType.assign(Calc.DIVIDE.type(type, BasicType.INTEGER));
 
     return this;
   }

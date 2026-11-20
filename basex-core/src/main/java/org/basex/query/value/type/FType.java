@@ -7,14 +7,13 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Abstract super class for function types.
- * This class is inherited by {@link MapType}, {@link ArrayType}, and {@link FuncType}.
+ * Abstract superclass of function types ({@link FuncType}, {@link MapType}, {@link ArrayType}).
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public abstract class FType implements Type {
-  /** Any function placeholder string. */
+  /** Wildcard parameter list of {@code function(*)}, {@code map(*)} and {@code array(*)}. */
   static final String[] WILDCARD = { "*" };
 
   /** Sequence types. */

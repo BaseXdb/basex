@@ -192,10 +192,10 @@ public final class Var extends ExprInfo {
         throw typeError(declType, st, null, name, info);
       }
       if(!st.keptBy(declType)) {
-        // coercion may change the items: only their number is kept, unless arrays are atomized
+        // coercion may change the items: their number is kept if each item atomizes to one item
         final SeqType dt = exprType.seqType();
         final Occ occ = dt.occ.intersect(st.occ);
-        if(occ != null && !st.mayBeWrapped()) {
+        if(occ != null && st.atomizesToOne()) {
           exprType.assign(dt, occ, occ.check(size) ? size : -1);
         }
         return;

@@ -111,6 +111,8 @@ public final class MixedTest extends SandboxTest {
         + "local:g({ 'a': 's' })", "ok");
     query("declare function local:f($x as local:d) { $x instance of xs:double };"
         + "declare type local:d as xs:double; local:f(xs:float(1))", true);
+    query("declare %basex:inline(0) function local:f($x as (local:t | xs:string)) {"
+        + "count(data($x)) }; declare type local:t as item(); local:f([ 1, 2 ])", 2);
     // types of other queries must not be reused
     query("let $q := fn($n) { 'declare %basex:inline(0) function local:f("
         + "$m as map(local:' || $n || ', xs:integer)) { map:filter($m, fn($k, $v) { true() })"

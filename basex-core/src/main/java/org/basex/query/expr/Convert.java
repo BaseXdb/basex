@@ -71,15 +71,14 @@ abstract class Convert extends Single {
    */
   final Boolean castable(final SeqType castType) {
     final SeqType est = expr.seqType();
-    if(!est.mayBeWrapped()) {
+    if(est.atomizesToOne()) {
       // the input cardinality is constrained by the target type, also for list types
       final long es = expr.size();
       if(es != -1 && !seqType.occ.check(es)) return false;
 
-      final Type et = est.type;
-      if(et.instanceOf(castType.type) && est.occ.instanceOf(castType.occ) &&
-          (et.eq(castType.type) || castType.type == BasicType.NUMERIC) &&
-          castType.type != BasicType.ERROR) return true;
+      final Type et = est.type, ct = castType.type.deref();
+      if(et.instanceOf(ct) && est.occ.instanceOf(castType.occ) &&
+          (et.eq(ct) || ct == BasicType.NUMERIC) && ct != BasicType.ERROR) return true;
     }
     return null;
   }

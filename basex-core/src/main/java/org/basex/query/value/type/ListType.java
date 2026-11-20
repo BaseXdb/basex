@@ -5,14 +5,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XDM list types.
+ * Built-in XML Schema list types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -27,7 +26,7 @@ public enum ListType implements Type {
 
   /** Name. */
   private final byte[] name;
-  /** Atom Type. */
+  /** Atomic type of the list items. */
   private final BasicType type;
 
   /** Sequence types. */
@@ -35,8 +34,8 @@ public enum ListType implements Type {
 
   /**
    * Constructor.
-   * @param name name
-   * @param type type
+   * @param name local name
+   * @param type atomic type of the list items
    */
   ListType(final String name, final BasicType type) {
     this.name = token(name);
@@ -44,9 +43,9 @@ public enum ListType implements Type {
   }
 
   /**
-   * Finds and returns the specified type.
+   * Returns the list type with the specified name.
    * @param qname name of type
-   * @return type or {@code null}
+   * @return list type (can be {@code null})
    */
   public static ListType get(final QNm qname) {
     if(Token.eq(qname.uri(), XS_URI)) {
@@ -59,8 +58,8 @@ public enum ListType implements Type {
   }
 
   /**
-   * Returns the name of a type.
-   * @return name
+   * Returns the QName of this type.
+   * @return QName
    */
   public final QNm qname() {
     return new QNm(name, XS_URI);
@@ -92,17 +91,6 @@ public enum ListType implements Type {
     final ValueBuilder vb = new ValueBuilder(qc, values.length);
     for(final byte[] value : values) vb.add(type.cast(Str.get(value), qc, info));
     return vb.value(type);
-  }
-
-  @Override
-  public final Value cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-    return cast(Str.get(value, info), qc, info);
-  }
-
-  @Override
-  public Item read(final DataInput in, final QueryContext qc) {
-    throw Util.notExpected();
   }
 
   @Override

@@ -3158,4 +3158,63 @@ public final class RewritingsTest extends SandboxTest {
     query("let $j := jtree({ 'a': 1 }) let $x := parse-xml('<x/>') "
         + "return count(($j, $x, $j/a, $x) | ())", 3);
   }
+
+  /** Static types of atomized arrays. */
+  @Test public void atomizedArrayTypes() {
+    final String input = "for $a in ([ 1 ], [ 2 ]) return ";
+    check(input + "$a + 1", "2\n3", type(Arith.class, "xs:integer?"));
+    check(input + "-$a", "-1\n-2", type(Unary.class, "xs:integer?"));
+    check(input + "abs($a)", "1\n2", type(ABS, "xs:integer?"));
+    check(input + "sum($a)", "1\n2", type(SUM, "xs:integer"));
+    check(input + "avg($a)", "1\n2", type(AVG, "xs:decimal?"));
+    check(input + "min($a)", "1\n2", type(MIN, "xs:integer?"));
+    check(input + "$a coerce as xs:decimal*", "1\n2", type(TypeCheck.class, "xs:integer*"));
+
+    // items of generic arrays and JNodes may not be comparable
+    final String func = "declare function f($a as %1$s, $b as %1$s) { $a = $b }; "
+        + "let $i := random:integer(1) return f(%2$s, %3$s)";
+    error(String.format(func, "array(*)", "[ 10 + $i ]", "[ string(10 + $i) ]"),
+        CMPTYPES_X_X_X_X);
+    error(String.format(func, "jnode()", "jtree([ 10 + $i ])/1", "jtree([ string(10 + $i) ])/1"),
+        CMPTYPES_X_X_X_X);
+
+    // single arrays may atomize to multiple items
+    final String arrays = "declare %%basex:inline(0) function f($a as array(xs:integer)) { %s }; "
+        + "f([ 2, random:integer(1) + 5 ])";
+    error(String.format(arrays, "$a + 1 = 3"), INVTYPE_X);
+    error(String.format(arrays, "-$a = -2"), INVTYPE_X);
+    error(String.format(arrays, "exists(($a, [ 3 ])[. eq $a])"), INVTYPE_X);
+
+    // hash comparisons
+    check("declare %basex:inline(0) function f($a as array(xs:string)*, $x as xs:string*) "
+        + "{ $x = $a }; f(([ 'a' ], [ 'b', 'c' || random:integer(1) ]), ('x', 'c0', 'c1'))",
+        true, exists(CmpHashG.class));
+
+    // keyed filters
+    check("declare %basex:inline(0) function f($a as array(xs:string)*, $x as xs:string*) "
+        + "{ for $s in $x return count($a[. = $s]) }; "
+        + "f(([ 'a', 'b' ], [ 'c' ], [ 'b' ]), ('b', 'c', 'd' || random:integer(1)))",
+        "2\n1\n0", exists(HashFilter.class));
+    check("declare %basex:inline(0) function f($a as array(xs:double)*, $x as xs:double*) "
+        + "{ for $d in $x return count($a[. > $d]) }; "
+        + "f(([ 1e0, 5e0 ], [ 3e0 ], []), (0e0, 2e0, 6e0 + random:integer(1)))",
+        "2\n2\n0", exists(RangeFilter.class));
+
+    // choice types
+    final String choice = "declare %%basex:inline(0) function f("
+        + "$x as (array(xs:integer)|xs:integer), $y as (element()|xs:untypedAtomic)) "
+        + "{ %s }; f(random:integer(1), <a>1</a>), f([ random:integer(1) ], xs:untypedAtomic('1'))";
+    check(String.format(choice, "data($x)"), "0\n0", type(DATA, "xs:integer*"));
+    check(String.format(choice, "$x + 1"), "1\n1", type(Arith.class, "xs:integer?"));
+    check(String.format(choice, "$y + 1"), "2\n2", type(Arith.class, "xs:double"));
+
+    // integers divided by 1 must yield decimals
+    final String numeric = "declare %%basex:inline(0) function f($x as %s) "
+        + "{ ($x div 1) instance of xs:decimal and not(($x div 1) instance of xs:integer) }; f(1)";
+    query(String.format(numeric, "xs:numeric"), true);
+    query(String.format(numeric, "(xs:integer | xs:untypedAtomic)"), true);
+    // xs:numeric operands keep their type only for integer literals
+    query("declare %basex:inline(0) function f($x as xs:numeric) "
+        + "{ ($x * xs:float(1)) instance of xs:float }; f(1)", true);
+  }
 }

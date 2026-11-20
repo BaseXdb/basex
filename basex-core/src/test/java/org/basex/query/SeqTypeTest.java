@@ -1133,7 +1133,8 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.mayBeFunction());
     assertFalse(JNODE.seqType().mayBeFunction());
     assertFalse(ERROR_O.mayBeFunction());
-    assertFalse(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeFunction());
+    assertTrue(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeFunction());
+    assertFalse(ChoiceItemType.get(DATE, STRING).seqType().mayBeFunction());
   }
 
   /** Checks that in-place resolution of forward references is not cached away. */
@@ -1148,12 +1149,14 @@ public final class SeqTypeTest {
     assertFalse(st.mayBeJNode());
     assertFalse(st.mayBeNumber());
 
-    // a reference in a choice item type is not dereferenced while unresolved
+    // a reference in a choice item type also denotes item() while unresolved
     final TypeRef ref2 = new TypeRef(new QNm("s"), ii);
     final SeqType choice = ChoiceItemType.get(ref2, STRING).seqType();
-    assertFalse(choice.mayBeJNode());
+    assertTrue(choice.mayBeJNode());
+    assertTrue(choice.mayBeNumber());
     ref2.resolve(JNODE);
     assertTrue(choice.mayBeJNode());
+    assertFalse(choice.mayBeNumber());
   }
 
   /**

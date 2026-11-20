@@ -50,7 +50,7 @@ public class FnDuplicateValues extends StandardFunc {
         if(values instanceof RangeSeq || values instanceof Range || st.atomOcc().max <= 1)
           return cc.voidAndReturn(values, Empty.VALUE, info);
         // duplicate-values((1 to 3) ! 1) → 1
-        if(values instanceof final SingletonSeq ss && !st.mayBeWrapped() && ss.singleItem()) {
+        if(values instanceof final SingletonSeq ss && st.atomizesToOne() && ss.singleItem()) {
           return type == st.type ? ss.itemAt(0) : cc.function(Function.DATA, info, ss.itemAt(0));
         }
       }

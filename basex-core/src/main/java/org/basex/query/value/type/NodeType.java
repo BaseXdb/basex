@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
- * XDM node types.
+ * XDM node types, optionally restricted by a node test.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -67,18 +67,18 @@ public final class NodeType implements Type {
   }
 
   /**
-   * Returns an instance for the specified kind.
+   * Returns the node type for the specified node kind.
    * @param kind node kind
-   * @return type
+   * @return node type
    */
   public static NodeType get(final Kind kind) {
     return TYPES.get(kind);
   }
 
   /**
-   * Returns an instance for the specified test.
+   * Returns the node type for the specified node test.
    * @param test node test
-   * @return type
+   * @return node type
    */
   public static NodeType get(final Test test) {
     final Kind kind = test.kind;
@@ -88,7 +88,7 @@ public final class NodeType implements Type {
   /**
    * Returns an element type for the specified names.
    * @param names element names (at least one)
-   * @return type
+   * @return element type
    */
   public static NodeType get(final QNm... names) {
     final ArrayList<Test> tests = new ArrayList<>(names.length);
@@ -99,7 +99,7 @@ public final class NodeType implements Type {
   /**
    * Returns an element type for the specified names.
    * @param names element names (at least one)
-   * @return type
+   * @return element type
    */
   public static NodeType get(final String... names) {
     return get(Arrays.stream(names).map(QNm::new).toArray(QNm[]::new));
@@ -107,7 +107,7 @@ public final class NodeType implements Type {
 
   /**
    * Returns a JNode type for the specified key and value type.
-   * @param key key ({@code null} for wildcard, {@link Empty#VALUE} for root node)
+   * @param key key, {@link Empty#VALUE} for root nodes, absent for any key (can be {@code null})
    * @param valueType value type (can be {@code null})
    * @return JNode type
    */
@@ -128,7 +128,7 @@ public final class NodeType implements Type {
    * @return result of check
    */
   public boolean leaf() {
-    return kind.leaf() || test instanceof final JNodeTest jt && leaf(jt.valueType);
+    return kind.leaf() || leaf(valueType());
   }
 
   /**
@@ -137,6 +137,14 @@ public final class NodeType implements Type {
    */
   public boolean leafChildren() {
     return test instanceof final JNodeTest jt && leaf(jt.childType());
+  }
+
+  /**
+   * Returns the value type of JNodes of this type if it is specified.
+   * @return value type (can be {@code null})
+   */
+  public SeqType valueType() {
+    return test instanceof final JNodeTest jt ? jt.valueType : null;
   }
 
   /**
@@ -162,11 +170,6 @@ public final class NodeType implements Type {
   @Override
   public boolean isStringOrUntyped() {
     return !kind.oneOf(Kind.NODE, Kind.JNODE);
-  }
-
-  @Override
-  public boolean isSortable() {
-    return isStringOrUntyped();
   }
 
   @Override
@@ -236,6 +239,8 @@ public final class NodeType implements Type {
 
   @Override
   public BasicType atomic() {
+    final SeqType vt = valueType();
+    if(vt != null) return vt.type.atomic();
     return kind.oneOf(Kind.NODE, Kind.JNODE) ? null :
       kind == Kind.XNODE ? BasicType.ANY_ATOMIC_TYPE :
       kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NAMESPACE) ? BasicType.STRING :
@@ -250,11 +255,6 @@ public final class NodeType implements Type {
   @Override
   public boolean global() {
     return test == null;
-  }
-
-  @Override
-  public boolean refinable() {
-    return kind == Kind.XNODE;
   }
 
   @Override

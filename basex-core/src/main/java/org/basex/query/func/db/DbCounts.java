@@ -93,7 +93,7 @@ public final class DbCounts extends StandardFunc {
     if(!(func instanceof final FuncItem fi) || fi.arity() != 1) return null;
     // the parameter must accept each single node without conversion
     final SeqType param = fi.funcType().argTypes[0];
-    if(!param.occ.check(1) || !type.instanceOf(param.type)) return null;
+    if(!param.occ.check(1) || !type.instanceOf(param.type.deref())) return null;
 
     Expr body = fi.expr;
     // skip type check that only atomizes the result

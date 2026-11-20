@@ -130,9 +130,7 @@ public abstract class Expr extends ExprInfo {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
 
-    long size = iter.size();
-    if(size != -1 && st.mayBeWrapped()) size = -1;
-    return new AtomIter(iter, qc, ii, size);
+    return new AtomIter(iter, qc, ii, st.atomizesToOne() ? iter.size() : -1);
   }
 
   /**
@@ -263,7 +261,7 @@ public abstract class Expr extends ExprInfo {
    * @return size, or {@code -1} if it is unknown
    */
   public final long atomSize() {
-    return seqType().mayBeWrapped() ? -1 : size();
+    return seqType().atomizesToOne() ? size() : -1;
   }
 
   /**

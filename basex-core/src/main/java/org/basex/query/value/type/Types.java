@@ -372,8 +372,8 @@ public final class Types {
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];
 
   static {
-    for(final BasicType type : BasicType.values()) TYPES[type.index()] = type;
-    for(final NodeType type : NodeType.TYPES.values()) TYPES[type.index()] = type;
+    for(final BasicType type : BasicType.values()) TYPES[type.id().asByte()] = type;
+    for(final NodeType type : NodeType.TYPES.values()) TYPES[type.id().asByte()] = type;
     TYPES[Type.ID.FUN.asByte()] = FUNCTION;
     TYPES[Type.ID.MAP.asByte()] = MAP;
     TYPES[Type.ID.ARRAY.asByte()] = ARRAY;

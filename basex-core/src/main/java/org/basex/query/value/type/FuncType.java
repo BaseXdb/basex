@@ -5,7 +5,6 @@ import static org.basex.query.value.type.Types.*;
 
 import java.util.*;
 
-import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
@@ -24,9 +23,9 @@ public final class FuncType extends FType {
   public final AnnList anns;
   /** Declared return type (used by instance-of, coercion, subtyping). */
   public final SeqType declType;
-  /** Refined return type (a subtype of {@link #declType}); used for result typing. */
+  /** Refined return type for result typing (a subtype of {@link #declType}). */
   public final SeqType refinedType;
-  /** Argument types (can be {@code null}, indicates that no types were specified). */
+  /** Argument types, unspecified for wildcard function types (can be {@code null}). */
   public final SeqType[] argTypes;
 
   /**
@@ -42,7 +41,7 @@ public final class FuncType extends FType {
    * Constructor.
    * @param anns annotations
    * @param declType declared return type (can be {@code null})
-   * @param refinedType refined return type ({@code null}: same as declared type)
+   * @param refinedType refined return type, defaults to the declared type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
   private FuncType(final AnnList anns, final SeqType declType, final SeqType refinedType,
@@ -65,7 +64,7 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Getter for function types.
+   * Returns a function type.
    * @param anns annotations
    * @param declType declared return type
    * @param args argument types
@@ -76,7 +75,7 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Getter for function types without annotations.
+   * Returns a function type without annotations.
    * @param declType declared return type
    * @param args argument types
    * @return function type
@@ -86,7 +85,7 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Getter for a function's type.
+   * Returns the function type for the specified parameters.
    * @param anns annotations
    * @param declType declared return type (can be {@code null})
    * @param params parameters (can contain {@code null} references)
@@ -102,9 +101,9 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Finds and returns the specified function type.
+   * Returns the wildcard function, map, record or array type with the specified name.
    * @param name name of type
-   * @return type or {@code null}
+   * @return type (can be {@code null})
    */
   public static Type get(final QNm name) {
     if(name.uri().length != 0) return null;
@@ -127,11 +126,6 @@ public final class FuncType extends FType {
       throws QueryException {
     if(item instanceof final FItem func) return func.coerceTo(this, qc, null, info);
     throw typeError(item, this, info);
-  }
-
-  @Override
-  public Item read(final DataInput in, final QueryContext qc) {
-    throw Util.notExpected();
   }
 
   @Override
@@ -280,8 +274,8 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Return function type with fewer arguments.
-   * @param arity arity of target type
+   * Returns a function type with the argument types truncated to the specified arity.
+   * @param arity arity of the target type
    * @return function type
    */
   public FuncType with(final int arity) {

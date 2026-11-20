@@ -64,18 +64,16 @@ public class CmpG extends Cmp {
     if(expr != this) return cc.replaceWith(this, cc.function(BOOLEAN, info, expr));
 
     // remove redundant type conversions
-    final Type t1 = exprs[0].seqType().type.atomic(), t2 = exprs[1].seqType().type.atomic();
-    if(t1 != null && t2 != null) {
-      if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
-        // $node[string() = 'x'] → $node[. = 'x']
-        exprs = simplifyAll(Simplify.STRING, cc);
-      } else if(t1.isNumber() && t2.isNumber()) {
-        exprs = simplifyAll(Simplify.NUMBER, cc);
-      } else if(t1.isNumber() && t2.isUntyped() || t1.isUntyped() && t2.isNumber()) {
-        // 1 = <x>1</x> → 1 = xs:untypedAtomic('1')
-        final int u = t1.isUntyped() ? 0 : 1;
-        exprs[u] = exprs[u].simplifyFor(Simplify.NUMBER, cc);
-      }
+    final Type t1 = exprs[0].seqType().atomType(), t2 = exprs[1].seqType().atomType();
+    if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
+      // $node[string() = 'x'] → $node[. = 'x']
+      exprs = simplifyAll(Simplify.STRING, cc);
+    } else if(t1.isNumber() && t2.isNumber()) {
+      exprs = simplifyAll(Simplify.NUMBER, cc);
+    } else if(t1.isNumber() && t2.isUntyped() || t1.isUntyped() && t2.isNumber()) {
+      // 1 = <x>1</x> → 1 = xs:untypedAtomic('1')
+      final int u = t1.isUntyped() ? 0 : 1;
+      exprs[u] = exprs[u].simplifyFor(Simplify.NUMBER, cc);
     }
 
     // simplify operands
@@ -115,8 +113,8 @@ public class CmpG extends Cmp {
     if(expr == this) {
       // skip runtime type check if items are known to be comparable
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-      final Type type1 = st1.type, type2 = st2.type;
-      if(type1 == type2 && !type1.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.ITEM)
+      final Type type1 = st1.atomType(), type2 = st2.atomType();
+      if(type1 == type2 && type1.atomic() == type1 && type1 != BasicType.ANY_ATOMIC_TYPE
           || type1.isUntyped() || type2.isUntyped()
           || type1.isNumber() && type2.isNumber()
           || type1.isStringOrUntyped() && type2.isStringOrUntyped()
@@ -127,7 +125,7 @@ public class CmpG extends Cmp {
       eager = expr1.eager() && expr2.eager();
 
       // choose best implementation
-      if(st1.atomOcc().max <= 1 && st2.atomOcc().max <= 1) {
+      if(st1.zeroOrOneUnwrapped() && st2.zeroOrOneUnwrapped()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() &&

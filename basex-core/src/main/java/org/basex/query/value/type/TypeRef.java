@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Forward reference to a named item type.
+ * Type reference to a named item type, which is resolved in place.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class TypeRef implements Type {
   /** Referenced type name. */
   private final QNm name;
-  /** Input info ({@code null} once this reference has been resolved). */
+  /** Input info, absent once this reference has been resolved (can be {@code null}). */
   private InputInfo info;
   /** Referenced type (initially {@code item()}, may itself be a {@code TypeRef}). */
   private Type type = BasicType.ITEM;
@@ -52,8 +52,8 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Checks if the specified type is a still-unresolved forward reference.
-   * @param type type
+   * Checks if the specified type is an unresolved type reference.
+   * @param type type to check
    * @return result of check
    */
   public static boolean unresolved(final Type type) {
@@ -72,9 +72,9 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Checks if the specified type, its chained references or its choice alternatives contain a
-   * still-unresolved reference.
-   * @param type type
+   * Checks if the specified type, its chained references or its choice alternatives contain an
+   * unresolved type reference.
+   * @param type type to check
    * @return result of check
    */
   public static boolean incomplete(final Type type) {
@@ -87,8 +87,8 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Returns the input info of an unresolved reference.
-   * @return input info, or {@code null} if resolved
+   * Returns the input info if this reference is unresolved.
+   * @return input info (can be {@code null})
    */
   public InputInfo info() {
     return info;
@@ -173,13 +173,13 @@ public final class TypeRef implements Type {
   }
 
   @Override
-  public boolean isStringOrUntyped() {
-    return deref().isStringOrUntyped();
+  public boolean isNumberOrUntyped() {
+    return deref().isNumberOrUntyped();
   }
 
   @Override
-  public boolean isSortable() {
-    return deref().isSortable();
+  public boolean isStringOrUntyped() {
+    return deref().isStringOrUntyped();
   }
 
   @Override
@@ -190,11 +190,6 @@ public final class TypeRef implements Type {
   @Override
   public ID id() {
     return deref().id();
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return deref().nsSensitive();
   }
 
   @Override

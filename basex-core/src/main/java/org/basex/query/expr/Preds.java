@@ -311,9 +311,11 @@ public abstract class Preds extends Arr {
     if(last instanceof final Cmp cmp) {
       final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
       final SeqType st1 = op1.seqType(), st2 = op2.seqType();
-      final Type type1 = st1.type, type2 = st2.type;
-      if((cmp instanceof CmpG || cmp instanceof CmpV && st1.zeroOrOne() && st2.zeroOrOne() && (
-        type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
+      final Type type1 = st1.atomType(), type2 = st2.atomType();
+      if((cmp instanceof CmpG || cmp instanceof CmpV &&
+          st1.atomOcc().max <= 1 && st2.atomOcc().max <= 1 && (
+        type1 == type2 && type1.atomic() == type1 && type1 != BasicType.ANY_ATOMIC_TYPE ||
+        type1.isStringOrUntyped() && type2.isStringOrUntyped()
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
         if(expr != this) return new CmpG(cmp.info, expr, op2, cmp.cmpOp()).optimize(cc);

@@ -285,13 +285,8 @@ public abstract sealed class SimpleMap extends Mapping
 
     // value of the root: map or array, or JNode with a map or array value
     final Expr root = path.root;
-    SeqType vt = root.seqType();
-    final boolean jnode = vt.type instanceof NodeType;
-    if(jnode) {
-      if(!(((NodeType) vt.type).test instanceof final JNodeTest jt)) return null;
-      vt = jt.valueType;
-    }
-    final boolean map = vt.instanceOf(Types.MAP_O);
+    final SeqType rst = root.seqType(), jvt = rst.valueType(), vt = jvt != null ? jvt : rst;
+    final boolean jnode = jvt != null, map = vt.instanceOf(Types.MAP_O);
     if(!map && !vt.instanceOf(Types.ARRAY_O)) return null;
 
     final Test test = step.test;

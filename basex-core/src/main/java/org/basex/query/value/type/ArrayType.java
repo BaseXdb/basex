@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Type for arrays.
+ * XDM array types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -31,7 +31,7 @@ public final class ArrayType extends FType {
   }
 
   /**
-   * Creates an array type.
+   * Returns the array type with the specified member type.
    * @param memberType member type
    * @return array type
    */
@@ -40,7 +40,7 @@ public final class ArrayType extends FType {
   }
 
   /**
-   * Getter for the member type.
+   * Returns the member type.
    * @return member type
    */
   public SeqType memberType() {
@@ -98,16 +98,16 @@ public final class ArrayType extends FType {
   @Override
   public Type union(final Type type) {
     return type instanceof ChoiceItemType ? type.union(this) :
-      SeqType.keptExact(this, type, true) ? type :
-      SeqType.keptExact(type, this, true) ? this :
+      type.keptExact(this, true) ? this :
+      keptExact(type, true) ? type :
       type instanceof final ArrayType at ? union(at.memberType) :
       type instanceof MapType ? FUNCTION :
       type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   /**
-   * Creates a union of two array types.
-   * @param mt member type
+   * Returns the union of this type and the array type with the specified member type.
+   * @param mt member type of the other array type
    * @return array type
    */
   public ArrayType union(final SeqType mt) {

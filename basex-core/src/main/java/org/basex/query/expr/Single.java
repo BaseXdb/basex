@@ -99,7 +99,7 @@ public abstract class Single extends ParseExpr {
   final Expr simplifyForCast(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr ex = this;
     final SeqType est = expr.seqType(), dst = seqType();
-    if(est.occ.instanceOf(dst.occ) && !est.mayBeWrapped()) {
+    if(est.occ.instanceOf(dst.occ) && est.atomizesToOne()) {
       final Type et = est.type, dt = dst.type;
       if(mode.stringifying() && et.isStringOrUntyped() &&
            dt.oneOf(BasicType.STRING, BasicType.UNTYPED_ATOMIC) ||

@@ -407,7 +407,7 @@ public final class Stores implements Closeable {
     final Format format = size > 1 ? Format.get(value) : null;
     // the type must be refined before it is written
     final boolean same = size > 1 && format == null && value.refineType();
-    out.writeNum(value.seqType().type.index());
+    out.writeNum(value.seqType().type.id().asByte());
     out.writeLong(size);
     if(size == 1) {
       value.write(out);
@@ -418,7 +418,7 @@ public final class Stores implements Closeable {
       out.writeNum(SEQUENCE);
       out.writeBool(same);
       for(final Item item : value) {
-        if(!same) out.writeNum(item.type.index());
+        if(!same) out.writeNum(item.type.id().asByte());
         item.write(out);
       }
     }

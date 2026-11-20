@@ -2672,6 +2672,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
     error(func.args(" ()", " fn {}"), INVTYPE_X);
     error(func.args(" ()", " fn { if(.) { . -1 } }"), INVTYPE_X);
+    error(func.args(" ()", " identity#1") + "=>" + DISTINCT_VALUES.args(), INVTYPE_X);
+    error("'x' = " + func.args(" ()", " fn { () }"), INVTYPE_X);
 
     final String init = "x";
     String step = " fn { . || 'x' }";
@@ -3845,6 +3847,9 @@ return
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
+    // choice types with untyped alternatives must be converted
+    error("declare %basex:inline(0) function f($x as (element() | xs:string)) { "
+        + func.args(" $x") + " }; f(<a>abc</a>)", FUNCCAST_X_X);
     check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'f']"), "f");
     check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'g']"), "");
     query(func.args(" 'x'"), "x");
@@ -4138,6 +4143,9 @@ return
   /** Test method. */
   @Test public void min() {
     final Function func = MIN;
+    // xs:anyAtomicType items may be untyped and must be converted to doubles
+    query(func.args(" if(random:double() < 2) then xs:untypedAtomic('2') else 1") +
+        " instance of xs:double", true);
     // repeated single item: the item is returned without evaluating the sequence
     check(func.args(" " + REPLICATE.args(1, 3)), 1, root(Itr.class));
     query(func.args(1), 1);
@@ -4170,6 +4178,8 @@ return
     query("for $n in (1, 2) return " + func.args(" ($n, $n)"), "1\n2");
 
     query("for $s in (['a', 'b'], ['c']) return " + func.args(" ($s, $s)"), "a\nc");
+    query("for $p in (<?a x?>, <?b y?>) return " + func.args(" $p") + " instance of xs:string",
+        "true\ntrue");
 
     // query plan checks
     check(func.args(" ()"), "", empty());

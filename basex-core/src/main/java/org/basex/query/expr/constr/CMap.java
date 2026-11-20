@@ -97,13 +97,11 @@ public final class CMap extends Arr {
       SeqType evt = Types.ITEM_ZM;
       if(nested(e)) {
         if(exprs[e].seqType().type instanceof final MapType mt) {
-          ekt = mt.keyType();
+          ekt = mt.keyType().deref();
           evt = mt.valueType();
         }
       } else {
-        final SeqType kst = exprs[e].seqType();
-        final Type akt = kst.type.atomic();
-        if(akt != null) ekt = akt;
+        ekt = exprs[e].seqType().type.atomicOrAny();
         evt = exprs[e + 1].seqType();
       }
       kt = e == 0 ? ekt : kt.union(ekt);

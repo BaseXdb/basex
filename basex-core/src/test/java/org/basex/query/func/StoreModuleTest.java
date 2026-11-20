@@ -477,7 +477,7 @@ public final class StoreModuleTest extends SandboxTest {
    */
   @Test public void newerFormat() throws IOException {
     // reserved format ID of versioned values
-    newerFormat(BasicType.STRING.index(), 2, 0x3e);
+    newerFormat(BasicType.STRING.id().asByte(), 2, 0x3e);
     // unknown type index
     newerFormat(100000, 1);
   }

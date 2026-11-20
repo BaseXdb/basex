@@ -177,7 +177,7 @@ public class MapMerge extends MapFn {
 
   /**
    * Refines the merger and assigns a map type for this expression.
-   * @param kt key type (can be {@code null})
+   * @param kt key type
    * @param vt value type
    * @param cc compilation context
    * @throws QueryException query exception
@@ -185,8 +185,7 @@ public class MapMerge extends MapFn {
   final void assignType(final Type kt, final SeqType vt, final CompileContext cc)
       throws QueryException {
     if(md != null) md = md.refine(vt, cc);
-    exprType.assign(MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE,
-      md != null ? md.type(vt) : Types.ITEM_ZM));
+    exprType.assign(MapType.get(kt, md != null ? md.type(vt) : Types.ITEM_ZM));
   }
 
   @Override

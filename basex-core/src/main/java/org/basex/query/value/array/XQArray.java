@@ -303,7 +303,7 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(SeqType.keptStatic(type, tp, coerce)) return true;
+    if(type.keptStatic(tp, coerce)) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {

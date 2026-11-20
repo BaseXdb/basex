@@ -80,7 +80,9 @@ public class FnLowest extends StandardFunc {
     if(defined(2)) {
       arg(2, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
-      final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
+      // atomized items must have a known type that is never untyped
+      final Predicate<Type> noCheck = type ->
+        !type.atomicOrAny().oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.UNTYPED_ATOMIC);
       // lowest($x) → $x
       if(st.zeroOrOne() && noCheck.test(st.type)) return input;
 

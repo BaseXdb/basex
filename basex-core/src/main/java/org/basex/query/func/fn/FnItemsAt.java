@@ -140,10 +140,8 @@ public final class FnItemsAt extends StandardFunc {
     if(ist.zero()) return input;
     if(ast.zero()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
-    Occ occ = Occ.ZERO_OR_MORE;
+    Occ occ = ast.atomOcc().max <= 1 ? Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE;
     if(!ast.mayBeWrapped()) {
-      if(ast.zeroOrOne()) occ = Occ.ZERO_OR_ONE;
-
       if(at instanceof final Item item) {
         // check for fractional or negative number
         final long l = Pos.position(toNumber(item, at)) - 1;

@@ -345,7 +345,7 @@ public abstract class XQMap extends XQStruct {
 
     try {
       if(tp instanceof final ShapeType sh) return sh.matches(this, coerce);
-      if(SeqType.keptStatic(type, tp, coerce)) return true;
+      if(type.keptStatic(tp, coerce)) return true;
 
       final Type kt;
       final SeqType vt;
@@ -361,7 +361,7 @@ public abstract class XQMap extends XQStruct {
         return false;
       }
       if(kt == null && vt == null) return true;
-      if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
+      if(!test((key, value) -> (kt == null || kt.instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
       // remember the more specific type to skip subsequent checks (records keep their type)
       if(tp instanceof MapType && !(type instanceof ShapeType) && tp.attachable(coerce)) {

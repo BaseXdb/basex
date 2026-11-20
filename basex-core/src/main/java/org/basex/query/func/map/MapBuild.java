@@ -53,7 +53,7 @@ public final class MapBuild extends MapMerge {
       arg(1, arg -> arg.refineFunc(cc, s1t));
       kt = arg(1).funcType().refinedType.type;
     }
-    kt = kt.atomic();
+    kt = kt.atomicOrAny();
 
     final boolean fiValue = value instanceof FuncItem || value instanceof Closure;
     SeqType vt = fiValue || value.size() == 0 ? s1t : returnType(value);

@@ -17,7 +17,7 @@ import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
- * Stores a sequence type definition.
+ * Sequence type, consisting of an item type and an occurrence indicator.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -32,7 +32,6 @@ public final class SeqType {
   private enum Check {
     /** May yield numbers. */ NUMBER,
     /** May yield function items. */ FUNCTION,
-    /** May be wrapped in a data structure. */ WRAPPED,
     /** May yield JNodes. */ JNODE
   }
 
@@ -40,7 +39,7 @@ public final class SeqType {
   public final Type type;
   /** Occurrence indicator. */
   public final Occ occ;
-  /** Array type (can be {@code null}; lazy instantiation). */
+  /** Array type, created lazily (can be {@code null}). */
   private ArrayType arrayType;
   /** Map types with basic key types, indexed by ordinal (can be {@code null}). */
   private MapType[] basicMapTypes;
@@ -49,8 +48,8 @@ public final class SeqType {
 
   /**
    * Constructor.
-   * @param type type
-   * @param occ occurrence
+   * @param type item type
+   * @param occ occurrence indicator
    */
   SeqType(final Type type, final Occ occ) {
     this.type = type;
@@ -58,8 +57,8 @@ public final class SeqType {
   }
 
   /**
-   * Returns a sequence type.
-   * @param type type
+   * Returns a sequence type with the specified item type and occurrence indicator.
+   * @param type item type
    * @param occ occurrence indicator
    * @return sequence type
    */
@@ -97,7 +96,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns an array type for this sequence type.
+   * Returns an array type with this sequence type as member type.
    * @return array type
    */
   public ArrayType arrayType() {
@@ -106,7 +105,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns a map type for this sequence type and the specified key type.
+   * Returns a map type with the specified key type and this sequence type as value type.
    * @param keyType key type
    * @return map type
    */
@@ -140,16 +139,16 @@ public final class SeqType {
   }
 
   /**
-   * Returns a sequence type with a new occurrence indicator.
+   * Returns a sequence type with the union of this and the specified occurrence indicator.
    * @param oc occurrence indicator
    * @return sequence type
    */
   public SeqType union(final Occ oc) {
-    return oc == occ ? this : get(type, occ.union(oc));
+    return with(occ.union(oc));
   }
 
   /**
-   * Checks if the specified value is an instance of this type.
+   * Checks if the specified value is an instance of this sequence type.
    * @param value value to check
    * @return result of check
    */
@@ -158,12 +157,12 @@ public final class SeqType {
   }
 
   /**
-   * Checks if the specified value is an instance of this type.
+   * Checks if the specified value is an instance of this sequence type.
    * @param value value to check
    * @param coerce item coercion
    * @return result of check
    */
-  public boolean instance(final Value value, final boolean coerce) {
+   public boolean instance(final Value value, final boolean coerce) {
     // coerce: a map is an instance of fn(xs:string) as item()* only without coercion (wrapped)
 
     // check cardinality
@@ -173,7 +172,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     final Type dt = type.deref(), vt = value.type.deref();
-    if(keptStatic(vt, dt, coerce)) return true;
+    if(vt.keptStatic(dt, coerce)) return true;
     // check single item
     if(size == 1) return dt.instance((Item) value, coerce);
     // check each item
@@ -186,22 +185,12 @@ public final class SeqType {
   }
 
   /**
-   * Checks if the specified item is an instance of this sequence type.
-   * @param item item to check
-   * @param coerce item coercion
-   * @return result of check
-   */
-  public boolean instance(final Item item, final boolean coerce) {
-    return type.instance(item, coerce);
-  }
-
-  /**
-   * Casts a sequence to this type.
+   * Casts a value to this sequence type.
    * @param value value to cast
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return cast value
+   * @return cast value (can be {@code null})
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final boolean error, final QueryContext qc,
@@ -269,7 +258,7 @@ public final class SeqType {
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return converted value, or {@code null} if conversion failed and no error was raised
+   * @return converted value (can be {@code null})
    * @throws QueryException query exception
    */
   public Value convert(final Value value, final boolean error, final QueryContext qc,
@@ -282,7 +271,7 @@ public final class SeqType {
     final ValueBuilder vb = new ValueBuilder(qc, value.size());
     for(final Item item : value) {
       qc.checkStop();
-      if(instance(item, false)) {
+      if(type.instance(item, false)) {
         vb.add(item);
       } else if(castable) {
         final Value cast = st.cast(item, error, qc, info);
@@ -303,7 +292,7 @@ public final class SeqType {
    * @param type type to check
    * @return result of check
    */
-  public static boolean castTarget(final Type type) {
+  private static boolean castTarget(final Type type) {
     // xs:short, array(xs:integer), (xs:int | xs:string): true; xs:anyAtomicType, element(): false
     final Type tp = type.deref();
     // item(); array, map, record types (their component types are checked while casting)
@@ -323,7 +312,7 @@ public final class SeqType {
   }
 
   /**
-   * Raises or reports a cast error.
+   * Raises a cast error or returns {@code null}.
    * @param value value that could not be cast
    * @param error raise error (return {@code null} otherwise)
    * @param info input info (can be {@code null})
@@ -337,12 +326,12 @@ public final class SeqType {
   }
 
   /**
-   * Casts an atomized item to this type.
+   * Casts an atomized item to the item type of this sequence type.
    * @param item item to cast
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return cast value
+   * @return cast value (can be {@code null})
    * @throws QueryException query exception
    */
   private Value castItem(final Item item, final boolean error, final QueryContext qc,
@@ -362,11 +351,11 @@ public final class SeqType {
   }
 
   /**
-   * Converts the specified value to this type.
-   * @param value value to promote
+   * Coerces the specified value to this sequence type.
+   * @param value value to coerce
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return converted value
+   * @return coerced value
    * @throws QueryException query exception
    */
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info)
@@ -375,13 +364,13 @@ public final class SeqType {
   }
 
   /**
-   * Converts the specified value to this type.
-   * @param value value to promote
+   * Coerces the specified value to this sequence type.
+   * @param value value to coerce
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @param name variable name (used for error message, can be {@code null})
-   * @param cc compilation context ({@code null} during runtime)
-   * @return converted value
+   * @param name variable name for error messages (can be {@code null})
+   * @param cc compilation context, unless called at runtime (can be {@code null})
+   * @return coerced value
    * @throws QueryException query exception
    */
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
@@ -404,13 +393,13 @@ public final class SeqType {
   }
 
   /**
-   * Converts the specified item to this type.
-   * @param item item to promote
-   * @param name variable name (used for error message, can be {@code null})
+   * Coerces the specified item to this sequence type.
+   * @param item item to coerce
+   * @param name variable name for error messages (can be {@code null})
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
+   * @param cc compilation context, unless called at runtime (can be {@code null})
    * @param info input info (can be {@code null})
-   * @return converted value, or {@code null} if conversion failed
+   * @return coerced value (can be {@code null})
    * @throws QueryException query exception
    */
   private Value coerce(final Item item, final QNm name, final QueryContext qc,
@@ -439,8 +428,7 @@ public final class SeqType {
     if(dt instanceof final ChoiceItemType cit) {
       // coerce to the first matching alternative
       for(final Type tp : cit.types) {
-        final SeqType st = tp.seqType();
-        if(st.instance(item, false)) return st.coerce(item, name, qc, cc, info);
+        if(tp.instance(item, false)) return tp.seqType().coerce(item, name, qc, cc, info);
       }
       for(final Type tp : cit.types) {
         try {
@@ -466,16 +454,16 @@ public final class SeqType {
     } else if(item instanceof final JNode jnode) {
       return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
     }
-    return instance(item, false) ? item : null;
+    return type.instance(item, false) ? item : null;
   }
 
   /**
-   * Converts the specified atomized item to this type.
-   * @param item item to promote
+   * Coerces the specified atomic item to the specified item type.
+   * @param item item to coerce
    * @param tp dereferenced item type of this sequence type
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return converted value, or {@code null} if conversion failed
+   * @return coerced item (can be {@code null})
    * @throws QueryException query exception
    */
   private Item coerceAtomic(final Item item, final Type tp, final QueryContext qc,
@@ -487,7 +475,7 @@ public final class SeqType {
 
     Item relabel = null;
     if(at == UNTYPED_ATOMIC) {
-      if(tp.nsSensitive()) throw NSSENS_X_X.get(info, at, type);
+      if(tp.oneOf(QNAME, NOTATION)) throw NSSENS_X_X.get(info, at, type);
       // item will be cast
     } else if(
       tp == DECIMAL && (at == DOUBLE || at == FLOAT) ||
@@ -514,9 +502,9 @@ public final class SeqType {
   }
 
   /**
-   * Computes the union of two sequence types, i.e. the lowest common ancestor of both types.
-   * @param st second type
-   * @return resulting type
+   * Computes the union of this and the specified sequence type.
+   * @param st other sequence type
+   * @return union type
    */
   public SeqType union(final SeqType st) {
     if(this == st) return this;
@@ -528,10 +516,10 @@ public final class SeqType {
   }
 
   /**
-   * Computes the union of the sequence type of all expressions.
+   * Computes the union of the sequence types of the specified expressions.
    * @param exprs expressions
-   * @param zero include expressions that return empty sequence
-   * @return sequence type, or {@code null} if unknown
+   * @param zero include expressions that yield the empty sequence
+   * @return union type (can be {@code null})
    */
   public static SeqType union(final Expr[] exprs, final boolean zero) {
     SeqType st = null;
@@ -543,15 +531,14 @@ public final class SeqType {
   }
 
   /**
-   * Computes the intersection of two sequence types, i.e. the most general type that is
-   * subtype of both types. If no such type exists, {@code null} is returned.
-   * @param st second type
-   * @return resulting type or {@code null}
+   * Computes the intersection of this and the specified sequence type.
+   * @param st other sequence type
+   * @return intersection type (can be {@code null})
    */
   public SeqType intersect(final SeqType st) {
     if(this == st) return this;
     // void types (xs:error, xs:error+) are bottom types; two void occurrences are intersected
-    if(voidType()) return st.voidType() ? get(type, occ.intersect(st.occ)) : this;
+    if(voidType()) return st.voidType() ? with(occ.intersect(st.occ)) : this;
     if(st.voidType()) return st;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
@@ -570,7 +557,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type yield zero items.
+   * Tests if this is the {@code empty-sequence()} type.
    * @return result of check
    */
   public boolean zero() {
@@ -598,19 +585,11 @@ public final class SeqType {
    * @return result of check
    */
   public boolean voidType() {
-    return type.deref() == ERROR && oneOrMore();
+    return oneOrMore() && itemless();
   }
 
   /**
-   * Tests if this type only matches the empty sequence ({@code xs:error?}, {@code xs:error*}).
-   * @return result of check
-   */
-  public boolean emptyType() {
-    return zero() || type.deref() == ERROR && !oneOrMore();
-  }
-
-  /**
-   * Tests if expressions of this type never yield items (empty or void category).
+   * Tests if expressions of this type yield no items ({@code empty-sequence()}, {@code xs:error*}).
    * @return result of check
    */
   public boolean itemless() {
@@ -634,29 +613,69 @@ public final class SeqType {
   }
 
   /**
-   * Tests if contents may be wrapped in a data structure. This includes JNodes,
-   * maps, arrays and function items.
+   * Tests if expressions of this type may yield items that wrap values (JNodes, function items).
    * @return result of check
    */
   public boolean mayBeWrapped() {
-    return mayBe(Check.WRAPPED);
+    return mayBeJNode() || mayBeFunction();
   }
 
   /**
-   * Returns the occurrence indicator of the atomized contents.
-   * @return occurrence indicator
-   */
-  public Occ atomOcc() {
-    // array(xs:integer): one item, which may atomize to any number of items
-    return mayBeWrapped() ? Occ.ZERO_OR_MORE : occ;
-  }
-
-  /**
-   * Tests if contents may be JNodes.
+   * Tests if expressions of this type may yield JNodes.
    * @return result of check
    */
   public boolean mayBeJNode() {
     return mayBe(Check.JNODE);
+  }
+
+  /**
+   * Returns the occurrence indicator of the atomized items.
+   * @return occurrence indicator
+   */
+  public Occ atomOcc() {
+    return occ.multiply(itemAtomOcc());
+  }
+
+  /**
+   * Tests if each item atomizes to exactly one item.
+   * @return result of check
+   */
+  public boolean atomizesToOne() {
+    return itemAtomOcc() == Occ.EXACTLY_ONE;
+  }
+
+  /**
+   * Tests if expressions of this type yield at most one item that is not wrapped.
+   * @return result of check
+   */
+  public boolean zeroOrOneUnwrapped() {
+    return zeroOrOne() && !mayBeWrapped();
+  }
+
+  /**
+   * Returns the item type to be checked for properties of atomized items.
+   * @return item type
+   */
+  public Type atomType() {
+    return mayBeWrapped() ? type.atomicOrAny() : type.deref();
+  }
+
+  /**
+   * Returns the value type of JNodes of this type.
+   * @return value type (can be {@code null})
+   */
+  public SeqType valueType() {
+    return type.deref() instanceof final NodeType nt ? nt.valueType() : null;
+  }
+
+  /**
+   * Returns the occurrence indicator of the atomized value of a single item.
+   * @return occurrence indicator
+   */
+  private Occ itemAtomOcc() {
+    // jnode(*, xs:integer): the atomized value; array(xs:integer): any number of items
+    final SeqType vt = valueType();
+    return vt != null ? vt.atomOcc() : mayBeWrapped() ? Occ.ZERO_OR_MORE : Occ.EXACTLY_ONE;
   }
 
   /**
@@ -679,23 +698,21 @@ public final class SeqType {
    * @return result of check
    */
   private boolean compute(final Check check) {
-    if(zero()) return false;
+    if(itemless()) return false;
     return switch(check) {
-      case NUMBER -> type instanceof BasicType ?
-        type.isNumber() || type.oneOf(ITEM, ANY_ATOMIC_TYPE) : type.intersect(NUMERIC) != null;
-      case FUNCTION -> type == ITEM || type instanceof FType;
-      case WRAPPED -> mayBe(Check.JNODE) || mayBe(Types.FUNCTION);
+      case NUMBER -> mayBe(NUMERIC);
+      case FUNCTION -> mayBe(Types.FUNCTION);
       case JNODE -> mayBe(NodeType.JNODE);
     };
   }
 
   /**
-   * Tests if contents may be instances of the specified type.
-   * @param tp type to check
+   * Tests if items of this type may be instances of the specified type.
+   * @param tp item type to check
    * @return result of check
    */
   private boolean mayBe(final Type tp) {
-    return type instanceof BasicType ? type == ITEM : type.intersect(tp) != null;
+    return type.intersect(tp) != null;
   }
 
   /**
@@ -708,9 +725,9 @@ public final class SeqType {
   }
 
   /**
-   * Returns the type of items that match the specified type without being coerced.
-   * @param type type
-   * @return type
+   * Returns the type of items that match the specified item type without being coerced.
+   * @param type item type
+   * @return item type
    */
   private static Type matched(final Type type) {
     final Type tp = type.deref();
@@ -751,7 +768,7 @@ public final class SeqType {
     // void category (xs:error, xs:error+): no instances, a subtype of every sequence type
     if(voidType()) return true;
     // empty category (empty-sequence(), xs:error?, xs:error*): subtype of every optional type
-    if(emptyType()) return !st.oneOrMore();
+    if(itemless()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
     return type.deref().instanceOf(st.type.deref());
   }
@@ -763,7 +780,8 @@ public final class SeqType {
    */
   public boolean keptBy(final SeqType st) {
     // identical records are kept, typed functions are always wrapped
-    return instanceOf(st) && (!st.type.coercive() || keptStatic(type, st.type, true));
+    return instanceOf(st) &&
+      (st.type.coercion() == Coercion.KEEP || type.keptStatic(st.type, true));
   }
 
   /**
@@ -774,38 +792,11 @@ public final class SeqType {
   public boolean refines(final SeqType st) {
     // inferred function types are upper bounds and must not be enforced
     // inferred xs:integer for xs:decimal: true; inferred fn(xs:integer) for fn(*): false
-    return keptBy(st) && !type.wraps();
+    return keptBy(st) && type.coercion() != Coercion.WRAP;
   }
 
   /**
-   * Checks if items of the given static type are instances of the target type that are kept.
-   * @param type static type
-   * @param target target type
-   * @param coerce coercion
-   * @return result of check
-   */
-  public static boolean keptStatic(final Type type, final Type target, final boolean coerce) {
-    // static function types are upper bounds: functions of the same type may still be wrapped
-    // fn(xs:integer) → fn(xs:integer): false (an fn(xs:decimal) item would be wrapped)
-    return !(coerce && target.wraps()) && keptExact(type, target, coerce);
-  }
-
-  /**
-   * Checks if items of the given exact type are instances of the target type that are kept.
-   * @param type exact type
-   * @param target target type
-   * @param coerce coercion
-   * @return result of check
-   */
-  public static boolean keptExact(final Type type, final Type target, final boolean coerce) {
-    // xs:integer → xs:decimal, R → R: true; fn(xs:decimal) → fn(xs:integer): false (wrapped)
-    return type == target || type.instanceOf(target) && (!coerce || type == ERROR ||
-      !target.coercive() || type.deref().eq(target.deref()) ||
-      RecordType.derives(type, target));
-  }
-
-  /**
-   * Returns this type with a resolved type reference replaced by the referenced type.
+   * Returns this sequence type with a resolved type reference replaced by the referenced type.
    * @return sequence type
    */
   public SeqType deref() {
@@ -814,8 +805,8 @@ public final class SeqType {
   }
 
   /**
-   * Checks the types for equality.
-   * @param st type
+   * Checks if this sequence type is equal to the specified one.
+   * @param st sequence type to compare
    * @return result of check
    */
   public boolean eq(final SeqType st) {
@@ -835,7 +826,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns a string representation of the type.
+   * Returns a string representation of the item type, or {@code empty-sequence()}.
    * @return string
    */
   public String typeString() {

@@ -1859,7 +1859,7 @@ public enum QueryError {
       // add cardinality string
       desc.add(name != null ? est.occ.desc : Strings.capitalize(est.occ.desc)).add(" expected");
       // add expected type if item type differs from input
-      if(!ist.type.instanceOf(est.type)) {
+      if(!ist.type.instanceOf(est.type.deref())) {
         desc.add(" (").add(est).add(")");
       }
       // add number of results or type of input

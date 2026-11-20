@@ -90,8 +90,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // min(distinct-values($values)) → min($values), exists(distinct-values($v)) → exists($v)
-    // arrays are excluded from the existence check: they may be atomized to an empty sequence
-    final boolean drop = mode == Simplify.EXISTENCE && !arg(0).seqType().mayBeWrapped() ||
+    // existence check: items must atomize to single items ([], { 'a': () }/a: empty sequence)
+    final boolean drop = mode == Simplify.EXISTENCE && arg(0).seqType().atomizesToOne() ||
         mode.deduplicating() && !defined(1);
     return cc.simplify(this, drop ? arg(0) : this, mode);
   }

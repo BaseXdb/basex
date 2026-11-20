@@ -282,8 +282,8 @@ public final class OrderBy extends Clause {
     if(keys.length != 1 || key.coll != null || !key.least) return false;
 
     final Expr expr = key.expr;
-    // do not rewrite array keys (as they may contain sequences)
-    if(expr.seqType().mayBeWrapped()) return false;
+    // keys must atomize to single items (arrays may contain sequences)
+    if(!expr.seqType().atomizesToOne()) return false;
     // for $i in E order by 1 → for $i in E
     if(expr instanceof Item) return true;
 

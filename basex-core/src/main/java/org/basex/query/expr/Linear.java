@@ -182,8 +182,8 @@ public final class Linear {
     for(int i = terms.size() - 1; i >= 0; i--) {
       if(factors.get(i).signum() == 0) {
         final SeqType st = terms.get(i).seqType();
-        if(!st.one()) return false;
-        if(!st.type.instanceOf(INTEGER)) dropped = true;
+        if(st.atomOcc() != Occ.EXACTLY_ONE) return false;
+        if(!st.type.atomicOrAny().instanceOf(INTEGER)) dropped = true;
         terms.remove(i);
         factors.remove(i);
       }
@@ -199,12 +199,12 @@ public final class Linear {
   private static boolean composite(final Expr expr) {
     if(expr instanceof final Unary unary) {
       return unary.minus && unary.seqType().type.instanceOf(DECIMAL) &&
-        unary.expr.seqType().zeroOrOne();
+        unary.expr.seqType().atomOcc().max <= 1;
     }
     return expr instanceof final Arith arith && (arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) ||
       arith.calc == Calc.MULTIPLY && arith.arg(1) instanceof ANum) &&
-      arith.seqType().type.instanceOf(DECIMAL) && arith.arg(0).seqType().zeroOrOne() &&
-      arith.arg(1).seqType().zeroOrOne();
+      arith.seqType().type.instanceOf(DECIMAL) && arith.arg(0).seqType().atomOcc().max <= 1 &&
+      arith.arg(1).seqType().atomOcc().max <= 1;
   }
 
   /**

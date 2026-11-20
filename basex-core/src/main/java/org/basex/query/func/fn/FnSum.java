@@ -47,24 +47,22 @@ public class FnSum extends NumericFn {
     if(zero == Empty.UNDEFINED) {
       // no default value
       if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
-      if(!st.mayBeWrapped()) {
-        // empty input: integer zero
-        final Type type = sumType(values);
-        if(type != null) {
-          exprType.assign(st.oneOrMore() ? type : type.union(INTEGER), Occ.EXACTLY_ONE);
-        }
+      // empty input: integer zero
+      final Type type = sumType(values);
+      if(type != null) {
+        exprType.assign(st.atomOcc().min >= 1 ? type : type.union(INTEGER), Occ.EXACTLY_ONE);
       }
     } else if(st.zero()) {
       if(zero == Empty.VALUE || stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) {
         return cc.voidAndReturn(values, zero, info);
       }
-    } else if(!st.mayBeWrapped() && !stZero.mayBeWrapped()) {
+    } else {
       // sum($nonempty, $zero) → sum($nonempty)  (default value unused)
-      if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
+      if(st.atomOcc().min >= 1) return cc.function(Function.SUM, info, values);
       final SeqType ost = optType(values), zst = optType(zero);
       final Type type = ost == null ? ANY_ATOMIC_TYPE : stZero.zero() ? ost.type :
         zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
-      final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+      final Occ occ = stZero.atomOcc().min >= 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
       exprType.assign(type, occ);
     }
     return this;
@@ -81,7 +79,7 @@ public class FnSum extends NumericFn {
     // sum(reverse($values)) → sum($values), avg(sort($values)) → avg($values)
     // exact arithmetic only: floating-point results depend on the summation order
     final Expr values = arg(0), reordered = reordered(values);
-    if(reordered != null && values.seqType().type.instanceOf(DECIMAL)) {
+    if(reordered != null && values.seqType().atomType().instanceOf(DECIMAL)) {
       final Expr[] args = exprs.clone();
       args[0] = reordered;
       return cc.function(avg ? Function.AVG : Function.SUM, info, args);
@@ -130,7 +128,7 @@ public class FnSum extends NumericFn {
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
-    if(arg(0).seqType().type.isNumberOrUntyped()) {
+    if(arg(0).seqType().atomType().isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
   }

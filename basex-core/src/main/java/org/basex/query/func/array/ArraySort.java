@@ -78,7 +78,7 @@ public final class ArraySort extends ArraySortBy {
         }
         // repeated sortable member
         if(members instanceof final SingletonSeq ss && ss.singleItem() &&
-            members.seqType().type.isSortable()) return array;
+            members.seqType().type.atomic() != null) return array;
       }
     }
     return null;

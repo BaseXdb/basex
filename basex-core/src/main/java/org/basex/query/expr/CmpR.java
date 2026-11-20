@@ -213,7 +213,7 @@ public final class CmpR extends CmpRange {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
-    single = expr.seqType().atomOcc().max <= 1;
+    single = expr.seqType().zeroOrOneUnwrapped();
 
     // position() = .1e0 → false()
     if(Function.POSITION.is(expr)) {

@@ -61,43 +61,45 @@ public final class TypeCheck extends Single {
     }
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         st.occ.instanceOf(expr.seqType().occ) &&
-        (!atomic || !expr.arg(0).seqType().mayBeWrapped())) {
+        (!atomic || expr.arg(0).seqType().atomizesToOne())) {
       // exactly-one(ITEM) coerce as item() → ITEM coerce as item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
 
-    final SeqType et = expr.seqType(), nst = et.with(st.occ);
-    cardinality = nst.keptBy(st);
+    final SeqType et = expr.seqType();
+    cardinality = et.with(st.occ).keptBy(st);
 
-    // refine type check (ignore arrays as coerced result may have a different size)
-    if(!et.mayBeWrapped() || !atomic) {
-      // occurrence indicator:
-      //   exactly-one/one-or-more → exactly-one
-      final Occ nocc = et.occ.intersect(st.occ);
-      // raise static error if no intersection is possible:
-      //   () coerce as item()
-      if(nocc == null) {
-        // xs:error is a subtype of every type; its occurrence indicator must not trigger an error
-        //   fn:error() coerce as empty-sequence()
-        if(et.instanceOf(st)) {
-          cc.info(OPTTYPE_X_X, st, expr);
-          return expr;
-        }
-        throw typeError(expr, st, name, info);
+    // refine type check (atomic target type: atomized input, arrays may change the size)
+    final SeqType it = atomic ? SeqType.get(et.type.atomicOrAny(), et.atomOcc()) : et;
+    // occurrence indicator:
+    //   exactly-one/one-or-more → exactly-one
+    final Occ nocc = it.occ.intersect(st.occ);
+    // raise static error if no intersection is possible:
+    //   () coerce as item()
+    if(nocc == null) {
+      // xs:error is a subtype of every type; its occurrence indicator must not trigger an error
+      //   fn:error() coerce as empty-sequence()
+      if(et.instanceOf(st)) {
+        cc.info(OPTTYPE_X_X, st, expr);
+        return expr;
       }
-      // refine result type:
-      //   INTEGERS coerce as item() → INTEGERS coerce as xs:integer
-      if(nst.refines(st)) st = nst;
-      // adopt the refined return type of a coerced function:
-      //   CLOSURE coerce as fn(item()*) as item()* → refined return type of CLOSURE
-      else if(st.type instanceof final FuncType ft && ft.argTypes != null &&
-          et.type instanceof final FuncType eft && eft.refinedType.instanceOf(ft.refinedType)) {
-        st = SeqType.get(ft.withRefinedType(eft.refinedType), st.occ);
-      }
-      // adopt result size and data reference from input expression
-      final Expr dataExpr = type.instanceOf(NodeType.XNODE) ? expr : null;
-      exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
+      throw typeError(expr, st, name, info);
     }
+    // refine result type:
+    //   INTEGERS coerce as item() → INTEGERS coerce as xs:integer
+    //   ARRAY(xs:integer) coerce as xs:decimal* → ARRAY coerce as xs:integer*
+    final SeqType rst = it.with(st.occ);
+    if(rst.refines(st)) st = rst;
+    // adopt the refined return type of a coerced function:
+    //   CLOSURE coerce as fn(item()*) as item()* → refined return type of CLOSURE
+    else if(st.type.deref() instanceof final FuncType ft && ft.argTypes != null &&
+        et.type instanceof final FuncType eft && eft.refinedType.instanceOf(ft.refinedType)) {
+      st = SeqType.get(ft.withRefinedType(eft.refinedType), st.occ);
+    }
+    // adopt result size and data reference from input expression
+    final Expr dataExpr = type.instanceOf(NodeType.XNODE) ? expr : null;
+    final long size = it.occ != st.occ ? -1 : atomic ? expr.atomSize() : expr.size();
+    exprType.assign(st, nocc, size).data(dataExpr);
 
     // remove redundant type check
     if(expr instanceof final TypeCheck tc && st.keptBy(et)) {
