@@ -3888,6 +3888,8 @@ return
   @Test public void matches() {
     final Function func = MATCHES;
     query(func.args("a", ""), true);
+    // nondeterministic input is still evaluated
+    check(func.args(" trace('a')", ""), true, exists(TRACE));
 
     query(func.args("nop", 'o'), true);
     query(func.args("nöp", 'ö'), true);
