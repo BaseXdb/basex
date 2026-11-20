@@ -284,9 +284,10 @@ public final class Types {
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(ZERO_OR_ONE);
   /** Permute function of a random number generator. */
   public static final FuncType PERMUTE_FUNCTION = FuncType.get(ITEM_ZM, ITEM_ZM);
+  /** Single non-negative integer. */
+  public static final SeqType NON_NEGATIVE_INTEGER_O = NON_NEGATIVE_INTEGER.seqType();
   /** Take function of a random number generator. */
-  public static final FuncType TAKE_FUNCTION =
-      FuncType.get(DOUBLE_ZM, NON_NEGATIVE_INTEGER.seqType());
+  public static final FuncType TAKE_FUNCTION = FuncType.get(DOUBLE_ZM, NON_NEGATIVE_INTEGER_O);
   /** Supplier function. */
   public static final SeqType SUPPLIER_O = FuncType.get(ITEM_ZM).seqType();
   /** Java function type. */
@@ -322,6 +323,15 @@ public final class Types {
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
+  /** Zero or one string or map. */
+  public static final SeqType STRING_OR_MAP_ZO = ChoiceItemType.get(STRING, MAP).seqType(
+      ZERO_OR_ONE);
+  /** Single map with integer keys. */
+  public static final SeqType INTEGER_MAP_O = MapType.get(INTEGER, ITEM_ZM).seqType();
+  /** Single string or integer. */
+  public static final SeqType STRING_OR_INTEGER_O = ChoiceItemType.get(STRING, INTEGER).seqType();
+  /** Function that maps a node to nodes. */
+  public static final SeqType NODE_STEP_O = FuncType.get(NODE_ZM, NODE_O).seqType();
   /** Map or array. */
   public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP, ARRAY);
   /** Zero or one map or array. */

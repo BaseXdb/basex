@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -32,6 +33,10 @@ public class FnRound extends NumericFn {
       return Enums.string(this);
     }
   }
+
+  /** Type of the mode argument. */
+  public static final SeqType MODE_TYPE = EnumType.get(RoundMode.values()).seqType(
+      Occ.ZERO_OR_ONE);
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
