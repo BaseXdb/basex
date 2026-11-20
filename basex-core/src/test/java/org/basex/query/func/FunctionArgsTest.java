@@ -89,8 +89,8 @@ public final class FunctionArgsTest extends SandboxTest {
       // skip test if all types are arbitrary
       if((min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
-        if(in) error(query, EXP_FOUND_X_X, INVTYPE_X, FUNCCAST_X_X, RESWHICH_X, DB_COMPACT_X,
-            DB_NODE_X, NODOC_X, PATHNODE_X_X_X, CLIENT_ID_X, SQL_ID1_X, SQL_ID2_X);
+        if(in) error(query, EXP_FOUND_X_X, ELMMAP_X_X_X, INVTYPE_X, FUNCCAST_X_X, RESWHICH_X,
+            DB_COMPACT_X, DB_NODE_X, NODOC_X, PATHNODE_X_X_X, CLIENT_ID_X, SQL_ID1_X, SQL_ID2_X);
         // wrong number of arguments: XPST0017
         else error(query, al < min ? PARAMMISSING_X_X : INVNARGS_X_X);
       }
