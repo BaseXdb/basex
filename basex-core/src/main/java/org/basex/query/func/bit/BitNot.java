@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -16,9 +15,8 @@ import org.basex.query.value.seq.*;
  */
 public final class BitNot extends BitFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Item item = atomItem(arg(0), qc);
-    return item == Empty.VALUE ? Empty.VALUE : Itr.get(~toLong(item, arg(0)));
+  Value value(final long value, final QueryContext qc) {
+    return Itr.get(~value);
   }
 
   @Override

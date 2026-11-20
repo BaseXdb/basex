@@ -5,7 +5,9 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -16,8 +18,33 @@ import org.basex.query.value.type.*;
  */
 abstract class BitFn extends StandardFunc {
   @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    final Item item = atomItem(arg(0), qc);
+    return item == Empty.VALUE ? Empty.VALUE : value(toLong(item, arg(0)), qc);
+  }
+
+  /**
+   * Evaluates the function for the integer value of the first argument.
+   * @param value value
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  abstract Value value(long value, QueryContext qc) throws QueryException;
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     return optFirst();
+  }
+
+  /**
+   * Checks if an expression is a specific integer literal.
+   * @param expr expression
+   * @param value integer value
+   * @return result of check
+   */
+  static boolean literal(final Expr expr, final long value) {
+    return expr instanceof final Itr itr && itr.itr() == value;
   }
 
   /**

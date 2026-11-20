@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -14,11 +13,8 @@ import org.basex.query.value.seq.*;
  */
 public final class BitShift extends BitFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Item item = atomItem(arg(0), qc);
-    if(item == Empty.VALUE) return Empty.VALUE;
-
-    final long value = toLong(item, arg(0)), by = toLong(arg(1), qc);
+  Value value(final long value, final QueryContext qc) throws QueryException {
+    final long by = toLong(arg(1), qc);
     return Itr.get(by >= Long.SIZE ? 0 : by >= 0 ? value << by :
       value >> -Math.max(by, 1 - Long.SIZE));
   }
@@ -30,6 +26,6 @@ public final class BitShift extends BitFn {
 
     // bit:shift($i, 0) → $i
     final Expr value = arg(0);
-    return arg(1) instanceof final Itr by && by.itr() == 0 && integer(value) ? value : this;
+    return literal(arg(1), 0) && integer(value) ? value : this;
   }
 }

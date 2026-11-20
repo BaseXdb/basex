@@ -1201,6 +1201,9 @@ public enum Function implements AFunction {
   _BIT_SHIFT(BitShift::new, "shift(value, by)",
       params(INTEGER_ZO, INTEGER_O), INTEGER_ZO, BIT_URI),
   /** XQuery function. */
+  _BIT_SIGNED(BitSigned::new, "signed(value, size)",
+      params(INTEGER_ZO, INTEGER_O), INTEGER_ZO, BIT_URI),
+  /** XQuery function. */
   _BIT_TEST(BitTest::new, "test(value, index)",
       params(INTEGER_ZO, INTEGER_O), BOOLEAN_ZO, BIT_URI),
   /** XQuery function. */

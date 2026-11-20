@@ -14,12 +14,9 @@ import org.basex.query.value.seq.*;
  */
 abstract class BitLogic extends BitFn {
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    final Item item1 = atomItem(arg(0), qc);
-    if(item1 == Empty.VALUE) return Empty.VALUE;
-    final Item item2 = atomItem(arg(1), qc);
-    if(item2 == Empty.VALUE) return Empty.VALUE;
-    return Itr.get(combine(toLong(item1, arg(0)), toLong(item2, arg(1))));
+  final Value value(final long value, final QueryContext qc) throws QueryException {
+    final Item item = atomItem(arg(1), qc);
+    return item == Empty.VALUE ? Empty.VALUE : Itr.get(combine(value, toLong(item, arg(1))));
   }
 
   @Override
@@ -29,18 +26,10 @@ abstract class BitLogic extends BitFn {
     if(expr != this) return expr;
 
     // bit:or($i, 0) → $i
-    if(identity(value2) && integer(value1)) return value1;
-    if(identity(value1) && integer(value2)) return value2;
+    final long identity = identity();
+    if(literal(value2, identity) && integer(value1)) return value1;
+    if(literal(value1, identity) && integer(value2)) return value2;
     return this;
-  }
-
-  /**
-   * Checks if an expression is the identity value.
-   * @param expr expression
-   * @return result of check
-   */
-  private boolean identity(final Expr expr) {
-    return expr instanceof final Itr itr && itr.itr() == identity();
   }
 
   /**
