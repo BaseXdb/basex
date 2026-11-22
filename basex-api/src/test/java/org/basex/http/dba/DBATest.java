@@ -1528,7 +1528,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void dynamicError() throws Exception {
       assertEquals("{\"type\":\"error\",\"run\":1," +
-          "\"message\":\"1 cannot be divided by zero.\",\"line\":1,\"column\":7}",
+          "\"message\":\"Division by zero, dividend: 1.\",\"line\":1,\"column\":7}",
           evaluate("1 div 0"));
     }
 
