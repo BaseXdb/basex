@@ -1079,10 +1079,12 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
+    boolean changed = false, refined = false;
     if(root != null) {
+      final SeqType st = root.seqType();
       final Expr inlined = root.inline(ic);
       if(inlined != null) {
+        refined = ic.refocus(root, st, inlined, true);
         root = inlined;
         changed = true;
       }
@@ -1096,7 +1098,18 @@ public abstract class Path extends ParseExpr {
     if(!changed && ic.var == null) return null;
     final CompileContext cc = ic.cc;
     final Expr focus = focus(cc);
-    if(changed) updateSteps(focus, cc, s -> steps[s].optimize(cc));
+    if(changed) {
+      // refined root type: re-optimize context references in non-axis steps
+      final InlineContext ctx = refined ? InlineContext.focus(info, cc) : null;
+      updateSteps(focus, cc, s -> {
+        final Expr step = steps[s];
+        if(ctx != null && !(step instanceof Step)) {
+          final Expr inlined = ctx.inlineOrNull(step);
+          if(inlined != null) return inlined;
+        }
+        return step.optimize(cc);
+      });
+    }
     changed |= ic.var != null && updateSteps(focus, cc, s -> steps[s].inline(ic));
 
     return changed ? optimize(cc) : null;

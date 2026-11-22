@@ -653,8 +653,16 @@ public final class CompileContext {
       }
     }
 
-    // create the return clause
-    final Expr expr = body.copy(this, vm).optimize(this);
+    // create the return clause; re-optimize references to parameters with refined types
+    Expr expr = body.copy(this, vm);
+    for(int p = 0; p < pl; p++) {
+      // values will be inlined anyway
+      final Var var = clauses.get(p).vars()[0];
+      if(!(exprs[p] instanceof Value) && !var.seqType().eq(params[p].seqType())) {
+        expr = InlineContext.refine(var, info, this).inline(expr);
+      }
+    }
+    expr = expr.optimize(this);
     final Expr rtrn = declType == null ? expr : new TypeCheck(info, expr, declType).optimize(this);
     // declare function f($x) { $x + 1 }; f(E) → let $x := E return $x + 1
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(this);

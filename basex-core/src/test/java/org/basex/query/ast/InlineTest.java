@@ -268,4 +268,32 @@ public final class InlineTest extends SandboxTest {
         ", fn() { local:g() } ] return array:size($a[random:integer(1) = 0])", 14,
         root(StaticFunc.class));
   }
+
+  /** Expressions are re-optimized if inlining refines the types of variables or the focus. */
+  @Test public void refinedTypes() {
+    final String f = "declare option db:inlinelimit '100'; "
+        + "declare record local:r(a as xs:integer); "
+        + "declare %basex:inline(0) function local:f($v as xs:integer, $rs as array(local:r)*) {"
+        + " some($rs, fn($alt) { every($alt?*, fn($c) { ";
+    final String r = " }) }) }; local:f(0, [ local:r(1) ])";
+    // refined focus
+    check(f + "$c?a > $v" + r, true, empty(Lookup.class), type(ShapeGet.class, "xs:integer"));
+    // refined variable
+    check("declare option db:inlinelimit '100'; declare record local:r(a as xs:integer); "
+        + "declare %basex:inline(0) function local:f($rs as array(local:r)) { "
+        + "let $g := fn($arr) { for $x at $p in $arr?* return $x?a + $p } return $g($rs) }; "
+        + "local:f([ local:r(1), local:r(2) ])", "2\n4", empty(Lookup.class),
+        type(ShapeGet.class, "xs:integer"));
+    // refined predicate focus
+    check("declare option db:inlinelimit '100'; declare record local:r(a as xs:integer); "
+        + "declare %basex:inline(0) function local:f($rs as array(local:r)) { "
+        + "let $g := fn($arr) { $arr?*[?a > 1] } return $g($rs) }; "
+        + "local:f([ local:r(1), local:r(2) ])", "{\"a\":2}", empty(Lookup.class),
+        type(ShapeGet.class, "xs:integer"));
+    // refined parameter and path focus (library module: no dynamic recompilation)
+    query("declare option db:inlinelimit '100'; xquery:parse(\"module namespace m = 'm'; "
+        + "declare function m:f($x as element(a)*) { "
+        + "let $g := fn($n) { $n/(. instance of element(a)) } return $g($x) };\", "
+        + "{ 'compile': true() })//Instance => count()", 0);
+  }
 }

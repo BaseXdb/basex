@@ -341,14 +341,19 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
+    final SeqType st = root.seqType();
     final Expr inlined = root.inline(ic);
     boolean changed = inlined != null;
+    final boolean refined = changed && ic.refocus(root, st, inlined, true);
     if(changed) root = inlined;
 
     // do not inline context reference in predicates; predicates are guarded by a non-empty root
-    changed |= ic.var != null && ic.cc.get(root, true, () -> ic.inline(exprs, true));
-
-    return changed ? optimize(ic.cc) : null;
+    // refined root type: re-optimize context references
+    final CompileContext cc = ic.cc;
+    changed |= (ic.var != null || refined) && cc.get(root, true, () ->
+        (ic.var != null && ic.inline(exprs, true)) |
+        refined && InlineContext.focus(info, cc).inline(exprs, true));
+    return changed ? optimize(cc) : null;
   }
 
   @Override

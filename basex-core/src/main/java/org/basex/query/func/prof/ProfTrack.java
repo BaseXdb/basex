@@ -1,14 +1,18 @@
 package org.basex.query.func.prof;
 
 import java.math.*;
+import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 /**
@@ -79,5 +83,23 @@ public final class ProfTrack extends StandardFunc {
     // evaluated value
     if(input != null) mb.put(TrackOptions.VALUE.name(), input);
     return mb.map();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    if(defined(1) && !(arg(1) instanceof Value)) return this;
+
+    // static options: assign record type
+    final TrackOptions options = toOptions(arg(1), new TrackOptions(), cc.qc);
+    final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>(4);
+    final BiConsumer<BooleanOption, SeqType> field = (option, st) -> {
+      if(options.get(option)) fields.put(Token.token(option.name()), new ShapeField(st));
+    };
+    field.accept(TrackOptions.TIME, Types.DECIMAL_O);
+    field.accept(TrackOptions.ALLOCATED, Types.INTEGER_O);
+    field.accept(TrackOptions.MEMORY, Types.INTEGER_O);
+    field.accept(TrackOptions.VALUE, arg(0).seqType());
+    exprType.assign(cc.qc.shared.shape(new ShapeType(fields)));
+    return this;
   }
 }

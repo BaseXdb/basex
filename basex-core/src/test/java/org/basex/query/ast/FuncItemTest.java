@@ -821,4 +821,18 @@ public final class FuncItemTest extends SandboxTest {
       }
     }
   }
+
+  /** Coerced closures. */
+  @Test public void coercedClosure() {
+    final String f = "declare %basex:inline(0) function local:f("
+        + "$p as fn(xs:integer) as xs:boolean, $a) { $p($a) }; "
+        + "declare %basex:inline(0) function local:g($n, $a) { local:f(";
+    // closure of the exact type: no wrapping
+    check(f + "fn($i as xs:integer) as xs:boolean { $i > $n }, $a) }; local:g(0, 1)", true,
+        empty(TypeCheck.class));
+    // untyped closure: parameter is typed by the coerced arguments
+    check(f + "fn($i) { $i > $n }, $a) }; local:g(0, 1)", true,
+        exists(TypeCheck.class), exists("VarRef[@name = '$i'][@type = 'xs:integer']"));
+    error(f + "fn($i) { $i > $n }, $a) }; local:g(0, 1.5)", INVTYPE_X);
+  }
 }

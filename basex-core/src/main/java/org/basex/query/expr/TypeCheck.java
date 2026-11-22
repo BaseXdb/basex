@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -65,6 +66,12 @@ public final class TypeCheck extends Single {
       // exactly-one(ITEM) coerce as item() → ITEM coerce as item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
+    // coerced closure: arguments are coerced to the target types before being passed on
+    //   fn($a) { $a + 1 } coerce as fn(xs:int) as item()* → $a is typed as xs:int in the body
+    if(expr instanceof Closure && type.deref() instanceof final FuncType ft &&
+        ft.argTypes != null) {
+      expr = expr.refineFunc(cc, ft.argTypes);
+    }
 
     final SeqType et = expr.seqType();
     cardinality = et.with(st.occ).keptBy(st);
@@ -109,7 +116,9 @@ public final class TypeCheck extends Single {
 
     // skip check if return type is correct
     //   (E coerce as fn(xs:int) as item()*) coerce as fn(xs:int) as item()* → inner check
-    if(et.keptBy(st) || expr instanceof TypeCheck && et.eq(st)) {
+    //   fn($i as xs:int) { $i } coerce as fn(xs:int) as item()* → closure (exact type)
+    if(et.keptBy(st) || expr instanceof TypeCheck && et.eq(st) ||
+        expr instanceof Closure && et.instanceOf(st) && et.type.keptExact(st.type, true)) {
       // (1, 3) coerce as xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;

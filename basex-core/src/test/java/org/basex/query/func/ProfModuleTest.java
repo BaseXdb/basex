@@ -114,6 +114,11 @@ public final class ProfModuleTest extends SandboxTest {
     query("empty(" + func.args("A", " { 'memory': false(), 'time': false(), " +
         "'allocated': false(), 'value': false() }") + "?*)", "true");
     query(func.args("A") + "?allocated >= 0", "true");
+
+    check(func.args(" (1 to 2)[. > 1]") + "?value", 2, type(func,
+        "record(time as xs:decimal, allocated as xs:integer, value as xs:integer*)"));
+    check(func.args(1, " { 'value': false(), 'memory': true() }") + "?memory >= 0", true,
+        type(func, "record(time as xs:decimal, allocated as xs:integer, memory as xs:integer)"));
   }
 
   /** Test method. */

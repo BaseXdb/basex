@@ -150,15 +150,27 @@ public abstract class Mapping extends Arr {
 
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
-    // context inlining: only consider first expression
+    boolean changed = false, refined = false;
     final CompileContext cc = ic.cc;
-    final int el = ic.var == null ? 1 : exprs.length;
+    final int el = exprs.length;
     final boolean items = items();
+    InlineContext focus = null;
     for(int e = 0; e < el; e++) {
-      Expr inlined;
+      // context inlining: only consider first expression
+      final boolean inline = e == 0 || ic.var != null;
+      if(!inline && !refined) break;
+
+      final Expr expr = exprs[e];
+      final SeqType st = expr.seqType();
+      Expr inlined = null;
       try {
-        inlined = exprs[e].inline(ic);
+        if(inline) inlined = expr.inline(ic);
+        // refined focus type: re-optimize context references
+        if(refined) {
+          if(focus == null) focus = InlineContext.focus(info, cc);
+          final Expr ex = focus.inlineOrNull(inlined != null ? inlined : expr);
+          if(ex != null) inlined = ex;
+        }
       } catch(final QueryException ex) {
         // replace original expression with error
         inlined = FnError.get(ex);
@@ -167,8 +179,9 @@ public abstract class Mapping extends Arr {
         exprs[e] = inlined;
         changed = true;
       } else {
-        inlined = exprs[e];
+        inlined = expr;
       }
+      refined = ic.refocus(expr, st, inlined, items);
       if(e == 0) cc.pushFocus(inlined, items);
       else cc.updateFocus(inlined, items);
     }

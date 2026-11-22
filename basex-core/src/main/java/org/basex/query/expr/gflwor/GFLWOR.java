@@ -1198,13 +1198,18 @@ public final class GFLWOR extends ParseExpr {
       throws QueryException {
 
     boolean changed = false;
+    final ArrayList<Var> refined = new ArrayList<>(0);
     while(iter.hasNext()) {
       final Clause clause = iter.next();
+      // positional and score variables have fixed types
+      final Var var = clause.vars.length != 0 ? clause.vars[0] : null;
+      final SeqType st = var != null ? var.seqType() : null;
       try {
         final Expr inlined = ic.inlineOrNull(clause);
         if(inlined != null) {
           iter.set((Clause) inlined);
           changed = true;
+          if(var != null && !var.seqType().eq(st)) refined.add(var);
         }
       } catch(final QueryException ex) {
         iter.remove();
@@ -1222,6 +1227,11 @@ public final class GFLWOR extends ParseExpr {
       return clauseError(ex, iter);
     }
 
+    // re-optimize the references to variables with refined types
+    for(final Var var : refined) {
+      final int c = Checks.index(clauses, clause -> clause.declares(var));
+      if(c != -1) inline(InlineContext.refine(var, info, ic.cc), clauses.listIterator(c + 1));
+    }
     return changed;
   }
 
