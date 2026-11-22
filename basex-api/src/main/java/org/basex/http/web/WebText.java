@@ -46,33 +46,33 @@ public interface WebText {
   /** Error message. */
   String ANN_CONFLICT_X = "Conflicting annotations: %.";
   /** Error message. */
-  String ANN_BODY_TWICE = "More than one body variable specified.";
+  String ANN_BODY_TWICE = "Duplicate body variable.";
   /** Error message. */
-  String ANN_TWICE_X_X = "Annotation %% is specified twice.";
+  String ANN_TWICE_X_X = "Duplicate annotation: %%.";
   /** Error message. */
   String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
-  String INV_ENCODING_X = "URL is invalid: \"%\".";
+  String INV_ENCODING_X = "Invalid URL: \"%\".";
   /** Error message. */
   String INV_VARNAME_X = "Invalid variable name: $%.";
   /** Error message. */
   String INV_CODE_X = "Invalid error code: %.";
   /** Error message. */
-  String INV_PRECEDENCE_X_X = "Errors must be of the same precedence (\"%\" vs \"%\").";
+  String INV_PRECEDENCE_X_X = "Errors must be of the same precedence (\"%\" vs. \"%\").";
   /** Error message. */
-  String INV_ERR_TWICE_X = "The same error has been specified twice: \"%\".";
+  String INV_ERR_TWICE_X = "Duplicate error: \"%\".";
   /** Error message. */
   String INV_NONS_X = "No namespace declared for '%'.";
   /** Error message. */
-  String ARG_TYPE_X_X_X = "% must be of type %, supplied: %.";
+  String ARG_TYPE_X_X_X = "% must be of type %, found: %.";
   /** Error message. */
   String ARG_MISSING_X_X = "% is missing (expected type: %).";
   /** Error message. */
   String PARAM_MISSING_X = "Parameter $% missing in function declaration.";
   /** Error message. */
-  String PARAM_DUPL_X = "$% is specified more than once.";
+  String PARAM_DUPL_X = "Duplicate parameter: $%.";
   /** Error message. */
-  String PATH_DUPL_X = "Path \"%\" is specified more than once.";
+  String PATH_DUPL_X = "Duplicate path: \"%\".";
   /** Error message. */
   String VAR_UNDEFINED_X = "No binding defined for $%.";
   /** Error message. */
@@ -80,7 +80,7 @@ public interface WebText {
   /** Error message. */
   String UNEXP_NODE_X = "Unexpected node: %.";
   /** Error message. */
-  String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
+  String HEAD_METHOD = "HEAD method must return a single 'rest:response' element.";
   /** Error message. */
   String RESPONSE_FIRST = "Only the first result item can be a 'rest:response' element.";
   /** Error message. */

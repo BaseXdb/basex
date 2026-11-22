@@ -147,9 +147,9 @@ public final class RecordTest extends SandboxTest {
   /** Strict field access on records. */
   @Test public void lookup() {
     // labeled record: lookup or call of an undeclared field is a type error
-    error("declare record local:c(x, y); local:c(1, 2)?z", RECORDFIELD_X_X);
-    error("declare record local:c(x, y); local:c(1, 2)('z')", RECORDFIELD_X_X);
-    error("declare record local:c(x, y); local:c(1, 2)(('z')[. != ''])", RECORDFIELD_X_X);
+    error("declare record local:c(x, y); local:c(1, 2)?z", RECORDFIELD_X);
+    error("declare record local:c(x, y); local:c(1, 2)('z')", RECORDFIELD_X);
+    error("declare record local:c(x, y); local:c(1, 2)(('z')[. != ''])", RECORDFIELD_X);
     // simple record type: lookup or call of an undeclared field returns ()
     query("let $r as record(a) := { 'a': 1 } return $r?b", "");
     query("let $r as record(a) := { 'a': 1 } return $r('b')", "");
@@ -173,10 +173,10 @@ public final class RecordTest extends SandboxTest {
         + "local:reset(local:coord(1, 2)) instance of local:coord", true);
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
-        + "local:reset(local:coord(1, 2))?z", RECORDFIELD_X_X);
+        + "local:reset(local:coord(1, 2))?z", RECORDFIELD_X);
     // multiple keys: on labeled records, every key must be a declared field
     query("declare record local:ab(a, b); local:ab(1, 2)?('a', 'b')", "1\n2");
-    error("declare record local:ab(a, b); local:ab(1, 2)?('a', 'c')", RECORDFIELD_X_X);
+    error("declare record local:ab(a, b); local:ab(1, 2)?('a', 'c')", RECORDFIELD_X);
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'c')", 1);
     // wildcard returns all field values and never errors
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?*", "1\n2");
@@ -204,7 +204,7 @@ public final class RecordTest extends SandboxTest {
     // coercion applies: an integer is promoted to the required type
     query("declare record local:d(a as xs:double); (local:d(1) but with { 'a': 2 })?a", 2);
     // the result is still a record: looking up an undeclared field errors
-    error(a + "(local:a(1) but with { 'a': 2 })?b", RECORDFIELD_X_X);
+    error(a + "(local:a(1) but with { 'a': 2 })?b", RECORDFIELD_X);
     // an undeclared field in the right operand is a type error
     error(a + "local:a(1) but with { 'c': 9 }", INVTYPE_X);
     // a value that does not conform to the field type is a type error
@@ -230,7 +230,7 @@ public final class RecordTest extends SandboxTest {
     query(ab + "(local:ab(1, 2) but with { 'a': 9 })?b", 2);
     // an empty right operand leaves the record unchanged (annotation included)
     query(a + "local:a(1) but with {}", "{\"a\":1}");
-    error(a + "(local:a(1) but with {})?b", RECORDFIELD_X_X);
+    error(a + "(local:a(1) but with {})?b", RECORDFIELD_X);
   }
 
   /** Width-invariant subtyping and {@code record(*)}. */
@@ -632,7 +632,7 @@ public final class RecordTest extends SandboxTest {
     // the fused result is a record again: strict field access applies
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
-        + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X_X);
+        + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X);
     // no fusion when the coercion target is not the record's own (strict) type
     check(ab + "let $r as local:ab := local:ab(<a/>, 2) return map:put($r, 'a', 0)",
         "{\"a\":0,\"b\":2}", empty(ButWith.class));
@@ -650,7 +650,7 @@ public final class RecordTest extends SandboxTest {
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
         + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
-        + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X_X);
+        + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X);
   }
 
   /** Chains of {@code but with} updates. */
@@ -1395,7 +1395,7 @@ public final class RecordTest extends SandboxTest {
 
     // labeled types are lower bounds: subtype records may have more fields
     query(prolog + "local:f(local:q(1))?z", "z");
-    error(prolog + "local:f(local:p(1))?z", RECORDFIELD_X_X);
+    error(prolog + "local:f(local:p(1))?z", RECORDFIELD_X);
     query(prolog + "map:size(local:f(local:q(1)))", 3);
     query(prolog + "map:get(local:f(local:q(1)), 'z')", "z");
     query(prolog + "map:contains(local:f(local:q(1)), 'z')", true);

@@ -136,15 +136,15 @@ public final class LookupTest extends SandboxTest {
   @Test public void error() {
     error("1?a", LOOKUP_X);
     error("(1, 2)[" + wrap(1) + " = 1]?((1)[" + wrap(1) + " = 2])", LOOKUP_X);
-    error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X_X);
-    error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X_X);
-    error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X);
+    error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X);
+    error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
-        + "$x as record(a, b)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + "$x as record(a, b)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
-        + "$x as record(*)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + "$x as record(*)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
         + "$x as record(*)) { if($x instance of record(a, b)) { $x?c } };"
-        + " local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + " local:f(local:r(1, 2))", RECORDFIELD_X);
   }
 }

@@ -18,7 +18,7 @@ public final class RemovedTest extends SandboxTest {
     description("convert:binary-to-string(xs:base64Binary(''))",
         "Unknown function: convert:binary-to-string (removed; use bin:decode-string).");
     description("fn:function-identity(true#0)",
-        "Unknown function: function-identity (removed).");
+        "Unknown function: fn:function-identity (removed).");
     description("hof:scan-left(1, 2, 3)",
         "Namespace prefix not declared: hof (removed; use the standard functions).");
     // other unknown functions are still reported with similar names

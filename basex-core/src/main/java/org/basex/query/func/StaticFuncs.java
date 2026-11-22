@@ -368,10 +368,10 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @return exception
    */
   QueryException similarError(final QNm qname, final InputInfo info) {
+    // name as written: keep a supplied prefix
+    final byte[] name = qname.hasPrefix() ? qname.string() : qname.prefixString(FN_URI);
     final String removed = Removed.function(Token.string(qname.prefixId()));
-    if(removed != null) {
-      return WHICHFUNC_X.get(info, Util.info("% (%)", qname.prefixString(FN_URI), removed));
-    }
+    if(removed != null) return WHICHFUNC_X.get(info, Util.info("% (%)", name, removed));
     final byte[] local = Token.lc(qname.local()), uri = qname.uri();
     // built-in function in the same URI (Levenshtein with prefix fallback)
     QNm similar = Levenshtein.similarOrPrefix(qname.local(), Functions.BUILT_IN.keys(),
@@ -395,8 +395,10 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
         }
       }
     }
-    return WHICHFUNC_X.get(info, similar(qname.prefixString(FN_URI),
-        similar != null ? similar.prefixString(FN_URI) : null));
+    // suggestion in the same namespace: reuse the supplied prefix
+    return WHICHFUNC_X.get(info, similar(name, similar, qnm ->
+      qname.hasPrefix() && Token.eq(qnm.uri(), uri) ? qname.withLocal(qnm.local()) :
+      qnm.prefixString(FN_URI)));
   }
 
   @Override

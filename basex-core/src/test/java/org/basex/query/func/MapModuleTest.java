@@ -289,7 +289,7 @@ public final class MapModuleTest extends SandboxTest {
     // keep the call if a strict record may lack the key
     check("(" + _MAP_ENTRY.args(" string(" + wrap("a") + ")", wrap(0)) + ")('a')", 0,
         empty(func));
-    error(record + "local:x(" + wrap(0) + ")('y')", RECORDFIELD_X_X);
+    error(record + "local:x(" + wrap(0) + ")('y')", RECORDFIELD_X);
   }
 
   /** Test method. */

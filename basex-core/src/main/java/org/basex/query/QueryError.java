@@ -32,7 +32,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_ANN2_X_X(BASEX, "annotation", "%: %."),
   /** Error code. */
-  BASEX_ANN3_X(BASEX, "annotation", "Annotation % is declared twice."),
+  BASEX_ANN3_X(BASEX, "annotation", "Duplicate annotation: %."),
   /** Error code. */
   BASEX_ANN_X_X_X(BASEX, "annotation", "%: % expected, % found."),
   /** Error code. */
@@ -64,7 +64,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_OPTIONS_X_X(BASEX, "options", "Database option '%' cannot be set to '%'."),
   /** Error code. */
-  BASEX_OVERFLOW(BASEX, "overflow", "Stack Overflow: Try tail recursion?"),
+  BASEX_OVERFLOW(BASEX, "overflow", "Stack overflow: try tail recursion?"),
   /** Error code. */
   BASEX_NESTED(BASEX, "overflow", "Value is too deeply nested."),
   /** Error code. */
@@ -96,7 +96,7 @@ public enum QueryError {
   /** Error code. */
   ARCHIVE_LEVEL_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */
-  ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
+  ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid: '%'."),
   /** Error code. */
   ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "%"),
   /** Error code. */
@@ -110,7 +110,7 @@ public enum QueryError {
   /** Error code. */
   ARCHIVE_MODIFY_X(ARCHIVE, "modify", "Entries of % archive cannot be modified."),
   /** Error code. */
-  ARCHIVE_NUMBER_X_X(ARCHIVE, "number", "Number of entries and contents differs: % vs. %."),
+  ARCHIVE_NUMBER_X_X(ARCHIVE, "number", "Numbers of entries and contents differ: % vs. %."),
   /** Error code. */
   ARCHIVE_SINGLE_X(ARCHIVE, "single", "% archives are limited to a single entry."),
   /** Error code. */
@@ -127,7 +127,7 @@ public enum QueryError {
   /** Error code. */
   BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
   /** Error code. */
-  BIN_OOR_X(BIN, "octet-out-of-range", "Octet '%' is out of range."),
+  BIN_OOR_X(BIN, "octet-out-of-range", "Octet out of range: %."),
   /** Error code. */
   BIN_NNC(BIN, "non-numeric-character", "Invalid character in constructor string."),
   /** Error code. */
@@ -135,7 +135,7 @@ public enum QueryError {
   /** Error code. */
   BIN_CE_X(BIN, "conversion-error", "%."),
   /** Error code. */
-  BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
+  BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: %."),
 
   // Bit Module
 
@@ -225,7 +225,7 @@ public enum QueryError {
   // Database Module
 
   /** Error code. */
-  DB_ARGS_X_X(DB, "args", "Number of specified inputs and paths differs: % vs. %."),
+  DB_ARGS_X_X(DB, "args", "Numbers of specified inputs and paths differ: % vs. %."),
   /** Error code. */
   DB_CONFLICT1_X_X(DB, "conflict", "Database '%' can only be % once."),
   /** Error code. */
@@ -233,7 +233,7 @@ public enum QueryError {
   /** Error code. */
   DB_CONFLICT3_X(DB, "conflict", "Database '%' cannot be both altered and dropped."),
   /** Error code. */
-  DB_CONFLICT4_X(DB, "conflict", "Name of source and target is equal: %."),
+  DB_CONFLICT4_X(DB, "conflict", "Source and target names are equal: %."),
   /** Error code. */
   DB_CONFLICT5_X(DB, "conflict", "Resource '%' can only be stored once."),
   /** Error code. */
@@ -281,7 +281,7 @@ public enum QueryError {
   /** Error code. */
   FILE_EXISTS_X(FILE, "exists", "'%' already exists."),
   /** Error code. */
-  FILE_NO_DIR_X(FILE, "no-dir", "'%' is no directory."),
+  FILE_NO_DIR_X(FILE, "no-dir", "'%' is not a directory."),
   /** Error code. */
   FILE_IS_DIR_X(FILE, "is-dir", "'%' is a directory."),
   /** Error code. */
@@ -304,7 +304,7 @@ public enum QueryError {
   // Fulltext Module
 
   /** Error code. */
-  FT_OPTIONS(FT, "options", "Wildcards and fuzzy option cannot be specified both."),
+  FT_OPTIONS(FT, "options", "Wildcards and fuzzy option cannot both be specified."),
 
   // HTTP Module
 
@@ -488,7 +488,7 @@ public enum QueryError {
   /** Error code. */
   UNIT_FAIL_X(UNIT, "fail", "%"),
   /** Error code. */
-  UNIT_FAIL_X_X_X(UNIT, "fail", "Item %: % expected, % returned."),
+  UNIT_FAIL_X_X_X(UNIT, "fail", "Item %: % expected, % found."),
   /** Error code. */
   UNIT_NOARGS_X(UNIT, "no-args", "Test function '%' must have no arguments."),
   /** Error code. */
@@ -503,7 +503,7 @@ public enum QueryError {
   /** Error code. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
   /** Error code. */
-  USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),
+  USER_EQUAL_X(USER, "equal", "Old and new user names are equal: %."),
   /** Error code. */
   USER_INFO_X(USER, "info", "Info can only be % once."),
   /** Error code. */
@@ -525,7 +525,7 @@ public enum QueryError {
   /** Error code. */
   USER_UPDATE1_X_X(USER, "update", "User '%' can only be % once."),
   /** Error code. */
-  USER_UPDATE2_X(USER, "update", "Pattern '%' is specified more than once."),
+  USER_UPDATE2_X(USER, "update", "Duplicate pattern: '%'."),
   /** Error code. */
   USER_UPDATE3_X_X(USER, "update", "User '%' can only be % once."),
 
@@ -578,7 +578,7 @@ public enum QueryError {
   APPLY_X_X(FOAP, 1, "%: %."),
 
   /** Error code. */
-  DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
+  DIVZERO_X(FOAR, 1, "Division by zero, dividend: %."),
   /** Error code. */
   INVIDIV_X(FOAR, 2, "Invalid integer division: %."),
   /** Error code. */
@@ -605,7 +605,7 @@ public enum QueryError {
   /** Error code. */
   WHICHCOLL_X(FOCH, 2, "%"),
   /** Error code. */
-  NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
+  NORMUNI_X(FOCH, 3, "Unsupported normalization form: '%'."),
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
 
@@ -678,24 +678,24 @@ public enum QueryError {
   /** Error code. */
   INVGROUP_X(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** Error code. */
-  DIFFMAND_X(FODF, 1310, "Mandatory digits is not of the same group: '%'."),
+  DIFFMAND_X(FODF, 1310, "Mandatory digits are not in the same group: '%'."),
   /** Error code. */
   INVMODIFIER_X(FODF, 1310, "Invalid specification of ordinal/cardinal numbering: '%'."),
   /** Error code. */
   INVDDPATTERN_X(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
   /** Error code. */
-  DATERANGE_X_X(FODT, 1, "%: '%' out of range."),
+  DATERANGE_X_X(FODT, 1, "% out of range: '%'."),
   /** Error code. */
-  YEARRANGE_X(FODT, 1, "Year '%' out of range."),
+  YEARRANGE_X(FODT, 1, "Year out of range: %."),
   /** Error code. */
-  SECRANGE_X(FODT, 1, "Seconds '%' out of range."),
+  SECRANGE_X(FODT, 1, "Seconds out of range: %."),
   /** Error code. */
-  DURRANGE_X_X(FODT, 2, "%: '%' out of range."),
+  DURRANGE_X_X(FODT, 2, "% out of range: '%'."),
   /** Error code. */
-  MONTHRANGE_X(FODT, 2, "Months '%' out of range."),
+  MONTHRANGE_X(FODT, 2, "Months out of range: %."),
   /** Error code. */
-  SECDURRANGE_X(FODT, 2, "Seconds '%' out of range."),
+  SECDURRANGE_X(FODT, 2, "Seconds out of range: %."),
   /** Error code. */
   DATEZERO_X_X(FODT, 2, "Invalid % calculation: %."),
   /** Error code. */
@@ -731,7 +731,7 @@ public enum QueryError {
   /** Error code. */
   DUPLICATE_JSON_X_X_X(FOJS, 3, "(%:%): %."),
   /** Error code. */
-  MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
+  MERGE_DUPLICATE_X(FOJS, 3, "Duplicate key: %."),
   /** Error code. */
   VALIDATE_JSON(FOJS, 4, "Schema validation is not supported."),
   /** Error code. */
@@ -745,7 +745,7 @@ public enum QueryError {
   /** Error code. */
   MAP_TO_ELEMENT_X(FOJS, 9, "%"),
   /** Error code. */
-  PLAN_TYPE_X_X(FOJS, 10, "Value '%' cannot be cast to type '%'."),
+  PLAN_TYPE_X_X(FOJS, 10, "Value cannot be cast to type '%': '%'."),
 
   /** Error code. */
   NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),
@@ -786,13 +786,13 @@ public enum QueryError {
   /** Error code. */
   FUNCCAST_X_X_X(FORG, 1, "Cannot convert % to %: %."),
   /** Error code. */
-  DATEFORMAT_X_X_X(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
+  DATEFORMAT_X_X_X(FORG, 1, "Wrong % format (try e.g. '%'): '%'."),
   /** Error code. */
   URIARG_X(FORG, 2, "Invalid URI: %."),
   /** Error code. */
   ZEROORONE(FORG, 3, "Zero or one item expected."),
   /** Error code. */
-  ONEORMORE(FORG, 4, "One or more item expected."),
+  ONEORMORE(FORG, 4, "One or more items expected."),
   /** Error code. */
   EXACTLYONE(FORG, 5, "Exactly one item expected."),
   /** Error code. */
@@ -811,7 +811,7 @@ public enum QueryError {
   INTINVALID_X_X(FORG, 12, "Cannot parse input with radix %: %."),
 
   /** Error code. */
-  REGFLAG_X(FORX, 1, "Invalid regular flag: '%'."),
+  REGFLAG_X(FORX, 1, "Invalid regular expression flag: '%'."),
   /** Error code. */
   REGINVALID_X(FORX, 2, "Invalid regular expression: %."),
   /** Error code. */
@@ -819,7 +819,7 @@ public enum QueryError {
   /** Error code. */
   REGDOLLAR_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
   /** Error code. */
-  REGGROUP_X(FORX, 4, "Unknown group name in replacement string: $<%>."),
+  REGGROUP_X(FORX, 4, "Unknown group name in replacement string: %."),
 
   /** Error code. */
   FIATOMIZE_X(FOTY, 13, "%."),
@@ -898,7 +898,7 @@ public enum QueryError {
   /** Error code. */
   NOTHES_X(FTST, 18, "Thesaurus not found: %."),
   /** Error code. */
-  FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
+  FTDUP_X(FTST, 19, "Duplicate match option: '%'."),
 
   /** Error code. */
   IXML_GRM_X_X_X(FOIX, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
@@ -910,9 +910,9 @@ public enum QueryError {
   IXML_RESULT_X(FOIX, 2, "Failed to process ixml parser result: %"),
 
   /** Error code. */
-  SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
+  SERATTR_X(SENR, 1, "Attributes cannot be serialized: %."),
   /** Error code. */
-  SERNS_X(SENR, 1, "Namespaces cannot be serialized:%."),
+  SERNS_X(SENR, 1, "Namespaces cannot be serialized: %."),
   /** Error code. */
   SERFUNC_X(SENR, 1, "% items cannot be serialized."),
   /** Error code. */
@@ -930,27 +930,27 @@ public enum QueryError {
   /** Error code. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
   /** Error code. */
-  SERNORM_X(SESU, 11, "Normalization form not supported: %."),
+  SERNORM_X(SESU, 11, "Unsupported normalization form: '%'."),
   /** Error code. */
   SERNOTSUPP_X(SESU, 13, "%"),
   /** Error code. */
   SERILL_X(SERE, 14, "Illegal HTML character found: #x%;."),
   /** Error code. */
-  SERPI(SERE, 15, "Processing construction contains '>'."),
+  SERPI(SERE, 15, "Processing instruction contains '>'."),
   /** Error code. */
   SERPARAM_X(SEPM, 16, "%"),
   /** Error code. */
   SERDOC_X(SEPM, 17, "%"),
   /** Error code. */
-  SERCHARDUP_X(SEPM, 18, "Character '%' is specified twice."),
+  SERCHARDUP_X(SEPM, 18, "Duplicate character: '%'."),
   /** Error code. */
-  SERDUP_X(SEPM, 19, "Serialization parameter '%' is specified twice."),
+  SERDUP_X(SEPM, 19, "Duplicate serialization parameter: '%'."),
   /** Error code. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'."),
   /** Error code. */
   SERJSONFUNC_X(SERE, 21, "% items cannot be serialized."),
   /** Error code. */
-  SERDUPL_X(SERE, 22, "Duplicate name found: '%'."),
+  SERDUPL_X(SERE, 22, "Duplicate name: '%'."),
   /** Error code. */
   SERJSON(SERE, 23, "Only one item can be serialized with JSON."),
   /** Error code. */
@@ -1008,7 +1008,7 @@ public enum QueryError {
   /** Error code. */
   NOCOMMENT(XPST, 3, "Expecting comment."),
   /** Error code. */
-  PIXML_X(XPST, 3, "Name of processing instruction is illegal: '%'."),
+  PIXML_X(XPST, 3, "Processing instruction has invalid name: '%'."),
   /** Error code. */
   NOPI(XPST, 3, "Expecting processing instruction."),
   /** Error code. */
@@ -1204,7 +1204,7 @@ public enum QueryError {
   /** Error code. */
   INVTYPE_X(XPTY, 4, "%."),
   /** Error code. */
-  RECORDFIELD_X_X(XPTY, 4, "% has no field named %."),
+  RECORDFIELD_X(XPTY, 4, "Undeclared field: %."),
   /** Error code. */
   RECORDCONSTRAINT_X_X(XPTY, 4, "Integrity constraint of % is violated: %."),
   /** Error code. */
@@ -1244,7 +1244,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %."),
   /** Error code. */
-  INVALIDBOOLOPTION_X_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %; use %."),
+  INVALIDBOOLOPTION_X_X_X_X_X(XPTY, 4, "Option %: % expected (use %), % found: %."),
   /** Error code. */
   INVALIDOPTION_X_X_X(XPTY, 4, "Option: % expected, % found: %."),
   /** Error code. */
@@ -1262,7 +1262,7 @@ public enum QueryError {
   /** Error code. */
   NSAXIS_X(XPTY, 4, "Namespace axis: XNode expected, % found."),
   /** Error code. */
-  INVCONVERT_X_X(XPTY, 4, "% cannot be cast to %."),
+  INVCONVERT_X_X(XPTY, 4, "Value cannot be cast to %: %."),
 
   /** Error code. */
   JAVANULL(XPTY, 17, "Java array contains null values."),
@@ -1288,7 +1288,7 @@ public enum QueryError {
   /** Error code. */
   CIRCCTX(XQDY, 54, "Context value depends on itself."),
   /** Error code. */
-  CPIXML_X(XQDY, 64, "Processing instruction has illegal name: %."),
+  CPIXML_X(XQDY, 64, "Processing instruction has invalid name: '%'."),
   /** Error code. */
   COMINVALID(XQDY, 72, "Comment must not contain '--' or end with '-'."),
   /** Error code. */
@@ -1310,9 +1310,9 @@ public enum QueryError {
   /** Error code. */
   EMPTYNSCONS(XQDY, 102, "Element is in no namespace, no namespace can be assigned."),
   /** Error code. */
-  DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
+  DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** Error code. */
-  MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
+  MAPDUPLKEY_X(XQDY, 137, "Duplicate map key: %."),
 
   /** Error code. */
   IMPLSCHEMA(XQST, 9, "No XML Schema support."),
@@ -1323,9 +1323,9 @@ public enum QueryError {
   /** Error code. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
   /** Error code. */
-  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
+  DUPLNSDECL_X(XQST, 33, "Duplicate prefix declaration: '%'."),
   /** Error code. */
-  DUPLFUNC_X(XQST, 34, "Duplicate declaration of function %."),
+  DUPLFUNC_X(XQST, 34, "Duplicate function declaration: %."),
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */
@@ -1343,11 +1343,11 @@ public enum QueryError {
   /** Error code. */
   INVURI_X(XQST, 46, "Invalid URI: %."),
   /** Error code. */
-  DUPLMODULE_X(XQST, 47, "Module namespace is declared twice: %."),
+  DUPLMODULE_X(XQST, 47, "Duplicate module namespace: %."),
   /** Error code. */
   MODULENS_X(XQST, 48, "Declaration % does not match the module namespace."),
   /** Error code. */
-  VARDUPL_X(XQST, 49, "Duplicate declaration of static variable $%."),
+  VARDUPL_X(XQST, 49, "Duplicate static variable declaration: $%."),
   /** Error code. */
   WHICHCAST_X(XQST, 52, "Type is not a simple type: %."),
   /** Error code. */
@@ -1365,7 +1365,7 @@ public enum QueryError {
   /** Error code. */
   WHICHMODFILE_X(XQST, 59, "Cannot retrieve module: %."),
   /** Error code. */
-  WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
+  WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs. '%'."),
   /** Error code. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
   /** Error code. */
@@ -1385,7 +1385,7 @@ public enum QueryError {
   /** Error code. */
   ILLEGALEQNAME_X(XQST, 70, "Illegal namespace: %."),
   /** Error code. */
-  DUPLNSDEF_X(XQST, 71, "Duplicate declaration of prefix '%'."),
+  DUPLNSDEF_X(XQST, 71, "Duplicate prefix declaration: '%'."),
   /** Error code. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** Error code. */
@@ -1399,7 +1399,7 @@ public enum QueryError {
   /** Error code. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
   /** Error code. */
-  DUPLVAR_X(XQST, 89, "Duplicate declaration of %."),
+  DUPLVAR_X(XQST, 89, "Duplicate variable declaration: %."),
   /** Error code. */
   INVCHARREF_X(XQST, 90, "Invalid XML character: %."),
   /** Error code. */
@@ -1411,17 +1411,17 @@ public enum QueryError {
   /** Error code. */
   INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
   /** Error code. */
-  INVDECZERO_X(XQST, 97, "Zero-digit property is no Unicode digit with value zero: %."),
+  INVDECZERO_X(XQST, 97, "Zero-digit property is not a Unicode digit with value zero: %."),
   /** Error code. */
-  DUPLDECFORM_X(XQST, 98, "Decimal-format character is assigned twice: '%'."),
+  DUPLDECFORM_X(XQST, 98, "Duplicate decimal-format character: '%'."),
   /** Error code. */
   DUPLVALUE(XQST, 99, "Duplicate context value declaration."),
   /** Error code. */
   DUPLWIND_X(XQST, 103, "Duplicate declaration: %."),
   /** Error code. */
-  DUPLUPD(XQST, 106, "More than one updating annotation declared."),
+  DUPLUPD(XQST, 106, "Duplicate updating annotation."),
   /** Error code. */
-  DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
+  DUPLFUNVIS(XQST, 106, "Duplicate visibility annotation."),
   /** Error code. */
   OUTPUTLIB_X(XQST, 108, "Declaration not allowed in library module: output:%."),
   /** Error code. */
@@ -1433,9 +1433,9 @@ public enum QueryError {
   /** Error code. */
   DECITEM(XQST, 113, "Context value cannot be bound in library module."),
   /** Error code. */
-  DECDUPLPROP_X(XQST, 114, "Property is defined twice: %."),
+  DECDUPLPROP_X(XQST, 114, "Duplicate decimal-format property: %."),
   /** Error code. */
-  DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
+  DUPLVARVIS(XQST, 116, "Duplicate visibility annotation."),
   /** Error code. */
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** Error code. */
@@ -1445,7 +1445,7 @@ public enum QueryError {
   /** Error code. */
   CIRCTYPE_X(XQST, 140, "Type depends on itself: %."),
   /** Error code. */
-  DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
+  DUPLTYPE_X(XQST, 146, "Duplicate type declaration: %."),
   /** Error code. */
   PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: %."),
   /** Error code. */
@@ -1522,7 +1522,7 @@ public enum QueryError {
   /** Error code. */
   UPWRELMNS_X(XUTY, 10, "Node cannot be replaced with namespace: %."),
   /** Error code. */
-  UPWRATTR_X(XUTY, 11, "Target is no attribute: %."),
+  UPWRATTR_X(XUTY, 11, "Target is not an attribute: %."),
   /** Error code. */
   UPWRTRGTYP_X(XUTY, 12, "Target is not an element, attribute or pi: %."),
   /** Error code. */
@@ -2094,6 +2094,19 @@ public enum QueryError {
    */
   public static String similar(final Object string, final Object similar) {
     return similar == null ? Util.info(string) : Util.info("% (maybe: %)", string, similar);
+  }
+
+  /**
+   * Returns an info message for similar entries.
+   * @param <T> entry type
+   * @param string original string
+   * @param similar similar entry (can be {@code null})
+   * @param display function for displaying the similar entry
+   * @return info message
+   */
+  public static <T> String similar(final Object string, final T similar,
+      final java.util.function.Function<? super T, ?> display) {
+    return similar(string, similar != null ? display.apply(similar) : null);
   }
 
   /**

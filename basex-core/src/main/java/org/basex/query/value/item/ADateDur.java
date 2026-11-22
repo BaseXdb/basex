@@ -67,7 +67,7 @@ public abstract class ADateDur extends Item {
    * @return date format exception
    */
   final QueryException dateError(final byte[] input, final String ex, final InputInfo info) {
-    return DATEFORMAT_X_X_X.get(info, type, input, ex);
+    return DATEFORMAT_X_X_X.get(info, type, ex, input);
   }
 
   /**

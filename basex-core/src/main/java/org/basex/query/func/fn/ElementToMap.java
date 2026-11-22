@@ -118,7 +118,7 @@ public final class ElementToMap {
         Util.debug(ex);
       }
       // value could not be cast to the prescribed type
-      if(!plan.liberal && pe.explicitType) throw PLAN_TYPE_X_X.get(info, value, pe.type);
+      if(!plan.liberal && pe.explicitType) throw PLAN_TYPE_X_X.get(info, pe.type, value);
     }
     return Atm.get(value);
   }

@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.similarity.*;
 
 /**
  * Function implementation.
@@ -113,7 +114,11 @@ public final class FnReplace extends RegExFn {
               i = string.indexOf('>', s);
               if(i == -1) throw REGDOLLAR_X.get(info, replace);
               final String name = string.substring(s + 1, i);
-              if(!names.contains(name)) throw REGGROUP_X.get(info, name);
+              if(!names.contains(name)) {
+                final String similar = Levenshtein.similar(token(name), regExpr.getGroupNames());
+                throw REGGROUP_X.get(info, QueryError.similar("$<" + name + '>', similar,
+                    n -> "$<" + n + '>'));
+              }
               sb.append("${").append(name).append('}');
               s = i + 1;
             } else {

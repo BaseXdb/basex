@@ -278,7 +278,7 @@ public final class SeqType {
         if(cast == null) return null;
         vb.add(cast);
       } else if(error) {
-        throw INVCONVERT_X_X.get(info, value, this);
+        throw INVCONVERT_X_X.get(info, this, value);
       } else {
         return null;
       }

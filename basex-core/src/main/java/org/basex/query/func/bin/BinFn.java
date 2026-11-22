@@ -13,6 +13,8 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * Functions on binary data.
@@ -145,7 +147,8 @@ abstract class BinFn extends StandardFunc {
     final byte[] order = toTokenOrNull(expr, qc);
     if(order == null || eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
     if(eq(order, LITTLE)) return ByteOrder.LITTLE_ENDIAN;
-    throw BIN_USO_X.get(info, order);
+    throw BIN_USO_X.get(info, QueryError.similar(Str.get(order),
+        Levenshtein.similar(order, new TokenList().add(BIG).add(LITTLE).finish()), Str::get));
   }
 
   /**

@@ -52,6 +52,19 @@ public final class Levenshtein {
    */
   public static <T> T similar(final byte[] token, final T[] objects,
       final Function<? super T, ?> prepare) {
+    return similar(token, Arrays.asList(objects), prepare);
+  }
+
+  /**
+   * Returns the most similar entry.
+   * @param <T> element type
+   * @param token input token
+   * @param objects objects to be compared
+   * @param prepare function for preparing the object to be compared for the comparison
+   * @return most similar entry or {@code null}
+   */
+  public static <T> T similar(final byte[] token, final Iterable<T> objects,
+      final Function<? super T, ?> prepare) {
 
     T similar = null;
     int err = Integer.MAX_VALUE;

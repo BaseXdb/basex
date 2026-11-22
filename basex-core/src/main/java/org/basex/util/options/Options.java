@@ -1087,7 +1087,7 @@ public class Options implements Iterable<Option<?>> {
       final Boolean bool = type.type == BasicType.BOOLEAN && value instanceof final Item it &&
         it.type.isStringOrUntyped() ? Strings.toBoolean(string(it.string(info))) : null;
       return bool != null ?
-        INVALIDBOOLOPTION_X_X_X_X_X.get(info, name, type, st, value, Bln.get(bool)) :
+        INVALIDBOOLOPTION_X_X_X_X_X.get(info, name, type, Bln.get(bool), st, value) :
         INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
     };
 
