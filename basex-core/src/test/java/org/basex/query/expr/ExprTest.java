@@ -611,7 +611,7 @@ public final class ExprTest extends SandboxTest {
 
     // error values are inlined if the error is known at compile time
     check("try { 1 div 0 } catch * { $err:code }", "#err:FOAR0001", root(QNm.class));
-    check("try { 1 div 0 } catch * { $err:description }", "1 cannot be divided by zero.",
+    check("try { 1 div 0 } catch * { $err:description }", "Division by zero, dividend: 1.",
         root(Str.class));
 
     // error tests must be namespace-qualified
