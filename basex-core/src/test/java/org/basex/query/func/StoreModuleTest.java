@@ -105,7 +105,9 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args() + "?entries", 0);
     query(func.args() + "?size", 0);
     query(func.args() + "?persisted", false);
-    query("map:contains(" + func.args() + ", 'modified')", false);
+    query(func.args() + "?modified", "");
+    query("map:size(" + func.args() + ')', 4);
+    query(func.args() + " instance of store:info-record", true);
 
     query(_STORE_PUT.args("key", "INFO"));
     query(func.args() + "?entries", 1);

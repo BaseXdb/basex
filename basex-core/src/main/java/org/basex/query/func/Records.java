@@ -18,6 +18,10 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
+  ARCHIVE_OPTIONS(ARCHIVE_URI, "options",
+    field("format", Types.STRING_ZO),
+    field("algorithm", Types.STRING_ZO)),
+  /** Record definition. */
   ARRAY_SORT_KEY(FN_URI, "array-sort-key",
     field("key", Types.SORT_KEY_SEQ_ZO),
     field("collation", Types.STRING_ZO),
@@ -26,6 +30,15 @@ public enum Records {
   ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string", "skip").
         seqType(Occ.ZERO_OR_ONE))),
+  /** Record definition. */
+  CACHE_INFO(CACHE_URI, "info",
+    field("entries", Types.INTEGER_O),
+    field("max-entries", Types.INTEGER_O),
+    field("ttl", Types.INTEGER_O),
+    field("hits", Types.INTEGER_O),
+    field("misses", Types.INTEGER_O),
+    field("evictions", Types.INTEGER_O),
+    field("expirations", Types.INTEGER_O)),
   /** Record definition. */
   CAPTURED_GROUP(FN_URI, "captured-group",
     field("value", Types.STRING_O),
@@ -150,6 +163,12 @@ public enum Records {
     field("get", FuncType.get(Types.STRING_O, Types.INTEGER_O,
       Types.INTEGER_OR_STRING.seqType()).seqType())),
   /** Record definition. */
+  PROF_TRACK(PROF_URI, "track",
+    field("time", Types.DECIMAL_ZO),
+    field("allocated", Types.INTEGER_ZO),
+    field("memory", Types.INTEGER_ZO),
+    field("value", Types.ITEM_ZM)),
+  /** Record definition. */
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator",
     field("number", Types.DOUBLE_O),
     field("next", FuncType.get(ref("random-number-generator", Occ.EXACTLY_ONE)).seqType()),
@@ -177,6 +196,16 @@ public enum Records {
     field("collation", Types.STRING_ZO),
     field("order", Types.SORT_ORDER_ZO)),
   /** Record definition. */
+  STORE_INFO(STORE_URI, "info",
+    field("entries", Types.INTEGER_O),
+    field("size", Types.INTEGER_O),
+    field("persisted", Types.BOOLEAN_O),
+    field("modified", Types.DATE_TIME_ZO)),
+  /** Record definition. */
+  STRING_CLOSEST(STRING_URI, "closest",
+    field("value", Types.STRING_O),
+    field("similarity", Types.DOUBLE_O)),
+  /** Record definition. */
   URI_STRUCTURE(FN_URI, "uri-structure",
     field("uri", Types.STRING_ZO),
     field("scheme", Types.STRING_ZO),
@@ -198,6 +227,12 @@ public enum Records {
     field("is-valid", Types.BOOLEAN_O),
     field("typed-node", Types.XNODE_ZO),
     field("error-details", Types.MAP_ZM)
+  ),
+  /** Record definition. */
+  XSLT_TRANSFORM_REPORT(XSLT_URI, "transform-report",
+    field("result", Types.ITEM_ZM),
+    field("messages", Types.ARRAY_ZM),
+    field("error", Types.STRING_ZO)
   );
 
   /** Built-in record types. */

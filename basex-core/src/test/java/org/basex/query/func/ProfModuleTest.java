@@ -111,14 +111,15 @@ public final class ProfModuleTest extends SandboxTest {
     query("exists(" + func.args("A") + "?value)", "true");
     query("exists(" + func.args("A") + "?allocated)", "true");
     query("count(" + func.args("A") + "?*)", 3);
+    query("map:size(" + func.args("A") + ")", 4);
     query("empty(" + func.args("A", " { 'memory': false(), 'time': false(), " +
         "'allocated': false(), 'value': false() }") + "?*)", "true");
     query(func.args("A") + "?allocated >= 0", "true");
+    query(func.args("A") + " instance of prof:track-record", true);
 
-    check(func.args(" (1 to 2)[. > 1]") + "?value", 2, type(func,
-        "record(time as xs:decimal, allocated as xs:integer, value as xs:integer*)"));
+    check(func.args(" (1 to 2)[. > 1]") + "?value", 2, type(func, "prof:track-record"));
     check(func.args(1, " { 'value': false(), 'memory': true() }") + "?memory >= 0", true,
-        type(func, "record(time as xs:decimal, allocated as xs:integer, memory as xs:integer)"));
+        type(func, "prof:track-record"));
   }
 
   /** Test method. */

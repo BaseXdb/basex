@@ -309,6 +309,8 @@ public final class Types {
   public static final MapType STRING_STRING_SEQ_MAP = MapType.get(STRING, STRING_ZM);
   /** Map with string keys and integer values. */
   public static final MapType STRING_INTEGER_MAP = MapType.get(STRING, INTEGER_O);
+  /** Map with string keys and single items as values. */
+  public static final MapType STRING_ITEM_MAP = MapType.get(STRING, ITEM_O);
   /** Map with string keys and arbitrary values. */
   public static final MapType STRING_ITEM_SEQ_MAP = MapType.get(STRING, ITEM_ZM);
   /** Map with QName keys and arbitrary values. */

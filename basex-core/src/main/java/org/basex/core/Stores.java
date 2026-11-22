@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -188,12 +189,9 @@ public final class Stores implements Closeable {
         throw STORE_IO_X.get(info, ex);
       }
     }
-    final MapBuilder mb = new MapBuilder();
-    mb.put("entries", Itr.get(entries));
-    mb.put("size", Itr.get(persisted ? file.length() : 0));
-    mb.put("persisted", Bln.get(persisted));
-    if(persisted) mb.put("modified", Dtm.get(file.timeStamp()));
-    return mb.map();
+    return XQMap.get(Records.STORE_INFO.get(), Itr.get(entries),
+        Itr.get(persisted ? file.length() : 0), Bln.get(persisted),
+        persisted ? Dtm.get(file.timeStamp()) : Empty.VALUE);
   }
 
   /**

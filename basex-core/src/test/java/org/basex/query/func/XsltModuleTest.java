@@ -68,6 +68,8 @@ public final class XsltModuleTest extends SandboxTest {
     query(func.args(doc, ' ' + style) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("")) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("<xsl:x/>")) + "?error => exists()", true);
+    query("map:size(" + func.args(doc, ' ' + style) + ')', 3);
+    query(func.args(doc, ' ' + style) + " instance of xslt:transform-report-record", true);
     // several top-level nodes
     query(func.args(doc, ' ' + wrap("<xsl:template match='/'><a/><b/></xsl:template>")) +
         "?result ! name(*)", "a\nb");

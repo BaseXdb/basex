@@ -106,6 +106,7 @@ public final class CacheModuleTest extends SandboxTest {
     query(func.args() + "?evictions", 0);
     query(func.args() + "?expirations", 0);
     query(func.args("unknown") + "?entries", 0);
+    query(func.args() + " instance of cache:info-record", true);
 
     query(_CACHE_PUT.args("key", "INFO"));
     query(func.args() + "?entries", 1);

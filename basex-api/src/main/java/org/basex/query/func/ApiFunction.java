@@ -37,7 +37,7 @@ public enum ApiFunction implements AFunction {
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_MAP(RequestAttributeMap::new, "attribute-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), STRING_ITEM_SEQ_MAP.seqType(), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -58,7 +58,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_FORM_MAP(RequestFormMap::new, "form-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), MapType.get(BasicType.STRING, ITEM_OM).seqType(), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name, default?)",
       params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
@@ -79,7 +79,7 @@ public enum ApiFunction implements AFunction {
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_MAP(RequestParameterMap::new, "parameter-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), MapType.get(BasicType.STRING, ITEM_OM).seqType(), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_NAMES(RequestParameterNames::new, "parameter-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -94,7 +94,8 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_QUERY_MAP(RequestQueryMap::new, "query-map()",
-      params(), MAP_O, REQUEST_URI),
+      params(), MapType.get(BasicType.STRING, BasicType.UNTYPED_ATOMIC.seqType(Occ.ONE_OR_MORE)).
+      seqType(), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress::new, "remote-address()",
       params(), STRING_O, REQUEST_URI),

@@ -8,8 +8,10 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -46,9 +48,7 @@ public final class ArchiveOptions extends ArchiveFn {
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
-    final MapBuilder mb = new MapBuilder();
-    if(format != null) mb.put(CreateOptions.FORMAT.name(), format);
-    if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(), algorithm(level));
-    return mb.map();
+    return XQMap.get(Records.ARCHIVE_OPTIONS.get(), format != null ? Str.get(format) : Empty.VALUE,
+        level >= 0 ? Str.get(algorithm(level)) : Empty.VALUE);
   }
 }

@@ -7,6 +7,7 @@ import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,11 +37,6 @@ public final class StringClosest extends StringFn {
     /** Maximum number of results (0 or less: all results). */
     public static final NumberOption LIMIT = new NumberOption("limit", 1);
   }
-
-  /** Result key: value. */
-  private static final String VALUE = "value";
-  /** Result key: similarity. */
-  private static final String SIMILARITY = "similarity";
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -102,11 +98,11 @@ public final class StringClosest extends StringFn {
         (o1, o2) -> Double.compare(similarities.get(o2), similarities.get(o1)));
 
     final int max = limit > 0 ? Math.min(limit, size) : size;
+    final RecordType type = Records.STRING_CLOSEST.get();
     final ValueBuilder vb = new ValueBuilder(qc, max);
     for(int o = 0; o < max; o++) {
       final int p = order[o];
-      vb.add(new MapBuilder().put(VALUE, Str.get(values.get(p))).
-          put(SIMILARITY, Dbl.get(similarities.get(p))).map());
+      vb.add(XQMap.get(type, Str.get(values.get(p)), Dbl.get(similarities.get(p))));
     }
     return vb.value(this);
   }

@@ -1063,7 +1063,8 @@ public enum Function implements AFunction {
       EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      params(ANY_ATOMIC_TYPE_O), MAP_O, flag(NDT), ARCHIVE_URI, Perm.ADMIN),
+      params(ANY_ATOMIC_TYPE_O), Records.ARCHIVE_OPTIONS.get().seqType(), flag(NDT),
+      ARCHIVE_URI, Perm.ADMIN),
   /** XQuery function. */
   _ARCHIVE_REFRESH(ArchiveRefresh::new, "refresh(path, entries, contents)",
       params(STRING_O, ITEM_ZM, ITEM_ZM),
@@ -1229,7 +1230,7 @@ public enum Function implements AFunction {
       params(STRING_O, SUPPLIER_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_INFO(CacheInfo::new, "info(name?)",
-      params(STRING_ZO), STRING_INTEGER_MAP.seqType(), flag(NDT), CACHE_URI, Perm.ADMIN),
+      params(STRING_ZO), Records.CACHE_INFO.get().seqType(), flag(NDT), CACHE_URI, Perm.ADMIN),
   /** XQuery function. */
   _CACHE_INIT(CacheInit::new, "init(options?, name?)",
       params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.ADMIN),
@@ -1444,7 +1445,7 @@ public enum Function implements AFunction {
       params(STRING_O), ITEM_O, DB_URI),
   /** XQuery function. */
   _DB_OPTION_MAP(DbOptionMap::new, "option-map()",
-      params(), MAP_O, DB_URI),
+      params(), STRING_ITEM_SEQ_MAP.seqType(), DB_URI),
   /** XQuery function. */
   _DB_PATH(DbPath::new, "path(node)",
       params(XNODE_O), STRING_O, DB_URI),
@@ -1453,7 +1454,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PROPERTY_MAP(DbPropertyMap::new, "property-map(database)",
-      params(STRING_O), MAP_O, DB_URI),
+      params(STRING_O), STRING_ITEM_SEQ_MAP.seqType(), DB_URI),
   /** XQuery function. */
   _DB_PUT(DbPut::new, "put(database, input, path, options?)",
       params(STRING_O, ChoiceItemType.get(NodeType.XNODE, STRING_OR_BINARY).seqType(), STRING_O,
@@ -1772,7 +1773,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _JOB_BINDINGS(JobBindings::new, "bindings(id)",
-      params(STRING_O), MAP_O, flag(NDT), JOB_URI, Perm.ADMIN),
+      params(STRING_O), STRING_ITEM_SEQ_MAP.seqType(), flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_CURRENT(JobCurrent::new, "current()",
       params(), STRING_O, flag(NDT), JOB_URI),
@@ -1787,7 +1788,7 @@ public enum Function implements AFunction {
       params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_INFO(JobInfo::new, "info(id)",
-      params(STRING_O), MAP_ZO, flag(NDT), JOB_URI, Perm.ADMIN),
+      params(STRING_O), STRING_ITEM_MAP.seqType(Occ.ZERO_OR_ONE), flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_LIST(JobList::new, "list()",
       params(), STRING_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
@@ -1893,7 +1894,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO, BOOLEAN_ZO), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TRACK(ProfTrack::new, "track(input, options?)",
-      params(ITEM_ZM, MAP_ZO), MAP_O, flag(NDT), PROF_URI),
+      params(ITEM_ZM, MAP_ZO), Records.PROF_TRACK.get().seqType(), flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TYPE(ProfType::new, "type(input, label?)",
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT), PROF_URI),
@@ -1987,7 +1988,7 @@ public enum Function implements AFunction {
       params(STRING_O, SUPPLIER_O, STRING_ZO), ITEM_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_INFO(StoreInfo::new, "info(name?)",
-      params(STRING_ZO), MAP_O, flag(NDT), STORE_URI, Perm.ADMIN),
+      params(STRING_ZO), Records.STORE_INFO.get().seqType(), flag(NDT), STORE_URI, Perm.ADMIN),
   /** XQuery function. */
   _STORE_KEYS(StoreKeys::new, "keys(name?)",
       params(STRING_ZO), STRING_ZM, flag(NDT), STORE_URI, Perm.ADMIN),
@@ -2010,7 +2011,8 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _STRING_CLOSEST(StringClosest::new, "closest(value, candidates, options?)",
-      params(STRING_O, STRING_ZM, MAP_ZO), MAP_ZM, STRING_URI),
+      params(STRING_O, STRING_ZM, MAP_ZO), Records.STRING_CLOSEST.get().seqType(Occ.ZERO_OR_MORE),
+      STRING_URI),
   /** XQuery function. */
   _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(value)",
       params(STRING_O), STRING_O, STRING_URI),
@@ -2253,7 +2255,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _XSLT_TRANSFORM_REPORT(XsltTransformReport::new,
       "transform-report(input, stylesheet, arguments?, options?)",
-      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), MAP_O, flag(NDT), XSLT_URI, Perm.ADMIN),
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), Records.XSLT_TRANSFORM_REPORT.get().seqType(),
+      flag(NDT), XSLT_URI, Perm.ADMIN),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText::new,
       "transform-text(input, stylesheet, arguments?, options?)",
