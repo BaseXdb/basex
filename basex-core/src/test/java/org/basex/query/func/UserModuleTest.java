@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.users.*;
 import org.junit.jupiter.api.*;
 
@@ -72,6 +73,33 @@ public final class UserModuleTest extends SandboxTest {
     error(func.args("x", "x"), USER_UNKNOWN_X);
     error(func.args(UserText.ADMIN, "x"), USER_PASSWORD_X);
     error(func.args(UserText.ADMIN, ""), USER_PASSWORD_X);
+  }
+
+  /** Tests the password algorithms. */
+  @Test public void algorithms() {
+    final String algorithms = context.soptions.get(StaticOptions.AUTHALGORITHMS);
+    final String details = _USER_LIST_DETAILS.args(NAME) +
+        "/password/@algorithm => string-join(',')";
+    try {
+      context.soptions.set(StaticOptions.AUTHALGORITHMS, "argon2id");
+      query(_USER_CREATE.args(NAME, NAME));
+      query(details, "argon2id");
+      query(_USER_LIST_DETAILS.args(NAME) + "/password/* ! name() => string-join(',')",
+          "salt,iterations,memory,parallelism,hash");
+      query(_USER_CHECK.args(NAME, NAME));
+      error(_USER_CHECK.args(NAME, "x"), USER_PASSWORD_X);
+
+      // codes of missing algorithms are added on the next login
+      context.soptions.set(StaticOptions.AUTHALGORITHMS, "salted-sha256");
+      query(_USER_PASSWORD.args(NAME, NAME));
+      query(details, "salted-sha256");
+      context.soptions.set(StaticOptions.AUTHALGORITHMS, "argon2id,salted-sha256");
+      context.users.rehash(context.users.get(NAME), NAME, context.soptions.authAlgorithms());
+      query(details, "salted-sha256,argon2id");
+      query(_USER_CHECK.args(NAME, NAME));
+    } finally {
+      context.soptions.set(StaticOptions.AUTHALGORITHMS, algorithms);
+    }
   }
 
   /** Test method. */

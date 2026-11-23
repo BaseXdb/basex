@@ -3,7 +3,8 @@ package org.basex.util;
 import java.util.*;
 
 /**
- * Blake3 algorithm, inspired by the RUST reference algorithm:
+ * Blake3 algorithm by Jack O’Connor, Jean-Philippe Aumasson, Samuel Neves and
+ * Zooko Wilcox-O’Hearn. The implementation was inspired by the RUST reference algorithm:
  * https://github.com/BLAKE3-team/BLAKE3.
  *
  * @author BaseX Team, BSD License

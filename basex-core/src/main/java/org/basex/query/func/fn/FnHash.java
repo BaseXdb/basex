@@ -58,6 +58,7 @@ public final class FnHash extends StandardFunc {
       return result;
     }
 
+    if(alg.equals("BLAKE2B")) return Blake2b.digest(toBytes(value, arg(0)));
     if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value, arg(0)));
 
     final MessageDigest md;
@@ -65,7 +66,7 @@ public final class FnHash extends StandardFunc {
       md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
       final ArrayList<String> algs = new ArrayList<>(Security.getAlgorithms("MessageDigest"));
-      Collections.addAll(algs, "CRC-32", "BLAKE3");
+      Collections.addAll(algs, "CRC-32", "BLAKE2B", "BLAKE3");
       final String similar = Levenshtein.similar(Token.token(alg), algs.toArray(String[]::new));
       throw HASH_ALGORITHM_X.get(info, similar("'" + algorithm + "'", similar)).cause(ex);
     }

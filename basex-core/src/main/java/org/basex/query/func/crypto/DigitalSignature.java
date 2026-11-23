@@ -190,7 +190,8 @@ final class DigitalSignature {
       // auto-generate keys if no certificate is provided
       } else {
         final KeyPairGenerator gen = KeyPairGenerator.getInstance(keytype);
-        gen.initialize(512);
+        // SHA-1 with DSA is limited to 1024-bit keys
+        gen.initialize(signature.equals(SignatureMethod.DSA_SHA1) ? 1024 : 2048);
         final KeyPair kp = gen.generateKeyPair();
         final KeyInfoFactory kif = fac.getKeyInfoFactory();
         final KeyValue kv = kif.newKeyValue(kp.getPublic());

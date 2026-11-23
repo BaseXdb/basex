@@ -241,6 +241,10 @@ public final class CryptoModuleTest extends SandboxTest {
         CX_INVALGO_X);
     // key mismatches
     error(func.args(data, "", HS256), CX_KEYINV_X);
+    // secrets with incomplete PEM blocks
+    query(func.args(data, "my-----BEGIN-secret", HS256) + " => bin:length()", 32);
+    query(func.args(data, "-----BEGIN X-----QUJD-----END X-----", HS256) + " => bin:length()",
+        32);
     error(func.args(data, RSA_JWK, HS256), CX_KEYALG_X);
     error(func.args(data, jwk, RS256), CX_KEYALG_X);
     error(func.args(data, "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----", HS256),
@@ -417,11 +421,398 @@ public final class CryptoModuleTest extends SandboxTest {
     query(func2.args(input, " xs:hexBinary('00')", pub, "Ed25519"), false);
 
     error(func2.args(input, sig, pub, "Ed448"), CX_KEYALG_X);
+    // public key with an invalid length
+    error(func2.args(input, sig, " map:put(" + pub + ", 'x', 'AAAA' || (" + pub + ")?x)",
+        "Ed25519"), CX_KEYINV_X);
     error(func2.args(input, sig, pub, " { 'name': 'Ed25519', 'hash': 'SHA-256' }"), CX_INVALGO_X);
     error(func2.args(input, sig, " map:put(" + pub + ", 'crv', 'X25519')", "Ed25519"),
         CX_KEYALG_X);
     error(func2.args(input, sig, " map:put(" + pub + ", 'kty', 'EC')", "Ed25519"), CX_KEYALG_X);
     error(func.args(input, pub, "Ed25519"), CX_KEYINV_X);
+  }
+
+  /** Tests encryption with WebCrypto algorithms (test vector from the GCM specification). */
+  @Test public void encryptionWebCrypto() {
+    final Function func = _CRYPTO_ENCRYPT, func2 = _CRYPTO_DECRYPT;
+    final String key = " { 'kty': 'oct', 'k': 'AAAAAAAAAAAAAAAAAAAAAA' }";
+    final String gcm = " { 'name': 'AES-GCM', 'iv': xs:hexBinary('000000000000000000000000') }";
+
+    // test case 2: explicit IV, ciphertext and tag without IV
+    query(func.args(" xs:hexBinary('00000000000000000000000000000000')", "symmetric", key, gcm) +
+        " => xs:hexBinary() => string()",
+        "0388DACE60B6A392F328C2B971B2FE78AB6E47D42CEC13BDF53A67B21257BDDF");
+    final String enc = func.args("message", "symmetric", key, gcm);
+    query(func2.args(enc, "symmetric", key, gcm), "message");
+    query(func2.args(enc, "symmetric", key, gcm, " { 'binary': true() }") + " => string()",
+        "bWVzc2FnZQ==");
+    query(func2.args(enc, "symmetric", key, gcm, " { 'binary': true() }") + " instance of " +
+        "xs:base64Binary", true);
+
+    // additional data, tag length
+    final String aad = " map:put(" + gcm + ", 'additional-data', 'header')";
+    query(func2.args(func.args("m", "symmetric", key, aad), "symmetric", key, aad), "m");
+    error(func2.args(func.args("m", "symmetric", key, aad), "symmetric", key, gcm), CX_BADPAD_X);
+    for(final int tl : new int[] { -8, 64, 100, 136 }) {
+      error(func.args("m", "symmetric", key, " map:put(" + gcm + ", 'tag-length', " + tl + ")"),
+          CX_INVALGO_X);
+    }
+    final String tag = " map:put(" + gcm + ", 'tag-length', 96)";
+    query(func.args("", "symmetric", key, tag) + " => bin:length()", 12);
+    query(func2.args(func.args("m", "symmetric", key, tag), "symmetric", key, tag), "m");
+
+    // generated IV: prepended to the result, compatible with legacy names
+    for(final String alg : new String[] { "AES-GCM", "AES-CBC" }) {
+      query(func2.args(func.args("m", "symmetric", key, alg), "symmetric", key,
+          " { 'name': '" + alg + "' }"), "m");
+    }
+    query(func2.args(func.args("m", "symmetric", key, "AES"), "symmetric", key, "AES-CBC"),
+        "m");
+    query(func.args("", "symmetric", key, "AES-CBC") + " => bin:length()", 32);
+    final String cbc = " { 'name': 'AES-CBC', 'iv': xs:hexBinary('" + "00".repeat(16) + "') }";
+    query(func.args("", "symmetric", key, cbc) + " => bin:length()", 16);
+    query(func2.args(func.args("m", "symmetric", key, cbc), "symmetric", key, cbc), "m");
+
+    // RSA-OAEP with SHA-256 (MGF1 with SHA-256)
+    final String oaep = " { 'name': 'RSA-OAEP', 'hash': 'SHA-256' }";
+    final String pub = " map:remove(" + RSA_JWK + ", 'd')";
+    query(func2.args(func.args("m", "asymmetric", pub, oaep), "asymmetric", RSA_JWK, oaep), "m");
+    error(func2.args(func.args("m", "asymmetric", pub, oaep), "asymmetric", RSA_JWK, "RSA"),
+        CX_BADPAD_X);
+    query(func2.args(func.args("m", "asymmetric", " map:put(" + pub + ", 'alg', 'RSA-OAEP-256')",
+        oaep), "asymmetric", RSA_JWK, oaep), "m");
+    error(func.args("m", "asymmetric", " map:put(" + pub + ", 'alg', 'RSA-OAEP')", oaep),
+        CX_KEYALG_X);
+    query(func.args("m", "asymmetric", " map:put(" + pub + ", 'alg', 'RS256')", "RSA") +
+        " => bin:length()", 256);
+    // JWK algorithms of AES keys exported by the Web Cryptography API
+    query(func.args("m", "symmetric", " map:put(" + key + ", 'alg', 'A128CBC')", "AES-CBC") +
+        " => bin:length()", 32);
+    error(func.args("m", "symmetric", " map:put(" + key + ", 'alg', 'A128GCM')", "AES-CBC"),
+        CX_KEYALG_X);
+
+    // random IVs: encryptions of the same input are never merged
+    query("(1 to 2) ! " + func.args("m", "symmetric", key, "AES-GCM") + " => distinct-values()" +
+        " => count()", 2);
+
+    error(func.args("m", "symmetric", key, " { 'name': 'AES-CBC', 'hash': 'SHA-256' }"),
+        CX_INVALGO_X);
+    error(func.args("m", "asymmetric", pub, " { 'name': 'RSA-OAEP' }"), CX_INVALGO_X);
+    error(func.args("m", "asymmetric", pub, " { 'name': 'RSA', 'hash': 'SHA-256' }"),
+        CX_INVALGO_X);
+    error(func.args("m", "symmetric", key, "HMAC"), CX_INVALGO_X);
+    error(func.args("m", "symmetric", key, " { 'name': 'AES-CBC', 'iv': xs:hexBinary('00') }"),
+        CX_INVALGO_X);
+    error(_CRYPTO_SIGN.args("m", key, "AES-GCM"), CX_INVALGO_X);
+  }
+
+  /** Tests key derivation (test vectors from RFC 5869 and RFC 7748). */
+  @Test public void derive() {
+    final Function func = _CRYPTO_DERIVE;
+
+    // HKDF, test case 1
+    query(func.args(" xs:hexBinary('" + "0b".repeat(22) + "')", " { 'name': 'HKDF', " +
+        "'hash': 'SHA-256', 'salt': xs:hexBinary('000102030405060708090a0b0c'), " +
+        "'info': xs:hexBinary('f0f1f2f3f4f5f6f7f8f9') }", 42) + " => xs:hexBinary() => string()",
+        "3CB25F25FAACD57A90434F64D0362F2A2D2D0A90CF1A5A4C5DB02D56ECC4C5BF" +
+        "34007208D5B887185865");
+    // HKDF, test case 3: no salt and info
+    query(func.args(" xs:hexBinary('" + "0b".repeat(22) + "')",
+        " { 'name': 'HKDF', 'hash': 'SHA-256' }", 42) + " => xs:hexBinary() => string()",
+        "8DA4E775A563C18F715F802A063C5A31B8A11F5C5EE1879EC3454E5F3C738D2D" +
+        "9D201395FAA4B61A96C8");
+    query(func.args("secret", " { 'name': 'HKDF', 'hash': 'SHA-512' }") + " => bin:length()",
+        64);
+
+    // X25519, RFC 7748, Section 6.1
+    final String alice = " { 'kty': 'OKP', 'crv': 'X25519', " +
+        "'d': 'dwdtCnMYpX08FsFyUbJmRd9ML4frwJkqsXf7pR25LCo', " +
+        "'x': 'hSDwCYkwp1R0i33ctD73Wg2_Og0mOBr066SpjqqbTmo' }";
+    final String bob = " { 'kty': 'OKP', 'crv': 'X25519', " +
+        "'x': '3p7bfXt9wbTTW2HC7OQ1Nz-DQ8hbeGdNrfx-FG-IK08' }";
+    query(func.args(alice, " { 'name': 'X25519', 'public': " + bob + " }") +
+        " => xs:hexBinary() => string()",
+        "4A5D9D5BA4CE2DE1728E3BF480350F25E07E21C947D19E3376F09B3C1E161742");
+    query(func.args(alice, " { 'name': 'X25519', 'public': " + bob + " }", 16) +
+        " => bin:length()", 16);
+
+    // ECDH and X25519 with generated keys
+    final String[][] algs = {
+      { " { 'name': 'ECDH', 'named-curve': 'P-384' }", "ECDH" },
+      { " 'X25519'", "X25519" }
+    };
+    for(final String[] alg : algs) {
+      query("let $a := " + _CRYPTO_GENERATE_KEY.args(alg[0]) + " " +
+          "let $b := " + _CRYPTO_GENERATE_KEY.args(alg[0]) + " return " +
+          func.args(" $a?private", " { 'name': '" + alg[1] + "', 'public': $b?public }") + " = " +
+          func.args(" $b?private", " { 'name': '" + alg[1] + "', 'public': $a?public }"), true);
+    }
+
+    error(func.args("secret", " { 'name': 'HKDF' }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'name': 'HKDF', 'hash': 'SHA-256' }", 255 * 32 + 1),
+        CX_INVALGO_X);
+    error(func.args(alice, " { 'name': 'X25519' }"), CX_INVALGO_X);
+    error(func.args(alice, " { 'name': 'X25519', 'public': " + bob + " }", 33), CX_INVALGO_X);
+    error(func.args(alice, " { 'name': 'ECDH', 'public': " + bob + " }"), CX_KEYALG_X);
+    error(func.args(alice, "Ed25519"), CX_INVALGO_X);
+    error(_CRYPTO_GENERATE_KEY.args(" 'HKDF'"), CX_INVALGO_X);
+    error(func.args(alice, " { 'name': 'ECDH', 'named-curve': 'P-256', 'public': " + bob + " }"),
+        CX_INVALGO_X);
+    error(func.args("secret", " { 'name': 'HKDF', 'hash': 'SHA-256' }", 3000000000L), RANGE_X);
+
+    // JWK members: key_ops of the Web Cryptography API, any alg for HKDF
+    query(func.args(" map:put(" + alice + ", 'key_ops', ['deriveKey'])", " { 'name': 'X25519', " +
+        "'public': " + bob + " }") + " => bin:length()", 32);
+    query(func.args(" { 'kty': 'oct', 'k': 'c2VjcmV0', 'alg': 'HKDF' }",
+        " { 'name': 'HKDF', 'hash': 'SHA-256' }") + " => bin:length()", 32);
+  }
+
+  /** Tests the generation of keys. */
+  @Test public void generateKey() {
+    final Function func = _CRYPTO_GENERATE_KEY, sign = _CRYPTO_SIGN, verify = _CRYPTO_VERIFY;
+    final String es384 = " { 'name': 'ECDSA', 'named-curve': 'P-384' }";
+    final String ps256 = " { 'name': 'RSA-PSS', 'modulus-length': 2048 }";
+
+    // key pairs: sign with the private key, verify with the public key
+    final String[][] algs = {
+      { RS256, RS256 },
+      { ps256, " { 'name': 'RSA-PSS', 'hash': 'SHA-256' }" },
+      { es384, " { 'name': 'ECDSA', 'hash': 'SHA-384' }" },
+      { " 'Ed25519'", " 'Ed25519'" },
+      { " 'Ed448'", " 'Ed448'" }
+    };
+    for(final String[] alg : algs) {
+      query("let $k := " + func.args(alg[0]) + " return " +
+          verify.args("m", sign.args("m", " $k?private", alg[1]), " $k?public", alg[1]), true);
+    }
+    // generation parameters are rejected by other functions, operation parameters by generation
+    error(sign.args("m", " " + func.args(es384) + "?private",
+        " { 'name': 'ECDSA', 'hash': 'SHA-384', 'named-curve': 'P-384' }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'ECDSA', 'named-curve': 'P-384', 'signature-format': 'der' }"),
+        CX_INVALGO_X);
+    query(func.args(es384) + "?public => map:keys()", "kty\ncrv\nx\ny");
+    query(func.args(es384) + "?public?crv", "P-384");
+    query(func.args(" 'Ed25519'") + "?private => map:keys()", "kty\ncrv\nx\nd");
+    query(func.args(RS256) + "?private => map:keys()", "kty\nn\ne\nd\np\nq\ndp\ndq\nqi");
+    query(func.args(RS256) + "?public?n => bin:from-base64url() => bin:length()", 256);
+
+    // secret keys: default length is the block size of the hash function
+    query(func.args(HS256) + "?k => bin:from-base64url() => bin:length()", 64);
+    query(func.args(" { 'name': 'HMAC', 'hash': 'SHA-512' }") +
+        "?k => bin:from-base64url() => bin:length()", 128);
+    query(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'length': 256 }") +
+        "?k => bin:from-base64url() => bin:length()", 32);
+    query(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'length': 384 }") +
+        "?k => bin:from-base64url() => bin:length()", 48);
+    query("let $k := " + func.args(HS256) + " return " +
+        verify.args("m", sign.args("m", " $k", HS256), " $k", HS256), true);
+    query(func.args(HS256) + "?k = " + func.args(HS256) + "?k", false);
+
+    error(func.args(" 'HMAC'"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'HMAC', 'length': 256 }"), CX_INVALGO_X);
+    // length is in bits: 32 bits would be a 4-byte key
+    error(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'length': 32 }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'length': 260 }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'ECDSA' }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'ECDSA', 'named-curve': 'P-192' }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'RSA-PSS', 'modulus-length': 100 }"), CX_INVALGO_X);
+    // key generation cannot be interrupted: upper limits
+    error(func.args(" { 'name': 'RSA-PSS', 'modulus-length': 65536 }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'length': 8200 }"), CX_INVALGO_X);
+    // randomized signatures are not merged
+    query("let $k := " + func.args(" { 'name': 'ECDSA', 'named-curve': 'P-256' }") + " " +
+        "return (1 to 2) ! " + _CRYPTO_SIGN.args("m", " $k?private", ES256) +
+        " => distinct-values() => count()", 2);
+    error(func.args(" { 'name': 'Ed25519', 'named-curve': 'P-256' }"), CX_INVALGO_X);
+    error(func.args(" { 'name': 'HMAC', 'hash': 'SHA-256', 'x': 1 }"), INVALIDOPTION_X);
+  }
+
+  /** Tests the export of keys. */
+  @Test public void exportKey() {
+    final Function func = _CRYPTO_EXPORT_KEY, verify = _CRYPTO_VERIFY, sign = _CRYPTO_SIGN;
+    final String edPub = " map:remove(" + ED_JWK + ", 'd')";
+
+    // JWK round trips
+    query(func.args(ED_JWK, "jwk") + " => map:keys()", "kty\ncrv\nx\nd");
+    query("deep-equal(" + func.args(ED_JWK, "jwk") + ", " + ED_JWK + ")", true);
+    query("deep-equal(" + func.args(EC_JWK, "jwk") + ", " + EC_JWK + ")", true);
+    query("deep-equal(" + func.args(RSA_JWK, "jwk") + ", " + RSA_JWK + ")", true);
+    query("deep-equal(" + func.args(func.args(RSA_JWK, "pem"), "jwk") + ", " + RSA_JWK + ")",
+        true);
+    query("deep-equal(" + func.args(func.args(EC_JWK, "pkcs8"), "jwk") + ", " + EC_JWK + ")",
+        true);
+    query(func.args("secret", "jwk") + " => serialize({ 'method': 'json' })",
+        "{\"kty\":\"oct\",\"k\":\"c2VjcmV0\"}");
+
+    // PEM, DER, raw
+    query(func.args(ED_JWK, "pem") + " => starts-with('-----BEGIN PRIVATE KEY-----')", true);
+    query(func.args(edPub, "pem") + " => starts-with('-----BEGIN PUBLIC KEY-----')", true);
+    query(func.args(edPub, "raw") + " => bin:to-base64url()",
+        "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo");
+    query(func.args(EC_JWK, "raw") + " => bin:length()", 65);
+    query(func.args("secret", "raw") + " => string()", "c2VjcmV0");
+    query(verify.args("m", sign.args("m", func.args(RSA_JWK, "pkcs8"), RS256),
+        func.args(RSA_JWK, "spki"), RS256), true);
+    query(verify.args("m", sign.args("m", func.args(ED_JWK, "pem"), "Ed25519"),
+        func.args(ED_JWK, "spki"), "Ed25519"), true);
+
+    // SEC1 key with EC parameters, as written by "openssl ecparam -genkey"
+    final String sec1 = "-----BEGIN EC PARAMETERS-----\nBggqhkjOPQMBBw==\n" +
+        "-----END EC PARAMETERS-----\n-----BEGIN EC PRIVATE KEY-----\n" +
+        "MHcCAQEEICllmUgPJhBWJlqeW1xrvyZzh/ENGFjPl17cW7OANsqRoAoGCCqGSM49\n" +
+        "AwEHoUQDQgAEnv+p5E+X35KBLzjiy/VaoQi/RXv9LqI4nh3s26I8Jj6PHgxOkfeW\n" +
+        "DWLx7FdEFnHvZy2V440cPh50dQ9BaKfo+Q==\n-----END EC PRIVATE KEY-----\n";
+    final String sec1Pub = "-----BEGIN PUBLIC KEY-----\n" +
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEnv+p5E+X35KBLzjiy/VaoQi/RXv9\n" +
+        "LqI4nh3s26I8Jj6PHgxOkfeWDWLx7FdEFnHvZy2V440cPh50dQ9BaKfo+Q==\n" +
+        "-----END PUBLIC KEY-----\n";
+    query(func.args(sec1, "jwk") + " => map:keys()", "kty\ncrv\nx\ny\nd");
+    query(func.args(sec1, "spki") + " = " + func.args(sec1Pub, "spki"), true);
+    query(verify.args("m", sign.args("m", sec1, ES256), sec1Pub, ES256), true);
+
+    error(func.args("secret", "pem"), CX_EXPORT_X);
+    error(func.args("secret", "spki"), CX_EXPORT_X);
+    error(func.args(edPub, "pkcs8"), CX_EXPORT_X);
+    error(func.args(RSA_JWK, "raw"), CX_EXPORT_X);
+    // public key of Ed25519 private keys in PKCS #8 format cannot be derived
+    error(func.args(func.args(ED_JWK, "pem"), "jwk"), CX_EXPORT_X);
+    error(func.args(ED_JWK, "xyz"), EXP_FOUND_X_X);
+
+    // binary items must be DER keys; corrupted keys are rejected instead of used as secrets
+    error(func.args(" xs:hexBinary('0102030405')", "jwk"), CX_KEYINV_X);
+    error(func.args(" bin:part(" + func.args(ED_JWK, "spki") + ", 0, 40)", "jwk"), CX_KEYINV_X);
+    error(func.args("-----BEGIN PUBLC KEY-----\nAAAA\n-----END PUBLIC KEY-----", "jwk"),
+        CX_KEYINV_X);
+    error(func.args("-----BEGIN PUBLIC KEY-----\nAAAA\n", "jwk"), CX_KEYINV_X);
+
+    // unsupported key types are rejected (X448 key, created with OpenSSL)
+    error(func.args("-----BEGIN PUBLIC KEY-----\n" +
+        "MEIwBQYDK2VvAzkAA4dvjZxvSjVVlMgXkzjxMX9w52p9yAlYO2hJoUF2yinC8GnP\n" +
+        "VHSpH+QkUuxMesej4f5gmYdeesg=\n-----END PUBLIC KEY-----", "jwk"), CX_KEYINV_X);
+    // DER element with a length that overflows the end offset: no internal error
+    error(func.args("-----BEGIN EC PRIVATE KEY-----\nMAYChH////8=\n-----END EC PRIVATE KEY-----",
+        "jwk"), CX_KEYINV_X);
+    // child that exceeds its parent, truncated long-form length
+    error(func.args("-----BEGIN EC PRIVATE KEY-----\nMAMCAgAAAAA=\n-----END EC PRIVATE KEY-----",
+        "jwk"), CX_KEYINV_X);
+    error(func.args("-----BEGIN EC PRIVATE KEY-----\nMIIA\n-----END EC PRIVATE KEY-----", "jwk"),
+        CX_KEYINV_X);
+    // SEC1 key with a malformed public point (1-byte BIT STRING): no internal error
+    error(func.args("-----BEGIN EC PRIVATE KEY-----\n" + Base64.getEncoder().encodeToString(
+        HexFormat.of().parseHex("3036020101" + "0420" + "11".repeat(32) +
+        "a00a06082a8648ce3d030107a103030100")) + "\n-----END EC PRIVATE KEY-----", "jwk"),
+        CX_EXPORT_X);
+    query(func.args(" { 'kty': 'oct', 'k': bin:to-base64url(xs:hexBinary('0102030405')) }",
+        "raw") + " => string()", "AQIDBAU=");
+  }
+
+  /** Tests JWK thumbprints (test vector from RFC 8037, Appendix A.3). */
+  @Test public void thumbprint() {
+    final Function func = _CRYPTO_THUMBPRINT;
+    final String tp = "kPrK_qmxVWaYVA9wwBF6Iuo3vVzz7TxHCTwXBygrS4k";
+    query(func.args(ED_JWK), tp);
+    query(func.args(" map:remove(" + ED_JWK + ", 'd')"), tp);
+    query(func.args(_CRYPTO_EXPORT_KEY.args(ED_JWK, "spki")), tp);
+    query(func.args(RSA_JWK) + " = " + func.args(_CRYPTO_EXPORT_KEY.args(RSA_JWK, "pem")),
+        true);
+    query(func.args(" { 'kty': 'oct', 'k': 'c2VjcmV0' }") + " = " + func.args("secret"), true);
+    error(func.args(" { 'kty': 'xyz' }"), CX_KEYINV_X);
+  }
+
+  /** Tests the creation of random bytes. */
+  @Test public void randomBytes() {
+    final Function func = _CRYPTO_RANDOM_BYTES;
+    query(func.args(16) + " => bin:length()", 16);
+    query(func.args(0) + " => string()", "");
+    query(func.args(16) + " = " + func.args(16), false);
+    error(func.args(-1), INVTYPE_X);
+    error(func.args(3000000000L), RANGE_X);
+  }
+
+  /** Tests the constant-time comparison. */
+  @Test public void equal() {
+    final Function func = _CRYPTO_EQUAL;
+    query(func.args("abc", "abc"), true);
+    query(func.args("abc", "abd"), false);
+    query(func.args("abc", "ab"), false);
+    query(func.args("abc", " xs:hexBinary('616263')"), true);
+    query(func.args("", " xs:base64Binary('')"), true);
+  }
+
+  /** Tests the hashing and verification of passwords (test vectors from RFC 7914, Node.js). */
+  @Test public void password() {
+    final Function func = _CRYPTO_HASH_PASSWORD, func2 = _CRYPTO_VERIFY_PASSWORD;
+
+    // Argon2id vectors in PHC format (lanes, uneven memory size, empty password, long key)
+    query(func2.args("password", "$argon2id$v=19$m=64,t=2,p=1$c29tZXNhbHQ$" +
+        "FqGkmHNGCd0BRW2kBt6fPZ2pPmyGwwChL8FGUhTOSSI"), true);
+    query(func2.args("password", "$argon2id$v=19$m=32,t=3,p=4$c29tZXNhbHQ$" +
+        "uwzICj5nEUlSaRVBjG7v52G7GdXS1WegF3A+DOpqsFw"), true);
+    query(func2.args("password", "$argon2id$v=19$m=37,t=1,p=2$c29tZXNhbHQ$" +
+        "4l0kmG8ivD5t2ak/U1Ksow"), true);
+    query(func2.args("", "$argon2id$v=19$m=8,t=1,p=1$c2FsdHNhbHQ$" +
+        "yKPDauzIcAZMUK20FOm8ZhRh2MNJ+qVwk4FMs7XZszpV1jmp/sUSjqMW6i9y+CbKei069V8BkLHZJkxrlNB3xIFf" +
+        "oJ94cJI2k3UMNBYaFHUOk4+YoxIrfFVFeTsB2HD7o5yMLQ"), true);
+    query(func2.args("password", "$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHQ$" +
+        "PL01amPyeUuxG7H0vIr5X+qHkZvWnHmGBGXFYvh8z2E"), true);
+    query(func2.args("Password", "$argon2id$v=19$m=64,t=2,p=1$c29tZXNhbHQ$" +
+        "FqGkmHNGCd0BRW2kBt6fPZ2pPmyGwwChL8FGUhTOSSI"), false);
+
+    // PBKDF2-HMAC-SHA256 vectors in PHC format
+    query(func2.args("password", "$pbkdf2-sha256$i=1$c2FsdA$" +
+        "Eg+2z/z4syxD5yJSVsT4N6hlSMkszDVICAWYfLcL4Xs"), true);
+    query(func2.args("password", "$pbkdf2-sha256$i=4096$c2FsdA$" +
+        "xeR41ZKIyEGqUw22hFxMjZYok6ABzk4RpJY4c6qYE0o"), true);
+    query(func2.args("Password", "$pbkdf2-sha256$i=1$c2FsdA$" +
+        "Eg+2z/z4syxD5yJSVsT4N6hlSMkszDVICAWYfLcL4Xs"), false);
+
+    // round trips, random salts
+    for(final String opts : new String[] { " { 'memory': 64 }",
+        " { 'scheme': 'pbkdf2', 'iterations': 1000 }" }) {
+      query("let $h := " + func.args("secret", opts) + " return " + func2.args("secret", " $h"),
+          true);
+      query("let $h := " + func.args("secret", opts) + " return " + func2.args("Secret", " $h"),
+          false);
+      query("let $h := " + func.args("", opts) + " return " + func2.args("", " $h"), true);
+      query(func.args("secret", opts) + " = " + func.args("secret", opts), false);
+    }
+    query(func.args("secret") + " => starts-with('$argon2id$v=19$m=19456,t=2,p=1$')", true);
+    query(func.args("secret", " { 'scheme': 'pbkdf2' }") +
+        " => starts-with('$pbkdf2-sha256$i=600000$')", true);
+    query(func.args("secret", " { 'memory': 64, 'parallelism': 2, 'iterations': 1 }") +
+        " => starts-with('$argon2id$v=19$m=64,t=1,p=2$')", true);
+    query(func.args("secret", " { 'memory': 8, 'length': 100 }") +
+        " => tokenize('\\$') => foot() => string-length()", 134);
+    query(func.args("secret",
+        " { 'scheme': 'pbkdf2', 'hash': 'SHA-512', 'iterations': 1, 'length': 64 }") +
+        " => tokenize('\\$') => foot() => string-length()", 86);
+
+    error(func.args("secret", " { 'scheme': 'pbkdf2', 'hash': 'MD5' }"), CX_INVHASH_X);
+    error(func.args("secret", " { 'scheme': 'pbkdf2', 'iterations': 0 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'scheme': 'pbkdf2', 'salt-length': 0 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'scheme': 'pbkdf2', 'memory': 64 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'hash': 'SHA-512' }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'hash': 'SHA-256' }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'scheme': 'pbkdf2', 'parallelism': 1 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'salt-length': 1025 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'length': 1025 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'iterations': 0 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'salt-length': 7 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'length': 3 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'memory': 15, 'parallelism': 2 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'memory': 2000000 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'parallelism': 0 }"), CX_INVALGO_X);
+    error(func.args("secret", " { 'scheme': 'scrypt' }"), INVALIDOPTIONVALUE_X);
+    error(func.args("secret", " { 'x': 1 }"), INVALIDOPTION_X);
+    error(func2.args("secret", "xyz"), CX_PWHASH_X);
+    error(func2.args("secret", "$argon2id$v=16$m=64,t=2,p=1$c29tZXNhbHQ$AAAAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$argon2id$v=19$t=2,m=64,p=1$c29tZXNhbHQ$AAAAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$argon2id$v=19$m=9999999,t=2,p=1$c29tZXNhbHQ$AAAAAA"),
+        CX_PWHASH_X);
+    error(func2.args("secret", "$argon2id$v=19$m=64,t=2,p=1$c2FsdA$AAAAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$argon2i$v=19$m=64,t=2,p=1$c29tZXNhbHQ$AAAAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$pbkdf2-md5$i=1$c2FsdA$AAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$pbkdf2-sha256$i=0$c2FsdA$AAAA"), CX_PWHASH_X);
+    error(func2.args("secret", "$pbkdf2-sha256$i=1$***$AAAA"), CX_PWHASH_X);
   }
 
   /** Tests the derivation of keys from passwords (test vectors from RFC 6070 and RFC 7914). */
@@ -446,6 +837,10 @@ public final class CryptoModuleTest extends SandboxTest {
         128);
 
     error(func.args("password", "salt", 1, 32, "unknown"), CX_INVHASH_X);
+    // only hash algorithms of the PBKDF2 implementation of the JDK
+    error(func.args("password", "salt", 1, 16, "MD5"), CX_INVHASH_X);
+    query(func.args("password", "salt", 1, 28, "SHA-224") + " => string()",
+        "3C198CBDB9464B7857966BD05B7BC92BC1CC4E6E63155D4E490557FD");
     error(func.args("password", "", 1, 32), CX_KEYINV_X);
     error(func.args("password", "salt", 0, 32), INVTYPE_X);
     error(func.args("password", "salt", 1, 0), INVTYPE_X);

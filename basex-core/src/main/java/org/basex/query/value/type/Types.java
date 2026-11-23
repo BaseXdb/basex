@@ -153,6 +153,9 @@ public final class Types {
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
+  /** Single string or xs:base64-binary. */
+  public static final SeqType STRING_OR_BASE64_BINARY_O =
+      ChoiceItemType.get(STRING, BASE64_BINARY).seqType();
   /** String or node. */
   public static final Type STRING_OR_NODE = ChoiceItemType.get(STRING, XNODE);
   /** Resource type enum, used by db:add and db:create as a per-path override. */

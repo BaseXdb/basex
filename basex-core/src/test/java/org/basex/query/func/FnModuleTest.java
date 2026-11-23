@@ -2748,6 +2748,13 @@ public final class FnModuleTest extends SandboxTest {
 
     query("string( " + func.args("X", "BLAKE3") + ')',
         "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
+    // test vectors from RFC 7693 and Node.js
+    query("string( " + func.args("abc", "blake2b") + ')',
+        "BA80A53F981C4D0D6A2797B69F12F6E94C212F14685AC4B74B12BB6FDBFFA2D1" +
+        "7D87C5392AAB792DC252D5DE4533CC9518D38AA8DBF1925AB92386EDD4009923");
+    query("string( " + func.args(" string-join((1 to 300) ! 'a')", "BLAKE2B") + ')',
+        "A2FF3040EDA405B929C2FC2FD93E8ADD6AC3BB5369B679BAE170AC6956863CA0" +
+        "06285F132A868000FC3FAE5BC696E5D17FE3FDDFB4A342876C40451184742986");
 
     error(func.args("", ""), HASH_ALGORITHM_X);
   }

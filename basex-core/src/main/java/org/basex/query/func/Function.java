@@ -1327,18 +1327,35 @@ public enum Function implements AFunction {
   // Cryptographic Module
 
   /** XQuery function. */
-  _CRYPTO_DECRYPT(CryptoDecrypt::new, "decrypt(value, type, key, algorithm)",
-      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O, STRING_O), STRING_O,
-      CRYPTO_URI),
+  _CRYPTO_DECRYPT(CryptoDecrypt::new, "decrypt(value, type, key, algorithm, options?)",
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O,
+      options(AlgorithmOptions::new), MAP_ZO),
+      STRING_OR_BASE64_BINARY_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_DERIVE(CryptoDerive::new, "derive(key, algorithm, length?)",
+      params(STRING_OR_BINARY_OR_MAP_O, options(AlgorithmOptions::new), INTEGER_ZO),
+      BASE64_BINARY_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_ENCRYPT(CryptoEncrypt::new, "encrypt(value, type, key, algorithm)",
-      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O, STRING_O), BASE64_BINARY_O,
-      CRYPTO_URI),
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O,
+      options(AlgorithmOptions::new)), BASE64_BINARY_O, flag(NDT), CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_EQUAL(CryptoEqual::new, "equal(value1, value2)",
+      params(STRING_OR_BINARY_O, STRING_OR_BINARY_O), BOOLEAN_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_EXPORT_KEY(CryptoExportKey::new, "export-key(key, format)",
+      params(STRING_OR_BINARY_OR_MAP_O, CryptoExportKey.FORMAT_TYPE), ITEM_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_GENERATE_KEY(CryptoGenerateKey::new, "generate-key(algorithm)",
+      params(options(AlgorithmOptions::new)), MAP_O, flag(NDT), CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature::new,
       "generate-signature(node, canonicalization, digest, signature, prefix, type, ext1?, ext2?)",
       params(XNODE_O, STRING_O, STRING_O, STRING_O, STRING_O, STRING_O, ITEM_ZO, XNODE_ZO),
       DOCUMENT_O, flag(CNS), CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_HASH_PASSWORD(CryptoHashPassword::new, "hash-password(password, options?)",
+      params(STRING_O, options(PasswordOptions::new)), STRING_O, flag(NDT), CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_HMAC(CryptoHmac::new, "hmac(value, key, algorithm, encoding?)",
       params(STRING_OR_BINARY_O, STRING_OR_BINARY_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
@@ -1347,9 +1364,15 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_OR_BINARY_O, INTEGER_O, INTEGER_O, STRING_ZO), HEX_BINARY_O,
       CRYPTO_URI),
   /** XQuery function. */
+  _CRYPTO_RANDOM_BYTES(CryptoRandomBytes::new, "random-bytes(length)",
+      params(INTEGER_O), BASE64_BINARY_O, flag(NDT), CRYPTO_URI),
+  /** XQuery function. */
   _CRYPTO_SIGN(CryptoSign::new, "sign(value, key, algorithm)",
       params(STRING_OR_BINARY_O, STRING_OR_BINARY_OR_MAP_O, options(AlgorithmOptions::new)),
-      BASE64_BINARY_O, CRYPTO_URI),
+      BASE64_BINARY_O, flag(NDT), CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_THUMBPRINT(CryptoThumbprint::new, "thumbprint(key)",
+      params(STRING_OR_BINARY_OR_MAP_O), STRING_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature::new, "validate-signature(node)",
       params(XNODE_O), BOOLEAN_O, CRYPTO_URI),
@@ -1357,6 +1380,9 @@ public enum Function implements AFunction {
   _CRYPTO_VERIFY(CryptoVerify::new, "verify(value, signature, key, algorithm)",
       params(STRING_OR_BINARY_O, BINARY_O, STRING_OR_BINARY_OR_MAP_O,
       options(AlgorithmOptions::new)), BOOLEAN_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_VERIFY_PASSWORD(CryptoVerifyPassword::new, "verify-password(password, hash)",
+      params(STRING_O, STRING_O), BOOLEAN_O, CRYPTO_URI),
 
   // CSV Module
 

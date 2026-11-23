@@ -167,6 +167,7 @@ public enum QueryError {
   CONVERT_KEY_X(CONVERT, "key", "Key cannot be decoded: %."),
 
   // Cryptographic Module
+  // BaseX 14.0: split CX0019/CX0021, use descriptive names (EXPath draft: invalid-crypto-key)
 
   /** Error code. */
   CX_CANINV_X(CX, 1, "Canonicalization algorithm is not supported: %."),
@@ -214,6 +215,10 @@ public enum QueryError {
   CX_SIGTYPINV_X(CX, 28, "Signature type is not supported: %."),
   /** Error code. */
   CX_KEYALG_X(CX, 29, "Key does not match algorithm or usage: %."),
+  /** Error code. */
+  CX_PWHASH_X(CX, 30, "Password hash is invalid: %."),
+  /** Error code. */
+  CX_EXPORT_X(CX, 31, "Key cannot be exported: %."),
 
   // CSV Module
 

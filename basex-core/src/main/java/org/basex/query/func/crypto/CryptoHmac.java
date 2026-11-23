@@ -13,6 +13,7 @@ import org.basex.query.value.item.*;
 public final class CryptoHmac extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
+    // BaseX 14.0: return binary item (as crypto:sign with HMAC)
     final byte[] value = toBytes(arg(0), qc);
     final byte[] key = toBytes(arg(1), qc);
     final String algorithm = toString(arg(2), qc);

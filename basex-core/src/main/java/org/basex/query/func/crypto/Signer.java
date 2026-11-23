@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.crypto.AlgorithmOptions.*;
 
 import java.security.*;
-import java.util.*;
 
 import javax.crypto.*;
 
@@ -13,7 +12,6 @@ import org.basex.query.func.crypto.CryptoAlgorithm.*;
 import org.basex.query.func.crypto.CryptoKey.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Creates and verifies signatures and message authentication codes.
@@ -35,24 +33,8 @@ record Signer(CryptoAlgorithm alg, Hash hash, int salt, boolean der, InputInfo i
    * @throws QueryException query exception
    */
   static Signer get(final AlgorithmOptions options, final InputInfo info) throws QueryException {
-    final String name = options.get(NAME);
-    if(name == null) throw CX_INVALGO_X.get(info, "no name supplied");
-    final CryptoAlgorithm alg = CryptoAlgorithm.get(name);
-    if(alg == null) throw CX_INVALGO_X.get(info, name);
-    for(final Option<?> option : options) {
-      if(option != NAME && options.contains(option) && !alg.params.contains(option)) {
-        throw CX_INVALGO_X.get(info, alg.name + " with parameter '" + option.name() + "'");
-      }
-    }
-
-    Hash hash = null;
-    final String h = options.get(HASH);
-    if(h != null) {
-      hash = Hash.get(h);
-      if(hash == null) throw CX_INVHASH_X.get(info, h);
-    } else if(alg.params.contains(HASH)) {
-      throw CX_INVALGO_X.get(info, alg.name + " without hash");
-    }
+    final CryptoAlgorithm alg = CryptoAlgorithm.get(options, Purpose.SIGN, info);
+    final Hash hash = alg.hash(options, info);
     final Integer sl = options.get(SALT_LENGTH);
     if(sl != null && sl < 0) throw CX_INVALGO_X.get(info, alg.name + " with salt-length " + sl);
     final int salt = sl != null ? sl : hash != null ? hash.length : 0;
@@ -120,10 +102,7 @@ record Signer(CryptoAlgorithm alg, Hash hash, int salt, boolean der, InputInfo i
    * @throws QueryException query exception
    */
   private Key key(final Item key, final Usage usage) throws QueryException {
-    // compatible JWK algorithm names
-    final List<String> jwk = alg.jwk != null ? List.of(alg.jwk + hash.length * 8) :
-      List.of("EdDSA", alg.name);
-    return new CryptoKey(info).get(key, alg.key, usage, jwk);
+    return new CryptoKey(info).get(key, alg.key, usage, alg.jwk(hash));
   }
 
   /**
@@ -134,7 +113,7 @@ record Signer(CryptoAlgorithm alg, Hash hash, int salt, boolean der, InputInfo i
    * @throws GeneralSecurityException security exception
    */
   private byte[] mac(final byte[] data, final Key key) throws GeneralSecurityException {
-    final Mac mac = Mac.getInstance("Hmac" + hash.compact);
+    final Mac mac = Mac.getInstance(hash.hmac);
     mac.init(key);
     return mac.doFinal(data);
   }

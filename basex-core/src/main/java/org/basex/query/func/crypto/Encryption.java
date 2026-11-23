@@ -1,6 +1,7 @@
 package org.basex.query.func.crypto;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.crypto.AlgorithmOptions.*;
 import static org.basex.util.Token.*;
 
 import java.security.*;
@@ -11,6 +12,7 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 
 import org.basex.query.*;
+import org.basex.query.func.crypto.CryptoAlgorithm.*;
 import org.basex.query.func.crypto.CryptoKey.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -23,53 +25,6 @@ import org.basex.util.Base64;
  * @author Lukas Kircher
  */
 final class Encryption {
-  /** Cipher algorithms. */
-  private enum Algorithm {
-    /** AES in CBC mode. */
-    AES("AES/CBC/PKCS5Padding", 16, Type.AES),
-    /** AES in GCM mode. */
-    AES_GCM("AES/GCM/NoPadding", 12, Type.AES),
-    /** RSA with OAEP padding. */
-    RSA("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", 0, Type.RSA);
-
-    /** Transformation. */
-    private final String transformation;
-    /** Length of the initialization vector (0 for asymmetric algorithms). */
-    private final int ivl;
-    /** Key type. */
-    private final Type key;
-
-    /**
-     * Constructor.
-     * @param transformation transformation
-     * @param ivl length of the initialization vector
-     * @param key key type
-     */
-    Algorithm(final String transformation, final int ivl, final Type key) {
-      this.transformation = transformation;
-      this.ivl = ivl;
-      this.key = key;
-    }
-
-    /**
-     * Returns the algorithm with the specified name.
-     * @param name algorithm name
-     * @param symmetric symmetric algorithm
-     * @return algorithm, or {@code null} if the name is unknown
-     */
-    static Algorithm get(final String name, final boolean symmetric) {
-      for(final Algorithm alg : values()) {
-        if(alg.toString().equals(name) && symmetric == alg.key.secret()) return alg;
-      }
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return name().replace('_', '-');
-    }
-  }
-
   /** String: symmetric. */
   private static final String SYMMETRIC = "symmetric";
   /** String: asymmetric. */
@@ -78,8 +33,6 @@ final class Encryption {
   private static final String BASE64 = "base64";
   /** String: hex. */
   private static final String HEX = "hex";
-  /** Length of the GCM authentication tag in bits. */
-  private static final int GCM_TAG_LENGTH = 128;
 
   /** Input info (can be {@code null}). */
   private final InputInfo info;
@@ -97,24 +50,71 @@ final class Encryption {
    * @param data data to process
    * @param type encryption type
    * @param key key item: secret key, or public (encrypt) or private (decrypt) key
-   * @param algorithm encryption algorithm
+   * @param options algorithm options
    * @param encrypt encrypt or decrypt
+   * @param binary return decrypted data as binary item
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  Item encryption(final byte[] data, final String type, final Item key, final String algorithm,
-      final boolean encrypt) throws QueryException {
+  Item encryption(final byte[] data, final String type, final Item key,
+      final AlgorithmOptions options, final boolean encrypt, final boolean binary)
+      throws QueryException {
 
+    // BaseX 14.0: drop $type, which is determined by the algorithm
     final boolean symmetric = type.equals(SYMMETRIC);
     if(!symmetric && !type.equals(ASYMMETRIC)) throw CX_ENCTYP_X.get(info, type);
-    final Algorithm alg = Algorithm.get(algorithm.toUpperCase(Locale.ENGLISH), symmetric);
-    if(alg == null) throw CX_INVALGO_X.get(info, algorithm);
+    final String name = options.get(NAME);
+    if(name == null) throw CX_INVALGO_X.get(info, "no name supplied");
+
+    // legacy names: AES (alias of AES-CBC), RSA (OAEP with SHA-256, but MGF1 with SHA-1)
+    final boolean rsa = name.equalsIgnoreCase("RSA"), legacy = rsa || name.equalsIgnoreCase("AES");
+    final CryptoAlgorithm alg = CryptoAlgorithm.get(rsa ? "RSA-OAEP" : legacy ? "AES-CBC" : name,
+        options, Purpose.ENCRYPT, info);
+    if(symmetric != alg.key.secret()) throw CX_INVALGO_X.get(info, name);
+    if(rsa && options.get(HASH) != null) {
+      throw CX_INVALGO_X.get(info, name + " with parameter 'hash'");
+    }
+    final Hash hash = rsa ? Hash.SHA_256 : alg.hash(options, info);
 
     final Usage usage = encrypt ? Usage.ENCRYPT : Usage.DECRYPT;
-    final Key kspec = new CryptoKey(info).get(key, alg.key, usage, null);
+    final Key k = new CryptoKey(info).get(key, alg.key, usage, legacy ? null : alg.jwk(hash));
+    final int mode = encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE;
     try {
-      final Cipher cipher = Cipher.getInstance(alg.transformation);
-      return encrypt ? encrypt(data, kspec, cipher, alg) : decrypt(data, kspec, cipher, alg);
+      final byte[] result;
+      if(alg == CryptoAlgorithm.RSA_OAEP) {
+        final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        cipher.init(mode, k, new OAEPParameterSpec(hash.jca, "MGF1",
+            rsa ? MGF1ParameterSpec.SHA1 : new MGF1ParameterSpec(hash.jca),
+            PSource.PSpecified.DEFAULT));
+        result = cipher.doFinal(data);
+      } else {
+        final boolean gcm = alg == CryptoAlgorithm.AES_GCM;
+        final Cipher cipher = Cipher.getInstance(gcm ? "AES/GCM/NoPadding" :
+          "AES/CBC/PKCS5Padding");
+        // without explicit initialization vector: generate it and prepend it to the result
+        byte[] iv = options.bytes(IV, info);
+        final boolean generated = iv == null;
+        final int ivl = gcm ? 12 : 16;
+        if(generated) iv = encrypt ? CryptoRandomBytes.get(ivl) : substring(data, 0, ivl);
+        final int off = generated && !encrypt ? iv.length : 0;
+        final Integer tl = options.get(TAG_LENGTH);
+        final int tag = tl != null ? tl : 128;
+        if(tag < 96 || tag > 128 || tag % 8 != 0) {
+          throw CX_INVALGO_X.get(info, alg.name + " with tag-length " + tag);
+        }
+        cipher.init(mode, k, gcm ? new GCMParameterSpec(tag, iv) : new IvParameterSpec(iv));
+        final byte[] aad = options.bytes(ADDITIONAL_DATA, info);
+        if(aad != null) cipher.updateAAD(aad);
+        if(encrypt && generated) {
+          // write the encrypted data behind the initialization vector
+          final byte[] output = Arrays.copyOf(iv, ivl + cipher.getOutputSize(data.length));
+          final int n = cipher.doFinal(data, 0, data.length, output, ivl);
+          result = n == output.length - ivl ? output : Arrays.copyOf(output, ivl + n);
+        } else {
+          result = cipher.doFinal(data, off, data.length - off);
+        }
+      }
+      return encrypt || binary ? B64.get(result) : Str.get(result);
     } catch(final NoSuchPaddingException ex) {
       throw CX_NOPAD_X.get(info, ex);
     } catch(final BadPaddingException ex) {
@@ -126,65 +126,6 @@ final class Encryption {
     } catch(final GeneralSecurityException ex) {
       throw CX_INVALGO_X.get(info, ex);
     }
-  }
-
-  /**
-   * Encrypts the given input data.
-   * @param data data to encrypt
-   * @param kspec key specification
-   * @param cipher cipher
-   * @param alg algorithm
-   * @return encrypted data
-   * @throws GeneralSecurityException general security exception
-   */
-  private static B64 encrypt(final byte[] data, final Key kspec, final Cipher cipher,
-      final Algorithm alg) throws GeneralSecurityException {
-
-    if(alg.ivl == 0) {
-      cipher.init(Cipher.ENCRYPT_MODE, kspec);
-      return B64.get(cipher.doFinal(data));
-    }
-
-    // random iv: encryptions of the same input look different every time
-    final byte[] iv = new byte[alg.ivl];
-    new SecureRandom().nextBytes(iv);
-    cipher.init(Cipher.ENCRYPT_MODE, kspec, params(alg, iv));
-    // initialization vector is prepended to the message for later decryption
-    return B64.get(concat(iv, cipher.doFinal(data)));
-  }
-
-  /**
-   * Decrypts the given input data.
-   * @param data data to decrypt
-   * @param kspec key specification
-   * @param cipher cipher
-   * @param alg algorithm
-   * @return decrypted data
-   * @throws GeneralSecurityException general security exception
-   */
-  private static Str decrypt(final byte[] data, final Key kspec, final Cipher cipher,
-      final Algorithm alg) throws GeneralSecurityException {
-
-    if(alg.ivl == 0) {
-      cipher.init(Cipher.DECRYPT_MODE, kspec);
-      return Str.get(cipher.doFinal(data));
-    }
-
-    final byte[] iv = substring(data, 0, alg.ivl);
-    final byte[] input = substring(data, alg.ivl, data.length);
-    cipher.init(Cipher.DECRYPT_MODE, kspec, params(alg, iv));
-    return Str.get(cipher.doFinal(input));
-  }
-
-  /**
-   * Returns the parameter specification for a symmetric algorithm.
-   * @param alg algorithm
-   * @param iv initialization vector
-   * @return parameter specification
-   */
-  private static AlgorithmParameterSpec params(final Algorithm alg, final byte[] iv) {
-    return alg == Algorithm.AES_GCM ? new GCMParameterSpec(GCM_TAG_LENGTH, iv) :
-      new IvParameterSpec(iv);
   }
 
   /**
@@ -212,32 +153,6 @@ final class Encryption {
     } catch(final NoSuchAlgorithmException ex) {
       throw CX_INVHASH_X.get(info, algorithm).cause(ex);
     } catch(final IllegalArgumentException | InvalidKeyException ex) {
-      throw CX_KEYINV_X.get(info, ex);
-    }
-  }
-
-  /**
-   * Derives a key from a password with PBKDF2.
-   * @param password password
-   * @param salt salt
-   * @param iterations number of iterations
-   * @param length length of the derived key in bytes
-   * @param algorithm hash algorithm (can be {@code null})
-   * @return derived key
-   * @throws QueryException query exception
-   */
-  Hex pbkdf2(final String password, final byte[] salt, final int iterations, final int length,
-      final String algorithm) throws QueryException {
-
-    final String alg = algorithm == null ? "SHA256" :
-      algorithm.toUpperCase(Locale.ENGLISH).replace("-", "");
-    try {
-      final SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmac" + alg);
-      final PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, length * 8);
-      return new Hex(skf.generateSecret(spec).getEncoded());
-    } catch(final NoSuchAlgorithmException ex) {
-      throw CX_INVHASH_X.get(info, algorithm).cause(ex);
-    } catch(final IllegalArgumentException | InvalidKeySpecException ex) {
       throw CX_KEYINV_X.get(info, ex);
     }
   }
