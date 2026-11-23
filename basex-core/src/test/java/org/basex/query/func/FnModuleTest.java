@@ -532,6 +532,9 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(32), " ");
     query(func.args(" 0x20"), " ");
+    query(func.args(65.0), "A");
+    query(func.args(" (65.0, 'x')[1]"), "A");
+    query(func.args(" xs:untypedAtomic('amp')"), "&");
 
     // permitted characters (XML 1.1 repertoire)
     query(func.args(1) + " => string-to-codepoints()", 1);
@@ -557,6 +560,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x"), CHARINV_X);
     error(func.args("xy"), CHARINV_X);
     error(func.args("xyz"), CHARINV_X);
+    error(func.args(65.5), INVTYPE_X);
   }
 
   /** Test method. */

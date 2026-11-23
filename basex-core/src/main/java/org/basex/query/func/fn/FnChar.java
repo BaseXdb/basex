@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -18,7 +19,7 @@ public final class FnChar extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
-    final Item item = atomItem(value, qc);
+    final Item item = (Item) coerce(value, Types.STRING_OR_INTEGER_O, qc);
 
     if(item instanceof Itr) {
       // codepoint integer
