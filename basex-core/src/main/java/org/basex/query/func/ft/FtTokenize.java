@@ -23,12 +23,6 @@ public class FtTokenize extends StandardFunc {
     return StrSeq.get(tokens(qc, false));
   }
 
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(1, FtLexerOptions::new, cc);
-    return this;
-  }
-
   /**
    * Returns all tokens.
    * @param qc query context
@@ -39,7 +33,7 @@ public class FtTokenize extends StandardFunc {
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final Expr value = arg(0);
     final Item item = atomItem(value, qc);
-    final FtLexerOptions options = options(1, FtLexerOptions::new, qc);
+    final FtLexerOptions options = toOptions(qc);
 
     final TokenList tl = new TokenList();
     if(item != Empty.VALUE) {

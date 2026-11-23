@@ -23,7 +23,7 @@ import org.basex.util.*;
 public final class WsEval extends WsFn {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final JobOptions options = toOptions(arg(2), new JobOptions(), qc);
+    final JobOptions options = toOptions(qc).copy();
     // the result is serialized by the job
     if(options.get(JobOptions.SERIALIZER) == null)
       options.set(JobOptions.SERIALIZER, new SerializerOptions());

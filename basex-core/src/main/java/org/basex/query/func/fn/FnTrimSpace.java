@@ -29,7 +29,7 @@ public final class FnTrimSpace extends ContextFn {
   public Str value(final QueryContext qc) throws QueryException {
     final Item item = atomArg(qc);
     final byte[] value = item == Empty.VALUE ? EMPTY : item.string(info);
-    final Side side = options(1, TrimOptions::new, qc).get(TrimOptions.SIDE);
+    final Side side = toOptions(qc).get(TrimOptions.SIDE);
 
     int s = 0, e = value.length;
     if(side != Side.END) {
@@ -54,7 +54,7 @@ public final class FnTrimSpace extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr value = arg(0);
     // trim-space(()) → ''
     if(value == Empty.VALUE) return Str.EMPTY;
@@ -62,7 +62,6 @@ public final class FnTrimSpace extends ContextFn {
     if(Function.NORMALIZE_SPACE.is(value)) return value;
     // trim-space(trim-space(E, O), O) → trim-space(E, O)
     if(Function.TRIM_SPACE.is(value) && arg(1).equals(value.arg(1))) return value;
-    optOptions(1, TrimOptions::new, cc);
     return this;
   }
 

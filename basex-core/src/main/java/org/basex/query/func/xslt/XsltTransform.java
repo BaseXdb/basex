@@ -50,7 +50,7 @@ public class XsltTransform extends StandardFunc {
     final Source input = source(arg(0), qc);
     final IO stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
-    final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
+    final XsltOptions options = toOptions(qc);
 
     final String error = Xslt.transform(stylesheet, input, result,
         options.get(XsltOptions.CACHE), true, qc, tr -> {

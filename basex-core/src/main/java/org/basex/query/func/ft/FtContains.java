@@ -34,7 +34,7 @@ public final class FtContains extends FtAccessFn {
    */
   private FTContains ftContains(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc), terms = arg(1).value(qc);
-    final FtContainsOptions options = options(2, FtContainsOptions::new, qc);
+    final FtContainsOptions options = toOptions(qc);
 
     final FTMode mode = options.get(FtIndexOptions.MODE);
     final FTOpt opt = ftOpt(options, qc.ftOpt(), input.data());
@@ -54,11 +54,5 @@ public final class FtContains extends FtAccessFn {
 
     final FTWords ftw = new FTWords(info, terms, mode, occ).ftOpt(opt).optimize(qc);
     return new FTContains(input, ftExpr(ftw, options), info);
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(2, FtContainsOptions::new, cc);
-    return this;
   }
 }

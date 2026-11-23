@@ -9,7 +9,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -18,16 +17,6 @@ import org.basex.util.options.*;
  * @author Rositsa Shadura
  */
 abstract class SqlFn extends StandardFunc {
-  /** Statement Options. */
-  public static class StatementOptions extends Options {
-    /** Query timeout. */
-    public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
-    /** Return auto-generated keys instead of the update count. */
-    public static final BooleanOption GENERATED_KEYS = new BooleanOption("generated-keys", false);
-    /** Represent null values as empty columns instead of omitting them. */
-    public static final BooleanOption NULL = new BooleanOption("null", false);
-  }
-
   /**
    * Returns a prepared statement.
    * @param qc query context

@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -17,14 +16,10 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class FnSerialize extends StandardFunc {
-  /** Type of the options argument. */
-  public static final SeqType OPTIONS_TYPE = ChoiceItemType.get(
-      NodeType.get(SerializerOptions.Q_ROOT), Types.MAP).seqType(Occ.ZERO_OR_ONE);
-
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final SerializerOptions options = toSerializerOptions(arg(1), qc);
+    final SerializerOptions options = toOptions(qc);
 
     return Str.get(serialize(input, options, SERPARAM_X, qc));
   }

@@ -35,8 +35,8 @@ public final class XQueryParse extends StandardFunc {
   /** QName. */
   private static final QNm Q_URI = new QNm("uri");
 
-  /** XQuery options. */
-  public static class XQueryOptions extends Options {
+  /** Options for parsing queries. */
+  public static class XQueryParseOptions extends Options {
     /** Return plan. */
     public static final BooleanOption PLAN = new BooleanOption("plan", true);
     /** Compile query. */
@@ -52,21 +52,21 @@ public final class XQueryParse extends StandardFunc {
   @Override
   public FNode value(final QueryContext qc) throws QueryException {
     final IO query = toContent(arg(0), qc);
-    final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), qc);
+    final XQueryParseOptions options = toOptions(qc);
 
     // base-uri: choose URI specified in options, file path, or base-uri from parent query
     // optimization opens databases: share the resources and locks of the parent query
-    final boolean optimize = options.get(XQueryOptions.OPTIMIZE);
+    final boolean optimize = options.get(XQueryParseOptions.OPTIMIZE);
     try(QueryContext qctx = optimize ? new QueryContext(qc, null) : new QueryContext(qc.context)) {
       // compilation may evaluate code: adopt the permissions of the calling code
       qctx.user = qc.user;
       qctx.maxPerm = perm(qc);
       qctx.resolver = qc.resolver;
       final AModule module = qctx.parse(query.readString(), null,
-          toStaticContext(qctx, query.path(), options, XQueryOptions.BASE_URI));
+          toStaticContext(qctx, query.path(), options, XQueryParseOptions.BASE_URI));
       // library modules have no main expression to optimize
       if(optimize && module instanceof MainModule) qctx.optimize();
-      else if(optimize || options.get(XQueryOptions.COMPILE)) qctx.compile();
+      else if(optimize || options.get(XQueryParseOptions.COMPILE)) qctx.compile();
 
       final FBuilder root;
       if(module instanceof MainModule) {
@@ -75,10 +75,10 @@ public final class XQueryParse extends StandardFunc {
         final QNm name = module.sc.module;
         root = FElem.build(Q_LIBRARY_MODULE).attr(Q_PREFIX, name.string()).attr(Q_URI, name.uri());
       }
-      if(options.get(XQueryOptions.PLAN)) root.node(qctx.toXml(false));
+      if(options.get(XQueryParseOptions.PLAN)) root.node(qctx.toXml(false));
       return root.finish();
     } catch(final QueryException ex) {
-      if(!options.get(XQueryOptions.PASS)) ex.info(info);
+      if(!options.get(XQueryParseOptions.PASS)) ex.info(info);
       throw ex;
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
@@ -99,7 +99,7 @@ public final class XQueryParse extends StandardFunc {
     if(!defined(1)) return false;
     final Expr options = arg(1) instanceof final JNode jnode ? jnode.value : arg(1);
     if(!(options instanceof final XQMap map)) return true;
-    final Value value = map.value(Str.get(XQueryOptions.OPTIMIZE.name()));
+    final Value value = map.value(Str.get(XQueryParseOptions.OPTIMIZE.name()));
     return value != null && !value.isEmpty() && value != Bln.FALSE;
   }
 }

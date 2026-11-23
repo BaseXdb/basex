@@ -91,7 +91,7 @@ public final class FnXsdValidator extends StandardFunc {
 
   @Override
   public FuncItem value(final QueryContext qc) throws QueryException {
-    final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
+    final XsdValidatorOptions options = toOptions(qc);
     final boolean trusted = trustExternal(options, qc);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
     if(xsi && !trusted) throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");

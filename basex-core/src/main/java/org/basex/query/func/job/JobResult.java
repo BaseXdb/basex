@@ -25,7 +25,7 @@ public final class JobResult extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
-    final ResultOptions options = toOptions(arg(1), new ResultOptions(), qc);
+    final ResultOptions options = toOptions(qc);
 
     final JobPool jobs = qc.context.jobs;
     final QueryJobResult result = jobs.results.get(id);

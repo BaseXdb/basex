@@ -80,6 +80,11 @@ public final class DeepEqualOptions extends Options {
   /** QNames (can be {@code null}). */
   private QNmSet unordered;
 
+  @Override
+  protected StringOption stringOption() {
+    return COLLATION;
+  }
+
   /**
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName

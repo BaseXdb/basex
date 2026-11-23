@@ -24,7 +24,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
   public void create(final OutputStream os, final IOFile target, final QueryContext qc)
       throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));
-    final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
+    final CreateFromOptions options = toOptions(qc);
     Value entries = arg(2).value(qc);
 
     final boolean recursive = options.get(CreateFromOptions.RECURSIVE);

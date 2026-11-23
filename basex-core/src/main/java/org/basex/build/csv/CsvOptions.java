@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.*;
@@ -98,12 +97,21 @@ public class CsvOptions extends Options {
   public synchronized void assign(final Item name, final Value value, final QueryContext qc,
       final InputInfo info) throws QueryException {
     super.assign(name, value, qc, info);
-    // boolean-like string: convert to boolean (W3 functions: strings are column names)
+    adjust(info);
+    validate(info);
+  }
+
+  /**
+   * Adjusts and checks assigned options.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  protected void adjust(final InputInfo info) throws QueryException {
+    // boolean-like string: convert to boolean
     if(get(HEADER) instanceof final Item item && item.type.isStringOrUntyped()) {
       final Boolean b = Strings.toBoolean(Token.string(item.string(info)));
       if(b != null) put(HEADER, Bln.get(b));
     }
-    validate(info);
   }
 
   /**
@@ -158,26 +166,6 @@ public class CsvOptions extends Options {
    */
   public Boolean header() {
     return get(HEADER) instanceof final Bln bln ? bln.bool(null) : null;
-  }
-
-  /**
-   * Checks if the options conform to the W3 functions.
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
-   */
-  public void checkW3(final InputInfo info) throws QueryException {
-    // literal single characters
-    for(final StringOption option : List.of(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
-      final String value = get(option);
-      if(value != null && value.codePointCount(0, value.length()) != 1) {
-        throw CSV_SINGLECHAR_X_X.get(info, option.name(), value);
-      }
-    }
-    // header: boolean or column names
-    final Value header = get(HEADER);
-    if(!BOOLEAN_O.instance(header) && !header.seqType().type.isStringOrUntyped()) {
-      throw typeError(header, BasicType.STRING, info);
-    }
   }
 
   /**

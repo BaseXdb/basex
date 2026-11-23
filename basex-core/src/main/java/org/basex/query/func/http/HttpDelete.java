@@ -12,6 +12,6 @@ import org.basex.query.value.map.*;
 public final class HttpDelete extends HttpFn {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    return send("DELETE", null, arg(1), qc);
+    return send("DELETE", null, qc);
   }
 }

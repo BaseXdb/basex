@@ -37,7 +37,7 @@ public class SqlExecute extends SqlFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String statement = toString(arg(1), qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final StatementOptions options = toOptions(qc);
     final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
     final boolean nulls = options.get(StatementOptions.NULL);
 

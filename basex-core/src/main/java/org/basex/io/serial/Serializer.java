@@ -134,12 +134,14 @@ public abstract class Serializer implements Closeable {
       final QueryError err, final InputInfo info, final QueryContext qc) throws QueryException {
 
     // use line feeds if no line ending was requested
-    if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
-      sopts.set(SerializerOptions.LINE_ENDING, "\n");
+    SerializerOptions so = sopts;
+    if(!so.contains(SerializerOptions.LINE_ENDING)) {
+      so = new SerializerOptions(so);
+      so.set(SerializerOptions.LINE_ENDING, "\n");
     }
     try {
       final ArrayOutput ao = new ArrayOutput();
-      try(Serializer ser = unencoded(ao, sopts)) {
+      try(Serializer ser = unencoded(ao, so)) {
         ser.qc(qc);
         if(info != null) ser.sc(info.sc());
         for(Item item; !ser.finished() && (item = qc.next(iter)) != null;) {

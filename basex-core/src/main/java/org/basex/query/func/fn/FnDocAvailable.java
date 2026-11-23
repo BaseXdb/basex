@@ -39,7 +39,7 @@ public class FnDocAvailable extends Docs {
    * @throws QueryException query exception
    */
   final Item doc(final QueryContext qc) throws QueryException {
-    final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
+    final DocOptions options = toOptions(qc);
     check(options, false);
 
     QueryInput qi = queryInput;

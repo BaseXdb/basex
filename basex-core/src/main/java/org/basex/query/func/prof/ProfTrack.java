@@ -33,7 +33,7 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final TrackOptions options = toOptions(arg(1), new TrackOptions(), qc);
+    final TrackOptions options = toOptions(qc);
     final Thread thread = Thread.currentThread();
 
     // include memory consumption

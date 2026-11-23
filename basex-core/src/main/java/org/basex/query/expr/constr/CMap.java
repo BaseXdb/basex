@@ -44,7 +44,7 @@ public final class CMap extends Arr {
       final ExprList list = new ExprList();
       for(int e = 0; e < el; e += 2) {
         final Expr expr = exprs[e];
-        if(!(nested(e) && flatten(expr, list))) list.add(expr).add(exprs[e + 1]);
+        if(!(nested(e) && entries(expr, list))) list.add(expr).add(exprs[e + 1]);
       }
       exprs = list.finish();
       el = exprs.length;
@@ -113,13 +113,13 @@ public final class CMap extends Arr {
   }
 
   /**
-   * Flattens nested map constructors.
-   * @param expr expression to flatten
-   * @param list list of expressions
-   * @return {@code true} if the expression was flattened
+   * Adds the key and value expressions of a map-building expression to the specified list.
+   * @param expr expression
+   * @param list list of key and value expressions
+   * @return {@code true} if the entries of the expression were added
    * @throws QueryException query exception
    */
-  private boolean flatten(final Expr expr, final ExprList list) throws QueryException {
+  public static boolean entries(final Expr expr, final ExprList list) throws QueryException {
     if(expr == Empty.VALUE) {
       // ignore empty values
     } else if(expr instanceof CMap) {

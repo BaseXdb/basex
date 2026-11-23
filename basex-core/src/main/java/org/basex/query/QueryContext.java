@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
@@ -963,11 +962,9 @@ public final class QueryContext extends Job implements Closeable {
 
     // convert JSON input
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
-      final JsonParserOptions jp = new JsonParserOptions();
-      jp.set(JsonOptions.FORMAT, JsonFormat.W3);
       try {
         final TextInput ti = new TextInput(new IOContent(object.toString()));
-        return JsonConverter.get(jp).convert(ti, "", null, this);
+        return JsonConverter.get(W3JsonOptions.w3()).convert(ti, "", null, this);
       } catch(final IOException ex) {
         throw BASEX_ERROR_X.get(null, ex);
       }

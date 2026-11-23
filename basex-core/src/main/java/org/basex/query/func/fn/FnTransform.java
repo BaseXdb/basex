@@ -143,7 +143,7 @@ public final class FnTransform extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final TransformOptions options = options(qc);
+    final TransformOptions options = toOptions(qc);
     requestedProperties(options);
     version(options);
     final boolean trusted = trusted(options, CommonOptions.TRUSTED, qc);
@@ -221,19 +221,9 @@ public final class FnTransform extends StandardFunc {
     return functionOption(0) ? Integer.MAX_VALUE : 0;
   }
 
-  /**
-   * Returns the transformation options. Values that are not permitted for an option are
-   * rejected with a function-specific error.
-   * @param qc query context
-   * @return options
-   * @throws QueryException query exception
-   */
-  private TransformOptions options(final QueryContext qc) throws QueryException {
-    try {
-      return toOptions(arg(0), new TransformOptions(), qc);
-    } catch(final QueryException ex) {
-      throw error(ex, ex.error() == INVALIDOPTIONVALUE_X ? TRANSFORM_OPTIONS_X : null);
-    }
+  @Override
+  protected QueryException error(final QueryException ex) {
+    return error(ex, ex.error() == INVALIDOPTIONVALUE_X ? TRANSFORM_OPTIONS_X : null);
   }
 
   /**

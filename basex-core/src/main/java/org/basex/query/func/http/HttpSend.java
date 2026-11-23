@@ -13,6 +13,6 @@ public final class HttpSend extends HttpFn {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     // methods are case-sensitive and sent unchanged
-    return send(toString(arg(1), qc), arg(2), arg(3), qc);
+    return send(toString(arg(1), qc), arg(2), qc);
   }
 }

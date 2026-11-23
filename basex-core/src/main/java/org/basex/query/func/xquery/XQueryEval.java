@@ -68,9 +68,8 @@ public class XQueryEval extends StandardFunc {
     final IOContent query = function != null ? null : toContent(input, arg(0), qc);
 
     // parse options
-    final XQueryOptions options = new XQueryOptions();
+    final XQueryOptions options = toOptions(qc);
     final User user = qc.user;
-    toOptions(arg(2), options, qc);
 
     // a supplied permission also limits the code, including returned function items
     final Perm limit = options.get(XQueryOptions.PERMISSION);

@@ -43,7 +43,7 @@ public final class StringClosest extends StringFn {
     final byte[] value = toToken(arg(0), qc);
     final Expr candidates = arg(1);
     final Iter iter = candidates.atomIter(qc, info);
-    final ClosestOptions options = options(2, ClosestOptions::new, qc);
+    final ClosestOptions options = toOptions(qc);
 
     final double threshold = ((ANum) options.get(ClosestOptions.THRESHOLD)).dbl();
     final int limit = options.get(ClosestOptions.LIMIT);
@@ -105,12 +105,6 @@ public final class StringClosest extends StringFn {
       vb.add(XQMap.get(type, Str.get(values.get(p)), Dbl.get(similarities.get(p))));
     }
     return vb.value(this);
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(2, ClosestOptions::new, cc);
-    return this;
   }
 
   /**

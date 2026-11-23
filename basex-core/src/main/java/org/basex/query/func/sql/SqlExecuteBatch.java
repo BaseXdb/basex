@@ -19,7 +19,7 @@ public final class SqlExecuteBatch extends SqlExecutePrepared {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final StatementOptions options = toOptions(qc);
 
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));

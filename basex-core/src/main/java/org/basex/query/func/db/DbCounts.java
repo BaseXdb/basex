@@ -41,7 +41,7 @@ public final class DbCounts extends StandardFunc {
   public XQMap value(final QueryContext qc) throws QueryException {
     final Value nodes = arg(0).value(qc);
     final FItem values = toFunction(arg(1), 1, qc);
-    final CountsOptions options = options(2, CountsOptions::new, qc);
+    final CountsOptions options = toOptions(qc);
     final Value missing = options.get(CountsOptions.MISSING);
     final Value width = options.get(CountsOptions.WIDTH);
     final double w = width.isEmpty() ? 0 : ((ANum) width).dbl();
@@ -75,8 +75,7 @@ public final class DbCounts extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(2, CountsOptions::new, cc);
+  protected Expr opt(final CompileContext cc) {
     if(arg(1) instanceof final FItem func && tests(func, arg(0).seqType().type) != null) {
       cc.info(QueryText.OPTVALUES_X, func);
     }

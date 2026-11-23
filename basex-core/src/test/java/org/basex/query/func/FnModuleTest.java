@@ -5757,6 +5757,24 @@ return
     query(func.args(" ['é']", " { 'method': 'json', 'encoding': 'US-ASCII' }"), "[\"\\u00E9\"]");
     error(func.args(" <x>é</x>", " { 'method': 'text', 'encoding': 'US-ASCII' }"), SERENC_X_X);
     error(func.args(" <é/>", " { 'encoding': 'US-ASCII' }"), SERENC_X_X);
+    // unknown options in non-constant arguments are detected at compile time
+    final String rnd = _RANDOM_DOUBLE.args();
+    check("if(" + rnd + " > 2) then " + func.args(rnd, " { 'indend': true() }") + " else ()",
+        "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'indent': " + rnd + " > 0, 'x': 1 }") +
+        " else ()", "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'json': { 'x': " + rnd + " } }") +
+        " else ()", "", exists(ERROR));
+    check(func.args(1, " { 'indent': " + rnd + " > 2 }"), 1, empty(ERROR));
+    // invalid constant values in non-constant arguments are detected at compile time
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'method': 'xmll', 'indent': " + rnd +
+        " > 0 }") + " else ()", "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'json': { 'format': 'x', 'indent': " +
+        rnd + " > 0 } }") + " else ()", "", exists(ERROR));
+    check(func.args(1, " { 'method': 'text', 'indent': " + rnd + " > 2 }"), 1, empty(ERROR));
+    // constant options are shared and must not be modified by serializers
+    query("(1, 2) ! " + func.args(" (1, 'a')", " { 'method': 'adaptive' }"),
+        "1\n\"a\"\n1\n\"a\"");
     query("string-to-codepoints(" + func.args(" <x/>", " { 'byte-order-mark': true() }") + ")[1]",
         0xFEFF);
     // character maps are applied to text nodes of the text method

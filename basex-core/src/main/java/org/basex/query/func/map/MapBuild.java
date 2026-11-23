@@ -22,7 +22,7 @@ public final class MapBuild extends MapMerge {
     final Iter input = arg(0).iter(qc);
     final FItem keys = toFunctionOrNull(arg(1), 2, qc);
     final FItem value = toFunctionOrNull(arg(2), 2, qc);
-    final MapDuplicates dups = duplicates(3, qc, Duplicates.COMBINE);
+    final MapDuplicates dups = duplicates(qc, Duplicates.COMBINE);
 
     final HofArgs args = new HofArgs(2, keys, value);
     final MapBuilder builder = new MapBuilder();
@@ -40,7 +40,7 @@ public final class MapBuild extends MapMerge {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    prepareMerge(3, Duplicates.COMBINE, cc);
+    prepareMerge(Duplicates.COMBINE, cc);
 
     final Expr input = arg(0), keys = arg(1), value = arg(2);
     final SeqType st = input.seqType(), s1t = st.with(Occ.EXACTLY_ONE);

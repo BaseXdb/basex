@@ -200,7 +200,8 @@ public final class ShapeConstructor extends StandardFunc {
     }
 
     final Supplier<ShapeConstructor> supplier = () -> new ShapeConstructor(sh);
-    return new FuncDefinition(supplier, description, params, sh.seqType(),
-        EnumSet.noneOf(Flag.class), name == null ? Token.EMPTY : name.uri(), Perm.NONE);
+    return new FuncDefinition(supplier, description, new FuncDefinition.Params(params, null, -1),
+        sh.seqType(), EnumSet.noneOf(Flag.class), name == null ? Token.EMPTY : name.uri(),
+        Perm.NONE);
   }
 }

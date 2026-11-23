@@ -52,7 +52,7 @@ public abstract class ParseHtml extends ParseFn {
    * @throws QueryException query exception
    */
   private DBNode parse(final IO io, final QueryContext qc) throws QueryException {
-    final HtmlOptions options = options(qc);
+    final HtmlOptions options = toOptions(qc);
     final Parser prsr = Parser.of(options, parser());
     if(prsr != null) prsr.ensureAvailable(options, definition.name, info);
     try {
@@ -71,10 +71,5 @@ public abstract class ParseHtml extends ParseFn {
   @Override
   final QueryError error() {
     return INVHTML_X;
-  }
-
-  @Override
-  protected final HtmlOptions options(final QueryContext qc) throws QueryException {
-    return toOptions(arg(1), new HtmlOptions(), qc);
   }
 }

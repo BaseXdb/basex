@@ -32,7 +32,7 @@ public class SqlExecutePrepared extends SqlExecute {
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
     final Item params = arg(1).unwrappedItem(qc, info);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final StatementOptions options = toOptions(qc);
 
     final boolean keys = jdbc(qc).generatedKeys(ps);
     final boolean nulls = options.get(StatementOptions.NULL);

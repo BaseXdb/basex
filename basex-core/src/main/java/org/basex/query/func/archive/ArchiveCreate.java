@@ -39,7 +39,7 @@ public class ArchiveCreate extends ArchiveFn {
   public void create(final OutputStream os, @SuppressWarnings("unused") final IOFile target,
       final QueryContext qc) throws QueryException {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(0), arg(1), qc);
-    final CreateOptions options = toOptions(arg(2), new CreateOptions(), qc);
+    final CreateOptions options = toOptions(qc);
     create(files, options, os, qc);
   }
 }

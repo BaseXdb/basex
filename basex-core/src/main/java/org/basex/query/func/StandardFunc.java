@@ -51,8 +51,6 @@ public abstract class StandardFunc extends Arr {
   public FuncDefinition definition;
   /** Options, parsed at compile time (can be {@code null}). */
   private Options staticOptions;
-  /** Argument index of the options parsed at compile time. */
-  private int staticArg = -1;
 
   /**
    * Constructor.
@@ -87,6 +85,20 @@ public abstract class StandardFunc extends Arr {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     checkPerm(cc.qc);
     simplifyArgs(cc);
+    // parse constant options, check keys and constant values of others
+    final Supplier<? extends Options> options = definition.options;
+    if(options != null && staticOptions == null) {
+      final Expr expr = arg(definition.optionsArg);
+      try {
+        if(expr instanceof final Value value) {
+          staticOptions = toOptions(value, options.get(), cc.qc).seal();
+        } else {
+          options.get().check(expr, cc.qc, info);
+        }
+      } catch(final QueryException ex) {
+        throw error(ex);
+      }
+    }
 
     // apply custom optimizations
     final Expr expr = opt(cc);
@@ -134,11 +146,19 @@ public abstract class StandardFunc extends Arr {
     return this;
   }
 
+  /**
+   * Adapts the code of an error raised by this function.
+   * @param ex query exception
+   * @return converted exception
+   */
+  protected QueryException error(final QueryException ex) {
+    return ex;
+  }
+
   @Override
   public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final StandardFunc sf = definition.get(info, copyAll(cc, vm, args()));
     sf.staticOptions = staticOptions;
-    sf.staticArg = staticArg;
     return copyType(sf);
   }
 
@@ -945,25 +965,22 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression and returns serialization parameters.
-   * @param expr expression (can be empty)
+   * Returns the options of the options parameter, which must not be modified.
+   * @param <E> options type
    * @param qc query context
-   * @return serialization parameters
+   * @return options
    * @throws QueryException query exception
    */
-  protected final SerializerOptions toSerializerOptions(final Expr expr, final QueryContext qc)
-      throws QueryException {
-
-    final SerializerOptions options = new SerializerOptions();
-    options.set(SerializerOptions.METHOD, SerialMethod.XML);
-
-    final Item item = expr.unwrappedItem(qc, info);
-    if(item instanceof final XQMap map) {
-      options.assign(map, qc, info);
-    } else if(!item.isEmpty()) {
-      options.assign(item, info);
+  @SuppressWarnings("unchecked")
+  protected final <E extends Options> E toOptions(final QueryContext qc) throws QueryException {
+    final Supplier<? extends Options> options = definition.options;
+    if(options == null) throw Util.notExpected("No options declared: %", definition);
+    if(staticOptions != null) return (E) staticOptions;
+    try {
+      return (E) toOptions(arg(definition.optionsArg), options.get(), qc);
+    } catch(final QueryException ex) {
+      throw error(ex);
     }
-    return options;
   }
 
   /**
@@ -991,41 +1008,23 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-    options.assign(toEmptyMap(expr, qc), qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
+    if(item instanceof final XQMap map) {
+      options.assign(map, qc, info);
+    } else if(!item.isEmpty()) {
+      options.assign(item, info);
+    }
     return options;
   }
 
   /**
-   * Returns the options of an argument. An instance that was parsed at compile time by
-   * {@link #optOptions(int, Supplier, CompileContext)} will be reused.
+   * Returns the options that were parsed at compile time.
    * @param <E> options type
-   * @param arg argument index
-   * @param options supplier for the options template
-   * @param qc query context
-   * @return options
-   * @throws QueryException query exception
+   * @return options (can be {@code null})
    */
   @SuppressWarnings("unchecked")
-  protected final <E extends Options> E options(final int arg, final Supplier<E> options,
-      final QueryContext qc) throws QueryException {
-    return staticArg == arg ? (E) staticOptions : toOptions(arg(arg), options.get(), qc);
-  }
-
-  /**
-   * Parses constant options at compile time. The resulting instance is shared by all
-   * evaluations of this expression and must not be modified.
-   * @param <E> options type
-   * @param arg argument index
-   * @param options supplier for the options template
-   * @param cc compilation context
-   * @throws QueryException query exception
-   */
-  protected final <E extends Options> void optOptions(final int arg, final Supplier<E> options,
-      final CompileContext cc) throws QueryException {
-    if(arg(arg) instanceof final Value value) {
-      staticOptions = toOptions(value, options.get(), cc.qc).seal();
-      staticArg = arg;
-    }
+  protected final <E extends Options> E staticOptions() {
+    return (E) staticOptions;
   }
 
   /**
