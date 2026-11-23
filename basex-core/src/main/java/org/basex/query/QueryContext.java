@@ -76,7 +76,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Query info. */
   public final QueryInfo info;
 
-  /** Global database options (will be reassigned after query execution). */
+  /** Query-specific database options. */
   final QueryOptions options = new QueryOptions(this);
 
   /** Query caches. */
@@ -224,7 +224,7 @@ public final class QueryContext extends Job implements Closeable {
     user = parent != null ? parent.user : context.user();
     maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;
     resolver = parent != null ? parent.resolver : null;
-    if(parent != null) options.inherit(parent.options);
+    if(parent != null) options.state(parent.options.state());
   }
 
   /**
@@ -364,7 +364,7 @@ public final class QueryContext extends Job implements Closeable {
 
       // bind external variables
       if(globalBindings) {
-        final Map<String, String> map = context.options.toMap(MainOptions.BINDINGS);
+        final Map<String, String> map = options().toMap(MainOptions.BINDINGS);
         for(final Entry<String, String> entry : map.entrySet()) {
           bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
         }
@@ -677,10 +677,34 @@ public final class QueryContext extends Job implements Closeable {
    */
   public SerializerOptions parameters() {
     if(sopts == null) {
-      sopts = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+      sopts = new SerializerOptions(options().get(MainOptions.SERIALIZER));
       defaultOutput = main != null;
     }
     return sopts;
+  }
+
+  /**
+   * Returns the effective main options, which must not be modified.
+   * @return main options
+   */
+  public MainOptions options() {
+    return options.get();
+  }
+
+  /**
+   * Returns the state of the query-specific options.
+   * @return state
+   */
+  public QueryOptions.State optionsState() {
+    return options.state();
+  }
+
+  /**
+   * Assigns the state of the query-specific options.
+   * @param st state
+   */
+  public void optionsState(final QueryOptions.State st) {
+    options.state(st);
   }
 
   /**
@@ -692,25 +716,16 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Assigns a pragma value to the global and query-local options.
+   * Assigns a pragma value to the effective and query-local options.
    * @param option option
    * @param value value
    * @param ii input info (can be {@code null})
-   * @return old values
+   * @return previous state
    * @throws QueryException query exception
    */
-  public Object[] assign(final Option<?> option, final String value, final InputInfo ii)
-      throws QueryException {
+  public QueryOptions.State assign(final Option<?> option, final String value,
+      final InputInfo ii) throws QueryException {
     return options.assign(option, value, ii);
-  }
-
-  /**
-   * Restores the values that were replaced by a pragma.
-   * @param option option
-   * @param old old values
-   */
-  public void restore(final Option<?> option, final Object[] old) {
-    options.restore(option, old);
   }
 
   /**
@@ -762,7 +777,6 @@ public final class QueryContext extends Job implements Closeable {
       parent.updates = updates;
       parent.popJob(this);
     }
-    options.close();
 
     final Performance perf = jc().performance;
     if(perf != null) info.serializing.addAndGet(perf.nanoRuntime());

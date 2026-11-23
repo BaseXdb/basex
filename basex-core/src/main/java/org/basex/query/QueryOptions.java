@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -15,15 +16,47 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class QueryOptions {
+public final class QueryOptions {
   /** Query context. */
   private final QueryContext qc;
-  /** Global database options (will be reassigned after query execution). */
-  private final HashMap<Option<?>, Object> cachedOpts = new HashMap<>();
   /** Options supplied by option declarations. */
   private final HashSet<Option<?>> declared = new HashSet<>();
-  /** Query-local options: declarations and active pragmas (can be {@code null}). */
-  private MainOptions queryOpts;
+  /** Current state. */
+  private State state = new State(null, null);
+
+  /** Option state. */
+  public static final class State {
+    /** Query-local options: declarations and active pragmas (can be {@code null}). */
+    private final MainOptions queryOpts;
+    /** Sealed effective options (can be {@code null}). */
+    private final MainOptions effective;
+    /** States derived by pragmas. */
+    private final Map<Key, Derived> derived = new ConcurrentHashMap<>();
+
+    /**
+     * Constructor.
+     * @param queryOpts query-local options (can be {@code null})
+     * @param effective sealed effective options (can be {@code null})
+     */
+    private State(final MainOptions queryOpts, final MainOptions effective) {
+      this.queryOpts = queryOpts;
+      this.effective = effective;
+    }
+  }
+
+  /**
+   * State derived by a pragma.
+   * @param base effective options the pragma was applied to
+   * @param state derived state
+   */
+  private record Derived(MainOptions base, State state) { }
+
+  /**
+   * Key of a state derived by a pragma.
+   * @param option option
+   * @param value value
+   */
+  private record Key(Option<?> option, String value) { }
 
   /**
    * Constructor.
@@ -34,11 +67,27 @@ final class QueryOptions {
   }
 
   /**
-   * Adopts the query-local options of a parent query.
-   * @param parent options of the parent query
+   * Returns the current state.
+   * @return state
    */
-  void inherit(final QueryOptions parent) {
-    if(parent.queryOpts != null) queryOpts = new MainOptions(parent.queryOpts);
+  State state() {
+    return state;
+  }
+
+  /**
+   * Assigns a state.
+   * @param st state
+   */
+  void state(final State st) {
+    state = st;
+  }
+
+  /**
+   * Returns the effective options.
+   * @return options
+   */
+  MainOptions get() {
+    return state.effective != null ? state.effective : qc.context.options;
   }
 
   /**
@@ -50,12 +99,14 @@ final class QueryOptions {
    */
   void add(final String name, final String value, final QueryParser parser) throws QueryException {
     final String key = name.toUpperCase(Locale.ENGLISH);
-    final MainOptions options = qc.context.options;
+    final MainOptions options = get();
     final Option<?> option = options.option(key);
     if(option == null) throw BASEX_OPTIONS_X.get(parser.info(), options.similar(name));
     if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, key, parser.info());
 
-    assign(queryOpts(), key, value, parser.info());
+    final MainOptions qopts = queryOpts();
+    assign(qopts, key, value, parser.info());
+    state = new State(qopts, state.effective);
     declared.add(option);
   }
 
@@ -63,28 +114,35 @@ final class QueryOptions {
    * Compiles all options.
    */
   void compile() {
-    // cache old database options at compile time; assign local ones
-    final MainOptions mopts = qc.context.options;
-    for(final Option<?> option : declared) {
-      cachedOpts.put(option, mopts.get(option));
-      mopts.put(option, queryOpts.get(option));
-    }
+    if(declared.isEmpty()) return;
+    final MainOptions mopts = new MainOptions(get());
+    for(final Option<?> option : declared) mopts.put(option, state.queryOpts.get(option));
+    state = new State(state.queryOpts, mopts.seal());
   }
 
   /**
-   * Assigns a pragma value to the global and query-local options.
+   * Assigns a pragma value to the effective and query-local options.
    * @param option option
    * @param value value
    * @param info input info (can be {@code null})
-   * @return old values
+   * @return previous state
    * @throws QueryException query exception
    */
-  Object[] assign(final Option<?> option, final String value, final InputInfo info)
+  State assign(final Option<?> option, final String value, final InputInfo info)
       throws QueryException {
-    final MainOptions mopts = qc.context.options, qopts = queryOpts();
-    final Object[] old = { mopts.get(option), qopts.get(option) };
-    assign(mopts, option.name(), value, info);
-    qopts.put(option, mopts.get(option));
+
+    final State old = state;
+    final MainOptions base = get();
+    final Key key = new Key(option, value);
+    Derived derived = old.derived.get(key);
+    if(derived == null || derived.base != base) {
+      final MainOptions mopts = new MainOptions(base), qopts = queryOpts();
+      assign(mopts, option.name(), value, info);
+      qopts.put(option, mopts.get(option));
+      derived = new Derived(base, new State(qopts.seal(), mopts.seal()));
+      old.derived.put(key, derived);
+    }
+    state = derived.state;
     return old;
   }
 
@@ -106,37 +164,18 @@ final class QueryOptions {
   }
 
   /**
-   * Restores the values that were replaced by a pragma.
-   * @param option option
-   * @param old old values
-   */
-  void restore(final Option<?> option, final Object[] old) {
-    qc.context.options.put(option, old[0]);
-    queryOpts.put(option, old[1]);
-  }
-
-  /**
    * Returns new main options with the query-local and default options.
    * @return main options
    */
   MainOptions dbOptions() {
-    final MainOptions mopts = queryOpts != null ? new MainOptions(queryOpts) : new MainOptions();
-    return mopts.adoptAccess(qc.context.options);
+    return queryOpts().adoptAccess(get());
   }
 
   /**
-   * Returns the query-local options.
+   * Returns a copy of the query-local options.
    * @return query-local options
    */
   private MainOptions queryOpts() {
-    if(queryOpts == null) queryOpts = new MainOptions();
-    return queryOpts;
-  }
-
-  /**
-   * Reassigns original options.
-   */
-  void close() {
-    cachedOpts.forEach(qc.context.options::put);
+    return state.queryOpts != null ? new MainOptions(state.queryOpts) : new MainOptions();
   }
 }

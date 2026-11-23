@@ -197,7 +197,7 @@ public final class Xslt {
     // representations may share their base URI with other stylesheets
     final String key = cache && !(stylesheet instanceof IOContent) ?
       (trusted ? "" : "!") + stylesheet.url() : null;
-    final URIResolver ur = qc.context.options.resolver().uriResolver();
+    final URIResolver ur = qc.options().resolver().uriResolver();
 
     // retrieve new or cached templates object
     Templates templates = key != null ? CACHE.get(key) : null;

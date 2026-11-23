@@ -177,7 +177,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // inline all values in the closure
       final Iterator<Entry<Var, Expr>> iter = global.entrySet().iterator();
       Map<Var, Expr> add = null;
-      final int limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
+      final int limit = cc.qc.options().get(MainOptions.INLINELIMIT);
       while(iter.hasNext()) {
         final Entry<Var, Expr> entry = iter.next();
         final Var var = entry.getKey();

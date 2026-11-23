@@ -499,7 +499,7 @@ public abstract class StandardFunc extends Arr {
       // fragments are unnamed; named main-memory instances are databases if MAINMEM is enabled
       final Data data = node.data();
       if(!data.inMemory() || !data.meta.name.isEmpty() &&
-          qc.context.options.get(MainOptions.MAINMEM)) return node;
+          qc.options().get(MainOptions.MAINMEM)) return node;
     }
     throw DB_NODE_X.get(info, item);
   }
@@ -757,7 +757,8 @@ public abstract class StandardFunc extends Arr {
         values[v] = values[v].materialize(TransferVisitor.SHAREABLE, true, info, qc);
       }
       return new QueryJobSpec(options,
-          function.materialize(TransferVisitor.SHAREABLE, true, info, qc), values);
+          function.materialize(TransferVisitor.SHAREABLE, true, info, qc), values).
+          queryOptions(qc.optionsState());
     }
 
     final IOContent content = toContent(item, query, qc);
@@ -782,7 +783,9 @@ public abstract class StandardFunc extends Arr {
     for(final Entry<String, Value> binding : bindings.entrySet()) {
       binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
-    return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "");
+    // services are restarted from disk: they must not depend on the options of the caller
+    return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "").
+        queryOptions(service ? null : qc.optionsState());
   }
 
   /**
@@ -1034,7 +1037,7 @@ public abstract class StandardFunc extends Arr {
    * @return main options
    */
   protected final MainOptions mainOptions(final QueryContext qc) {
-    final MainOptions mopts = qc.context.options;
+    final MainOptions mopts = qc.options();
     return qc.allowExternal(info) ? mopts : new MainOptions(mopts).allowExternal(false);
   }
 

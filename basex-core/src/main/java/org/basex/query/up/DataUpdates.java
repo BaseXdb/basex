@@ -59,7 +59,7 @@ final class DataUpdates {
    */
   DataUpdates(final Data data, final QueryContext qc) {
     this.data = data;
-    writeback = qc.context.options.get(MainOptions.WRITEBACK);
+    writeback = qc.options().get(MainOptions.WRITEBACK);
   }
 
   /**
@@ -251,7 +251,7 @@ final class DataUpdates {
         (data.meta.docOpts != null || data == qc.context.data())) {
       if(writeback) {
         try {
-          Export.export(data, original, qc.context.options, null);
+          Export.export(data, original, qc.options(), null);
         } catch(final IOException ex) {
           throw UPDBERROR_X.get(null, ex);
         }

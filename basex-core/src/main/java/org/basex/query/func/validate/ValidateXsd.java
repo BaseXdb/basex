@@ -153,7 +153,7 @@ public class ValidateXsd extends ValidateFn {
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
-          final SchemaFactory sf = factory(qc.context.options);
+          final SchemaFactory sf = factory(qc.options());
           sf.setErrorHandler(this);
 
           // assign parser features

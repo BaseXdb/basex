@@ -32,7 +32,7 @@ public class XsltTransform extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XsltResult result = new XsltResult(EMPTY, qc.context.options);
+    final XsltResult result = new XsltResult(EMPTY, qc.options());
     transform(result, null, qc);
     return result.node();
   }

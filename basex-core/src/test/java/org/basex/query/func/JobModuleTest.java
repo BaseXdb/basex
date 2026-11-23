@@ -136,6 +136,18 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalOptions() {
+    final String option = " \"" + _DB_OPTION.args(" string(<_>intparse</_>)") + "\"";
+    // jobs adopt the options of the caller
+    final String id = query("declare option db:intparse 'true'; " +
+        _JOB_EVAL.args(option, " ()", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    query(_JOB_RESULT.args(id), true);
+    query("(# db:intparse true #) { " + _JOB_EXECUTE.args(option) + " }", true);
+    query(_JOB_EXECUTE.args(option), false);
+  }
+
+  /** Test method. */
   @Test public void evalTimeout() {
     final Function func = _JOB_EVAL;
     final String id = query(func.args(VERY_SLOW_QUERY, " ()",

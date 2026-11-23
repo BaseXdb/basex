@@ -414,6 +414,6 @@ public final class IndexInfo {
    * @return result of check
    */
   public boolean enforce() {
-    return cc.qc.context.options.get(MainOptions.ENFORCEINDEX);
+    return cc.qc.options().get(MainOptions.ENFORCEINDEX);
   }
 }

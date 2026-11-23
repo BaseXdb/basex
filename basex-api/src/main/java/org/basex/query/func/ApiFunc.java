@@ -48,7 +48,7 @@ public abstract class ApiFunc extends StandardFunc {
    */
   public final XQMap formValues(final QueryContext qc) throws QueryException {
     try {
-      return requestContext(qc).formValues(qc.context.options);
+      return requestContext(qc).formValues(qc.options());
     } catch(final IOException ex) {
       throw REQUEST_PARAMETER_X.get(info, ex).cause(ex);
     }

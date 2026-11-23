@@ -2515,7 +2515,7 @@ public class QueryParser extends InputParser {
       if(name.eqPrefix(DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final MainOptions mopts = qc.context.options;
+        final MainOptions mopts = qc.options();
         final Option<?> option = mopts.option(key);
         if(option == null) throw error(BASEX_OPTIONS_X, mopts.similar(key));
         el.add(new DBPragma(name, option, value));

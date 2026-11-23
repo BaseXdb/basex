@@ -51,7 +51,7 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public QueryProcessor(final String query, final String uri, final Context ctx,
       final QueryInfo info) {
-    this(query, uri, ctx, info, null);
+    this(query, uri, ctx, info, null, null);
   }
 
   /**
@@ -61,11 +61,13 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param ctx database context
    * @param info query info (can be {@code null})
    * @param perm maximum permission of the user and the code (can be {@code null})
+   * @param options state of the options of a calling query (can be {@code null})
    */
   public QueryProcessor(final String query, final String uri, final Context ctx,
-      final QueryInfo info, final Perm perm) {
+      final QueryInfo info, final Perm perm, final QueryOptions.State options) {
     this.query = query;
     qc = pushJob(new QueryContext(ctx, null, null, info));
+    if(options != null) qc.optionsState(options);
     if(perm != null) {
       qc.user = new User(qc.user, perm);
       qc.maxPerm = perm;
@@ -275,7 +277,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @return query plan
    */
   public FNode toXml() {
-    return qc.toXml(qc.context.options.get(MainOptions.FULLPLAN));
+    return qc.toXml(qc.options().get(MainOptions.FULLPLAN));
   }
 
   @Override

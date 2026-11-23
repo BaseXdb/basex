@@ -16,6 +16,6 @@ public final class DbSystem extends StandardFunc {
   @Override
   public FNode value(final QueryContext qc) {
     final boolean admin = qc.has(Perm.ADMIN, null, info);
-    return DbInfo.node(DbAccessFn.Q_SYSTEM, Info.info(qc.context, admin), qc);
+    return DbInfo.node(DbAccessFn.Q_SYSTEM, Info.info(qc.context, qc.options(), admin), qc);
   }
 }

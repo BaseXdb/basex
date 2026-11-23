@@ -58,7 +58,8 @@ public final class XQueryParse extends StandardFunc {
     // optimization opens databases: share the resources and locks of the parent query
     final boolean optimize = options.get(XQueryParseOptions.OPTIMIZE);
     try(QueryContext qctx = optimize ? new QueryContext(qc, null) : new QueryContext(qc.context)) {
-      // compilation may evaluate code: adopt the permissions of the calling code
+      // compilation may evaluate code: adopt the permissions and options of the calling code
+      if(!optimize) qctx.optionsState(qc.optionsState());
       qctx.user = qc.user;
       qctx.maxPerm = perm(qc);
       qctx.resolver = qc.resolver;

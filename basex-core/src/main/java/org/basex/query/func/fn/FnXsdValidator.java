@@ -221,7 +221,7 @@ public final class FnXsdValidator extends StandardFunc {
         if(typedNode) {
           // the validated input is passed on to a database builder
           typed = new DBNode(MemBuilder.build(new ValidatingParser(input, reader, handler,
-              node.type.instanceOf(NodeType.DOCUMENT), qc.context.options)));
+              node.type.instanceOf(NodeType.DOCUMENT), qc.options())));
         } else {
           handler.setContentHandler(null);
           reader.setProperty(LEXICAL_HANDLER, null);

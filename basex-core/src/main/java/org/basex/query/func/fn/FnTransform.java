@@ -184,7 +184,7 @@ public final class FnTransform extends StandardFunc {
     final boolean tree = format == DeliveryFormat.DOCUMENT;
     final ArrayOutput output = tree ? null : new ArrayOutput();
     final XsltResult document = tree ?
-      new XsltResult(uri != null ? token(uri) : EMPTY, qc.context.options) : null;
+      new XsltResult(uri != null ? token(uri) : EMPTY, qc.options()) : null;
 
     final String error = Xslt.transform(stylesheet, source,
         tree ? document : new StreamResult(output),

@@ -19,6 +19,8 @@ import org.basex.util.options.*;
 public final class DBPragma extends Pragma {
   /** Option key. */
   private final Option<?> option;
+  /** Option value. */
+  private final String string;
 
   /**
    * Constructor.
@@ -29,17 +31,18 @@ public final class DBPragma extends Pragma {
   public DBPragma(final QNm name, final Option<?> option, final byte[] value) {
     super(name, value);
     this.option = option;
+    string = string(value);
   }
 
   @Override
   Object init(final QueryContext qc, final InputInfo info) throws QueryException {
     if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, option.name(), info);
-    return qc.assign(option, string(value), info);
+    return qc.assign(option, string, info);
   }
 
   @Override
   void finish(final QueryContext qc, final Object state) {
-    qc.restore(option, (Object[]) state);
+    qc.optionsState((QueryOptions.State) state);
   }
 
   @Override

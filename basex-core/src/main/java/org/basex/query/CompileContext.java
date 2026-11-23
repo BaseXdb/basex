@@ -560,7 +560,7 @@ public final class CompileContext {
    */
   public ExprList unroll(final Expr expr, final boolean single) {
     final Consumer<ExprList> add;
-    final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
+    final long size = expr.size(), limit = qc.options().get(MainOptions.UNROLLLIMIT);
     if(single && size == 1) {
       // expression yielding single item: <a/>
       add = exprs -> exprs.add(expr);
@@ -620,7 +620,7 @@ public final class CompileContext {
     } else if(anns.contains(Annotation._BASEX_LOCK)) {
       limit = 0;
     } else {
-      limit = qc.context.options.get(MainOptions.INLINELIMIT);
+      limit = qc.options().get(MainOptions.INLINELIMIT);
       if(unlimited && limit > 0) return true;
     }
     return limit > 0 && expr.exprSize() < limit;

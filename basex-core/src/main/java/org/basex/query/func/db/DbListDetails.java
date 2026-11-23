@@ -30,7 +30,7 @@ public final class DbListDetails extends DbList {
       public FNode get(final long i) {
         final String name = dbs.get((int) i);
         final FBuilder database = FElem.build(Q_DATABASE);
-        final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
+        final MetaData meta = new MetaData(name, qc.options(), ctx.soptions);
         try {
           meta.read();
           final MetaData.DiskStats stats = meta.diskStats();

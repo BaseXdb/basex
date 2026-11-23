@@ -22,7 +22,7 @@ public class DbOptionMap extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     final boolean admin = qc.has(Perm.ADMIN, null, info);
-    for(final Entry<String, Object> option : qc.context.options(admin).entrySet()) {
+    for(final Entry<String, Object> option : qc.context.options(qc.options(), admin).entrySet()) {
       map.put(option.getKey(), toValue(option.getValue()));
     }
     return map.map();

@@ -200,7 +200,7 @@ public final class QueryResources {
   public synchronized Data database(final String name, final QueryContext qc,
       final boolean updating, final InputInfo info) throws QueryException {
 
-    final boolean mainmem = context.options.get(MainOptions.MAINMEM);
+    final boolean mainmem = qc.options().get(MainOptions.MAINMEM);
     final Perm perm = updating ? Perm.WRITE : Perm.READ;
     qc.checkPerm(perm, name, name, info);
 
@@ -216,7 +216,7 @@ public final class QueryResources {
 
     // open and register database
     try {
-      return addData(Open.open(name, context, context.options, true, false));
+      return addData(Open.open(name, context, qc.options(), true, false));
     } catch(final IOException ex) {
       throw DB_GET2_X.get(info, ex);
     }
@@ -236,7 +236,7 @@ public final class QueryResources {
   public synchronized DBNode doc(final QueryInput qi, final DocOptions docOpts,
       final QueryContext qc, final InputInfo info, final boolean allowExternal)
       throws QueryException {
-    final MainOptions options = context.options;
+    final MainOptions options = qc.options();
     final boolean withdb = options.get(MainOptions.WITHDB);
     // favor default database
     if(withdb && options.get(MainOptions.DEFAULTDB)) {
@@ -275,7 +275,7 @@ public final class QueryResources {
       final boolean uris, final QueryContext qc, final InputInfo info) throws QueryException {
 
     // return default collection
-    final boolean withdb = context.options.get(MainOptions.WITHDB);
+    final boolean withdb = qc.options().get(MainOptions.WITHDB);
     if(qi == null) {
       if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(info);
       return colls.getFirst();
@@ -302,7 +302,7 @@ public final class QueryResources {
       final Value cached = dirs.get(key);
       if(cached != null) return cached;
       final ArrayList<IOFile> files =
-          parser(dir, options(docOpts, options, false), options, qc, info).files();
+          parser(dir, options(docOpts, options, false, qc), options, qc, info).files();
       if(files != null) {
         final TokenList list = new TokenList(files.size());
         for(final IOFile file : files) list.add(file.url());
@@ -334,7 +334,7 @@ public final class QueryResources {
       return new ArrayList<>(0);
     }
     checkAccess(dir, qi.original, qc, info);
-    return parser(dir, options(docOpts, options, false), options, qc, info).others();
+    return parser(dir, options(docOpts, options, false, qc), options, qc, info).others();
   }
 
   /**
@@ -356,7 +356,7 @@ public final class QueryResources {
       DocScope.CHILDREN;
     if(withdb) {
       // favor default database
-      if(context.options.get(MainOptions.DEFAULTDB)) {
+      if(qc.options().get(MainOptions.DEFAULTDB)) {
         final Data data = globalData();
         if(data != null) {
           checkRead(data, qc, info);
@@ -440,9 +440,10 @@ public final class QueryResources {
   /**
    * Removes and closes the specified database. Called during updates.
    * @param name name of database to be removed
+   * @param qc query context
    */
-  public void remove(final String name) {
-    final boolean mainmem = context.options.get(MainOptions.MAINMEM);
+  public void remove(final String name, final QueryContext qc) {
+    final boolean mainmem = qc.options().get(MainOptions.MAINMEM);
     final int ds = datas.size();
     for(int d = globalData ? 1 : 0; d < ds; d++) {
       final Data data = datas.get(d);
@@ -634,7 +635,7 @@ public final class QueryResources {
     // try to open existing database
     if(name != null) {
       try {
-        final Data data = Open.open(name, context, context.options, false, false);
+        final Data data = Open.open(name, context, qc.options(), false, false);
         if(data != null) {
           // check permissions only if the database exists: otherwise, the input is a file path
           try {
@@ -759,7 +760,7 @@ public final class QueryResources {
     if(!io.exists()) throw WHICHRES_X.get(info, io.path());
     if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 
-    final MainOptions options = options(docOpts, collOpts, allowExternal);
+    final MainOptions options = options(docOpts, collOpts, allowExternal, qc);
     try {
       final DirParser parser = parser(io, options, collOpts, qc, info);
       final Data data = CreateDB.create(io.dbName(), parser, context, options, true);
@@ -783,11 +784,12 @@ public final class QueryResources {
    * @param docOpts options used by fn:doc or fn:collection
    * @param collOpts collection options (can be {@code null})
    * @param allowExternal allow access to external resources
+   * @param qc query context
    * @return options
    */
-  private MainOptions options(final DocOptions docOpts, final CollectionOptions collOpts,
-      final boolean allowExternal) {
-    final MainOptions mopts = context.options;
+  private static MainOptions options(final DocOptions docOpts, final CollectionOptions collOpts,
+      final boolean allowExternal, final QueryContext qc) {
+    final MainOptions mopts = qc.options();
     final boolean skip = collOpts != null && collOpts.get(CollectionOptions.IGNORE_ERRORS);
     if(!allowExternal && !skip && docOpts == DOC_OPTIONS &&
         mopts.resolver().standard() && !mopts.trustExternal(docOpts)) return MAIN_OPTIONS;

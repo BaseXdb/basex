@@ -399,7 +399,7 @@ public final class Sftp extends QueryModule {
   public DBNode getXml(final ChannelSftp sftp, final Str path) throws QueryException {
     final IOContent io = new IOContent(get(sftp, path), path.toJava());
     try {
-      return new DBNode(Parser.xmlParser(io, queryContext.context.options));
+      return new DBNode(Parser.xmlParser(io, queryContext.options()));
     } catch(final IOException ex) {
       throw error("parse", Util.message(ex));
     }

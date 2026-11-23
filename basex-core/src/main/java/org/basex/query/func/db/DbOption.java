@@ -25,9 +25,10 @@ public final class DbOption extends DbOptionMap {
 
     final Context ctx = qc.context;
     final boolean admin = qc.has(Perm.ADMIN, null, info);
-    final Object value = ctx.option(Token.string(key), admin);
+    final MainOptions mopts = qc.options();
+    final Object value = ctx.option(Token.string(key), mopts, admin);
     if(value == null) {
-      final StringList names = new StringList().add(ctx.options.names());
+      final StringList names = new StringList().add(mopts.names());
       if(admin) names.add(ctx.soptions.names());
       throw DB_OPTION_X.get(info, QueryError.similar(key, Levenshtein.similar(key, names.finish()),
           name -> name.toLowerCase(Locale.ENGLISH)));
