@@ -320,6 +320,7 @@ results_%            = % Résultat(s)
 revert               = Rétablir
 revert_file_%        = Rétablir % et annuler les changements ?
 revert_files_%       = % fichier(s) seront rétabli(s), les modifications plus récentes seront perdues.
+rt_compilation       = Compilation en temps réel
 rt_execution         = Exécution en temps réel
 rt_filtering         = Filtrage en temps réel
 rt_focus             = Focus souris en temps réel

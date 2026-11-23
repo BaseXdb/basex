@@ -173,6 +173,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption FILTERRT = new BooleanOption("FILTERRT", false);
   /** Flag for real-time query execution. */
   public static final BooleanOption EXECRT = new BooleanOption("EXECRT", false);
+  /** Flag for real-time query compilation. */
+  public static final BooleanOption COMPILERT = new BooleanOption("COMPILERT", false);
 
   /** Name of new database. */
   public static final StringOption DBNAME = new StringOption("DBNAME", "");

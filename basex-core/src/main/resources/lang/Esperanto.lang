@@ -320,6 +320,7 @@ results_%            = % rezulto(j)
 revert               = Restarigi
 revert_file_%        = Ĉu restarigi % kaj forĵeti ŝanĝojn?
 revert_files_%       = % dosiero(j) estos restarigita(j), pli novaj ŝanĝoj perdiĝos.
+rt_compilation       = Realtempa kompilado
 rt_execution         = Realtempa plenumo
 rt_filtering         = Realtempa filtrado
 rt_focus             = Realtempa musa fokuso

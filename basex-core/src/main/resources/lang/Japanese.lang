@@ -320,6 +320,7 @@ results_%            = % 結果
 revert               = 元に戻す
 revert_file_%        = 変更を破棄して % を元に戻しますか？
 revert_files_%       = % 個のファイルを元に戻します。新しい変更は失われます。
+rt_compilation       = リアルタイムでのコンパイル
 rt_execution         = リアルタイムでの実行
 rt_filtering         = リアルタイムフィルタリング
 rt_focus             = リアルタイムマウスフォーカス

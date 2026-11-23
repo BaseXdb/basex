@@ -320,6 +320,7 @@ results_%            = % Ergebnis(se)
 revert               = Zurücksetzen
 revert_file_%        = Datei % zurücksetzen und Änderungen verwerfen?
 revert_files_%       = % Datei(en) werden zurückgesetzt, neuere Änderungen gehen verloren.
+rt_compilation       = Echtzeit-Kompilierung
 rt_execution         = Echtzeit-Ausführung
 rt_filtering         = Echtzeit-Filter
 rt_focus             = Echtzeit-Mausfokus

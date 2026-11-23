@@ -320,6 +320,7 @@ results_%            = % Үр дүн(гүүд)
 revert               = Буцаах
 revert_file_%        = %-г буцааж, өөрчлөлтүүдийг цуцлах уу?
 revert_files_%       = % файл буцаагдаж, шинэ өөрчлөлтүүд устана.
+rt_compilation       = Тухайн агшинд хөрвүүлэх (Real-Time)
 rt_execution         = Тухайн агшинд хөрвүүлэлт (Real-Time)
 rt_filtering         = Тухайн агшинд шүүлт хийх (Real-Time)
 rt_focus             = Тухайн агшинд төвлөрүүрэлт хийх (Real-Time)

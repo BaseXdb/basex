@@ -18,6 +18,8 @@ import javax.swing.Timer;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.jobs.*;
+import org.basex.core.jobs.Job.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
@@ -96,6 +98,8 @@ public final class EditorView extends View {
 
   /** Parse counter. */
   private final AtomicInteger parseID = new AtomicInteger();
+  /** Query context of the current parse run (can be {@code null}). */
+  private final AtomicReference<QueryContext> parsing = new AtomicReference<>();
   /** Current input info (can be {@code null}). */
   private InputInfo inputInfo;
 
@@ -818,17 +822,24 @@ public final class EditorView extends View {
    * @param file file
    */
   private void parse(final String input, final IO file) {
-    final int id = parseID.incrementAndGet();
+    final int id = cancelParse();
     PARSER.schedule(() -> {
-      // check if the run is obsolete
-      if(id != parseID.get()) return;
-
-      // parse query, and show the outcome in the event dispatch thread
+      // parse (and compile) query, and show the outcome in the event dispatch thread
       Exception error = null;
-      try(QueryContext qc = new QueryContext(gui.context)) {
+      try(QueryContext qc = new QueryContext(gui.context); Binding bound = qc.bind()) {
+        // check if the run is obsolete
+        parsing.set(qc);
+        if(id != parseID.get()) return;
         qc.parse(input, file.path());
+        if(gui.gopts.get(GUIOptions.COMPILERT)) qc.compile();
       } catch(final QueryException ex) {
         error = ex;
+      } catch(final JobException ex) {
+        // run has been superseded
+        Util.debug(ex);
+        return;
+      } finally {
+        parsing.set(null);
       }
       final Exception result = error;
       SwingUtilities.invokeLater(() -> {
@@ -836,6 +847,17 @@ public final class EditorView extends View {
         if(id == parseID.get()) info(result);
       });
     }, SEARCH_DELAY, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Invalidates the current parse run and stops it.
+   * @return new parse ID
+   */
+  private int cancelParse() {
+    final int id = parseID.incrementAndGet();
+    final QueryContext running = parsing.get();
+    if(running != null) running.stop();
+    return id;
   }
 
   /**
@@ -848,7 +870,7 @@ public final class EditorView extends View {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
-    parseID.incrementAndGet();
+    cancelParse();
     final EditorArea editor = getEditor();
     String path = "";
     if(editor != null) {

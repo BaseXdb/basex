@@ -975,6 +975,8 @@ public interface Text {
   /** Command info. */
   String RT_EXECUCTION = lang("rt_execution");
   /** Command info. */
+  String RT_COMPILATION = lang("rt_compilation");
+  /** Command info. */
   String RT_FILTERING = lang("rt_filtering");
   /** Command info. */
   String BUTTONS = lang("buttons");

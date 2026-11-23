@@ -320,6 +320,7 @@ results_%            = % Sonuç(lar)
 revert               = Geri al
 revert_file_%        = % geri alınsın ve değişiklikler atılsın mı?
 revert_files_%       = % dosya geri alınacak, daha yeni değişiklikler kaybolacak.
+rt_compilation       = Gerçek zamanlı Derleme
 rt_execution         = Gerçek zamanlı Çalıştırma
 rt_filtering         = Gerçek zamanlı Filtreleme
 rt_focus             = Gerçek zamanlı fare odaklama
