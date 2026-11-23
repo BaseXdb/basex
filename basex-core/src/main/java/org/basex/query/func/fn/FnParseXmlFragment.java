@@ -80,8 +80,8 @@ public class FnParseXmlFragment extends Docs {
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value, arg(0)), baseURI, encoding);
 
-    final MainOptions mopts = new MainOptions(options, qc.context.options).
-        allowExternal(trustExternal(options, qc));
+    final MainOptions mopts = new MainOptions(options, qc.context.options);
+    if(!qc.allowExternal(info)) mopts.allowExternal(false);
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

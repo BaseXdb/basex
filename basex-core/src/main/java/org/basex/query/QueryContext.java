@@ -585,6 +585,16 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Indicates if the current user and the code at the specified location may access external
+   * resources when parsing XML.
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   */
+  public boolean allowExternal(final InputInfo ii) {
+    return has(Perm.ADMIN, null, ii);
+  }
+
+  /**
    * Checks if the current user and the code at the specified location have the given permission.
    * @param perm permission
    * @param db database pattern (can be {@code null})

@@ -790,7 +790,7 @@ public final class QueryResources {
     final MainOptions mopts = context.options;
     final boolean skip = collOpts != null && collOpts.get(CollectionOptions.IGNORE_ERRORS);
     if(!allowExternal && !skip && docOpts == DOC_OPTIONS &&
-        mopts.resolver().standard() && !mopts.get(MainOptions.TRUSTEXTERNAL)) return MAIN_OPTIONS;
+        mopts.resolver().standard() && !mopts.trustExternal(docOpts)) return MAIN_OPTIONS;
 
     final MainOptions options = new MainOptions(docOpts, mopts);
     if(allowExternal) options.allowExternal(true);

@@ -10,7 +10,6 @@ import java.util.List;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
-import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
@@ -53,8 +52,6 @@ public final class DBNew {
 
     this.qc = qc;
     this.info = info;
-    // external entities, XIncludes and catalogs require ADMIN permission
-    if(!qc.has(Perm.ADMIN, null, info)) opts.allowExternal(false);
 
     final int il = inputs.length;
     this.inputs = new ArrayList<>(il);

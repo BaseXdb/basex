@@ -66,6 +66,7 @@ public final class DBOptions {
   public MainOptions mainOptions() {
     final MainOptions opts = qc.dbOptions();
     map.forEach(opts::put);
+    if(!qc.allowExternal(info)) opts.allowExternal(false);
     return opts;
   }
 

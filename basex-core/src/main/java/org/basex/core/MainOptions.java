@@ -297,13 +297,22 @@ public class MainOptions extends Options {
         put(target, value);
       }
     });
-    final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
-      allowExternal = t == Boolean.TRUE;
+      allowExternal = options.get(CommonOptions.TRUST_EXTERNAL) == Boolean.TRUE;
     } else {
       setResolver(parent);
-      allowExternal = t != null ? t : parent.allowExternal && parent.get(TRUSTEXTERNAL);
+      allowExternal = parent.trustExternal(options);
     }
+  }
+
+  /**
+   * Indicates if external resources may be accessed with the specified options.
+   * @param options options with an optional {@link CommonOptions#TRUST_EXTERNAL} value
+   * @return result of check
+   */
+  public boolean trustExternal(final Options options) {
+    final Boolean trust = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
+    return allowExternal && (trust != null ? trust : get(TRUSTEXTERNAL));
   }
 
   /**

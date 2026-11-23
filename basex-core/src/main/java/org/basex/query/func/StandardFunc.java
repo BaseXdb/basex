@@ -1035,19 +1035,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final MainOptions mainOptions(final QueryContext qc) {
     final MainOptions mopts = qc.context.options;
-    return !qc.has(Perm.ADMIN, null, info) ? new MainOptions(mopts).allowExternal(false) : mopts;
-  }
-
-  /**
-   * Indicates if the current user and code may retrieve external resources.
-   * @param options options
-   * @param qc query context
-   * @return result of check
-   */
-  protected final boolean trustExternal(final Options options, final QueryContext qc) {
-    final Boolean trust = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
-    return qc.has(Perm.ADMIN, null, info) && (trust != null ? trust :
-      qc.context.options.get(MainOptions.TRUSTEXTERNAL));
+    return qc.allowExternal(info) ? mopts : new MainOptions(mopts).allowExternal(false);
   }
 
   /**
