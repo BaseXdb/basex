@@ -1465,10 +1465,10 @@ public enum Function implements AFunction {
       params(STRING_O, BOOLEAN_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTION(DbOption::new, "option(key)",
-      params(STRING_O), ITEM_O, DB_URI),
+      params(STRING_O), ITEM_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_OPTION_MAP(DbOptionMap::new, "option-map()",
-      params(), STRING_ITEM_SEQ_MAP.seqType(), DB_URI),
+      params(), STRING_ITEM_SEQ_MAP.seqType(), flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PATH(DbPath::new, "path(node)",
       params(XNODE_O), STRING_O, DB_URI),

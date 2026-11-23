@@ -1200,6 +1200,10 @@ public final class DbModuleTest extends SandboxTest {
     query("declare option db:csvparser 'select-columns=2'; "
         + func.args("csvparser") + "?select-columns", 2);
 
+    // pragmas: no pre-evaluation outside the pragma scope
+    query("let $key := string(<_>intparse</_>) return (# db:intparse true #) { "
+        + func.args(" $key") + " }", true);
+
     error(func.args("XYZ"), DB_OPTION_X);
   }
 
@@ -1212,6 +1216,10 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args() + "?bindings", "");
     query(func.args() + "?serializer?indent", "no");
     query(func.args() + "?xyz", "");
+
+    // pragmas: no pre-evaluation outside the pragma scope
+    query("let $f := fn() { " + func.args() + " } "
+        + "return (# db:intparse true #) { $f()?intparse }", true);
   }
 
   /** Test method. */
