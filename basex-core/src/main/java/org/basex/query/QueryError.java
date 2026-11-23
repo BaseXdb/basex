@@ -195,7 +195,7 @@ public enum QueryError {
   /** Error code. */
   CX_ENCTYP_X(CX, 18, "Encryption type is not supported: %."),
   /** Error code. */
-  CX_KEYINV_X(CX, 19, "Secret key is invalid: %."),
+  CX_KEYINV_X(CX, 19, "Key is invalid: %."),
   /** Error code. */
   CX_ILLBLO_X(CX, 20, "Illegal block size: %."),
   /** Error code. */
@@ -212,6 +212,8 @@ public enum QueryError {
   CX_SIGEXC_X(CX, 27, "Signature exception: %"),
   /** Error code. */
   CX_SIGTYPINV_X(CX, 28, "Signature type is not supported: %."),
+  /** Error code. */
+  CX_KEYALG_X(CX, 29, "Key does not match algorithm or usage: %."),
 
   // CSV Module
 

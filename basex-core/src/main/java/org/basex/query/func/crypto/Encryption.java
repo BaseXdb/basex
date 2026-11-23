@@ -11,6 +11,7 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 
 import org.basex.query.*;
+import org.basex.query.func.crypto.CryptoKey.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
@@ -25,25 +26,29 @@ final class Encryption {
   /** Cipher algorithms. */
   private enum Algorithm {
     /** AES in CBC mode. */
-    AES("AES/CBC/PKCS5Padding", 16),
+    AES("AES/CBC/PKCS5Padding", 16, Type.AES),
     /** AES in GCM mode. */
-    AES_GCM("AES/GCM/NoPadding", 12),
+    AES_GCM("AES/GCM/NoPadding", 12, Type.AES),
     /** RSA with OAEP padding. */
-    RSA("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", 0);
+    RSA("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", 0, Type.RSA);
 
     /** Transformation. */
     private final String transformation;
     /** Length of the initialization vector (0 for asymmetric algorithms). */
     private final int ivl;
+    /** Key type. */
+    private final Type key;
 
     /**
      * Constructor.
      * @param transformation transformation
      * @param ivl length of the initialization vector
+     * @param key key type
      */
-    Algorithm(final String transformation, final int ivl) {
+    Algorithm(final String transformation, final int ivl, final Type key) {
       this.transformation = transformation;
       this.ivl = ivl;
+      this.key = key;
     }
 
     /**
@@ -54,7 +59,7 @@ final class Encryption {
      */
     static Algorithm get(final String name, final boolean symmetric) {
       for(final Algorithm alg : values()) {
-        if(alg.toString().equals(name) && symmetric == (alg.ivl > 0)) return alg;
+        if(alg.toString().equals(name) && symmetric == alg.key.secret()) return alg;
       }
       return null;
     }
@@ -91,13 +96,13 @@ final class Encryption {
    * Encrypts or decrypts the given input.
    * @param data data to process
    * @param type encryption type
-   * @param key secret key, or the public (encrypt) or private (decrypt) key
+   * @param key key item: secret key, or public (encrypt) or private (decrypt) key
    * @param algorithm encryption algorithm
    * @param encrypt encrypt or decrypt
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  Item encryption(final byte[] data, final String type, final byte[] key, final String algorithm,
+  Item encryption(final byte[] data, final String type, final Item key, final String algorithm,
       final boolean encrypt) throws QueryException {
 
     final boolean symmetric = type.equals(SYMMETRIC);
@@ -105,37 +110,22 @@ final class Encryption {
     final Algorithm alg = Algorithm.get(algorithm.toUpperCase(Locale.ENGLISH), symmetric);
     if(alg == null) throw CX_INVALGO_X.get(info, algorithm);
 
+    final Usage usage = encrypt ? Usage.ENCRYPT : Usage.DECRYPT;
+    final Key kspec = new CryptoKey(info).get(key, alg.key, usage, null);
     try {
-      final Key kspec = symmetric ? new SecretKeySpec(key, "AES") : rsaKey(key, encrypt);
       final Cipher cipher = Cipher.getInstance(alg.transformation);
       return encrypt ? encrypt(data, kspec, cipher, alg) : decrypt(data, kspec, cipher, alg);
     } catch(final NoSuchPaddingException ex) {
       throw CX_NOPAD_X.get(info, ex);
     } catch(final BadPaddingException ex) {
       throw CX_BADPAD_X.get(info, ex);
-    } catch(final IllegalArgumentException | InvalidKeyException | InvalidKeySpecException ex) {
+    } catch(final IllegalArgumentException | InvalidKeyException ex) {
       throw CX_KEYINV_X.get(info, ex);
     } catch(final IllegalBlockSizeException ex) {
       throw CX_ILLBLO_X.get(info, ex);
     } catch(final GeneralSecurityException ex) {
       throw CX_INVALGO_X.get(info, ex);
     }
-  }
-
-  /**
-   * Parses an RSA key in PEM or DER format.
-   * @param key key
-   * @param pub public or private key
-   * @return key
-   * @throws GeneralSecurityException general security exception
-   */
-  private static Key rsaKey(final byte[] key, final boolean pub) throws GeneralSecurityException {
-    // PEM: strip header and footer, decode base64 body
-    final byte[] der = startsWith(key, token("-----")) ?
-      Base64.decode(token(string(key).replaceAll("-----[^\n]*", ""))) : key;
-    final KeyFactory kf = KeyFactory.getInstance("RSA");
-    return pub ? kf.generatePublic(new X509EncodedKeySpec(der)) :
-      kf.generatePrivate(new PKCS8EncodedKeySpec(der));
   }
 
   /**

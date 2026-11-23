@@ -325,6 +325,9 @@ public final class Types {
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
+  /** Single string, xs:hex-binary, xs:base64-binary or map. */
+  public static final SeqType STRING_OR_BINARY_OR_MAP_O =
+      ChoiceItemType.get(STRING_OR_BINARY, MAP).seqType();
   /** Zero or one string or map. */
   public static final SeqType STRING_OR_MAP_ZO = ChoiceItemType.get(STRING, MAP).seqType(
       ZERO_OR_ONE);

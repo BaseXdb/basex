@@ -1328,10 +1328,11 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CRYPTO_DECRYPT(CryptoDecrypt::new, "decrypt(value, type, key, algorithm)",
-      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_O, STRING_O), STRING_O, CRYPTO_URI),
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O, STRING_O), STRING_O,
+      CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_ENCRYPT(CryptoEncrypt::new, "encrypt(value, type, key, algorithm)",
-      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_O, STRING_O), BASE64_BINARY_O,
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_OR_MAP_O, STRING_O), BASE64_BINARY_O,
       CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature::new,
@@ -1346,8 +1347,16 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_OR_BINARY_O, INTEGER_O, INTEGER_O, STRING_ZO), HEX_BINARY_O,
       CRYPTO_URI),
   /** XQuery function. */
+  _CRYPTO_SIGN(CryptoSign::new, "sign(value, key, algorithm)",
+      params(STRING_OR_BINARY_O, STRING_OR_BINARY_OR_MAP_O, options(AlgorithmOptions::new)),
+      BASE64_BINARY_O, CRYPTO_URI),
+  /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature::new, "validate-signature(node)",
       params(XNODE_O), BOOLEAN_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_VERIFY(CryptoVerify::new, "verify(value, signature, key, algorithm)",
+      params(STRING_OR_BINARY_O, BINARY_O, STRING_OR_BINARY_OR_MAP_O,
+      options(AlgorithmOptions::new)), BOOLEAN_O, CRYPTO_URI),
 
   // CSV Module
 
