@@ -20,7 +20,7 @@ public final class DbPutValue extends DbNew {
     final Value input = arg(1).value(qc);
     final String path = toDbPath(arg(2), qc);
     putFile(data, path, ResourceType.VALUE, new DBPut(data, input.shrink(qc), path, info),
-        toEmptyMap(arg(3), qc), qc);
+        toOptions(qc), qc);
     return Empty.VALUE;
   }
 }

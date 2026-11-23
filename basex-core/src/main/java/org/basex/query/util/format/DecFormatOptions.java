@@ -36,17 +36,8 @@ public final class DecFormatOptions extends Options {
   public static final StringOption FORMAT_NAME = new StringOption("format-name", null,
       ChoiceItemType.get(BasicType.NCNAME, BasicType.QNAME).seqType(Occ.ZERO_OR_ONE));
 
-  /**
-   * Default constructor.
-   */
-  public DecFormatOptions() {
-  }
-
-  /**
-   * Constructor with options to be copied.
-   * @param opts options
-   */
-  public DecFormatOptions(final DecFormatOptions opts) {
-    super(opts);
+  @Override
+  protected StringOption stringOption() {
+    return FORMAT_NAME;
   }
 }

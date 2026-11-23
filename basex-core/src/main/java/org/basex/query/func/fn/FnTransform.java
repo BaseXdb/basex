@@ -146,19 +146,21 @@ public final class FnTransform extends StandardFunc {
     final TransformOptions options = toOptions(qc);
     requestedProperties(options);
     version(options);
-    final boolean trusted = trusted(options, CommonOptions.TRUSTED, qc);
+    final boolean trusted = trusted(options, TRUSTED, qc);
     return saxon() ? new SaxonTransform(this, options, trusted, qc).transform() :
-      jaxp(options, qc);
+      jaxp(options, trusted, qc);
   }
 
   /**
    * Performs a transformation via the JAXP interface.
    * @param options transformation options
+   * @param trusted trusted flag
    * @param qc query context
    * @return result map
    * @throws QueryException query exception
    */
-  private XQMap jaxp(final TransformOptions options, final QueryContext qc) throws QueryException {
+  private XQMap jaxp(final TransformOptions options, final boolean trusted,
+      final QueryContext qc) throws QueryException {
     // reject requests that cannot be served by the JAXP interface
     for(final Option<?> option : UNSUPPORTED) {
       if(options.contains(option))
@@ -186,7 +188,7 @@ public final class FnTransform extends StandardFunc {
 
     final String error = Xslt.transform(stylesheet, source,
         tree ? document : new StreamResult(output),
-        options.get(CACHE), trusted(options, CommonOptions.TRUSTED, qc), qc, tr -> {
+        options.get(CACHE), trusted, qc, tr -> {
           params.forEach(tr::setParameter);
           properties.forEach((name, value) -> {
             if(OUTPUT_KEYS.contains(name)) tr.setOutputProperty(name, value);

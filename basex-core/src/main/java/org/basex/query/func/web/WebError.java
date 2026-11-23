@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -21,13 +20,8 @@ public final class WebError extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long status = toLong(arg(0), qc);
     final Value message = arg(1).value(qc);
-    final XQMap options = toEmptyMap(arg(2), qc);
+    final SerializerOptions sopts = toOptions(qc);
     WebFn.status(status, info);
-
-    // serialization parameters (default: plain text)
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.TEXT);
-    sopts.assign(options, qc, info);
 
     // description: message text for a plain string, generic phrase for a structured body
     final String desc = message instanceof final AStr str ? Token.string(str.string(info)) :

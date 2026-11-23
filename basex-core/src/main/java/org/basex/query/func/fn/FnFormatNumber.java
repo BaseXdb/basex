@@ -8,8 +8,8 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -23,22 +23,13 @@ public final class FnFormatNumber extends StandardFunc {
     final Expr value = arg(0);
     Item number = atomItem(value, qc);
     final byte[] picture = toToken(arg(1), qc);
-    final Item options = arg(2).unwrappedItem(qc, info);
+    final DecFormatOptions options = toOptions(qc);
 
     // check input
     number = number.isEmpty() ? Dbl.NAN : toNumber(number, value);
 
-    // find decimal-format name
-    DecFormatOptions dfo = null;
-    final String name;
-    if(options instanceof XQMap) {
-      dfo = toOptions(options, new DecFormatOptions(), qc);
-      name = dfo.get(DecFormatOptions.FORMAT_NAME);
-    } else {
-      name = toStringOrNull(options, arg(2), qc);
-    }
-
     // create formatter, based on decimal-format name
+    final String name = options.get(DecFormatOptions.FORMAT_NAME);
     DecFormatter df = null;
     try {
       df = sc().decFormat(name != null ? QNm.parse(trim(token(name)), qc, sc()) : QNm.EMPTY, info);
@@ -47,10 +38,16 @@ public final class FnFormatNumber extends StandardFunc {
     }
     if(df == null) throw FORMATWHICH_X.get(info, name);
 
-    // enrich formatter, based on options
+    // enrich formatter, based on supplied options
+    DecFormatOptions dfo = null;
+    for(final Option<?> option : options) {
+      if(option == DecFormatOptions.FORMAT_NAME || !options.contains(option)) continue;
+      if(dfo == null) dfo = df.options().copy();
+      dfo.put(option, options.get(option));
+    }
     if(dfo != null) {
       try {
-        df = new DecFormatter(toOptions(options, new DecFormatOptions(df.options()), qc), info);
+        df = new DecFormatter(dfo, info);
       } catch(final QueryException ex) {
         throw FORMATINV_X.get(info, ex.getLocalizedMessage()).cause(ex);
       }

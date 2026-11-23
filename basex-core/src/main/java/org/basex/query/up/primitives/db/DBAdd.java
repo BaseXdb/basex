@@ -10,8 +10,8 @@ import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Add primitive.
@@ -45,14 +45,14 @@ public final class DBAdd extends DBUpdate {
    * @param inputs documents to add (IO or ANode instances)
    * @throws QueryException query exception
    */
-  public DBAdd(final Data data, final XQMap qopts, final boolean replace,
+  public DBAdd(final Data data, final Options qopts, final boolean replace,
       final QueryContext qc, final InputInfo info, final NewInput... inputs)
       throws QueryException {
 
     super(UpdateType.DBADD, data, info);
     this.replace = replace;
 
-    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, qc, info);
+    final DBOptions dbopts = new DBOptions(qopts, qc, info);
     final MainOptions mopts = dbopts.mainOptions();
     newDocs = new DBNew(qc, mopts, info, inputs);
     for(final NewInput input : inputs) {

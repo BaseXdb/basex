@@ -9,7 +9,6 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -25,7 +24,7 @@ public final class DbPut extends DbNew {
     final Data data = toData(qc);
     final Item input = toNodeOrAtomItem(arg(1), false, qc);
     final String path = toDbPath(arg(2), qc);
-    final XQMap options = toEmptyMap(arg(3), qc);
+    final DbOptions options = toOptions(qc);
 
     if(input instanceof Bin) {
       // store binary resource
@@ -39,11 +38,10 @@ public final class DbPut extends DbNew {
       if(put(docs, tree ? 0 : data.resources.files(path), options)) {
         // store XML documents: replace existing document or add new ones
         final Updates updates = qc.updates();
-        final XQMap opts = options.remove(REPLACE);
         int d = 0;
         final Update update = docs.isEmpty() ?
-          new DBAdd(data, opts, true, qc, info, ni) :
-          new ReplaceDoc(docs.get(d++), data, ni, opts, qc, info);
+          new DBAdd(data, options, true, qc, info, ni) :
+          new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
         updates.add(update, qc);
         if(!tree) deleteFiles(data, path, null, qc);
         // delete spare documents

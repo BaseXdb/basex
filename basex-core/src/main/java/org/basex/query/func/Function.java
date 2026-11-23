@@ -56,6 +56,7 @@ import org.basex.query.func.web.*;
 import org.basex.query.func.xquery.*;
 import org.basex.query.func.xslt.*;
 import org.basex.query.util.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.http.RequestOptions;
@@ -331,7 +332,7 @@ public enum Function implements AFunction {
       params(INTEGER_ZO, STRING_O, STRING_ZO), STRING_O),
   /** XQuery function. */
   FORMAT_NUMBER(FnFormatNumber::new, "format-number(value, picture, options?)",
-      params(NUMERIC_ZO, STRING_O, STRING_OR_MAP_ZO), STRING_O),
+      params(NUMERIC_ZO, STRING_O, options(DecFormatOptions::new)), STRING_O),
   /** XQuery function. */
   FORMAT_TIME(FnFormatTime::new, "format-time(value, picture, language?, calendar?, place?)",
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
@@ -454,7 +455,8 @@ public enum Function implements AFunction {
       params(), INTEGER_O, flag(POS, CTX)),
   /** XQuery function. */
   LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri, options?)",
-      params(STRING_O, MAP_ZO), Records.LOAD_XQUERY_MODULE.get().seqType(),
+      params(STRING_O, options(FnLoadXQueryModule.LoadXQueryModuleOptions::new)),
+      Records.LOAD_XQUERY_MODULE.get().seqType(),
       flag(NDT, HOF), FN_URI),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name(node?)",
@@ -1364,7 +1366,8 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _DB_ADD(DbAdd::new, "add(database, inputs, paths?, options?)",
-      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, options(DbOptions.Parsing::new)),
+      EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_ALTER(DbAlter::new, "alter(database, newname)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1394,7 +1397,8 @@ public enum Function implements AFunction {
       MapType.get(BasicType.ANY_ATOMIC_TYPE, INTEGER_O).seqType(), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate::new, "create(database, inputs?, paths?, options?)",
-      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, options(DbOptions.Create::new)),
+      EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database?, options?)",
       params(STRING_ZO, options(CreateBackupOptions::new)), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1462,7 +1466,8 @@ public enum Function implements AFunction {
       params(XNODE_ZM), INTEGER_ZM, DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize::new, "optimize(database, all?, options?)",
-      params(STRING_O, BOOLEAN_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, BOOLEAN_ZO, options(DbOptions.Indexing::new)), EMPTY_SEQUENCE_Z,
+      flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTION(DbOption::new, "option(key)",
       params(STRING_O), ITEM_O, flag(NDT), DB_URI),
@@ -1481,13 +1486,15 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_PUT(DbPut::new, "put(database, input, path, options?)",
       params(STRING_O, ChoiceItemType.get(NodeType.XNODE, STRING_OR_BINARY).seqType(), STRING_O,
-      MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      options(DbOptions.Put::new)), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database, input, path, options?)",
-      params(STRING_O, STRING_OR_BINARY_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, STRING_OR_BINARY_O, STRING_O, options(DbOptions.Replace::new)),
+      EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_VALUE(DbPutValue::new, "put-value(database, input, path, options?)",
-      params(STRING_O, ITEM_ZM, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, ITEM_ZM, STRING_O, options(DbOptions.Replace::new)), EMPTY_SEQUENCE_Z,
+      flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database, source, target)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1517,13 +1524,14 @@ public enum Function implements AFunction {
       params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI, Perm.ADMIN),
   /** XQuery function. */
   _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(source, options?)",
-      params(BINARY_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI),
+      params(BINARY_O, options(DbOptions.Parsing::new)), DOCUMENT_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(source)",
       params(STRING_O), STRING_O, flag(NDT), FETCH_URI, Perm.ADMIN),
   /** XQuery function. */
   _FETCH_DOC(FetchDoc::new, "doc(source, options?)",
-      params(STRING_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI, Perm.ADMIN),
+      params(STRING_O, options(DbOptions.Parsing::new)), DOCUMENT_O, flag(NDT), FETCH_URI,
+      Perm.ADMIN),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(source, encoding?, fallback?)",
       params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI, Perm.ADMIN),
@@ -2244,7 +2252,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
   _WEB_ERROR(WebError::new, "error(status, message, options?)",
-      params(INTEGER_O, ITEM_ZM, MAP_ZO), ERROR_O, flag(NDT), WEB_URI),
+      params(INTEGER_O, ITEM_ZM, options(SerializerOptions::text)), ERROR_O, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect::new, "redirect(url, parameters?, anchor?, status?)",
       params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), NodeType.get(Q_REST_RESPONSE).seqType(),

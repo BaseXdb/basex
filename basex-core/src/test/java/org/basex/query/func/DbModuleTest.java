@@ -121,9 +121,6 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
-    query(func.args(NAME, CSV, "csv1.xml",
-        " { 'parser': 'csv', 'csvparser': 'header=true' }"));
-    query("exists(" + _DB_GET.args(NAME, "csv1.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv2.xml",
         " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }"));
     query("exists(" + _DB_GET.args(NAME, "csv2.xml") + "//City)", true);
@@ -133,13 +130,15 @@ public final class DbModuleTest extends SandboxTest {
 
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
-    error(func.args(NAME, CSV, "csv.xml",
-        " { 'parser': 'csv', 'csvparser': { 'header': ('true', 'false') } }"),
-        INVALIDOPTION_X_X_X);
+    query(func.args(NAME, CSV, "csv4.xml",
+        " { 'parser': 'csv', 'csvparser': { 'header': ('A', 'B') } }"));
+    query("exists(" + _DB_GET.args(NAME, "csv4.xml") + "//A)", true);
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': 'csv', 'csvparser': { 'headr': 'true' } }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
+    error(func.args(NAME, CSV, "csv.xml",
+        " { 'parser': 'csv', 'csvparser': 'header=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), DB_PATH_X);
     error("declare base-uri 'http://x/y.xml'; " + func.args(NAME, " document { <a/> }"),

@@ -1045,23 +1045,22 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   protected final boolean trustExternal(final Options options, final QueryContext qc) {
-    return qc.has(Perm.ADMIN, null, info) &&
-        trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
+    final Boolean trust = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
+    return qc.has(Perm.ADMIN, null, info) && (trust != null ? trust :
+      qc.context.options.get(MainOptions.TRUSTEXTERNAL));
   }
 
   /**
-   * Indicates if external resources may be retrieved. If the option was not specified, the value
-   * of {@link MainOptions#TRUSTEXTERNAL} is returned.
+   * Indicates if the current code and the specified trust option grant full permissions.
    * @param options options
-   * @param name name of the trust option
+   * @param option trust option
    * @param qc query context
    * @return result of check
    */
-  protected final boolean trusted(final Options options, final String name, final QueryContext qc) {
-    final Object trusted = options.get(name);
+  protected final boolean trusted(final Options options, final BooleanOption option,
+      final QueryContext qc) {
     // untrusted code cannot grant itself access
-    return trusted(qc) && (trusted != null ? (Boolean) trusted :
-      qc.context.options.get(MainOptions.TRUSTEXTERNAL));
+    return trusted(qc) && options.get(option) == Boolean.TRUE;
   }
 
   /**

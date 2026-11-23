@@ -20,7 +20,7 @@ import org.xml.sax.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MainOptions extends Options {
+public class MainOptions extends Options {
   // General
 
   /** Flag for creating a main memory database. */
@@ -263,6 +263,14 @@ public final class MainOptions extends Options {
    * Default constructor.
    */
   public MainOptions() {
+  }
+
+  /**
+   * Constructor with or without default values.
+   * @param defaults assign default values
+   */
+  protected MainOptions(final boolean defaults) {
+    super(defaults);
   }
 
   /**

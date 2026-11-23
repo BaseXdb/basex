@@ -191,6 +191,16 @@ public final class SerializerOptions extends Options {
   }
 
   /**
+   * Returns serialization parameters with the text output method.
+   * @return serialization parameters
+   */
+  public static SerializerOptions text() {
+    final SerializerOptions options = new SerializerOptions();
+    options.set(METHOD, SerialMethod.TEXT);
+    return options;
+  }
+
+  /**
    * Returns serialization parameters for serializing to a string.
    * @return serialization parameters
    */

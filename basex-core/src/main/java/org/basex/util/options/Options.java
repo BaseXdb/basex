@@ -128,7 +128,7 @@ public class Options implements Iterable<Option<?>> {
    * Default constructor.
    */
   public Options() {
-    this((IOFile) null);
+    this(true);
   }
 
   /**
@@ -136,10 +136,18 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file (can be {@code null})
    */
   protected Options(final IOFile opts) {
-    meta = META.get(getClass());
-    values = meta.values.clone();
-    free = new HashMap<>();
+    this(true);
     if(opts != null) read(opts);
+  }
+
+  /**
+   * Constructor with or without default values.
+   * @param defaults assign default values
+   */
+  protected Options(final boolean defaults) {
+    meta = META.get(getClass());
+    values = defaults ? meta.values.clone() : new Object[meta.values.length];
+    free = new HashMap<>();
   }
 
   /**
@@ -609,7 +617,7 @@ public class Options implements Iterable<Option<?>> {
    * @return name
    * @throws QueryException query exception
    */
-  public static String name(final Item name, final InputInfo info) throws QueryException {
+  private static String name(final Item name, final InputInfo info) throws QueryException {
     if(name instanceof final QNm qnm) {
       // implementation-defined options must have a non-absent namespace
       if(qnm.uri().length == 0) throw INVALIDOPTION_X.get(info,
@@ -627,7 +635,7 @@ public class Options implements Iterable<Option<?>> {
    * @return string
    * @throws QueryException query exception
    */
-  public static String serialize(final Value value, final InputInfo info) throws QueryException {
+  private static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Item item : value) {
       if(!tb.isEmpty()) tb.add(' ');
@@ -759,7 +767,7 @@ public class Options implements Iterable<Option<?>> {
    * @param options options
    * @return error string
    */
-  public static String similar(final Object option, final Map<String, Option<?>> options) {
+  private static String similar(final Object option, final Map<String, Option<?>> options) {
     if(Removed.option(string(token(option))) != null) return unknown(option);
     final String[] names = options.keySet().stream().sorted().toArray(String[]::new);
     final String similar = Levenshtein.similar(token(option), names);
@@ -933,10 +941,11 @@ public class Options implements Iterable<Option<?>> {
     for(int e = 0; e < es; e += 2) {
       final Expr value = entries.get(e + 1);
       if(value == Empty.UNDEFINED || !(entries.get(e) instanceof final Item key)) continue;
-      final Option<?> option = definitions().get(name(key, info));
+      final String name = name(key, info);
+      final Option<?> option = definitions().get(name);
       if(option == null) continue;
       if(value instanceof final Value val) {
-        assign(option.name(), val, qc, info);
+        assign(name, val, qc, info);
       } else if(option instanceof final OptionsOption<?> oo) {
         // nested options
         final Options options = oo.newInstance();
@@ -1041,7 +1050,7 @@ public class Options implements Iterable<Option<?>> {
    * @param options current options (can be {@code null})
    * @return error string or {@code null}
    */
-  public static String assign(final Option<?> option, final String value, final int index,
+  private static String assign(final Option<?> option, final String value, final int index,
       final Consumer<Object> assign, final Options options) {
 
     final String name = option.name();

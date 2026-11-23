@@ -23,7 +23,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -32,8 +31,10 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class DbNew extends DbAccessFn {
-  /** Key of the replace option. */
-  static final Str REPLACE = Str.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH));
+  @Override
+  protected QueryException error(final QueryException ex) {
+    return error(ex, BASEX_OPTIONS_X);
+  }
 
   /**
    * Creates a container for the specified XML input. Used by functions that only accept
@@ -203,14 +204,9 @@ abstract class DbNew extends DbAccessFn {
    * @param files number of existing file resources
    * @param options options
    * @return result of check
-   * @throws QueryException query exception
    */
-  final boolean put(final IntList docs, final int files, final XQMap options)
-      throws QueryException {
-    final Value pr = options.get(REPLACE);
-    if(pr.isEmpty() || Strings.toBoolean(Options.serialize(pr, info))) return true;
-
-    return docs.isEmpty() && files == 0;
+  final boolean put(final IntList docs, final int files, final DbOptions options) {
+    return options.get(MainOptions.REPLACE) != Boolean.FALSE || docs.isEmpty() && files == 0;
   }
 
   /**
@@ -241,7 +237,7 @@ abstract class DbNew extends DbAccessFn {
    * @throws QueryException query exception
    */
   final void putFile(final Data data, final String path, final ResourceType type,
-      final Update up, final XQMap options, final QueryContext qc) throws QueryException {
+      final Update up, final DbOptions options, final QueryContext qc) throws QueryException {
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
     final IntList docs = data.resources.docsAt(path);

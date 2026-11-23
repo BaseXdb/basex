@@ -26,6 +26,11 @@ public class FetchDoc extends StandardFunc {
     return fetch(toIO(arg(0), qc), qc);
   }
 
+  @Override
+  protected QueryException error(final QueryException ex) {
+    return error(ex, BASEX_OPTIONS_X);
+  }
+
   /**
    * Parses the input and creates an XML document.
    * @param source source
@@ -34,7 +39,7 @@ public class FetchDoc extends StandardFunc {
    * @throws QueryException query exception
    */
   protected DBNode fetch(final IO source, final QueryContext qc) throws QueryException {
-    final DBOptions dbopts = new DBOptions(toEmptyMap(arg(1), qc), MainOptions.PARSING, qc, info);
+    final DBOptions dbopts = new DBOptions(toOptions(qc), qc, info);
     final MainOptions mopts = dbopts.mainOptions();
     // external entities, XIncludes and catalogs require ADMIN permission
     if(!qc.has(Perm.ADMIN, null, info)) mopts.allowExternal(false);

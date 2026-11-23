@@ -10,9 +10,6 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -32,44 +29,24 @@ public final class DBOptions {
 
   /**
    * Constructor.
-   * @param qopts query options
-   * @param supported supported options
+   * @param options supplied options
    * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DBOptions(final XQMap qopts, final Option<?>[] supported, final QueryContext qc,
-      final InputInfo info) throws QueryException {
+  public DBOptions(final Options options, final QueryContext qc, final InputInfo info)
+      throws QueryException {
 
     this.qc = qc;
     this.info = info;
-    final HashMap<String, Option<?>> options = new HashMap<>();
-    for(final Option<?> option : supported) {
-      options.put(option.name().toLowerCase(Locale.ENGLISH), option);
-    }
-
-    for(final Item key : qopts.keys()) {
-      final String name = Options.name(key, info);
-      final Option<?> option = options.get(name);
-      if(option == null) throw BASEX_OPTIONS_X.get(info, Options.similar(name, options));
-      if(MainOptions.admin(option)) qc.checkPerm(Perm.ADMIN, null, name, info);
-
-      // nested maps and functions cannot be serialized as strings and are assigned with types
-      Value value = qopts.get(key);
-      XQMap typed = XQMap.empty();
-      if(option instanceof OptionsOption && value instanceof final XQMap nested) {
-        final MapBuilder strings = new MapBuilder(), values = new MapBuilder();
-        for(final Item k : nested.keys()) {
-          final Value v = nested.get(k);
-          (v instanceof FItem ? values : strings).put(k, v);
-        }
-        value = strings.map();
-        typed = values.map();
+    for(final Option<?> option : options) {
+      final Object value = options.get(option);
+      if(value == null) continue;
+      if(MainOptions.admin(option)) {
+        qc.checkPerm(Perm.ADMIN, null, option.name().toLowerCase(Locale.ENGLISH), info);
       }
-      final String error = Options.assign(option, Options.serialize(value, info), -1,
-          v -> map.put(option, v), null);
-      if(error != null) throw BASEX_OPTIONS_X.get(info, error);
-      if(typed.structSize() != 0) ((Options) map.get(option)).assign(typed, qc, info);
+      // nested options may be shared by several evaluations
+      map.put(option, value instanceof final Options opts ? opts.copy() : value);
     }
   }
 
