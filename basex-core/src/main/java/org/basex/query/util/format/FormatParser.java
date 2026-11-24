@@ -45,7 +45,7 @@ abstract class FormatParser extends FormatUtil {
   int radix = 10;
 
   /**
-   * Constructor for formatting integers.
+   * Constructor.
    * @param info input info (can be {@code null})
    */
   FormatParser(final InputInfo info) {

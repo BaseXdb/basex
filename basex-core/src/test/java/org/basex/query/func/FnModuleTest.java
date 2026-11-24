@@ -2451,6 +2451,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')",
         "[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]", " ()", " ()", "Asia/Kolkata"),
         "2023-07-01T17:30:00+05:30");
+    // unsupported language: timezone names fall back to English
+    query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')", "[H]:[m] [ZN]", "xx-YY", " ()",
+        "Europe/Berlin"), "[Language: en]14:00 CEST");
   }
 
   /** Test method. */
@@ -2492,6 +2495,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:date('0000-01-01')", "[E][Y]", " ()", "ISO", " ()"), "0");
     query(func.args(" xs:date('-0044-03-15')", "[E][Y]", " ()", "ISO", " ()"), "-44");
     query(func.args(" xs:date('2024-03-15')", "[E][Y]", " ()", "ISO", " ()"), "2024");
+    query(func.args(" xs:date('2024-03-15')", "[CN]", " ()", "ISO", " ()"), "ISO");
+    query(func.args(" xs:date('2024-03-15')", "[CN]", " ()", "AD", " ()"), "AD");
+    // picture is mandatory
+    error(func.args(" xs:date('2024-03-15')", " ()"), INVTYPE_X);
 
     if(ExternalLib.ICU.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
@@ -2503,6 +2510,8 @@ public final class FnModuleTest extends SandboxTest {
       query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-CZ"), "Septiembre");
       // fallback to default language
       query(func.args(" xs:date('2023-09-01')", "[MNn]", "zu-DE"), "[Language: en]September");
+      // Gregorian names for locales with other default calendars
+      query(func.args(" xs:date('2026-03-01')", "[MNn]", "fa"), "مارس");
     }
   }
 
@@ -2538,8 +2547,17 @@ public final class FnModuleTest extends SandboxTest {
     if(ExternalLib.ICU.available()) {
       query(func.args(1, "Ww;c", "de"), "Ein");
       query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
-      query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");
+      query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primero");
       query(func.args(99, "w", "fr"), "quatre-vingt-dix-neuf");
+      // numbers outside the range of the rule set: fallback to format token 1
+      query(func.args(1000000000000000000L, "w", "en"), "1000000000000000000");
+      query(func.args(1000000000000000000L, "W;o", "en"), "1000000000000000000th");
+      query(func.args(" -9223372036854775808", "w;o", "en"), "-9223372036854775808th");
+      query(func.args(" -9223372036854775808", "1;o", "en"), "-9223372036854775808th");
+      // modifier endings only select rule sets of the requested numeral type
+      query(func.args(1, "w;c(-e)", "de"), "eine");
+      // ordinal suffix after non-ASCII digits
+      query(func.args(21, "1;o", "en-US-u-nu-arab"), "21st");
       // different wording for country
       query(func.args(99, "w", "fr-CH"), "nonante-neuf");
       // fallback to language code
@@ -2551,12 +2569,12 @@ public final class FnModuleTest extends SandboxTest {
     // empty input, not known at compile time
     query(func.args(" let $x :=" + _RANDOM_INTEGER.args() + " return ()", "0"), "");
 
-    // minimum integer: only supported for digit patterns
+    // minimum integer: other format tokens fall back to 1
     query(func.args(" -9223372036854775808", "#,##0"), "-9,223,372,036,854,775,808");
     query(func.args(" -9223372036854775808", "1"), "-9223372036854775808");
-    error(func.args(" -9223372036854775808", "w"), RANGE_X);
-    error(func.args(" -9223372036854775808", "i"), RANGE_X);
-    error(func.args(" -9223372036854775808", "a"), RANGE_X);
+    query(func.args(" -9223372036854775808", "w"), "-9223372036854775808");
+    query(func.args(" -9223372036854775808", "i"), "-9223372036854775808");
+    query(func.args(" -9223372036854775808", "a"), "-9223372036854775808");
   }
 
   /** Test method. */

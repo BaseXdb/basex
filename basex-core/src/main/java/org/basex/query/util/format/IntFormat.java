@@ -63,37 +63,28 @@ public final class IntFormat extends FormatParser {
     // parses the format modifier
     final byte[] mod = substring(picture, sc + 1);
 
-    final TokenParser tp = new TokenParser(mod);
+    final int ml = mod.length;
+    int m = 0;
     // parse cardinal/ordinal flag
-    if(tp.consume('o')) numType = NumeralType.ORDINAL;
-    else if(tp.consume('c')) numType = NumeralType.CARDINAL;
-    if(numType != NumeralType.NUMBERING) {
-      final TokenBuilder tb = new TokenBuilder();
-      if(tp.consume('(')) {
-        while(!tp.consume(')')) {
-          if(!tp.more()) throw INVMODIFIER_X.get(info, mod);
-          tb.add(tp.next());
-        }
-        if(tb.isEmpty()) throw INVMODIFIER_X.get(info, mod);
-        modifier = tb.finish();
+    if(m < ml && (mod[m] == 'o' || mod[m] == 'c')) {
+      numType = mod[m++] == 'o' ? NumeralType.ORDINAL : NumeralType.CARDINAL;
+      if(m < ml && mod[m] == '(') {
+        // the variation string may contain parentheses: it ends at the last closing one
+        final int close = lastIndexOf(mod, ')');
+        if(close <= m + 1) throw INVMODIFIER_X.get(info, mod);
+        modifier = substring(mod, m + 1, close);
+        m = close + 1;
       }
     }
     // parse alphabetical/traditional flag
-    if(!tp.consume('a')) tp.consume('t');
-    if(tp.more()) throw INVMODIFIER_X.get(info, mod);
-  }
-
-  /**
-   * Checks if this format generates digits.
-   * @return result of check
-   */
-  public boolean isDigitFormat() {
-    return zeroes(first) != -1;
+    if(m < ml && (mod[m] == 'a' || mod[m] == 't')) m++;
+    if(m < ml) throw INVMODIFIER_X.get(info, mod);
   }
 
   /**
    * Returns the zero base for the specified code point, or {@code -1}.
    * @param ch character
+   * @return zero base
    */
   @Override
   public int zeroes(final int ch) {

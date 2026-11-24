@@ -36,17 +36,9 @@ abstract class FormatUtil {
     { 0x1E8C7, -1, 1, 9, 0x1E8C7 } // Mende Kikakui digits
   };
 
-  /** Roman numbers (1-10). */
-  static final byte[][] ROMANI =
-    tokens("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX");
-  /** Roman numbers (10-100). */
-  static final byte[][] ROMANX =
-    tokens("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC");
-  /** Roman numbers (100-1000). */
-  static final byte[][] ROMANC =
-    tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM");
-  /** Roman numbers (1000-3000). */
-  static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
+  /** Units of large numbers (million, milliard/billion, ...). */
+  static final long[] UNITS1000000 = {
+    1000000, 1000000000, 1000000000000L, 1000000000000000L, 1000000000000000000L };
 
   /** Alphabet sequences. */
   private static final String[] SEQS = {
@@ -56,22 +48,22 @@ abstract class FormatUtil {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     // Greek numbering
     "\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba" +
-    "\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c2\u03c3\u03c4" +
+    "\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c3\u03c4" +
     "\u03c5\u03c6\u03c7\u03c8\u03c9",
     // Greek numbering (upper case)
     "\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a" +
-    "\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\u03a2\u03a3\u03a4" +
+    "\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\u03a3\u03a4" +
     "\u03a5\u03a6\u03a7\u03a8\u03a9",
     // Hebrew numbering
     "\u05d0\u05d1\u05d2\u05d3\u05d4\u05d5\u05d6\u05d7\u05d8\u05d9\u05db" +
     "\u05dc\u05de\u05e0\u05e1\u05e2\u05e4\u05e6\u05e7\u05e8\u05e9\u05ea",
     // Cyrillic numbering, based on Dmitry Kirsanov's sequence in Saxon.
     "\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u043a" +
-    "\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0441\u0443\u0444" +
+    "\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444" +
     "\u0445\u0446\u0447\u0448\u0449\u044b\u044d\u044e\u044f",
     // Cyrillic numbering (upper case).
     "\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u041a" +
-    "\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0421\u0423\u0424" +
+    "\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424" +
     "\u0425\u0426\u0427\u0428\u0429\u042b\u042d\u042e\u042f",
     // Hiragana A numbering, based on Murakami Shinyu's sequences in Saxon.
     "\u3042\u3044\u3046\u3048\u304a\u304b\u304d\u304f\u3051\u3053" +
@@ -110,6 +102,17 @@ abstract class FormatUtil {
       if(ch == seq.charAt(0)) return seq;
     }
     return null;
+  }
+
+  /**
+   * Returns the index of the largest unit of a large number.
+   * @param n number (at least one million)
+   * @return index into {@link #UNITS1000000}
+   */
+  static int unit(final long n) {
+    int u = UNITS1000000.length;
+    while(--u > 0 && n < UNITS1000000[u]);
+    return u;
   }
 
   /**

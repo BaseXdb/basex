@@ -26,10 +26,9 @@ final class FormatterDE extends Formatter {
   /** Written numbers (1000000, ...). */
   private static final byte[][] WORDS1000000 = tokens(
       "Million", "Milliarde", "Billion", "Billiarde", "Trillion");
-
-  /** Units (100, 1000, ...). */
-  private static final long[] UNITS100 = {
-    1000000, 1000000000, 1000000000000L, 1000000000000000L, 1000000000000000000L };
+  /** Stems of ordinal numbers (1000000, ...). */
+  private static final byte[][] ORDINALS1000000 = tokens(
+      "million", "milliard", "billion", "billiard", "trillion");
 
   /** Ordinal Numbers (1-20). */
   private static final byte[][] ORDINALS = tokens("nullt", "erst", "zweit",
@@ -60,10 +59,14 @@ final class FormatterDE extends Formatter {
   private static final byte[] UND = token("und");
   /** Token: ein. */
   private static final byte[] EIN = token("ein");
-  /** Token: eine. */
-  private static final byte[] EINE = token("eine");
   /** Token: e. */
   private static final byte[] E = cpToken('e');
+  /** Token: st. */
+  private static final byte[] ST = token("st");
+  /** Declension endings of ordinals. */
+  private static final byte[][] ENDINGS = tokens("e", "em", "en", "er", "es");
+  /** Ordinal suffix of digits. */
+  private static final byte[] DOT = cpToken('.');
   /** Token: hundert. */
   private static final byte[] HUNDERT = token("hundert");
   /** Token: tausend. */
@@ -72,42 +75,31 @@ final class FormatterDE extends Formatter {
   /** Eras: BC, AD. */
   private static final byte[][] ERAS = tokens("v. Chr.", "n. Chr.");
 
+  /**
+   * Constructor.
+   */
+  FormatterDE() {
+    super(MONTHS, DAYS, AMPM, ERAS);
+  }
+
   @Override
   public byte[] word(final long n, final NumeralType numType, final byte[] modifier) {
-    final byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
+    // declension endings of ordinals (others are ignored)
+    final byte[] mod = modifier == null ? null : delete(modifier, '-');
+    final byte[] suffix = eq(mod, ENDINGS) ? mod : E;
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType, suffix);
     return tb.finish();
   }
 
   @Override
+  protected boolean ordinalWords() {
+    return true;
+  }
+
+  @Override
   public byte[] suffix(final long n, final NumeralType numType) {
-    return numType == ORDINAL ? E : EMPTY;
-  }
-
-  @Override
-  public byte[] month(final int n) {
-    return MONTHS[n];
-  }
-
-  @Override
-  public byte[][] day(final int n) {
-    return DAYS[n];
-  }
-
-  @Override
-  public byte[] ampm(final boolean am) {
-    return AMPM[am ? 0 : 1];
-  }
-
-  @Override
-  public byte[] calendar() {
-    return ERAS[1];
-  }
-
-  @Override
-  public byte[] era(final long year) {
-    return ERAS[year <= 0 ? 0 : 1];
+    return numType == ORDINAL ? DOT : EMPTY;
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -117,20 +109,20 @@ final class FormatterDE extends Formatter {
    * @param tb token builder
    * @param n number to be formatted
    * @param numType numeral type
-   * @param suffix suffix (can be {@code null} or empty)
+   * @param suffix ordinal suffix (can be {@code null})
    */
   private static void word(final TokenBuilder tb, final long n, final NumeralType numType,
       final byte[] suffix) {
     if(n == 0 && !tb.isEmpty()) {
-      if(numType == ORDINAL) tb.add("st").add(suffix == null ? E : suffix);
+      if(numType == ORDINAL) tb.add(ST).add(suffix);
     } else if(n < 20) {
       if(numType != ORDINAL) tb.add(WORDS[(int) n]);
-      else tb.add(ORDINALS[(int) n]).add(suffix == null ? E : suffix);
+      else tb.add(ORDINALS[(int) n]).add(suffix);
     } else if(n < 100) {
       final int r = (int) (n % 10);
       if(r != 0) tb.add(r == 1 ? EIN : WORDS[r]).add(UND);
       tb.add(WORDS20[(int) n / 10]);
-      if(numType == ORDINAL) tb.add("st").add(suffix == null ? E : suffix);
+      if(numType == ORDINAL) tb.add(ST).add(suffix);
     } else if(n < 1000) {
       if(n < 200) tb.add(EIN);
       else word(tb, n / 100, NUMBERING, null);
@@ -139,23 +131,29 @@ final class FormatterDE extends Formatter {
     } else if(n < 1000000) {
       final long m = n % 100000;
       word(tb, n / 1000, NUMBERING, null);
-      if(m >= 1000 && m < 2000) tb.delete(tb.size() - 1, tb.size());
+      if(m >= 1000 && m < 2000) tb.removeLast();
       tb.add(TAUSEND);
       word(tb, n % 1000, numType, suffix);
     } else {
-      int w = WORDS1000000.length;
-      while(--w > 0 && n < UNITS100[w]);
-      final long f = UNITS100[w];
+      final int w = unit(n);
+      final long f = UNITS1000000[w];
 
-      final long i = n / f;
-      if(i == 1) tb.add(EINE);
-      else word(tb, i, NUMBERING, null);
-      tb.add(' ').add(WORDS1000000[w]);
-      final long r = n % f;
-      if(numType == ORDINAL && r == 0) {
-        tb.add("st").add(suffix == null ? E : suffix);
-      } else if(i > 1) {
-        tb.add(w % 2 == 0 ? "en" : "n");
+      final long i = n / f, r = n % f;
+      // ordinals of round values are compounds (einmillionste, zweimillionste)
+      final boolean compound = numType == ORDINAL && r == 0;
+      // trailing one: einmillionste, eine Million, einhunderteine Millionen
+      if(i % 100 == 1) {
+        if(i > 1) word(tb, i - 1, NUMBERING, null);
+        tb.add(EIN);
+        if(!compound) tb.add(E);
+      } else {
+        word(tb, i, NUMBERING, null);
+      }
+      if(compound) {
+        tb.add(ORDINALS1000000[w]).add(ST).add(suffix);
+      } else {
+        tb.add(' ').add(WORDS1000000[w]);
+        if(i > 1) tb.add(w % 2 == 0 ? "en" : "n");
       }
       if(r != 0) {
         tb.add(' ');

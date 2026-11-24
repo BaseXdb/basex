@@ -38,8 +38,6 @@ final class DateFormat extends FormatParser {
   final int optional;
   /** Modulus for reducing years to the requested number of digits ({@code 0}: none). */
   long yearModulus;
-  /** Indicates if the digits of fractional seconds are output. */
-  boolean fraction;
 
   /**
    * Constructor.
@@ -63,16 +61,13 @@ final class DateFormat extends FormatParser {
     final byte[] picture = substring(marker, 1);
     final int comma = lastIndexOf(picture, ',');
     byte[] pres = comma == -1 ? picture : substring(picture, 0, comma);
-    // extract second presentation modifier
-    final int pl = pres.length;
-    if(pl > 1) {
-      final int p = pres[pl - 1];
-      if(p == 'a' || p == 'c' || p == 'o' || p == 't') {
-        pres = substring(pres, 0, pl - 1);
-        if(p == 'o') numType = NumeralType.ORDINAL;
-        if(p == 't') trad = true;
-      }
+    // extract second presentation modifier: numeral type (c, o), followed by style (a, t)
+    int pl = pres.length;
+    if(pl > 1 && (pres[pl - 1] == 'a' || pres[pl - 1] == 't')) trad = pres[--pl] == 't';
+    if(pl > 1 && (pres[pl - 1] == 'c' || pres[pl - 1] == 'o')) {
+      if(pres[--pl] == 'o') numType = NumeralType.ORDINAL;
     }
+    pres = substring(pres, 0, pl);
 
     // choose first character and case
     try {
@@ -82,8 +77,8 @@ final class DateFormat extends FormatParser {
     }
 
     // check width modifier
-    final byte[] width = comma == -1 ? null : substring(picture, comma + 1);
-    if(width != null) {
+    if(comma != -1) {
+      final byte[] width = substring(picture, comma + 1);
       final Matcher m = WIDTH.matcher(string(width));
       if(!m.find()) throw PICDATE_X.get(info, width);
       final String mn = m.group(1), mx = m.group(3);
@@ -92,9 +87,18 @@ final class DateFormat extends FormatParser {
         if(min < 1) throw PICDATE_X.get(info, width);
       }
       if(mx != null && !mx.equals("*")) {
+        // maximum widths beyond the integer range are unbounded
         max = Strings.toInt(mx);
+        if(max == Integer.MIN_VALUE) max = Integer.MAX_VALUE;
         if(max < 1 || max < min) throw PICDATE_X.get(info, width);
       }
+    }
+
+    // no name available, or fractional seconds without digits: decimal output
+    final boolean zone = comp == 'Z' || comp == 'z', names = first == 'n' && contains(NAMES, comp);
+    if(first == 'n' && !names && !zone || comp == 'f' && zeroes(first) == -1) {
+      first = '0';
+      primary = ONE;
     }
 
     // count digit signs of the presentation modifier
@@ -118,19 +122,12 @@ final class DateFormat extends FormatParser {
       }
     }
 
-    // timezones: widths are applied to the output
-    if(comp == 'Z' || comp == 'z') return;
-    if(first == 'n') {
-      // names: widths are applied to the output
-      if(contains(NAMES, comp)) return;
-      // no name available: decimal output
-      first = '0';
-      primary = ONE;
-    } else if(comp == 'f') {
+    // timezones and names: widths are applied to the output
+    if(zone || names) return;
+    if(comp == 'f') {
       // fractional seconds: mandatory digits extend the widths
       max = Math.max(max, md);
       min = Math.max(min, md);
-      fraction = true;
       return;
     }
     // integer-valued component: minimum width is enforced, maximum width is ignored
