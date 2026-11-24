@@ -2573,8 +2573,38 @@ public final class FnModuleTest extends SandboxTest {
     // floats: shortest decimal representation
     query(func.args(" xs:float('0.1')", "0.0"), "0.1");
     query(func.args(" xs:float('34')", "0.0e0"), "3.4e1");
-    query(func.args(" xs:float('1234.5')", "0.000e0"), "1.235e3");
+    query(func.args(" xs:float('1234.5')", "0.000e0"), "1.234e3");
     query(func.args(" xs:float('3.4028235E38')", "0.0e0"), "3.4e38");
+    // floating-point numbers: shortest decimal representation is rounded
+    query(func.args(" 2.675e0", "0.00"), "2.68");
+    query(func.args(" xs:float('2.675')", "0.00"), "2.68");
+    query(func.args(" 1e23", "0.0e0"), "1.0e23");
+    query(func.args(" 1e-7", "0.0e0"), "1.0e-7");
+    query(func.args(" -2.2139886974486133E8", "0.0################e0"),
+        "-2.2139886974486133e8");
+    query(func.args(" xs:float('-2.2139886E8')", "0.0#########e0"), "-2.2139886e8");
+    // mantissa is scaled before it is rounded
+    query(func.args(" 9.6", "0.0e0"), "9.6e0");
+    query(func.args(" 9.99", "0.0e0"), "10.0e0");
+    // large decimals and integers
+    query(func.args(" xs:decimal('1' || string-join((1 to 400) ! '0'))", "0e0"), "1e400");
+    query(func.args(" -xs:decimal('0.' || string-join((1 to 399) ! '0') || '1')", "0.0e0"),
+        "-1.0e-400");
+    query(func.args(" 9223372036854775807", "0%"), "922337203685477580700%");
+    query(func.args(" -9223372036854775808", "0‰"), "-9223372036854775808000‰");
+    // infinity: no exponent
+    query(func.args(" xs:double('-INF')", "0.0e0"), "-Infinity");
+    // grouping separator at the end of the integer part
+    error(func.args(1, "0,e0"), PICNUM_X);
+    error(func.args(1, "#,%"), PICNUM_X);
+    query(func.args(1, "0.0,%"), "100.0%");
+    // exponent-separator characters treated as passive
+    query(func.args(5, "0 sec"), "5 sec");
+    query(func.args(5, "0ee"), "5ee");
+    query(func.args(5, "0e0 e"), "5e0 e");
+    error(func.args(5, "0 e0"), PICNUM_X);
+    // languages with multi-character exponent separators
+    query(func.args(12345, "0e0", "sv"), "1×10^4");
 
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "

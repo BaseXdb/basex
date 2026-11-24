@@ -27,6 +27,7 @@ public final class FnFormatNumberTest extends SandboxTest {
     error("declare default decimal-format percent=','; 1", DUPLDECFORM_X);
     // unknown decimal-format property
     error("declare default decimal-format xxx='x'; 1", FORMPROP_X);
+    error("declare default decimal-format format-name='x'; 1", FORMPROP_X);
     // invalid decimal-format property
     error("declare default decimal-format zero-digit='x'; 1", INVDECFORM_X_X);
     error("declare default decimal-format percent='xxx'; 1", INVDECFORM_X_X);
@@ -69,7 +70,9 @@ public final class FnFormatNumberTest extends SandboxTest {
     query("format-number(-9999, '#,###')", "-9,999");
 
     query("declare default decimal-format zero-digit = '&#xA66;';"
-        + "format-number(0, '#,i')", "੦,i");
+        + "format-number(0, '#,#i')", "੦i");
+    error("declare default decimal-format zero-digit = '&#xA66;';"
+        + "format-number(0, '#,i')", PICNUM_X);
     query("declare default decimal-format zero-digit = '&#xA66;';"
         + "format-number(1, '#੦')", "੧");
 

@@ -202,6 +202,9 @@ public final class InspectModuleTest extends SandboxTest {
     check(func.args(" fn() { 1 }", "boundary-space"), "strip", root(Str.class));
     query(func.args(" ()", "copy-namespaces"), "preserve\ninherit");
     query(func.args(" ()", "decimal-formats") + "('')('percent')", "%");
+    // decimal formats for languages are not declared
+    query("format-number(" + wrap(1) + ", '0', 'de'), map:keys(" +
+        func.args(" ()", "decimal-formats") + ")", "1\n");
 
     // check different function types
     query(func.args(" true#0", "boundary-space"), "strip");

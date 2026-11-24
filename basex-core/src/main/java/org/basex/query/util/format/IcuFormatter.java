@@ -283,16 +283,16 @@ public final class IcuFormatter extends Formatter {
     final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
     if(dfs.getLocale(ULocale.ACTUAL_LOCALE).toLanguageTag().equals(languageTag)) {
       final DecFormatOptions dfo = new DecFormatOptions();
-      dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, dfs.getDecimalSeparatorString());
+      dfo.putMarker(DecFormatOptions.DECIMAL_SEPARATOR, dfs.getDecimalSeparatorString(), '.');
       dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
-      dfo.put(DecFormatOptions.GROUPING_SEPARATOR, dfs.getGroupingSeparatorString());
-      dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
+      dfo.putMarker(DecFormatOptions.GROUPING_SEPARATOR, dfs.getGroupingSeparatorString(), ',');
+      dfo.putMarker(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator(), 'e');
       dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
       dfo.put(DecFormatOptions.MINUS_SIGN, dfs.getMinusSignString());
       dfo.put(DecFormatOptions.NAN, dfs.getNaN());
       dfo.put(DecFormatOptions.PATTERN_SEPARATOR, String.valueOf(dfs.getPatternSeparator()));
-      dfo.put(DecFormatOptions.PERCENT, dfs.getPercentString());
-      dfo.put(DecFormatOptions.PER_MILLE, dfs.getPerMillString());
+      dfo.putMarker(DecFormatOptions.PERCENT, dfs.getPercentString(), '%');
+      dfo.putMarker(DecFormatOptions.PER_MILLE, dfs.getPerMillString(), '‰');
       dfo.put(DecFormatOptions.ZERO_DIGIT, String.valueOf(dfs.getZeroDigit()));
       return dfo;
     }

@@ -316,11 +316,12 @@ public final class StaticContext {
       throws QueryException {
     final byte[] id = name.unique();
     DecFormatter df = decFormats.get(id);
-    if(df == null) {
-      // lazy instantiation of default decimal format
-      df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id, info);
-      if(df != null) decFormats.put(id, df);
-    }
+    if(df != null) return df;
+    // decimal formats for languages are not part of the declared formats
+    if(!eq(id, EMPTY)) return DecFormatter.forLanguage(id, info);
+    // lazy instantiation of default decimal format
+    df = new DecFormatter();
+    decFormats.put(id, df);
     return df;
   }
 

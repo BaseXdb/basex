@@ -834,6 +834,9 @@ public class QueryParser extends InputParser {
       skipWs();
       final String prop = string(ncName(null, false));
       if(prop.isEmpty()) break;
+      if(prop.equals(DecFormatOptions.FORMAT_NAME.name())) {
+        throw error(FORMPROP_X, Options.unknown(prop));
+      }
       wsCheck("=");
       if(dfo.get(prop) != null) throw error(DECDUPLPROP_X, prop);
       try {
