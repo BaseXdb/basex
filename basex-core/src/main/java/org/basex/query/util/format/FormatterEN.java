@@ -65,8 +65,15 @@ final class FormatterEN extends Formatter {
   /** Eras: BC, AD. */
   private static final byte[][] ERAS = tokens("BC", "AD");
 
+  /**
+   * Constructor.
+   */
+  FormatterEN() {
+    super(MONTHS, DAYS, AMPM, ERAS);
+  }
+
   @Override
-  public byte[] word(final long n, final NumeralType numType, final byte[] suffix) {
+  public byte[] word(final long n, final NumeralType numType, final byte[] modifier) {
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType);
     return tb.finish();
@@ -77,31 +84,6 @@ final class FormatterEN extends Formatter {
     if(numType != NumeralType.ORDINAL) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
-  }
-
-  @Override
-  public byte[] month(final int n) {
-    return MONTHS[n];
-  }
-
-  @Override
-  public byte[][] day(final int n) {
-    return DAYS[n];
-  }
-
-  @Override
-  public byte[] ampm(final boolean am) {
-    return AMPM[am ? 0 : 1];
-  }
-
-  @Override
-  public byte[] calendar() {
-    return ERAS[1];
-  }
-
-  @Override
-  public byte[] era(final long year) {
-    return ERAS[year <= 0 ? 0 : 1];
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -446,7 +446,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), JNODE_ROOT.seqType(), flag(CNS)),
   /** XQuery function. */
   JVALUE(FnJvalue::new, "jvalue(input?)",
-      params(JNODE_ZO), ITEM_ZM),
+      params(ITEM_ZO), ITEM_ZM),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language, node?)",
       params(STRING_ZO, XNODE_O), BOOLEAN_O),
@@ -796,7 +796,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, options(FnUnparsedTextAvailable.ParseOptions::new)), STRING_ZM,
       flag(NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
-  UPDATE(FnUpdate::new, "update(value, select, actions?)",
+  UPDATE(FnUpdate::new, "update(value, select, actions)",
       params(NODE_OR_MAP_OR_ARRAY_O, NODE_STEP_O, UPDATE_ACTIONS_O),
       NODE_OR_MAP_OR_ARRAY_O, flag(HOF, CNS)),
   /** XQuery function. */

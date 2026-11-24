@@ -48,7 +48,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    win = win.simplifyFor(Simplify.NUMBER, cc);
+    win = win.simplifyFor(Simplify.DATA, cc);
     return this;
   }
 

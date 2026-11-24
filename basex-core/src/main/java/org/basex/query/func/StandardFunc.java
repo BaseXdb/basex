@@ -124,8 +124,9 @@ public abstract class StandardFunc extends Arr {
       final Type type = definition.types[p].type;
       // string-length(string($elem)) → string-length($elem)
       if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-        final Simplify mode = type.instanceOf(BasicType.NUMERIC) ? Simplify.NUMBER :
-            type.instanceOf(BasicType.STRING) ? Simplify.STRING : Simplify.DATA;
+        final Simplify mode = type == BasicType.DOUBLE ? Simplify.NUMBER :
+          type == BasicType.NUMERIC ? Simplify.numeric(sc()) :
+          type.instanceOf(BasicType.STRING) ? Simplify.STRING : Simplify.DATA;
         arg(a, arg -> arg.simplifyFor(mode, cc));
       } else if(type instanceof final FuncType ft && ft.declType != null &&
           ft.declType.instanceOf(Types.ANY_ATOMIC_TYPE_ZM)) {
@@ -784,8 +785,8 @@ public abstract class StandardFunc extends Arr {
       binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
     // services are restarted from disk: they must not depend on the options of the caller
-    return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "").
-        queryOptions(service ? null : qc.optionsState());
+    return new QueryJobSpec(options, bindings, content, qc.modules.resolver,
+        uri != null ? null : "").queryOptions(service ? null : qc.optionsState());
   }
 
   /**

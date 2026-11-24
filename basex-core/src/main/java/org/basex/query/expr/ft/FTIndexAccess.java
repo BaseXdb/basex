@@ -57,11 +57,11 @@ public final class FTIndexAccess extends Simple {
         final FTNode item = iter.next();
         if(item != null) {
           // assign scoring
-          if(qc.scoring) item.score();
+          if(qc.ft.scoring) item.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(qc.ftPosData != null) {
+          if(qc.ft.posData != null) {
             final Data data = item.data();
-            qc.ftPosData.add(data, item.pre(), item.matches(), data.meta.language());
+            qc.ft.posData.add(data, item.pre(), item.matches(), data.meta.language());
           }
           // remove matches reference to save memory
           item.matches(null);

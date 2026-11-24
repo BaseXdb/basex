@@ -44,7 +44,7 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs = simplifyAll(Simplify.NUMBER, cc);
+    exprs = simplifyAll(Simplify.DATA, cc);
 
     // pos: 2.0 → pos: 2
     final QueryFunction<Expr, Expr> simplify = expr -> {

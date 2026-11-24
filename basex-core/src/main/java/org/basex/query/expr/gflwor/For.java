@@ -69,12 +69,12 @@ public final class For extends ForLet {
           Item item = null;
           if(iter != null) {
             if(scoring) {
-              final boolean s = qc.scoring;
+              final boolean s = qc.ft.scoring;
               try {
-                qc.scoring = true;
+                qc.ft.scoring = true;
                 item = qc.next(iter);
               } finally {
-                qc.scoring = s;
+                qc.ft.scoring = s;
               }
             } else {
               item = qc.next(iter);
@@ -101,12 +101,12 @@ public final class For extends ForLet {
 
           // next iteration, reset iterator and counter
           if(scoring) {
-            final boolean s = qc.scoring;
+            final boolean s = qc.ft.scoring;
             try {
-              qc.scoring = true;
+              qc.ft.scoring = true;
               iter = expr.iter(qc);
             } finally {
-              qc.scoring = s;
+              qc.ft.scoring = s;
             }
           } else {
             iter = expr.iter(qc);

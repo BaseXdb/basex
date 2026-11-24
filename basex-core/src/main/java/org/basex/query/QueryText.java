@@ -202,6 +202,7 @@ public interface QueryText {
   /** Parser token. */ String DEFAULT_ORDER_EMPTY = "default-order-empty";
   /** Parser token. */ String DECIMAL_FORMATS = "decimal-formats";
 
+  /** Parser token. */ String ARITHMETIC_MODE = "arithmetic-mode";
   /** Parser token. */ String LOCK = "lock";
   /** Parser token. */ String NONDETERMINISTIC = "nondeterministic";
 

@@ -340,11 +340,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value[] values = new Value[pl];
     for(int p = 0; p < pl; p++) values[p] = params[p].checkType(args[p], qc, null);
     final MemoKey key = new MemoKey(this, values);
-    Value value = qc.memo.get(key);
+    Value value = qc.globalCaches.memoized(key);
     if(value == null) {
       value = qc.invoke(params, values, false, expr, simple, null);
       // skip placeholders of deferred tail calls
-      if(qc.tcFunc == null) qc.memo.put(key, value);
+      if(!qc.stack.tailCall()) qc.globalCaches.memoize(key, value);
     }
     return value;
   }

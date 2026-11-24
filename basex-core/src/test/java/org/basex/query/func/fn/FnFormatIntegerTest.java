@@ -34,7 +34,10 @@ public final class FnFormatIntegerTest extends SandboxTest {
     query("format-integer(1, '0.0')", "0.1");
     query("format-integer(1, '0,0')", "0,1");
     query("format-integer(11, '#,0')", "1,1");
-    query("format-integer(111, '##0.0')", "1.1.1");
+    query("format-integer(111, '##0.0')", "11.1");
+    query("format-integer(1111, '#0.0')", "111.1");
+    query("format-integer(1111, '#.#.0')", "1.1.1.1");
+    query("format-integer(1234567, '#,##0')", "1,234,567");
 
     query("string-join(for $i in 1 to 4 return format-integer($i, 'a'))", "abcd");
     query("string-join(for $i in 1 to 4 return format-integer($i, 'A'))", "ABCD");
@@ -100,6 +103,32 @@ public final class FnFormatIntegerTest extends SandboxTest {
         + "20=二十|21=二十一|22=二十二|23=二十三|"
         + "151=百五十一|302=三百二|469=四百六十九|"
         + "2025=二千二十五|");
+    query("string-join(for $i in (10000, 11000, 100000000, 1000000000000) "
+        + "return format-integer($i, '一'), '|')", "一万|一万千|一億|一兆");
+
+    query("format-integer(18, 'а')", "т");
+    query("format-integer(18, 'А')", "Т");
+    query("format-integer(29, 'а')", "я");
+
+    query("format-integer(12, '1;o(a)b)')", "12th");
+    query("format-integer(12, '1;o())t')", "12th");
+    query("format-integer(255, '16^XX;o')", "FFth");
+    query("format-integer(-9223372036854775808, 'w')", "-9223372036854775808");
+    query("format-integer(-9223372036854775808, 'I')", "-9223372036854775808");
+    query("format-integer(-9223372036854775808, '#,##0')", "-9,223,372,036,854,775,808");
+    query("format-integer(1, 'w;o', 'fr')", "premier");
+    query("format-integer(1, 'w;o', 'es')", "primero");
+    query("format-integer(101, 'w;o', 'fr')", "cent unième");
+    query("format-integer(200000000, 'w;o', 'fr')", "deux cent millionième");
+    query("format-integer(2000000, 'w;o(-en)', 'de')", "zweimillionsten");
+    query("format-integer(21, 'w;o(-th)', 'de')", "einundzwanzigste");
+    query("(1, 2) ! format-integer(., 'w;o(-e)', 'fr')", "première\ndeuxième");
+    query("format-integer(1, 'w;o(-s)', 'fr')", "premiers");
+    query("format-integer(2000000, 'w;o', 'de')", "zweimillionste");
+    query("format-integer(2, '1;o', 'de')", "2.");
+    query("format-integer(2, '1;o', 'fr')", "2e");
+    query("(18, 19, 25) ! format-integer(., 'α')", "σ\nτ\nαα");
+    query("format-integer(18, 'Α')", "Σ");
   }
 
   /** fn:format-integer, error cases. */
@@ -109,7 +138,9 @@ public final class FnFormatIntegerTest extends SandboxTest {
     error("format-integer(123, '0١0')", DIFFMAND_X);
     error("format-integer(1234, '٣0٣')", DIFFMAND_X);
     error("format-integer(1, '')", PICEMPTY_X);
-    error("format-integer(1234, 'Ww;o())')", INVMODIFIER_X);
+    error("format-integer(1234, 'Ww;o()')", INVMODIFIER_X);
+    error("format-integer(1234, 'Ww;o(x)y')", INVMODIFIER_X);
+    error("format-integer(1234, 'Ww;o(x')", INVMODIFIER_X);
     error("format-integer(1500000, '0,000,')", INVGROUP_X);
     error("format-integer(1500000, '11#0,000')", OPTAFTER_X);
     error("format-integer(1500000, '0,00,,000')", INVGROUP_X);

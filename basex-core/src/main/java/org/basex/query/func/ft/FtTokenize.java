@@ -37,7 +37,7 @@ public class FtTokenize extends StandardFunc {
 
     final TokenList tl = new TokenList();
     if(item != Empty.VALUE) {
-      final FTOpt opt = new FTOpt().assign(qc.ftOpt());
+      final FTOpt opt = new FTOpt().assign(sc().ftOpt());
       final FTDiacritics dc = options.get(FtLexerOptions.DIACRITICS);
       if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
       final Boolean st = options.get(FtLexerOptions.STEMMING);

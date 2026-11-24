@@ -22,12 +22,12 @@ public enum Calc {
   /** Addition. */
   ADD("+") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case INTEGER -> addInt(item1, item2, info);
           case DOUBLE  -> addDbl(item1, item2, info);
           case FLOAT   -> addFlt(item1, item2, info);
@@ -50,11 +50,11 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) throws QueryException {
       // check for neutral number (-0 + 0 → 0)
       final Type type1 = expr1.seqType().atomType();
-      final Type type = numType(type1, expr2.seqType().atomType());
+      final Type type = numType(type1, expr2.seqType().atomType(), preferred);
       if(expr2 instanceof final ANum num && num.dbl() == 0 &&
           (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) < 0)) {
         return cast(expr1, type, num.type, info, cc);
@@ -75,7 +75,7 @@ public enum Calc {
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
       if(type1 == type2) {
         if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
         if(type1 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
@@ -85,7 +85,7 @@ public enum Calc {
       if(type1 == DATE || type2 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION ||
          type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
-      return numOperandType(type1, type2);
+      return numOperandType(type1, type2, preferred);
     }
 
     @Override
@@ -97,12 +97,12 @@ public enum Calc {
   /** Subtraction. */
   SUBTRACT("-") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case INTEGER -> subtractInt(item1, item2, info);
           case DOUBLE  -> subtractDbl(item1, item2, info);
           case FLOAT   -> subtractFlt(item1, item2, info);
@@ -126,12 +126,12 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) throws QueryException {
 
       // check for neutral number (-0 - -0 → 0)
       final Type type1 = expr1.seqType().atomType();
-      final Type type = numType(type1, expr2.seqType().atomType());
+      final Type type = numType(type1, expr2.seqType().atomType(), preferred);
       if(expr2 instanceof final ANum num && num.dbl() == 0 &&
           (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) >= 0)) {
         return cast(expr1, type, num.type, info, cc);
@@ -147,7 +147,7 @@ public enum Calc {
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
       if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME)) return DAY_TIME_DURATION;
       if(type1 == type2) {
         if(type1.oneOf(DATE, TIME, DAY_TIME_DURATION)) return DAY_TIME_DURATION;
@@ -156,7 +156,7 @@ public enum Calc {
       if(type1.instanceOf(DATE_TIME)) return type1;
       if(type1 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
-      return numOperandType(type1, type2);
+      return numOperandType(type1, type2, preferred);
     }
 
     @Override
@@ -168,8 +168,8 @@ public enum Calc {
   /** Multiplication. */
   MULTIPLY("*") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(type1 == YEAR_MONTH_DURATION) {
@@ -185,7 +185,7 @@ public enum Calc {
       } else if(type2 == DURATION) {
         if(num1) return new Dur((Dur) item2, item1.dbl(info), true, info);
       } else if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case INTEGER -> multiplyInt(item1, item2, info);
           case DOUBLE  -> multiplyDbl(item1, item2, info);
           case FLOAT   -> multiplyFlt(item1, item2, info);
@@ -197,17 +197,18 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) throws QueryException {
 
-      final Type type = numType(expr1.seqType().atomType(), expr2.seqType().atomType());
+      final Type type1 = expr1.seqType().atomType();
+      final Type type = numType(type1, expr2.seqType().atomType(), preferred);
       if(expr2 instanceof final ANum num) {
         final double dbl2 = num.dbl();
         // check for neutral number: $x * 1 → $x
         if(dbl2 == 1) return cast(expr1, type, num.type, info, cc);
         // check for absorbing number: $x * 0 → 0
         if(dbl2 == 0) return type == INTEGER ? Itr.ZERO :
-          type == DECIMAL && num.type == DECIMAL ? Dec.ZERO : null;
+          type1.instanceOf(DECIMAL) && num.type == DECIMAL ? Dec.ZERO : null;
       }
       // $x * $x → math:pow($x, 2)
       if(type == DOUBLE && expr1.equals(expr2)) {
@@ -217,11 +218,11 @@ public enum Calc {
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
       if(type1 == YEAR_MONTH_DURATION || type2 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION || type2 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
       if(type1 == DURATION || type2 == DURATION) return DURATION;
-      return numType(type1, type2);
+      return numType(type1, type2, preferred);
     }
 
     @Override
@@ -233,8 +234,8 @@ public enum Calc {
   /** Division. */
   DIVIDE("div") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(type1 == type2) {
@@ -256,7 +257,7 @@ public enum Calc {
       } else if(type1 == DURATION) {
         if(num2) return new Dur((Dur) item1, item2.dbl(info), false, info);
       } else if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case DOUBLE -> divideDbl(item1, item2, info);
           case FLOAT  -> divideFlt(item1, item2, info);
           default     -> divideDec(item1, item2, info);
@@ -267,31 +268,30 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) throws QueryException {
 
       // check for neutral number
       final Type type1 = expr1.seqType().atomType(), type2 = expr2.seqType().atomType();
-      final Type type = numType(type1, type2);
       // $x div 1 → xs:decimal($x)
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
-        return cast(expr1, type(type1, type2), DECIMAL, info, cc);
+        return cast(expr1, type(type1, type2, preferred), DECIMAL, info, cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       // $x div $x → 1
       if(expr1.equals(expr2)) {
-        return type.oneOf(DECIMAL, INTEGER) ? Dec.ONE : null;
+        return type1.instanceOf(DECIMAL) ? Dec.ONE : null;
       }
       return unnegate(expr1, expr2, info, cc);
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
       if(type1 == type2 && type1.oneOf(YEAR_MONTH_DURATION, DAY_TIME_DURATION)) return DECIMAL;
       if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
       if(type1 == DURATION) return DURATION;
-      final Type type = numType(type1, type2);
+      final Type type = numType(type1, type2, preferred);
       return type == INTEGER ? DECIMAL : type;
     }
 
@@ -304,12 +304,12 @@ public enum Calc {
   /** Integer division. */
   DIVIDEINT("idiv") {
     @Override
-    public Itr eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Itr eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case INTEGER -> divideIntInt(item1, item2, info);
           case DOUBLE  -> divideIntDbl(item1, item2, info);
           case FLOAT   -> divideIntFlt(item1, item2, info);
@@ -320,12 +320,12 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) throws QueryException {
 
       // check for neutral number
       final Type type1 = expr1.seqType().atomType();
-      final Type type = numType(type1, expr2.seqType().atomType());
+      final Type type = numType(type1, expr2.seqType().atomType(), preferred);
       // $x idiv 1 → xs:integer($x)
       if(type1.instanceOf(INTEGER) && expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
@@ -333,7 +333,7 @@ public enum Calc {
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       // $x idiv $x → 1
       if(expr1.equals(expr2)) {
-        return type.oneOf(DECIMAL, INTEGER) ? Itr.ONE : null;
+        return type1.instanceOf(DECIMAL) ? Itr.ONE : null;
       }
       // $x * 6 idiv 3 → $x * 2, $x * 2 idiv 6 → $x idiv 3
       if(type == INTEGER && expr1 instanceof final Arith arth && arth.calc == MULTIPLY &&
@@ -348,7 +348,7 @@ public enum Calc {
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
       return INTEGER;
     }
 
@@ -361,12 +361,12 @@ public enum Calc {
   /** Modulo. */
   MODULO("mod") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final BasicType preferred,
+        final InputInfo info) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 && num2) {
-        return switch(numType(type1, type2)) {
+        return switch(numType(type1, type2, preferred)) {
           case INTEGER -> moduloInt(item1, item2, info);
           case DOUBLE  -> moduloDbl(item1, item2, info);
           case FLOAT   -> moduloFlt(item1, item2, info);
@@ -377,11 +377,11 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) {
+    public Expr optimize(final Expr expr1, final Expr expr2, final BasicType preferred,
+        final InputInfo info, final CompileContext cc) {
 
       // check for neutral number
-      final Type type = numType(expr1.seqType().atomType(), expr2.seqType().atomType());
+      final Type type = numType(expr1.seqType().atomType(), expr2.seqType().atomType(), preferred);
       // $x mod 1 → 0
       if(type == INTEGER && expr2 == Itr.ONE) return Itr.ZERO;
       // $x mod $x → 0; ignore floating numbers (NaN, INF) and decimals (may be integers)
@@ -399,8 +399,8 @@ public enum Calc {
     }
 
     @Override
-    public Type type(final Type type1, final Type type2) {
-      final Type type = numType(type1, type2);
+    public Type type(final Type type1, final Type type2, final BasicType preferred) {
+      final Type type = numType(type1, type2, preferred);
       return type == ANY_ATOMIC_TYPE ? NUMERIC : type;
     }
 
@@ -425,31 +425,35 @@ public enum Calc {
    * Performs the calculation.
    * @param item1 first item
    * @param item2 second item
+   * @param preferred preferred numeric type
    * @param info input info (can be {@code null})
    * @return result item
    * @throws QueryException query exception
    */
-  public abstract Item eval(Item item1, Item item2, InputInfo info) throws QueryException;
+  public abstract Item eval(Item item1, Item item2, BasicType preferred, InputInfo info)
+      throws QueryException;
 
   /**
    * Optimizes the expressions.
    * @param expr1 first expression
    * @param expr2 second expression
+   * @param preferred preferred numeric type
    * @param info input info (can be {@code null})
    * @param cc compilation context
    * @return result expression, or {@code null} if expression cannot be optimized
    * @throws QueryException query exception
    */
-  public abstract Expr optimize(Expr expr1, Expr expr2, InputInfo info, CompileContext cc)
-      throws QueryException;
+  public abstract Expr optimize(Expr expr1, Expr expr2, BasicType preferred, InputInfo info,
+      CompileContext cc) throws QueryException;
 
   /**
    * Returns the result type of this calculation.
    * @param type1 first item type
    * @param type2 second item type
+   * @param preferred preferred numeric type
    * @return result type
    */
-  public abstract Type type(Type type1, Type type2);
+  public abstract Type type(Type type1, Type type2, BasicType preferred);
 
   /**
    * Inverts the operator.
@@ -486,29 +490,37 @@ public enum Calc {
    * Returns the numeric type with the highest precedence.
    * @param type1 first item type
    * @param type2 second item type
+   * @param preferred preferred numeric type
    * @return type
    */
-  public static BasicType numType(final Type type1, final Type type2) {
+  public static BasicType numType(final Type type1, final Type type2,
+      final BasicType preferred) {
     if(!type1.isNumberOrUntyped() || !type2.isNumberOrUntyped()) return ANY_ATOMIC_TYPE;
-    if(type1 == DOUBLE || type2 == DOUBLE || type1.isUntyped() || type2.isUntyped()) return DOUBLE;
-    final boolean dec1 = type1.instanceOf(DECIMAL), dec2 = type2.instanceOf(DECIMAL);
-    if(dec1 && dec2) {
-      return type1.instanceOf(INTEGER) && type2.instanceOf(INTEGER) ? INTEGER : DECIMAL;
-    }
-    return (dec1 || type1 == FLOAT) && (dec2 || type2 == FLOAT) ? FLOAT : NUMERIC;
+    // untyped operands are cast to the preferred type, which takes precedence
+    final Type tp1 = type1.isUntyped() ? preferred : type1;
+    final Type tp2 = type2.isUntyped() ? preferred : type2;
+    final boolean int12 = tp1.instanceOf(INTEGER) && tp2.instanceOf(INTEGER);
+    if(tp1.instanceOf(preferred) || tp2.instanceOf(preferred)) return int12 ? INTEGER : preferred;
+    // other type (decimal or double): no promotion, or promotion to float
+    final BasicType other = preferred == DOUBLE ? DECIMAL : DOUBLE;
+    final boolean other1 = tp1.instanceOf(other), other2 = tp2.instanceOf(other);
+    if(other1 && other2) return int12 ? INTEGER : other;
+    return (other1 || tp1 == FLOAT) && (other2 || tp2 == FLOAT) ? FLOAT : NUMERIC;
   }
 
   /**
    * Returns the static type of an addition or subtraction with a possibly unknown operand type.
    * @param type1 type of first operand
    * @param type2 type of second operand
+   * @param preferred preferred numeric type
    * @return result type
    */
-  private static Type numOperandType(final Type type1, final Type type2) {
-    final Type type = numType(type1, type2);
+  private static Type numOperandType(final Type type1, final Type type2,
+      final BasicType preferred) {
+    final Type type = numType(type1, type2, preferred);
     if(type != ANY_ATOMIC_TYPE) return type;
-    // untyped operands are cast to doubles, numbers can only be combined with numbers
-    return type1.isUntyped() || type2.isUntyped() ? DOUBLE :
+    // untyped operands are cast to the preferred type, numbers can only be combined with numbers
+    return type1.isUntyped() || type2.isUntyped() ? preferred :
       type1.isNumber() || type2.isNumber() ? NUMERIC : type;
   }
 

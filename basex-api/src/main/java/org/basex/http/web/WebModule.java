@@ -106,7 +106,7 @@ public final class WebModule {
       // record module and imported modules, even if parsing failed
       if(archive == null) {
         record(file, start);
-        for(final byte[] path : qc.modParsed) {
+        for(final byte[] path : qc.modules.paths()) {
           if(IO.get(Token.string(path)) instanceof final IOFile io) record(io, start);
         }
       }
@@ -179,10 +179,10 @@ public final class WebModule {
    * @throws QueryException query exception
    */
   private AModule parse(final QueryContext qc) throws QueryException {
-    qc.resolver = archive;
+    qc.modules.resolver = archive;
     // modules of the web application may access external resources
     qc.parseResources = true;
-    qc.realPaths = realPaths;
+    qc.modules.realPaths(realPaths);
     try {
       return qc.parse(content, file.path());
     } finally {

@@ -47,8 +47,28 @@ public final class FnFormatDateTest extends SandboxTest {
     query("format-time(xs:time('15:58:45'), '[PNn,3-3]', 'en', (), ())", "Pm ");
     query("format-date(xs:date('2002-12-31'), '[MNn,1-1]/[FNn,2-2]', 'en', (), ())", "D/Tu");
     query("format-time(xs:time('12:12:12'), '[ZZ]')", "J");
-    query("format-time(xs:time('12:12:12'), '[zZ]')", "");
+    query("format-time(xs:time('12:12:12'), '[zZ]')", "J");
+    query("format-time(xs:time('12:12:12+01:00'), '[zZ]')", "A");
     query("format-time(xs:time('12:12:12'), '[Zz]')", "");
+    // fractional seconds without digit pattern: decimal output
+    query("format-time(xs:time('00:00:00.25'), '[fn]')", "25");
+    query("format-time(xs:time('00:00:00.25'), '[fw]')", "25");
+    query("format-time(xs:time('00:00:00.25'), '[fI,1-1]')", "2");
+    // digit families outside the BMP; minutes of timezones
+    query("format-time(xs:time('00:00:00.1'), '[f𝟎𝟎##]')", "𝟏𝟎");
+    query("format-time(xs:time('00:00:00'), '[f##]')", "0");
+    query("format-time(xs:time('12:00:00+05:30'), '[Z𝟎]')", "+𝟓:𝟑𝟎");
+    query("format-time(xs:time('12:00:00+05:05'), '[Z0:0]')", "+5:05");
+    // timezone names: case; places with local mean time; unbounded maximum width
+    query("format-dateTime(xs:dateTime('2002-01-15T12:00:00Z'), '[Zn]', 'en', (), "
+        + "'America/New_York')", "est");
+    query("format-dateTime(xs:dateTime('1800-01-01T12:00:00Z'), '[H]:[m] [Z]', 'en', (), "
+        + "'America/New_York')", "7:04 -04:56");
+    query("format-date(xs:date('2002-01-01'), '[MNn,*-99999999999]')", "January");
+    query("format-dateTime(xs:dateTime('2002-04-07T03:30:00'), '[Z] [ZN]', 'en', (), "
+        + "'America/New_York')", "-04:00 EDT");
+    // numeral type, followed by numbering style
+    query("format-date(xs:date('2002-12-31'), '[D1ot] [Dwot]')", "31st thirty-first");
   }
 
   /** fn:format-dateTime. */

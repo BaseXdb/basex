@@ -113,8 +113,20 @@ public class QueryParser extends AQueryParser {
    */
   QueryParser(final String query, final String uri, final QueryContext qctx,
       final StaticContext sctx) {
-
     super(query, uri, qctx, sctx);
+  }
+
+  /**
+   * Constructor.
+   * @param query query string
+   * @param uri base URI (can be {@code null}; only passed on if not bound to static context yet)
+   * @param qctx query context
+   * @param sctx static context (can be {@code null})
+   * @param state parse state, shared with the parsers of imported modules
+   */
+  QueryParser(final String query, final String uri, final QueryContext qctx,
+      final StaticContext sctx, final ParseState state) {
+    super(query, uri, qctx, sctx, state);
   }
 
   /**
@@ -178,10 +190,10 @@ public class QueryParser extends AQueryParser {
       namespaces.put(prefix, uri);
       wsCheck(";");
 
-      final byte[] pth = token(qc.modulePath(sc.baseIO()));
-      qc.modParsed.put(pth, uri);
+      final byte[] pth = qc.modules.path(sc.baseIO());
+      qc.modules.uri(pth, uri);
       // records of modules with a location are identified by their path
-      if(!(root && qc.inlineModule)) recordIdentity = string(pth);
+      if(!(root && qc.modules.inlineModule)) recordIdentity = string(pth);
 
       prolog1();
       importModules();
@@ -295,7 +307,7 @@ public class QueryParser extends AQueryParser {
           // subsequent assignment required to enable duplicate checks
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          qc.ftOpt().assign(fto);
+          sc.ftOpt().assign(fto);
         } else {
           pos = p;
           return;
@@ -532,6 +544,13 @@ public class QueryParser extends AQueryParser {
       // query-specific options
       if(!name.equals(LOCK)) throw error(BASEX_OPTIONSINV_X, name);
       for(final String lock : Locking.queryLocks(token(value))) qc.locks.add(lock);
+    } else if(eq(uri, XQ_URI) && name.equals(ARITHMETIC_MODE)) {
+      // arithmetic mode of the current module
+      sc.decimal = value.equals("decimal");
+      if(!sc.decimal && !value.equals("double")) {
+        throw error(BASEX_OPTIONS_X,
+            Util.info(Text.OPT_ONEOF_X_X_X, name, value, "decimal, double"));
+      }
     }
     // ignore unknown options
     options.put(qname, value);
@@ -596,6 +615,9 @@ public class QueryParser extends AQueryParser {
       skipWs();
       final String prop = string(ncName(null, false));
       if(prop.isEmpty()) break;
+      if(prop.equals(DecFormatOptions.FORMAT_NAME.name())) {
+        throw error(FORMPROP_X, Options.unknown(prop));
+      }
       wsCheck("=");
       if(dfo.get(prop) != null) throw error(DECDUPLPROP_X, prop);
       try {
@@ -685,7 +707,7 @@ public class QueryParser extends AQueryParser {
     final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final TokenList pths = qc.modDeclared.get(uri);
+      final TokenList pths = qc.modules.declared(uri);
       if(pths != null) {
         pths.forEach(mi.paths::add);
         mi.declared = true;
@@ -829,7 +851,7 @@ public class QueryParser extends AQueryParser {
     final SeqType st = itemType();
     currentTypeDeps = null;
     declareType(qn, st, refs, anns, ii);
-    qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
+    state.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
   }
 
   /**
@@ -1393,6 +1415,12 @@ public class QueryParser extends AQueryParser {
       if(exprs.size() == 1) {
         // add default case
         if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());
+        // braced switch without default case: return empty sequence if no case matches
+        skipWs();
+        if(brace && current('}')) {
+          groups.add(new SwitchGroup(info(), Empty.VALUE));
+          break;
+        }
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
@@ -1424,6 +1452,12 @@ public class QueryParser extends AQueryParser {
     do {
       cs = wsConsumeWs(CASE);
       if(!cs) {
+        // braced typeswitch without default case: return empty sequence if no case matches
+        skipWs();
+        if(brace && current('}')) {
+          cases = Array.add(cases, new TypeswitchGroup(info(), null, new SeqType[0], Empty.VALUE));
+          break;
+        }
         wsCheck(DEFAULT);
         skipWs();
       }
@@ -2288,13 +2322,13 @@ public class QueryParser extends AQueryParser {
   private Expr methodCall(final Expr expr) throws QueryException {
     skipWs();
     final InputInfo info = info();
-    final Str key = Str.get(ncName(NONCNAME_X, false));
+    final byte[] name = ncName(NONCNAME_X, false);
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
     final FuncBuilder fb = argumentList(false, arg);
-    if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, key);
-    final Lookup func = new Lookup(info, arg, key);
+    if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, name);
+    final Lookup func = new Lookup(info, arg, Str.get(name));
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);
@@ -3474,7 +3508,7 @@ public class QueryParser extends AQueryParser {
               throw error(WHICHCAST_X, name.prefixId(XML));
             } else {
               final TypeRef ref = typeRef(name);
-              qc.deferredCastTargets.add(new DeferredRef(ref, info()));
+              state.castTargets.add(new DeferredRef(ref, info()));
               type = ref;
             }
           }
@@ -3639,7 +3673,7 @@ public class QueryParser extends AQueryParser {
     if(type instanceof MapType) {
       final Type key = itemType().type;
       if(key instanceof final TypeRef ref && !ref.resolved()) {
-        qc.deferredMapKeys.add(new DeferredRef(ref, info()));
+        state.mapKeys.add(new DeferredRef(ref, info()));
       } else if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
         throw error(MAPTAAT_X, key);
       }

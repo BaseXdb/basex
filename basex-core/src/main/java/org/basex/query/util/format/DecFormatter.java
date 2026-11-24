@@ -6,13 +6,13 @@ import static org.basex.util.Token.*;
 import java.math.*;
 import java.text.*;
 import java.util.*;
-import java.util.function.*;
+import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -25,6 +25,14 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class DecFormatter extends FormatUtil {
+  /** Percent factor (decimal, as integer multiplication may overflow). */
+  private static final Dec HUNDRED = Dec.get(BigDecimal.valueOf(100));
+  /** Per-mille factor (decimal, as integer multiplication may overflow). */
+  private static final Dec THOUSAND = Dec.get(Dec.BD_1000);
+  /** Cached decimal formatters for languages. */
+  private static final ConcurrentHashMap<String, DecFormatter> LANGUAGES =
+      new ConcurrentHashMap<>();
+
   /** Decimal Format. */
   private final DecFormatOptions options;
 
@@ -42,33 +50,21 @@ public final class DecFormatter extends FormatUtil {
   private byte[] nan = Token.NAN;
   /** Pattern-separator character. */
   private int pattern = ';';
-
-  /** Decimal-separator character. */
-  private int decimal = '.';
-  /** Exponent-separator character. */
-  private int exponent = 'e';
-  /** Grouping-separator character. */
-  private int grouping = ',';
   /** Optional-digit character. */
   private int digit = '#';
-
   /** Minus rendition. */
-  private int[] minus = { '-' };
-  /** Percent character. */
-  private int percent = '%';
-  /** Permille character. */
-  private int permille = '\u2030';
+  private byte[] minus = { '-' };
 
-  /** Decimal-separator rendition. */
-  private int[] decimalRendition = { decimal };
-  /** Exponent-separator rendition. */
-  private int[] exponentRendition = { exponent };
-  /** Grouping-separator rendition. */
-  private int[] groupingRendition = { grouping };
-  /** Percent rendition. */
-  private int[] percentRendition = { percent };
-  /** Per-mille rendition. */
-  private int[] permilleRendition = { permille };
+  /** Decimal-separator. */
+  private Sign decimal = new Sign('.');
+  /** Exponent-separator. */
+  private Sign exponent = new Sign('e');
+  /** Grouping-separator. */
+  private Sign grouping = new Sign(',');
+  /** Percent. */
+  private Sign percent = new Sign('%');
+  /** Per-mille. */
+  private Sign permille = new Sign('‰');
 
   /**
    * Constructor.
@@ -90,7 +86,7 @@ public final class DecFormatter extends FormatUtil {
     // assign map values
     int z = '0';
     for(final Option<?> option : options) {
-      if(!options.contains(option)) continue;
+      if(!options.contains(option) || option == DecFormatOptions.FORMAT_NAME) continue;
       final String k = option.name();
       final byte[] v = token(options.get((StringOption) option));
       if(option == DecFormatOptions.INFINITY) {
@@ -98,22 +94,17 @@ public final class DecFormatter extends FormatUtil {
       } else if(option == DecFormatOptions.NAN) {
         nan = v;
       } else if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
-        decimalRendition = renditionValue(k, v, info);
-        decimal = cp(v, 0);
+        decimal = sign(k, v, info);
       } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
-        groupingRendition = renditionValue(k, v, info);
-        grouping = cp(v, 0);
+        grouping = sign(k, v, info);
       } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
-        exponentRendition = renditionValue(k, v, info);
-        exponent = cp(v, 0);
+        exponent = sign(k, v, info);
       } else if(option == DecFormatOptions.PERCENT) {
-        percentRendition = renditionValue(k, v, info);
-        percent = cp(v, 0);
+        percent = sign(k, v, info);
       } else if(option == DecFormatOptions.PER_MILLE) {
-        permilleRendition = renditionValue(k, v, info);
-        permille = cp(v, 0);
+        permille = sign(k, v, info);
       } else if(option == DecFormatOptions.MINUS_SIGN) {
-        minus = cps(v);
+        minus = v;
       } else if(v.length != 0 && cl(v, 0) == v.length) {
         final int cp = cp(v, 0);
         if(option == DecFormatOptions.PATTERN_SEPARATOR) {
@@ -125,47 +116,46 @@ public final class DecFormatter extends FormatUtil {
           if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
           if(z != cp) throw INVDECZERO_X.get(info, Strings.describe(cp));
         }
-      } else if(option != DecFormatOptions.FORMAT_NAME) {
+      } else {
         // signs must have single character
         throw INVDECSINGLE_X_X.get(info, k, v);
       }
     }
 
-    // check for duplicate characters
+    // check for duplicate characters, create auxiliary strings
     zero = z;
     final IntSet is = new IntSet();
-    for(int i = 0; i < 10; i++) is.add(zero + i);
-    final int[] ss = { decimal, grouping, exponent, percent, permille, digit, pattern };
-    for(final int s : ss) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < 10; i++) {
+      is.add(zero + i);
+      tb.add(zero + i);
+    }
+    for(final int s : new int[] { decimal.marker, grouping.marker, exponent.marker,
+        percent.marker, permille.marker, digit, pattern }) {
       if(!is.add(s)) throw DUPLDECFORM_X.get(info, Strings.describe(s));
     }
-
-    // create auxiliary strings
-    final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < 10; i++) tb.add(zero + i);
     digits = tb.toArray();
-    // decimal-separator, exponent-separator, ... , are classified as active characters.
-    // decimal-digit-family: added above. pattern-separator: will never occur at this stage
-    actives = tb.add(decimal).add(exponent).add(grouping).add(digit).finish();
-    // "all other characters (...) are classified as passive characters."
+    // "decimal-separator, exponent-separator, grouping-separator, digit, pattern-separator and
+    // the members of the decimal digit family are classified as active characters"
+    // (pattern-separator: will never occur at this stage)
+    actives = tb.add(decimal.marker).add(exponent.marker).add(grouping.marker).add(digit).finish();
   }
 
   /**
-   * Returns the rendition value from an option value matching the pattern '.|.:.*', where the first
+   * Returns a sign from an option value matching the pattern '.|.:.*', where the first
    * character identifies the marker, and the optional part following a colon is the rendition.
-   * In absence of the colon part, the rendition value defaults to the marker character.
    * @param name option name
    * @param value option value
    * @param info input info (can be {@code null})
-   * @return rendition value
+   * @return sign
    * @throws QueryException query exception
    */
-  private static int[] renditionValue(final String name, final byte[] value, final InputInfo info)
+  private static Sign sign(final String name, final byte[] value, final InputInfo info)
       throws QueryException {
-    if(value.length != 0) {
-      final int[] cps = cps(value);
-      if(cps.length == 1) return cps;
-      if(cps[1] == ':') return Arrays.copyOfRange(cps, 2, cps.length);
+    final int[] cps = cps(value);
+    if(cps.length == 1) return new Sign(cps[0]);
+    if(cps.length > 1 && cps[1] == ':') {
+      return new Sign(cps[0], Arrays.copyOfRange(cps, 2, cps.length));
     }
     throw INVDECFORM_X_X.get(info, name, value);
   }
@@ -180,9 +170,15 @@ public final class DecFormatter extends FormatUtil {
   public static DecFormatter forLanguage(final byte[] languageTag, final InputInfo info)
       throws QueryException {
     final String l = string(languageTag);
-    final DecFormatOptions dfo = ExternalLib.ICU.available() ? IcuFormatter.decFormat(l) :
-      decFormatSymbols(l);
-    return dfo != null ? new DecFormatter(dfo, info) : null;
+    DecFormatter df = LANGUAGES.get(l);
+    if(df == null) {
+      final DecFormatOptions dfo = ExternalLib.ICU.available() ? IcuFormatter.decFormat(l) :
+        decFormatSymbols(l);
+      if(dfo == null) return null;
+      df = new DecFormatter(dfo, info);
+      LANGUAGES.putIfAbsent(l, df);
+    }
+    return df;
   }
 
   /**
@@ -198,7 +194,7 @@ public final class DecFormatter extends FormatUtil {
         dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, String.valueOf(dfs.getDecimalSeparator()));
         dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
         dfo.put(DecFormatOptions.GROUPING_SEPARATOR, String.valueOf(dfs.getGroupingSeparator()));
-        dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
+        dfo.putMarker(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator(), 'e');
         dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
         dfo.put(DecFormatOptions.MINUS_SIGN, String.valueOf(dfs.getMinusSign()));
         dfo.put(DecFormatOptions.NAN, dfs.getNaN());
@@ -226,29 +222,18 @@ public final class DecFormatter extends FormatUtil {
    * @throws QueryException query exception
    */
   public XQMap toMap() throws QueryException {
-    final Function<int[], byte[]> cpToken = rendition -> {
-      final TokenBuilder tb = new TokenBuilder(rendition.length);
-      for(final int r : rendition) tb.add(cpToken(r));
-      return tb.finish();
-    };
-    final BiFunction<Integer, int[], byte[]> value = (marker, rendition) -> {
-      final byte[] m = cpToken(marker);
-      if(rendition.length == 1 && marker == rendition[0]) return m;
-      return new TokenBuilder(rendition.length + 2).add(m).add(':').add(
-          cpToken.apply(rendition)).finish();
-    };
     final MapBuilder map = new MapBuilder();
-    map.put(DecFormatOptions.DECIMAL_SEPARATOR.name(), value.apply(decimal, decimalRendition));
-    map.put(DecFormatOptions.EXPONENT_SEPARATOR.name(), value.apply(exponent, exponentRendition));
-    map.put(DecFormatOptions.GROUPING_SEPARATOR.name(), value.apply(grouping, groupingRendition));
-    map.put(DecFormatOptions.PERCENT.name(), value.apply(percent, percentRendition));
-    map.put(DecFormatOptions.PER_MILLE.name(), value.apply(permille, permilleRendition));
+    map.put(DecFormatOptions.DECIMAL_SEPARATOR.name(), decimal.token());
+    map.put(DecFormatOptions.EXPONENT_SEPARATOR.name(), exponent.token());
+    map.put(DecFormatOptions.GROUPING_SEPARATOR.name(), grouping.token());
+    map.put(DecFormatOptions.PERCENT.name(), percent.token());
+    map.put(DecFormatOptions.PER_MILLE.name(), permille.token());
     map.put(DecFormatOptions.ZERO_DIGIT.name(), cpToken(zero));
     map.put(DecFormatOptions.DIGIT.name(), cpToken(digit));
     map.put(DecFormatOptions.PATTERN_SEPARATOR.name(), cpToken(pattern));
     map.put(DecFormatOptions.INFINITY.name(), inf);
     map.put(DecFormatOptions.NAN.name(), nan);
-    map.put(DecFormatOptions.MINUS_SIGN.name(), cpToken.apply(minus));
+    map.put(DecFormatOptions.MINUS_SIGN.name(), minus);
     return map.map();
   }
 
@@ -262,258 +247,166 @@ public final class DecFormatter extends FormatUtil {
    */
   public byte[] format(final ANum number, final byte[] picture, final InputInfo info)
       throws QueryException {
-
-    // find pattern separator and sub-patterns
-    final TokenList tl = new TokenList();
-    byte[] pic = picture;
     // "A picture-string consists either of a sub-picture, or of two sub-pictures separated by
     // the pattern-separator"
-    final int i = indexOf(pic, pattern);
-    if(i != -1) {
-      tl.add(substring(pic, 0, i));
-      pic = substring(pic, i + cl(pic, i));
-      // "A picture-string must not contain more than one instance of the pattern-separator"
-      if(contains(pic, pattern)) throw PICNUM_X.get(info, picture);
+    final byte[][] patterns = split(picture, cpToken(pattern), true);
+    final int pl = patterns.length;
+    if(pl > 2) throw PICNUM_X.get(info, picture);
+
+    final Picture[] pics = new Picture[pl];
+    for(int p = 0; p < pl; p++) {
+      pics[p] = analyze(patterns[p]);
+      if(pics[p] == null) throw PICNUM_X.get(info, picture);
     }
-    final byte[][] patterns = tl.add(pic).finish();
-
-    // check and analyze patterns
-    if(!checkSyntax(patterns)) throw PICNUM_X.get(info, picture);
-    final Picture[] pics = analyze(patterns);
-
-    // return formatted string
     return format(number, pics, info);
   }
 
   /**
-   * Checks the syntax of the specified patterns.
-   * @param patterns patterns
-   * @return result of check
+   * Checks and analyzes a sub-picture.
+   * @param pt sub-picture
+   * @return picture variables, or {@code null} if the sub-picture is invalid
    */
-  private boolean checkSyntax(final byte[][] patterns) {
-    for(final byte[] pt : patterns) {
-      boolean frac = false, act = false, expAct = false, exp = false, digMant = false;
-      boolean optInt = false, optFrac = false, per = false;
-      int cl, last = 0;
+  private Picture analyze(final byte[] pt) {
+    final Picture pic = new Picture();
+    // fractional part, active character, exponent-separator found
+    boolean frac = false, act = false, exp = false;
+    // number of optional-digit characters in the integer and fractional part, last character
+    int optInt = 0, optFrac = 0, last = 0;
 
-      // loop through all characters
-      final int pl = pt.length;
-      for(int i = 0; i < pl; i += cl) {
-        final int ch = ch(pt, i);
-        cl = cl(pt, i);
-        final boolean containsDigit = contains(digits, ch);
-        boolean active = contains(actives, ch), expon = false;
+    final int pl = pt.length;
+    for(int i = 0, cl; i < pl; i += cl) {
+      final int ch = ch(pt, i);
+      cl = cl(pt, i);
+      // "A character that matches the chosen exponent-separator-sign is treated as an
+      // exponent-separator-sign if it is both preceded and followed within the sub-picture by
+      // an active character. Otherwise, it is treated as a passive character."
+      final boolean active = contains(actives, ch) &&
+          (ch != exponent.marker || act && containsActive(pt, i + cl));
 
-        if(ch == decimal) {
-          // "A sub-picture must not contain more than one instance of the decimal-separator."
-          if(frac) return false;
-          frac = true;
-        } else if(ch == grouping) {
-          // "A sub-picture must not contain a grouping-separator-sign that appears adjacent to a
-          // decimal-separator-sign, or in the absence of a decimal-separator-sign, at the end of
-          // the integer part."
-          if(i == 0 && frac || last == decimal || (i + cl < pl ? ch(pt, i + cl) == decimal : !frac))
-            return false;
-          // "A sub-picture must not contain two adjacent grouping-separator-signs."
-          if(last == grouping) return false;
-        } else if(ch == exponent) {
-          // "A character that matches the chosen exponent-separator-sign is treated as an
-          // exponent-separator-sign if it is both preceded and followed within the sub-picture by
-          // an active character."
-          if(act && containsActive(pt, i + cl)) {
-            // "A sub-picture must not contain more than one character that is treated as an
-            // exponent-separator-sign."
-            if(exp) return false;
-            expon = true;
-          } else {
-            // "Otherwise, it is treated as a passive character."
-            active = false;
-          }
-        } else if(ch == percent || ch == permille) {
+      if(!active) {
+        // "A sub-picture must not contain a passive character that is preceded by an active
+        // character and that is followed by another active character."
+        if(act && containsActive(pt, i + cl)) return null;
+        final IntList affix = act ? pic.suffix : pic.prefix;
+        if(ch == percent.marker || ch == permille.marker) {
           // "A sub-picture must not contain more than one percent-sign or per-mille-sign,
           // and it must not contain one of each."
-          if(per) return false;
-          per = true;
-        } else if(ch == digit) {
-          if(frac) {
-            optFrac = true;
-          } else {
-            // "The integer part of a sub-picture must not contain a member of the decimal-digit-
-            // family that is followed by an optional-digit-sign."
-            if(digMant) return false;
-            optInt = true;
-          }
-        } else if(containsDigit) {
-          if(!exp) {
-            // "The fractional part of a sub-picture must not contain an optional-digit-sign that
-            // is followed by a member of the decimal-digit-family."
-            if(optFrac) return false;
-            digMant = true;
-          }
+          if(pic.factor != null) return null;
+          final boolean pc = ch == percent.marker;
+          pic.factor = pc ? HUNDRED : THOUSAND;
+          affix.add((pc ? percent : permille).rendition);
+        } else {
+          affix.add(ch);
         }
-
-        if(active) {
-          // "If a sub-picture contains a character treated as an exponent-separator-sign then
-          // this must be followed by one or more characters that are members of the
-          // decimal-digit-family, and it must not be followed by any active character that is not
-          // a member of the decimal-digit-family." (*)
-          if(exp) {
-            if(!containsDigit) return false;
-            expAct = true;
-          }
-          act = true;
-        } else if(act && containsActive(pt, i + cl)) {
-          // "A sub-picture must not contain a passive character that is preceded by an active
-          // character and that is followed by another active character."
-          return false;
-        }
-
-        // cache last character
-        last = ch;
-        if(expon) exp = true;
+      } else if(exp) {
+        // "If a sub-picture contains a character treated as an exponent-separator-sign then
+        // this must be followed by one or more characters that are members of the
+        // decimal-digit-family, and it must not be followed by any active character that is not
+        // a member of the decimal-digit-family."
+        if(!contains(digits, ch)) return null;
+        pic.minExp++;
+      } else if(ch == decimal.marker) {
+        // "A sub-picture must not contain more than one instance of the decimal-separator."
+        if(frac) return null;
+        frac = true;
+      } else if(ch == grouping.marker) {
+        // "A sub-picture must not contain a grouping-separator-sign that appears adjacent to a
+        // decimal-separator-sign, or in the absence of a decimal-separator-sign, at the end of
+        // the integer part. [It] must not contain two adjacent grouping-separator-signs."
+        final int next = nextActive(pt, i + cl);
+        if(last == decimal.marker || last == grouping.marker || next == decimal.marker ||
+            !frac && (next == -1 || next == exponent.marker)) return null;
+        if(frac) pic.groupFrac.add(pic.minFrac + optFrac);
+        else pic.groupInt.add(pic.minInt + optInt);
+      } else if(ch == exponent.marker) {
+        exp = true;
+      } else if(ch == digit) {
+        // "The integer part of a sub-picture must not contain a member of the decimal-digit-family
+        // that is followed by an optional-digit-sign."
+        if(frac) optFrac++;
+        else if(pic.minInt == 0) optInt++;
+        else return null;
+      } else if(!frac) {
+        pic.minInt++;
+      } else {
+        // "The fractional part of a sub-picture must not contain an optional-digit-sign that is
+        // followed by a member of the decimal-digit-family."
+        if(optFrac != 0) return null;
+        pic.minFrac++;
       }
-
-      // "The mantissa part of a sub-picture must contain at least one character that is an
-      // optional-digit-sign or a member of the decimal-digit-family."
-      if(!optInt && !optFrac && !digMant) return false;
-
-      // "A sub-picture that contains a percent-sign or per-mille-sign must not contain a character
-      // treated as an exponent-separator-sign."
-      if(exp && (per || !expAct)) return false;
+      act |= active;
+      last = ch;
     }
 
-    // everything ok
-    return true;
-  }
+    // "The mantissa part of a sub-picture must contain at least one character that is an
+    // optional-digit-sign or a member of the decimal-digit-family."
+    if(pic.minInt + pic.minFrac + optInt + optFrac == 0) return null;
+    // "A sub-picture that contains a percent-sign or per-mille-sign must not contain a character
+    // treated as an exponent-separator-sign."
+    if(exp && pic.factor != null) return null;
 
-  /**
-   * Analyzes the specified patterns.
-   * @param patterns patterns
-   * @return picture variables
-   */
-  private Picture[] analyze(final byte[][] patterns) {
-    // pictures
-    final int picL = patterns.length;
-    final Picture[] pics = new Picture[picL];
+    // finalize integer-part-grouping-positions
+    final IntList ipgp = pic.groupInt;
+    final int igl = ipgp.size(), intSize = pic.minInt + optInt;
+    for(int g = 0; g < igl; g++) ipgp.set(g, intSize - ipgp.get(g));
 
-    // analyze patterns
-    for(int p = 0; p < picL; p++) {
-      final byte[] pt = patterns[p];
-      final Picture pic = new Picture();
-
-      // fractional part
-      boolean frac = false;
-      // active character found
-      boolean act = false;
-      // exponential flag
-      boolean exp = false;
-      // number of optional-digit-characters
-      int optInt = 0, optFrac = 0;
-
-      // loop through all characters
-      final int pl = pt.length;
-      for(int i = 0, cl; i < pl; i += cl) {
-        final int ch = ch(pt, i);
-        cl = cl(pt, i);
-        boolean active = contains(actives, ch);
-
-        if(ch == decimal) {
-          frac = true;
-          act = false;
-        } else if(ch == digit) {
-          if(frac) optFrac++;
-          else optInt++;
-        } else if(ch == exponent) {
-          if(act && containsActive(pt, i + cl)) {
-            exp = true;
-          } else {
-            active = false;
-          }
-        } else if(ch == grouping) {
-          if(frac) pic.groupFrac.add(pic.minFrac + optFrac);
-          else pic.groupInt.add(pic.minInt + optInt);
-        } else if(contains(digits, ch)) {
-          if(exp) {
-            pic.minExp++;
-          } else if(frac) {
-            pic.minFrac++;
-          } else {
-            pic.minInt++;
-          }
-        }
-
-        if(active) {
-          act = true;
-        } else {
-          // passive characters
-          // add to prefix or suffix
-          final IntList pix = frac || act ? pic.suffix : pic.prefix;
-          if(ch == percent) {
-            pic.pc = true;
-            pix.add(percentRendition);
-          } else if(ch == permille) {
-            pic.pm = true;
-            pix.add(permilleRendition);
-          } else {
-            pix.add(ch);
-          }
-        }
+    // if integer-part-grouping-positions are regular, replace them with a single position
+    if(igl >= 1) {
+      final int i = ipgp.get(igl - 1);
+      // make sure that there is no digit where the first non-present grouping separator goes
+      pic.isRegular = ipgp.get(0) + i >= intSize;
+      for(int g = igl - 2; g >= 0; --g) pic.isRegular &= i * (igl - g) == ipgp.get(g);
+      if(pic.isRegular) {
+        ipgp.reset();
+        ipgp.add(i);
       }
-      // finalize integer-part-grouping-positions
-      final IntList ipgp = pic.groupInt;
-      final int igl = ipgp.size();
-      for(int g = 0; g < igl; g++) ipgp.set(g, pic.minInt + optInt - ipgp.get(g));
+    }
+    pic.scaling = pic.minInt;
 
-      // check if integer-part-grouping-positions are regular
-      // if yes, they are replaced with a single position
-      if(igl >= 1) {
-        final int i = ipgp.get(igl - 1);
-        // make sure that there is no digit where the first non-present grouping separator goes
-        pic.isRegular = ipgp.get(0) + i >= pic.minInt + optInt;
-        for(int g = igl - 2; g >= 0; --g) pic.isRegular &= i * (igl - g) == ipgp.get(g);
-        if(pic.isRegular) {
-          pic.groupInt.reset();
-          pic.groupInt.add(i);
-        }
-      }
-      pic.scaling = pic.minInt;
-
-      // The maximum-fractional-part-size is set to ...
-      pic.maxFrac = optFrac + pic.minFrac;
-      // If the effect of the above rules is that...
-      if(pic.minInt == 0 && pic.maxFrac == 0) {
-        if(exp) {
-          pic.minFrac = 1;
-          pic.maxFrac = 1;
-        } else {
-          pic.minInt = 1;
-        }
-      }
-      // if all the following conditions are true...
-      if(exp && pic.minInt == 0 && optInt > 0) {
+    // "The maximum-fractional-part-size is set to ..."
+    pic.maxFrac = optFrac + pic.minFrac;
+    // "If the effect of the above rules is that ..."
+    if(pic.minInt == 0 && pic.maxFrac == 0) {
+      if(exp) {
+        pic.minFrac = 1;
+        pic.maxFrac = 1;
+      } else {
         pic.minInt = 1;
       }
-      // if, after making the above adjustments...
-      if(pic.minInt == 0 && pic.minFrac == 0) {
-        pic.minFrac = 1;
-      }
-      pics[p] = pic;
     }
-    return pics;
+    // "If all the following conditions are true ..."
+    if(exp && pic.minInt == 0 && optInt > 0) pic.minInt = 1;
+    // "If (after making the above adjustments) ..."
+    if(pic.minInt == 0 && pic.minFrac == 0) pic.minFrac = 1;
+    return pic;
   }
 
   /**
-   * Checks if the specified pattern contains active characters after the specified index.
+   * Checks if the specified pattern contains active characters other than the exponent-separator
+   * at or after the specified index.
    * @param pt pattern
    * @param i index
    * @return result of check
    */
   private boolean containsActive(final byte[] pt, final int i) {
+    return nextActive(pt, i) != -1;
+  }
+
+  /**
+   * Returns the first character at or after the specified index that is treated as active.
+   * @param pt pattern
+   * @param i index
+   * @return character, or {@code -1} if there is none
+   */
+  private int nextActive(final byte[] pt, final int i) {
+    boolean exp = false;
     final int pl = pt.length;
     for(int p = i; p < pl; p += cl(pt, p)) {
-      if(contains(actives, ch(pt, p))) return true;
+      final int ch = ch(pt, p);
+      if(ch == exponent.marker) exp = true;
+      else if(contains(actives, ch)) return exp ? exponent.marker : ch;
     }
-    return false;
+    return -1;
   }
 
   /**
@@ -534,104 +427,117 @@ public final class DecFormatter extends FormatUtil {
     // Rule 2: check if value is negative (smaller than zero or -0)
     final boolean neg = d < 0 || d == 0 && Double.doubleToLongBits(d) == Long.MIN_VALUE;
     final Picture pic = pics[neg && pics.length == 2 ? 1 : 0];
-    final IntList res = new IntList(), intgr = new IntList(), fract = new IntList();
+    final IntList intgr = new IntList(), fract = new IntList();
     int exp = 0;
 
     // Rule 3: percent/permille
     ANum num = item;
-    if(pic.pc) num = (ANum) Calc.MULTIPLY.eval(num, Itr.get(100), info);
-    if(pic.pm) num = (ANum) Calc.MULTIPLY.eval(num, Itr.get(1000), info);
+    if(pic.factor != null) num = (ANum) Calc.MULTIPLY.eval(num, pic.factor, BasicType.DOUBLE, info);
 
-    if(Double.isInfinite(num.dbl(info))) {
+    final boolean infinite = num.floating() && Double.isInfinite(num.dbl(info));
+    if(infinite) {
       // Rule 4: infinity
       intgr.add(cps(inf));
     } else {
-      // Rule 5: exponent
-      if(pic.minExp != 0 && d != 0) {
-        BigDecimal dec = num.dec(info).abs().stripTrailingZeros();
-        int scl = 0;
-        if(dec.compareTo(BigDecimal.ONE) >= 0) {
-          scl = dec.setScale(0, RoundingMode.HALF_DOWN).precision();
-        } else {
-          while(dec.compareTo(BigDecimal.ONE) < 0) {
-            dec = dec.multiply(BigDecimal.TEN);
-            scl--;
-          }
-          scl++;
-        }
-        exp = scl - pic.scaling;
-        if(exp != 0) {
-          // scale decimally: powers of ten may exceed the double range (e.g. for 4.9E-324)
-          final BigDecimal sc = decimal(num).movePointLeft(exp);
-          num = num instanceof Flt ? Flt.get(sc.floatValue()) :
-            num instanceof Dbl ? Dbl.get(sc.doubleValue()) : Dec.get(sc);
-        }
+      // Rule 5: exponent (decimal representation is scaled to preserve all digits)
+      BigDecimal mantissa = decimal(num);
+      if(pic.minExp != 0 && mantissa.signum() != 0) {
+        exp = mantissa.precision() - mantissa.scale() - pic.scaling;
+        mantissa = mantissa.movePointLeft(exp);
       }
-      num = num.round(pic.maxFrac, RoundMode.HALF_TO_EVEN);
+      // Rule 6: round decimal representation of mantissa
+      final BigDecimal rounded = mantissa.setScale(pic.maxFrac, RoundingMode.HALF_EVEN);
 
       // convert number to string; chop sign and leading 0
-      String s = string(Dec.get(decimal(num)).string());
-      if(Strings.startsWith(s, '-')) s = s.substring(1);
+      String s = rounded.abs().stripTrailingZeros().toPlainString();
       if(Strings.startsWith(s, '0')) s = s.substring(1);
-
-      // integer/fractional separator
-      final int fracSep = s.indexOf('.');
+      final int sl = s.length(), fracSep = s.indexOf('.'), il = fracSep == -1 ? sl : fracSep;
 
       // create integer part
-      final int sl = s.length();
-      final int il = fracSep == -1 ? sl : fracSep;
-      for(int i = il; i < pic.minInt; i++) intgr.add(zero);
-      for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
+      intgr.add(toDigits(s, 0, il, pic.minInt));
 
       // squeeze in grouping separators
-      if(pic.isRegular && pic.groupInt.get(0) > 0) {
+      if(pic.isRegular) {
         // regular pattern with repeating separators
-        for(int i = intgr.size() - 1; i > 0; --i) {
-          if(i % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - i, groupingRendition);
+        final int g = pic.groupInt.get(0);
+        for(int i = (intgr.size() - 1) / g * g; i > 0; i -= g) {
+          intgr.insert(intgr.size() - i, grouping.rendition);
         }
       } else {
         // irregular pattern, or no separators at all
         final int gil = pic.groupInt.size();
         for(int g = 0; g < gil; g++) {
           final int pos = intgr.size() - pic.groupInt.get(g);
-          if(pos > 0) intgr.insert(pos, groupingRendition);
+          if(pos > 0) intgr.insert(pos, grouping.rendition);
         }
       }
 
       // create fractional part
-      final int fl = fracSep == -1 ? 0 : sl - il - 1;
-      if(fl != 0) for(int i = fracSep + 1; i < sl; i++) fract.add(zero + s.charAt(i) - '0');
-      for(int i = fl; i < pic.minFrac; i++) fract.add(zero);
+      if(fracSep != -1) fract.add(toDigits(s, fracSep + 1, sl, 0));
+      for(int i = fract.size(); i < pic.minFrac; i++) fract.add(zero);
 
       // squeeze in grouping separators in a reverse manner
       final int ul = fract.size();
       for(int p = pic.groupFrac.size() - 1; p >= 0; p--) {
         final int pos = pic.groupFrac.get(p);
-        if(pos < ul) fract.insert(pos, groupingRendition);
+        if(pos < ul) fract.insert(pos, grouping.rendition);
       }
     }
 
-    // add minus sign
-    if(neg && pics.length != 2) res.add(minus);
-    // add prefix and integer part
-    res.add(pic.prefix.toArray()).add(intgr.finish());
+    final TokenBuilder tb = new TokenBuilder();
+    // add minus sign, prefix and integer part
+    if(neg && pics.length != 2) tb.add(minus);
+    add(add(tb, pic.prefix), intgr);
     // add fractional part
-    if(!fract.isEmpty()) res.add(decimalRendition).add(fract.finish());
+    if(!fract.isEmpty()) add(add(tb, decimal.rendition), fract);
     // add exponent
-    if(pic.minExp != 0) {
-      res.add(exponentRendition);
-      if(exp < 0) res.add(minus);
+    if(pic.minExp != 0 && !infinite) {
+      add(tb, exponent.rendition);
+      if(exp < 0) tb.add(minus);
       final String s = Integer.toString(Math.abs(exp));
-      final int sl = s.length();
-      for(int i = sl; i < pic.minExp; i++) res.add(zero);
-      for(int i = 0; i < sl; i++) res.add(zero + s.charAt(i) - '0');
+      add(tb, toDigits(s, 0, s.length(), pic.minExp));
     }
     // add suffix
-    res.add(pic.suffix.toArray());
+    return add(tb, pic.suffix).finish();
+  }
 
-    final TokenBuilder tb = new TokenBuilder(res.size());
-    for(final int r : res.finish()) tb.add(r);
-    return tb.finish();
+  /**
+   * Converts a range of ASCII digits to characters of the decimal-digit-family.
+   * @param s string with ASCII digits
+   * @param start start index
+   * @param end end index
+   * @param min minimum number of digits (padded with leading zeros)
+   * @return codepoints
+   */
+  private int[] toDigits(final String s, final int start, final int end, final int min) {
+    final int pad = Math.max(0, min - (end - start));
+    final int[] cps = new int[pad + end - start];
+    Arrays.fill(cps, 0, pad, zero);
+    for(int i = start; i < end; i++) cps[pad + i - start] = zero + s.charAt(i) - '0';
+    return cps;
+  }
+
+  /**
+   * Adds codepoints to a token builder.
+   * @param tb token builder
+   * @param cps codepoints
+   * @return token builder
+   */
+  private static TokenBuilder add(final TokenBuilder tb, final int... cps) {
+    for(final int cp : cps) tb.add(cp);
+    return tb;
+  }
+
+  /**
+   * Adds the codepoints of a list to a token builder.
+   * @param tb token builder
+   * @param list codepoints
+   * @return token builder
+   */
+  private static TokenBuilder add(final TokenBuilder tb, final IntList list) {
+    final int ls = list.size();
+    for(int l = 0; l < ls; l++) tb.add(list.get(l));
+    return tb;
   }
 
   /**
@@ -643,6 +549,31 @@ public final class DecFormatter extends FormatUtil {
   private static BigDecimal decimal(final ANum num) throws QueryException {
     return num instanceof Flt ? new BigDecimal(Float.toString(num.flt(null))) :
       num instanceof Dbl ? BigDecimal.valueOf(num.dbl()) : num.dec(null);
+  }
+
+  /**
+   * Marker character and rendition of a decimal-format property.
+   * @param marker marker character in the picture string
+   * @param rendition rendition in the result string
+   */
+  private record Sign(int marker, int[] rendition) {
+    /**
+     * Constructor for a property whose rendition is the marker character.
+     * @param marker marker character
+     */
+    Sign(final int marker) {
+      this(marker, new int[] { marker });
+    }
+
+    /**
+     * Returns the property value in the form 'marker' or 'marker:rendition'.
+     * @return token
+     */
+    byte[] token() {
+      final TokenBuilder tb = new TokenBuilder().add(marker);
+      if(rendition.length != 1 || rendition[0] != marker) add(tb.add(':'), rendition);
+      return tb.finish();
+    }
   }
 
   /** Picture variables. */
@@ -667,9 +598,7 @@ public final class DecFormatter extends FormatUtil {
     private int maxFrac;
     /** Minimum-exponent-size. */
     private int minExp;
-    /** Percent flag. */
-    private boolean pc;
-    /** Per-mille flag. */
-    private boolean pm;
+    /** Percent or per-mille factor (can be {@code null}). */
+    private Dec factor;
   }
 }

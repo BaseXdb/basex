@@ -88,6 +88,19 @@ public final class RExQueryParser extends AQueryParser {
     super(query, uri, qctx, sctx);
   }
 
+  /**
+   * Constructor.
+   * @param query query string
+   * @param uri base URI (can be {@code null}; only passed on if not bound to static context yet)
+   * @param qctx query context
+   * @param sctx static context (can be {@code null})
+   * @param state parse state, shared with the parsers of imported modules
+   */
+  RExQueryParser(final String query, final String uri, final QueryContext qctx,
+      final StaticContext sctx, final ParseState state) {
+    super(query, uri, qctx, sctx, state);
+  }
+
   /** Kinds of literals. */
   private static final BitSet LITERALS = Sym.set(Sym.INTEGER_LITERAL,
       Sym.HEX_INTEGER_LITERAL, Sym.BINARY_INTEGER_LITERAL, Sym.DECIMAL_LITERAL,
@@ -254,10 +267,10 @@ public final class RExQueryParser extends AQueryParser {
       namespaces.put(prefix, uri);
       comments(mdecl.end());
 
-      final byte[] pth = token(qc.modulePath(sc.baseIO()));
-      qc.modParsed.put(pth, uri);
+      final byte[] pth = qc.modules.path(sc.baseIO());
+      qc.modules.uri(pth, uri);
       // records of modules with a location are identified by their path
-      if(!(root && qc.inlineModule)) recordIdentity = string(pth);
+      if(!(root && qc.modules.inlineModule)) recordIdentity = string(pth);
 
       prolog(library.prolog());
       comments(Integer.MAX_VALUE);
@@ -910,7 +923,7 @@ public final class RExQueryParser extends AQueryParser {
       case final Nodes.TypedMapType map -> {
         final Type key = itemType(map.itemType()).type;
         if(key instanceof final TypeRef ref && !ref.resolved()) {
-          qc.deferredMapKeys.add(new DeferredRef(ref, infoAfter(map.itemType())));
+          state.mapKeys.add(new DeferredRef(ref, infoAfter(map.itemType())));
         } else if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
           throw error(node, MAPTAAT_X, key);
         }
@@ -1187,7 +1200,7 @@ public final class RExQueryParser extends AQueryParser {
             throw error(WHICHCAST_X, name.prefixId(XML));
           } else {
             final TypeRef ref = typeRef(name, infoAfter(target));
-            qc.deferredCastTargets.add(new DeferredRef(ref, infoAfter(target)));
+            state.castTargets.add(new DeferredRef(ref, infoAfter(target)));
             type = ref;
           }
         }
@@ -1349,7 +1362,7 @@ public final class RExQueryParser extends AQueryParser {
           for(final FTMatchOption option : ((FTOptionDecl) node).ftMatchOptions().children()) {
             ftMatchOption(option, fto);
           }
-          qc.ftOpt().assign(fto);
+          sc.ftOpt().assign(fto);
         }
         case Sym.SchemaImport -> schemaImport((SchemaImport) node);
         case Sym.ModuleImport -> moduleImport((ModuleImport) node);
@@ -1519,7 +1532,7 @@ public final class RExQueryParser extends AQueryParser {
     final ModInfo mi = new ModInfo();
     if(!locations(children, mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final TokenList pths = qc.modDeclared.get(uri);
+      final TokenList pths = qc.modules.declared(uri);
       if(pths != null) {
         pths.forEach(mi.paths::add);
         mi.declared = true;
@@ -1690,6 +1703,13 @@ public final class RExQueryParser extends AQueryParser {
       // query-specific options
       if(!name.equals(LOCK)) throw error(BASEX_OPTIONSINV_X, name);
       for(final String lock : Locking.queryLocks(token(value))) qc.locks.add(lock);
+    } else if(eq(uri, XQ_URI) && name.equals(ARITHMETIC_MODE)) {
+      // arithmetic mode of the current module
+      sc.decimal = value.equals("decimal");
+      if(!sc.decimal && !value.equals("double")) {
+        throw error(BASEX_OPTIONS_X,
+            Util.info(Text.OPT_ONEOF_X_X_X, name, value, "decimal, double"));
+      }
     }
     // ignore unknown options
     options.put(qname, value);
@@ -1750,7 +1770,7 @@ public final class RExQueryParser extends AQueryParser {
     pos = after(node.end());
     declareType(qn, st, refs, anns, ii);
     comments(node.end());
-    qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
+    state.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
   }
 
   /**
@@ -2464,7 +2484,9 @@ public final class RExQueryParser extends AQueryParser {
     for(int c = 0; c < clauses.length; c++) {
       groups[c] = switchGroup(clauses[c].children(), clauses[c].exprSingle());
     }
-    groups[clauses.length] = switchGroup(NONE, cases.exprSingle());
+    // the default case of a braced switch may be omitted
+    groups[clauses.length] = cases.exprSingle() != null ? switchGroup(NONE, cases.exprSingle()) :
+      new SwitchGroup(infoAt(node.bracedSwitchCases().end() - 1), Empty.VALUE);
     return new Switch(ii, cond, groups);
   }
 
@@ -2503,8 +2525,11 @@ public final class RExQueryParser extends AQueryParser {
       groups[c] = typeswitchGroup(clauses[c].varName(), clauses[c].sequenceTypeUnion().children(),
           clauses[c].exprSingle(), s);
     }
-    groups[clauses.length] = typeswitchGroup(cases.varName(), new Nodes.SequenceType[0],
-        cases.exprSingle(), s);
+    // the default case of a braced typeswitch may be omitted
+    groups[clauses.length] = cases.exprSingle() != null ?
+      typeswitchGroup(cases.varName(), new Nodes.SequenceType[0], cases.exprSingle(), s) :
+      new TypeswitchGroup(infoAt(node.bracedTypeswitchCases().end() - 1), null,
+          new SeqType[0], Empty.VALUE);
     return new Typeswitch(ii, cond, groups);
   }
 
@@ -2984,13 +3009,13 @@ public final class RExQueryParser extends AQueryParser {
   private Expr methodCall(final MethodCall node) throws QueryException {
     final Expr expr = single(node.postfixExpr());
     final InputInfo info = info(node.ncName());
-    final Str key = Str.get(token(text(node.ncName())));
+    final byte[] name = token(text(node.ncName()));
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
     final FuncBuilder fb = argumentList(node.positionalArgumentList(), arg);
-    if(fb.placeholders != 0) throw error(node, INVPLACEHOLDER_X, key);
-    final Lookup func = new Lookup(info, arg, key);
+    if(fb.placeholders != 0) throw error(node, INVPLACEHOLDER_X, name);
+    final Lookup func = new Lookup(info, arg, Str.get(name));
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);

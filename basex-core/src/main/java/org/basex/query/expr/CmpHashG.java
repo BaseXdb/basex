@@ -100,7 +100,7 @@ public final class CmpHashG extends CmpG {
     // stable right-hand operand: probe against populated cache without re-evaluating expr2
     // recursive evaluation of the same expression: skip the cache, which is in use
     final Expr expr2 = exprs[1];
-    final CmpCache cc = qc.caches.get(this, () -> new CmpCache(info, expr2));
+    final CmpCache cc = qc.exprCaches.get(this, () -> new CmpCache(info, expr2));
     final CmpCache cache = cc.busy ? null : cc;
     if(cache != null && cache.stable && cache.value != null) return probe(iter1, cache, qc);
 

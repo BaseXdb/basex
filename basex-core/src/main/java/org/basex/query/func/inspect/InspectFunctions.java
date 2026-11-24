@@ -13,7 +13,6 @@ import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -37,11 +36,11 @@ public final class InspectFunctions extends StandardFunc {
 
     // URI specified: return functions of imported module, or compile module and return new ones
     final IOContent src = toContent(source, qc);
-    Value funcs = qc.resources.functions(src.path());
+    Value funcs = qc.globalCaches.functions(src.path());
     if(funcs != null) return funcs;
 
     // module has already been imported: return its functions
-    final LibraryModule lib = qc.libs.get(Token.token(qc.modulePath(IO.get(src.path()))));
+    final LibraryModule lib = qc.modules.library(qc.modules.path(IO.get(src.path())));
     final ArrayList<StaticFunc> list;
     if(lib != null) {
       list = lib.funcs;
@@ -71,7 +70,7 @@ public final class InspectFunctions extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : list) addItems(vb, sf, qc);
     funcs = vb.value(this);
-    qc.resources.addFunctions(src.path(), funcs);
+    qc.globalCaches.functions(src.path(), funcs);
     return funcs;
   }
 

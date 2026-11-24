@@ -36,7 +36,8 @@ public final class FnSystemProperties extends StandardFunc {
       put(property("supports-dynamic-xquery"), Bln.TRUE).
       put(property("supports-dynamic-xslt"), Bln.TRUE).
       put(property("supports-binary-library"), Bln.TRUE).
-      put(property("supports-file-library"), Bln.TRUE).map();
+      put(property("supports-file-library"), Bln.TRUE).
+      put(property("supports-arithmetic-mode-decimal"), Bln.TRUE).map();
   }
 
   /**

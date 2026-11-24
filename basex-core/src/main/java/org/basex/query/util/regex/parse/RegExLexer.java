@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.util.regex.*;
 
+import org.basex.query.util.regex.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -36,7 +37,8 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
 
   /** Unicode category regex. */
   private static final Pattern CAT_REGEX = Pattern.compile("^L[ultmo]?|M[nce]?|N[dlo]?" +
-      "|P[cdseifo]?|Z[slp]?|S[mcko]?|C[cfon]?|Is[a-zA-Z\\d\\-]+$");
+      "|P[cdseifo]?|Z[slp]?|S[mcko]?|C[cfon]?|Is[a-zA-Z\\d\\-]+" +
+      "|Script(?:_Extensions)?=([A-Z][a-z]*(?:_[A-Z][a-z]*)*|SignWriting)$");
 
   /**
    * Constructor.
@@ -244,7 +246,10 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
         for(int cp = next(skipCmt); cp != '}'; cp = next(skipCmt))
           if(cp == -1) throw error(tb.toString(), -1);
         final String in = tb.toString().substring(3, tb.size() - 1);
-        if(!CAT_REGEX.matcher(in).matches()) throw error("{", nxt);
+        final Matcher m = CAT_REGEX.matcher(in);
+        if(!m.matches() || m.group(1) != null && Escape.javaScript(m.group(1)) == null) {
+          throw error("{", nxt);
+        }
         payload = in;
         return CAT_ESC;
       default:

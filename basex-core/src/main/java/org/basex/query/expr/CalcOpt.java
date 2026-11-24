@@ -22,10 +22,12 @@ interface CalcOpt {
    * @param st1 first sequence type
    * @param st2 second sequence type
    * @param calc calculation operator
+   * @param preferred preferred numeric type
    * @return operator or {@code null}
    */
-  static CalcOpt get(final SeqType st1, final SeqType st2, final Calc calc) {
-    final BasicType type = Calc.numType(st1.type, st2.type);
+  static CalcOpt get(final SeqType st1, final SeqType st2, final Calc calc,
+      final BasicType preferred) {
+    final BasicType type = Calc.numType(st1.type, st2.type, preferred);
     if(!type.isNumber()) return null;
     return switch(calc) {
       case ADD -> switch(type) {

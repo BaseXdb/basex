@@ -854,7 +854,11 @@ public enum QueryError {
   /** Error code. */
   UPREPLACE_X_X(FOUP, 4, "% expected, % found."),
   /** Error code. */
-  UPACTIONS(FOUP, 4, "Replacement cannot be combined with a new value or name."),
+  UPACTIONS_X_X(FOUP, 4, "Actions cannot be combined: %, %."),
+  /** Error code. */
+  UPNOACTIONS(FOUP, 4, "No action supplied."),
+  /** Error code. */
+  UPDELETE_X(FOUP, 4, "Deletion: empty sequence expected, % found."),
   /** Error code. */
   UPRENAME_X(FOUP, 4, "Node cannot be renamed: %."),
   /** Error code. */

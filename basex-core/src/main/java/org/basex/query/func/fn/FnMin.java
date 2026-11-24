@@ -60,13 +60,13 @@ public class FnMin extends StandardFunc {
     final boolean numeric = !(string || dateTime || duration || type == BOOLEAN || type == QNAME ||
         item instanceof ADate || item instanceof Bin);
     if(numeric) {
-      if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
+      if(type.isUntyped()) item = toNumber(item, null);
       if(item == Dbl.NAN || item == Flt.NAN) return item;
     }
     for(Item it; (it = qc.next(iter)) != null;) {
       final Type type2 = it.type;
       if(numeric) {
-        if(type2.isUntyped()) it = DOUBLE.cast(it, qc, info);
+        if(type2.isUntyped()) it = toNumber(it, null);
         if(it == Dbl.NAN || it == Flt.NAN) return it;
       }
       if(!(numeric ? it instanceof ANum : string ? it instanceof AStr :
@@ -82,7 +82,7 @@ public class FnMin extends StandardFunc {
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
     if(arg(0).seqType().atomType().isNumberOrUntyped()) {
-      arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
+      arg(0, arg -> arg.simplifyFor(Simplify.numeric(sc()), cc));
     }
     // min(distinct-values($values)) → min($values), max(sort($values)) → max($values)
     arg(0, arg -> arg.simplifyFor(Simplify.SET, cc));
@@ -111,10 +111,11 @@ public class FnMin extends StandardFunc {
       if(monotonic != null) return monotonic;
     }
     final SeqType st = values.seqType();
+    final BasicType preferred = sc().numericType();
     BasicType type = st.type.atomic();
     if(type != null) {
       if(type.isUntyped()) {
-        type = DOUBLE;
+        type = preferred;
       } else if(st.one() && noColl && type != ANY_ATOMIC_TYPE &&
           st.type.instanceOf(ANY_ATOMIC_TYPE)) {
         // min($item) → $item, max($item) → $item
@@ -129,7 +130,7 @@ public class FnMin extends StandardFunc {
     }
 
     // max(db:get('db')//price) → 99e0
-    if(noColl && values instanceof final Path path) {
+    if(noColl && preferred == DOUBLE && values instanceof final Path path) {
       final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
         double v = min ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;

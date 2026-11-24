@@ -26,8 +26,6 @@ import org.basex.util.list.*;
 public abstract class Formatter extends FormatUtil {
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
-  /** Default digit pattern of a timezone component. */
-  private static final byte[] ZONE_PATTERN = token("00");
   /** Components that are not available in times. */
   private static final byte[] DATE_COMPONENTS = token("YMDdFWwE");
   /** Components that are not available in dates. */
@@ -35,6 +33,13 @@ public abstract class Formatter extends FormatUtil {
   /** Japanese factors (kanji offset: 10 + array index). */
   private static final long[] JAPANESE = { 10, 100, 1000, 10000, 100000000L, 1000000000000L,
     10000000000000000L };
+  /** Roman numerals for each digit of thousands, hundreds, tens and ones. */
+  private static final byte[][][] ROMAN = {
+    tokens("", "M", "MM", "MMM"),
+    tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"),
+    tokens("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"),
+    tokens("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+  };
   /** Allowed calendars. */
   private static final byte[][] CALENDARS = tokens(
     "ISO", "AD", "AH", "AME", "AM", "AP", "AS", "BE", "CB", "CE", "CL", "CS", "EE", "FE",
@@ -50,6 +55,30 @@ public abstract class Formatter extends FormatUtil {
     MAP.put(EN, new FormatterEN());
     MAP.put(token("de"), new FormatterDE());
     MAP.put(token("fr"), new FormatterFR());
+  }
+
+  /** Months (January-December). */
+  private final byte[][] months;
+  /** Names of weekdays (Monday-Sunday), each ordered by length. */
+  final byte[][][] days;
+  /** AM/PM markers. */
+  private final byte[][] ampm;
+  /** Eras (BC, AD). */
+  private final byte[][] eras;
+
+  /**
+   * Constructor.
+   * @param months months (January-December)
+   * @param days names of weekdays (Monday-Sunday), each ordered by length
+   * @param ampm am/pm markers
+   * @param eras eras (BC, AD)
+   */
+  Formatter(final byte[][] months, final byte[][][] days, final byte[][] ampm,
+      final byte[][] eras) {
+    this.months = months;
+    this.days = days;
+    this.ampm = ampm;
+    this.eras = eras;
   }
 
   /**
@@ -69,8 +98,9 @@ public abstract class Formatter extends FormatUtil {
    * @return formatter instance, or {@code null} if not implemented
    */
   protected static Formatter getInternal(final byte[] languageTag) {
+    // language tags are case-insensitive
     final int i = indexOf(languageTag, '-');
-    return i < 0 ? MAP.get(languageTag) : MAP.get(substring(languageTag, 0, i));
+    return MAP.get(lc(i < 0 ? languageTag : substring(languageTag, 0, i)));
   }
 
   /**
@@ -87,10 +117,18 @@ public abstract class Formatter extends FormatUtil {
    * Returns a word representation for the specified number.
    * @param n number to be formatted
    * @param numType numeral type
-   * @param suffix suffix
-   * @return token
+   * @param modifier format modifier (can be {@code null})
+   * @return token, or {@code null} if the number is outside the supported range
    */
-  protected abstract byte[] word(long n, NumeralType numType, byte[] suffix);
+  protected abstract byte[] word(long n, NumeralType numType, byte[] modifier);
+
+  /**
+   * Indicates if ordinal words of this formatter are preferred to those of ICU.
+   * @return result of check
+   */
+  protected boolean ordinalWords() {
+    return false;
+  }
 
   /**
    * Returns a suffix for the representation of the specified number.
@@ -100,39 +138,6 @@ public abstract class Formatter extends FormatUtil {
    */
   protected abstract byte[] suffix(long n, NumeralType numType);
 
-  /**
-   * Returns the specified month (0-11).
-   * @param n number to be formatted
-   * @return month
-   */
-  protected abstract byte[] month(int n);
-
-  /**
-   * Returns the names of the specified day of the week (0-6, Sunday-Saturday).
-   * @param n number to be formatted
-   * @return names, ordered by length
-   */
-  protected abstract byte[][] day(int n);
-
-  /**
-   * Returns the am/pm marker.
-   * @param am am flag
-   * @return am/pm marker
-   */
-  protected abstract byte[] ampm(boolean am);
-
-  /**
-   * Returns the calendar.
-   * @return calendar
-   */
-  protected abstract byte[] calendar();
-
-  /**
-   * Returns the era.
-   * @param year year
-   * @return era
-   */
-  protected abstract byte[] era(long year);
 
   /**
    * Formats the specified date.
@@ -150,7 +155,9 @@ public abstract class Formatter extends FormatUtil {
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
+    final boolean fallback = languageTag.length != 0 && !available(languageTag);
+    final boolean english = languageTag.length == 0 || fallback;
+    if(fallback) tb.add("[Language: en]");
     final int cal = calendar != null ? calendar(calendar, info) : 1;
     if(cal > 1) tb.add("[Calendar: AD]");
 
@@ -161,12 +168,13 @@ public abstract class Formatter extends FormatUtil {
     if(id != null) {
       final ZoneRules rules = id.getRules();
       final boolean time = dt.type == BasicType.TIME;
-      final Instant instant = time ? Instant.now() :
-        dt.toLocalDateTime().atZone(zoneId(dt)).toInstant();
+      // values without timezone are interpreted as local time at the place
+      final Instant instant = time ? Instant.now() : dt.toLocalDateTime().atZone(
+        dt.hasTz() ? ZoneOffset.ofTotalSeconds(dt.tz() * 60) : id).toInstant();
       final ZoneOffset offset = time ? rules.getStandardOffset(instant) : rules.getOffset(instant);
-      date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
-      final Locale locale = languageTag.length == 0 ? Locale.ENGLISH :
-        Locale.forLanguageTag(string(languageTag));
+      // historical offsets (local mean time) are truncated to minutes
+      date = dt.timeZone(DTDur.get(offset.getTotalSeconds() / 60 * 60000L), false, info);
+      final Locale locale = english ? Locale.ENGLISH : Locale.forLanguageTag(string(languageTag));
       zone = token(TimeZone.getTimeZone(id).getDisplayName(
         !time && rules.isDaylightSavings(instant), TimeZone.SHORT, locale));
     }
@@ -239,27 +247,35 @@ public abstract class Formatter extends FormatUtil {
 
     if(comp == 'Z' || comp == 'z') {
       // output timezone (as name if requested via 'N' and a place is known)
-      final byte[] tz = fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp);
+      final byte[] tz = fp.first == 'n' && zone != null ? letterCase(zone, fp.cs) :
+        formatZone((int) num, fp);
       // pad to minimum width; the representation is never shortened
       return tz.length == 0 ? tz : format(tz, fp.min, Integer.MAX_VALUE);
     }
     if(fp.first == 'n') {
       // output name representation
-      byte[] name = switch(comp) {
-        case 'M' -> month((int) num - 1);
-        case 'F' -> abbreviation(day((int) num - 1), fp.max);
-        case 'P' -> ampm(num == 0);
-        case 'C' -> calendar();
-        default -> era(num);
+      final byte[] name = switch(comp) {
+        case 'M' -> months[(int) num - 1];
+        case 'F' -> abbreviation(days[(int) num - 1], fp.max);
+        case 'P' -> ampm[num == 0 ? 0 : 1];
+        case 'C' -> iso ? CALENDARS[0] : eras[1];
+        default -> eras[num <= 0 ? 0 : 1];
       };
-      if(fp.cs == Case.LOWER) name = lc(name);
-      else if(fp.cs == Case.UPPER) name = uc(name);
-      else name = tc(name);
       // names are abbreviated to the maximum width and padded to the minimum width
-      return format(name, fp.min, fp.max);
+      return format(letterCase(name, fp.cs), fp.min, fp.max);
     }
-    return fp.fraction ? formatFrac(date.seconds().remainder(BigDecimal.ONE), fp) :
+    return comp == 'f' ? formatFrac(date.seconds().remainder(BigDecimal.ONE), fp) :
       formatInt(num, fp);
+  }
+
+  /**
+   * Converts a name to the requested case.
+   * @param name name
+   * @param cs case
+   * @return converted name
+   */
+  private static byte[] letterCase(final byte[] name, final Case cs) {
+    return cs == Case.LOWER ? lc(name) : cs == Case.UPPER ? uc(name) : tc(name);
   }
 
   /**
@@ -319,21 +335,22 @@ public abstract class Formatter extends FormatUtil {
     }
 
     // format number
-    byte[] number = number(token(s), fp, fp.first);
+    byte[] number = number(token(s), fp);
 
     // truncate trailing zeroes
     if(od > 0 && s.endsWith("0")) {
-      final String ns = string(number);
-      int nsi = ns.length();
-      for(int dc = 0; dc <= od;) {
-        final int cp = ns.charAt(--nsi);
+      final int[] cps = cps(number);
+      final int cl = cps.length;
+      int c = cl;
+      for(int dc = 0; dc <= od && c > 0;) {
+        final int cp = cps[--c];
         final int zero = zeroes(cp);
         if(zero != -1) {
           ++dc;
           if(cp != zero) break;
         }
       }
-      if(nsi + 1 != ns.length()) number = token(ns.substring(0, nsi + 1));
+      if(c + 1 != cl) number = token(new String(cps, 0, c + 1));
     }
     return number;
   }
@@ -348,33 +365,71 @@ public abstract class Formatter extends FormatUtil {
     // prepend minus sign to negative values
     final boolean sign = num < 0;
     final long n = sign ? -num : num;
+    // ordinal suffixes only depend on the last digits (Long.MIN_VALUE has no absolute value)
+    final long ord = n < 0 ? -(num % 1000) : n;
 
-    final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
+    // the absolute value of the minimum integer can only be represented with digits
+    if(n < 0 && fp.zeroes(ch) == -1) return decimal(num, ord, fp.numType);
+
+    byte[] in, suffix = EMPTY;
     if(ch == 'w') {
-      tb.add(word(n, fp.numType, fp.modifier));
-    } else if(ch == KANJI[1]) {
-      if(n == 0) tb.add(KANJI[0]);
-      else japanese(tb, n, false);
-    } else if(ch == 'i') {
-      roman(tb, n, fp.min);
+      in = word(n, fp.numType, fp.modifier);
+      // numbers outside the supported range
+      if(in == null) return decimal(num, ord, fp.numType);
     } else {
-      // numbering sequences are limited to small ranges; decimal output is used as fallback
-      final int[] numbering = numbering(ch);
-      final int cp = numbering != null ? numbered(numbering, n) : -1;
-      final String seq = sequence(ch);
-      if(cp != -1) tb.add(cp);
-      else if(numbering != null) tb.addLong(n);
-      else if(seq != null) alpha(tb, n, seq);
-      else tb.add(number(n, fp, ch));
+      in = symbols(n, ch, fp.min);
+      if(in == null) {
+        in = number(n, fp);
+        suffix = suffix(ord, fp.numType);
+      }
     }
 
-    // finalize formatted string
-    byte[] in = tb.finish();
+    // finalize formatted string; the ordinal suffix keeps its case
     if(fp.cs == Case.LOWER) in = lc(in);
     else if(fp.cs == Case.UPPER) in = uc(in);
     else if(ch == 'w') in = capitalize(in);
-    return sign ? concat(cpToken('-'), in) : in;
+    return sign || suffix.length != 0 ? concat(sign ? cpToken('-') : EMPTY, in, suffix) : in;
+  }
+
+  /**
+   * Returns a decimal representation, which is the fallback for unsupported numbers.
+   * @param num integer to be formatted
+   * @param ord value for choosing the ordinal suffix
+   * @param numType numeral type
+   * @return string representation
+   */
+  private byte[] decimal(final long num, final long ord, final NumeralType numType) {
+    return concat(token(num), suffix(ord, numType));
+  }
+
+  /**
+   * Returns the representation of a number in a sequence of symbols.
+   * @param n non-negative number
+   * @param ch first character of the format token
+   * @param min minimum width
+   * @return representation, or {@code null} if the format token denotes a digit pattern
+   */
+  private static byte[] symbols(final long n, final int ch, final int min) {
+    final int[] numbering = numbering(ch);
+    final String seq = numbering == null ? sequence(ch) : null;
+    if(ch != KANJI[1] && ch != 'i' && numbering == null && seq == null) return null;
+
+    final TokenBuilder tb = new TokenBuilder();
+    if(ch == KANJI[1]) {
+      if(n == 0) tb.add(KANJI[0]);
+      else japanese(tb, n, false);
+    } else if(ch == 'i') {
+      roman(tb, n, min);
+    } else if(numbering != null) {
+      // numbering sequences are limited to small ranges; decimal output is used as fallback
+      final int cp = numbered(numbering, n);
+      if(cp != -1) tb.add(cp);
+      else tb.addLong(n);
+    } else {
+      alpha(tb, n, seq);
+    }
+    return tb.finish();
   }
 
   /**
@@ -399,17 +454,16 @@ public abstract class Formatter extends FormatUtil {
    * @param num timezone (minutes)
    * @param fp date format
    * @return string representation
-   * @throws QueryException query exception
    */
-  private byte[] formatZone(final int num, final DateFormat fp) throws QueryException {
-    final boolean uc = fp.comp == 'Z', mil = uc && ch(fp.marker, 1) == 'Z';
+  private byte[] formatZone(final int num, final DateFormat fp) {
+    final boolean mil = ch(fp.marker, 1) == 'Z';
     // ignore values without timezone. exception: military timezone
     if(num == Short.MAX_VALUE) return mil ? cpToken('J') : EMPTY;
     // military timezone: single letter, restricted to full hours
     if(mil && num % 60 == 0 && num >= -720 && num <= 720) return cpToken(MIL[num / 60 + 12]);
 
     final TokenBuilder tb = new TokenBuilder();
-    if(!uc) tb.add("GMT");
+    if(fp.comp == 'z') tb.add("GMT");
     if(fp.trad && num == 0) return tb.add('Z').finish();
     tb.add(num < 0 ? '-' : '+');
 
@@ -419,56 +473,42 @@ public abstract class Formatter extends FormatUtil {
     int digits = 0;
     while(digits < cl && zeroes(cps[digits]) != -1) ++digits;
 
-    final TokenBuilder hours = new TokenBuilder(), minutes = new TokenBuilder();
-    int sep = 0;
-    if(digits == 0) {
-      // no digits: use default pattern
-      hours.add(ZONE_PATTERN);
-      minutes.add(ZONE_PATTERN);
-      sep = ':';
-    } else if(digits > 2) {
+    // width of hours, separator and minutes (no digits: default pattern 00:00)
+    final int zero = digits > 0 ? zeroes(cps[0]) : '0';
+    int hours = 2, sep = ':';
+    boolean minutes = true;
+    if(digits > 2) {
       // three or more digits: the last two ones represent the minutes
-      final int hl = Math.min(digits - 2, 2);
-      for(int c = 0; c < hl; c++) hours.add(cps[c]);
-      minutes.add(cps[hl]).add(cps[hl + 1]);
-    } else {
-      for(int c = 0; c < digits; c++) hours.add(cps[c]);
-      if(digits < cl) {
-        // digits are followed by a separator and by up to two minute digits
-        sep = cps[digits];
-        for(int c = digits + 1; c <= digits + 2 && c < cl; c++) {
-          final int zero = zeroes(cps[c]);
-          if(zero == -1) break;
-          minutes.add(zero);
-        }
-        if(minutes.isEmpty()) minutes.add('0');
-      } else if(num % 60 != 0) {
-        // no separator: add minutes only if required
-        minutes.add(ZONE_PATTERN);
-        sep = ':';
-      }
+      hours = Math.min(digits - 2, 2);
+      sep = 0;
+    } else if(digits > 0) {
+      // minutes after the separator, or (if required) after a colon
+      hours = digits;
+      if(digits < cl) sep = cps[digits];
+      else minutes = num % 60 != 0;
     }
 
-    tb.add(zoneValue(num, true, hours.finish()));
-    if(!minutes.isEmpty()) {
+    final int abs = Math.abs(num);
+    digits(tb, abs / 60, hours, zero);
+    if(minutes) {
       if(sep != 0) tb.add(sep);
-      tb.add(zoneValue(num, false, minutes.finish()));
+      digits(tb, abs % 60, 2, zero);
     }
     return tb.finish();
   }
 
   /**
-   * Returns a timezone component.
-   * @param num timezone (minutes)
-   * @param hours format hours (otherwise, minutes)
-   * @param pattern digit pattern
-   * @return timezone component
-   * @throws QueryException query exception
+   * Adds the digits of a non-negative number, padded with leading zeroes.
+   * @param tb token builder
+   * @param num number
+   * @param width minimum number of digits
+   * @param zero zero digit of the digit family
    */
-  private byte[] zoneValue(final int num, final boolean hours, final byte[] pattern)
-      throws QueryException {
-    return number(Math.abs(hours ? num / 60 : num % 60), new IntFormat(pattern, null),
-        ch(pattern, 0));
+  private static void digits(final TokenBuilder tb, final int num, final int width,
+      final int zero) {
+    final String string = Integer.toString(num);
+    for(int s = string.length(); s < width; s++) tb.add(zero);
+    for(final char ch : string.toCharArray()) tb.add(zero + ch - '0');
   }
 
   /**
@@ -494,11 +534,9 @@ public abstract class Formatter extends FormatUtil {
   private static void roman(final TokenBuilder tb, final long n, final int min) {
     final int sz = tb.size();
     if(n > 0 && n < 4000) {
-      final int v = (int) n;
-      tb.add(ROMANM[v / 1000]);
-      tb.add(ROMANC[v / 100 % 10]);
-      tb.add(ROMANX[v / 10 % 10]);
-      tb.add(ROMANI[v % 10]);
+      for(int r = 0, d = 1000; r < ROMAN.length; r++, d /= 10) {
+        tb.add(ROMAN[r][(int) (n / d % 10)]);
+      }
     } else {
       tb.addLong(n);
     }
@@ -509,12 +547,12 @@ public abstract class Formatter extends FormatUtil {
    * Recursively adds a Japanese character sequence.
    * @param tb token builder
    * @param n number to be formatted
-   * @param initial initial call
+   * @param omitOne omit a single one (multiplier of a unit)
    */
-  private static void japanese(final TokenBuilder tb, final long n, final boolean initial) {
+  private static void japanese(final TokenBuilder tb, final long n, final boolean omitOne) {
     if(n == 0) return;
     if(n <= 9) {
-      if(n != 1 || !initial) tb.add(KANJI[(int) n]);
+      if(n != 1 || !omitOne) tb.add(KANJI[(int) n]);
     } else {
       final int jl = JAPANESE.length - 1;
       int j = 0;
@@ -523,20 +561,12 @@ public abstract class Formatter extends FormatUtil {
         tb.addLong(n);
       } else {
         final long f = JAPANESE[j];
-        japanese(tb, n / f, true);
+        // a leading one is omitted for 十, 百 and 千, but not for 万 and larger units
+        japanese(tb, n / f, j < 3);
         tb.add(KANJI[10 + j]);
         japanese(tb, n % f, false);
       }
     }
-  }
-
-  /**
-   * Returns the timezone of a date, or the system timezone if the date has none.
-   * @param date date
-   * @return timezone
-   */
-  private static ZoneId zoneId(final ADate date) {
-    return date.hasTz() ? ZoneOffset.ofTotalSeconds(date.tz() * 60) : ZoneId.systemDefault();
   }
 
   /**
@@ -556,30 +586,27 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Creates a number character sequence.
+   * Creates a number character sequence for an integer.
    * @param num number to be formatted
    * @param fp format parser
-   * @param first first digit
    * @return number character sequence
    */
-  private byte[] number(final long num, final FormatParser fp, final int first) {
+  private static byte[] number(final long num, final FormatParser fp) {
     if(num >= 0 && digit(fp.primary)) {
       // decimal digit pattern without separators: pad with leading zeroes
-      return new TokenBuilder().addLong(num, Math.max(fp.primary.length, fp.min)).
-          add(suffix(num, fp.numType)).finish();
+      return new TokenBuilder().addLong(num, Math.max(fp.primary.length, fp.min)).finish();
     }
-    return concat(number(token(num, fp.radix), fp, first), suffix(num, fp.numType));
+    return number(token(num, fp.radix), fp);
   }
 
   /**
-   * Creates a number character sequence.
-   * @param num number to be formatted
+   * Creates a number character sequence for the digits of a number.
+   * @param num digits (ASCII, or radix digits)
    * @param fp format parser
-   * @param first first digit
    * @return number character sequence
    */
-  private static byte[] number(final byte[] num, final FormatParser fp, final int first) {
-    final int zero = fp.zeroes(first);
+  private static byte[] number(final byte[] num, final FormatParser fp) {
+    final int zero = fp.zeroes(fp.first);
 
     // cache characters of presentation modifier
     final int[] mod = cps(fp.primary);
@@ -588,7 +615,7 @@ public abstract class Formatter extends FormatUtil {
     while(modStart < modSize && mod[modStart] == '#') modStart++;
 
     // try to find regular separator pattern
-    int sepPos = -1, sepChar = -1, digitPos = 0;
+    int sepPos = -1, sepChar = -1, digitPos = 0, seps = 0;
     boolean regSep = false;
     for(int mp = modSize - 1; mp >= modStart; --mp) {
       final int ch = mod[mp];
@@ -597,6 +624,7 @@ public abstract class Formatter extends FormatUtil {
         continue;
       }
       if(ch == '#') continue;
+      seps++;
       if(sepPos == -1) {
         sepPos = modSize - mp;
         sepChar = ch;
@@ -605,6 +633,8 @@ public abstract class Formatter extends FormatUtil {
         regSep = (modSize - mp) % sepPos == 0 && ch == sepChar;
       }
     }
+    // every multiple of the grouping size below the number of digit signs must be a separator
+    if(regSep) regSep = sepPos > 1 && seps == (modSize - seps - 1) / (sepPos - 1);
     if(!regSep) sepPos = Integer.MAX_VALUE;
 
     // cache characters in reverse order
@@ -657,7 +687,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private static byte[] abbreviation(final byte[][] forms, final int max) {
     int f = forms.length;
-    while(--f > 0 && max < forms[f].length);
+    while(--f > 0 && max < length(forms[f]));
     return forms[f];
   }
 

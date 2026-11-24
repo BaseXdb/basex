@@ -53,11 +53,11 @@ public abstract class NumericFn extends StandardFunc {
    * @param expr expression
    * @return sequence type or {@code null}
    */
-  protected static SeqType optType(final Expr expr) {
+  protected final SeqType optType(final Expr expr) {
     final SeqType st = expr.seqType();
     Type type = st.type.atomicOrAny();
-    // untyped values are treated as doubles, derived integer types are not preserved
-    if(type.isUntyped()) type = BasicType.DOUBLE;
+    // untyped values are cast to the preferred type, derived integer types are not preserved
+    if(type.isUntyped()) type = sc().numericType();
     else if(type.instanceOf(BasicType.INTEGER)) type = BasicType.INTEGER;
     if(type.isNumber()) return type.seqType(st.atomOcc().intersect(Occ.ZERO_OR_ONE));
     return null;

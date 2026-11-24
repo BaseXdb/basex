@@ -27,27 +27,41 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnUpdate extends StandardFunc {
-  /** Action: new value. */
-  private static final Str VALUE = Str.get("value");
-  /** Action: new name. */
-  private static final Str RENAME = Str.get("rename");
+  /** Action: deletion. */
+  private static final Str DELETE = Str.get("delete");
   /** Action: replacing nodes. */
   private static final Str REPLACE = Str.get("replace");
+  /** Action: new value. */
+  private static final Str REPLACE_VALUE = Str.get("replace-value");
+  /** Action: new name. */
+  private static final Str RENAME = Str.get("rename");
   /** Action: nodes inserted before. */
-  private static final Str BEFORE = Str.get("before");
+  private static final Str INSERT_BEFORE = Str.get("insert-before");
   /** Action: nodes inserted after. */
-  private static final Str AFTER = Str.get("after");
-  /** Default actions: the selected nodes are deleted. */
-  private static final XQMap DELETE = XQMap.get(REPLACE, Empty.VALUE);
+  private static final Str INSERT_AFTER = Str.get("insert-after");
+  /** Actions that exclude a deletion or replacement. */
+  private static final Str[] EXCLUDED = { REPLACE, REPLACE_VALUE, RENAME };
+  /** Actions that only remove the selected nodes. */
+  private static final XQMap REMOVE = XQMap.get(DELETE, Empty.VALUE);
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).item(qc, info);
     final FItem select = toFunction(arg(1), 1, qc);
-    final XQMap actions = defined(2) ?
-      (XQMap) coerce(arg(2), Types.UPDATE_ACTIONS_O, qc) : DELETE;
-    if(actions.contains(REPLACE) && (actions.contains(VALUE) || actions.contains(RENAME)))
-      throw UPACTIONS.get(info);
+    XQMap actions = (XQMap) coerce(arg(2), Types.UPDATE_ACTIONS_O, qc);
+    final long size = actions.structSize();
+    if(size == 0) throw UPNOACTIONS.get(info);
+    // deletion and replacement exclude each other and changes of the selected node
+    final Str removal = actions.contains(DELETE) ? DELETE : actions.contains(REPLACE) ? REPLACE :
+      null;
+    if(removal != null) {
+      for(final Str other : EXCLUDED) {
+        if(other != removal && actions.contains(other))
+          throw UPACTIONS_X_X.get(info, removal, other);
+      }
+      // selected nodes that are only removed need not be rebuilt
+      if(size == 1 && actions.getOrNull(removal).isEmpty()) actions = REMOVE;
+    }
 
     // effective value: the supplied value, wrapped in a root JNode if it is a map or an array
     final GNode node;
@@ -102,8 +116,8 @@ public final class FnUpdate extends StandardFunc {
     // they are consumed by the rebuilt parent and need no copy
     if(!root && !ancestors.contains(node.id()))
       return node instanceof JNode ? node : copy(node, qc);
-    // nodes that are deleted by default are not rebuilt
-    if(actions == DELETE && targets.contains(node.id())) return Empty.VALUE;
+    // nodes that are only removed are not rebuilt
+    if(actions == REMOVE && targets.contains(node.id())) return Empty.VALUE;
 
     // the builder is created first, so that node IDs are assigned in document order
     final FBuilder builder = builder(node, root);
@@ -136,10 +150,15 @@ public final class FnUpdate extends StandardFunc {
 
     // all actions are evaluated before the content of the node is moved to its successor
     final ValueBuilder vb = new ValueBuilder(qc), after = new ValueBuilder(qc);
-    supply(action(actions, BEFORE, node, qc), vb, qc);
-    final Value replace = action(actions, REPLACE, node, qc);
-    final Value value = action(actions, VALUE, node, qc), name = action(actions, RENAME, node, qc);
-    supply(action(actions, AFTER, node, qc), after, qc);
+    supply(action(actions, INSERT_BEFORE, node, qc), vb, qc);
+    // a deletion is a replacement with no nodes
+    final Value delete = action(actions, DELETE, node, qc);
+    if(delete != null && !delete.isEmpty())
+      throw UPDELETE_X.get(info, delete.seqType());
+    final Value replace = delete != null ? delete : action(actions, REPLACE, node, qc);
+    final Value value = action(actions, REPLACE_VALUE, node, qc);
+    final Value name = action(actions, RENAME, node, qc);
+    supply(action(actions, INSERT_AFTER, node, qc), after, qc);
     if(replace != null) supply(replace, vb, qc);
     else vb.add(change(node, container, value, name, qc));
     vb.add(after.value());

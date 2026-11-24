@@ -83,7 +83,7 @@ public abstract class KeyedFilter<C> extends Filter {
     if(value == null || value.size() < 2 || value.size() > Integer.MAX_VALUE) return null;
 
     // first evaluation with this root: remember it, evaluate sequentially
-    final Entry<C> entry = qc.caches.get(this, Entry::new);
+    final Entry<C> entry = qc.exprCaches.get(this, Entry::new);
     if(entry.root != value) {
       entry.root = value;
       entry.cache = cache();

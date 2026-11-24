@@ -87,7 +87,7 @@ public abstract class AxisPath extends Path {
     if(root == null && value == Empty.VALUE) return value;
     if(!cacheable) return null;
 
-    final PathCache cache = qc.caches.get(this, () -> new PathCache(this, value));
+    final PathCache cache = qc.exprCaches.get(this, () -> new PathCache(this, value));
     Value result = cache.get(value, qc);
     if(result == null && cache.ready()) {
       result = nodes(qc);

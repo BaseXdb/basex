@@ -100,7 +100,7 @@ public final class FTWords extends FTExpr {
     optimize(cc.qc);
     if(occ != null) {
       final int ol = occ.length;
-      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.NUMBER, cc);
+      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.DATA, cc);
     }
     return this;
   }
@@ -146,14 +146,14 @@ public final class FTWords extends FTExpr {
   @Override
   public FTNode value(final QueryContext qc) throws QueryException {
     final FTTokenizer ftt = get(qc);
-    if(ftt.pos == 0) ftt.pos = ++qc.ftPos;
+    if(ftt.pos == 0) ftt.pos = ++qc.ft.pos;
     ftt.matches.reset(ftt.pos);
 
     final int count = contains(qc, ftt);
     if(count == 0) ftt.matches.size(0);
 
     // scoring: include number of tokens for calculations
-    return new FTNode(ftt.matches, count == 0 ? 0 : Scoring.word(count, qc.ftLexer.count()));
+    return new FTNode(ftt.matches, count == 0 ? 0 : Scoring.word(count, qc.ft.lexer.count()));
   }
 
   @Override
@@ -233,7 +233,7 @@ public final class FTWords extends FTExpr {
       } else {
         final FTIndexIterator ir = lexer.token().length > data.meta.maxlen ?
           scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
-        ir.pos(++qc.ftPos);
+        ir.pos(++qc.ft.pos);
         if(iter == null) {
           iter = ir;
         } else {
@@ -327,7 +327,7 @@ public final class FTWords extends FTExpr {
    */
   private int contains(final QueryContext qc, final FTTokenizer ftt) throws QueryException {
     ftt.first = true;
-    final FTLexer lexer = qc.ftLexer.copy(ftOpt);
+    final FTLexer lexer = qc.ft.lexer.copy(ftOpt);
 
     // use faster evaluation for default options
     int num = 0;
@@ -420,7 +420,7 @@ public final class FTWords extends FTExpr {
    * @return tokenizer
    */
   private FTTokenizer get(final QueryContext qc) {
-    return qc.caches.get(this, () -> new FTTokenizer(ftOpt, qc, info));
+    return qc.exprCaches.get(this, () -> new FTTokenizer(ftOpt, qc, info));
   }
 
   @Override

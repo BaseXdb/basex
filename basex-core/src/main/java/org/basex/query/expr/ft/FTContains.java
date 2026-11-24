@@ -45,16 +45,16 @@ public final class FTContains extends Single {
 
   @Override
   public Bln value(final QueryContext qc) throws QueryException {
-    final boolean scoring = qc.scoring;
+    final boolean scoring = qc.ft.scoring;
     final Iter iter = expr.iter(qc);
 
-    final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
-    qc.ftLexer = lexer;
+    final FTLexer tmp = qc.ft.lexer, lexer = new FTLexer(new FTOpt());
+    qc.ft.lexer = lexer;
     try {
       double score = 0;
       int count = 0;
       boolean found = false;
-      final FTPosData ftPosData = qc.ftPosData;
+      final FTPosData ftPosData = qc.ft.posData;
       loop:
       for(Item input; (input = qc.next(iter)) != null;) {
         // arrays are atomized, as in the optimized expression
@@ -83,7 +83,7 @@ public final class FTContains extends Single {
       }
       return found && scoring ? Bln.get(Scoring.avg(score, count)) : Bln.get(found);
     } finally {
-      qc.ftLexer = tmp;
+      qc.ft.lexer = tmp;
     }
   }
 
@@ -91,7 +91,7 @@ public final class FTContains extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     // options of an enclosing full-text selection do not apply
     final FTOpt tmp = cc.ftOpt;
-    cc.ftOpt = cc.qc.ftOpt();
+    cc.ftOpt = info.sc().ftOpt();
     try {
       ftexpr = ftexpr.compile(cc);
       return super.compile(cc);

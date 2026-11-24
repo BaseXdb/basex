@@ -60,16 +60,16 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   private Value score(final QueryContext qc) throws QueryException {
-    final boolean scrng = qc.scoring;
+    final boolean scrng = qc.ft.scoring;
     try {
-      qc.scoring = true;
+      qc.ft.scoring = true;
       double s = 0;
       int c = 0;
       final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null; c++) s += item.score();
       return Dbl.get(Scoring.avg(s, c));
     } finally {
-      qc.scoring = scrng;
+      qc.ft.scoring = scrng;
     }
   }
 
@@ -95,8 +95,11 @@ public final class Let extends ForLet {
   @Override
   public Let optimize(final CompileContext cc) throws QueryException {
     // skip redundant type check: let $x as xs:int := (E coerce as xs:int) → let $x as xs:int := E
-    if(!scoring && expr instanceof final TypeCheck tc && (var.declType != null &&
-        var.declType.keptBy(expr.seqType()) || var.adoptCheck(expr.seqType()))) {
+    // coercion depends on the arithmetic mode of the static context
+    if(!scoring && expr instanceof final TypeCheck tc &&
+        tc.sc().numericType() == sc().numericType() &&
+        (var.declType != null && var.declType.keptBy(expr.seqType()) ||
+        var.adoptCheck(expr.seqType()))) {
       cc.info(OPTTYPE_X, this);
       expr = tc.expr;
     }

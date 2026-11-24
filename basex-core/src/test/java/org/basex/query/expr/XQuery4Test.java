@@ -3,7 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
+
 import org.basex.*;
+import org.basex.io.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.map.*;
@@ -53,6 +56,11 @@ public final class XQuery4Test extends SandboxTest {
     query("let $_ := '' let $m := { '': 1 } return $m?$_", 1);
 
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
+
+    // the key specifier is guarded by the existence of an input item
+    query("()?(1 idiv 0)", "");
+    query("[]?*?(1 idiv 0)", "");
+    error("[ 1 ]?(1 idiv 0)", DIVZERO_X);
   }
 
   /** Method call. */
@@ -543,6 +551,12 @@ public final class XQuery4Test extends SandboxTest {
     query("tail(" + sw + "(1, 2, 3) default return (4, 5, 6))", "2\n3");
     // iterator-based branch: results must not be materialized
     query("head(" + sw + "(1 to 100_000_000)[. > 0] default return ())", 1);
+
+    // braced switch and typeswitch: optional default clause
+    query("switch(" + wrap(1) + ") { case '1' return 1 }", 1);
+    query("switch(" + wrap(2) + ") { case '1' return 1 }", "");
+    query("typeswitch(" + wrap(1) + ") { case xs:untypedAtomic return 1 }", 1);
+    query("typeswitch(1) { case xs:string return 1 }", "");
   }
 
   /** Numeric literals. */
@@ -1335,5 +1349,61 @@ public final class XQuery4Test extends SandboxTest {
     query("fn($x as (xs:string | xs:integer)*) { $x }([ 1, 'a' ])", "1\na");
     error("fn($x as (xs:string | xs:integer)) { $x }({ 'a': 1 })", FIATOMIZE_X);
     error("fn($x as (xs:string | xs:integer)) { $x }([ 1, 'a' ])", INVTYPE_X);
+  }
+
+  /**
+   * Arithmetic mode (qtspecs#3081).
+   * @throws IOException I/O exception
+   */
+  @Test public void arithmeticMode() throws IOException {
+    final String dec = "declare option arithmetic-mode 'decimal'; ";
+    final String u = "xs:untypedAtomic('0.1')", e = "<a>0.2</a>";
+
+    // arithmetic operators
+    query(dec + u + " + 0.2", 0.3);
+    query(dec + "(" + u + " + " + e + ") => type-of()", "xs:decimal");
+    query(dec + "-" + u, -0.1);
+    query(dec + "(1e0 + 0.5) => type-of()", "xs:decimal");
+    query(dec + "(xs:double(" + e + ") * 5) => type-of()", "xs:decimal");
+    query(dec + "xs:double(" + e + ") * 5 = 1", false);
+    query(dec + "(xs:float(1) + 1e0) => type-of()", "xs:float");
+    query(dec + "(1e0 + 1e0) => type-of()", "xs:double");
+    query(dec + "(1 + 1) => type-of()", "xs:integer");
+    query(dec + "(" + e + " idiv 0.1) => type-of()", "xs:integer");
+    error(dec + "xs:double('NaN') + 1", INVALUE_X_X);
+    error(dec + "xs:untypedAtomic('1e0') + 1", FUNCCAST_X_X);
+    error(dec + "1e0 div 0", DIVZERO_X);
+    // rewrites must not suppress errors
+    error(dec + "for $d in (xs:double('NaN'), 1e0) return $d * 0.0", INVALUE_X_X);
+    error(dec + "for $u in (xs:untypedAtomic('0'), " + u + ") return $u div $u", DIVZERO_X);
+    error(dec + "for $u in (xs:untypedAtomic('x'), " + u + ") return $u idiv $u", FUNCCAST_X_X);
+
+    // functions
+    query(dec + "sum((" + u + ", " + e + "))", 0.3);
+    query(dec + "avg((" + u + ", " + e + "))", 0.15);
+    query(dec + "max((" + u + ", " + e + ")) => type-of()", "xs:decimal");
+    query(dec + "abs(" + u + ") => type-of()", "xs:decimal");
+    query(dec + "lowest((" + e + ", <b>0.1</b>))", "<b>0.1</b>");
+    query(dec + "format-number(" + u + ", '0.00')", "0.10");
+
+    // coercion
+    query(dec + "fn($x as xs:numeric) { $x }(" + u + ") => type-of()", "xs:decimal");
+    query(dec + "let $x as xs:numeric := " + e + " return $x => type-of()", "xs:decimal");
+
+    // double mode
+    query(u + " + 0.2", "0.30000000000000004");
+    query("declare option arithmetic-mode 'double'; (" + u + " + 0.2) => type-of()", "xs:double");
+    error("declare option arithmetic-mode 'x'; 1", BASEX_OPTIONS_X);
+    query("system-properties()(QName('', 'supports-arithmetic-mode-decimal'))", true);
+
+    // the mode applies to the module; coercion uses the static context of the call
+    final IOFile lib = new IOFile(sandbox(), "arithmetic-mode.xqm");
+    lib.write("module namespace l = 'l'; " + dec
+        + "declare function l:add($a, $b) { $a + $b }; "
+        + "declare function l:num($x as xs:numeric) { $x };");
+    final String imp = "import module namespace l = 'l' at '" + lib.path() + "'; ";
+    query(imp + "l:add(" + u + ", 0.2)", 0.3);
+    query(imp + "l:num(" + u + ") => type-of()", "xs:double");
+    query(imp + dec + "l:num(" + u + ") => type-of()", "xs:decimal");
   }
 }

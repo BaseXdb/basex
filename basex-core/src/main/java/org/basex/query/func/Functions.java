@@ -506,7 +506,7 @@ public final class Functions {
    * @param args arguments with optional placeholders
    * @return integer array, where the value at index i indicates the index in the parameter list
    *         of the partially evaluated function of the i-th placeholder in the (positional) target
-   *         function argument list.
+   *         function argument list, or {@code null} for the identity (can be {@code null})
    */
   private static int[] preparePlaceholders(final FuncBuilder fb, final QNm[] names,
       final Expr[] args) {
@@ -531,6 +531,9 @@ public final class Functions {
         phPerm[p++] = i;
       }
     }
-    return phPerm;
+    for(int i = 0; i < phPerm.length; i++) {
+      if(phPerm[i] != i) return phPerm;
+    }
+    return null;
   }
 }

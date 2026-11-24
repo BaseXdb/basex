@@ -40,7 +40,7 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs = simplifyAll(Simplify.NUMBER, cc);
+    exprs = simplifyAll(Simplify.numeric(sc()), cc);
     if(values(false, cc)) return cc.preEval(this);
 
     // move values to second position: 1 + position() → position() + 1
@@ -58,7 +58,8 @@ public final class Arith extends Arr {
     final Type type1 = st1.atomType(), type2 = st2.atomType();
     final boolean numbers = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
 
-    final Type type = calc.type(type1, type2);
+    final BasicType preferred = sc().numericType();
+    final Type type = calc.type(type1, type2, preferred);
     final Occ occ1 = st1.atomOcc(), occ2 = st2.atomOcc();
     final boolean oneOrMore = occ1.min >= 1 && occ2.min >= 1;
     exprType.assign(type, oneOrMore ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
@@ -85,7 +86,7 @@ public final class Arith extends Arr {
       // ($x + 1) + ($y - 1) → $x + $y
       Expr ex = Linear.normalize(this, cc);
       // number($a) + 0 → number($a)
-      if(ex == null) ex = calc.optimize(expr1, expr2, info, cc);
+      if(ex == null) ex = calc.optimize(expr1, expr2, preferred, info, cc);
       if(ex != null) {
         expr = ex;
       } else if(expr1 instanceof final Arith arth1 && arth1.calc == Calc.MULTIPLY &&
@@ -113,7 +114,7 @@ public final class Arith extends Arr {
       }
     }
 
-    if(expr == this) calcOpt = CalcOpt.get(st1, st2, calc);
+    if(expr == this) calcOpt = CalcOpt.get(st1, st2, calc, preferred);
     return cc.replaceWith(this, expr);
   }
 
@@ -125,7 +126,8 @@ public final class Arith extends Arr {
     if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = opt ? exprs[1].item(qc, info) : exprs[1].atomItem(qc, info);
     if(item2 == Empty.VALUE) return Empty.VALUE;
-    return opt ? calcOpt.eval(item1, item2, info) : calc.eval(item1, item2, info);
+    return opt ? calcOpt.eval(item1, item2, info) :
+      calc.eval(item1, item2, sc().numericType(), info);
   }
 
   @Override

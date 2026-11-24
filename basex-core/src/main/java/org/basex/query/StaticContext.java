@@ -20,6 +20,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.Util;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.xml.sax.*;
 
@@ -38,6 +39,8 @@ public final class StaticContext {
   private final QNmMap<TypeDecl> publics;
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
+  /** Full-text options of the prolog (can be {@code null}). */
+  private FTOpt ftOpt;
   /** Look up documents in databases. */
   public final boolean withdb;
   /** Favor the opened database when looking up documents. */
@@ -76,6 +79,8 @@ public final class StaticContext {
   public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean inheritNS = true;
+  /** Arithmetic mode: decimal (instead of double). */
+  public boolean decimal;
 
   /** Static type of context value. */
   public SeqType contextType;
@@ -103,8 +108,8 @@ public final class StaticContext {
     withdb = mopts.get(MainOptions.WITHDB);
     defaultdb = mopts.get(MainOptions.DEFAULTDB);
     maxPerm = qc.maxPerm;
-    publics = qc.namedTypes;
-    resolver = qc.resolver;
+    publics = qc.modules.publicTypes();
+    resolver = qc.modules.resolver;
     uriResolver = mopts.resolver().uriResolver();
   }
 
@@ -128,6 +133,14 @@ public final class StaticContext {
     } else {
       ns.add(prefix1, u, null);
     }
+  }
+
+  /**
+   * Returns the preferred numeric type.
+   * @return {@link BasicType#DECIMAL} or {@link BasicType#DOUBLE}
+   */
+  public BasicType numericType() {
+    return decimal ? BasicType.DECIMAL : BasicType.DOUBLE;
   }
 
   /**
@@ -313,12 +326,31 @@ public final class StaticContext {
       throws QueryException {
     final byte[] id = name.unique();
     DecFormatter df = decFormats.get(id);
-    if(df == null) {
-      // lazy instantiation of default decimal format
-      df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id, info);
-      if(df != null) decFormats.put(id, df);
-    }
+    if(df != null) return df;
+    // decimal formats for languages are not part of the declared formats
+    if(!eq(id, EMPTY)) return DecFormatter.forLanguage(id, info);
+    // lazy instantiation of default decimal format
+    df = new DecFormatter();
+    decFormats.put(id, df);
     return df;
+  }
+
+  /**
+   * Returns the full-text options of the prolog.
+   * @return full-text options
+   */
+  public FTOpt ftOpt() {
+    if(ftOpt == null) ftOpt = new FTOpt();
+    return ftOpt;
+  }
+
+  /**
+   * Checks if the full-text options of the prolog are accepted by the visitor.
+   * @param visitor visitor
+   * @return result of check
+   */
+  public boolean acceptFTOpt(final ASTVisitor visitor) {
+    return ftOpt == null || ftOpt.accept(visitor);
   }
 
   /**

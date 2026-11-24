@@ -46,7 +46,7 @@ public class FnLowest extends StandardFunc {
       Value low = value.atomValue(qc, info);
       if(BasicType.UNTYPED_ATOMIC.instanceOf(low.type)) {
         final ValueBuilder vb = new ValueBuilder(qc);
-        for(final Item it : low) vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
+        for(final Item it : low) vb.add(it.type.isUntyped() ? toNumber(it, null) : it);
         low = vb.value();
       }
       int diff = SortFn.compare(lowest != null ? lowest : low, low, collation, qc, info);

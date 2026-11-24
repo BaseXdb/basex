@@ -36,6 +36,16 @@ public final class DecFormatOptions extends Options {
   public static final StringOption FORMAT_NAME = new StringOption("format-name", null,
       ChoiceItemType.get(BasicType.NCNAME, BasicType.QNAME).seqType(Occ.ZERO_OR_ONE));
 
+  /**
+   * Assigns a marker property, using the specified marker if the value has more than one character.
+   * @param option option
+   * @param value value
+   * @param marker marker
+   */
+  void putMarker(final StringOption option, final String value, final char marker) {
+    put(option, value.codePointCount(0, value.length()) == 1 ? value : marker + ":" + value);
+  }
+
   @Override
   protected StringOption stringOption() {
     return FORMAT_NAME;

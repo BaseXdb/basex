@@ -170,7 +170,7 @@ public final class Types {
       MapType.get(STRING, DB_RESOURCE_TYPE.seqType())).seqType(ZERO_OR_MORE);
   /** Update actions, used by fn:update. */
   public static final EnumType UPDATE_ACTION =
-      EnumType.get("value", "rename", "replace", "before", "after");
+      EnumType.get("delete", "replace", "replace-value", "rename", "insert-before", "insert-after");
   /** Single map of update actions. */
   public static final SeqType UPDATE_ACTIONS_O = MapType.get(UPDATE_ACTION, ITEM_ZM).seqType();
   /** Single XNode. */

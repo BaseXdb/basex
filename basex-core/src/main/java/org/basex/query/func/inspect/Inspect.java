@@ -88,7 +88,7 @@ public abstract class Inspect {
   final AModule parseModule(final IO content) throws QueryException {
     try(QueryContext qctx = new QueryContext(qc.context)) {
       qctx.optionsState(qc.optionsState());
-      qctx.resolver = qc.resolver;
+      qctx.modules.resolver = qc.modules.resolver;
       return qctx.parse(content.toString(), content.path());
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);

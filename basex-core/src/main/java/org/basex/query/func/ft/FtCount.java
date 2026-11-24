@@ -18,8 +18,8 @@ public final class FtCount extends FtAccessFn {
   public Itr value(final QueryContext qc) throws QueryException {
     // only the positions of the returned nodes are counted: index requests may yield
     // additional candidates, which are discarded by the subsequent name tests
-    final FTPosData tmp = qc.ftPosData, ftPosData = new FTPosData();
-    qc.ftPosData = ftPosData;
+    final FTPosData tmp = qc.ft.posData, ftPosData = new FTPosData();
+    qc.ft.posData = ftPosData;
     try {
       int count = 0;
       final Iter nodes = arg(0).unwrappedIter(qc);
@@ -31,14 +31,14 @@ public final class FtCount extends FtAccessFn {
       }
       return Itr.get(count);
     } finally {
-      qc.ftPosData = tmp;
+      qc.ft.posData = tmp;
     }
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     // collect positions in the whole query
-    if(cc.qc.ftPosData == null) cc.qc.ftPosData = new FTPosData();
+    if(cc.qc.ft.posData == null) cc.qc.ft.posData = new FTPosData();
     return this;
   }
 }

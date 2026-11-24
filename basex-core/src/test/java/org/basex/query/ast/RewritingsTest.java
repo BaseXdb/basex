@@ -273,7 +273,9 @@ public final class RewritingsTest extends SandboxTest {
     check("(0e0, 1e0, 2e0, 3e0, 4e0, 5e0)[number() = 1]", 1, empty(NUMBER));
     check("(0e0, 1e0, 2e0, 3e0, 4e0, 5e0)[number(.) = 1]", 1, empty(NUMBER));
 
-    check("<_>1</_>[xs:double(.) = 1]", "<_>1</_>", empty(Cast.class));
+    // untyped values are compared as decimals: keep cast
+    check("<_>1</_>[xs:double(.) = 1]", "<_>1</_>", exists(Cast.class));
+    query("<_>1.0000000000000001</_>[xs:double(.) = 1] => count()", 1);
     check("<_>1</_>[number(.) = 1]", "<_>1</_>", exists(NUMBER));
 
     check("xs:double(" + wrap(1) + ") + 2", 3, empty(Cast.class));
