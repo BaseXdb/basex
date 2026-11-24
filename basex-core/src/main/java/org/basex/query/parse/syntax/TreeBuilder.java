@@ -7,30 +7,30 @@ import org.basex.query.parse.gen.*;
 import org.basex.query.parse.gen.XQuerySyntaxParser.*;
 
 /**
- * Builds the syntax tree from the bottom-up events of the generated parser. Each stack entry
- * stands for one reported symbol, or for several: adjacent content characters are merged into the
- * entry of the first one, which then has a weight greater than one. The child counts of the events
- * refer to reported symbols, so they are resolved by adding up the weights of the entries. The
- * reductions of merged characters leave the tree unchanged and are skipped. The nodes of the
- * nonterminals are created by {@link NodeFactory}. The tree is shaped as defined by
- * {@link FoldPolicy}:
- * <ul>
- * <li>Whitespace and the end marker are dropped, and delimiters are skipped. Their entries are
- *   placeholders, so that the child counts of the events remain valid.</li>
- * <li>A nonterminal whose children are all dropped vanishes. If some were skipped delimiters,
- *   the node stays without children, as for {@code ()}, unless the nonterminal is listed in
- *   {@link FoldPolicy#VANISH}.</li>
- * <li>A nonterminal that is listed in {@link NodeFactory#FOLDS} is replaced by its only child.
- *   This applies to the nonterminals of {@link FoldPolicy#NAMES}, and to all that always have
- *   exactly one child.</li>
- * <li>NCName, QName and UnreservedFunctionQName are wrappers around a single token. They are
- *   collapsed into a terminal named NCName or QName.</li>
- * </ul>
+ * Builds the syntax tree from the bottom-up events of the generated parser, as defined by
+ * {@link FoldPolicy}.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 final class TreeBuilder implements BottomUpEventHandler {
+  // Each stack entry stands for one reported symbol, or for several: adjacent content characters
+  // are merged into the entry of the first one, which then has a weight greater than one. The
+  // child counts of the events refer to reported symbols, so they are resolved by adding up the
+  // weights of the entries. The reductions of merged characters leave the tree unchanged and are
+  // skipped. The nodes of the nonterminals are created by NodeFactory. The tree is shaped as
+  // follows:
+  // - Whitespace and the end marker are dropped, and delimiters are skipped. Their entries are
+  //   placeholders, so that the child counts of the events remain valid.
+  // - A nonterminal whose children are all dropped vanishes. If some were skipped delimiters, the
+  //   node stays without children, as for (), unless the nonterminal is listed in
+  //   FoldPolicy.VANISH.
+  // - A nonterminal that is listed in NodeFactory.FOLDS is replaced by its only child. This
+  //   applies to the nonterminals of FoldPolicy.NAMES, and to all that always have exactly one
+  //   child.
+  // - NCName, QName and UnreservedFunctionQName are wrappers around a single token. They are
+  //   collapsed into a terminal named NCName or QName.
+
   /** Terminals that are merged if they are adjacent. */
   private static final BitSet MERGE = Sym.set(
       Sym.ELEMENT_CONTENT_CHAR, Sym.QUOT_ATTR_CONTENT_CHAR, Sym.APOS_ATTR_CONTENT_CHAR);
@@ -310,14 +310,14 @@ final class TreeBuilder implements BottomUpEventHandler {
   }
 
   /**
-   * Returns the terminals with the given texts. The grammar names of literal tokens are quoted,
-   * with quotes in the text doubled.
+   * Returns the terminals with the given texts.
    * @param texts texts
    * @return terminals
    */
   private static BitSet terminals(final Set<String> texts) {
     final BitSet kinds = new BitSet(Sym.SYMBOL_COUNT);
     for(final String text : texts) {
+      // the grammar names of literal tokens are quoted, with quotes in the text doubled
       kinds.set(Sym.terminal("'" + text.replace("'", "''") + "'"));
     }
     return kinds;

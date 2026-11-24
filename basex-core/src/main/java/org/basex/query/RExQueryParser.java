@@ -70,10 +70,7 @@ import org.basex.util.options.*;
 import org.basex.util.similarity.*;
 
 /**
- * Parser for XQuery expressions, which is driven by a syntax tree. The syntax tree is created
- * by the REx generated parser: its nodes are records, whose components are the children of the
- * nonterminals. The tree is evaluated without scanning the input again, except for the values of
- * string literals and entities. Error positions are the start offsets of nodes.
+ * Parser for XQuery expressions, which is driven by the syntax tree of the generated parser.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -98,7 +95,7 @@ public final class RExQueryParser extends AQueryParser {
 
   /** Maximum number of expected tokens that are listed in a syntax error. */
   private static final int MAX_EXPECTED = 3;
-  /** Maximum offset up to which the continuations of a syntax error are tried. */
+  /** Maximum offset up to which syntax errors are probed by parsing the input again. */
   private static final int MAX_PROBE = 20_000;
   /** Operators that are followed by an operand. */
   private static final Set<String> OPERATORS = Set.of("+", "-", "*", "|", "||", "!", "!=", "=",
@@ -124,10 +121,7 @@ public final class RExQueryParser extends AQueryParser {
   private static final BitSet DECLARATIONS = Sym.set(Sym.ContextValueDecl, Sym.VarDecl,
       Sym.FunctionDecl, Sym.ItemTypeDecl, Sym.LabeledRecordTypeDecl, Sym.OptionDecl);
 
-  /**
-   * Declarations after which the comments are processed before the documentation is cleared.
-   * Their last token consumes the whitespace and comments that follow it.
-   */
+  /** Declarations whose last token consumes the whitespace and comments that follow it. */
   private static final BitSet TRAILING = Sym.set(Sym.BoundarySpaceDecl,
       Sym.ConstructionDecl, Sym.OrderingModeDecl, Sym.RevalidationDecl,
       Sym.CopyNamespacesDecl, Sym.EmptyOrderDecl, Sym.DecimalFormatDecl,
@@ -177,6 +171,8 @@ public final class RExQueryParser extends AQueryParser {
 
   /** Index of the next gap that has not been scanned for comments. */
   private int gap;
+  /** The input is a sequence type, not a module: syntax errors are probed with that grammar. */
+  private boolean typeInput;
 
   /**
    * Namespaces of an element constructor.
@@ -289,6 +285,7 @@ public final class RExQueryParser extends AQueryParser {
     try {
       final SyntaxTree tree;
       try {
+        typeInput = true;
         tree = SyntaxParser.parseSequenceType(input);
       } catch(final ParseException ex) {
         throw syntaxError(ex);
@@ -302,13 +299,13 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Builds the syntax tree of the query with the generated parser. The input is not copied:
-   * {@link InputParser#input} is never modified.
+   * Builds the syntax tree of the query with the generated parser.
    * @return root of the syntax tree
    * @throws QueryException query exception, if the input is not accepted by the grammar
    */
   private Nodes.Module syntaxTree() throws QueryException {
     try {
+      // the input is not copied: it is never modified
       final SyntaxTree tree = SyntaxParser.parse(input);
       gaps = tree.gaps();
       gap = 0;
@@ -324,14 +321,12 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Maps a syntax error of the generated parser to a query error, which is positioned at the
-   * start of the offending token. The messages are those of the hand-written parser as far as
-   * possible. The parser reports more tokens than are possible (merged states): the possible
-   * ones are found by parsing the input up to the error, followed by the token.
+   * Maps a syntax error of the generated parser to a query error at the offending token.
    * @param ex exception of the generated parser
    * @return query error
    */
   private QueryException syntaxError(final ParseException ex) {
+    // messages as of the hand-written parser; probing finds the possible tokens (merged states)
     pos = ex.getBegin();
 
     // Elvis operator: a colon follows a question mark, where a key specifier is expected
@@ -357,19 +352,24 @@ public final class RExQueryParser extends AQueryParser {
       return qe;
     }
     pos = ex.getBegin();
+    // large queries are not parsed again: the messages are less specific
+    final boolean probe = pos <= MAX_PROBE;
     // the input up to the offending token is a complete module
-    if(pos > 0 && accepts(Arrays.copyOf(input, pos), false)) {
-      // a keyword was parsed as a name, and an operand follows
-      final String last = lastToken();
-      final int cp = current();
-      if(XMLToken.isNCStartChar(cp) || digit(cp) || quote(cp) || cp == '$' || cp == '{') {
-        if(last.equals(RETURN)) return error(UNEXPRETURN);
-        final String follow = KEYWORD_HINTS.get(last);
-        if(follow != null) return error(EXPECTAFTER_X_X, follow, last);
+    if(probe && pos > 0 && accepts(Arrays.copyOf(input, pos), false)) {
+      if(!typeInput) {
+        // a keyword was parsed as a name, and an operand follows
+        final String last = lastToken();
+        final int cp = current();
+        if(XMLToken.isNCStartChar(cp) || digit(cp) || quote(cp) || cp == '$' || cp == '{') {
+          if(last.equals(RETURN)) return error(UNEXPRETURN);
+          final String follow = KEYWORD_HINTS.get(last);
+          if(follow != null) return error(EXPECTAFTER_X_X, follow, last);
+        }
+        if(cp == '(') return error(EXPREMPTY);
       }
-      if(cp == '(') return error(EXPREMPTY);
       final String rest = remaining();
       pos++;
+      if(!typeInput && libraryModule(pos - 1)) return error(MODEXPR);
       return rest.startsWith(";") ? error(QUERYSEMI) : error(QUERYEND_X, rest);
     }
 
@@ -377,18 +377,19 @@ public final class RExQueryParser extends AQueryParser {
       return error(WRONGCHAR_X_X, ":=", found());
     }
     // incomplete FLWOR expression
-    if(tokens.contains(RETURN) && tokens.size() > 1 && accepts(append(RETURN + " 1"), false)) {
+    if(probe && tokens.contains(RETURN) && tokens.size() > 1 &&
+        accepts(append(RETURN + " 1"), false)) {
       return error(FLWORRETURN);
     }
     final String last = lastToken();
-    if(OPERATORS.contains(last) && accepts(append("1"), true)) {
+    if(probe && OPERATORS.contains(last) && accepts(append("1"), true)) {
       return error(EXPECTAFTER_X_X, "expression", last);
     }
     // the innermost open parenthesis, bracket or brace (keywords are also valid names)
     String closing = null;
     int count = 0;
     for(final String delimiter : new String[] { ")", "]", "}" }) {
-      if(tokens.contains(delimiter) && pos <= MAX_PROBE && accepts(append(delimiter), true)) {
+      if(probe && tokens.contains(delimiter) && accepts(append(delimiter), true)) {
         closing = delimiter;
         count++;
       }
@@ -410,8 +411,7 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Raises the lexical errors of the hand-written parser at the current position: invalid
-   * entities and incomplete numbers. Changes the position.
+   * Raises the lexical errors of the hand-written parser (invalid entities, incomplete numbers).
    * @param others expected tokens that are no literals
    * @throws QueryException query exception
    */
@@ -458,12 +458,28 @@ public final class RExQueryParser extends AQueryParser {
    * @param prefix also accept a query that is too short
    * @return result of check
    */
-  private static boolean accepts(final int[] query, final boolean prefix) {
+  private boolean accepts(final int[] query, final boolean prefix) {
     try {
-      new XQuerySyntaxParser(query, null).parse_Module();
+      final XQuerySyntaxParser parser = new XQuerySyntaxParser(query, null);
+      if(typeInput) parser.parse_SequenceTypeEOF();
+      else parser.parse_Module();
       return true;
     } catch(final ParseException ex) {
       return prefix && ex.getBegin() >= query.length;
+    }
+  }
+
+  /**
+   * Checks if the input up to a position is a library module.
+   * @param end end of the module
+   * @return result of check
+   */
+  private boolean libraryModule(final int end) {
+    try {
+      final SyntaxTree tree = SyntaxParser.parse(Arrays.copyOf(input, end));
+      return ((Nodes.Module) tree.root()).libraryModule() != null;
+    } catch(final ParseException | TagMismatch ex) {
+      return false;
     }
   }
 
@@ -508,8 +524,7 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Scans the comments of the gaps that start before or at a position. XQDoc comments are
-   * collected for the documentation of declarations and modules, as in {@link QueryParser}.
+   * Scans the comments of the gaps up to a position, and collects XQDoc comments.
    * @param end position
    * @throws QueryException query exception
    */
@@ -1258,8 +1273,7 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Parses the "Prolog" rule. The declarations of the first part are namespace declarations,
-   * settings and imports. The modules are imported before the declarations of the second part.
+   * Parses the "Prolog" rule.
    * @param prolog prolog
    * @throws QueryException query exception
    */
@@ -1267,6 +1281,7 @@ public final class RExQueryParser extends AQueryParser {
     boolean imported = false;
     for(final Node node : prolog.children()) {
       final int sym = node.sym();
+      // modules are imported before the declarations of the second part
       if(!imported && DECLARATIONS.get(sym)) {
         importModules();
         imported = true;
@@ -1848,8 +1863,7 @@ public final class RExQueryParser extends AQueryParser {
    * @throws QueryException query exception
    */
   private Expr single(final Node node) throws QueryException {
-    // switching on the symbol and casting is faster than a switch on the types of the nodes
-    // (benchmark: about 26 ns vs. 42 ns per dispatch of the operands of the QT4 queries)
+    // switching on the symbol is faster than on the types of the nodes (26 vs. 42 ns)
     return switch(node.sym()) {
       case Sym.FLWORExpr -> flwor((FLWORExpr) node);
       case Sym.QuantifiedExpr -> quantified((QuantifiedExpr) node);
@@ -2617,7 +2631,7 @@ public final class RExQueryParser extends AQueryParser {
   }
 
   /**
-   * Creates intersect and except expressions. Operands of the same operator are combined.
+   * Creates intersect and except expressions, combining operands of the same operator.
    * @param ch operands and operators
    * @return expression
    * @throws QueryException query exception

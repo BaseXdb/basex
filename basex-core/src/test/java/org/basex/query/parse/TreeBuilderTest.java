@@ -7,9 +7,8 @@ import org.basex.query.parse.syntax.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for the construction of the syntax tree: merged content, lists, and the
- * boundaries between text and enclosed expressions. Timings are not asserted: see
- * {@code StressBench}.
+ * Tests for the construction of the syntax tree: merged content, lists, and the boundaries between
+ * text and enclosed expressions.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

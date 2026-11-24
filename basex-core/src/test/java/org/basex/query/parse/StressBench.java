@@ -8,19 +8,14 @@ import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 
 /**
- * Measures the time that the query parsers need for large inputs, which could take quadratic time.
- * The times are printed, not asserted. Progress is reported after each input, outside of the
- * timed region. A Markdown table shows the median and the best time of the measurement rounds
- * (those after the warm-up) for each parser.
- *
- * Arguments (optional): the number of rounds (default: 7) and of warm-up rounds (default: 2).
- * Both parsers are measured. Deeply nested input needs a deep stack: if a parser runs out of it,
- * the table shows {@code overflow}, which depends on the stack size of the JVM ({@code -Xss}).
+ * Measures the time that the query parsers need for large inputs.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class StressBench {
+  // Optional arguments: rounds (default: 7) and warm-up rounds (default: 2); deep input needs -Xss
+
   /** Private constructor. */
   private StressBench() { }
 

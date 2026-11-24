@@ -9,24 +9,14 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * Regenerates the REx parser: fetches the current grammar from its home, adds the rule for the
- * entry point {@code SequenceTypeEOF}, notes the commit in its header comment, stores it next to
- * the test resources, and invokes {@code rex -remake XQuerySyntaxParser.xml} there, which
- * regenerates the XML representation of the grammar. The parser is regenerated with
- * {@code rex -remake XQuerySyntaxParser.java} in its own directory, below {@code src/main}: the
- * command line recorded in its header refers to the grammar by a relative path. The line endings
- * of the results are those of the system. This is a main program, not a test; it is the first
- * step of {@link GrammarUpdate}.
- *
- * <p>The grammar is fetched, as of the latest commit that changed it, unless the argument
- * {@code offline} is given: then the grammar file next to the test resources is used as it is,
- * which allows to test grammar changes by editing it. REx (which must be on the path) always
- * runs.</p>
+ * Regenerates the REx parser from the current grammar.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class RExRemake {
+  // Fetches the grammar (unless offline), adds the SequenceTypeEOF rule, and runs rex -remake
+
   /** Repository of the grammar. */
   private static final String REPO = "GuntherRademacher/rex-parser-generator";
   /** Path of the grammar in the repository. */
@@ -46,7 +36,6 @@ public final class RExRemake {
   private static final String ENTRY = "SequenceTypeEOF";
   /** Rule to be added. */
   private static final String RULE = ENTRY + "\n         ::= SequenceType EOF\n\n";
-
   /** Argument for skipping the fetch of the grammar. */
   static final String OFFLINE = "offline";
 

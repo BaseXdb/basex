@@ -1,8 +1,7 @@
 package org.basex.query.parse.syntax;
 
 /**
- * Placeholder for a symbol that has no node: dropped whitespace and skipped delimiters. It occupies a stack entry while the tree is built, so
- * that the child counts reported by the parser remain valid.
+ * Placeholder for dropped whitespace and skipped delimiters, which keeps child counts valid.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

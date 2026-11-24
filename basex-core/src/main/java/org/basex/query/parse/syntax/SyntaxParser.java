@@ -24,9 +24,9 @@ public final class SyntaxParser {
   }
 
   /**
-   * Parses a module. The offsets of the syntax tree are positions in the array. The array is not
-   * copied: the caller must not modify it as long as the syntax tree is in use.
-   * @param input code points of the query, with normalized line endings
+   * Parses a module, with offsets that are positions in the array.
+   * @param input code points of the query, with normalized line endings (not copied, and not to
+   *   be modified as long as the syntax tree is in use)
    * @return syntax tree
    * @throws ParseException if the query is not accepted by the grammar
    * @throws TagMismatch if an element with different start and end tags was parsed before

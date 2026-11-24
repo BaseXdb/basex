@@ -8,8 +8,7 @@ import org.basex.core.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for query error messages, which are raised by the parser that is driven by the syntax
- * tree. {@link ErrorMessageTest} contains the tests for the parser that processes the query string.
+ * Tests for query error messages, which are raised by the parser that is driven by the syntax tree.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -273,7 +272,9 @@ public final class RExErrorMessageTest extends SandboxTest {
     try {
       eval(query);
     } catch(final QueryException ex) {
-      assertEquals(code.qname(), ex.qname(), ex.getLocalizedMessage());
+      // errors that are raised by deferred code have no error reference, only a code
+      if(ex.error() != null) assertSame(code, ex.error(), ex.getLocalizedMessage());
+      else assertEquals(code.qname(), ex.qname(), ex.getLocalizedMessage());
       return ex;
     } catch(final Exception ex) {
       return fail(ex);

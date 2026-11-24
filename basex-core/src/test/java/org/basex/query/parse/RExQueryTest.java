@@ -349,11 +349,10 @@ public final class RExQueryTest {
   }
 
   /**
-   * The grammar is ambiguous if a keyword such as {@code div} is used as the name of a computed
-   * constructor, or if {@code updating} is followed by two parenthesized expressions. The generated
-   * parser picks one alternative, which must be the one of the manual parser.
+   * Tests the alternatives that the generated parser picks for ambiguous input.
    */
   @Test public void ambiguities() {
+    // ambiguous grammar: the generated parser must pick the alternative of the manual parser
     assertEquals("<?div x?>", outcome("processing-instruction div { 'x' }", MANUAL));
     assertEquals("xmlns:div=\"u\"", outcome("namespace div { 'u' }", MANUAL));
     assertEquals("<div>1</div>", outcome("element div { 1 }", MANUAL));
@@ -486,9 +485,7 @@ public final class RExQueryTest {
    * @throws Exception exception
    */
   @Test public void externalVariableDoc() throws Exception {
-    // the first comment documents the variable, unless a comment inside the declaration is
-    // followed by something else than a declaration: this comment is the module documentation,
-    // and the first one is cleared
+    // the first comment documents the variable, unless followed by a non-declaration
     for(final String query : new String[] {
       "(:~module:) declare variable $v (:~c:) external; $v",
       "(:~module:) declare variable $v external (:~c:); $v",
@@ -542,6 +539,10 @@ public final class RExQueryTest {
     // different start and end tags are reported before a later syntax error
     error("<a><b></a>, 1 +", QueryError.TAGWRONG_X_X, 1, 11);
     error("1 2", QueryError.QUERYEND_X, 1, 4);
+    // a library module must not be followed by an expression
+    error("module namespace m = 'm'; declare function m:f() { 1 }; m:f()",
+        QueryError.MODEXPR, 1, 58);
+    error("module namespace m = 'm'; 1", QueryError.MODEXPR, 1, 28);
     error("(1 !", QueryError.EXPECTAFTER_X_X, 1, 5);
     error("(1, 2 !", QueryError.EXPECTAFTER_X_X, 1, 8);
     error("declare namespace p = ; 1", QueryError.NOQUOTE_X, 1, 23);
@@ -605,6 +606,21 @@ public final class RExQueryTest {
     try(QueryContext qc = new QueryContext(context)) {
       final AModule module = qc.parse(query, null);
       return module.doc();
+    } finally {
+      context.close();
+    }
+  }
+
+  /** Syntax errors in type strings are diagnosed with the grammar of types. */
+  @Test public void typeStringErrors() {
+    final Context context = rexContext();
+    try(QueryContext qc = new QueryContext(context)) {
+      for(final String type : new String[] { "xs:integer+ x", "xs:integer+ +", "map {}" }) {
+        final QueryException ex = assertThrows(QueryException.class,
+            () -> qc.bind("x", "1", type, null), type);
+        final String msg = ex.getLocalizedMessage();
+        assertFalse(msg.contains("Expecting expression") || msg.contains("after '"), msg);
+      }
     } finally {
       context.close();
     }

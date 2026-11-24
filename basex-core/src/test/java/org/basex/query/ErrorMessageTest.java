@@ -291,7 +291,9 @@ public final class ErrorMessageTest extends SandboxTest {
     try {
       eval(query);
     } catch(final QueryException ex) {
-      assertEquals(code.qname(), ex.qname(), ex.getLocalizedMessage());
+      // errors that are raised by deferred code have no error reference, only a code
+      if(ex.error() != null) assertSame(code, ex.error(), ex.getLocalizedMessage());
+      else assertEquals(code.qname(), ex.qname(), ex.getLocalizedMessage());
       return ex;
     } catch(final Exception ex) {
       return fail(ex);

@@ -27,9 +27,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Abstract parser for XQuery expressions. It contains everything that is shared by the
- * parser {@link QueryParser}, which is written by hand and processes the query string, and the
- * parser {@link RExQueryParser}, which is driven by a syntax tree.
+ * Abstract parser for XQuery expressions, shared by {@link QueryParser} and {@link RExQueryParser}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

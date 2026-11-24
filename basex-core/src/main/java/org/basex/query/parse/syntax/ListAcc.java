@@ -5,8 +5,7 @@ import java.util.*;
 import org.basex.query.parse.gen.*;
 
 /**
- * Accumulates the items of a left-recursive list, which the parser reduces one item at a time.
- * The record of the list is created once, when the list is used by its parent.
+ * Accumulates the items of a left-recursive list, which is created when its parent uses it.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

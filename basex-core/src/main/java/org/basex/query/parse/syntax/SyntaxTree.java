@@ -16,9 +16,7 @@ import org.basex.query.parse.gen.*;
  */
 public record SyntaxTree(int[] input, Node root, int[] gaps) {
   /**
-   * Returns a readable dump of the tree: one line per node, indented by level, with the components
-   * of the records and the text of the terminals. Offsets and components that are not set are
-   * omitted.
+   * Returns a readable dump of the tree, with one indented line per node.
    * @return dump
    */
   @Override

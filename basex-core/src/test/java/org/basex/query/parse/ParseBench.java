@@ -13,22 +13,14 @@ import org.basex.query.*;
 import org.w3c.dom.*;
 
 /**
- * Measures the time that the query parsers need for the queries of the QT4 test suite, which is
- * taken from the environment variable {@code QT4_PATH}, or from a {@code qt4tests} directory next
- * to the root project. The times are printed, not asserted. Progress is reported after each round,
- * outside of the timed region, so that a profiler can be attached after the warm-up. A Markdown
- * table shows all rounds, and the best time and the median of the measurement rounds (those after
- * the warm-up).
- *
- * Arguments (optional): the number of rounds (default: 6) and of warm-up rounds (default: 2).
- * Both parsers are measured. Unreadable test sets and missing query files are reported, as runs
- * with different inputs are not comparable. Queries that raise errors are parsed as well, so the
- * time includes the creation of the errors.
+ * Measures the time that the query parsers need for the queries of the QT4 test suite.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class ParseBench {
+  // The suite is taken from QT4_PATH or qt4tests; arguments: rounds (default: 6), warm-up (2)
+
   /** Namespace of the test catalog. */
   private static final String NS = "http://www.w3.org/2010/09/qt-fots-catalog";
   /** Maximum number of names that are reported for skipped inputs. */

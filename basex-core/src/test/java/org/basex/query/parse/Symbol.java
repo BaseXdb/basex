@@ -5,14 +5,14 @@ import java.lang.reflect.*;
 import org.basex.query.parse.gen.*;
 
 /**
- * A symbol of the generated parser, as an object that is convenient for the generators. There is
- * exactly one instance for each symbol, so that instances can be compared by identity. They are
- * ordered like the integer constants of {@link Sym}.
+ * A symbol of the generated parser, as an object that is convenient for the generators.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 final class Symbol implements Comparable<Symbol> {
+  // one instance per symbol (compare by identity), ordered like the integer constants of Sym
+
   /** All symbols, indexed by their constant. */
   private static final Symbol[] ALL = all();
 

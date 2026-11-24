@@ -3,26 +3,27 @@ package org.basex.query.parse;
 import java.util.*;
 
 /**
- * Policies for shaping the syntax tree, which are applied by its builder. Symbols are given by
- * their grammar names; terminals by their text, without quotes.
- * <ul>
- * <li>{@link #NAMES}: transparent nonterminals. If such a node has exactly one retained child,
- *   the node is replaced by its child. The list is derived from the grammar (see
- *   {@code GrammarXml} in the tests) and reviewed by hand.</li>
- * <li>{@link #LISTS}: left-recursive lists, which are flattened.</li>
- * <li>{@link #DELIMITERS} and {@link #PARENT_DELIMITERS}: terminals that are implied by the kind
- *   of the enclosing node and are removed. All other terminals are kept: they are operators,
- *   keywords or values, or they tell alternatives of a node apart.</li>
- * <li>{@link #VANISH}: nonterminals that consist of removed delimiters only, and are removed
- *   entirely.</li>
- * </ul>
- * {@code FoldPolicyTest} compares the grammar productions of the nonterminals above with the
- * signatures recorded when the policy was last reviewed.
+ * Policies for shaping the syntax tree, which are applied by its builder.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class FoldPolicy {
+  // Symbols are given by their grammar names; terminals by their text, without quotes.
+  //
+  // - NAMES: transparent nonterminals. If such a node has exactly one retained child, the node is
+  //   replaced by its child. The list is derived from the grammar (see GrammarXml in the tests) and
+  //   reviewed by hand.
+  // - LISTS: left-recursive lists, which are flattened.
+  // - DELIMITERS and PARENT_DELIMITERS: terminals that are implied by the kind of the enclosing
+  //   node and are removed. All other terminals are kept: they are operators, keywords or values,
+  //   or they tell alternatives of a node apart.
+  // - VANISH: nonterminals that consist of removed delimiters only, and are removed entirely.
+  //
+  // FoldPolicyTest checks that all left-recursive productions are listed in LISTS, and
+  // compares the grammar productions of the nonterminals above with the signatures
+  // recorded when the policy was last reviewed.
+
   /** Transparent nonterminals. */
   public static final Set<String> NAMES = Set.of(
     // expression precedence ladder
@@ -42,16 +43,13 @@ public final class FoldPolicy {
     "InitialClause", "IntermediateClause", "ForBinding", "LetBinding", "Setter", "Import");
 
   /**
-   * Left-recursive list nonterminals. The grammar defines these as {@code L ::= E | L ',' E},
-   * which would nest the elements of a list. They are flattened into a single node.
-   * {@code FoldPolicyTest} checks that all left-recursive productions are listed.
+   * Left-recursive list nonterminals, which are flattened into a single node.
    */
   public static final Set<String> LISTS = Set.of("PositionalArguments");
 
   /**
-   * Delimiters that are removed wherever they occur. They are brackets, separators and the
-   * opening and closing tokens of constructors. In all productions in which they appear, they
-   * are implied by the kind of the node, or by the children that are present.
+   * Delimiters that are removed wherever they occur: brackets, separators and the opening and
+   * closing tokens of constructors.
    */
   public static final Set<String> DELIMITERS = Set.of(
     "(", ")", "{", "}", "[", "]", ",", ";", "$", ":=", "::", ":", "#", "%", ".",
@@ -61,9 +59,7 @@ public final class FoldPolicy {
     "`");
 
   /**
-   * Terminals that are removed below some nonterminals only, as they are operators or values
-   * elsewhere: {@code =}, {@code <} and {@code >} in comparisons, and {@code ?} as an occurrence
-   * indicator. Keys are nonterminals.
+   * Terminals that are removed below some nonterminals only, by nonterminal.
    */
   public static final Map<String, Set<String>> PARENT_DELIMITERS = Map.ofEntries(
     Map.entry("ModuleDecl", Set.of("=")),

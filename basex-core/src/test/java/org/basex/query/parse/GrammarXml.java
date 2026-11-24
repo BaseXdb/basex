@@ -138,8 +138,7 @@ final class GrammarXml {
   }
 
   /**
-   * Returns the serialized productions of nonterminals. Whitespace between elements and
-   * comments are not significant.
+   * Returns the serialized productions of nonterminals, without whitespace and comments.
    * @param names names of the nonterminals
    * @return serialized productions by name; names that are no productions are missing
    */
