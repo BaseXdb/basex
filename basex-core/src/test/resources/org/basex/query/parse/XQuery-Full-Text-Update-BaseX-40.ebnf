@@ -1,6 +1,6 @@
 /* XQuery 4.0: An XML Query Language
  * version https://qt4cg.org/specifications/xquery-40/
- * extracted from https://qt4cg.org/specifications/xquery-40/xquery-40.html on Wed Nov 18, 2026, 17:29 (UTC+01)
+ * extracted from https://qt4cg.org/specifications/xquery-40/xquery-40.html on Tue Nov 24, 2026, 20:08 (UTC+01)
  * with references to https://www.w3.org/TR/REC-xml/ resolved and inlined
  * with references to https://www.w3.org/TR/REC-xml-names/ resolved and inlined
  * with productions from https://www.w3.org/TR/xquery-update-30/ added
@@ -8,7 +8,7 @@
  * augmented with BaseX extensions
  * reordered into depth-first order
  * adapted for REx by rexify-xquery-40.xq
- * fetched from https://github.com/GuntherRademacher/rex-parser-generator, commit 14440c68b20704498d2eda751cc5a364b10d4fa4
+ * fetched from https://github.com/GuntherRademacher/rex-parser-generator, commit 52f3bcc355cbfab7692733d79c38c16441fc4eec
  * extended by RExRemake with the rule SequenceTypeEOF
  */
 
@@ -818,23 +818,27 @@ SwitchComparand
          ::= '(' Expr? ')'
 Expr     ::= ExprSingle ( ',' ExprSingle )*
 SwitchCases
-         ::= SwitchCaseClause+ 'default' 'return' ExprSingle
+         ::= SwitchCaseClause+ SwitchDefaultClause
 SwitchCaseClause
          ::= ( 'case' SwitchCaseOperand )+ 'return' ExprSingle
 SwitchCaseOperand
          ::= Expr
+SwitchDefaultClause
+         ::= 'default' 'return' ExprSingle
 BracedSwitchCases
-         ::= '{' SwitchCases '}'
+         ::= '{' SwitchCaseClause+ SwitchDefaultClause? '}'
 TypeswitchExpr
          ::= 'typeswitch' '(' Expr ')' ( TypeswitchCases | BracedTypeswitchCases )
 TypeswitchCases
-         ::= CaseClause+ 'default' VarName? 'return' ExprSingle
+         ::= CaseClause+ TypeswitchDefaultClause
 CaseClause
          ::= 'case' ( VarName 'as' )? SequenceTypeUnion 'return' ExprSingle
 SequenceTypeUnion
          ::= SequenceType ( '|' SequenceType )*
+TypeswitchDefaultClause
+         ::= 'default' VarName? 'return' ExprSingle
 BracedTypeswitchCases
-         ::= '{' TypeswitchCases '}'
+         ::= '{' CaseClause+ TypeswitchDefaultClause? '}'
 IfExpr   ::= 'if' '(' Expr ')' ( UnbracedActions | BracedActions )
 UnbracedActions
          ::= 'then' ExprSingle 'else' ExprSingle
@@ -1107,7 +1111,9 @@ PositionalArgumentList
 LookupExpr
          ::= PostfixExpr Lookup
 MethodCall
-         ::= PostfixExpr '=?>' NCName PositionalArgumentList
+         ::= PostfixExpr '=?>' NCName MethodArgumentList
+MethodArgumentList
+         ::= '(' ( ExprSingle ( ',' ExprSingle )* )? ')'
 AxisStep ::= ( AbbreviatedStep | FullStep ) Predicate*
 AbbreviatedStep
          ::= '..'

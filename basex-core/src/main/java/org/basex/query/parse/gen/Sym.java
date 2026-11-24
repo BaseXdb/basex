@@ -205,455 +205,458 @@ public final class Sym {
   public static final int MapType = 186;
   public static final int MappingArrowTarget = 187;
   public static final int MarkedNCName = 188;
-  public static final int MethodCall = 189;
-  public static final int Module = 190;
-  public static final int ModuleDecl = 191;
-  public static final int ModuleImport = 192;
-  public static final int MultiplicativeExpr = 193;
-  public static final int NCName = 194;
-  public static final int NameTest = 195;
-  public static final int NameTestUnion = 196;
-  public static final int NamedFunctionRef = 197;
-  public static final int NamespaceDecl = 198;
-  public static final int NamespaceNodeType = 199;
-  public static final int NewNameExpr = 200;
-  public static final int NextVar = 201;
-  public static final int NodeComp = 202;
-  public static final int NodeConstructor = 203;
-  public static final int NodeFollows = 204;
-  public static final int NodePrecedes = 205;
-  public static final int NodeTest = 206;
-  public static final int NumericLiteral = 207;
-  public static final int OccurrenceIndicator = 208;
-  public static final int OptionDecl = 209;
-  public static final int OrExpr = 210;
-  public static final int OrderByClause = 211;
-  public static final int OrderModifier = 212;
-  public static final int OrderSpec = 213;
-  public static final int OrderedExpr = 214;
-  public static final int OrderingModeDecl = 215;
-  public static final int OtherwiseExpr = 216;
-  public static final int ParamList = 217;
-  public static final int ParamListWithDefaults = 218;
-  public static final int ParamWithDefault = 219;
-  public static final int ParenthesizedExpr = 220;
-  public static final int PathExpr = 221;
-  public static final int PipelineExpr = 222;
-  public static final int PositionalArgumentList = 223;
-  public static final int PositionalArguments = 224;
-  public static final int PositionalVar = 225;
-  public static final int PostfixExpr = 226;
-  public static final int Pragma = 227;
-  public static final int Predicate = 228;
-  public static final int PreserveMode = 229;
-  public static final int PreviousVar = 230;
-  public static final int PrimaryExpr = 231;
-  public static final int ProcessingInstructionNodeType = 232;
-  public static final int Prolog = 233;
-  public static final int QName = 234;
-  public static final int QNameLiteral = 235;
-  public static final int QuantifiedExpr = 236;
-  public static final int QuantifierBinding = 237;
-  public static final int QueryBody = 238;
-  public static final int QuotAttrValueContent = 239;
-  public static final int RangeExpr = 240;
-  public static final int RecordType = 241;
-  public static final int RegularItemType = 242;
-  public static final int RelativePathExpr = 243;
-  public static final int RenameExpr = 244;
-  public static final int ReplaceExpr = 245;
-  public static final int RestrictedDynamicCall = 246;
-  public static final int ReturnClause = 247;
-  public static final int RevalidationDecl = 248;
-  public static final int SchemaAttributeNodeType = 249;
-  public static final int SchemaElementNodeType = 250;
-  public static final int SchemaImport = 251;
-  public static final int SchemaPrefix = 252;
-  public static final int Selector = 253;
-  public static final int Separator = 254;
-  public static final int SequenceArrowTarget = 255;
-  public static final int SequenceType = 256;
-  public static final int SequenceTypeEOF = 257;
-  public static final int SequenceTypeUnion = 258;
-  public static final int Setter = 259;
-  public static final int SimpleMapExpr = 260;
-  public static final int SimpleNodeTest = 261;
-  public static final int SlidingWindowClause = 262;
-  public static final int SourceExpr = 263;
-  public static final int SquareArrayConstructor = 264;
-  public static final int StepExpr = 265;
-  public static final int StringConcatExpr = 266;
-  public static final int StringConstructor = 267;
-  public static final int StringConstructorContent = 268;
-  public static final int StringInterpolation = 269;
-  public static final int StringTemplate = 270;
-  public static final int StringTemplateVariablePart = 271;
-  public static final int SwitchCaseClause = 272;
-  public static final int SwitchCaseOperand = 273;
-  public static final int SwitchCases = 274;
-  public static final int SwitchComparand = 275;
-  public static final int SwitchExpr = 276;
-  public static final int TargetExpr = 277;
-  public static final int TextNodeType = 278;
-  public static final int TraceClause = 279;
-  public static final int TransformWithExpr = 280;
-  public static final int TreatExpr = 281;
-  public static final int TryCatchExpr = 282;
-  public static final int TryClause = 283;
-  public static final int TumblingWindowClause = 284;
-  public static final int TypeDeclaration = 285;
-  public static final int TypeName = 286;
-  public static final int TypeTest = 287;
-  public static final int TypedArrayType = 288;
-  public static final int TypedFunctionParam = 289;
-  public static final int TypedFunctionType = 290;
-  public static final int TypedMapType = 291;
-  public static final int TypedRecordType = 292;
-  public static final int TypeswitchCases = 293;
-  public static final int TypeswitchExpr = 294;
-  public static final int URILiteral = 295;
-  public static final int UnaryExpr = 296;
-  public static final int UnaryLookup = 297;
-  public static final int UnbracedActions = 298;
-  public static final int UnionExpr = 299;
-  public static final int UnionNodeTest = 300;
-  public static final int UnorderedExpr = 301;
-  public static final int UnreservedFunctionEQName = 302;
-  public static final int UnreservedFunctionQName = 303;
-  public static final int UpdatingFunctionCall = 304;
-  public static final int ValidateExpr = 305;
-  public static final int ValidationMode = 306;
-  public static final int ValueComp = 307;
-  public static final int ValueExpr = 308;
-  public static final int VarDecl = 309;
-  public static final int VarDefaultValue = 310;
-  public static final int VarName = 311;
-  public static final int VarNameAndType = 312;
-  public static final int VarRef = 313;
-  public static final int VarValue = 314;
-  public static final int VersionDecl = 315;
-  public static final int WhereClause = 316;
-  public static final int WhileClause = 317;
-  public static final int Whitespace = 318;
-  public static final int WindowClause = 319;
-  public static final int WindowEndCondition = 320;
-  public static final int WindowStartCondition = 321;
-  public static final int WindowVars = 322;
-  public static final int XNodeType = 323;
+  public static final int MethodArgumentList = 189;
+  public static final int MethodCall = 190;
+  public static final int Module = 191;
+  public static final int ModuleDecl = 192;
+  public static final int ModuleImport = 193;
+  public static final int MultiplicativeExpr = 194;
+  public static final int NCName = 195;
+  public static final int NameTest = 196;
+  public static final int NameTestUnion = 197;
+  public static final int NamedFunctionRef = 198;
+  public static final int NamespaceDecl = 199;
+  public static final int NamespaceNodeType = 200;
+  public static final int NewNameExpr = 201;
+  public static final int NextVar = 202;
+  public static final int NodeComp = 203;
+  public static final int NodeConstructor = 204;
+  public static final int NodeFollows = 205;
+  public static final int NodePrecedes = 206;
+  public static final int NodeTest = 207;
+  public static final int NumericLiteral = 208;
+  public static final int OccurrenceIndicator = 209;
+  public static final int OptionDecl = 210;
+  public static final int OrExpr = 211;
+  public static final int OrderByClause = 212;
+  public static final int OrderModifier = 213;
+  public static final int OrderSpec = 214;
+  public static final int OrderedExpr = 215;
+  public static final int OrderingModeDecl = 216;
+  public static final int OtherwiseExpr = 217;
+  public static final int ParamList = 218;
+  public static final int ParamListWithDefaults = 219;
+  public static final int ParamWithDefault = 220;
+  public static final int ParenthesizedExpr = 221;
+  public static final int PathExpr = 222;
+  public static final int PipelineExpr = 223;
+  public static final int PositionalArgumentList = 224;
+  public static final int PositionalArguments = 225;
+  public static final int PositionalVar = 226;
+  public static final int PostfixExpr = 227;
+  public static final int Pragma = 228;
+  public static final int Predicate = 229;
+  public static final int PreserveMode = 230;
+  public static final int PreviousVar = 231;
+  public static final int PrimaryExpr = 232;
+  public static final int ProcessingInstructionNodeType = 233;
+  public static final int Prolog = 234;
+  public static final int QName = 235;
+  public static final int QNameLiteral = 236;
+  public static final int QuantifiedExpr = 237;
+  public static final int QuantifierBinding = 238;
+  public static final int QueryBody = 239;
+  public static final int QuotAttrValueContent = 240;
+  public static final int RangeExpr = 241;
+  public static final int RecordType = 242;
+  public static final int RegularItemType = 243;
+  public static final int RelativePathExpr = 244;
+  public static final int RenameExpr = 245;
+  public static final int ReplaceExpr = 246;
+  public static final int RestrictedDynamicCall = 247;
+  public static final int ReturnClause = 248;
+  public static final int RevalidationDecl = 249;
+  public static final int SchemaAttributeNodeType = 250;
+  public static final int SchemaElementNodeType = 251;
+  public static final int SchemaImport = 252;
+  public static final int SchemaPrefix = 253;
+  public static final int Selector = 254;
+  public static final int Separator = 255;
+  public static final int SequenceArrowTarget = 256;
+  public static final int SequenceType = 257;
+  public static final int SequenceTypeEOF = 258;
+  public static final int SequenceTypeUnion = 259;
+  public static final int Setter = 260;
+  public static final int SimpleMapExpr = 261;
+  public static final int SimpleNodeTest = 262;
+  public static final int SlidingWindowClause = 263;
+  public static final int SourceExpr = 264;
+  public static final int SquareArrayConstructor = 265;
+  public static final int StepExpr = 266;
+  public static final int StringConcatExpr = 267;
+  public static final int StringConstructor = 268;
+  public static final int StringConstructorContent = 269;
+  public static final int StringInterpolation = 270;
+  public static final int StringTemplate = 271;
+  public static final int StringTemplateVariablePart = 272;
+  public static final int SwitchCaseClause = 273;
+  public static final int SwitchCaseOperand = 274;
+  public static final int SwitchCases = 275;
+  public static final int SwitchComparand = 276;
+  public static final int SwitchDefaultClause = 277;
+  public static final int SwitchExpr = 278;
+  public static final int TargetExpr = 279;
+  public static final int TextNodeType = 280;
+  public static final int TraceClause = 281;
+  public static final int TransformWithExpr = 282;
+  public static final int TreatExpr = 283;
+  public static final int TryCatchExpr = 284;
+  public static final int TryClause = 285;
+  public static final int TumblingWindowClause = 286;
+  public static final int TypeDeclaration = 287;
+  public static final int TypeName = 288;
+  public static final int TypeTest = 289;
+  public static final int TypedArrayType = 290;
+  public static final int TypedFunctionParam = 291;
+  public static final int TypedFunctionType = 292;
+  public static final int TypedMapType = 293;
+  public static final int TypedRecordType = 294;
+  public static final int TypeswitchCases = 295;
+  public static final int TypeswitchDefaultClause = 296;
+  public static final int TypeswitchExpr = 297;
+  public static final int URILiteral = 298;
+  public static final int UnaryExpr = 299;
+  public static final int UnaryLookup = 300;
+  public static final int UnbracedActions = 301;
+  public static final int UnionExpr = 302;
+  public static final int UnionNodeTest = 303;
+  public static final int UnorderedExpr = 304;
+  public static final int UnreservedFunctionEQName = 305;
+  public static final int UnreservedFunctionQName = 306;
+  public static final int UpdatingFunctionCall = 307;
+  public static final int ValidateExpr = 308;
+  public static final int ValidationMode = 309;
+  public static final int ValueComp = 310;
+  public static final int ValueExpr = 311;
+  public static final int VarDecl = 312;
+  public static final int VarDefaultValue = 313;
+  public static final int VarName = 314;
+  public static final int VarNameAndType = 315;
+  public static final int VarRef = 316;
+  public static final int VarValue = 317;
+  public static final int VersionDecl = 318;
+  public static final int WhereClause = 319;
+  public static final int WhileClause = 320;
+  public static final int Whitespace = 321;
+  public static final int WindowClause = 322;
+  public static final int WindowEndCondition = 323;
+  public static final int WindowStartCondition = 324;
+  public static final int WindowVars = 325;
+  public static final int XNodeType = 326;
 
   // terminals
-  public static final int ERROR = 324;
-  public static final int BANG = 325;
-  public static final int NOT_EQUALS = 326;
-  public static final int ESCAPE_QUOT = 327;
-  public static final int QUOT = 328;
-  public static final int HASH = 329;
-  public static final int PRAGMA_CLOSE = 330;
-  public static final int DOLLAR = 331;
-  public static final int PERCENT_SIGN = 332;
-  public static final int APOS = 333;
-  public static final int PRAGMA_OPEN = 334;
-  public static final int LPAREN = 335;
-  public static final int COMMENT_OPEN = 336;
-  public static final int RPAREN = 337;
-  public static final int STAR = 338;
-  public static final int PLUS = 339;
-  public static final int COMMA = 340;
-  public static final int MINUS = 341;
-  public static final int XML_COMMENT_CLOSE = 342;
-  public static final int THIN_ARROW = 343;
-  public static final int DOT = 344;
-  public static final int DOT2 = 345;
-  public static final int SLASH = 346;
-  public static final int SLASH2 = 347;
-  public static final int EMPTY_TAG_CLOSE = 348;
-  public static final int COLON = 349;
-  public static final int COMMENT_CLOSE = 350;
-  public static final int COLON2 = 351;
-  public static final int ASSIGN = 352;
-  public static final int SEMICOLON = 353;
-  public static final int XML_COMMENT_OPEN = 354;
-  public static final int CDATA_OPEN = 355;
-  public static final int LESS = 356;
-  public static final int END_TAG_OPEN = 357;
-  public static final int LESS2 = 358;
-  public static final int LESS_EQUAL = 359;
-  public static final int PI_OPEN = 360;
-  public static final int MAPPING_ARROW = 361;
-  public static final int EQUALS = 362;
-  public static final int FAT_ARROW = 363;
-  public static final int LOOKUP_ARROW = 364;
-  public static final int GREATER = 365;
-  public static final int GREATER_EQUAL = 366;
-  public static final int GREATER2 = 367;
-  public static final int QUESTION = 368;
-  public static final int PI_CLOSE = 369;
-  public static final int AT_SIGN = 370;
-  public static final int NAN = 371;
-  public static final int LBRACKET = 372;
-  public static final int RBRACKET = 373;
-  public static final int CDATA_CLOSE = 374;
-  public static final int STRING_CONSTRUCTOR_CLOSE = 375;
-  public static final int BACKTICK = 376;
-  public static final int STRING_CONSTRUCTOR_OPEN = 377;
-  public static final int AFTER = 378;
-  public static final int ALL = 379;
-  public static final int ALLOWING = 380;
-  public static final int ANCESTOR = 381;
-  public static final int ANCESTOR_OR_SELF = 382;
-  public static final int AND = 383;
-  public static final int ANY = 384;
-  public static final int ARRAY = 385;
-  public static final int AS = 386;
-  public static final int ASCENDING = 387;
-  public static final int AT = 388;
-  public static final int ATTRIBUTE = 389;
-  public static final int BASE_URI = 390;
-  public static final int BEFORE = 391;
-  public static final int BOUNDARY_SPACE = 392;
-  public static final int BUT = 393;
-  public static final int BY = 394;
-  public static final int CASE = 395;
-  public static final int CAST = 396;
-  public static final int CASTABLE = 397;
-  public static final int CATCH = 398;
-  public static final int CHILD = 399;
-  public static final int COERCE = 400;
-  public static final int COLLATION = 401;
-  public static final int COMMENT = 402;
-  public static final int CONSTRUCTION = 403;
-  public static final int CONTAINS = 404;
-  public static final int CONTENT = 405;
-  public static final int CONTEXT = 406;
-  public static final int COPY = 407;
-  public static final int COPY_NAMESPACES = 408;
-  public static final int COUNT = 409;
-  public static final int DECIMAL_FORMAT = 410;
-  public static final int DECIMAL_SEPARATOR = 411;
-  public static final int DECLARE = 412;
-  public static final int DEFAULT = 413;
-  public static final int DELETE = 414;
-  public static final int DESCENDANT = 415;
-  public static final int DESCENDANT_OR_SELF = 416;
-  public static final int DESCENDING = 417;
-  public static final int DIACRITICS = 418;
-  public static final int DIFFERENT = 419;
-  public static final int DIGIT = 420;
-  public static final int DISTANCE = 421;
-  public static final int DIV = 422;
-  public static final int DOCUMENT = 423;
-  public static final int DOCUMENT_NODE = 424;
-  public static final int ELEMENT = 425;
-  public static final int ELSE = 426;
-  public static final int EMPTY = 427;
-  public static final int EMPTY_SEQUENCE = 428;
-  public static final int ENCODING = 429;
-  public static final int END = 430;
-  public static final int ENTIRE = 431;
-  public static final int ENUM = 432;
-  public static final int EQ = 433;
-  public static final int ERRORS = 434;
-  public static final int EVERY = 435;
-  public static final int EXACTLY = 436;
-  public static final int EXCEPT = 437;
-  public static final int EXPONENT_SEPARATOR = 438;
-  public static final int EXTENDS = 439;
-  public static final int EXTERNAL = 440;
-  public static final int FALSE = 441;
-  public static final int FINALLY = 442;
-  public static final int FIRST = 443;
-  public static final int FIXED = 444;
-  public static final int FN = 445;
-  public static final int FOLLOWING = 446;
-  public static final int FOLLOWING_OR_SELF = 447;
-  public static final int FOLLOWING_SIBLING = 448;
-  public static final int FOLLOWING_SIBLING_OR_SELF = 449;
-  public static final int FOLLOWS = 450;
-  public static final int FOLLOWS_OR_IS = 451;
-  public static final int FOR = 452;
-  public static final int FROM = 453;
-  public static final int FT_OPTION = 454;
-  public static final int FTAND = 455;
-  public static final int FTNOT = 456;
-  public static final int FTOR = 457;
-  public static final int FUNCTION = 458;
-  public static final int FUZZY = 459;
-  public static final int GE = 460;
-  public static final int GREATEST = 461;
-  public static final int GROUP = 462;
-  public static final int GROUPING_SEPARATOR = 463;
-  public static final int GT = 464;
-  public static final int IDIV = 465;
-  public static final int IF = 466;
-  public static final int IMPORT = 467;
-  public static final int IN = 468;
-  public static final int INFINITY = 469;
-  public static final int INHERIT = 470;
-  public static final int INSENSITIVE = 471;
-  public static final int INSERT = 472;
-  public static final int INSTANCE = 473;
-  public static final int INTERSECT = 474;
-  public static final int INTO = 475;
-  public static final int INVOKE = 476;
-  public static final int IS = 477;
-  public static final int IS_NOT = 478;
-  public static final int ITEM = 479;
-  public static final int JNODE = 480;
-  public static final int KEY = 481;
-  public static final int LANGUAGE = 482;
-  public static final int LAST = 483;
-  public static final int LAX = 484;
-  public static final int LE = 485;
-  public static final int LEAST = 486;
-  public static final int LET = 487;
-  public static final int LEVELS = 488;
-  public static final int LOWERCASE = 489;
-  public static final int LT = 490;
-  public static final int MAP = 491;
-  public static final int MEMBER = 492;
-  public static final int MINUS_SIGN = 493;
-  public static final int MOD = 494;
-  public static final int MODIFY = 495;
-  public static final int MODULE = 496;
-  public static final int MOST = 497;
-  public static final int NAMESPACE = 498;
-  public static final int NAMESPACE_NODE = 499;
-  public static final int NE = 500;
-  public static final int NEXT = 501;
-  public static final int NO = 502;
-  public static final int NO_INHERIT = 503;
-  public static final int NO_PRESERVE = 504;
-  public static final int NODE = 505;
-  public static final int NODES = 506;
-  public static final int NOT = 507;
-  public static final int OCCURS = 508;
-  public static final int OF = 509;
-  public static final int ONLY = 510;
-  public static final int OPTION = 511;
-  public static final int OR = 512;
-  public static final int ORDER = 513;
-  public static final int ORDERED = 514;
-  public static final int ORDERING = 515;
-  public static final int OTHERWISE = 516;
-  public static final int PARAGRAPH = 517;
-  public static final int PARAGRAPHS = 518;
-  public static final int PARENT = 519;
-  public static final int PATTERN_SEPARATOR = 520;
-  public static final int PER_MILLE = 521;
-  public static final int PERCENT = 522;
-  public static final int PHRASE = 523;
-  public static final int PRECEDES = 524;
-  public static final int PRECEDES_OR_IS = 525;
-  public static final int PRECEDING = 526;
-  public static final int PRECEDING_OR_SELF = 527;
-  public static final int PRECEDING_SIBLING = 528;
-  public static final int PRECEDING_SIBLING_OR_SELF = 529;
-  public static final int PRESERVE = 530;
-  public static final int PREVIOUS = 531;
-  public static final int PROCESSING_INSTRUCTION = 532;
-  public static final int RECORD = 533;
-  public static final int RELATIONSHIP = 534;
-  public static final int RENAME = 535;
-  public static final int REPLACE = 536;
-  public static final int RETURN = 537;
-  public static final int REVALIDATION = 538;
-  public static final int SAME = 539;
-  public static final int SATISFIES = 540;
-  public static final int SCHEMA = 541;
-  public static final int SCHEMA_ATTRIBUTE = 542;
-  public static final int SCHEMA_ELEMENT = 543;
-  public static final int SCORE = 544;
-  public static final int SELF = 545;
-  public static final int SENSITIVE = 546;
-  public static final int SENTENCE = 547;
-  public static final int SENTENCES = 548;
-  public static final int SKIP = 549;
-  public static final int SLIDING = 550;
-  public static final int SOME = 551;
-  public static final int STABLE = 552;
-  public static final int START = 553;
-  public static final int STEMMING = 554;
-  public static final int STOP = 555;
-  public static final int STRICT = 556;
-  public static final int STRIP = 557;
-  public static final int SWITCH = 558;
-  public static final int TEXT = 559;
-  public static final int THEN = 560;
-  public static final int THESAURUS = 561;
-  public static final int TIMES = 562;
-  public static final int TO = 563;
-  public static final int TRACE = 564;
-  public static final int TRANSFORM = 565;
-  public static final int TREAT = 566;
-  public static final int TRUE = 567;
-  public static final int TRY = 568;
-  public static final int TUMBLING = 569;
-  public static final int TYPE = 570;
-  public static final int TYPESWITCH = 571;
-  public static final int UNION = 572;
-  public static final int UNORDERED = 573;
-  public static final int UPDATE = 574;
-  public static final int UPDATING = 575;
-  public static final int UPPERCASE = 576;
-  public static final int USING = 577;
-  public static final int VALIDATE = 578;
-  public static final int VALUE = 579;
-  public static final int VARIABLE = 580;
-  public static final int VERSION = 581;
-  public static final int WEIGHT = 582;
-  public static final int WHEN = 583;
-  public static final int WHERE = 584;
-  public static final int WHILE = 585;
-  public static final int WILDCARDS = 586;
-  public static final int WINDOW = 587;
-  public static final int WITH = 588;
-  public static final int WITHOUT = 589;
-  public static final int WORD = 590;
-  public static final int WORDS = 591;
-  public static final int XNODE = 592;
-  public static final int XQUERY = 593;
-  public static final int ZERO_DIGIT = 594;
-  public static final int LBRACE = 595;
-  public static final int LBRACE2 = 596;
-  public static final int BAR = 597;
-  public static final int BAR2 = 598;
-  public static final int RBRACE = 599;
-  public static final int RBRACE2 = 600;
-  public static final int MULTIPLY_SIGN = 601;
-  public static final int DIVIDE_SIGN = 602;
-  public static final int APOS_ATTR_CONTENT_CHAR = 603;
-  public static final int BINARY_INTEGER_LITERAL = 604;
-  public static final int C_DATA_SECTION_CONTENTS = 605;
-  public static final int CHAR_REF = 606;
-  public static final int COMMENT_CONTENTS = 607;
-  public static final int DECIMAL_LITERAL = 608;
-  public static final int DIR_COMMENT_CONTENTS = 609;
-  public static final int DIR_PI_CONTENTS = 610;
-  public static final int DOUBLE_LITERAL = 611;
-  public static final int EOF = 612;
-  public static final int ELEMENT_CONTENT_CHAR = 613;
-  public static final int ESCAPE_APOS = 614;
-  public static final int HEX_INTEGER_LITERAL = 615;
-  public static final int INTEGER_LITERAL = 616;
-  public static final int NC_NAME = 617;
-  public static final int NON_KEYWORD_Q_NAME = 618;
-  public static final int PI_TARGET = 619;
-  public static final int PRAGMA_CONTENTS = 620;
-  public static final int PREDEFINED_ENTITY_REF = 621;
-  public static final int Q_NAME = 622;
-  public static final int QUOT_ATTR_CONTENT_CHAR = 623;
-  public static final int S = 624;
-  public static final int STRING_CONSTRUCTOR_CHARS = 625;
-  public static final int STRING_LITERAL = 626;
-  public static final int STRING_TEMPLATE_FIXED_PART = 627;
-  public static final int URI_QUALIFIED_NAME = 628;
-  public static final int UNRESERVED_NC_NAME = 629;
-  public static final int WILDCARD = 630;
+  public static final int ERROR = 327;
+  public static final int BANG = 328;
+  public static final int NOT_EQUALS = 329;
+  public static final int ESCAPE_QUOT = 330;
+  public static final int QUOT = 331;
+  public static final int HASH = 332;
+  public static final int PRAGMA_CLOSE = 333;
+  public static final int DOLLAR = 334;
+  public static final int PERCENT_SIGN = 335;
+  public static final int APOS = 336;
+  public static final int PRAGMA_OPEN = 337;
+  public static final int LPAREN = 338;
+  public static final int COMMENT_OPEN = 339;
+  public static final int RPAREN = 340;
+  public static final int STAR = 341;
+  public static final int PLUS = 342;
+  public static final int COMMA = 343;
+  public static final int MINUS = 344;
+  public static final int XML_COMMENT_CLOSE = 345;
+  public static final int THIN_ARROW = 346;
+  public static final int DOT = 347;
+  public static final int DOT2 = 348;
+  public static final int SLASH = 349;
+  public static final int SLASH2 = 350;
+  public static final int EMPTY_TAG_CLOSE = 351;
+  public static final int COLON = 352;
+  public static final int COMMENT_CLOSE = 353;
+  public static final int COLON2 = 354;
+  public static final int ASSIGN = 355;
+  public static final int SEMICOLON = 356;
+  public static final int XML_COMMENT_OPEN = 357;
+  public static final int CDATA_OPEN = 358;
+  public static final int LESS = 359;
+  public static final int END_TAG_OPEN = 360;
+  public static final int LESS2 = 361;
+  public static final int LESS_EQUAL = 362;
+  public static final int PI_OPEN = 363;
+  public static final int MAPPING_ARROW = 364;
+  public static final int EQUALS = 365;
+  public static final int FAT_ARROW = 366;
+  public static final int LOOKUP_ARROW = 367;
+  public static final int GREATER = 368;
+  public static final int GREATER_EQUAL = 369;
+  public static final int GREATER2 = 370;
+  public static final int QUESTION = 371;
+  public static final int PI_CLOSE = 372;
+  public static final int AT_SIGN = 373;
+  public static final int NAN = 374;
+  public static final int LBRACKET = 375;
+  public static final int RBRACKET = 376;
+  public static final int CDATA_CLOSE = 377;
+  public static final int STRING_CONSTRUCTOR_CLOSE = 378;
+  public static final int BACKTICK = 379;
+  public static final int STRING_CONSTRUCTOR_OPEN = 380;
+  public static final int AFTER = 381;
+  public static final int ALL = 382;
+  public static final int ALLOWING = 383;
+  public static final int ANCESTOR = 384;
+  public static final int ANCESTOR_OR_SELF = 385;
+  public static final int AND = 386;
+  public static final int ANY = 387;
+  public static final int ARRAY = 388;
+  public static final int AS = 389;
+  public static final int ASCENDING = 390;
+  public static final int AT = 391;
+  public static final int ATTRIBUTE = 392;
+  public static final int BASE_URI = 393;
+  public static final int BEFORE = 394;
+  public static final int BOUNDARY_SPACE = 395;
+  public static final int BUT = 396;
+  public static final int BY = 397;
+  public static final int CASE = 398;
+  public static final int CAST = 399;
+  public static final int CASTABLE = 400;
+  public static final int CATCH = 401;
+  public static final int CHILD = 402;
+  public static final int COERCE = 403;
+  public static final int COLLATION = 404;
+  public static final int COMMENT = 405;
+  public static final int CONSTRUCTION = 406;
+  public static final int CONTAINS = 407;
+  public static final int CONTENT = 408;
+  public static final int CONTEXT = 409;
+  public static final int COPY = 410;
+  public static final int COPY_NAMESPACES = 411;
+  public static final int COUNT = 412;
+  public static final int DECIMAL_FORMAT = 413;
+  public static final int DECIMAL_SEPARATOR = 414;
+  public static final int DECLARE = 415;
+  public static final int DEFAULT = 416;
+  public static final int DELETE = 417;
+  public static final int DESCENDANT = 418;
+  public static final int DESCENDANT_OR_SELF = 419;
+  public static final int DESCENDING = 420;
+  public static final int DIACRITICS = 421;
+  public static final int DIFFERENT = 422;
+  public static final int DIGIT = 423;
+  public static final int DISTANCE = 424;
+  public static final int DIV = 425;
+  public static final int DOCUMENT = 426;
+  public static final int DOCUMENT_NODE = 427;
+  public static final int ELEMENT = 428;
+  public static final int ELSE = 429;
+  public static final int EMPTY = 430;
+  public static final int EMPTY_SEQUENCE = 431;
+  public static final int ENCODING = 432;
+  public static final int END = 433;
+  public static final int ENTIRE = 434;
+  public static final int ENUM = 435;
+  public static final int EQ = 436;
+  public static final int ERRORS = 437;
+  public static final int EVERY = 438;
+  public static final int EXACTLY = 439;
+  public static final int EXCEPT = 440;
+  public static final int EXPONENT_SEPARATOR = 441;
+  public static final int EXTENDS = 442;
+  public static final int EXTERNAL = 443;
+  public static final int FALSE = 444;
+  public static final int FINALLY = 445;
+  public static final int FIRST = 446;
+  public static final int FIXED = 447;
+  public static final int FN = 448;
+  public static final int FOLLOWING = 449;
+  public static final int FOLLOWING_OR_SELF = 450;
+  public static final int FOLLOWING_SIBLING = 451;
+  public static final int FOLLOWING_SIBLING_OR_SELF = 452;
+  public static final int FOLLOWS = 453;
+  public static final int FOLLOWS_OR_IS = 454;
+  public static final int FOR = 455;
+  public static final int FROM = 456;
+  public static final int FT_OPTION = 457;
+  public static final int FTAND = 458;
+  public static final int FTNOT = 459;
+  public static final int FTOR = 460;
+  public static final int FUNCTION = 461;
+  public static final int FUZZY = 462;
+  public static final int GE = 463;
+  public static final int GREATEST = 464;
+  public static final int GROUP = 465;
+  public static final int GROUPING_SEPARATOR = 466;
+  public static final int GT = 467;
+  public static final int IDIV = 468;
+  public static final int IF = 469;
+  public static final int IMPORT = 470;
+  public static final int IN = 471;
+  public static final int INFINITY = 472;
+  public static final int INHERIT = 473;
+  public static final int INSENSITIVE = 474;
+  public static final int INSERT = 475;
+  public static final int INSTANCE = 476;
+  public static final int INTERSECT = 477;
+  public static final int INTO = 478;
+  public static final int INVOKE = 479;
+  public static final int IS = 480;
+  public static final int IS_NOT = 481;
+  public static final int ITEM = 482;
+  public static final int JNODE = 483;
+  public static final int KEY = 484;
+  public static final int LANGUAGE = 485;
+  public static final int LAST = 486;
+  public static final int LAX = 487;
+  public static final int LE = 488;
+  public static final int LEAST = 489;
+  public static final int LET = 490;
+  public static final int LEVELS = 491;
+  public static final int LOWERCASE = 492;
+  public static final int LT = 493;
+  public static final int MAP = 494;
+  public static final int MEMBER = 495;
+  public static final int MINUS_SIGN = 496;
+  public static final int MOD = 497;
+  public static final int MODIFY = 498;
+  public static final int MODULE = 499;
+  public static final int MOST = 500;
+  public static final int NAMESPACE = 501;
+  public static final int NAMESPACE_NODE = 502;
+  public static final int NE = 503;
+  public static final int NEXT = 504;
+  public static final int NO = 505;
+  public static final int NO_INHERIT = 506;
+  public static final int NO_PRESERVE = 507;
+  public static final int NODE = 508;
+  public static final int NODES = 509;
+  public static final int NOT = 510;
+  public static final int OCCURS = 511;
+  public static final int OF = 512;
+  public static final int ONLY = 513;
+  public static final int OPTION = 514;
+  public static final int OR = 515;
+  public static final int ORDER = 516;
+  public static final int ORDERED = 517;
+  public static final int ORDERING = 518;
+  public static final int OTHERWISE = 519;
+  public static final int PARAGRAPH = 520;
+  public static final int PARAGRAPHS = 521;
+  public static final int PARENT = 522;
+  public static final int PATTERN_SEPARATOR = 523;
+  public static final int PER_MILLE = 524;
+  public static final int PERCENT = 525;
+  public static final int PHRASE = 526;
+  public static final int PRECEDES = 527;
+  public static final int PRECEDES_OR_IS = 528;
+  public static final int PRECEDING = 529;
+  public static final int PRECEDING_OR_SELF = 530;
+  public static final int PRECEDING_SIBLING = 531;
+  public static final int PRECEDING_SIBLING_OR_SELF = 532;
+  public static final int PRESERVE = 533;
+  public static final int PREVIOUS = 534;
+  public static final int PROCESSING_INSTRUCTION = 535;
+  public static final int RECORD = 536;
+  public static final int RELATIONSHIP = 537;
+  public static final int RENAME = 538;
+  public static final int REPLACE = 539;
+  public static final int RETURN = 540;
+  public static final int REVALIDATION = 541;
+  public static final int SAME = 542;
+  public static final int SATISFIES = 543;
+  public static final int SCHEMA = 544;
+  public static final int SCHEMA_ATTRIBUTE = 545;
+  public static final int SCHEMA_ELEMENT = 546;
+  public static final int SCORE = 547;
+  public static final int SELF = 548;
+  public static final int SENSITIVE = 549;
+  public static final int SENTENCE = 550;
+  public static final int SENTENCES = 551;
+  public static final int SKIP = 552;
+  public static final int SLIDING = 553;
+  public static final int SOME = 554;
+  public static final int STABLE = 555;
+  public static final int START = 556;
+  public static final int STEMMING = 557;
+  public static final int STOP = 558;
+  public static final int STRICT = 559;
+  public static final int STRIP = 560;
+  public static final int SWITCH = 561;
+  public static final int TEXT = 562;
+  public static final int THEN = 563;
+  public static final int THESAURUS = 564;
+  public static final int TIMES = 565;
+  public static final int TO = 566;
+  public static final int TRACE = 567;
+  public static final int TRANSFORM = 568;
+  public static final int TREAT = 569;
+  public static final int TRUE = 570;
+  public static final int TRY = 571;
+  public static final int TUMBLING = 572;
+  public static final int TYPE = 573;
+  public static final int TYPESWITCH = 574;
+  public static final int UNION = 575;
+  public static final int UNORDERED = 576;
+  public static final int UPDATE = 577;
+  public static final int UPDATING = 578;
+  public static final int UPPERCASE = 579;
+  public static final int USING = 580;
+  public static final int VALIDATE = 581;
+  public static final int VALUE = 582;
+  public static final int VARIABLE = 583;
+  public static final int VERSION = 584;
+  public static final int WEIGHT = 585;
+  public static final int WHEN = 586;
+  public static final int WHERE = 587;
+  public static final int WHILE = 588;
+  public static final int WILDCARDS = 589;
+  public static final int WINDOW = 590;
+  public static final int WITH = 591;
+  public static final int WITHOUT = 592;
+  public static final int WORD = 593;
+  public static final int WORDS = 594;
+  public static final int XNODE = 595;
+  public static final int XQUERY = 596;
+  public static final int ZERO_DIGIT = 597;
+  public static final int LBRACE = 598;
+  public static final int LBRACE2 = 599;
+  public static final int BAR = 600;
+  public static final int BAR2 = 601;
+  public static final int RBRACE = 602;
+  public static final int RBRACE2 = 603;
+  public static final int MULTIPLY_SIGN = 604;
+  public static final int DIVIDE_SIGN = 605;
+  public static final int APOS_ATTR_CONTENT_CHAR = 606;
+  public static final int BINARY_INTEGER_LITERAL = 607;
+  public static final int C_DATA_SECTION_CONTENTS = 608;
+  public static final int CHAR_REF = 609;
+  public static final int COMMENT_CONTENTS = 610;
+  public static final int DECIMAL_LITERAL = 611;
+  public static final int DIR_COMMENT_CONTENTS = 612;
+  public static final int DIR_PI_CONTENTS = 613;
+  public static final int DOUBLE_LITERAL = 614;
+  public static final int EOF = 615;
+  public static final int ELEMENT_CONTENT_CHAR = 616;
+  public static final int ESCAPE_APOS = 617;
+  public static final int HEX_INTEGER_LITERAL = 618;
+  public static final int INTEGER_LITERAL = 619;
+  public static final int NC_NAME = 620;
+  public static final int NON_KEYWORD_Q_NAME = 621;
+  public static final int PI_TARGET = 622;
+  public static final int PRAGMA_CONTENTS = 623;
+  public static final int PREDEFINED_ENTITY_REF = 624;
+  public static final int Q_NAME = 625;
+  public static final int QUOT_ATTR_CONTENT_CHAR = 626;
+  public static final int S = 627;
+  public static final int STRING_CONSTRUCTOR_CHARS = 628;
+  public static final int STRING_LITERAL = 629;
+  public static final int STRING_TEMPLATE_FIXED_PART = 630;
+  public static final int URI_QUALIFIED_NAME = 631;
+  public static final int UNRESERVED_NC_NAME = 632;
+  public static final int WILDCARD = 633;
 
   /** Number of symbols. */
-  public static final int SYMBOL_COUNT = 631;
+  public static final int SYMBOL_COUNT = 634;
   /** First terminal. */
-  public static final int FIRST_TERMINAL = 324;
+  public static final int FIRST_TERMINAL = 327;
 
   /** Grammar names, indexed by symbol; keywords and punctuation are quoted. */
   private static final String[] SYMBOLS = {
@@ -846,6 +849,7 @@ public final class Sym {
     "MapType",
     "MappingArrowTarget",
     "MarkedNCName",
+    "MethodArgumentList",
     "MethodCall",
     "Module",
     "ModuleDecl",
@@ -933,6 +937,7 @@ public final class Sym {
     "SwitchCaseOperand",
     "SwitchCases",
     "SwitchComparand",
+    "SwitchDefaultClause",
     "SwitchExpr",
     "TargetExpr",
     "TextNodeType",
@@ -951,6 +956,7 @@ public final class Sym {
     "TypedMapType",
     "TypedRecordType",
     "TypeswitchCases",
+    "TypeswitchDefaultClause",
     "TypeswitchExpr",
     "URILiteral",
     "UnaryExpr",
@@ -1292,43 +1298,43 @@ public final class Sym {
 
   /** Symbols of the nonterminals, indexed by the ids that the parser reports. */
   private static final int[] NONTERMINAL_SYMS = {
-    190, 315, 254, 178, 191, 194, 295, 233, 66, 259, 25, 65, 24, 55, 215, 81, 248, 59, 229, 155, 64,
-    78, 234, 303, 63, 198, 154, 251, 252, 192, 106, 104, 103, 101, 126, 121, 120, 102, 116, 92, 95,
-    117, 118, 119, 97, 99, 56, 256, 163, 242, 8, 323, 75, 80, 196, 195, 286, 250, 79, 21, 249, 20,
-    232, 40, 278, 199, 11, 149, 165, 166, 54, 207, 235, 186, 9, 291, 17, 6, 288, 241, 10, 292, 130,
-    131, 84, 148, 5, 7, 290, 289, 37, 208, 314, 86, 88, 156, 136, 135, 140, 312, 285, 3, 225, 311,
-    114, 141, 137, 138, 139, 174, 173, 177, 176, 172, 175, 319, 284, 321, 322, 62, 230, 201, 320,
-    262, 161, 316, 317, 151, 152, 211, 213, 212, 60, 279, 247, 236, 237, 276, 275, 85, 274, 272,
-    273, 28, 294, 293, 32, 258, 29, 153, 298, 26, 83, 27, 282, 283, 36, 134, 210, 4, 51, 93, 216,
-    266, 240, 2, 193, 299, 162, 30, 160, 281, 38, 35, 33, 280, 222, 18, 296, 308, 305, 306, 87, 227,
-    260, 221, 1, 243, 265, 226, 231, 179, 313, 220, 57, 144, 302, 14, 224, 13, 15, 169, 168, 214,
-    301, 203, 74, 71, 68, 69, 239, 41, 12, 72, 31, 70, 73, 53, 44, 45, 48, 82, 42, 46, 47, 188, 50,
-    43, 49, 146, 197, 157, 147, 217, 143, 184, 185, 16, 264, 61, 270, 271, 267, 268, 269, 297, 180,
-    167, 182, 133, 228, 76, 223, 181, 189, 23, 0, 206, 300, 261, 287, 253, 77, 142, 22, 255, 19,
-    246, 187, 34, 115, 107, 89, 105, 123, 111, 110, 128, 129, 90, 122, 112, 98, 125, 109, 108, 127,
-    124, 96, 113, 91, 94, 100, 307, 150, 202, 205, 204, 158, 263, 159, 277, 67, 244, 200, 245, 304,
-    58, 310, 309, 145, 52, 218, 219, 164, 171, 170, 132, 209, 183, 238, 318, 39, 257
+    191, 318, 255, 178, 192, 195, 298, 234, 66, 260, 25, 65, 24, 55, 216, 81, 249, 59, 230, 155, 64,
+    78, 235, 306, 63, 199, 154, 252, 253, 193, 106, 104, 103, 101, 126, 121, 120, 102, 116, 92, 95,
+    117, 118, 119, 97, 99, 56, 257, 163, 243, 8, 326, 75, 80, 197, 196, 288, 251, 79, 21, 250, 20,
+    233, 40, 280, 200, 11, 149, 165, 166, 54, 208, 236, 186, 9, 293, 17, 6, 290, 242, 10, 294, 130,
+    131, 84, 148, 5, 7, 292, 291, 37, 209, 317, 86, 88, 156, 136, 135, 140, 315, 287, 3, 226, 314,
+    114, 141, 137, 138, 139, 174, 173, 177, 176, 172, 175, 322, 286, 324, 325, 62, 231, 202, 323,
+    263, 161, 319, 320, 151, 152, 212, 214, 213, 60, 281, 248, 237, 238, 278, 276, 85, 275, 273,
+    274, 277, 28, 297, 295, 32, 259, 296, 29, 153, 301, 26, 83, 27, 284, 285, 36, 134, 211, 4, 51,
+    93, 217, 267, 241, 2, 194, 302, 162, 30, 160, 283, 38, 35, 33, 282, 223, 18, 299, 311, 308, 309,
+    87, 228, 261, 222, 1, 244, 266, 227, 232, 179, 316, 221, 57, 144, 305, 14, 225, 13, 15, 169,
+    168, 215, 304, 204, 74, 71, 68, 69, 240, 41, 12, 72, 31, 70, 73, 53, 44, 45, 48, 82, 42, 46, 47,
+    188, 50, 43, 49, 146, 198, 157, 147, 218, 143, 184, 185, 16, 265, 61, 271, 272, 268, 269, 270,
+    300, 180, 167, 182, 133, 229, 76, 224, 181, 190, 189, 23, 0, 207, 303, 262, 289, 254, 77, 142,
+    22, 256, 19, 247, 187, 34, 115, 107, 89, 105, 123, 111, 110, 128, 129, 90, 122, 112, 98, 125,
+    109, 108, 127, 124, 96, 113, 91, 94, 100, 310, 150, 203, 206, 205, 158, 264, 159, 279, 67, 245,
+    201, 246, 307, 58, 313, 312, 145, 52, 219, 220, 164, 171, 170, 132, 210, 183, 239, 321, 39, 258
   };
 
   /** Symbols of the terminals, indexed by the ids that the parser reports. */
   private static final int[] TERMINAL_SYMS = {
-    324, 621, 606, 614, 327, 630, 624, 620, 623, 603, 613, 605, 609, 619, 610, 627, 625, 607, 328,
-    330, 333, 334, 336, 342, 345, 350, 355, 357, 369, 370, 374, 596, 600, 612, 626, 629, 628, 618,
-    616, 615, 604, 608, 611, 624, 325, 326, 331, 332, 337, 338, 339, 340, 341, 343, 344, 346, 347,
-    348, 349, 351, 352, 353, 356, 356, 354, 358, 359, 360, 362, 361, 363, 364, 365, 366, 367, 368,
-    371, 373, 375, 376, 377, 379, 380, 381, 382, 384, 385, 389, 390, 392, 394, 398, 399, 402, 403,
-    405, 406, 407, 408, 410, 411, 414, 415, 416, 418, 419, 420, 421, 423, 424, 425, 428, 429, 431,
-    432, 434, 435, 436, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 453, 454, 455,
-    456, 457, 458, 459, 461, 463, 466, 468, 469, 470, 471, 472, 476, 479, 480, 481, 482, 483, 484,
-    486, 488, 489, 491, 492, 493, 497, 498, 499, 501, 502, 503, 504, 505, 506, 507, 508, 509, 511,
-    514, 515, 517, 519, 520, 521, 522, 523, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536,
-    538, 539, 541, 542, 543, 544, 545, 546, 547, 549, 550, 551, 554, 555, 556, 557, 558, 559, 560,
-    561, 567, 568, 569, 570, 571, 573, 575, 576, 577, 578, 579, 580, 581, 582, 583, 586, 587, 589,
-    590, 592, 594, 595, 597, 598, 599, 601, 602, 329, 335, 372, 378, 383, 386, 387, 388, 391, 393,
-    395, 396, 397, 400, 401, 404, 409, 412, 413, 417, 422, 426, 427, 430, 433, 437, 450, 451, 452,
-    460, 462, 464, 465, 467, 473, 474, 475, 477, 478, 485, 487, 490, 494, 495, 496, 500, 510, 512,
-    513, 516, 518, 524, 525, 537, 540, 548, 552, 553, 562, 563, 564, 565, 566, 572, 574, 584, 585,
-    588, 591, 593
+    327, 624, 609, 617, 330, 633, 627, 623, 626, 606, 616, 608, 612, 622, 613, 630, 628, 610, 331,
+    333, 336, 337, 339, 345, 348, 353, 358, 360, 372, 373, 377, 599, 603, 615, 629, 632, 631, 621,
+    619, 618, 607, 611, 614, 627, 328, 329, 334, 335, 340, 341, 342, 343, 344, 346, 347, 349, 350,
+    351, 352, 354, 355, 356, 359, 359, 357, 361, 362, 363, 365, 364, 366, 367, 368, 369, 370, 371,
+    374, 376, 378, 379, 380, 382, 383, 384, 385, 387, 388, 392, 393, 395, 397, 401, 402, 405, 406,
+    408, 409, 410, 411, 413, 414, 417, 418, 419, 421, 422, 423, 424, 426, 427, 428, 431, 432, 434,
+    435, 437, 438, 439, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 456, 457, 458,
+    459, 460, 461, 462, 464, 466, 469, 471, 472, 473, 474, 475, 479, 482, 483, 484, 485, 486, 487,
+    489, 491, 492, 494, 495, 496, 500, 501, 502, 504, 505, 506, 507, 508, 509, 510, 511, 512, 514,
+    517, 518, 520, 522, 523, 524, 525, 526, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539,
+    541, 542, 544, 545, 546, 547, 548, 549, 550, 552, 553, 554, 557, 558, 559, 560, 561, 562, 563,
+    564, 570, 571, 572, 573, 574, 576, 578, 579, 580, 581, 582, 583, 584, 585, 586, 589, 590, 592,
+    593, 595, 597, 598, 600, 601, 602, 604, 605, 332, 338, 375, 381, 386, 389, 390, 391, 394, 396,
+    398, 399, 400, 403, 404, 407, 412, 415, 416, 420, 425, 429, 430, 433, 436, 440, 453, 454, 455,
+    463, 465, 467, 468, 470, 476, 477, 478, 480, 481, 488, 490, 493, 497, 498, 499, 503, 513, 515,
+    516, 519, 521, 527, 528, 540, 543, 551, 555, 556, 565, 566, 567, 568, 569, 575, 577, 587, 588,
+    591, 594, 596
   };
 
 

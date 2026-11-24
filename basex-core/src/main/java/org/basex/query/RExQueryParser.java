@@ -2477,15 +2477,16 @@ public final class RExQueryParser extends AQueryParser {
     final SwitchComparand comparand = node.switchComparand();
     final InputInfo ii = info(comparand);
     final Expr cond = comparand.expr() == null ? Bln.TRUE : single(comparand.expr());
-    final SwitchCases cases = node.switchCases() != null ? node.switchCases() :
-      node.bracedSwitchCases().switchCases();
-    final SwitchCaseClause[] clauses = cases.children();
+    final SwitchCaseClause[] clauses = node.switchCases() != null ?
+      node.switchCases().children() : node.bracedSwitchCases().children();
+    final SwitchDefaultClause dflt = node.switchCases() != null ?
+      node.switchCases().switchDefaultClause() : node.bracedSwitchCases().switchDefaultClause();
     final SwitchGroup[] groups = new SwitchGroup[clauses.length + 1];
     for(int c = 0; c < clauses.length; c++) {
       groups[c] = switchGroup(clauses[c].children(), clauses[c].exprSingle());
     }
     // the default case of a braced switch may be omitted
-    groups[clauses.length] = cases.exprSingle() != null ? switchGroup(NONE, cases.exprSingle()) :
+    groups[clauses.length] = dflt != null ? switchGroup(NONE, dflt.exprSingle()) :
       new SwitchGroup(infoAt(node.bracedSwitchCases().end() - 1), Empty.VALUE);
     return new Switch(ii, cond, groups);
   }
@@ -2516,18 +2517,20 @@ public final class RExQueryParser extends AQueryParser {
   private Expr typeswitch(final TypeswitchExpr node) throws QueryException {
     final InputInfo ii = infoAt(after(node.begin() + TYPESWITCH.length()));
     final Expr cond = single(node.expr());
-    final TypeswitchCases cases = node.typeswitchCases() != null ? node.typeswitchCases() :
-      node.bracedTypeswitchCases().typeswitchCases();
+    final CaseClause[] clauses = node.typeswitchCases() != null ?
+      node.typeswitchCases().children() : node.bracedTypeswitchCases().children();
+    final TypeswitchDefaultClause dflt = node.typeswitchCases() != null ?
+      node.typeswitchCases().typeswitchDefaultClause() :
+      node.bracedTypeswitchCases().typeswitchDefaultClause();
     final int s = localVars.openScope();
-    final CaseClause[] clauses = cases.children();
     final TypeswitchGroup[] groups = new TypeswitchGroup[clauses.length + 1];
     for(int c = 0; c < clauses.length; c++) {
       groups[c] = typeswitchGroup(clauses[c].varName(), clauses[c].sequenceTypeUnion().children(),
           clauses[c].exprSingle(), s);
     }
     // the default case of a braced typeswitch may be omitted
-    groups[clauses.length] = cases.exprSingle() != null ?
-      typeswitchGroup(cases.varName(), new Nodes.SequenceType[0], cases.exprSingle(), s) :
+    groups[clauses.length] = dflt != null ?
+      typeswitchGroup(dflt.varName(), new Nodes.SequenceType[0], dflt.exprSingle(), s) :
       new TypeswitchGroup(infoAt(node.bracedTypeswitchCases().end() - 1), null,
           new SeqType[0], Empty.VALUE);
     return new Typeswitch(ii, cond, groups);
@@ -3009,13 +3012,12 @@ public final class RExQueryParser extends AQueryParser {
   private Expr methodCall(final MethodCall node) throws QueryException {
     final Expr expr = single(node.postfixExpr());
     final InputInfo info = info(node.ncName());
-    final byte[] name = token(text(node.ncName()));
+    final Str key = Str.get(token(text(node.ncName())));
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
-    final FuncBuilder fb = argumentList(node.positionalArgumentList(), arg);
-    if(fb.placeholders != 0) throw error(node, INVPLACEHOLDER_X, name);
-    final Lookup func = new Lookup(info, arg, Str.get(name));
+    final FuncBuilder fb = argumentList(node.methodArgumentList(), arg);
+    final Lookup func = new Lookup(info, arg, key);
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);
@@ -3273,6 +3275,21 @@ public final class RExQueryParser extends AQueryParser {
   private FuncBuilder argumentList(final PositionalArgumentList node, final Expr expr)
       throws QueryException {
     return argList(node, node.positionalArguments(), null, expr);
+  }
+
+  /**
+   * Parses the "MethodArgumentList" rule.
+   * @param node argument list
+   * @param expr first argument
+   * @return function builder
+   * @throws QueryException query exception
+   */
+  private FuncBuilder argumentList(final MethodArgumentList node, final Expr expr)
+      throws QueryException {
+    final FuncBuilder fb = new FuncBuilder(info(node));
+    fb.add(expr, null);
+    for(final Node argument : node.children()) fb.add(single(argument), null);
+    return fb;
   }
 
   /**

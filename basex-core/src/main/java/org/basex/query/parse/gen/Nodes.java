@@ -208,18 +208,19 @@ public final class Nodes {
     }
   }
 
-  /** BracedSwitchCases ::= '{' SwitchCases '}' */
-  public record BracedSwitchCases(int begin, int end,
-      Nodes.SwitchCases switchCases) implements Node {
+  /** BracedSwitchCases ::= '{' {SwitchCaseClause}+ [SwitchDefaultClause] '}' */
+  public record BracedSwitchCases(int begin, int end, Nodes.SwitchDefaultClause switchDefaultClause,
+      Nodes.SwitchCaseClause[] children) implements Node {
     @Override
     public int sym() {
       return Sym.BracedSwitchCases;
     }
   }
 
-  /** BracedTypeswitchCases ::= '{' TypeswitchCases '}' */
+  /** BracedTypeswitchCases ::= '{' {CaseClause}+ [TypeswitchDefaultClause] '}' */
   public record BracedTypeswitchCases(int begin, int end,
-      Nodes.TypeswitchCases typeswitchCases) implements Node {
+      Nodes.TypeswitchDefaultClause typeswitchDefaultClause,
+      Nodes.CaseClause[] children) implements Node {
     @Override
     public int sym() {
       return Sym.BracedTypeswitchCases;
@@ -1415,9 +1416,17 @@ public final class Nodes {
     }
   }
 
-  /** MethodCall ::= PostfixExpr '=?&gt;' NCName PositionalArgumentList */
+  /** MethodArgumentList ::= '(' [ExprSingle {',' ExprSingle}*] ')' */
+  public record MethodArgumentList(int begin, int end, Node[] children) implements Node {
+    @Override
+    public int sym() {
+      return Sym.MethodArgumentList;
+    }
+  }
+
+  /** MethodCall ::= PostfixExpr '=?&gt;' NCName MethodArgumentList */
   public record MethodCall(int begin, int end, Node postfixExpr, Terminal ncName,
-      Nodes.PositionalArgumentList positionalArgumentList) implements Node {
+      Nodes.MethodArgumentList methodArgumentList) implements Node {
     @Override
     public int sym() {
       return Sym.MethodCall;
@@ -1935,8 +1944,8 @@ public final class Nodes {
     }
   }
 
-  /** SwitchCases ::= {SwitchCaseClause}+ 'default' 'return' ExprSingle */
-  public record SwitchCases(int begin, int end, Node exprSingle,
+  /** SwitchCases ::= {SwitchCaseClause}+ SwitchDefaultClause */
+  public record SwitchCases(int begin, int end, Nodes.SwitchDefaultClause switchDefaultClause,
       Nodes.SwitchCaseClause[] children) implements Node {
     @Override
     public int sym() {
@@ -1949,6 +1958,14 @@ public final class Nodes {
     @Override
     public int sym() {
       return Sym.SwitchComparand;
+    }
+  }
+
+  /** SwitchDefaultClause ::= 'default' 'return' ExprSingle */
+  public record SwitchDefaultClause(int begin, int end, Node exprSingle) implements Node {
+    @Override
+    public int sym() {
+      return Sym.SwitchDefaultClause;
     }
   }
 
@@ -2083,12 +2100,22 @@ public final class Nodes {
     }
   }
 
-  /** TypeswitchCases ::= {CaseClause}+ 'default' [VarName] 'return' ExprSingle */
-  public record TypeswitchCases(int begin, int end, Nodes.VarName varName, Node exprSingle,
+  /** TypeswitchCases ::= {CaseClause}+ TypeswitchDefaultClause */
+  public record TypeswitchCases(int begin, int end,
+      Nodes.TypeswitchDefaultClause typeswitchDefaultClause,
       Nodes.CaseClause[] children) implements Node {
     @Override
     public int sym() {
       return Sym.TypeswitchCases;
+    }
+  }
+
+  /** TypeswitchDefaultClause ::= 'default' [VarName] 'return' ExprSingle */
+  public record TypeswitchDefaultClause(int begin, int end, Nodes.VarName varName,
+      Node exprSingle) implements Node {
+    @Override
+    public int sym() {
+      return Sym.TypeswitchDefaultClause;
     }
   }
 

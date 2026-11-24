@@ -206,6 +206,7 @@ public final class NodeFactory {
       case Sym.MapConstructorEntry -> createMapConstructorEntry(begin, end, st, sy, from, to);
       case Sym.MappingArrowTarget -> createMappingArrowTarget(begin, end, st, sy, from, to);
       case Sym.MarkedNCName -> createMarkedNCName(begin, end, st, sy, from, to);
+      case Sym.MethodArgumentList -> createMethodArgumentList(begin, end, st, sy, from, to);
       case Sym.MethodCall -> createMethodCall(begin, end, st, sy, from, to);
       case Sym.Module -> createModule(begin, end, st, sy, from, to);
       case Sym.ModuleDecl -> createModuleDecl(begin, end, st, sy, from, to);
@@ -268,6 +269,7 @@ public final class NodeFactory {
       case Sym.SwitchCaseClause -> createSwitchCaseClause(begin, end, st, sy, from, to);
       case Sym.SwitchCases -> createSwitchCases(begin, end, st, sy, from, to);
       case Sym.SwitchComparand -> createSwitchComparand(begin, end, st, sy, from, to);
+      case Sym.SwitchDefaultClause -> createSwitchDefaultClause(begin, end, st, sy, from, to);
       case Sym.SwitchExpr -> createSwitchExpr(begin, end, st, sy, from, to);
       case Sym.TextNodeType -> createTextNodeType(begin, end, st, sy, from, to);
       case Sym.TraceClause -> createTraceClause(begin, end, st, sy, from, to);
@@ -283,6 +285,8 @@ public final class NodeFactory {
       case Sym.TypedMapType -> createTypedMapType(begin, end, st, sy, from, to);
       case Sym.TypedRecordType -> createTypedRecordType(begin, end, st, sy, from, to);
       case Sym.TypeswitchCases -> createTypeswitchCases(begin, end, st, sy, from, to);
+      case Sym.TypeswitchDefaultClause -> createTypeswitchDefaultClause(begin, end, st, sy, from,
+          to);
       case Sym.TypeswitchExpr -> createTypeswitchExpr(begin, end, st, sy, from, to);
       case Sym.UnaryExpr -> createUnaryExpr(begin, end, st, sy, from, to);
       case Sym.UnbracedActions -> createUnbracedActions(begin, end, st, sy, from, to);
@@ -690,30 +694,41 @@ public final class NodeFactory {
 
   private static Node createBracedSwitchCases(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
-    Nodes.SwitchCases switchCases = null;
+    Nodes.SwitchDefaultClause switchDefaultClause = null;
+    int size = to - from;
+    final Nodes.SwitchCaseClause[] ch = new Nodes.SwitchCaseClause[size];
+    int n = 0;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
-        case Sym.SwitchCases -> switchCases = (Nodes.SwitchCases) c;
+        case Sym.SwitchDefaultClause -> switchDefaultClause = (Nodes.SwitchDefaultClause) c;
+        case Sym.SwitchCaseClause -> ch[n++] = (Nodes.SwitchCaseClause) c;
         default -> { }
       }
     }
-    return new Nodes.BracedSwitchCases(begin, end, switchCases);
+    return new Nodes.BracedSwitchCases(begin, end, switchDefaultClause,
+        n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
   private static Node createBracedTypeswitchCases(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
-    Nodes.TypeswitchCases typeswitchCases = null;
+    Nodes.TypeswitchDefaultClause typeswitchDefaultClause = null;
+    int size = to - from;
+    final Nodes.CaseClause[] ch = new Nodes.CaseClause[size];
+    int n = 0;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
-        case Sym.TypeswitchCases -> typeswitchCases = (Nodes.TypeswitchCases) c;
+        case Sym.TypeswitchDefaultClause -> typeswitchDefaultClause =
+            (Nodes.TypeswitchDefaultClause) c;
+        case Sym.CaseClause -> ch[n++] = (Nodes.CaseClause) c;
         default -> { }
       }
     }
-    return new Nodes.BracedTypeswitchCases(begin, end, typeswitchCases);
+    return new Nodes.BracedTypeswitchCases(begin, end, typeswitchDefaultClause,
+        n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
   private static Node createButWithExpr(final int begin, final int end, final Node[] st,
@@ -2997,23 +3012,39 @@ public final class NodeFactory {
     return new Nodes.MarkedNCName(begin, end, ncName);
   }
 
+  private static Node createMethodArgumentList(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
+    int size = to - from;
+    final Node[] ch = new Node[size];
+    int n = 0;
+    for(int i = from; i < to; i++) {
+      final Node c = st[i];
+      if(c instanceof Marker) continue;
+      switch(sy[i]) {
+        case Sym.ExprSingle -> ch[n++] = c;
+        default -> { }
+      }
+    }
+    return new Nodes.MethodArgumentList(begin, end,
+        n == 0 ? NONE : n == ch.length ? ch : Arrays.copyOf(ch, n));
+  }
+
   private static Node createMethodCall(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
     Node postfixExpr = null;
     Terminal ncName = null;
-    Nodes.PositionalArgumentList positionalArgumentList = null;
+    Nodes.MethodArgumentList methodArgumentList = null;
     for(int i = from; i < to; i++) {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
         case Sym.PostfixExpr -> postfixExpr = c;
         case Sym.NCName -> ncName = (Terminal) c;
-        case Sym.PositionalArgumentList -> positionalArgumentList = (Nodes.PositionalArgumentList)
-            c;
+        case Sym.MethodArgumentList -> methodArgumentList = (Nodes.MethodArgumentList) c;
         default -> { }
       }
     }
-    return new Nodes.MethodCall(begin, end, postfixExpr, ncName, positionalArgumentList);
+    return new Nodes.MethodCall(begin, end, postfixExpr, ncName, methodArgumentList);
   }
 
   private static Node createModule(final int begin, final int end, final Node[] st, final int[] sy,
@@ -3985,7 +4016,7 @@ public final class NodeFactory {
 
   private static Node createSwitchCases(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
-    Node exprSingle = null;
+    Nodes.SwitchDefaultClause switchDefaultClause = null;
     int size = to - from;
     final Nodes.SwitchCaseClause[] ch = new Nodes.SwitchCaseClause[size];
     int n = 0;
@@ -3993,13 +4024,13 @@ public final class NodeFactory {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
-        case Sym.ExprSingle -> exprSingle = c;
+        case Sym.SwitchDefaultClause -> switchDefaultClause = (Nodes.SwitchDefaultClause) c;
         case Sym.SwitchCaseClause -> ch[n++] = (Nodes.SwitchCaseClause) c;
         default -> { }
       }
     }
-    return new Nodes.SwitchCases(begin, end, exprSingle, n == ch.length ? ch : Arrays.copyOf(ch,
-        n));
+    return new Nodes.SwitchCases(begin, end, switchDefaultClause,
+        n == ch.length ? ch : Arrays.copyOf(ch, n));
   }
 
   private static Node createSwitchComparand(final int begin, final int end, final Node[] st,
@@ -4014,6 +4045,20 @@ public final class NodeFactory {
       }
     }
     return new Nodes.SwitchComparand(begin, end, expr);
+  }
+
+  private static Node createSwitchDefaultClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
+    Node exprSingle = null;
+    for(int i = from; i < to; i++) {
+      final Node c = st[i];
+      if(c instanceof Marker) continue;
+      switch(sy[i]) {
+        case Sym.ExprSingle -> exprSingle = c;
+        default -> { }
+      }
+    }
+    return new Nodes.SwitchDefaultClause(begin, end, exprSingle);
   }
 
   private static Node createSwitchExpr(final int begin, final int end, final Node[] st,
@@ -4260,8 +4305,7 @@ public final class NodeFactory {
 
   private static Node createTypeswitchCases(final int begin, final int end, final Node[] st,
       final int[] sy, final int from, final int to) {
-    Nodes.VarName varName = null;
-    Node exprSingle = null;
+    Nodes.TypeswitchDefaultClause typeswitchDefaultClause = null;
     int size = to - from;
     final Nodes.CaseClause[] ch = new Nodes.CaseClause[size];
     int n = 0;
@@ -4269,14 +4313,30 @@ public final class NodeFactory {
       final Node c = st[i];
       if(c instanceof Marker) continue;
       switch(sy[i]) {
-        case Sym.VarName -> varName = (Nodes.VarName) c;
-        case Sym.ExprSingle -> exprSingle = c;
+        case Sym.TypeswitchDefaultClause -> typeswitchDefaultClause =
+            (Nodes.TypeswitchDefaultClause) c;
         case Sym.CaseClause -> ch[n++] = (Nodes.CaseClause) c;
         default -> { }
       }
     }
-    return new Nodes.TypeswitchCases(begin, end, varName, exprSingle,
+    return new Nodes.TypeswitchCases(begin, end, typeswitchDefaultClause,
         n == ch.length ? ch : Arrays.copyOf(ch, n));
+  }
+
+  private static Node createTypeswitchDefaultClause(final int begin, final int end, final Node[] st,
+      final int[] sy, final int from, final int to) {
+    Nodes.VarName varName = null;
+    Node exprSingle = null;
+    for(int i = from; i < to; i++) {
+      final Node c = st[i];
+      if(c instanceof Marker) continue;
+      switch(sy[i]) {
+        case Sym.VarName -> varName = (Nodes.VarName) c;
+        case Sym.ExprSingle -> exprSingle = c;
+        default -> { }
+      }
+    }
+    return new Nodes.TypeswitchDefaultClause(begin, end, varName, exprSingle);
   }
 
   private static Node createTypeswitchExpr(final int begin, final int end, final Node[] st,

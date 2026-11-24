@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This file was generated on Wed Nov 18, 2026 18:35 (UTC+01) by REx v7.1-SNAPSHOT which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net> -->
+<!-- This file was generated on Tue Nov 24, 2026 20:59 (UTC+01) by REx v7.1-SNAPSHOT which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net> -->
 <!-- REx command line: -xmlonly -name XQuerySyntaxParser XQuery-Full-Text-Update-BaseX-40.ebnf -->
 <g:grammar xmlns:g="http://www.w3.org/2001/03/XPath/grammar">
   <g:production name="Module">
@@ -1732,9 +1732,7 @@
     <g:oneOrMore>
       <g:ref name="SwitchCaseClause"/>
     </g:oneOrMore>
-    <g:string>default</g:string>
-    <g:string>return</g:string>
-    <g:ref name="ExprSingle"/>
+    <g:ref name="SwitchDefaultClause"/>
   </g:production>
   <g:production name="SwitchCaseClause">
     <g:oneOrMore>
@@ -1747,9 +1745,19 @@
   <g:production name="SwitchCaseOperand">
     <g:ref name="Expr"/>
   </g:production>
+  <g:production name="SwitchDefaultClause">
+    <g:string>default</g:string>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
   <g:production name="BracedSwitchCases">
     <g:string>{</g:string>
-    <g:ref name="SwitchCases"/>
+    <g:oneOrMore>
+      <g:ref name="SwitchCaseClause"/>
+    </g:oneOrMore>
+    <g:optional>
+      <g:ref name="SwitchDefaultClause"/>
+    </g:optional>
     <g:string>}</g:string>
   </g:production>
   <g:production name="TypeswitchExpr">
@@ -1766,12 +1774,7 @@
     <g:oneOrMore>
       <g:ref name="CaseClause"/>
     </g:oneOrMore>
-    <g:string>default</g:string>
-    <g:optional>
-      <g:ref name="VarName"/>
-    </g:optional>
-    <g:string>return</g:string>
-    <g:ref name="ExprSingle"/>
+    <g:ref name="TypeswitchDefaultClause"/>
   </g:production>
   <g:production name="CaseClause">
     <g:string>case</g:string>
@@ -1790,9 +1793,22 @@
       <g:ref name="SequenceType"/>
     </g:zeroOrMore>
   </g:production>
+  <g:production name="TypeswitchDefaultClause">
+    <g:string>default</g:string>
+    <g:optional>
+      <g:ref name="VarName"/>
+    </g:optional>
+    <g:string>return</g:string>
+    <g:ref name="ExprSingle"/>
+  </g:production>
   <g:production name="BracedTypeswitchCases">
     <g:string>{</g:string>
-    <g:ref name="TypeswitchCases"/>
+    <g:oneOrMore>
+      <g:ref name="CaseClause"/>
+    </g:oneOrMore>
+    <g:optional>
+      <g:ref name="TypeswitchDefaultClause"/>
+    </g:optional>
     <g:string>}</g:string>
   </g:production>
   <g:production name="IfExpr">
@@ -2629,7 +2645,18 @@
     <g:ref name="PostfixExpr"/>
     <g:string>=?&gt;</g:string>
     <g:ref name="NCName"/>
-    <g:ref name="PositionalArgumentList"/>
+    <g:ref name="MethodArgumentList"/>
+  </g:production>
+  <g:production name="MethodArgumentList">
+    <g:string>(</g:string>
+    <g:optional>
+      <g:ref name="ExprSingle"/>
+      <g:zeroOrMore>
+        <g:string>,</g:string>
+        <g:ref name="ExprSingle"/>
+      </g:zeroOrMore>
+    </g:optional>
+    <g:string>)</g:string>
   </g:production>
   <g:production name="AxisStep">
     <g:choice>
