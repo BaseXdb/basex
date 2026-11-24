@@ -47,7 +47,7 @@ public final class SymGenerator {
     Map.entry("/>", "EMPTY_TAG_CLOSE"), Map.entry(":", "COLON"), Map.entry("::", "COLON2"),
     Map.entry(":=", "ASSIGN"), Map.entry(";", "SEMICOLON"), Map.entry("<<", "LESS2"),
     Map.entry("<=", "LESS_EQUAL"), Map.entry("=", "EQUALS"), Map.entry("=!>", "MAPPING_ARROW"),
-    Map.entry("=>", "FAT_ARROW"), Map.entry("=?>", "LOOKUP_ARROW"), Map.entry(">", "GREATER"),
+    Map.entry("=>", "FAT_ARROW"), Map.entry("=¿>", "LOOKUP_ARROW"), Map.entry(">", "GREATER"),
     Map.entry(">=", "GREATER_EQUAL"), Map.entry(">>", "GREATER2"), Map.entry("?", "QUESTION"),
     Map.entry("[", "LBRACKET"), Map.entry("]", "RBRACKET"), Map.entry("{", "LBRACE"),
     Map.entry("|", "BAR"), Map.entry("||", "BAR2"), Map.entry("}", "RBRACE"),

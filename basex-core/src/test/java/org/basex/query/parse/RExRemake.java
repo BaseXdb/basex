@@ -18,8 +18,10 @@ import java.util.regex.*;
  * of the results are those of the system. This is a main program, not a test; it is the first
  * step of {@link GrammarUpdate}.
  *
- * <p>The grammar is always fetched, as of the latest commit that changed it. REx (which must be
- * on the path) always runs.</p>
+ * <p>The grammar is fetched, as of the latest commit that changed it, unless the argument
+ * {@code offline} is given: then the grammar file next to the test resources is used as it is,
+ * which allows to test grammar changes by editing it. REx (which must be on the path) always
+ * runs.</p>
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -45,40 +47,54 @@ public final class RExRemake {
   /** Rule to be added. */
   private static final String RULE = ENTRY + "\n         ::= SequenceType EOF\n\n";
 
+  /** Argument for skipping the fetch of the grammar. */
+  static final String OFFLINE = "offline";
+
   /** Private constructor. */
   private RExRemake() { }
 
   /**
    * Main method.
-   * @param args ignored; to be started in the directory of module basex-core, or its parent
+   * @param args {@code offline} to use the grammar file as it is, without fetching it; to be
+   *   started in the directory of module basex-core, or its parent
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    remake(Files.isDirectory(DIR) ? Path.of(".") : Path.of("basex-core"));
+    remake(Files.isDirectory(DIR) ? Path.of(".") : Path.of("basex-core"),
+        Arrays.asList(args).contains(OFFLINE));
   }
 
   /**
    * Fetches the grammar, and regenerates the parser.
    * @param core directory of module basex-core
+   * @param offline do not fetch the grammar: use the existing grammar file
    * @throws Exception exception
    */
-  static void remake(final Path core) throws Exception {
+  static void remake(final Path core, final boolean offline) throws Exception {
     final Path parser = core.resolve(DIR), resources = core.resolve(RESOURCES);
     for(final Path dir : List.of(parser, resources)) {
       if(!Files.isDirectory(dir)) throw new IOException("Directory not found: " + dir);
     }
     final Path grammarFile = resources.resolve(GRAMMAR.substring(GRAMMAR.lastIndexOf('/') + 1));
 
-    // fetch the grammar as of the latest commit that changed it
-    try(HttpClient client = HttpClient.newHttpClient()) {
-      // the first sha of the response is the one of the latest commit
-      final Matcher latest = SHA.matcher(fetch(client, "https://api.github.com/repos/" + REPO +
-          "/commits?sha=main&per_page=1&path=" + GRAMMAR));
-      if(!latest.find()) throw new IOException("No commit found for " + GRAMMAR);
-      final String commit = latest.group(1);
-      write(grammarFile, grammar(fetch(client, "https://raw.githubusercontent.com/" + REPO + '/' +
-          commit + '/' + GRAMMAR), commit));
-      log("Grammar fetched: commit " + commit + '.');
+    if(offline) {
+      if(!Files.isRegularFile(grammarFile)) {
+        throw new IOException("Grammar not found: " + grammarFile + ". Run without " + OFFLINE +
+            " to fetch it.");
+      }
+      log("Offline: using the grammar as it is: " + grammarFile);
+    } else {
+      // fetch the grammar as of the latest commit that changed it
+      try(HttpClient client = HttpClient.newHttpClient()) {
+        // the first sha of the response is the one of the latest commit
+        final Matcher latest = SHA.matcher(fetch(client, "https://api.github.com/repos/" + REPO +
+            "/commits?sha=main&per_page=1&path=" + GRAMMAR));
+        if(!latest.find()) throw new IOException("No commit found for " + GRAMMAR);
+        final String commit = latest.group(1);
+        write(grammarFile, grammar(fetch(client, "https://raw.githubusercontent.com/" + REPO +
+            '/' + commit + '/' + GRAMMAR), commit));
+        log("Grammar fetched: commit " + commit + '.');
+      }
     }
 
     // regenerate the parser and its XML representation, with the line endings of the system
