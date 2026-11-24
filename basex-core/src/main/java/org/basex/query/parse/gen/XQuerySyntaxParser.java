@@ -1,11 +1,8 @@
-// This file was generated on Wed Nov 18, 2026 18:35 (UTC+01) by REx v7.1-SNAPSHOT which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net>
-// REx command line: -glalr 2 -ambiguity minimal -java -codepoints -tree -name org.basex.query.parse.gen.XQuerySyntaxParser ../../../../../../../test/resources/org/basex/query/parse/XQuery-Full-Text-Update-BaseX-40.ebnf
+// This file was generated on Tue Nov 24, 2026 09:04 (UTC+01) by REx v7.1-SNAPSHOT which is Copyright (c) 1979-2026 by Gunther Rademacher <grd@gmx.net>
+// REx command line: -glalr 2 -ambiguity minimal -java -codepoints -tree -nobuilder -name org.basex.query.parse.gen.XQuerySyntaxParser ../../../../../../../test/resources/org/basex/query/parse/XQuery-Full-Text-Update-BaseX-40.ebnf
 
 package org.basex.query.parse.gen;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
 import java.util.PriorityQueue;
 
 @SuppressWarnings("all")
@@ -33,149 +30,11 @@ public class XQuerySyntaxParser
            : "syntax error";
     }
 
-    public void serialize(EventHandler eventHandler)
-    {
-    }
-
     public int getBegin() {return begin;}
     public int getEnd() {return end;}
     public int getState() {return state;}
     public int getOffending() {return offending;}
     public int getExpected() {return expected;}
-    public boolean isAmbiguousInput() {return false;}
-  }
-
-  public interface EventHandler
-  {
-    public void reset(int[] string);
-    public void startNonterminal(int id, int begin);
-    public void endNonterminal(int id, int end);
-    public void terminal(int id, int begin, int end);
-    public void whitespace(int begin, int end);
-  }
-
-  public static class TopDownTreeBuilder implements EventHandler
-  {
-    private int[] input = null;
-    private Nonterminal[] stack = new Nonterminal[64];
-    private int top = -1;
-
-    @Override
-    public void reset(int[] input)
-    {
-      this.input = input;
-      top = -1;
-    }
-
-    @Override
-    public void startNonterminal(int id, int begin)
-    {
-      Nonterminal nonterminal = new Nonterminal(id, begin, begin, new Symbol[0]);
-      if (top >= 0) addChild(nonterminal);
-      if (++top >= stack.length) stack = Arrays.copyOf(stack, stack.length << 1);
-      stack[top] = nonterminal;
-    }
-
-    @Override
-    public void endNonterminal(int id, int end)
-    {
-      stack[top].end = end;
-      if (top > 0) --top;
-    }
-
-    @Override
-    public void terminal(int id, int begin, int end)
-    {
-      addChild(new Terminal(id, begin, end));
-    }
-
-    @Override
-    public void whitespace(int begin, int end)
-    {
-    }
-
-    private void addChild(Symbol s)
-    {
-      Nonterminal current = stack[top];
-      current.children = Arrays.copyOf(current.children, current.children.length + 1);
-      current.children[current.children.length - 1] = s;
-    }
-
-    public void serialize(EventHandler e)
-    {
-      e.reset(input);
-      stack[0].send(e);
-    }
-  }
-
-  public static abstract class Symbol
-  {
-    public int id;
-    public int begin;
-    public int end;
-
-    protected Symbol(int id, int begin, int end)
-    {
-      this.id = id;
-      this.begin = begin;
-      this.end = end;
-    }
-
-    public abstract String getName();
-
-    public abstract void send(EventHandler e);
-  }
-
-  public static class Terminal extends Symbol
-  {
-    public Terminal(int id, int begin, int end)
-    {
-      super(id, begin, end);
-    }
-
-    @Override
-    public String getName()
-    {
-      return TOKEN[id];
-    }
-
-    @Override
-    public void send(EventHandler e)
-    {
-      e.terminal(id, begin, end);
-    }
-  }
-
-  public static class Nonterminal extends Symbol
-  {
-    public Symbol[] children;
-
-    public Nonterminal(int id, int begin, int end, Symbol[] children)
-    {
-      super(id, begin, end);
-      this.children = children;
-    }
-
-    @Override
-    public String getName()
-    {
-      return NONTERMINAL[id];
-    }
-
-    @Override
-    public void send(EventHandler e)
-    {
-      e.startNonterminal(id, begin);
-      int pos = begin;
-      for (Symbol c : children)
-      {
-        if (pos < c.begin) e.whitespace(pos, c.begin);
-        c.send(e);
-        pos = c.end;
-      }
-      if (pos < end) e.whitespace(pos, end);
-      e.endNonterminal(id, end);
-    }
   }
 
   public interface BottomUpEventHandler
@@ -184,201 +43,6 @@ public class XQuerySyntaxParser
     public void nonterminal(int id, int begin, int end, int count);
     public void terminal(int id, int begin, int end);
     public void ambiguity(int begin, int end);
-  }
-
-  public static class XmlSerializer implements EventHandler
-  {
-    private int[] input;
-    private String delayedTag;
-    private Writer out;
-    private boolean indent;
-    private boolean hasChildElement;
-    private int depth;
-
-    public XmlSerializer(Writer w, boolean indent)
-    {
-      input = null;
-      delayedTag = null;
-      out = w;
-      this.indent = indent;
-    }
-
-    @Override
-    public void reset(int[] string)
-    {
-      writeOutput("<?xml version=\"1.0\" encoding=\"UTF-8\"?" + ">");
-      input = string;
-      delayedTag = null;
-      hasChildElement = false;
-      depth = 0;
-    }
-
-    @Override
-    public void startNonterminal(int id, int begin)
-    {
-      startElement(getNonterminalName(id));
-    }
-
-    private void startElement(String name)
-    {
-      if (delayedTag != null)
-      {
-        writeOutput("<");
-        writeOutput(delayedTag);
-        writeOutput(">");
-      }
-      delayedTag = name;
-      if (indent)
-      {
-        writeOutput("\n");
-        for (int i = 0; i < depth; ++i)
-        {
-          writeOutput("  ");
-        }
-      }
-      hasChildElement = false;
-      ++depth;
-    }
-
-    @Override
-    public void endNonterminal(int id, int end)
-    {
-      endElement(getNonterminalName(id));
-    }
-
-    private void endElement(String name)
-    {
-      --depth;
-      if (delayedTag != null)
-      {
-        delayedTag = null;
-        writeOutput("<");
-        writeOutput(name);
-        writeOutput("/>");
-      }
-      else
-      {
-        if (indent)
-        {
-          if (hasChildElement)
-          {
-            writeOutput("\n");
-            for (int i = 0; i < depth; ++i)
-            {
-              writeOutput("  ");
-            }
-          }
-        }
-        writeOutput("</");
-        writeOutput(name);
-        writeOutput(">");
-      }
-      hasChildElement = true;
-    }
-
-    @Override
-    public void terminal(int id, int begin, int end)
-    {
-      String name = getTerminalName(id);
-      if (name.charAt(0) == '\'')
-      {
-        name = "TOKEN";
-      }
-      startElement(name);
-      characters(begin, end);
-      endElement(name);
-    }
-
-    @Override
-    public void whitespace(int begin, int end)
-    {
-      characters(begin, end);
-    }
-
-    private void characters(int begin, int end)
-    {
-      if (begin < end)
-      {
-        if (delayedTag != null)
-        {
-          writeOutput("<");
-          writeOutput(delayedTag);
-          writeOutput(">");
-          delayedTag = null;
-        }
-        writeOutput(new String(input, begin, end - begin)
-                         .replace("&", "&amp;")
-                         .replace("<", "&lt;")
-                         .replace(">", "&gt;"));
-      }
-    }
-
-    public void writeOutput(String content)
-    {
-      try
-      {
-        out.write(content);
-      }
-      catch (IOException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  public static class ParseTreeBuilder implements BottomUpEventHandler
-  {
-    private int[] input;
-    public Symbol[] stack = new Symbol[64];
-    public int top = -1;
-
-    @Override
-    public void reset(int[] input)
-    {
-      this.input = input;
-      top = -1;
-    }
-
-    @Override
-    public void nonterminal(int id, int begin, int end, int count)
-    {
-      push(new Nonterminal(id, begin, end, pop(count)));
-    }
-
-    @Override
-    public void terminal(int id, int begin, int end)
-    {
-      push(new Terminal(id, begin, end));
-    }
-
-    @Override
-    public void ambiguity(int begin, int end)
-    {
-    }
-
-    public void serialize(EventHandler e)
-    {
-      e.reset(input);
-      for (int i = 0; i <= top; ++i)
-      {
-        stack[i].send(e);
-      }
-    }
-
-    public void push(Symbol s)
-    {
-      if (++top >= stack.length)
-      {
-        stack = Arrays.copyOf(stack, stack.length << 1);
-      }
-      stack[top] = s;
-    }
-
-    public Symbol[] pop(int count)
-    {
-      top -= count;
-      return Arrays.copyOfRange(stack, top + 1, top + count + 1);
-    }
   }
 
   public XQuerySyntaxParser(int[] codepoints, BottomUpEventHandler t)
@@ -423,12 +87,12 @@ public class XQuerySyntaxParser
 
   public static String[] getExpectedTokenSet(ParseException e)
   {
-    String[] expected = {};
+    String[] expected;
     if (e.getExpected() >= 0)
     {
       expected = new String[]{TOKEN[e.getExpected()]};
     }
-    else if (! e.isAmbiguousInput())
+    else
     {
       expected = getTokenSet(- e.getState());
     }
@@ -438,21 +102,14 @@ public class XQuerySyntaxParser
   public String getErrorMessage(ParseException e)
   {
     String message = e.getMessage();
-    if (e.isAmbiguousInput())
-    {
-      message += "\n";
-    }
-    else
-    {
-      String[] tokenSet = getExpectedTokenSet(e);
-      String found = getOffendingToken(e);
-      int size = e.getEnd() - e.getBegin();
-      message += (found == null ? "" : ", found " + found)
-              + "\nwhile expecting "
-              + (tokenSet.length == 1 ? tokenSet[0] : java.util.Arrays.toString(tokenSet))
-              + "\n"
-              + (size == 0 || found != null ? "" : "after successfully scanning " + size + " characters beginning ");
-    }
+    String[] tokenSet = getExpectedTokenSet(e);
+    String found = getOffendingToken(e);
+    int size = e.getEnd() - e.getBegin();
+    message += (found == null ? "" : ", found " + found)
+            + "\nwhile expecting "
+            + (tokenSet.length == 1 ? tokenSet[0] : java.util.Arrays.toString(tokenSet))
+            + "\n"
+            + (size == 0 || found != null ? "" : "after successfully scanning " + size + " characters beginning ");
     String prefix = new String(input, 0, e.getBegin());
     int line = prefix.replaceAll("[^\n]", "").length() + 1;
     int column = prefix.codePointCount(prefix.lastIndexOf('\n') + 1, prefix.length()) + 1;
@@ -721,7 +378,7 @@ public class XQuerySyntaxParser
     return thread;
   }
 
-  private ParsingThread thread = new ParsingThread();
+  private ParsingThread thread;
   private BottomUpEventHandler eventHandler;
   private int[] input = null;
   private int size = 0;
