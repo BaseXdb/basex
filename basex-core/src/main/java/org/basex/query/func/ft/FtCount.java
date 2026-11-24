@@ -25,7 +25,7 @@ public final class FtCount extends FtAccessFn {
       final Iter nodes = arg(0).unwrappedIter(qc);
       for(Item item; (item = qc.next(nodes)) != null;) {
         // prefer positions of the argument
-        final XNode node = toNode(item);
+        final XNode node = toNode(item, arg(0));
         final int size = ftPosData.size(node);
         count += size != 0 || tmp == null ? size : tmp.size(node);
       }

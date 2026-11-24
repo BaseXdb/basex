@@ -431,7 +431,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ()"), false, empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" <a>A</a>/text()"), true, exists(EXISTS));
+    check(func.args(opaque("<a>A</a>") + "/text()"), true, exists(EXISTS));
     // function is replaced by its argument (argument yields no result)
     check("(false(), true())[" + func.args(" .") + "]", true, empty(func));
     // no replacement
@@ -532,6 +532,9 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(32), " ");
     query(func.args(" 0x20"), " ");
+    query(func.args(65.0), "A");
+    query(func.args(" (65.0, 'x')[1]"), "A");
+    query(func.args(" xs:untypedAtomic('amp')"), "&");
 
     // permitted characters (XML 1.1 repertoire)
     query(func.args(1) + " => string-to-codepoints()", 1);
@@ -557,6 +560,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x"), CHARINV_X);
     error(func.args("xy"), CHARINV_X);
     error(func.args("xyz"), CHARINV_X);
+    error(func.args(65.5), INVTYPE_X);
   }
 
   /** Test method. */
@@ -1397,6 +1401,8 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" 1 to 100_000_000") + ')', 100000000);
     check(func.args(" void(1)"), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(BytSeq.class));
+    check(func.args(" one-or-more((1 to 6)[. > 2]) ! (. mod 2)"), "1\n0",
+        type(func, "xs:integer+"));
 
     // remove duplicate expressions
     check(func.args(" (1, <_/>, 1)"), "1\n", count(Itr.class, 1));
@@ -1767,6 +1773,11 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void elementToMap() {
     final Function func = Function.ELEMENT_TO_MAP;
+    check("for $a in (<a/>, <a/>) return " + func.args(" $a") + " => map:size()", "1\n1",
+        type(func, "map(xs:string, item()?)"));
+    // plans may skip the root element
+    query("exists(" + func.args(" <a/>", " { 'plan': { 'a': { 'layout': 'deep-skip' } } }") + ')',
+        false);
     query(func.args(" <a>10</a>") + "?a instance of xs:integer", true);
     query(func.args(" <a>10.0</a>") + "?a instance of xs:decimal", true);
     query(func.args(" <a>10e0</a>") + "?a instance of xs:double", true);
@@ -2003,6 +2014,9 @@ public final class FnModuleTest extends SandboxTest {
         exists(IterFilter.class));
     check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
+    check(func.args(" (1 to 6)[. > 2]", " (fn($x) { $x > 3 }, fn($x) { $x >= 4 })" +
+        " => items-at(" + _RANDOM_INTEGER.args(2) + " + 1)"), "4\n5\n6", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:integer*"));
 
     check(func.args(9, " { 9: true() }"), 9);
     check(func.args(9, " { 9: false() }"), null);
@@ -2362,6 +2376,9 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(5, " op('*')"), 5);
     query(func.args(" reverse(1 to 6)", " op('*')"), "6\n10\n12\n12\n10\n6");
+    check(func.args(" 1 to 2", " (string#1, fn($x) { string($x) }) => items-at(" +
+        _RANDOM_INTEGER.args(2) + " + 1)"), "1\n2", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:string+"));
 
     inline(true);
     // pre-compute result size
@@ -2659,6 +2676,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
     error(func.args(" ()", " fn {}"), INVTYPE_X);
     error(func.args(" ()", " fn { if(.) { . -1 } }"), INVTYPE_X);
+    error(func.args(" ()", " identity#1") + "=>" + DISTINCT_VALUES.args(), INVTYPE_X);
+    error("'x' = " + func.args(" ()", " fn { () }"), INVTYPE_X);
 
     final String init = "x";
     String step = " fn { . || 'x' }";
@@ -2715,6 +2734,9 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void hash() {
     final Function func = HASH;
+    check("for $a in (<_>a</_>, <_>a</_>) return string(" + func.args(" $a") + ')',
+        "0CC175B9C0F1B6A831C399E269772661\n0CC175B9C0F1B6A831C399E269772661",
+        type(func, "xs:hexBinary"));
     query("string(" + func.args(" ()") + ")", "");
     query("string(" + func.args("") + ")", "D41D8CD98F00B204E9800998ECF8427E");
     query("string(" + func.args("", " ()") + ")", "D41D8CD98F00B204E9800998ECF8427E");
@@ -2726,6 +2748,13 @@ public final class FnModuleTest extends SandboxTest {
 
     query("string( " + func.args("X", "BLAKE3") + ')',
         "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
+    // test vectors from RFC 7693 and Node.js
+    query("string( " + func.args("abc", "blake2b") + ')',
+        "BA80A53F981C4D0D6A2797B69F12F6E94C212F14685AC4B74B12BB6FDBFFA2D1" +
+        "7D87C5392AAB792DC252D5DE4533CC9518D38AA8DBF1925AB92386EDD4009923");
+    query("string( " + func.args(" string-join((1 to 300) ! 'a')", "BLAKE2B") + ')',
+        "A2FF3040EDA405B929C2FC2FD93E8ADD6AC3BB5369B679BAE170AC6956863CA0" +
+        "06285F132A868000FC3FAE5BC696E5D17FE3FDDFB4A342876C40451184742986");
 
     error(func.args("", ""), HASH_ALGORITHM_X);
   }
@@ -3124,6 +3153,8 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void innermost() {
     final Function func = INNERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+    check(func.args(" one-or-more((<a><b/></a>, <b/>)[. = ''])"), "<a><b/></a>\n<b/>",
+        type(func, "element(a|b)+"));
   }
 
   /** Test method. */
@@ -3482,10 +3513,10 @@ return
     // value types of child JNodes
     final String maps = "for $m in ({ 'a': [ 1, 2 ] }, { 'a': [ 3 ] }) return ";
     check(maps + "$m/a", "{\"a\":[1,2]}\n{\"a\":[3]}",
-        type("*[@axis = 'child']", "jnode(a, array(xs:integer))*"));
+        type("*[@axis = 'child']", "jnode(a, array(xs:integer))"));
     check(maps + COUNT.args(" $m/a/*"), "2\n1", exists("*[@type = 'jnode(*, xs:integer)*']"));
     check(maps + "$m/a/* ! " + JVALUE.args(), "1\n2\n3", type(JVALUE, "xs:integer"));
-    check(maps + JVALUE.args(" $m/a"), "[1,2]\n[3]", type(JVALUE, "array(xs:integer)?"));
+    check(maps + JVALUE.args(" $m/a"), "[1,2]\n[3]", type(JVALUE, "array(xs:integer)"));
     check(maps + "$m/a/self::jnode(*, array(*)) ! " + JVALUE.args(), "[1,2]\n[3]",
         empty("*[@axis]"));
     check(maps + "$m/a/self::jnode(*, map(*))", "", empty());
@@ -3827,6 +3858,9 @@ return
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
+    // choice types with untyped alternatives must be converted
+    error("declare %basex:inline(0) function f($x as (element() | xs:string)) { "
+        + func.args(" $x") + " }; f(<a>abc</a>)", FUNCCAST_X_X);
     check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'f']"), "f");
     check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'g']"), "");
     query(func.args(" 'x'"), "x");
@@ -3870,6 +3904,8 @@ return
   @Test public void matches() {
     final Function func = MATCHES;
     query(func.args("a", ""), true);
+    // nondeterministic input is still evaluated
+    check(func.args(" trace('a')", ""), true, exists(TRACE));
 
     query(func.args("nop", 'o'), true);
     query(func.args("nöp", 'ö'), true);
@@ -4118,6 +4154,9 @@ return
   /** Test method. */
   @Test public void min() {
     final Function func = MIN;
+    // xs:anyAtomicType items may be untyped and must be converted to doubles
+    query(func.args(" if(random:double() < 2) then xs:untypedAtomic('2') else 1") +
+        " instance of xs:double", true);
     // repeated single item: the item is returned without evaluating the sequence
     check(func.args(" " + REPLICATE.args(1, 3)), 1, root(Itr.class));
     query(func.args(1), 1);
@@ -4150,6 +4189,8 @@ return
     query("for $n in (1, 2) return " + func.args(" ($n, $n)"), "1\n2");
 
     query("for $s in (['a', 'b'], ['c']) return " + func.args(" ($s, $s)"), "a\nc");
+    query("for $p in (<?a x?>, <?b y?>) return " + func.args(" $p") + " instance of xs:string",
+        "true\ntrue");
 
     // query plan checks
     check(func.args(" ()"), "", empty());
@@ -4168,6 +4209,17 @@ return
   }
 
   /** Test method. */
+  @Test public void monthFromDateTime() {
+    final Function func = MONTH_FROM_DATETIME;
+    final String dates = "for $d in (<_>2000-02-03</_>, <_>2001-03-04</_>) return ";
+    check(dates + func.args(" xs:date($d)"), "2\n3", type(func, "xs:integer"));
+    check(dates + func.args(" dateTime(xs:date($d), xs:time('00:00:00'))"), "2\n3",
+        type(func, "xs:integer"));
+    check(dates + func.args(" xs:gYear(substring($d, 1, 4))"), "", type(func, "xs:integer?"));
+    check(dates + func.args(" $d"), "2\n3", type(func, "xs:integer?"));
+  }
+
+  /** Test method. */
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
@@ -4178,6 +4230,13 @@ return
 
     error(func.args("p ", " <e/>"), INVTYPE_X);
     error(func.args("p:q", " <e/>"), INVTYPE_X);
+  }
+
+  /** Test method. */
+  @Test public void nilled() {
+    final Function func = NILLED;
+    check(func.args(" <a/>"), false, type(func, "xs:boolean"));
+    check(func.args(" (<a/>, text { 'a' })[. = '']"), false, type(func, "xs:boolean?"));
   }
 
   /** Test method. */
@@ -4307,7 +4366,7 @@ return
 
     check(func.args(" empty((1, 2)[. = 1])"), true, root(Bln.class));
     check(func.args(" exists((1, 2)[. = 1])"), false, root(Bln.class));
-    check(func.args(" <a/>/text()"), true, exists(EMPTY));
+    check(func.args(opaque("<a/>") + "/text()"), true, exists(EMPTY));
     // function is replaced with fn:boolean
     check(func.args(func.args(" ((1, 2)[. = 1])")), true, exists(BOOLEAN));
 
@@ -4404,6 +4463,8 @@ return
   @Test public void outermost() {
     final Function func = OUTERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+    check(func.args(" (<a><b/></a>, <b/>)[. = '']"), "<a><b/></a>\n<b/>",
+        type(func, "element(a|b)*"));
   }
 
   /** Test method. */
@@ -4462,7 +4523,7 @@ return
     query(func.args(_BIN_ENCODE_STRING.args("42"), " { 'encoding': () }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
 
-    error(func.args(42), STRBIN_X_X);
+    error(func.args(42), INVTYPE_X);
     error(func.args("42", 42), INVTYPE_X);
     error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
     error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTIONVALUE_X);
@@ -5703,6 +5764,24 @@ return
     query(func.args(" ['é']", " { 'method': 'json', 'encoding': 'US-ASCII' }"), "[\"\\u00E9\"]");
     error(func.args(" <x>é</x>", " { 'method': 'text', 'encoding': 'US-ASCII' }"), SERENC_X_X);
     error(func.args(" <é/>", " { 'encoding': 'US-ASCII' }"), SERENC_X_X);
+    // unknown options in non-constant arguments are detected at compile time
+    final String rnd = _RANDOM_DOUBLE.args();
+    check("if(" + rnd + " > 2) then " + func.args(rnd, " { 'indend': true() }") + " else ()",
+        "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'indent': " + rnd + " > 0, 'x': 1 }") +
+        " else ()", "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'json': { 'x': " + rnd + " } }") +
+        " else ()", "", exists(ERROR));
+    check(func.args(1, " { 'indent': " + rnd + " > 2 }"), 1, empty(ERROR));
+    // invalid constant values in non-constant arguments are detected at compile time
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'method': 'xmll', 'indent': " + rnd +
+        " > 0 }") + " else ()", "", exists(ERROR));
+    check("if(" + rnd + " > 2) then " + func.args(1, " { 'json': { 'format': 'x', 'indent': " +
+        rnd + " > 0 } }") + " else ()", "", exists(ERROR));
+    check(func.args(1, " { 'method': 'text', 'indent': " + rnd + " > 2 }"), 1, empty(ERROR));
+    // constant options are shared and must not be modified by serializers
+    query("(1, 2) ! " + func.args(" (1, 'a')", " { 'method': 'adaptive' }"),
+        "1\n\"a\"\n1\n\"a\"");
     query("string-to-codepoints(" + func.args(" <x/>", " { 'byte-order-mark': true() }") + ")[1]",
         0xFEFF);
     // character maps are applied to text nodes of the text method
@@ -6591,7 +6670,7 @@ return
     query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
 
     // GH-2315
-    check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
+    check("(1 to 6) ! " + func.args(opaque("<a/>") + "/*", " .", 1), "", root(_UTIL_RANGE));
 
     // large offsets and lengths (no integer overflow)
     query(func.args(" 1 to 2000", 2000, 9223372036854775807L), 2000);
@@ -6792,6 +6871,11 @@ return
   @Test public void sum() {
     final Function func = SUM;
     query(func.args(1), 1);
+    check(func.args(" (1 to 6)[. > 2]"), 18, type(func, "xs:integer"));
+    check(func.args(" (1 to 6)[. > 2]", " ()"), 18, type(func, "xs:integer?"));
+    // empty input yields the integer 0
+    check(func.args(" (1 to 6)[. > 6] ! xs:double(.)"), 0, type(func, "xs:numeric"));
+    query(func.args(" (1 to 6)[. > 6] ! xs:double(.)") + " instance of xs:double?", false);
     query(func.args(" 1 to 10"), 55);
     query(func.args(" 1 to 3037000499"), 4611686016981624750L);
     query(func.args(" 1 to 3037000500"), 4611686020018625250L);
@@ -6936,6 +7020,9 @@ return
     final Function func = TAKE_WHILE;
 
     query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
+    check(func.args(" (1 to 6)[. > 2]", " (fn($x) { $x < 5 }, fn($x) { $x <= 4 })" +
+        " => items-at(" + _RANDOM_INTEGER.args(2) + " + 1)"), "3\n4", root(GFLWOR.class),
+        type(GFLWOR.class, "xs:integer*"));
 
     // closure
     check("for $a in (1 to 2)[. > 0] return " +

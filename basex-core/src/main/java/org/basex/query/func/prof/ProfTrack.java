@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -32,7 +33,7 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final TrackOptions options = toOptions(arg(1), new TrackOptions(), qc);
+    final TrackOptions options = toOptions(qc);
     final Thread thread = Thread.currentThread();
 
     // include memory consumption
@@ -59,25 +60,18 @@ public final class ProfTrack extends StandardFunc {
       }
     }
 
-    final MapBuilder mb = new MapBuilder(4);
-    // execution time (called before garbage collection)
-    if(perf != null) {
-      final BigDecimal ms = BigDecimal.valueOf(perf.nanoRuntime()).divide(Dec.BD_1000000,
-          MathContext.DECIMAL64);
-      mb.put(TrackOptions.TIME.name(), Dec.get(ms));
-    }
-    // allocated memory (called before garbage collection)
-    if(allocated) {
-      mb.put(TrackOptions.ALLOCATED.name(),
-          Itr.get(Math.max(0, Performance.allocated(thread) - alloc)));
-    }
+    // execution time and allocated memory (called before garbage collection)
+    final Value time = perf != null ? Dec.get(BigDecimal.valueOf(perf.nanoRuntime()).
+        divide(Dec.BD_1000000, MathContext.DECIMAL64)) : Empty.VALUE;
+    final Value allocation = allocated ?
+      Itr.get(Math.max(0, Performance.allocated(thread) - alloc)) : Empty.VALUE;
     // memory consumption
+    Value memory = Empty.VALUE;
     if(min != -1) {
       Performance.gc(2);
-      mb.put(TrackOptions.MEMORY.name(), Itr.get(Math.max(0, Performance.memory() - min)));
+      memory = Itr.get(Math.max(0, Performance.memory() - min));
     }
-    // evaluated value
-    if(input != null) mb.put(TrackOptions.VALUE.name(), input);
-    return mb.map();
+    return XQMap.get(Records.PROF_TRACK.get(), time, allocation, memory,
+        input != null ? input : Empty.VALUE);
   }
 }

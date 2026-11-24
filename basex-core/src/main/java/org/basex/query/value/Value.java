@@ -389,7 +389,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     final Data data = data();
-    return (data == null || visitor.lock(data.meta.name, false)) && visitor.value(this);
+    return (data == null || data.inMemory() || visitor.lock(data.meta.name, false)) &&
+        visitor.value(this);
   }
 
   @Override

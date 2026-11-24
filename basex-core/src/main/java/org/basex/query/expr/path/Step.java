@@ -268,22 +268,89 @@ public abstract class Step extends Preds {
       if(mvt != null) {
         final Test it = test.intersect(JNodeTest.get(null, mvt));
         if(it instanceof final JNodeTest jt) {
-          if(jt.key != Empty.VALUE) st = NodeType.get(jt).seqType(st.occ);
+          if(jt.key != Empty.VALUE) {
+            final SeqType ft = fieldType(pt, jt);
+            // keys are unique: at most one child for a specific key
+            st = ft != null ? ft : NodeType.get(jt).seqType(jt.key != null ?
+              st.occ.intersect(Occ.ZERO_OR_ONE) : st.occ);
+          }
         } else if(it == null && test instanceof JNodeTest) {
           // no results: { 'a': 1 }/jnode(a, xs:string)
           st = Types.EMPTY_SEQUENCE_Z;
         }
       }
     }
-    if(expr != null && axis == SELF && ct != null) {
-      // node test: adopt type of context expression: <a/>/self::node()
-      if(test == NodeTest.NODE) st = ct.seqType(st.occ);
-      // no predicates: step will yield single result: $elements/self::element()
-      if(exprs.length == 0 && selector == null && test.subsumes(ct) == Boolean.TRUE)
-        st = st.with(Occ.EXACTLY_ONE);
+    if(expr != null && ct != null) {
+      // without predicates and selectors, a matching context node is always part of the result
+      final boolean plain = exprs.length == 0 && selector == null;
+      switch(axis) {
+        case SELF -> {
+          // node test: adopt type of context expression: <a/>/self::node()
+          if(test == NodeTest.NODE) st = ct.seqType(st.occ);
+          // $elements/self::element()
+          if(plain && test.subsumes(ct) == Boolean.TRUE) st = st.with(Occ.EXACTLY_ONE);
+        }
+        case ANCESTOR_OR_SELF, DESCENDANT_OR_SELF -> {
+          // $element/ancestor-or-self::element()
+          if(plain && test.subsumes(ct) == Boolean.TRUE) st = st.with(Occ.ONE_OR_MORE);
+        }
+        case PARENT -> {
+          // attributes and namespaces belong to elements: $attribute/.. → element()?
+          if(ct.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE)) {
+            st = seqType(test.intersect(NodeTest.ELEMENT), Occ.ZERO_OR_ONE);
+          }
+        }
+        case CHILD, DESCENDANT -> {
+          if(plain && ct.test instanceof final DocTest dt) {
+            final Test child = dt.child();
+            if(axis == CHILD && test.kind == Kind.ELEMENT) {
+              // single root element: document-node(element(a))/* → element(a)
+              st = seqType(test.intersect(child),
+                child.instanceOf(test) ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+            } else if(test.subsumes(NodeType.get(child)) == Boolean.TRUE) {
+              // document-node(element(a))/node() → xnode()+, document-node(element(a))//a → a+
+              st = st.with(Occ.ONE_OR_MORE);
+            }
+          }
+        }
+        default -> { }
+      }
+      // constructed parent: <a b="{ $i }"/>/@b → attribute(b), <a>{ $i }</a>/text() → text()
+      if(plain && axis.oneOf(CHILD, ATTRIBUTE) &&
+          expr.childOcc(test, axis == ATTRIBUTE) instanceof final Occ occ &&
+          st.occ.intersect(occ) instanceof final Occ io) {
+        st = st.with(io);
+      }
     }
     exprType.assign(st).data(expr);
     return expr;
+  }
+
+  /**
+   * Returns the sequence type of a child JNode that addresses a declared record field.
+   * @param parent test of the parent JNode
+   * @param child test of the child JNodes
+   * @return sequence type (can be {@code null})
+   */
+  private static SeqType fieldType(final JNodeTest parent, final JNodeTest child) {
+    // declared fields exist in all instances: $record/a
+    if(!(child.key instanceof final Str key && parent.valueType.one() &&
+        parent.valueType.type instanceof final ShapeType shape)) return null;
+    final ShapeField field = shape.fields().get(key.string());
+    if(field == null) return null;
+    final SeqType ft = field.seqType(), vt = ft.intersect(child.valueType);
+    return vt == null ? Types.EMPTY_SEQUENCE_Z : NodeType.get(JNodeTest.get(key, vt)).
+      seqType(ft.instanceOf(child.valueType) ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+  }
+
+  /**
+   * Returns the sequence type of the nodes matched by the specified test.
+   * @param test test (can be {@code null})
+   * @param occ occurrence indicator
+   * @return sequence type (empty if the test is {@code null})
+   */
+  private static SeqType seqType(final Test test, final Occ occ) {
+    return test == null ? Types.EMPTY_SEQUENCE_Z : NodeType.get(test).seqType(occ);
   }
 
   /**
@@ -452,15 +519,15 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the step will never yield results.
-   * @param seqType type of input nodes
+   * @param input input expression
    * @return {@code true} if steps will never yield results
    */
-  final boolean empty(final SeqType seqType) {
-    final NodeType nt = nodeType(seqType.type);
+  final boolean empty(final Expr input) {
+    final NodeType nt = nodeType(input.seqType().type);
     if(nt == null || selectorMayFail()) return false;
 
     // $doc/.. → (), $array/following::* → (), $text/child::x → (), [ 1 ]/*/* → ()
-    final Axis ax = axis(nt);
+    final Axis ax = axis(nt, input.parentless());
     if(ax == null) return true;
 
     final Kind kind = test.kind, nk = nt.kind();
@@ -498,16 +565,16 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the step is redundant.
-   * @param seqType type of incoming nodes
+   * @param input input expression
    * @return {@code true} if the step can be removed
    */
-  final boolean remove(final SeqType seqType) {
+  final boolean remove(final Expr input) {
     // <xml/>/. → <xml/>
     // <xml/>/self::node() → <xml/>
     // $text/descendant-or-self::text() → $text
     // $doc/ancestor-or-self::node() → $doc
-    return exprs.length == 0 && selector == null && axis(seqType) == SELF &&
-      test.subsumes(seqType.type) == Boolean.TRUE;
+    return exprs.length == 0 && selector == null && axis(input) == SELF &&
+      test.subsumes(input.seqType().type) == Boolean.TRUE;
   }
 
   /**
@@ -544,7 +611,7 @@ public abstract class Step extends Preds {
    */
   private static NodeType nodeType(final Type type) {
     // xs:error is a subtype of every type, but yields no nodes
-    if(TypeRef.deref(type) == BasicType.ERROR) return null;
+    if(type.deref() == BasicType.ERROR) return null;
     return type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.get(Empty.VALUE, type.seqType()) :
       type instanceof final NodeType nt ? nt : null;
   }
@@ -552,11 +619,12 @@ public abstract class Step extends Preds {
   /**
    * Returns the axis that is equivalent to the step axis for the specified input.
    * @param nt input type (can be {@code null})
+   * @param parentless indicates if the input nodes have no parent
    * @return equivalent axis, or {@code null} if no nodes will be returned
    */
-  private Axis axis(final NodeType nt) {
+  private Axis axis(final NodeType nt, final boolean parentless) {
     if(nt == null) return axis;
-    Axis ax = nt.root() ? axis.onRoot() : axis;
+    Axis ax = parentless || nt.root() ? axis.onRoot() : axis;
     if(ax != null && nt.leaf()) ax = ax.onLeaf();
     // array { 1 to 3 }/descendant::* → array { 1 to 3 }/child::*
     return ax == DESCENDANT && nt.leafChildren() ? CHILD : ax;
@@ -564,11 +632,11 @@ public abstract class Step extends Preds {
 
   /**
    * Returns the axis that is equivalent to the step axis for the specified input.
-   * @param seqType input type
+   * @param input input expression
    * @return equivalent axis, or {@code null} if no nodes will be returned
    */
-  final Axis axis(final SeqType seqType) {
-    return axis(nodeType(seqType.type));
+  final Axis axis(final Expr input) {
+    return axis(nodeType(input.seqType().type), input.parentless());
   }
 
   /**

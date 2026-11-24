@@ -28,6 +28,9 @@ public final class MapModuleTest extends SandboxTest {
     final Function func = _MAP_BUILD;
 
     query(func.args(" ()", " boolean#1"), "{}");
+    check(func.args(" (1 to 3)[. > 1]", " (string#1, fn($i) { string($i) }) => items-at(" +
+        _RANDOM_INTEGER.args(2) + " + 1)"), "{\"2\":2,\"3\":3}",
+        type(func, "map(xs:string, xs:integer+)"));
     query(func.args(" 0", " boolean#1"), "{false():0}");
     query(func.args(" 1", " boolean#1"), "{true():1}");
     query(func.args(" (0, 1)", " boolean#1") + " => map:size()", 2);
@@ -286,7 +289,7 @@ public final class MapModuleTest extends SandboxTest {
     // keep the call if a strict record may lack the key
     check("(" + _MAP_ENTRY.args(" string(" + wrap("a") + ")", wrap(0)) + ")('a')", 0,
         empty(func));
-    error(record + "local:x(" + wrap(0) + ")('y')", RECORDFIELD_X_X);
+    error(record + "local:x(" + wrap(0) + ")('y')", RECORDFIELD_X);
   }
 
   /** Test method. */
@@ -587,7 +590,7 @@ public final class MapModuleTest extends SandboxTest {
 
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
-    check("({}, <a/>/*) =>" + func.args(), 0, root(func));
+    check("({}," + opaque("<a/>") + "/*) =>" + func.args(), 0, root(func));
     // record(*): the number of fields is unknown
     query("declare record local:r(a); declare record local:s(a, b);"
         + " declare %basex:inline(0) function local:f($m as map(xs:string, record(*))) {"

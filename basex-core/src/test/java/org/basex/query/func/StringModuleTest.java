@@ -279,6 +279,7 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("Rembrant", candidates) + "?value", "Rembrandt");
     query("count(" + func.args("Rembrant", candidates) + ')', 1);
     query(func.args("Rembrandt", candidates) + "?similarity", 1);
+    query(func.args("Rembrandt", candidates) + " instance of string:closest-record", true);
 
     // limit and ranking: equal similarities preserve the input order
     query(func.args("Rembrant", candidates, " { 'limit': 0 }") + "?value",
@@ -342,7 +343,7 @@ public final class StringModuleTest extends SandboxTest {
 
     // the measure must return a number
     error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { () } }"), INVTYPE_X);
-    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { 'x' } }"), NONUMBER_X_X);
+    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { 'x' } }"), INVTYPE_X);
   }
 
   /** Test method. */

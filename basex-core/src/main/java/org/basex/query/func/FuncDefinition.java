@@ -12,6 +12,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Definition of a built-in function.
@@ -40,6 +41,10 @@ public final class FuncDefinition {
   final int visible;
   /** Minimum permission. */
   final Perm perm;
+  /** Supplier for the options of the options parameter (can be {@code null}). */
+  final Supplier<? extends Options> options;
+  /** Position of the options parameter ({@code -1} if there is none). */
+  final int optionsArg;
 
   /** Descriptive parameter string. */
   private final String paramString;
@@ -53,21 +58,22 @@ public final class FuncDefinition {
    *   in parentheses. Optional arguments are suffixed with a question mark, hidden arguments are
    *   prefixed with a tilde; three dots indicate that the number of arguments of a function is
    *   not limited
-   * @param types parameter types
+   * @param parameters parameter types and options
    * @param seqType return type
    * @param flags static function properties
    * @param uri URI
    * @param perm minimum permission
    */
   FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String string,
-      final SeqType[] types, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
-      final Perm perm) {
+      final Params parameters, final SeqType seqType, final EnumSet<Flag> flags,
+      final byte[] uri, final Perm perm) {
 
     this.supplier = supplier;
     this.seqType = seqType;
-    this.types = types;
     this.flags = flags;
     this.perm = perm;
+    options = parameters.options();
+    optionsArg = parameters.optionsArg();
 
     name = name(string, uri);
     final String allParams = paramString(string);
@@ -89,6 +95,13 @@ public final class FuncDefinition {
     }
     visible = vsbl;
     paramString = sb.toString();
+
+    // assign the type of the options parameter
+    types = parameters.types();
+    if(optionsArg != -1) {
+      final Occ occ = optionsArg < minMax[0] ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+      types[optionsArg] = options.get().type().seqType(occ);
+    }
 
     // treat updating expressions as nondeterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
@@ -173,15 +186,19 @@ public final class FuncDefinition {
    */
   QNm[] paramNames(final int arity) {
     final QNm[] qnames = new QNm[arity];
-    final int nl = params.length;
-    Array.copy(params, Math.min(arity, nl), qnames);
-    if(arity > nl) {
-      final String nm = Token.string(params[nl - 1].local());
-      for(int n = nl; n < arity; n++) {
-        qnames[n] = new QNm(nm + (n - nl + 1), "");
-      }
-    }
+    for(int a = 0; a < arity; a++) qnames[a] = paramName(a);
     return qnames;
+  }
+
+  /**
+   * Returns the name of the parameter at the specified position.
+   * @param arg argument position
+   * @return parameter name
+   */
+  QNm paramName(final int arg) {
+    final int nl = params.length;
+    return arg < nl ? params[arg] :
+      new QNm(Token.string(params[nl - 1].local()) + (arg - nl + 1), "");
   }
 
   /**
@@ -250,5 +267,51 @@ public final class FuncDefinition {
   @Override
   public String toString() {
     return Strings.concat(name.string(), '(', paramString, ')');
+  }
+
+  /**
+   * Parameter types and options.
+   * @param types parameter types ({@code null} at the position of the options parameter)
+   * @param options supplier for the options of the options parameter (can be {@code null})
+   * @param optionsArg position of the options parameter ({@code -1} if there is none)
+   */
+  record Params(SeqType[] types, Supplier<? extends Options> options, int optionsArg) { }
+
+  /**
+   * Options parameter.
+   * @param supplier supplier for the options
+   */
+  record Opts(Supplier<? extends Options> supplier) { }
+
+  /**
+   * Returns the specified parameters.
+   * @param params parameter types and at most one options parameter
+   * @return parameter types and options
+   */
+  static Params params(final Object... params) {
+    final int pl = params.length;
+    final SeqType[] types = new SeqType[pl];
+    Supplier<? extends Options> options = null;
+    int optionsArg = -1;
+    for(int p = 0; p < pl; p++) {
+      if(params[p] instanceof final SeqType st) {
+        types[p] = st;
+      } else if(params[p] instanceof final Opts opts && optionsArg == -1) {
+        options = opts.supplier();
+        optionsArg = p;
+      } else {
+        throw Util.notExpected("Invalid parameter: %", params[p]);
+      }
+    }
+    return new Params(types, options, optionsArg);
+  }
+
+  /**
+   * Returns an options parameter.
+   * @param supplier supplier for the options
+   * @return options parameter
+   */
+  static Opts options(final Supplier<? extends Options> supplier) {
+    return new Opts(supplier);
   }
 }

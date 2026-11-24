@@ -242,7 +242,7 @@ public final class JNode extends GNode {
   private boolean atomicLeaves() {
     // map entries and array members with several items have children
     final SeqType st = value instanceof final XQMap map ? ((MapType) map.type).valueType() :
-      value instanceof final XQArray array ? ((ArrayType) array.type).valueType() : null;
+      value instanceof final XQArray array ? ((ArrayType) array.type).memberType() : null;
     return st != null ? st.instanceOf(Types.ANY_ATOMIC_TYPE_ZO) :
       value.seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
   }

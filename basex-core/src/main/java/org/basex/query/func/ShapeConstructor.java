@@ -75,7 +75,7 @@ public final class ShapeConstructor extends StandardFunc {
     // skip runtime coercion of values that already match the field type
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     for(int e = 0; e < el; e++) {
-      typed[e] = exprs[e].seqType().coercible(fields.value(e + 1).seqType());
+      typed[e] = exprs[e].seqType().keptBy(fields.value(e + 1).seqType());
     }
     return this;
   }
@@ -91,7 +91,7 @@ public final class ShapeConstructor extends StandardFunc {
       throws QueryException {
     // { 'y': Y, 'x': X } coerce as local:point → local:point(X, Y, ())
     final SeqType st = tc.seqType();
-    return st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt &&
+    return st.occ.check(1) && st.type.deref() instanceof final RecordType rt &&
       !rt.any() && !(shapeType instanceof RecordType) ? record(info, rt, entries(), cc) : null;
   }
 
@@ -200,7 +200,8 @@ public final class ShapeConstructor extends StandardFunc {
     }
 
     final Supplier<ShapeConstructor> supplier = () -> new ShapeConstructor(sh);
-    return new FuncDefinition(supplier, description, params, sh.seqType(),
-        EnumSet.noneOf(Flag.class), name == null ? Token.EMPTY : name.uri(), Perm.NONE);
+    return new FuncDefinition(supplier, description, new FuncDefinition.Params(params, null, -1),
+        sh.seqType(), EnumSet.noneOf(Flag.class), name == null ? Token.EMPTY : name.uri(),
+        Perm.NONE);
   }
 }

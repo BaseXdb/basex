@@ -55,12 +55,12 @@ public final class Arith extends Arr {
     }
 
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type type1 = st1.type, type2 = st2.type;
+    final Type type1 = st1.atomType(), type2 = st2.atomType();
     final boolean numbers = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
 
     final Type type = calc.type(type1, type2);
-    final boolean noArrays = !st1.mayBeWrapped() && !st2.mayBeWrapped();
-    final boolean oneOrMore = noArrays && st1.oneOrMore() && st2.oneOrMore();
+    final Occ occ1 = st1.atomOcc(), occ2 = st2.atomOcc();
+    final boolean oneOrMore = occ1.min >= 1 && occ2.min >= 1;
     exprType.assign(type, oneOrMore ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
 
     Expr expr = emptyExpr();
@@ -79,7 +79,8 @@ public final class Arith extends Arr {
         !has(Flag.NDT)) {
       expr = cc.function(Function.AVG, info, expr1.arg(0));
     }
-    if(expr == this && numbers && noArrays && st1.one() && st2.one() && !has(Flag.NDT)) {
+    if(expr == this && numbers && occ1 == Occ.EXACTLY_ONE && occ2 == Occ.EXACTLY_ONE &&
+        !has(Flag.NDT)) {
       // nondeterministic operands must not be dropped, in order to preserve side effects
       // ($x + 1) + ($y - 1) → $x + $y
       Expr ex = Linear.normalize(this, cc);
@@ -100,7 +101,7 @@ public final class Arith extends Arr {
         } else if(calc == Calc.DIVIDE) {
           // NUMBER * E div NUMBER → E
           final Expr arg = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) ? arg2 : null;
-          final Expr cast = arg != null ? Calc.cast(arg, type, true, info, cc) : null;
+          final Expr cast = arg != null ? Calc.cast(arg, type, BasicType.DECIMAL, info, cc) : null;
           if(cast != null) expr = cast;
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&

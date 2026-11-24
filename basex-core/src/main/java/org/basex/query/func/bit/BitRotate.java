@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -16,11 +15,8 @@ import org.basex.query.value.seq.*;
  */
 public final class BitRotate extends BitFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Item item = atomItem(arg(0), qc);
-    if(item == Empty.VALUE) return Empty.VALUE;
-
-    final long value = toLong(item, arg(0)), by = toLong(arg(1), qc);
+  Value value(final long value, final QueryContext qc) throws QueryException {
+    final long by = toLong(arg(1), qc);
     final int size = toSize(arg(2), Long.SIZE, qc);
     if(size == 0) return Itr.ZERO;
 
@@ -36,7 +32,7 @@ public final class BitRotate extends BitFn {
 
     // bit:rotate($i, 0, $size) → bit:unsigned($i, $size)
     final long size = size(arg(2));
-    return arg(1) instanceof final Itr by && by.itr() == 0 && size != -1 && size <= Long.SIZE ?
+    return literal(arg(1), 0) && size != -1 && size <= Long.SIZE ?
       cc.function(_BIT_UNSIGNED, info, arg(0), arg(2)) : this;
   }
 }

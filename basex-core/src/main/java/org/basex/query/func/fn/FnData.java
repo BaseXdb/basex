@@ -28,7 +28,6 @@ public final class FnData extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = usesContext();
     final Expr input = contextArg(cc);
 
     if(input != null) {
@@ -39,9 +38,9 @@ public final class FnData extends ContextFn {
       if(type == st.type) {
         // data('x') → 'x'
         // $string[data() = 'a'] → $string[. = 'a']
-        return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
+        return contextExpr(input, cc);
       }
-      // ignore arrays: data((1 to 6) ! [ ., . ])
+      // skip unknown atomic types: data([ <a/>, 1 ])
       if(type != null) exprType.assign(type.seqType(st.atomOcc()), input.atomSize());
     }
     return this;
@@ -58,10 +57,11 @@ public final class FnData extends ContextFn {
     Expr expr = this;
     final Expr input = usesContext() ? ContextValue.get(cc, info) : arg(0);
     // data(<a/>) = '' → <a/> = '', A[B ! data() = ''] → A[B ! . = '']
-    // count(data($x)) → count($x), string(data($node)) → string($node)
-    // arrays are excluded if the wrapper is not atomized: string(data([ 1 ]))
-    if(mode.atomizing() || mode.oneOf(Simplify.STRING_VALUE, Simplify.COUNT,
-        Simplify.EXISTENCE) && !input.seqType().mayBeWrapped()) {
+    // count(data($node)) → count($node), string(data($node)) → string($node)
+    // excluded: string(data([ 1 ])), count(data([ 1, 2 ])), exists(data({ 'a': () }/a))
+    final SeqType st = input.seqType();
+    if(mode.atomizing() || mode == Simplify.STRING_VALUE && !st.mayBeWrapped() ||
+        mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && st.atomizesToOne()) {
       expr = input;
     } else if(mode.conditional()) {
       // if(data($node)) → if($node/descendant::text())

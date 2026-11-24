@@ -333,10 +333,15 @@ public final class GFLWOR extends ParseExpr {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
     if(ret && minMax[1] != 0) {
-      final long size = rtrn.size();
-      minMax[0] *= Math.max(size, 0);
-      if(minMax[1] > 0) minMax[1] = size >= 0 ? minMax[1] * size : -1;
-      else if(size == 0) minMax[1] = 0;
+      long min = rtrn.size(), max = min;
+      if(min < 0) {
+        final SeqType st = rtrn.seqType();
+        min = st.occ.min;
+        max = st.zeroOrOne() ? 1 : -1;
+      }
+      minMax[0] *= min;
+      if(minMax[1] > 0) minMax[1] = max >= 0 ? minMax[1] * max : -1;
+      else if(max == 0) minMax[1] = 0;
     }
     return minMax;
   }
@@ -1193,13 +1198,18 @@ public final class GFLWOR extends ParseExpr {
       throws QueryException {
 
     boolean changed = false;
+    final ArrayList<Var> refined = new ArrayList<>(0);
     while(iter.hasNext()) {
       final Clause clause = iter.next();
+      // positional and score variables have fixed types
+      final Var var = clause.vars.length != 0 ? clause.vars[0] : null;
+      final SeqType st = var != null ? var.seqType() : null;
       try {
         final Expr inlined = ic.inlineOrNull(clause);
         if(inlined != null) {
           iter.set((Clause) inlined);
           changed = true;
+          if(var != null && !var.seqType().eq(st)) refined.add(var);
         }
       } catch(final QueryException ex) {
         iter.remove();
@@ -1217,6 +1227,11 @@ public final class GFLWOR extends ParseExpr {
       return clauseError(ex, iter);
     }
 
+    // re-optimize the references to variables with refined types
+    for(final Var var : refined) {
+      final int c = Checks.index(clauses, clause -> clause.declares(var));
+      if(c != -1) inline(InlineContext.refine(var, info, ic.cc), clauses.listIterator(c + 1));
+    }
     return changed;
   }
 

@@ -25,7 +25,7 @@ public final class DBFlush extends DBUpdate {
    */
   public DBFlush(final Data data, final QueryContext qc, final InputInfo info) {
     super(UpdateType.DBFLUSH, data, info);
-    autoflush = qc.context.options.get(MainOptions.AUTOFLUSH);
+    autoflush = qc.options().get(MainOptions.AUTOFLUSH);
   }
 
   @Override

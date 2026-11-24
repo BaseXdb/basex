@@ -40,9 +40,9 @@ public final class FnFilter extends StandardFunc {
 
     // filter(INPUT, PREDICATE) →
     // for $item at $pos in INPUT where PREDICATE($item, $pos) return $item
-    final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+    final FLWORBuilder flwor = new FLWORBuilder(input, arity, cc, info);
     final Expr where = flwor.function(this, 1, false);
     final Expr rtrn = flwor.item();
-    return flwor.finish(input, where, rtrn);
+    return flwor.finish(where, rtrn);
   }
 }

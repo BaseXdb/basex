@@ -2,7 +2,6 @@ package org.basex.query.func.csv;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.build.csv.CsvOptions.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
@@ -24,16 +23,7 @@ public class CsvParse extends ParseCsv {
   }
 
   @Override
-  protected CsvFormat format() {
-    return null;
-  }
-
-  /**
-   * Adapts the error code.
-   * @param ex exception to be adapted
-   * @return new exception
-   */
-  final QueryException error(final QueryException ex) {
+  protected final QueryException error(final QueryException ex) {
     return error(ex, ex.matches(ErrType.FOCV) ? CSV_PARSE_X : null);
   }
 }

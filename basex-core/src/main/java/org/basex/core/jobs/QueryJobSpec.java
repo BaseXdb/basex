@@ -3,6 +3,7 @@ package org.basex.core.jobs;
 import java.util.*;
 
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -32,6 +33,8 @@ public final class QueryJobSpec {
   FItem function;
   /** Arguments of the invoked function; discarded after the job was started. */
   Value[] args;
+  /** State of the options of the calling query (can be {@code null}). */
+  QueryOptions.State queryOptions;
 
   /**
    * Constructor for a query.
@@ -72,6 +75,16 @@ public final class QueryJobSpec {
     query = function.funcIdentity();
     simple = true;
     path = null;
+  }
+
+  /**
+   * Assigns the state of the options of the calling query.
+   * @param state state (can be {@code null})
+   * @return self reference
+   */
+  public QueryJobSpec queryOptions(final QueryOptions.State state) {
+    queryOptions = state;
+    return this;
   }
 
   /**

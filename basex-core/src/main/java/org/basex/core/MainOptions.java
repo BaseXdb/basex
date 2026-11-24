@@ -20,7 +20,7 @@ import org.xml.sax.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MainOptions extends Options {
+public class MainOptions extends Options {
   // General
 
   /** Flag for creating a main memory database. */
@@ -281,6 +281,14 @@ public final class MainOptions extends Options {
   }
 
   /**
+   * Constructor with or without default values.
+   * @param defaults assign default values
+   */
+  protected MainOptions(final boolean defaults) {
+    super(defaults);
+  }
+
+  /**
    * Constructor, adopting all options from the specified instance.
    * @param options parent options
    */
@@ -304,13 +312,22 @@ public final class MainOptions extends Options {
         put(target, value);
       }
     });
-    final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
-      allowExternal = t == Boolean.TRUE;
+      allowExternal = options.get(CommonOptions.TRUST_EXTERNAL) == Boolean.TRUE;
     } else {
       setResolver(parent);
-      allowExternal = t != null ? t : parent.allowExternal && parent.get(TRUSTEXTERNAL);
+      allowExternal = parent.trustExternal(options);
     }
+  }
+
+  /**
+   * Indicates if external resources may be accessed with the specified options.
+   * @param options options with an optional {@link CommonOptions#TRUST_EXTERNAL} value
+   * @return result of check
+   */
+  public boolean trustExternal(final Options options) {
+    final Boolean trust = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
+    return allowExternal && (trust != null ? trust : get(TRUSTEXTERNAL));
   }
 
   /**

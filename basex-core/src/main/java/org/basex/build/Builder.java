@@ -213,6 +213,7 @@ public abstract class Builder extends Job implements XmlHandler {
    * @throws IOException I/O exception
    */
   public final void binary(final String target, final IO data) throws IOException {
+    if(binariesDir == null) throw new BaseXException(NO_MAINMEM);
     final IOFile file = new IOFile(binariesDir, target);
     if(!binariesDir.contains(file)) throw new BaseXException(PATH_INVALID_X, target);
     BinaryPut.put(data.inputSource(), file);

@@ -14,7 +14,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -33,7 +32,7 @@ public class XsltTransform extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XsltResult result = new XsltResult(EMPTY, qc.context.options);
+    final XsltResult result = new XsltResult(EMPTY, qc.options());
     transform(result, null, qc);
     return result.node();
   }
@@ -51,7 +50,7 @@ public class XsltTransform extends StandardFunc {
     final Source input = source(arg(0), qc);
     final IO stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
-    final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
+    final XsltOptions options = toOptions(qc);
 
     final String error = Xslt.transform(stylesheet, input, result,
         options.get(XsltOptions.CACHE), true, qc, tr -> {
@@ -73,7 +72,7 @@ public class XsltTransform extends StandardFunc {
   private Source source(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
     return item instanceof final XNode node ? Xslt.source(node, sc().baseURI(), info) :
-      io(item).streamSource();
+      toIO(item, expr).streamSource();
   }
 
   /**
@@ -86,18 +85,6 @@ public class XsltTransform extends StandardFunc {
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
     return item instanceof final XNode node ?
-      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : io(item);
-  }
-
-  /**
-   * Converts an item (URI string, string content) to an input reference.
-   * @param item item
-   * @return input reference
-   * @throws QueryException query exception
-   */
-  private IO io(final Item item) throws QueryException {
-    final Type type = item.type;
-    if(type.isStringOrUntyped()) return toIO(toString(item), true);
-    throw STRNOD_X_X.get(info, type, item);
+      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : toIO(item, expr);
   }
 }

@@ -21,6 +21,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.similarity.*;
 
 /**
  * The map item.
@@ -141,7 +142,8 @@ public abstract class XQMap extends XQStruct {
     final Value value = getOrNull(k);
     if(value != null) return value;
     if(type instanceof final RecordType rt && rt.index(k) == 0) {
-      throw RECORDFIELD_X_X.get(ii, this, k);
+      throw RECORDFIELD_X.get(ii, QueryError.similar(k,
+          Levenshtein.similar(k.string(ii), rt.fields().keys()), Str::get));
     }
     return Empty.VALUE;
   }
@@ -345,7 +347,7 @@ public abstract class XQMap extends XQStruct {
 
     try {
       if(tp instanceof final ShapeType sh) return sh.matches(this, coerce);
-      if(SeqType.keptStatic(type, tp, coerce)) return true;
+      if(type.keptStatic(tp, coerce)) return true;
 
       final Type kt;
       final SeqType vt;
@@ -361,10 +363,10 @@ public abstract class XQMap extends XQStruct {
         return false;
       }
       if(kt == null && vt == null) return true;
-      if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
+      if(!test((key, value) -> (kt == null || kt.instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
       // remember the more specific type to skip subsequent checks (records keep their type)
-      if(tp instanceof MapType && !(type instanceof ShapeType) && tp.assignable(coerce)) {
+      if(tp instanceof MapType && !(type instanceof ShapeType) && tp.attachable(coerce)) {
         refineType(tp);
       }
       return true;
@@ -503,7 +505,7 @@ public abstract class XQMap extends XQStruct {
     })) return null;
     final int f = addMissing(sh, mb, qc);
     if(f == 0) return mb.map();
-    if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, fields.value(f).seqType());
+    if(error) throw INVCONVERT_X_X.get(info, fields.value(f).seqType(), Empty.VALUE);
     return null;
   }
 
@@ -590,7 +592,7 @@ public abstract class XQMap extends XQStruct {
       } else if(rf.optional()) {
         cast = rf.init(qc);
       } else {
-        if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, ft);
+        if(error) throw INVCONVERT_X_X.get(info, ft, Empty.VALUE);
         cast = null;
       }
       if(cast == null) return null;

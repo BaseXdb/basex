@@ -45,7 +45,7 @@ public final class FnUpdate extends StandardFunc {
     final Item value = arg(0).item(qc, info);
     final FItem select = toFunction(arg(1), 1, qc);
     final XQMap actions = defined(2) ?
-      (XQMap) Types.UPDATE_ACTIONS_O.coerce(arg(2).value(qc), qc, info) : DELETE;
+      (XQMap) coerce(arg(2), Types.UPDATE_ACTIONS_O, qc) : DELETE;
     if(actions.contains(REPLACE) && (actions.contains(VALUE) || actions.contains(RENAME)))
       throw UPACTIONS.get(info);
 
@@ -53,7 +53,7 @@ public final class FnUpdate extends StandardFunc {
     final GNode node;
     if(value instanceof final GNode gnode) node = gnode;
     else if(value instanceof XQStruct) node = new JNode(value);
-    else throw typeError(value, Types.NODE_OR_MAP_OR_ARRAY, info);
+    else throw argTypeError(value, Types.NODE_OR_MAP_OR_ARRAY, arg(0));
     final TokenSet targets = new TokenSet(), ancestors = new TokenSet();
     for(final Item item : select.invoke(qc, info, node)) {
       if(!(item instanceof final GNode target)) throw typeError(item, NodeType.NODE, info);

@@ -78,7 +78,7 @@ public final class FTWords extends FTExpr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(occ);
+    checkNoUp(occ);
     checkNoUp(query);
   }
 

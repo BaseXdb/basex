@@ -174,8 +174,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // no root, no nesting: assign context value (can be null)
-    if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
+    // no root, no dummy: assign context value (can be null)
+    if(root == null && !(cc.qc.focus.value instanceof Dummy)) root = cc.qc.focus.value;
 
     // remove redundant steps, find empty steps
     Expr expr = cleanSteps(cc);
@@ -213,13 +213,12 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr;
 
     // choose the best path implementation (dummy will be used for type checking)
-    final Expr input = root == null && rt instanceof Dummy ? rt : root;
-    final Expr path = copyType(get(info, input, steps));
+    final Expr path = copyType(get(info, rt, steps));
     if(path instanceof final AxisPath ap) {
       ap.optimize();
     } else if(path instanceof final MixedPath mp) {
       // a/(if (@x) then * else .): not checked when parsed, as steps may be incomplete
-      mp.iterative = iterative(input, mp.steps);
+      mp.iterative = iterative(rt, mp.steps);
     }
     return path;
   }
@@ -308,8 +307,8 @@ public abstract class Path extends ParseExpr {
   private Expr splitPredicates(final CompileContext cc) throws QueryException {
     // for $o in O return db:get('db')/a/b[@id > $o/@r] → (db:get('db')/a/b)[@id > $o/@r]
     final int last = steps.length - 1;
-    if(!(root instanceof Value) || root instanceof Dummy ||
-        !(steps[last] instanceof final Step step) || step.mayBePositional()) return this;
+    if(!(root instanceof Value) || !(steps[last] instanceof final Step step) ||
+        step.mayBePositional()) return this;
 
     final Expr[] preds = step.exprs;
     final int p = Checks.index(preds, Expr::hasFreeVars);
@@ -341,7 +340,7 @@ public abstract class Path extends ParseExpr {
     // Examples: text(); ./abc; position()/a
     if(Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
        Flag.POS.oneOf(flags) && root != null && root.has(Flag.POS)) return true;
-    if(Flag.CNS.oneOf(flags) && seqType().type.intersect(NodeType.JNODE) != null) return true;
+    if(Flag.CNS.oneOf(flags) && seqType().mayBeJNode()) return true;
     // check remaining flags
     final Flag[] flgs = Flag.remove(flags, Flag.POS, Flag.CTX);
     if(flgs.length == 0) return false;
@@ -430,17 +429,16 @@ public abstract class Path extends ParseExpr {
       Expr step = steps[s];
       final Expr prev = list.isEmpty() ? cc.focusOr(root) : list.peek();
       if(prev != null) {
-        final SeqType seqType = prev.seqType();
-        final Type pt = seqType.type;
+        final Type pt = prev.seqType().type;
         // $node/./a → $node/a, a/self::node()/b → a/b
         if(pt instanceof NodeType && (step instanceof ContextValue ||
-            step instanceof final Step stp && stp.remove(seqType))) {
+            step instanceof final Step stp && stp.remove(prev))) {
           removed = true;
           continue;
         }
         // $doc/following-or-self::x → $doc/self::x, $array/descendant::* → $array/child::*
         if(step instanceof final Step stp) {
-          final Axis axis = stp.axis(seqType);
+          final Axis axis = stp.axis(prev);
           if(axis != null && axis != stp.axis) {
             step = Step.get(cc, prev, stp.info(info), axis, stp.test, stp.selector, stp.exprs);
             cc.info(QueryText.OPTREWRITE_X_X, stp.axis, step);
@@ -500,7 +498,8 @@ public abstract class Path extends ParseExpr {
       Expr prev = rt;
       for(final Expr step : steps) {
         if(step instanceof final Step stp) {
-          if(stp.empty(prev.seqType())) return true;
+          // constructed nodes have no parent: <a/>/.. → ()
+          if(stp.empty(prev)) return true;
           // later steps must not discard a failing selector
           if(stp.selectorMayFail()) return false;
         }
@@ -1080,10 +1079,12 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
+    boolean changed = false, refined = false;
     if(root != null) {
+      final SeqType st = root.seqType();
       final Expr inlined = root.inline(ic);
       if(inlined != null) {
+        refined = ic.refocus(root, st, inlined, true);
         root = inlined;
         changed = true;
       }
@@ -1097,7 +1098,18 @@ public abstract class Path extends ParseExpr {
     if(!changed && ic.var == null) return null;
     final CompileContext cc = ic.cc;
     final Expr focus = focus(cc);
-    if(changed) updateSteps(focus, cc, s -> steps[s].optimize(cc));
+    if(changed) {
+      // refined root type: re-optimize context references in non-axis steps
+      final InlineContext ctx = refined ? InlineContext.focus(info, cc) : null;
+      updateSteps(focus, cc, s -> {
+        final Expr step = steps[s];
+        if(ctx != null && !(step instanceof Step)) {
+          final Expr inlined = ctx.inlineOrNull(step);
+          if(inlined != null) return inlined;
+        }
+        return step.optimize(cc);
+      });
+    }
     changed |= ic.var != null && updateSteps(focus, cc, s -> steps[s].inline(ic));
 
     return changed ? optimize(cc) : null;

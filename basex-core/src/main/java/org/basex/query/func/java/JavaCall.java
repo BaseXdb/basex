@@ -72,7 +72,7 @@ public abstract class JavaCall extends Arr {
     // check permission
     checkPerm(qc, perm);
 
-    final Value value = eval(qc, qc.context.options.get(MainOptions.WRAPJAVA));
+    final Value value = eval(qc, qc.options().get(MainOptions.WRAPJAVA));
     if(!updating) return value;
 
     // updating function: cache output
@@ -226,7 +226,7 @@ public abstract class JavaCall extends Arr {
    */
   public static Value toValue(final Object object, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    return toValue(object, qc, info, qc.context.options.get(MainOptions.WRAPJAVA));
+    return toValue(object, qc, info, qc.options().get(MainOptions.WRAPJAVA));
   }
 
   /**

@@ -99,7 +99,7 @@ public final class StaticContext {
    * @param qc query context
    */
   public StaticContext(final QueryContext qc) {
-    final MainOptions mopts = qc.context.options;
+    final MainOptions mopts = qc.options();
     withdb = mopts.get(MainOptions.WITHDB);
     defaultdb = mopts.get(MainOptions.DEFAULTDB);
     maxPerm = qc.maxPerm;

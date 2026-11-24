@@ -320,6 +320,7 @@ results_%            = % eredmény
 revert               = Visszaállítás
 revert_file_%        = Visszaállítja (%) és eldobja a változásokat?
 revert_files_%       = % fájl visszaállítása, az újabb változtatások elvesznek.
+rt_compilation       = Valósidejű fordítás
 rt_execution         = Valósidejű futás
 rt_filtering         = Valósidejű szűrés
 rt_focus             = Valósidejű egérfókusz

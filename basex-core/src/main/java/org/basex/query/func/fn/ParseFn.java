@@ -78,7 +78,9 @@ public abstract class ParseFn extends StandardFunc {
    * @return parse options
    * @throws QueryException query exception
    */
-  protected abstract Options options(QueryContext qc) throws QueryException;
+  protected Options options(final QueryContext qc) throws QueryException {
+    return toOptions(qc);
+  }
 
   /** Input reference (can be {@code null}). */
   IO input;
@@ -94,7 +96,7 @@ public abstract class ParseFn extends StandardFunc {
     final Item value = atomItem(arg(0), qc);
     if(value.isEmpty()) return Empty.VALUE;
 
-    final IO io = new IOContent(toBytes(value));
+    final IO io = new IOContent(toBytes(value, arg(0)));
     try(TextInput ti = nl() ? new NewlineInput(io) : new TextInput(io)) {
       return parse(ti.fallback(false), options(qc), qc);
     } catch(final DecodingException ex) {

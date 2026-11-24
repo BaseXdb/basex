@@ -26,7 +26,7 @@ public final class Info extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
-    out.print(info(context, context.user().has(Perm.ADMIN)));
+    out.print(info(context, options, context.user().has(Perm.ADMIN)));
     return true;
   }
 
@@ -38,10 +38,11 @@ public final class Info extends AInfo {
   /**
    * Creates a database information string.
    * @param context database context
+   * @param opts main options
    * @param admin include global options
    * @return info string
    */
-  public static String info(final Context context, final boolean admin) {
+  public static String info(final Context context, final MainOptions opts, final boolean admin) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + COL + NL);
     info(tb, INFO_VERSION, Prop.VERSION);
@@ -54,7 +55,6 @@ public final class Info extends AInfo {
       for(final Option<?> o : sopts) info(tb, o.name(), sopts.get(o));
     }
 
-    final MainOptions opts = context.options;
     tb.add(NL + LOCAL_OPTIONS + NL);
     for(final Option<?> o : opts) info(tb, o.name(), opts.get(o));
 

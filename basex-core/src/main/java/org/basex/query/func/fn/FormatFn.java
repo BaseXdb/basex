@@ -9,6 +9,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.hash.*;
 
 /**
  * Formatting functions.
@@ -17,6 +18,9 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 abstract class FormatFn extends StandardFunc {
+  /** Picture cache. */
+  private final TokenObjectMap<DatePicture> pictures = new TokenObjectMap<>();
+
   /**
    * Returns a formatted date.
    * @param tp input type
@@ -35,9 +39,16 @@ abstract class FormatFn extends StandardFunc {
     if(calendar != null) calendar = trim(calendar);
     final byte[] place = toZeroToken(arg(4), qc);
 
-    final ADate date = toDate(item, tp, value, qc);
-    final Formatter form = Formatter.get(language);
-    return Str.get(form.formatDate(date, language, picture, calendar, place, info));
+    final ADate date = (ADate) coerce(item, tp, value, qc);
+    DatePicture pic;
+    synchronized(pictures) {
+      pic = pictures.get(picture);
+      if(pic == null) {
+        pic = new DatePicture(picture, info);
+        pictures.put(picture, pic);
+      }
+    }
+    return Str.get(Formatter.get(language).formatDate(date, language, pic, calendar, place, info));
   }
 
   @Override

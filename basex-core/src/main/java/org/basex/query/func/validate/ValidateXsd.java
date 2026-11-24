@@ -141,11 +141,11 @@ public class ValidateXsd extends ValidateFn {
     return validate(new Validation() {
       @Override
       void validate() throws IOException, SAXException, QueryException {
-        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
+        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), arg(0), null);
         final Item schema = toNodeOrAtomItem(arg(1), true, qc);
         final HashMap<String, String> options = toOptions(arg(2), qc);
 
-        final IO io = schema == null ? null : read(schema, null);
+        final IO io = schema == null ? null : read(schema, arg(1), null);
         final boolean content = content(io);
         final String url = io == null ? "" : io.url();
         final String caching = options.remove("cache");
@@ -153,7 +153,7 @@ public class ValidateXsd extends ValidateFn {
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
-          final SchemaFactory sf = factory(qc.context.options);
+          final SchemaFactory sf = factory(qc.options());
           sf.setErrorHandler(this);
 
           // assign parser features

@@ -42,11 +42,6 @@ public abstract class ParseJson extends ParseFn {
   }
 
   @Override
-  protected final Options options(final QueryContext qc) throws QueryException {
-    return toOptions(arg(1), new JsonParserOptions(), qc);
-  }
-
-  @Override
   public final boolean hasCNS() {
     return super.hasCNS() && (format() != null || !format(JsonOptions.FORMAT, JsonFormat.W3));
   }
@@ -60,24 +55,22 @@ public abstract class ParseJson extends ParseFn {
   final Value parse(final TextInput ti, final Options options, final QueryContext qc)
       throws QueryException, IOException {
 
+    JsonParserOptions jopts = (JsonParserOptions) options;
     final JsonFormat format = format();
-    if(format != null) {
-      if(options.get(JsonParserOptions.JSON_LINES)) {
-        throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.JSON_LINES));
-      }
-      options.set(JsonOptions.FORMAT, format);
+    if(format != null && jopts.get(JsonOptions.FORMAT) != format) {
+      jopts = jopts.copy();
+      jopts.set(JsonOptions.FORMAT, format);
     }
 
-    final JsonParserOptions jopts = (JsonParserOptions) options;
     final boolean elements = jopts.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING;
     final JsonConverter converter = JsonConverter.get(jopts, info);
-    final Value fallback = options.get(JsonParserOptions.FALLBACK);
+    final Value fallback = jopts.get(JsonParserOptions.FALLBACK);
     if(!fallback.isEmpty()) {
       final FItem fb = toFunction(fallback, 1, qc);
       converter.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
     }
-    if(!elements) converter.nullValue(options.get(JsonParserOptions.NULL));
-    final Value match = options.get(JsonParserOptions.MATCH);
+    if(!elements) converter.nullValue(jopts.get(JsonParserOptions.NULL));
+    final Value match = jopts.get(JsonParserOptions.MATCH);
     if(!match.isEmpty()) {
       final Type[] types = new Type[(int) match.size()];
       int t = 0;

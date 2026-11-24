@@ -39,7 +39,7 @@ abstract class ProcFn extends StandardFunc {
     for(final Item item : atomValue(arguments, qc)) args.add(toString(item, arguments));
 
     // options
-    final ProcOptions options = toOptions(arg(2), new ProcOptions(), qc);
+    final ProcOptions options = toOptions(qc);
     final String encoding = toEncodingOrNull(options.get(ProcOptions.ENCODING), PROC_ENCODING_X);
     final byte[] input = input(options.get(ProcOptions.INPUT), encoding);
     final long seconds = options.get(ProcOptions.TIMEOUT);

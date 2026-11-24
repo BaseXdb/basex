@@ -320,6 +320,7 @@ results_%            = % result(s)
 revert               = Revert
 revert_file_%        = Revert '%' and discard changes?
 revert_files_%       = % file(s) will be reverted, discarding newer changes.
+rt_compilation       = Real-time compilation
 rt_execution         = Real-time execution
 rt_filtering         = Real-time filtering
 rt_focus             = Real-time mouse focus

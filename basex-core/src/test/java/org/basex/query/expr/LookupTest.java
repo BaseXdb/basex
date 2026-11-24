@@ -126,6 +126,29 @@ public final class LookupTest extends SandboxTest {
         + " (1, 2)[$a?(.) = 'b'] }; local:f([ 'a', 'b' ])", 2);
   }
 
+  /** Static typing: choices of records. */
+  @Test public void choiceTyping() {
+    final String decl = "declare record local:a(x as xs:integer, y as xs:string); "
+        + "declare record local:b(x as xs:double); declare %basex:inline(0) function local:f(";
+    check(decl + "$r as (local:a|local:b)) { $r?x }; local:f(local:a(1, 's'))", 1,
+        type(Lookup.class, "xs:numeric"));
+    check(decl + "$r as (local:a|local:b)) { $r?y }; local:f(local:a(1, 's'))", "s",
+        type(Lookup.class, "xs:string?"));
+    check(decl + "$r as (local:a|xs:integer)) { $r?y }; local:f(local:a(1, 's'))", "s",
+        type(Lookup.class, "xs:string"));
+    check(decl + "$r as (local:a|local:b)*) { $r?x }; local:f((local:a(1, 's'), local:b(2)))",
+        "1\n2", type(Lookup.class, "xs:numeric*"));
+    check(decl + "$r as (local:a|local:b)) { map:get($r, 'x') }; local:f(local:a(1, 's'))", 1,
+        type(_MAP_GET, "xs:numeric"));
+    check(decl + "$r as (local:a|local:b)) { map:get($r, 'y') }; local:f(local:b(1))", "",
+        type(_MAP_GET, "xs:string?"));
+    check(decl + "$r as (local:a|local:b)) { map:get($r, 'y', 'z') }; local:f(local:b(1))", "z",
+        type(_MAP_GET, "xs:string"));
+
+    error(decl + "$r as (local:a|local:b)) { $r?z }; local:f(local:a(1, 's'))",
+        RECORDFIELD_X);
+  }
+
   /** JNodes: lookup is applied to each item of the value. */
   @Test public void jnode() {
     query("let $j := { 'a': ({ 'x': 1 }, { 'x': 2 }) }/a return $j?x", "1\n2");
@@ -136,15 +159,15 @@ public final class LookupTest extends SandboxTest {
   @Test public void error() {
     error("1?a", LOOKUP_X);
     error("(1, 2)[" + wrap(1) + " = 1]?((1)[" + wrap(1) + " = 2])", LOOKUP_X);
-    error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X_X);
-    error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X_X);
-    error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X);
+    error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X);
+    error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
-        + "$x as record(a, b)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + "$x as record(a, b)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
-        + "$x as record(*)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + "$x as record(*)) { $x?c }; local:f(local:r(1, 2))", RECORDFIELD_X);
     error("declare record local:r(a, b); declare %basex:inline(0) function local:f("
         + "$x as record(*)) { if($x instance of record(a, b)) { $x?c } };"
-        + " local:f(local:r(1, 2))", RECORDFIELD_X_X);
+        + " local:f(local:r(1, 2))", RECORDFIELD_X);
   }
 }

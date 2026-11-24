@@ -23,7 +23,7 @@ public final class ArrayFoot extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
-    if(type instanceof final ArrayType at) exprType.assign(at.valueType());
+    if(type instanceof final ArrayType at) exprType.assign(at.memberType());
     return this;
   }
 }

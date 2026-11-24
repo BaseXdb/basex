@@ -48,6 +48,27 @@ public enum Algorithm {
     boolean current(final EnumMap<Code, String> codes) {
       return toInt(codes.get(Code.ITERATIONS)) >= PBKDF2_ITERATIONS;
     }
+  },
+  /** Argon2id. */
+  ARGON2ID(Code.SALT, Code.ITERATIONS, Code.MEMORY, Code.PARALLELISM, Code.HASH) {
+    @Override
+    void prepare(final EnumMap<Code, String> codes) {
+      codes.put(Code.SALT, salt());
+      codes.put(Code.ITERATIONS, Integer.toString(Argon2.ITERATIONS));
+      codes.put(Code.MEMORY, Integer.toString(Argon2.MEMORY));
+      codes.put(Code.PARALLELISM, Integer.toString(Argon2.PARALLELISM));
+    }
+    @Override
+    String hash(final String password, final EnumMap<Code, String> codes) {
+      return string(hex(new Argon2(null).derive(token(password), token(codes.get(Code.SALT)),
+          toInt(codes.get(Code.ITERATIONS)), toInt(codes.get(Code.MEMORY)),
+          toInt(codes.get(Code.PARALLELISM)), 32), false));
+    }
+    @Override
+    boolean current(final EnumMap<Code, String> codes) {
+      return toInt(codes.get(Code.ITERATIONS)) >= Argon2.ITERATIONS &&
+          toInt(codes.get(Code.MEMORY)) >= Argon2.MEMORY;
+    }
   };
 
   /** Salt generation. */
@@ -85,8 +106,14 @@ public enum Algorithm {
    * @return result of check
    */
   final boolean verify(final String password, final EnumMap<Code, String> codes) {
-    // constant-time comparison of the recomputed and the stored hash
-    return MessageDigest.isEqual(token(hash(password, codes)), token(codes.get(Code.HASH)));
+    try {
+      // constant-time comparison of the recomputed and the stored hash
+      return MessageDigest.isEqual(token(hash(password, codes)), token(codes.get(Code.HASH)));
+    } catch(final IllegalArgumentException ex) {
+      // invalid stored parameters
+      Util.debug(ex);
+      return false;
+    }
   }
 
   /**

@@ -89,7 +89,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry last-modified='2020'>X</archive:entry>", ""),
         ARCHIVE_TIMESTAMP_X);
     // content must be string or binary
-    error(func.args(" <archive:entry>X</archive:entry>", " 123"), STRBIN_X_X);
+    error(func.args(" <archive:entry>X</archive:entry>", " 123"), INVTYPE_X);
     // wrong encoding
     error(func.args(" <archive:entry encoding='x'>X</archive:entry>", ""), ARCHIVE_ENCODE1_X);
     // errors while converting a string
@@ -523,8 +523,12 @@ public final class ArchiveModuleTest extends SandboxTest {
     // and verifies round-trip through ZipOutputStream's STORED path)
     query(func.args(_ARCHIVE_CREATE.args("X", "X", " { 'algorithm': 'stored' }")) + "?algorithm",
         "stored");
-    // map structure: both keys populated for a regular archive
+    // record structure: both fields are always present
     query("map:size(" + func.args(ZIP) + ')', 2);
+    final String empty = func.args(" " + _ARCHIVE_CREATE.args(" ()", " ()"));
+    query(empty + "?algorithm", "");
+    query("map:size(" + empty + ')', 2);
+    query(func.args(ZIP) + " instance of archive:options-record", true);
   }
 
   /** Test method. */

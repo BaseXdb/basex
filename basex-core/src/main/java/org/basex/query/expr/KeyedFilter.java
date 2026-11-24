@@ -51,7 +51,8 @@ public abstract class KeyedFilter<C> extends Filter {
       final Expr kx = cmpg.arg(k), px = cmpg.arg(1 - k);
       if(kx.has(Flag.CTX) && !kx.has(Flag.POS, Flag.NDT) && !(px instanceof Value) &&
           !px.has(Flag.CTX, Flag.POS, Flag.NDT) &&
-          types.test(kx.seqType().type, px.seqType().type) && !kx.hasFreeVars()) return k;
+          types.test(kx.seqType().atomType(), px.seqType().atomType()) &&
+          !kx.hasFreeVars()) return k;
     }
     return -1;
   }

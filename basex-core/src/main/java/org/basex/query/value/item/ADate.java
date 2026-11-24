@@ -6,7 +6,6 @@ import static org.basex.query.value.item.Dec.*;
 import java.math.*;
 import java.time.*;
 import java.util.*;
-import java.util.regex.*;
 
 import javax.xml.datatype.*;
 
@@ -27,18 +26,6 @@ public abstract class ADate extends ADateDur {
   private static final long MIN_DAY = LocalDate.MIN.toEpochDay();
   /** Maximum day count. */
   private static final long MAX_DAY = LocalDate.MAX.toEpochDay();
-
-  /** Pattern for two digits. */
-  static final String DD = "(\\d{2})";
-  /** Year pattern. */
-  static final String YEAR = "(-?([1-9]\\d{3,}|0\\d{3}))";
-  /** Timezone pattern. */
-  static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
-  /** Date pattern. */
-  public static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
-  /** Time pattern. */
-  public static final Pattern TIME = Pattern.compile(
-      DD + ':' + DD + ':' + "(\\d{2}(\\.\\d+)?)" + ZONE);
 
   /** Component flag: year. */
   static final int YEA = 1;
@@ -110,78 +97,103 @@ public abstract class ADate extends ADateDur {
   }
 
   /**
-   * Initializes the date format.
-   * @param date input
+   * Initializes the date, time and/or timezone components from the specified input.
+   * @param value input
+   * @param date parse date components
+   * @param time parse time components
    * @param exp example format
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void date(final byte[] date, final String exp, final InputInfo info) throws QueryException {
-    final Matcher mt = DATE.matcher(Token.string(Token.trim(date)));
-    if(!mt.matches()) throw dateError(date, exp, info);
-    year = toLong(mt.group(1), false, info);
-    month = (byte) Strings.toInt(mt.group(3));
-    day = (byte) Strings.toInt(mt.group(4));
-    defined |= YEA | MON | DAY;
+  final void parse(final byte[] value, final boolean date, final boolean time, final String exp,
+      final InputInfo info) throws QueryException {
 
-    if(month < 1 || month > 12 || day < 1 || day > daysOfMonth(year, month)) {
-      throw dateError(date, exp, info);
+    final DateScanner ds = new DateScanner(value);
+    if(date && (!scanDate(ds) || time && !ds.consume('T')) || time && !scanTime(ds) ||
+        !ds.zone() || !ds.done()) throw dateError(value, exp, info);
+
+    if(date) {
+      year = toLong(ds, ds.yearStart, ds.yearEnd, info);
+      defined |= YEA | MON | DAY;
+      if(month < 1 || month > 12 || day < 1 || day > daysOfMonth(year, month)) {
+        throw dateError(value, exp, info);
+      }
+      if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw DATERANGE_X_X.get(info, type, value);
     }
-    if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw DATERANGE_X_X.get(info, type, date);
-    zone(mt, 5, date, info);
+    if(time) {
+      defined |= HRS | MIN | SEC;
+      if(minute >= 60 || seconds.compareTo(BD_60) >= 0 || hour > 24 ||
+         hour == 24 && (minute > 0 || seconds.signum() > 0)) {
+        throw dateError(value, exp, info);
+      }
+    }
+    zone(ds, value, info);
+    if(time && hour == 24) {
+      hour = 0;
+      add(BD_86400, info);
+    }
   }
 
   /**
-   * Initializes the time format.
-   * @param time input format
-   * @param exp expected format
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
+   * Scans the year, month and day components.
+   * @param ds date scanner
+   * @return success flag
    */
-  final void time(final byte[] time, final String exp, final InputInfo info) throws QueryException {
-    final Matcher mt = TIME.matcher(Token.string(Token.trim(time)));
-    if(!mt.matches()) throw dateError(time, exp, info);
+  private boolean scanDate(final DateScanner ds) {
+    return ds.year() && ds.consume('-') && scanMonth(ds) && ds.consume('-') && scanDay(ds);
+  }
 
-    hour = (byte) Strings.toInt(mt.group(1));
-    minute = (byte) Strings.toInt(mt.group(2));
-    seconds = toDecimal(mt.group(3), false, info);
-    defined |= HRS | MIN | SEC;
-    if(minute >= 60 || seconds.compareTo(BD_60) >= 0 || hour > 24 ||
-       hour == 24 && (minute > 0 || seconds.compareTo(BigDecimal.ZERO) > 0)) {
-      throw dateError(time, exp, info);
-    }
-    zone(mt, 5, time, info);
-    if(hour == 24) {
-      hour = 0;
-      add(BD_864000, info);
-    }
+  /**
+   * Scans the month component.
+   * @param ds date scanner
+   * @return success flag
+   */
+  final boolean scanMonth(final DateScanner ds) {
+    month = (byte) ds.twoDigits();
+    return month != -1;
+  }
+
+  /**
+   * Scans the day component.
+   * @param ds date scanner
+   * @return success flag
+   */
+  final boolean scanDay(final DateScanner ds) {
+    day = (byte) ds.twoDigits();
+    return day != -1;
+  }
+
+  /**
+   * Scans the hour, minute and second components.
+   * @param ds date scanner
+   * @return success flag
+   */
+  private boolean scanTime(final DateScanner ds) {
+    hour = (byte) ds.twoDigits();
+    if(hour == -1 || !ds.consume(':')) return false;
+    minute = (byte) ds.twoDigits();
+    if(minute == -1 || !ds.consume(':')) return false;
+    seconds = ds.seconds();
+    return seconds != null;
   }
 
   /**
    * Initializes the timezone.
-   * @param matcher matcher
-   * @param pos first matching position
-   * @param value value
+   * @param ds date scanner
+   * @param value input
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void zone(final Matcher matcher, final int pos, final byte[] value, final InputInfo info)
+  final void zone(final DateScanner ds, final byte[] value, final InputInfo info)
       throws QueryException {
-
-    final String z = matcher.group(pos);
-    if(z == null) return;
-    defined |= ZON;
-    if("Z".equals(z)) {
-      tz = 0;
-    } else {
-      final int th = Strings.toInt(matcher.group(pos + 2));
-      final int tm = Strings.toInt(matcher.group(pos + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) {
-        throw INVALIDVALUE_X_X.get(info, "timezone", value);
-      }
-      final int mn = th * 60 + tm;
-      tz = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
+    if(!ds.hasZone) return;
+    final int th = ds.zoneHours, tm = ds.zoneMinutes;
+    if(th > 14 || tm > 59 || th == 14 && tm != 0) {
+      throw INVALIDVALUE_X_X.get(info, "timezone", value);
     }
+    final int mn = th * 60 + tm;
+    tz = (short) (ds.zoneNeg ? -mn : mn);
+    defined |= ZON;
   }
 
   /**
@@ -219,23 +231,22 @@ public abstract class ADate extends ADateDur {
    * @throws QueryException query exception
    */
   private void add(final BigDecimal add, final InputInfo info) throws QueryException {
-    // normalized modulo: sc % 60  vs.  (-sc + sc % 60 + 60 + sc) % 60
     final BigDecimal sc = seconds().add(add);
-    seconds = sc.signum() >= 0 ? sc.remainder(BD_60) :
-      sc.negate().add(sc.remainder(BD_60)).add(BD_60).add(sc).remainder(BD_60);
+    final long mns = Math.floorDiv(sc.setScale(0, RoundingMode.FLOOR).longValue(), 60);
+    seconds = mns == 0 ? sc : sc.subtract(BigDecimal.valueOf(mns * 60));
 
-    final long mn = (has(MIN) ? minute : 0) + Math.floorDiv(
-        sc.setScale(0, RoundingMode.FLOOR).longValue(), 60);
+    final long mn = (has(MIN) ? minute : 0) + mns;
     minute = (byte) Math.floorMod(mn, 60);
 
     final long ho = (has(HRS) ? hour : 0) + Math.floorDiv(mn, 60);
     hour = (byte) Math.floorMod(ho, 24);
     defined |= HRS | MIN | SEC;
 
-    // xs:time: the date is undefined and will be discarded
-    if(!has(YEA)) return;
+    // xs:time: the date is undefined and will be discarded; skip unchanged dates
+    final long dd = Math.floorDiv(ho, 24);
+    if(!has(YEA) || dd == 0) return;
 
-    final long dys = days() + Math.floorDiv(ho, 24);
+    final long dys = days() + dd;
     // 400 years span exactly 146097 days: sufficient for an approximate error message
     if(dys < MIN_DAY || dys > MAX_DAY) throw YEARRANGE_X.get(info, dys * 400 / 146097 + 1970);
 
@@ -390,19 +401,12 @@ public abstract class ADate extends ADateDur {
     final boolean ymd = has(YEA);
     if(ymd) {
       if(year < 0) tb.add('-');
-      prefix(tb, Math.abs(yea()), 4);
-      tb.add('-');
-      prefix(tb, mon(), 2);
-      tb.add('-');
-      prefix(tb, day(), 2);
+      tb.addLong(Math.abs(yea()), 4).add('-').addLong(mon(), 2).add('-').addLong(day(), 2);
     }
     if(has(HRS)) {
       if(ymd) tb.add('T');
-      prefix(tb, hour(), 2);
-      tb.add(':');
-      prefix(tb, minute(), 2);
-      tb.add(':');
-      if(seconds.intValue() < 10) tb.add('0');
+      tb.addLong(hour(), 2).add(':').addLong(minute(), 2).add(':');
+      if(seconds.compareTo(BigDecimal.TEN) < 0) tb.add('0');
       tb.add(Token.chopNumber(Token.token(seconds().abs().toPlainString())));
     }
     zone(tb);
@@ -416,18 +420,6 @@ public abstract class ADate extends ADateDur {
   void zone(final TokenBuilder tb) {
     // the offset ID is the XSD lexical form: 'Z', or +/-HH:MM
     if(has(ZON)) tb.add(ZoneOffset.ofTotalSeconds(tz * 60).getId());
-  }
-
-  /**
-   * Prefixes the specified number of zero digits before a number.
-   * @param tb token builder
-   * @param number number to be printed
-   * @param zero maximum number of zero digits
-   */
-  static void prefix(final TokenBuilder tb, final long number, final int zero) {
-    final byte[] t = Token.token(number);
-    for(int i = t.length; i < zero; i++) tb.add('0');
-    tb.add(t);
   }
 
   @Override
@@ -448,7 +440,7 @@ public abstract class ADate extends ADateDur {
   public final int hashCode() {
     // the implicit timezone is irrelevant here: items are only equal if both have or lack a
     // timezone, and if both lack one, it cancels out in the comparison
-    return toSeconds(0).intValue();
+    return Long.hashCode(minuteSeconds(0) + (long) seconds().doubleValue());
   }
 
   @Override
@@ -472,7 +464,21 @@ public abstract class ADate extends ADateDur {
     // resolve the implicit timezone only if exactly one operand has a timezone: if both have or
     // lack one, it is either unused or cancels out in the comparison
     final int implicit = has(ZON) == dat.has(ZON) ? 0 : implicitTz(qc);
-    return toSeconds(implicit).compareTo(dat.toSeconds(implicit));
+    // equal timezones: compare local components; seconds are within [0, 60): compare them last
+    final int c = (has(ZON) ? tz : implicit) == (dat.has(ZON) ? dat.tz : implicit) ?
+      Long.compare(localMinutes(), dat.localMinutes()) :
+      Long.compare(minuteSeconds(implicit), dat.minuteSeconds(implicit));
+    return c != 0 ? c : seconds().compareTo(dat.seconds());
+  }
+
+  /**
+   * Returns an order-preserving number for the local date and time, excluding the seconds.
+   * @return number
+   */
+  private long localMinutes() {
+    final long ymd = ((has(YEA) ? year : 2000) * 13 + (has(MON) ? month : 1)) * 32 +
+        (has(DAY) ? day : 1);
+    return ymd * 1440 + (has(HRS) ? hour : 0) * 60 + (has(MIN) ? minute : 0);
   }
 
   @Override
@@ -494,7 +500,16 @@ public abstract class ADate extends ADateDur {
    * @return seconds
    */
   final BigDecimal toSeconds(final int implicit) {
-    return daySeconds(implicit).add(BigDecimal.valueOf(days()).multiply(BD_864000));
+    return BigDecimal.valueOf(minuteSeconds(implicit)).add(seconds());
+  }
+
+  /**
+   * Returns the date in seconds, excluding the seconds component.
+   * @param implicit implicit timezone in minutes, applied if the item has none
+   * @return seconds
+   */
+  private long minuteSeconds(final int implicit) {
+    return days() * 86400 + timeSeconds(implicit);
   }
 
   /**
@@ -503,9 +518,17 @@ public abstract class ADate extends ADateDur {
    * @return seconds
    */
   public final BigDecimal daySeconds(final int implicit) {
+    return seconds().add(BigDecimal.valueOf(timeSeconds(implicit)));
+  }
+
+  /**
+   * Returns the seconds of the hours and minutes, minus the timezone offset.
+   * @param implicit implicit timezone in minutes, applied if the item has none
+   * @return seconds
+   */
+  private long timeSeconds(final int implicit) {
     final int z = has(ZON) ? tz : implicit;
-    return seconds().add(BigDecimal.valueOf(
-        (has(HRS) ? hour : 0) * 3600L + (has(MIN) ? minute : 0) * 60L - z * 60L));
+    return (has(HRS) ? hour : 0) * 3600L + (has(MIN) ? minute : 0) * 60L - z * 60L;
   }
 
   /**

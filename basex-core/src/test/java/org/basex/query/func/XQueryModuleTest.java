@@ -503,6 +503,21 @@ xquery:fork-join(
   }
 
   /** Test method. */
+  @Test @Timeout(60) public void forkJoinOptions() {
+    final Function func = _XQUERY_FORK_JOIN;
+    final String option = _DB_OPTION.args(" string(<_>intparse</_>)");
+
+    // options of the caller are inherited
+    query("(# db:intparse true #) { " + func.args(" fn() { " + option + " }") + " }", true);
+    // options assigned in a branch are invisible to other branches and the caller
+    query(func.args(" (fn() { (# db:intparse true #) { prof:sleep(200), " + option + " } }, " +
+        "fn() { prof:sleep(100), " + option + " })"), "true\nfalse");
+    query(func.args(" (fn() { " + _XQUERY_EVAL.args(" \"declare option db:intparse 'true'; " +
+        "prof:sleep(200)\"") + " }, fn() { prof:sleep(100), " + option + " })"), false);
+    query(option, false);
+  }
+
+  /** Test method. */
   @Test @Timeout(value = 60, threadMode = SEPARATE_THREAD) public void gh2678() {
     final Function func = _XQUERY_FORK_JOIN;
 

@@ -140,7 +140,7 @@ public final class Otherwise extends Arr {
     final int el = exprs.length;
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       for(int e = 0; e < el - 1; e++) {
-        if(exprs[e].seqType().mayBeWrapped()) return null;
+        if(!exprs[e].seqType().atomizesToOne()) return null;
       }
     }
     boolean changed = false;

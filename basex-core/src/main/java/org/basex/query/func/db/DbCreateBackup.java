@@ -18,7 +18,7 @@ public final class DbCreateBackup extends BackupFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String name = toBackup(arg(0), qc);
-    final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
+    final CreateBackupOptions options = toOptions(qc);
 
     checkBackup(name, qc);
     if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);

@@ -119,6 +119,39 @@ public final class BitModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void signed() {
+    final Function func = _BIT_SIGNED;
+    query(func.args(" ()", 8), "");
+    query(func.args(255, 8), -1);
+    query(func.args(127, 8), 127);
+    query(func.args(128, 8), -128);
+    query(func.args(4095, 12), -1);
+    query(func.args(2048, 12), -2048);
+    query(func.args(4294967295L, 32), -1);
+    query(func.args(300, 8), 44);
+    query(func.args(1, 1), -1);
+    query(func.args(1, 0), 0);
+    query(func.args(-1, 0), 0);
+    query(func.args(Long.MAX_VALUE, 63), -1);
+    query(func.args(-1, 64), -1);
+    query(func.args(5, 65), 5);
+    query(func.args(5, Long.MAX_VALUE), 5);
+    error(func.args(1, -1), BIT_SIZE_X);
+
+    check(func.args(INTEGER, 64), 5, root(Cast.class));
+    check(func.args(INTEGER, 1000), 5, root(Cast.class));
+    check(func.args(wrap(5), 64), 5, root(func));
+    check(func.args(" " + func.args(INTEGER, 8), 16), 5, count(func, 1), "//Itr = 8");
+    check(func.args(" " + func.args(INTEGER, 16), 8), 5, count(func, 1), "//Itr = 8");
+    check(func.args(" " + _BIT_UNSIGNED.args(INTEGER, 16), 8), 5, count(func, 1),
+        empty(_BIT_UNSIGNED), "//Itr = 8");
+    check(func.args(" " + _BIT_UNSIGNED.args(INTEGER, 8), 16), 5, empty(func),
+        root(_BIT_UNSIGNED));
+    check(func.args(" " + func.args(INTEGER, 8), 8), 5, count(func, 1));
+    error(func.args(" " + func.args(INTEGER, -1), 8), BIT_SIZE_X);
+  }
+
+  /** Test method. */
   @Test public void test() {
     final Function func = _BIT_TEST;
     query(func.args(" ()", 0), "");
@@ -155,6 +188,11 @@ public final class BitModuleTest extends SandboxTest {
     check(func.args(" " + func.args(INTEGER, 16), 8), 5, count(func, 1), "//Itr = 8");
     check(func.args(" " + func.args(INTEGER, 8), 16), 5, count(func, 1), "//Itr = 8");
     check(func.args(" " + func.args(INTEGER, 0), 8), 0, count(func, 1), "//Itr = 0");
+    check(func.args(" " + _BIT_SIGNED.args(INTEGER, 16), 8), 5, count(func, 1),
+        empty(_BIT_SIGNED), "//Itr = 8");
+    check(func.args(" " + _BIT_SIGNED.args(INTEGER, 8), 16), 5, count(func, 1),
+        count(_BIT_SIGNED, 1));
+    query(func.args(" " + _BIT_SIGNED.args(255, 8), 16), 65535);
     error(func.args(" " + func.args(INTEGER, -1), 8), BIT_SIZE_X);
   }
 

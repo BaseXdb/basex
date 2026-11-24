@@ -69,7 +69,7 @@ public final class FileModuleTest extends SandboxTest {
     // queries
     final String bin = " xs:base64Binary('MA==')";
     error(func.args(PATH, bin), FILE_IS_DIR_X);
-    error(_FILE_WRITE_BINARY.args(PATH1, "NoBinary"), BINARY_X);
+    error(_FILE_WRITE_BINARY.args(PATH1, "NoBinary"), INVTYPE_X);
 
     query(func.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -690,7 +690,7 @@ public final class FileModuleTest extends SandboxTest {
     // check errors
     final String bin = " xs:base64Binary('MA==')";
     error(func.args(PATH, bin), FILE_IS_DIR_X);
-    error(func.args(PATH1, "NoBinary"), BINARY_X);
+    error(func.args(PATH1, "NoBinary"), INVTYPE_X);
     // write file and check size
     query(func.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), 1);

@@ -29,7 +29,7 @@ public class JobEval extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toOptions(arg(2), new EvalOptions(), qc), qc);
+    return eval(toOptions(qc).copy(), qc);
   }
 
   /**

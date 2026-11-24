@@ -33,14 +33,14 @@ public class ValidateRng extends ValidateFn {
         final String missing = ExternalLib.JING.missing();
         if(missing != null) throw BASEX_CLASSPATH_X_X.get(info, definition.name, missing);
 
-        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
+        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), arg(0), null);
         final Item schema = toNodeOrAtomItem(arg(1), false, qc);
         final boolean compact = toBooleanOrFalse(arg(2), qc);
 
         // detect format of schema input
         IO schm;
         try {
-          schm = read(schema, null);
+          schm = read(schema, arg(1), null);
         } catch(final QueryException ex) {
           // compact schema: treat string as input
           if(!compact || !schema.type.isStringOrUntyped()) throw ex;

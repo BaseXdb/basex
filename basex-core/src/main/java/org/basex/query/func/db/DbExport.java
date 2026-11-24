@@ -21,7 +21,7 @@ public final class DbExport extends DbAccessFn {
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = toString(arg(1), qc);
-    final SerializerOptions options = toSerializerOptions(arg(2), qc);
+    final SerializerOptions options = toOptions(qc);
 
     try {
       Export.export(data, path, options, null);

@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.BasicType.*;
 
 import java.time.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -21,18 +20,8 @@ import org.basex.util.*;
 public final class GDt extends ADate {
   /** Date types. */
   private static final Type[] TYPES = { G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY };
-  /** Date patterns. */
-  private static final Pattern[] PATTERNS = {
-    Pattern.compile(YEAR + ZONE),
-    Pattern.compile(YEAR + '-' + DD + ZONE),
-    Pattern.compile("--" + DD + ZONE),
-    Pattern.compile("--" + DD + '-' + DD + ZONE),
-    Pattern.compile("---" + DD + ZONE)
-  };
   /** Date examples. */
   private static final String[] EXAMPLES = { XYEA, XYMO, XMON, XMDA, XDAY };
-  /** Date zones. */
-  private static final int[] ZONES = { 3, 4, 2, 3, 2 };
 
   /**
    * Constructor.
@@ -63,28 +52,41 @@ public final class GDt extends ADate {
   public GDt(final byte[] date, final Type type, final InputInfo info) throws QueryException {
     super(type);
 
-    final String dt = Token.string(Token.trim(date));
+    final DateScanner ds = new DateScanner(date);
     final int i = type(type);
-    final Matcher mt = PATTERNS[i].matcher(dt);
-    if(!mt.matches()) throw dateError(date, EXAMPLES[i], info);
+    if(!scan(ds, i) || !ds.zone() || !ds.done()) throw dateError(date, EXAMPLES[i], info);
 
     if(i < 2) {
-      year = toLong(mt.group(1), false, info);
+      year = toLong(ds, ds.yearStart, ds.yearEnd, info);
       defined |= YEA;
       if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw DATERANGE_X_X.get(info, type, date);
     }
     if(i > 0 && i < 4) {
-      month = (byte) Strings.toLong(mt.group(i == 1 ? 3 : 1));
       defined |= MON;
       if(month < 1 || month > 12) throw dateError(date, EXAMPLES[i], info);
     }
     if(i > 2) {
-      day = (byte) Strings.toLong(mt.group(i == 3 ? 2 : 1));
       defined |= DAY;
       if(day < 1 || day > maxDaysOfMonth(has(MON) ? month : 1))
         throw dateError(date, EXAMPLES[i], info);
     }
-    zone(mt, ZONES[i], date, info);
+    zone(ds, date, info);
+  }
+
+  /**
+   * Scans the components of the specified type.
+   * @param ds date scanner
+   * @param i type offset
+   * @return success flag
+   */
+  private boolean scan(final DateScanner ds, final int i) {
+    return switch(i) {
+      case 0  -> ds.year();
+      case 1  -> scan(ds, 0) && ds.consume('-') && scanMonth(ds);
+      case 2  -> ds.consume('-') && ds.consume('-') && scanMonth(ds);
+      case 3  -> scan(ds, 2) && ds.consume('-') && scanDay(ds);
+      default -> ds.consume('-') && ds.consume('-') && ds.consume('-') && scanDay(ds);
+    };
   }
 
   /**
@@ -112,11 +114,11 @@ public final class GDt extends ADate {
       tb.add('-');
     } else {
       if(year < 0) tb.add('-');
-      prefix(tb, Math.abs(yea()), 4);
+      tb.addLong(Math.abs(yea()), 4);
     }
     if(has(MON) || has(DAY)) tb.add('-');
-    if(has(MON)) prefix(tb, month, 2);
-    if(has(DAY)) prefix(tb.add('-'), day, 2);
+    if(has(MON)) tb.addLong(month, 2);
+    if(has(DAY)) tb.add('-').addLong(day, 2);
 
     zone(tb);
     return tb.finish();

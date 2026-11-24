@@ -161,7 +161,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Checks whether the type of this test is a supertype of the specified type.
-   * The runtime type may be any of its subtypes.
+   * The dynamic type may be any of its subtypes.
    * @param type type to check
    * @return {@link Boolean#TRUE} if the type subsumes the specified type;
    *         {@link Boolean#FALSE} if it does not;

@@ -657,6 +657,43 @@ public final class JNodeTest extends SandboxTest {
     error("(" + JTREE_STRING + "//x)?y", LOOKUP_X);
   }
 
+  /** Static types of atomized JNodes. */
+  @Test public void atomizedType() {
+    check("distinct-values({ [ <?_ x?> ]: 1 }/*)", 1, type(DATA, "xs:integer"));
+    check("distinct-values({ 'a': (1, 2), 'b': 3 }/*)", "1\n2\n3",
+        type(DISTINCT_VALUES, "xs:integer+"));
+    check("distinct-values({ 'a': [ 1, 2 ] }/*)", "1\n2", type(DISTINCT_VALUES, "xs:integer*"));
+
+    // each JNode atomizes to exactly one item
+    final String j = "{ 'a': 1, 'b': 2 }";
+    check("data(" + j + "/*)", "1\n2", root(DATA) + " and .//@size = 2");
+    check("count(" + j + "/*) = count(distinct-values(" + j + "/*))", true,
+        exists(DUPLICATE_VALUES));
+    check("items-at((1, 2), " + j + "/a)", 1, type(ITEMS_AT, "xs:integer?"));
+    final String func = "declare %%basex:inline(0) function f($m as map(xs:string, xs:integer)) "
+        + "{ %s }; f({ 'a': random:integer(1) }), f({ 'b': 3, 'a': 2 })";
+    check(String.format(func, "zero-or-one($m/a) coerce as xs:integer?"), "0\n2",
+        empty(ZERO_OR_ONE));
+    check(String.format(func, "count(data($m/*))"), "1\n2", empty(DATA));
+    check(String.format(func, "for $j in $m/* order by $j return string($j)"), "0\n2\n3",
+        exists(SORT));
+
+    // arithmetic rewrites must atomize JNodes
+    query("let $j := jtree({ 'a': 6 }) return ($j/a * 1, $j/a - 0, $j/a div 1)", "6\n6\n6");
+
+    // single-item comparisons must atomize JNodes
+    query("{ 'a': 1 }/a = 1", true);
+    query("{ 'a': 1 }/a eq 1", true);
+    query("{ 'a': 2.5 }/a > 1 and { 'a': 2.5 }/a < 3", true);
+    query("{ 'a': 'x' }/a > 'a' and { 'a': 'x' }/a < 'z'", true);
+    query("{ 'a': [ [ 7 ] ] }/a = 7", true);
+    query("{ 'a': () }/a = 1", false);
+    query("[ (), () ]/* = 1", false);
+    query("[ (), () ]/* > 'a' and [ (), () ]/* < 'z'", false);
+    query("[ (), () ]/* || ''", "");
+    query("atomic-equal({ 'a': 1 }/a, 1)", true);
+  }
+
   /** EBV. */
   @Test public void ebv() {
     query("boolean([] => jtree())", true);

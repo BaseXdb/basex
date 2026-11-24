@@ -10,7 +10,6 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 import org.basex.util.similarity.*;
 
 /**
@@ -20,14 +19,6 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 abstract class StringFn extends StandardFunc {
-  /** N-gram options. */
-  public static class NgramOptions extends StringOptions {
-    /** Option: n-gram length. */
-    public static final NumberOption N = new NumberOption("n", 2);
-    /** Option: pad the input with boundary characters. */
-    public static final BooleanOption PADDING = new BooleanOption("padding", false);
-  }
-
   /**
    * Returns full-text options for normalizing the input.
    * @param options string options

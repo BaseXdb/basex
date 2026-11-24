@@ -2,10 +2,8 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
@@ -25,7 +23,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final Dur dur) {
     super(BasicType.DAY_TIME_DURATION);
-    seconds = dur.totalSeconds();
+    seconds = dur.seconds;
   }
 
   /**
@@ -35,8 +33,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final long hours, final long minutes) {
     super(BasicType.DAY_TIME_DURATION);
-    seconds = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
-        multiply(BD_60);
+    seconds = BigDecimal.valueOf((hours * 60 + minutes) * 60);
   }
 
   /**
@@ -68,11 +65,9 @@ public final class DTDur extends Dur {
   public DTDur(final byte[] value, final InputInfo info) throws QueryException {
     super(BasicType.DAY_TIME_DURATION);
 
-    final String val = Token.string(Token.trim(value));
-    final Matcher mt = DTD.matcher(val);
-    if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
-      throw dateError(value, XDTD, info);
-    dayTime(value, mt, 2, info);
+    final DateScanner ds = new DateScanner(value);
+    if(!ds.duration(2, 3, true)) throw dateError(value, XDTD, info);
+    dayTime(value, ds, info);
   }
 
   /**
@@ -124,15 +119,6 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Checks if the seconds are within the supported range.
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
-   */
-  private void checkSeconds(final InputInfo info) throws QueryException {
-    if(!secondsInRange()) throw SECDURRANGE_X.get(info, seconds.doubleValue());
-  }
-
-  /**
    * Returns the duration in seconds.
    * @return seconds
    */
@@ -166,6 +152,7 @@ public final class DTDur extends Dur {
    * @return dayTimeDuration instance
    */
   public static DTDur get(final long ms) {
-    return new DTDur(BigDecimal.valueOf(ms).divide(BD_1000, MathContext.DECIMAL64));
+    return new DTDur(ms % 1000 == 0 ? BigDecimal.valueOf(ms / 1000) :
+      BigDecimal.valueOf(ms, 3).stripTrailingZeros());
   }
 }

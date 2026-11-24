@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -56,7 +55,7 @@ public class FnParseUri extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String value = toStringOrNull(arg(0), qc);
-    final UriOptions options = options(1, UriOptions::new, qc);
+    final UriOptions options = toOptions(qc);
     if(value == null) return Empty.VALUE;
 
     String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
@@ -167,12 +166,6 @@ public class FnParseUri extends StandardFunc {
       toValue(authority), toValue(userinfo), toValue(host), toValue(prt),
       toValue(path), toValue(query), toValue(fragment), toValue(StrSeq.get(segments)),
       toValue(queries), toValue(filepath));
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(1, UriOptions::new, cc);
-    return this;
   }
 
   /**

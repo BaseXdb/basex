@@ -94,9 +94,8 @@ public final class JsonParser extends SingleParser {
   private JsonMappingOptions mapping() throws IOException, QueryException {
     Value mapping = jopts.get(JsonOptions.MAPPING);
     if(mapping instanceof final Str path) {
-      final JsonParserOptions opts = new JsonParserOptions();
-      opts.set(JsonOptions.FORMAT, JsonFormat.W3);
-      mapping = JsonConverter.get(opts).convert(IO.get(Token.string(path.string())));
+      final IO io = IO.get(Token.string(path.string()));
+      mapping = JsonConverter.get(W3JsonOptions.w3()).convert(io);
     }
     return JsonMappingOptions.get(mapping, null, null);
   }

@@ -44,6 +44,7 @@ import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
+import org.basex.util.similarity.*;
 
 /**
  * Parser for XQuery expressions.
@@ -412,12 +413,8 @@ public class QueryParser extends AQueryParser {
             if(removed != null) {
               hnt = Util.info("% (%)", hnt, removed);
             } else {
-              final Annotation similar = Annotation.similar(name);
-              if(similar != null) {
-                hnt = QueryError.similar(hnt, ai.apply(name.hasPrefix() ?
-                  concat(name.prefix(), cpToken(':'), similar.name.local()) :
-                  similar.name.local()));
-              }
+              hnt = QueryError.similar(hnt, Annotation.similar(name),
+                a -> ai.apply(name.withLocal(a.name.local())));
             }
             throw error(NSGlobal.reserved(uri) ? ANNRESERVED_X : BASEX_ANN1_X, ii, ai.apply(hnt));
           }
@@ -1325,7 +1322,10 @@ public class QueryParser extends AQueryParser {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
         if(ref == null || curr.get(var.name.unique()) != ref.var) {
-          throw error(GVARNOTDEFINED_X, var);
+          final Var similar = Levenshtein.similar(var.name.local(), curr.values(),
+              v -> v.name.local());
+          throw error(GVARNOTDEFINED_X, QueryError.similar(var.name.varString(), similar,
+              v -> v.name.varString()));
         }
         by = ref;
       }
@@ -1964,7 +1964,7 @@ public class QueryParser extends AQueryParser {
       if(name.eqPrefix(DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final MainOptions mopts = qc.context.options;
+        final MainOptions mopts = qc.options();
         final Option<?> option = mopts.option(key);
         if(option == null) throw error(BASEX_OPTIONS_X, mopts.similar(key));
         el.add(new DBPragma(name, option, value));

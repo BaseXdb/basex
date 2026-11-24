@@ -283,7 +283,7 @@ public final class Functions {
         final QNm similar = Levenshtein.similarOrPrefix(qnm.local(),
             Arrays.copyOf(names, visible), QNm::local);
         throw PARAMUNKNOWN_X_X.get(fb.info, function, QueryError.similar(qnm.prefixString(),
-            similar != null ? similar.prefixString() : null));
+            similar, QNm::prefixString));
       }
       if(list.get(n) != null) throw PARAMTWICE_X_X.get(fb.info, function, qnm.prefixString());
       list.set(n, fb.keywords.get(qnm));

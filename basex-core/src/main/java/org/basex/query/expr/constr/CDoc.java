@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -27,6 +28,30 @@ public final class CDoc extends CNode {
    */
   public CDoc(final InputInfo info, final boolean computed, final Expr expr) {
     super(info, Types.DOCUMENT_O, computed, expr);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) {
+    // document { <!--x-->, <a/> } → document-node(element(a))
+    final Expr expr = exprs[0];
+    Test child = null;
+    for(final Expr ex : expr instanceof List ? expr.args() : new Expr[] { expr }) {
+      final SeqType st = ex.seqType();
+      if(!(st.type instanceof final NodeType nt)) return this;
+      final Kind kind = nt.kind();
+      if(kind.oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION)) continue;
+      if(child != null || !st.one()) return this;
+      if(kind == Kind.ELEMENT) child = nt.test != null ? nt.test : NodeTest.ELEMENT;
+      else if(nt.test instanceof final DocTest dt) child = dt.child();
+      else return this;
+    }
+    if(child != null) exprType.assign(NodeType.get(new DocTest(child)));
+    return this;
+  }
+
+  @Override
+  public Occ childOcc(final Test test, final boolean attributes) {
+    return contentOcc(test, attributes);
   }
 
   @Override

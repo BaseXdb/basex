@@ -18,7 +18,7 @@ public final class SqlPrepare extends SqlFn {
   public Uri value(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String prepStmt = toString(arg(1), qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final StatementOptions options = toOptions(qc);
     final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
     // statement is discarded again if it cannot be registered
     PreparedStatement ps = null;

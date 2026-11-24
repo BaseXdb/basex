@@ -55,12 +55,11 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = usesContext();
     final Expr value = contextArg(cc);
     if(value != null && value.seqType().eq(Types.STRING_O)) {
       // string('x') → 'x'
       // $string[string() = 'a'] → $string[. = 'a']
-      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
+      return contextExpr(value, cc);
     }
     return this;
   }

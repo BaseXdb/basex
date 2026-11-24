@@ -19,7 +19,7 @@ public final class FnSerialize extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final SerializerOptions options = toSerializerOptions(arg(1), qc);
+    final SerializerOptions options = toOptions(qc);
 
     return Str.get(serialize(input, options, SERPARAM_X, qc));
   }

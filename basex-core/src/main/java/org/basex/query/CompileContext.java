@@ -361,14 +361,6 @@ public final class CompileContext {
   }
 
   /**
-   * Indicates if the query focus is nested.
-   * @return result of check
-   */
-  public boolean nestedFocus() {
-    return !focuses.isEmpty();
-  }
-
-  /**
    * Returns the current variable scope.
    * @return variable scope
    */
@@ -473,7 +465,7 @@ public final class CompileContext {
    * @param refine refine type
    * @return optimized expression
    */
-  private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
+  public Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     if(result != expr) {
       info("%", (Supplier<String>) () -> {
         final String exprDesc = expr.description(), resDesc = result.description();
@@ -568,7 +560,7 @@ public final class CompileContext {
    */
   public ExprList unroll(final Expr expr, final boolean single) {
     final Consumer<ExprList> add;
-    final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
+    final long size = expr.size(), limit = qc.options().get(MainOptions.UNROLLLIMIT);
     if(single && size == 1) {
       // expression yielding single item: <a/>
       add = exprs -> exprs.add(expr);
@@ -628,7 +620,7 @@ public final class CompileContext {
     } else if(anns.contains(Annotation._BASEX_LOCK)) {
       limit = 0;
     } else {
-      limit = qc.context.options.get(MainOptions.INLINELIMIT);
+      limit = qc.options().get(MainOptions.INLINELIMIT);
       if(unlimited && limit > 0) return true;
     }
     return limit > 0 && expr.exprSize() < limit;
@@ -661,8 +653,16 @@ public final class CompileContext {
       }
     }
 
-    // create the return clause
-    final Expr expr = body.copy(this, vm).optimize(this);
+    // create the return clause; re-optimize references to parameters with refined types
+    Expr expr = body.copy(this, vm);
+    for(int p = 0; p < pl; p++) {
+      // values will be inlined anyway
+      final Var var = clauses.get(p).vars()[0];
+      if(!(exprs[p] instanceof Value) && !var.seqType().eq(params[p].seqType())) {
+        expr = InlineContext.refine(var, info, this).inline(expr);
+      }
+    }
+    expr = expr.optimize(this);
     final Expr rtrn = declType == null ? expr : new TypeCheck(info, expr, declType).optimize(this);
     // declare function f($x) { $x + 1 }; f(E) → let $x := E return $x + 1
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(this);

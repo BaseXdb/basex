@@ -25,7 +25,7 @@ public final class ArchiveWrite extends ArchiveFn {
   public Value value(final QueryContext qc) throws QueryException {
     final Path path = toPath(arg(0), qc);
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
-    final CreateOptions options = toOptions(arg(3), new CreateOptions(), qc);
+    final CreateOptions options = toOptions(qc);
 
     try(BufferOutput out = new BufferOutput(new IOFile(path))) {
       create(files, options, out, qc);

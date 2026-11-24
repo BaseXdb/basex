@@ -42,9 +42,9 @@ public final class FnTakeWhile extends StandardFunc {
     if(arity != -1) {
       // take-while(INPUT, PREDICATE) →
       // for $item at $pos in INPUT while PREDICATE($item, $pos) return $item
-      final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+      final FLWORBuilder flwor = new FLWORBuilder(input, arity, cc, info);
       final Expr cond = flwor.function(this, 1, false);
-      return flwor.finishWhile(input, cond, flwor.item());
+      return flwor.finishWhile(cond, flwor.item());
     }
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;

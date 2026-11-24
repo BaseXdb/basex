@@ -320,6 +320,7 @@ results_%            = % 结果
 revert               = 还原
 revert_file_%        = 还原 % 并放弃所有更改？
 revert_files_%       = 将还原 % 个文件，放弃较新的更改。
+rt_compilation       = 实时编译
 rt_execution         = 实时执行
 rt_filtering         = 实时过滤
 rt_focus             = 实时鼠标焦点

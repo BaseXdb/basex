@@ -15,4 +15,14 @@ public final class JsonSerialOptions extends JsonOptions {
   public static final BooleanOption ESCAPE = new BooleanOption("escape", true);
   /** Option: escape solidus (custom). */
   public static final BooleanOption ESCAPE_SOLIDUS = new BooleanOption("escape-solidus", true);
+
+  /**
+   * Returns options with the W3 XML format.
+   * @return options
+   */
+  public static JsonSerialOptions w3Xml() {
+    final JsonSerialOptions options = new JsonSerialOptions();
+    options.set(FORMAT, JsonFormat.W3_XML);
+    return options;
+  }
 }

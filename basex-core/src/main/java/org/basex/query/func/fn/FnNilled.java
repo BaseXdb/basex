@@ -30,6 +30,9 @@ public final class FnNilled extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(false, false, cc.qc.focus.value);
+    // elements always yield a boolean
+    final Expr node = contextArg(cc);
+    final boolean elem = node != null && node.seqType().type.instanceOf(NodeType.ELEMENT);
+    return optFirst(elem, false, cc.qc.focus.value);
   }
 }

@@ -127,8 +127,8 @@ public abstract class Cmp extends Arr {
    */
   static boolean mayBeNaN(final Expr... exprs) {
     for(final Expr expr : exprs) {
-      final BasicType type = expr.seqType().type.atomic();
-      if(type == null || !type.instanceOf(BasicType.DECIMAL) &&
+      final BasicType type = expr.seqType().type.atomicOrAny();
+      if(!type.instanceOf(BasicType.DECIMAL) &&
           (type.isNumberOrUntyped() || type == BasicType.ANY_ATOMIC_TYPE)) return true;
     }
     return false;
@@ -290,7 +290,7 @@ public abstract class Cmp extends Arr {
                 // (code ! (. = 1)) = false() → code != 1
                 final Expr op1 = args[al - 1], op2 = ops[1];
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().atomOcc() == Occ.EXACTLY_ONE &&
-                    !op1.seqType().mayBeWrapped() && (t || nanSafe(cmp.op, op1, op2)))) {
+                    op1.seqType().atomizesToOne() && (t || nanSafe(cmp.op, op1, op2)))) {
                   CmpOp cmpOp = cmp.op;
                   if(!t) cmpOp = cmpOp.invert();
                   return new CmpG(info, map.remove(cc, al), op2, cmpOp).optimize(cc);
@@ -336,10 +336,10 @@ public abstract class Cmp extends Arr {
     if(COUNT.is(count)) {
       final Expr carg = count.arg(0);
       // count(E) = count(distinct-values(E)) → empty(duplicate-values(E))
-      if(DISTINCT_VALUES.is(carg) && arg.equals(carg.arg(0)) && !arg.seqType().mayBeWrapped())
+      if(DISTINCT_VALUES.is(carg) && arg.equals(carg.arg(0)) && arg.seqType().atomizesToOne())
         return ((FnDistinctValues) carg).duplicates(op, cc);
       // count(distinct-values(E)) < count(E) → exists(duplicate-values(E))
-      if(DISTINCT_VALUES.is(arg) && arg.arg(0).equals(carg) && !carg.seqType().mayBeWrapped())
+      if(DISTINCT_VALUES.is(arg) && arg.arg(0).equals(carg) && carg.seqType().atomizesToOne())
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
     // count(distinct-values(($a, $b))) = 2 → empty(duplicate-values(($a, $b)))

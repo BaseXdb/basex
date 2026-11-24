@@ -47,7 +47,7 @@ public class FnParseXmlFragment extends Docs {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
+    return parse(qc, true, toOptions(qc));
   }
 
   @Override
@@ -78,10 +78,10 @@ public class FnParseXmlFragment extends Docs {
     final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ?
       resolveUri(uri) : string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
-    final IO io = new IOContent(toBytes(value), baseURI, encoding);
+    final IO io = new IOContent(toBytes(value, arg(0)), baseURI, encoding);
 
-    final MainOptions mopts = new MainOptions(options, qc.context.options).
-        allowExternal(trustExternal(options, qc));
+    final MainOptions mopts = new MainOptions(options, qc.options());
+    if(!qc.allowExternal(info)) mopts.allowExternal(false);
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

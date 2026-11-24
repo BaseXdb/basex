@@ -320,6 +320,7 @@ results_%            = % Risultato/i
 revert               = Ripristina
 revert_file_%        = Ripristinare % e scartare le modifiche?
 revert_files_%       = % documento/i verranno ripristinati, le modifiche più recenti andranno perse.
+rt_compilation       = Compilazione in tempo reale
 rt_execution         = Esecuzione in tempo reale
 rt_filtering         = Filtro in tempo reale
 rt_focus             = Focus del mouse in tempo reale

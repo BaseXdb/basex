@@ -18,7 +18,7 @@ public final class ProfHuman extends StandardFunc {
     if(value instanceof final DTDur dur) {
       return Str.get(Performance.formatTime(dur.dtd().doubleValue()));
     }
-    final double size = toDouble(value);
+    final double size = toDouble(value, arg(0));
     return Str.get(Double.isFinite(size) ? Performance.formatHuman(size) :
       Token.string(Token.token(size)));
   }

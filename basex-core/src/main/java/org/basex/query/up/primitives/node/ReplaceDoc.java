@@ -8,8 +8,8 @@ import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Replace document primitive.
@@ -34,18 +34,18 @@ public final class ReplaceDoc extends NodeUpdate {
    * @throws QueryException query exception
    */
   public ReplaceDoc(final int pre, final Data data, final NewInput input,
-      final XQMap qopts, final QueryContext qc, final InputInfo info)
+      final Options qopts, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
-    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, qc, info);
+    final DBOptions dbopts = new DBOptions(qopts, qc, info);
     final MainOptions mopts = dbopts.mainOptions();
     newDocs = new DBNew(qc, mopts, info, input);
   }
 
   @Override
   public void prepare(final MemData memData, final QueryContext qc) throws QueryException {
-    clip = newDocs.prepare(data.meta.name, false);
+    clip = newDocs.prepare(data.meta.name, data);
   }
 
   @Override

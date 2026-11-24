@@ -90,13 +90,10 @@ public final class FnParseIetfDate extends StandardFunc {
     private Dtm parse() throws QueryException {
       input();
       final TokenBuilder tb = new TokenBuilder();
-      addNumber(tb, year, 4).add('-');
-      addNumber(tb, month, 2).add('-');
-      addNumber(tb, day, 2).add('T');
-      addNumber(tb, hours, 2).add(':');
-      addNumber(tb, minutes, 2).add(':');
+      tb.addLong(year, 4).add('-').addLong(month, 2).add('-').addLong(day, 2).add('T');
+      tb.addLong(hours, 2).add(':').addLong(minutes, 2).add(':');
       final int sec = seconds.intValue();
-      addNumber(tb, sec, 2);
+      tb.addLong(sec, 2);
       if(seconds.scale() > 0) {
         tb.add(seconds.subtract(BigDecimal.valueOf(sec)).toString().substring(1));
       }
@@ -105,8 +102,7 @@ public final class FnParseIetfDate extends StandardFunc {
         tb.add('Z');
       } else {
         tb.add(z < 0 ? '-' : '+');
-        addNumber(tb, Math.abs(z / 60), 2).add(':');
-        addNumber(tb, Math.abs(z % 60), 2);
+        tb.addLong(Math.abs(z / 60), 2).add(':').addLong(Math.abs(z % 60), 2);
       }
       try {
         return new Dtm(tb.finish(), BasicType.DATE_TIME, info);
@@ -369,19 +365,6 @@ public final class FnParseIetfDate extends StandardFunc {
       if(!more() || !ws(current())) return false;
       do consume(); while(more() && ws(current()));
       return true;
-    }
-
-    /**
-     * Adds a number to a string.
-     * @param tb token builder
-     * @param num number
-     * @param digits minimum number of digits to add
-     * @return token builder
-     */
-    private static TokenBuilder addNumber(final TokenBuilder tb, final int num, final int digits) {
-      final byte[] tmp = token(num);
-      for(int n = tmp.length; n < digits; n++) tb.add('0');
-      return tb.add(tmp);
     }
 
     /**

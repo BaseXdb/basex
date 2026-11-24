@@ -40,7 +40,7 @@ public final class FnMatches extends RegExFn {
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         pattern instanceof final Str str && !defined(2)) {
       // matches($string, '') → true()
-      if(str == Str.EMPTY) return Bln.TRUE;
+      if(str == Str.EMPTY) return cc.voidAndReturn(value, Bln.TRUE, info);
       // rewrite literal match to fn:contains (which, unlike fn:matches, respects collations)
       // matches($string, 'abc') → contains($string, 'abc')
       if(sc().collation == null && literal(str.string(), Token.EMPTY) != null) {

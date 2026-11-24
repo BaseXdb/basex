@@ -34,7 +34,7 @@ abstract class Convert extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // only atomizing casts benefit from string simplification (not item(), arrays, maps, records)
-    final Type dt = TypeRef.deref(seqType.type);
+    final Type dt = seqType.type.deref();
     if(dt != BasicType.ITEM && !(dt instanceof FType)) {
       // xs:integer(string($string)) → xs:integer($string)
       expr = expr.simplifyFor(Simplify.STRING, cc);
@@ -71,15 +71,14 @@ abstract class Convert extends Single {
    */
   final Boolean castable(final SeqType castType) {
     final SeqType est = expr.seqType();
-    if(!est.mayBeWrapped()) {
+    if(est.atomizesToOne()) {
       // the input cardinality is constrained by the target type, also for list types
       final long es = expr.size();
       if(es != -1 && !seqType.occ.check(es)) return false;
 
-      final Type et = est.type;
-      if(et.instanceOf(castType.type) && est.occ.instanceOf(castType.occ) &&
-          (et.eq(castType.type) || castType.type == BasicType.NUMERIC) &&
-          castType.type != BasicType.ERROR) return true;
+      final Type et = est.type, ct = castType.type.deref();
+      if(et.instanceOf(ct) && est.occ.instanceOf(castType.occ) &&
+          (et.eq(ct) || ct == BasicType.NUMERIC) && ct != BasicType.ERROR) return true;
     }
     return null;
   }

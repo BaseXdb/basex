@@ -320,6 +320,7 @@ results_%            = % resultado(s)
 revert               = Reverter
 revert_file_%        = Reverter % e descartar alterações?
 revert_files_%       = % arquivo(s) será(ão) revertido(s), descartando alterações mais recentes.
+rt_compilation       = Compilação em tempo real
 rt_execution         = Execução em tempo real
 rt_filtering         = Filtragem em tempo real
 rt_focus             = Foco do mouse em tempo real

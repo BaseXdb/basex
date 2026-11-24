@@ -68,6 +68,18 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void addMainMem() {
+    final Function func = _DB_ADD;
+    execute(new DropDB(NAME));
+    set(MainOptions.MAINMEM, true);
+    execute(new CreateDB(NAME, XML));
+    error(func.args(NAME, " xs:base64Binary('AQID')", "b.bin"), DB_MAINMEM_X);
+    error(func.args(NAME, 123, "v"), DB_MAINMEM_X);
+    error(func.args(NAME, XML, "r.xml", " { 'parser': 'raw' }"), UPDBERROR_X);
+    assertFalse(context.soptions.dbPath(NAME).exists());
+  }
+
+  /** Test method. */
   @Test public void add() {
     final Function func = _DB_ADD;
     query("count(" + COLLECTION.args(NAME) + ")", 1);
@@ -109,9 +121,6 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
-    query(func.args(NAME, CSV, "csv1.xml",
-        " { 'parser': 'csv', 'csvparser': 'header=true' }"));
-    query("exists(" + _DB_GET.args(NAME, "csv1.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv2.xml",
         " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }"));
     query("exists(" + _DB_GET.args(NAME, "csv2.xml") + "//City)", true);
@@ -121,13 +130,15 @@ public final class DbModuleTest extends SandboxTest {
 
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
-    error(func.args(NAME, CSV, "csv.xml",
-        " { 'parser': 'csv', 'csvparser': { 'header': ('true', 'false') } }"),
-        INVALIDOPTION_X_X_X);
+    query(func.args(NAME, CSV, "csv4.xml",
+        " { 'parser': 'csv', 'csvparser': { 'header': ('A', 'B') } }"));
+    query("exists(" + _DB_GET.args(NAME, "csv4.xml") + "//A)", true);
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': 'csv', 'csvparser': { 'headr': 'true' } }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
+    error(func.args(NAME, CSV, "csv.xml",
+        " { 'parser': 'csv', 'csvparser': 'header=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), DB_PATH_X);
     error("declare base-uri 'http://x/y.xml'; " + func.args(NAME, " document { <a/> }"),
@@ -193,9 +204,9 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, " (<a/>, <b/>)", "only-one.xml"), DB_ARGS_X_X);
 
     // error: type 'binary' with a non-binary, non-string input
-    error(func.args(NAME, " xs:date('2026-05-13')", " { 'x.bin': 'binary' }"), STRBIN_X_X);
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'x.bin': 'binary' }"), INVTYPE_X);
     // error: type 'xml' with a binary literal
-    error(func.args(NAME, " xs:hexBinary('41')", " { 'x.xml': 'xml' }"), STRNOD_X_X);
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'x.xml': 'xml' }"), INVTYPE_X);
     // error: empty path for binary
     error(func.args(NAME, " xs:hexBinary('41')", " { '': 'binary' }"), DB_PATH_X);
     // error: empty path for value
@@ -616,9 +627,9 @@ public final class DbModuleTest extends SandboxTest {
     // error: unknown resource type
     error(func.args(NAME, "x", " { 'a': 'unknown' }"), EXP_FOUND_X_X);
     // error: type 'binary' with a non-binary, non-string input
-    error(func.args(NAME, " xs:date('2026-05-13')", " { 'a': 'binary' }"), STRBIN_X_X);
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'a': 'binary' }"), INVTYPE_X);
     // error: type 'xml' with a binary literal
-    error(func.args(NAME, " xs:hexBinary('41')", " { 'a': 'xml' }"), STRNOD_X_X);
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'a': 'xml' }"), INVTYPE_X);
     // error: duplicate binary path within a single call
     error(func.args(NAME,
         " (xs:hexBinary('41'), xs:hexBinary('42'))",
@@ -1188,6 +1199,10 @@ public final class DbModuleTest extends SandboxTest {
     query("declare option db:csvparser 'select-columns=2'; "
         + func.args("csvparser") + "?select-columns", 2);
 
+    // pragmas: no pre-evaluation outside the pragma scope
+    query("let $key := string(<_>intparse</_>) return (# db:intparse true #) { "
+        + func.args(" $key") + " }", true);
+
     error(func.args("XYZ"), DB_OPTION_X);
   }
 
@@ -1200,6 +1215,10 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args() + "?bindings", "");
     query(func.args() + "?serializer?indent", "no");
     query(func.args() + "?xyz", "");
+
+    // pragmas: no pre-evaluation outside the pragma scope
+    query("let $f := fn() { " + func.args() + " } "
+        + "return (# db:intparse true #) { $f()?intparse }", true);
   }
 
   /** Test method. */
@@ -1310,7 +1329,7 @@ public final class DbModuleTest extends SandboxTest {
     // string input: interpreted as URI of an existing file
     error(func.args(NAME, "no-such-file.bin", "errPath"), WHICHRES_X);
     // non-string/non-binary atomic inputs rejected
-    error(func.args(NAME, 123, "errType"), STRBIN_X_X);
+    error(func.args(NAME, 123, "errType"), INVTYPE_X);
 
     // store the same path twice during the same query
     error(func.args(NAME, " xs:hexBinary('41')", "b") + ',' +
@@ -1365,6 +1384,8 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);
     error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), DB_PATH_X);
+    error(func.args(NAME, " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })", "deep"),
+        BASEX_NESTED);
   }
 
   /** Put operations only replace resources at the exact path. */

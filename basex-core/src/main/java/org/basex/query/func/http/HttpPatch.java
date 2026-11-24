@@ -12,6 +12,6 @@ import org.basex.query.value.map.*;
 public final class HttpPatch extends HttpFn {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    return send("PATCH", arg(1), arg(2), qc);
+    return send("PATCH", arg(1), qc);
   }
 }

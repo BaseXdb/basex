@@ -102,14 +102,14 @@ public final class FuncItem extends FItem implements Scope {
     this.anns = anns;
     this.stackSize = stackSize;
     this.name = name;
-    this.focus = focus;
+    this.focus = simple ? null : focus;
     this.simple = simple;
   }
 
   @Override
   public boolean instanceOf(final Type tp, final boolean coerce) {
     // the type of a function item is exact: functions of the same type are kept
-    return SeqType.kept(type, tp, coerce);
+    return type.keptExact(tp, coerce);
   }
 
   @Override

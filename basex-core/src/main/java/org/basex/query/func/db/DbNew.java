@@ -23,7 +23,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -32,8 +31,10 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class DbNew extends DbAccessFn {
-  /** Key of the replace option. */
-  static final Str REPLACE = Str.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH));
+  @Override
+  protected QueryException error(final QueryException ex) {
+    return error(ex, BASEX_OPTIONS_X);
+  }
 
   /**
    * Creates a container for the specified XML input. Used by functions that only accept
@@ -74,7 +75,7 @@ abstract class DbNew extends DbAccessFn {
       case XML    -> fillXmlInput(ni, input, path, qc);
       case VALUE  -> ni.value = input;
       case BINARY -> {
-        final Object source = toBinarySource(input, qc);
+        final Object source = toBinarySource(input, arg(1), qc);
         if(source instanceof final Bin bin) ni.value = bin;
         else ni.io = (IO) source;
       }
@@ -107,13 +108,13 @@ abstract class DbNew extends DbAccessFn {
         if(name.isEmpty()) throw DB_PATH_X.get(info, name);
       }
 
-      if(node.kind() == Kind.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node);
+      if(node.kind() == Kind.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node.seqType());
       ni.node = node;
       ni.path = name;
       return;
     }
 
-    if(!input.type.isStringOrUntyped()) throw STRNOD_X_X.get(info, input.type, input);
+    if(!input.type.isStringOrUntyped()) throw argTypeError(input, Types.STRING_OR_NODE, arg(1));
 
     final String string = string(input.string(info));
     final IO io = IO.get(string);
@@ -187,7 +188,7 @@ abstract class DbNew extends DbAccessFn {
       if(!(value instanceof final Item type) || type.isEmpty()) throw DB_PATH_X.get(info, map);
       return new PathSpec(toDbPath(toString(entry.key())), toEnum(type, ResourceType.class));
     }
-    return new PathSpec(toDbPath(toString(item)), null);
+    return new PathSpec(toDbPath(toString(item, arg(2))), null);
   }
 
   /**
@@ -203,14 +204,9 @@ abstract class DbNew extends DbAccessFn {
    * @param files number of existing file resources
    * @param options options
    * @return result of check
-   * @throws QueryException query exception
    */
-  final boolean put(final IntList docs, final int files, final XQMap options)
-      throws QueryException {
-    final Value pr = options.get(REPLACE);
-    if(pr.isEmpty() || Strings.toBoolean(Options.serialize(pr, info))) return true;
-
-    return docs.isEmpty() && files == 0;
+  final boolean put(final IntList docs, final int files, final DbOptions options) {
+    return options.get(MainOptions.REPLACE) != Boolean.FALSE || docs.isEmpty() && files == 0;
   }
 
   /**
@@ -241,7 +237,7 @@ abstract class DbNew extends DbAccessFn {
    * @throws QueryException query exception
    */
   final void putFile(final Data data, final String path, final ResourceType type,
-      final Update up, final XQMap options, final QueryContext qc) throws QueryException {
+      final Update up, final DbOptions options, final QueryContext qc) throws QueryException {
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
     final IntList docs = data.resources.docsAt(path);

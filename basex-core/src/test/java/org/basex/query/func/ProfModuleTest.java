@@ -48,7 +48,7 @@ public final class ProfModuleTest extends SandboxTest {
 
     check(func.args(1536), "1.5 kB", root(Str.class));
 
-    error(func.args(" 'x'"), NONUMBER_X_X);
+    error(func.args(" 'x'"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -111,14 +111,21 @@ public final class ProfModuleTest extends SandboxTest {
     query("exists(" + func.args("A") + "?value)", "true");
     query("exists(" + func.args("A") + "?allocated)", "true");
     query("count(" + func.args("A") + "?*)", 3);
+    query("map:size(" + func.args("A") + ")", 4);
     query("empty(" + func.args("A", " { 'memory': false(), 'time': false(), " +
         "'allocated': false(), 'value': false() }") + "?*)", "true");
     query(func.args("A") + "?allocated >= 0", "true");
+    query(func.args("A") + " instance of prof:track-record", true);
+
+    check(func.args(" (1 to 2)[. > 1]") + "?value", 2, type(func, "prof:track-record"));
+    check(func.args(1, " { 'value': false(), 'memory': true() }") + "?memory >= 0", true,
+        type(func, "prof:track-record"));
   }
 
   /** Test method. */
   @Test public void type() {
     final Function func = _PROF_TYPE;
+    check(func.args(" (1 to 6)[. > 4]"), "5\n6", type(func, "xs:integer*"));
     query(func.args(" ()"), "");
     query(func.args(1), 1);
     query(func.args(" (1, 2, 3)"), "1\n2\n3");

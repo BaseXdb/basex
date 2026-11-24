@@ -13,13 +13,13 @@ import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
- * Type for maps.
+ * XDM map types.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public class MapType extends FType {
-  /** Key type of the map. */
+  /** Key type. */
   private final Type keyType;
   /** Value type. */
   private final SeqType valueType;
@@ -35,7 +35,7 @@ public class MapType extends FType {
   }
 
   /**
-   * Creates a new map type.
+   * Returns the map type with the specified key and value type.
    * @param keyType key type
    * @param valueType value type
    * @return map type
@@ -45,8 +45,8 @@ public class MapType extends FType {
   }
 
   /**
-   * Creates a new map type; drops record type information.
-   * @param mapType map type
+   * Returns the map type with the key and value type of the specified map or record type.
+   * @param mapType map or record type
    * @return map type
    */
   public static MapType get(final MapType mapType) {
@@ -54,7 +54,7 @@ public class MapType extends FType {
   }
 
   /**
-   * Getter for the key type.
+   * Returns the key type.
    * @return key type
    */
   public final Type keyType() {
@@ -62,7 +62,7 @@ public class MapType extends FType {
   }
 
   /**
-   * Getter for the value type.
+   * Returns the value type.
    * @return value type
    */
   public final SeqType valueType() {
@@ -75,8 +75,8 @@ public class MapType extends FType {
   }
 
   @Override
-  public boolean assignable() {
-    return keyType.assignable() && valueType.type.assignable();
+  public boolean attachable() {
+    return keyType.attachable() && valueType.type.attachable();
   }
 
   @Override
@@ -105,7 +105,7 @@ public class MapType extends FType {
     if(this == type) return true;
     if(type.getClass() != MapType.class) return false;
     final MapType mt = (MapType) type;
-    return keyType.eq(mt.keyType) && valueType.eq(mt.valueType);
+    return TypeRef.eq(keyType, mt.keyType) && valueType.eq(mt.valueType);
   }
 
   @Override
@@ -113,7 +113,8 @@ public class MapType extends FType {
     if(this == type || type.oneOf(MAP, FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof ShapeType) return false;
     if(type instanceof final MapType mt) {
-      return this != MAP && valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
+      return this != MAP && valueType.instanceOf(mt.valueType) &&
+        keyType.instanceOf(mt.keyType.deref());
     }
     if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.unary(ANY_ATOMIC_TYPE_O);
@@ -124,21 +125,22 @@ public class MapType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType || type instanceof ShapeType) return type.union(this);
-    if(SeqType.kept(type, this, true)) return this;
-    if(SeqType.kept(this, type, true)) return type;
+    if(type.keptExact(this, true)) return this;
+    if(keptExact(type, true)) return type;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
     return type instanceof ArrayType ? FUNCTION :
            type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   /**
-   * Creates a union of two map types.
-   * @param kt key type
-   * @param vt value type
+   * Returns the union of this type and the map type with the specified key and value type.
+   * @param kt key type of the other map type
+   * @param vt value type of the other map type
    * @return map type
    */
   public MapType union(final Type kt, final SeqType vt) {
-    return keyType.eq(kt) && valueType.eq(vt) ? this : get(keyType.union(kt), valueType.union(vt));
+    return TypeRef.eq(keyType, kt) && valueType.eq(vt) ? this :
+      get(keyType.union(kt.deref()), valueType.union(vt));
   }
 
   @Override
@@ -149,7 +151,7 @@ public class MapType extends FType {
 
     if(type instanceof final MapType mt) {
       // disjoint key or value types: the empty map is still an instance of both types
-      final Type kt = keyType.intersect(mt.keyType);
+      final Type kt = keyType.intersect(mt.keyType.deref());
       final SeqType vt = valueType.intersect(mt.valueType);
       return kt != null && vt != null ? get(kt, vt) : get(BasicType.ERROR, ERROR_O);
     }

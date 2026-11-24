@@ -15,7 +15,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Labeled record type: a shape that is assigned to its records as type annotation (label).
+ * Labeled record type: a shape that is attached to its records as type annotation (label).
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -24,7 +24,7 @@ public final class RecordType extends ShapeType {
   /** No initializing expressions. */
   private static final Expr[] NO_INITS = {};
 
-  /** Record name ({@code null} for {@code record(*)}). */
+  /** Record name, absent for {@code record(*)} (can be {@code null}). */
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
@@ -39,7 +39,7 @@ public final class RecordType extends ShapeType {
   /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
   /** Type without initializing expressions and integrity constraints (can be {@code null}). */
-  private volatile RecordType detachedType;
+  private volatile RecordType standaloneType;
   /** Initializers and constraints of this and all nested records (can be {@code null}). */
   private volatile Expr[] inits;
 
@@ -53,7 +53,7 @@ public final class RecordType extends ShapeType {
   /**
    * Constructor for a labeled record type.
    * @param fields field declarations
-   * @param name record name
+   * @param name record name (can be {@code null})
    * @param anns annotations
    * @param identity identity of the record declaration (can be {@code null})
    * @param constraint integrity constraint (can be {@code null})
@@ -81,8 +81,8 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public boolean detached() {
-    return !constrained() && super.detached();
+  public boolean standalone() {
+    return !constrained() && super.standalone();
   }
 
   @Override
@@ -105,7 +105,7 @@ public final class RecordType extends ShapeType {
    * @param values field values (missing values are {@code null})
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @param cc compilation context ({@code null} during runtime)
+   * @param cc compilation context, unless called at runtime (can be {@code null})
    * @return record
    * @throws QueryException query exception
    */
@@ -138,7 +138,7 @@ public final class RecordType extends ShapeType {
   @Override
   public boolean matches(final XQMap map, final boolean coerce) {
     // the map must be a record with a matching label
-    return map.type instanceof final RecordType rt && SeqType.kept(rt, this, coerce);
+    return map.type instanceof final RecordType rt && rt.keptExact(this, coerce);
   }
 
   @Override
@@ -158,18 +158,18 @@ public final class RecordType extends ShapeType {
   }
 
   /**
-   * Checks if a type is a record type derived from the specified type.
-   * @param type type
+   * Checks if a type is a record type derived from the specified record type.
+   * @param type type to check
    * @param target target type
    * @return result of check
    */
   public static boolean derives(final Type type, final Type target) {
-    return TypeRef.deref(type) instanceof final RecordType rt && rt.base != null &&
-        TypeRef.deref(target) instanceof final RecordType tt && rt.base.ancestor(tt) != null;
+    return type.deref() instanceof final RecordType rt && rt.base != null &&
+        target.deref() instanceof final RecordType tt && rt.base.ancestor(tt) != null;
   }
 
   /**
-   * Returns the annotations of this record.
+   * Returns the annotations of this record type.
    * @return annotations
    */
   public AnnList anns() {
@@ -185,15 +185,15 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  public RecordType detach() {
-    if(detached()) return this;
-    RecordType dt = detachedType;
-    if(dt == null) {
-      dt = new RecordType(detachedFields(), name, anns, identity, null,
-        base != null ? base.detach() : null);
-      detachedType = dt;
+  public RecordType toStandalone() {
+    if(standalone()) return this;
+    RecordType rt = standaloneType;
+    if(rt == null) {
+      rt = new RecordType(standaloneFields(), name, anns, identity, null,
+        base != null ? base.toStandalone() : null);
+      standaloneType = rt;
     }
-    return dt;
+    return rt;
   }
 
   @Override
@@ -209,8 +209,8 @@ public final class RecordType extends ShapeType {
   /**
    * Returns the initializing expressions and integrity constraints of records that may be evaluated
    * when values are coerced or cast to the specified type.
-   * @param type type
-   * @return initializing expressions
+   * @param type item type
+   * @return initializing expressions and integrity constraints
    */
   public static Expr[] inits(final Type type) {
     final RecordType rt = type instanceof final RecordType r ? r : null;
@@ -230,7 +230,7 @@ public final class RecordType extends ShapeType {
 
   /** Collector of the initializers and constraints of records that are reachable from a type. */
   private static final class Collector {
-    /** Initializing expressions (can be {@code null}). */
+    /** Initializing expressions and integrity constraints (can be {@code null}). */
     private ExprList list;
     /** Visited shapes (can be {@code null}). */
     private Set<ShapeType> visited;
@@ -239,7 +239,7 @@ public final class RecordType extends ShapeType {
 
     /**
      * Collects the initializers and constraints of records that are reachable from a type.
-     * @param type type
+     * @param type item type
      */
     private void collect(final Type type) {
       switch(type) {
@@ -260,7 +260,7 @@ public final class RecordType extends ShapeType {
           }
         }
         case final MapType mt -> collect(mt.valueType().type);
-        case final ArrayType at -> collect(at.valueType().type);
+        case final ArrayType at -> collect(at.memberType().type);
         case final FuncType ft -> {
           collect(ft.declType.type);
           if(ft.argTypes != null) {
@@ -275,7 +275,7 @@ public final class RecordType extends ShapeType {
     }
 
     /**
-     * Adds an expression.
+     * Adds an expression if it has not been added yet.
      * @param expr expression
      */
     private void add(final Expr expr) {

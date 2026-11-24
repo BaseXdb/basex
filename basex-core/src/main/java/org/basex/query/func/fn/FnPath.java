@@ -42,7 +42,7 @@ public final class FnPath extends ContextFn {
   public Value value(final QueryContext qc) throws QueryException {
     GNode node = toGNodeOrNull(contextArg(qc), qc);
     final XQMap map = toEmptyMap(arg(1), qc);
-    final PathOptions options = options(1, PathOptions::new, qc);
+    final PathOptions options = toOptions(qc);
     if(node == null) return Empty.VALUE;
 
     final boolean indexes = options.get(PathOptions.INDEXES);
@@ -167,8 +167,7 @@ public final class FnPath extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(1, PathOptions::new, cc);
+  protected Expr opt(final CompileContext cc) {
     return optFirst(true, false, cc.qc.focus.value);
   }
 

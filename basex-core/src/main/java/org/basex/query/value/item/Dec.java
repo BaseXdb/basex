@@ -27,9 +27,7 @@ public final class Dec extends ANum {
   /** Decimal representing a million. */
   public static final BigDecimal BD_1000000 = BigDecimal.valueOf(1000000);
   /** Seconds per day. */
-  public static final BigDecimal BD_864000 = BigDecimal.valueOf(86400);
-  /** BigDecimal: 3600. */
-  public static final BigDecimal BD_3600 = BigDecimal.valueOf(3600);
+  public static final BigDecimal BD_86400 = BigDecimal.valueOf(86400);
   /** BigDecimal: 1000. */
   public static final BigDecimal BD_1000 = BigDecimal.valueOf(1000);
   /** BigDecimal: 60. */

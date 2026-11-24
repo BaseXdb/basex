@@ -7,6 +7,7 @@ import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -37,17 +38,12 @@ public final class StringClosest extends StringFn {
     public static final NumberOption LIMIT = new NumberOption("limit", 1);
   }
 
-  /** Result key: value. */
-  private static final String VALUE = "value";
-  /** Result key: similarity. */
-  private static final String SIMILARITY = "similarity";
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
     final Expr candidates = arg(1);
     final Iter iter = candidates.atomIter(qc, info);
-    final ClosestOptions options = options(2, ClosestOptions::new, qc);
+    final ClosestOptions options = toOptions(qc);
 
     final double threshold = ((ANum) options.get(ClosestOptions.THRESHOLD)).dbl();
     final int limit = options.get(ClosestOptions.LIMIT);
@@ -102,19 +98,13 @@ public final class StringClosest extends StringFn {
         (o1, o2) -> Double.compare(similarities.get(o2), similarities.get(o1)));
 
     final int max = limit > 0 ? Math.min(limit, size) : size;
+    final RecordType type = Records.STRING_CLOSEST.get();
     final ValueBuilder vb = new ValueBuilder(qc, max);
     for(int o = 0; o < max; o++) {
       final int p = order[o];
-      vb.add(new MapBuilder().put(VALUE, Str.get(values.get(p))).
-          put(SIMILARITY, Dbl.get(similarities.get(p))).map());
+      vb.add(XQMap.get(type, Str.get(values.get(p)), Dbl.get(similarities.get(p))));
     }
     return vb.value(this);
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(2, ClosestOptions::new, cc);
-    return this;
   }
 
   /**

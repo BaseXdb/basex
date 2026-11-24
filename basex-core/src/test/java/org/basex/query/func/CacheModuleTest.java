@@ -106,6 +106,7 @@ public final class CacheModuleTest extends SandboxTest {
     query(func.args() + "?evictions", 0);
     query(func.args() + "?expirations", 0);
     query(func.args("unknown") + "?entries", 0);
+    query(func.args() + " instance of cache:info-record", true);
 
     query(_CACHE_PUT.args("key", "INFO"));
     query(func.args() + "?entries", 1);
@@ -250,6 +251,11 @@ public final class CacheModuleTest extends SandboxTest {
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("error", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("error", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
+
+    error(func.args("error", " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })"),
+        BASEX_NESTED);
+    error(func.args("error", " fold-left(1 to 100_000, {}, fn($m, $_) { { 'a': $m } })"),
+        BASEX_NESTED);
   }
 
   /** Lazy items in sequences and arrays. */

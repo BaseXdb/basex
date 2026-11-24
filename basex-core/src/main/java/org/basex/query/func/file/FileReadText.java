@@ -21,10 +21,10 @@ public final class FileReadText extends FileReadFn {
   public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(arg(0), qc);
 
-    final ParseOptions options = options(path, qc);
-    final String encoding = options.get(ParseOptions.ENCODING);
-    final boolean fallback = options.get(ParseOptions.FALLBACK);
-    final boolean normalize = options.get(ParseOptions.NORMALIZE_NEWLINES);
+    final ReadTextOptions options = options(path, qc);
+    final String encoding = options.get(ReadTextOptions.ENCODING);
+    final boolean fallback = options.get(ReadTextOptions.FALLBACK) || toBooleanOrFalse(arg(2), qc);
+    final boolean normalize = options.get(ReadTextOptions.NORMALIZE_NEWLINES);
     return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, fallback, normalize, null);
   }
 }

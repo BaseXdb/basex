@@ -109,7 +109,7 @@ public final class SaxonTransform {
     properties = func.outputProperties(options, qc);
 
     // untrusted stylesheets must not access external resources
-    final URIResolver ur = trusted ? qc.context.options.resolver().uriResolver() : null;
+    final URIResolver ur = trusted ? qc.options().resolver().uriResolver() : null;
     resolver = trusted ? ur != null ? new ResourceResolverWrappingURIResolver(ur) : null :
       request -> { throw new XPathException(Util.info(Text.EXTACCESS_BLOCKED_X, request.uri)); };
   }

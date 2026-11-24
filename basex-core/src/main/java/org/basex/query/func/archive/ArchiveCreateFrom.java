@@ -24,7 +24,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
   public void create(final OutputStream os, final IOFile target, final QueryContext qc)
       throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));
-    final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
+    final CreateFromOptions options = toOptions(qc);
     Value entries = arg(2).value(qc);
 
     final boolean recursive = options.get(CreateFromOptions.RECURSIVE);
@@ -52,7 +52,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {
         for(final Item item : entries) {
-          final IOFile file = new IOFile(root, toString(item, qc));
+          final IOFile file = new IOFile(root, toString(atomItem(item, arg(2), qc), arg(2)));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
           add(new SimpleEntry<>(item, new B64IOLazy(file, FILE_NOT_FOUND_X)), out, method, dir, qc);

@@ -27,13 +27,12 @@ public final class FnNumber extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final boolean context = usesContext();
     final Expr value = contextArg(cc);
     final Type type = argType(cc);
 
     // number(1e1) → 1e1
     // $double[number() = 1] → $double[. = 1]
-    if(type == DOUBLE) return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
+    if(type == DOUBLE) return contextExpr(value, cc);
 
     // number(string(E))
     // number(xs:untypedAtomic(E))

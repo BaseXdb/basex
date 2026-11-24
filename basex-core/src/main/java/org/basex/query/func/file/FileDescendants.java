@@ -32,7 +32,7 @@ public final class FileDescendants extends FileList {
   @Override
   public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path dir = toPath(arg(0), qc);
-    final DescendantsOptions options = toOptions(arg(1), new DescendantsOptions(), qc);
+    final DescendantsOptions options = toOptions(qc);
 
     final Value filterValue = options.get(DescendantsOptions.FILTER);
     final Value recurseValue = options.get(DescendantsOptions.RECURSE);

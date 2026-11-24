@@ -162,9 +162,9 @@ public final class QueryJob extends Job implements Runnable {
     // integer
     if(string.matches("^\\d+$")) return Itr.get(Itr.parse(token(string), info));
     // dayTimeDuration
-    if(Dur.DTD.matcher(string).matches()) return new DTDur(token(string), info);
-    // time
-    if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), info);
+    if(string.startsWith("P") || string.startsWith("-P")) return new DTDur(token(string), info);
+    // time (a dateTime starts with a year of four or more digits)
+    if(string.length() > 2 && string.charAt(2) == ':') return new Tim(token(string), info);
     // dateTime
     return new Dtm(token(string), BasicType.DATE_TIME, info);
   }
@@ -260,7 +260,8 @@ public final class QueryJob extends Job implements Runnable {
 
       final Performance perf = new Performance();
       final QueryInfo qi = opts.get(JobOptions.INFO) ? new QueryInfo(ctx, true) : null;
-      qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, qi, perm);
+      qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, qi, perm,
+          job.queryOptions);
       qp.sc.modulePath = job.path;
       // modules of the calling application are resolved as they were for the caller.
       // only unscheduled jobs have a resolver; they run once, so it can be released

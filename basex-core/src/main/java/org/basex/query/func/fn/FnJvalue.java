@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -32,10 +31,8 @@ public final class FnJvalue extends ContextFn {
 
     // adopt value type: jvalue(jtree({ 'a': 1 })/a) → xs:integer?
     final SeqType st = input != null ? input.seqType() : null;
-    if(st != null && st.type instanceof final NodeType nt &&
-        nt.test instanceof final JNodeTest jt) {
-      exprType.assign(context || st.one() ? jt.valueType : jt.valueType.union(Occ.ZERO));
-    }
+    final SeqType vt = st != null ? st.valueType() : null;
+    if(vt != null) exprType.assign(context || st.one() ? vt : vt.union(Occ.ZERO));
     return this;
   }
 }

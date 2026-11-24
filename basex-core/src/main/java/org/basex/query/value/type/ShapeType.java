@@ -14,8 +14,7 @@ import org.basex.util.hash.*;
 
 /**
  * Simple record type: a fixed set of named, individually typed fields that maps are matched against
- * structurally. Shapes are declared in queries or inferred from expressions with a statically known
- * field set; labeled record types are represented by {@link RecordType}.
+ * structurally.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -28,11 +27,11 @@ public class ShapeType extends MapType {
 
   /** Fields. */
   private final TokenObjectMap<ShapeField> fields;
-  /** Field names as string items (can be {@code null}). */
+  /** Field names as string items, created lazily (can be {@code null}). */
   private volatile Str[] keys;
   /** Indicates if the fields are free of initializing expressions. */
-  private final boolean detached;
-  /** Indicates if the shape is detached and its field types are independent of a query. */
+  private final boolean standalone;
+  /** Indicates if the shape is standalone and its field types are independent of a query. */
   private final boolean global;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
@@ -53,20 +52,20 @@ public class ShapeType extends MapType {
   ShapeType(final TokenObjectMap<ShapeField> fields, final SeqType valueType) {
     super(BasicType.STRING, valueType);
     this.fields = fields;
-    boolean d = true, g = true;
+    boolean s = true, g = true;
     for(final ShapeField rf : fields.values()) {
-      d &= rf.init() == null;
+      s &= rf.init() == null;
       g &= rf.seqType().type.global();
     }
-    detached = d;
-    global = d && g;
+    standalone = s;
+    global = s && g;
   }
 
   /**
-   * Returns an inferred shape with an additional or updated field.
+   * Returns an inferred shape with an additional or updated field, unless it gets too large.
    * @param fieldName field name
    * @param seqType sequence type of the field
-   * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
+   * @return shape (can be {@code null})
    */
   public final ShapeType put(final byte[] fieldName, final SeqType seqType) {
     return copy(fieldName, seqType);
@@ -82,18 +81,18 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns an inferred shape with an updated or removed field.
-   * @param field name of the field to be added or updated, or of the field to be removed
-   * @param seqType sequence type of the added field, {@code null} to remove the field
-   * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
+   * Returns an inferred shape with an added, updated or removed field, unless it gets too large.
+   * @param field name of the field to be added, updated or removed
+   * @param seqType type of the added or updated field, absent for removal (can be {@code null})
+   * @return shape (can be {@code null})
    */
   private ShapeType copy(final byte[] field, final SeqType seqType) {
     if(seqType != null && !fields.contains(field) && fields.size() >= MAX_GENERATED_SIZE) {
       return null;
     }
     // shapes with query-scoped components must not be cached: they would be retained forever
-    // (field instead of detached(): derived shapes have no integrity constraint)
-    if(detached && (seqType == null || seqType.type.global())) {
+    // (field instead of standalone(): derived shapes have no integrity constraint)
+    if(standalone && (seqType == null || seqType.type.global())) {
       if(derived == null) derived = new ConcurrentHashMap<>();
       // do not cache shapes that are derived from arbitrarily many field names
       if(derived.size() < MAX_DERIVED) {
@@ -110,9 +109,9 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Creates a shape with an updated or removed field.
-   * @param field name of the field to be added or updated, or of the field to be removed
-   * @param seqType sequence type of the added field, {@code null} to remove the field
+   * Creates a shape with an added, updated or removed field.
+   * @param field name of the field to be added, updated or removed
+   * @param seqType type of the added or updated field, absent for removal (can be {@code null})
    * @return shape
    */
   private ShapeType create(final byte[] field, final SeqType seqType) {
@@ -127,7 +126,7 @@ public class ShapeType extends MapType {
   /**
    * Key of a shape that is derived from another one.
    * @param field name of the added, updated or removed field
-   * @param seqType sequence type of the added field (can be {@code null})
+   * @param seqType sequence type of the added or updated field (can be {@code null})
    */
   private record Derived(byte[] field, SeqType seqType) {
     @Override
@@ -181,10 +180,10 @@ public class ShapeType extends MapType {
   /**
    * Coerces a value to the type of a field and names the field in error messages.
    * @param f index of the field (starting with 1)
-   * @param value value
+   * @param value value to coerce
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @param cc compilation context ({@code null} during runtime)
+   * @param cc compilation context, unless called at runtime (can be {@code null})
    * @return coerced value
    * @throws QueryException query exception
    */
@@ -202,7 +201,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Calculate union type of field sequence types.
+   * Computes the union of the sequence types of the specified fields.
    * @param rfs field declarations
    * @return union type
    */
@@ -223,7 +222,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this is a labeled record type, which is assigned to its records as label.
+   * Indicates if this is a labeled record type, which is attached to its records as label.
    * @return result of check
    */
   public boolean labeled() {
@@ -267,8 +266,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this is the abstract {@code record(*)} type, which matches any record. Its field
-   * set is unknown, so no assumptions must be made about the presence or absence of a field.
+   * Indicates if this is the abstract {@code record(*)} type, which matches any record.
    * @return result of check
    */
   public final boolean any() {
@@ -285,7 +283,7 @@ public class ShapeType extends MapType {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return true;
   }
 
@@ -312,7 +310,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     if(this == tp || tp.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) return true;
     if(tp instanceof final ChoiceItemType cit) {
       for(final Type t : cit.types) {
@@ -343,7 +341,7 @@ public class ShapeType extends MapType {
    * @throws QueryException query exception
    */
   public boolean matches(final XQMap map, final boolean coerce) throws QueryException {
-    if(SeqType.keptStatic(map.type, this, coerce)) return true;
+    if(map.type.keptStatic(this, coerce)) return true;
     final int fs = fields.size();
     if(map.structSize() != fs) return false;
     // coercion converts other keys to strings
@@ -380,8 +378,8 @@ public class ShapeType extends MapType {
     if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == Types.MAP) return Types.MAP;
-    if(SeqType.kept(type, this, true)) return this;
-    if(SeqType.kept(this, type, true)) return type;
+    if(type.keptExact(this, true)) return this;
+    if(keptExact(type, true)) return type;
 
     if(type instanceof final ShapeType sh) {
       if(labeled() && sh.labeled()) {
@@ -405,7 +403,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final MapType union(final Type kt, final SeqType vt) {
-    return get(keyType().union(kt), valueType().union(vt));
+    return get(keyType().union(kt.deref()), valueType().union(vt));
   }
 
   /**
@@ -517,8 +515,8 @@ public class ShapeType extends MapType {
    * references to the query in which it was declared.
    * @return result of check
    */
-  public boolean detached() {
-    return detached;
+  public boolean standalone() {
+    return standalone;
   }
 
   /**
@@ -527,7 +525,7 @@ public class ShapeType extends MapType {
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @return map, or {@code null} if an integrity constraint failed and no error was raised
+   * @return map (can be {@code null})
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
@@ -540,17 +538,17 @@ public class ShapeType extends MapType {
    * Returns a version of this shape that can be attached to a materialized value.
    * @return shape without initializing expressions and integrity constraints
    */
-  public ShapeType detach() {
-    return detached() ? this : new ShapeType(detachedFields());
+  public ShapeType toStandalone() {
+    return standalone() ? this : new ShapeType(standaloneFields());
   }
 
   /**
    * Returns the fields of this shape without their initializing expressions.
    * @return fields
    */
-  final TokenObjectMap<ShapeField> detachedFields() {
+  final TokenObjectMap<ShapeField> standaloneFields() {
     final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.size());
-    for(final byte[] key : fields) map.put(key, fields.get(key).detach());
+    for(final byte[] key : fields) map.put(key, fields.get(key).toStandalone());
     return map;
   }
 
@@ -560,7 +558,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns the fields of this type.
+   * Returns a string representation of the fields of this type.
    * @param types include field types
    * @return comma-separated fields
    */

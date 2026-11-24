@@ -76,6 +76,16 @@ public abstract class ContextFn extends StandardFunc {
     return usesContext() ? cc.qc.focus.value : arg(contextIndex());
   }
 
+  /**
+   * Returns the specified context argument, or a context value reference if it is a dummy.
+   * @param expr context argument, as returned by {@link #contextArg(CompileContext)}
+   * @param cc compilation context
+   * @return expression
+   */
+  protected final Expr contextExpr(final Expr expr, final CompileContext cc) {
+    return expr instanceof Dummy ? ContextValue.get(cc, info) : expr;
+  }
+
   @Override
   public final boolean hasCTX() {
     return usesContext();

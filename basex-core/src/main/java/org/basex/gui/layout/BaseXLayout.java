@@ -197,7 +197,6 @@ public final class BaseXLayout {
    * @param clipboard clipboard supplier (can be {@code null})
    * @return clipboard contents
    */
-  @SuppressWarnings("unchecked")
   public static ArrayList<Object> fromClipboard(final Supplier<Transferable> clipboard) {
     // try multiple times (system clipboard may be blocked by another process)
     final ArrayList<Object> list = new ArrayList<>();
@@ -207,27 +206,55 @@ public final class BaseXLayout {
         final Transferable tr = clipboard != null ? clipboard.get() :
           Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
         if(tr != null) {
-          if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            list.addAll((List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor));
-          } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            list.add(tr.getTransferData(DataFlavor.stringFlavor));
-          } else {
-            final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
-            for(final DataFlavor df : tr.getTransferDataFlavors()) {
-              sb.append("- ").append(df).append('\n');
-            }
-            Util.debugln(sb);
-          }
-          break;
+          fromTransferable(tr, list);
+        } else {
+          Util.debugln("Clipboard has no contents.");
         }
-        Util.debugln("Clipboard has no contents.");
         break;
-      } catch(final Exception ex) {
-        Util.stack(ex);
+      } catch(final IllegalStateException ex) {
+        Util.debug(ex);
         Performance.sleep(i * 200L);
       }
     }
     return list;
+  }
+
+  /**
+   * Adds the files or the text of a transferable to the specified list.
+   * @param tr transferable
+   * @param list list of clipboard contents
+   */
+  @SuppressWarnings("unchecked")
+  private static void fromTransferable(final Transferable tr, final List<Object> list) {
+    try {
+      if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+        list.addAll((List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor));
+        return;
+      }
+      if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        list.add(tr.getTransferData(DataFlavor.stringFlavor));
+        return;
+      }
+    } catch(final IOException | UnsupportedFlavorException ex) {
+      Util.debug(ex);
+    }
+    // owners may fail to convert single formats (e.g. Emacs on X11): try other plain-text flavors
+    final DataFlavor[] flavors = tr.getTransferDataFlavors();
+    for(final DataFlavor df : flavors) {
+      if(df.isMimeTypeEqual("text/plain") && df.isFlavorTextType()) {
+        try(Reader reader = df.getReaderForText(tr)) {
+          final StringWriter sw = new StringWriter();
+          reader.transferTo(sw);
+          list.add(sw.toString());
+          return;
+        } catch(final IOException | UnsupportedFlavorException ex) {
+          Util.debug(ex);
+        }
+      }
+    }
+    final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
+    for(final DataFlavor df : flavors) sb.append("- ").append(df).append('\n');
+    Util.debugln(sb);
   }
 
   /**

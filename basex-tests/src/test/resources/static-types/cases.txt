@@ -1,0 +1,682 @@
+head($is)
+foot($is)
+trunk($is)
+tail($ip)
+reverse($ip)
+subsequence($is, 2)
+slice($is, 2)
+items-at($is, 2)
+remove($is, $i)
+insert-before($is, 2, $ss)
+distinct-values($ip)
+duplicate-values($is)
+sort($ip)
+sort-by($ip, {})
+unordered($ip)
+zero-or-one($is)
+one-or-more($is)
+exactly-one($is)
+replicate($i, 3)
+replicate($ip, 3)
+sum($is)
+sum($is, ())
+avg($ip)
+max($ip)
+min($ss)
+abs($i)
+round($d)
+floor($i)
+highest($ip)
+lowest($is)
+index-where($is, fn { . > 1 })
+index-of($is, 1)
+filter($is, fn { . > 1 })
+for-each($ip, fn($x) { $x + 1 })
+for-each($ip, $f)
+for-each-pair($ip, $ip, fn($x, $y) { $x + $y })
+fold-left($is, 0, fn($r, $x) { $r + $x })
+fold-right($is, 0, fn($x, $r) { $r + $x })
+take-while($is, fn { . > 1 })
+partition($is, fn($p, $x) { $x > 1 })
+while-do($i, fn { . < 10 }, fn { . + 1 })
+do-until($i, fn { . + 1 }, fn { . < 10 })
+apply($f, [ 1 ])
+identity($is)
+$is otherwise $ss
+$ip otherwise $ss
+data($e)
+data($is)
+string-join($is)
+characters($s)
+tokenize($s)
+string($i)
+`{ $i }`
+$s || $i
+parse-integer($s)
+transitive-closure($e, fn { * })
+innermost($es)
+outermost($es)
+$es union $es
+$es except $es
+$es intersect $es
+$es[1]
+$is[. > 1]
+$i + $i
+$i div $i
+$i idiv $i
+-$i
+$i to $i
+if($b) then $i else $s
+switch($i) { case 1 return $i default return $d }
+for $x in $ip return $x * 2
+for $x at $p in $ss return $p
+let $x := $ip return count($x)
+[ $i ]
+[ $i, $s ]
+array { $is }
+{ "a": $i }
+{ $s: $i, $s: $d }
+$a(1)
+$a?1
+$a?*
+$as?*
+$m?a
+$m?*
+array:get($a, 1)
+array:get($a, 1, fn { $s })
+array:head($a)
+array:foot($a)
+array:tail($a)
+array:trunk($a)
+array:reverse($a)
+array:subarray($a, 2)
+array:slice($a, 2)
+array:remove($a, 1)
+array:insert-before($a, 1, $s)
+array:append($a, $s)
+array:put($a, 1, $s)
+array:filter($a, fn { . > 1 })
+array:sort($a)
+array:sort-by($a, {})
+array:for-each($a, $f)
+array:for-each-pair($a, $a, fn($x, $y) { $x + $y })
+array:fold-left($a, 0, fn($r, $x) { $r + $x })
+array:fold-right($a, 0, fn($x, $r) { $r + $x })
+array:join($as)
+array:flatten($a)
+array:flatten($as)
+array:members($a)
+array:split($a)
+array:items($a)
+array:of-members(array:members($a))
+array:build($is, $f)
+array:index-where($a, fn { . > 1 })
+array:index-of($a, 1)
+array:size($a)
+array:empty($a)
+map:get($m, "a")
+map:get($m, "a", fn { $s })
+map:keys($m)
+map:items($m)
+map:entries($m)
+map:put($m, "b", $s)
+map:remove($m, "a")
+map:filter($m, fn($k, $v) { $v > 1 })
+map:merge(($m, $m))
+map:for-each($m, fn($k, $v) { $v + 1 })
+map:build($is)
+map:build($is, string#1)
+map:build($is, string#1, fn { . * 2 })
+map:entry($s, $i)
+map:size($m)
+map:find(($m, $a), "a")
+$f(1)
+$f(?)
+function-lookup(#a, 1)
+xs:integer($s)
+$s cast as xs:integer?
+$is treat as xs:integer+
+random-number-generator()?number
+parse-xml($s)/*
+$e/@*
+$e/text()
+$e/..
+$e/self::a
+$e/self::b
+$e/string()
+$es ! string()
+node-name($e)
+name($e)
+root($e)
+element { "a" } { }
+element a { }
+filter($is, $g)
+take-while($is, $g)
+index-where($is, $g)
+for-each($io, $f)
+$ip ! $f(.)
+for $x in $ip return $f($x)
+$ip =!> $f()
+$i => $f()
+fold-left($is, 0, $h)
+fold-right($is, 0, $h)
+sort($ip, (), $f)
+sort-by($ip, { "key": $f })
+highest($ip, (), $f)
+partition($is, fn($p, $x) { $g($x) })
+array:filter($a, $g)
+array:fold-left($a, 0, $h)
+array:index-where($a, $g)
+map:for-each($m, fn($k, $v) { $f($v) })
+map:filter($m, fn($k, $v) { $g($v) })
+map:build($is, $f)
+apply($h, [ 1, 2 ])
+some($is, $g)
+every($is, $g)
+function-arity($f)
+$f(?) => function-arity()
+$h(1, ?)
+$h(1, ?)(2)
+fn($x as xs:integer) { $x + 1 }
+fn { . + 1 }
+abs#1
+string-length#1
+string-length($so)
+substring($so, 2)
+upper-case($so)
+normalize-space($so)
+concat($so, $so)
+contains($so, "a")
+replace($so, "a", "b")
+translate($so, "a", "b")
+string-to-codepoints($s)
+codepoints-to-string($is)
+number($so)
+boolean($is)
+not($is)
+xs:string($io)
+xs:integer($so)
+string($io)
+data($io)
+abs($io)
+round($io, 2)
+round-half-to-even($i)
+max(($i, $d))
+max(($i, 1.5))
+sum(($i, $d))
+avg($is)
+avg($d)
+count($is) + 1
+$io + 1
+$i * $d
+$i mod 2
+$i = 1
+$io eq 1
+$is = 1
+typeswitch($is) case xs:integer return $i default return 1
+try { $i } catch * { 0 }
+try { $i } catch * { $s }
+if($b) { $i }
+if($b) then $ip else $i
+if($b) then $e else $e/*
+some $x in $is satisfies $x > 1
+$is instance of xs:integer+
+$is[last()]
+$is[1 to 2]
+$ip[1]
+$ip[position() = 1]
+($ip, $s)[1]
+($is, $s)
+($ip, $ip)
+for $x in $is order by $x return $x
+for $x in $ip order by $x return $x
+for $x in $is count $c return $c
+for $x in $is group by $k := $x mod 2 return $k
+for $x in $is group by $k := $x mod 2 return count($x)
+for $x in $is group by $k := $x mod 2 return $x
+for $x in $ip group by $k := $x mod 2 return $k
+for $x allowing empty in $is return $x
+for $x allowing empty in $is return count($x)
+for tumbling window $w in $is start when true() return count($w)
+for tumbling window $w in $is start $s when true() return $s
+for tumbling window $w in $is start when true() return $w
+for member $x in $a return $x
+for key $k value $v in $m return $k
+for key $k value $v in $m return $v
+let $x as xs:integer := $io return $x
+$r?a
+$r?b
+$r?c
+$r?*
+map:get($r, "a")
+map:keys($r)
+map:size($r)
+map:contains($r, "a")
+map:put($r, "a", 2)
+map:put($r, "c", 2)
+map:remove($r, "a")
+{ "a": 1, "b": $s }?b
+map:entries($r)
+map:merge(($m, $r))
+map:merge(map:entries($m))
+map:merge(for $x in $is return { $x: $s })
+array:head(array:split($a))
+array { $is }?*
+[ $is ]?1
+$a?($i)
+$a?($is)
+$m?($ss)
+[ $i ] => array:size()
+array:of-members(for $x in $is return { "value": $x })
+parse-json($s)
+json-doc($s)
+json-to-xml($s)
+parse-xml($s)
+parse-xml-fragment($s)
+doc($s)
+serialize($is)
+trace($is)
+message($is)
+error()
+$e/a/b
+$e/a[1]
+$e/(a | b)
+$e/@a
+$e/@a/string()
+$e/*/name()
+$e/text()/data()
+$e/comment()/data()
+$e/processing-instruction()/data()
+$e/@a/data()
+data($e/@a)
+$e/ancestor::*
+$e/parent::*
+$e/following-sibling::node()
+document { $e }
+document { $e }/*
+<a/>/self::a
+<a><b/></a>/b
+attribute a { }
+text { $s }
+text { $so }
+comment { $s }
+copy $c := $e modify () return $c
+$e transform with { }
+in-scope-namespaces($e)
+in-scope-prefixes($e)
+path($e)
+generate-id($e)
+has-children($e)
+base-uri($e)
+local-name($e)
+string($e)
+distinct-ordered-nodes(($es, $es))
+random-number-generator()?permute($is)
+random-number-generator()?next()
+xs:integer#1($s)
+$s castable as xs:integer
+fn($x as xs:decimal) { $x }($i)
+declare function f($x as xs:decimal) { $x }; f($i)
+declare function f($x) as xs:decimal { $x }; f($i)
+declare function f($x) { $x + 1 }; f($i)
+declare %basex:inline(0) function f($x) { $x + 1 }; f($i)
+declare %basex:inline(0) function f($x as xs:integer) { $x + 1 }; f($i)
+declare %basex:inline(0) function f($x as xs:integer) { if($x > 0) then f($x - 1) else 0 }; f($i)
+$x + 1
+$u + 1
+$u * $u
+-$u
+abs($u)
+sum($u)
+filter($is, not#1)
+filter($is, fn($i) { $g($i) })
+for-each($ip, string#1)
+for-each($is, $g)
+document { <a/> }
+substring-before($so, "a")
+substring-after($s, $s)
+string-join($ss, $s)
+tokenize($so, ",")
+contains-token($ss, "a")
+char("aacute")
+characters($so)
+normalize-unicode($so)
+lower-case($ss[1])
+format-integer($i, "1")
+format-integer($io, "1")
+format-number($d, "#")
+compare($s, $s)
+compare($so, $s)
+codepoint-equal($so, $s)
+string-to-codepoints($so)
+matches($so, "a")
+analyze-string($s, "a")
+starts-with($so, $s)
+string-length($ss[1])
+encode-for-uri($so)
+resolve-uri($s)
+parse-integer($s, 16)
+hash($s)
+$io || ""
+`{ $is }`
+round($dc, 1)
+abs($dc)
+ceiling($d)
+floor($io)
+number($i)
+number($u)
+xs:double($i)
+$d idiv $d
+$d mod $d
+$dc div $dc
+$i * $dc
+-$io
++$u
+$u + $u
+$u * 2
+$io * $io
+count($is) * 2
+min(($i, $dc))
+max($ss)
+max($u)
+avg(($dc, $i))
+is-NaN($d)
+divide-decimals($dc, $dc)
+current-date()
+year-from-date($dt)
+year-from-date($dto)
+month-from-dateTime($dtm)
+seconds-from-dateTime($dtm)
+timezone-from-date($dt)
+adjust-date-to-timezone($dt)
+dateTime($dt, xs:time("00:00:00"))
+$dt - $dt
+$dtm - $dtm
+$dt + $dur
+$dtm - $ym
+$dur * 2
+$dur div $dur
+$ym div $ym
+$dur div 2
+$dur + $dur
+$dt < $dt
+days-from-duration($dur)
+format-date($dt, "[Y]")
+format-date($dto, "[Y]")
+civil-timezone($dtm)
+parse-ietf-date($s)
+subsequence($ip, 1, 1)
+subsequence($is, 1, 1)
+subsequence($ip, 1)
+slice($ip, 1, 1)
+slice($ip, 1)
+slice($ip, -1)
+items-at($ip, 1)
+items-at($is, ($i, $i))
+$ip[last()]
+$is[2]
+$is[$i]
+$is[$io]
+head($ip)
+foot($ip)
+reverse($is)
+replicate($is, $i)
+replicate($ip, 2)
+insert-separator($ip, $s)
+insert-separator($ip, 0)
+void($is)
+remove($ip, 5)
+remove($ip, 1)
+index-of($ss, "a")
+empty($is)
+count($ip)
+deep-equal($is, $is)
+all-equal($is)
+all-different($is)
+sort($ss)
+sort-with($ip, compare#2)
+distinct-values($ss)
+duplicate-values($ip)
+data($e/@x)
+data($a)
+data($as)
+data($m)
+fold-left($is, (), fn($a, $b) { $a, $b })
+for-each($is, fn($x) { $x, $x })
+for-each($ip, fn($x) { $x, $x })
+for-each($ip, fn($x) { $x[. > 1] })
+op("+")(1, 2)
+apply(abs#1, [ $i ])
+apply($f, [ $i ])
+function-name($f)
+function-arity($h)
+$h(?, 1)($i)
+$f($i) => string-length()
+$is ! $f(.)
+sort($ss, (), string-length#1)
+highest($ss, (), string-length#1)
+some($is)
+transitive-closure($e, fn { .. })
+map:get($m, $s)
+$m($s)
+$m?($s)
+map:contains($m, $s)
+map:items($r)
+$r?a + 1
+map:for-each($m, fn($k, $v) { $k })
+map:for-each($r, fn($k, $v) { $k })
+map:filter($r, fn($k, $v) { true() })
+map:merge(($m, { $s: $s }))
+map:merge(($m, $m), { "duplicates": "combine" })
+map:entry($i, $ss)
+map:keys($m)[1]
+$as?1
+$as ! array:size(.)
+[ $is ]
+array { $ip }
+array:size(array { $ip })
+array:flatten([ [ $i ], [ $i ] ])
+array:flatten([ $a, $a ])
+{ $s: $i }?($s)
+{ "a": $i }?a
+array:append($a, $i)
+array:remove($a, ())
+array:put($a, 1, 2)
+array:head([ $i, $s ])
+array:foot([ $i, $s ])
+[ $i, $s ]?1
+[ $i, $s ]?2
+array:size([ $i, $s ])
+$e//b
+$e/descendant::b
+$e/self::node()
+$e/self::element()
+$e/self::text()
+$e/@x/..
+$e/b/parent::a
+$e/b/..
+$e/*[1]
+$e/node()
+$e/text()/string()
+string($e/@x)
+exists($e/@x)
+$e/(@x, @y)
+$es/a
+$es[@x]
+$e/data()
+$e/ancestor-or-self::*
+$e/ancestor-or-self::node()
+$e/descendant-or-self::node()
+$e/root()
+$e ! name()
+$e ! (a, b)
+<a>{ $i }</a>/text()
+<a>{ $so }</a>/text()
+<a b="{ $i }"/>/@b
+<a b="{ $i }"/>/@b/string()
+element a { }/self::b
+<a/>/..
+<a/>/root()
+document { $e }/root()
+$e/@x/string()
+name($es[1])
+node-name($es[1])
+local-name-from-QName(node-name($e))
+namespace-uri($e)
+nilled($e)
+document-uri($e)
+lang("en", $e)
+element-to-map($e)
+deep-equal($e, $e)
+for $x in $is where $x > 1 return $x
+for $x in $ip return ($x, $x)
+for $x in $ip, $y in $ip return $x
+for $x in $is order by $x return string($x)
+for $x in $ip count $c return $c
+for $x in $ip let $y := $x * 2 return $y
+for sliding window $w in $is start at $p when true() end at $q when $q - $p = 1 return sum($w)
+for tumbling window $w in $ip start when true() return head($w)
+if($b) then $ip else ()
+if(empty($is)) then 0 else $is
+if($b) then $i else $dc
+typeswitch($i) case xs:string return 1 default return $s
+typeswitch($io) case xs:integer return 1 default return $s
+switch($s) case "a" return $i case "b" return $i default return $i
+try { $is } catch * { () }
+try { $ip } catch * { 0 }
+$ip ! string()
+$ip ! (., .)
+$is ! ()
+$io otherwise 0
+$is otherwise $ip
+$s cast as xs:integer
+$so cast as xs:integer?
+$i cast as xs:double
+$i treat as xs:decimal
+$is treat as xs:decimal*
+$io treat as xs:integer
+$is instance of xs:integer*
+$is castable as xs:integer
+($i, $s) ! (typeswitch(.) case xs:integer return . default return 0)
+$is ! (if(. > 1) then . else ())
+$ip[. > 0]
+$is[position() < 3]
+($i, $i)[2]
+($i, $is)
+($i, $s)[1]
+($i, $s)[2]
+($io, $s)[1]
+declare function f($x as xs:integer) as xs:integer* { $x }; f($i)
+declare %basex:inline(0) function f($x as xs:integer) { ($x, $x) }; f($i)
+declare %basex:inline(0) function f($x as xs:integer) { $x[. > 0] }; f($i)
+declare %basex:inline(0) function f($x) { string($x) }; f($i)
+let $f := fn($x) { $x + 1 } return $f($i)
+let $f := fn($x as xs:integer) as xs:integer { $x + 1 } return $f($io)
+prof:type($is)
+prof:memory($ip)
+prof:time($ip)
+prof:track($ip)
+prof:shrink($ip)
+util:range($is, 1, 2)
+util:if($b, $i, $s)
+util:if($b, $i, $i)
+util:root($es)
+util:strip-namespaces($e)
+util:values-except($is, $is)
+util:count-within($is, 1)
+util:array-member($is)
+do-until($is, fn { tail(.) }, fn { empty(.) })
+while-do($ss, fn { exists(.) }, fn { tail(.) })
+identity($ip)
+fn:jkey(jtree($m)/*[1])
+jtree($m)/*
+jtree($a)/*
+jtree($m)/a
+$m/a
+$a/*
+jtree($m)/descendant::*
+$doc/a
+$doc/*
+$doc/a/@x
+$doc/node()
+$doc/b
+$doc//a
+$doc/a/..
+root($doc)
+$doc/root()
+$doc/descendant-or-self::node()
+document { $es }
+document { $doc }
+document { $doc }/a
+$is[1][1]
+$ip[. > 1][1]
+$es[1]/@x
+$ip[true()]
+$ip[$b]
+$is[. instance of xs:integer]
+($is, $ss)[. instance of xs:string]
+($is, $ss)[. instance of xs:double]
+$es[self::a]
+$es[self::b]
+(1 to $i)[. > 1]
+($e, $s)[1]
+($e, $s)[. instance of element()]
+$es ! .
+$is ! (. + 1)[. > 0]
+for $x in $es group by $n := name($x) return $n
+for $x in $es group by $n := name($x) return $x
+for $x in $is group by $k := $x return count($x)
+for $x in $ip group by $k := $x return count($x)
+for $x in $ss order by $x return $x
+for $x in $es where $x/@x return $x
+for $x in $is let $y := $x return $y
+let $x := $ip return $x[1]
+for $x at $p in $ip return $p
+for $x in $ip return if($b) then $x else ()
+for $x in $is count $c where $c > 1 return $x
+for sliding window $w in $ip start when true() end when true() return $w
+for tumbling window $w in $is start at $p when true() return $p
+for tumbling window $w in $is start previous $p when true() return $p
+for tumbling window $w in $is start next $n when true() return $n
+declare function f($n as xs:integer) { if($n > 0) then f($n - 1) else $n }; f($i)
+declare function f($n as xs:integer) { if($n > 0) then f($n - 1) else "x" }; f($i)
+declare function f($n) { if($n > 0) then f($n - 1) else $n }; f($i)
+declare function f($x as xs:integer*) { $x ! string() }; f($is)
+declare %basex:inline(0) function f($x as xs:integer*) { $x ! string() }; f($ip)
+declare function f($x) as xs:integer { $x }; f#1
+string#1
+abs(?)
+fn($x) { $x }(1)
+(abs#1, round#1)[1]($i)
+(abs#1, round#1)[$b]($i)
+(abs#1, $f)[$b]($i)
+fn:apply(abs#1, [ $i ])
+function-lookup(xs:QName("fn:abs"), 1)
+function-lookup(xs:QName("fn:abs"), 1)($i)
+load-xquery-module("x")
+$r/a
+$r/b
+$r/c
+jtree($r)/a
+$r/jnode(a, xs:string)
+$r/a[. > 1]
+$doc/descendant::a
+$doc/descendant::b
+$doc/descendant::node()
+$doc//a[@x]
+for tumbling window $w in $is start when true() return head($w)
+for sliding window $w in $ip start when true() end when true() return head($w)
+for tumbling window $w in $ip start when true() only end when true() return $w
+for tumbling window $w in $ip start $s when $s > 1 return $w
+<a/>/following-sibling::*
+<a><b/></a>/b/..
+text { $i }/..
+<a b="{ $i }"/>/@b/..
+<a/>/ancestor-or-self::*
+(<a/>, $i)[$b]/..
+1 - $x
+$u + $x
+$x - $u
+$e/@x/parent::a
+document { <!--x-->, $e, <?pi?> }
+element-to-map($e, { 'plan': { 'a': { 'layout': 'deep-skip' } } })

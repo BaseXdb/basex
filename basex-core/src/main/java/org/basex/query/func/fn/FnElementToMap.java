@@ -17,8 +17,8 @@ import org.basex.query.value.type.*;
 public final class FnElementToMap extends PlanFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
-    final ElementsOptions options = options(1, ElementsOptions::new, qc);
+    final Item node = (Item) coerce(arg(0), Types.DOCUMENT_OR_ELEMENT_ZO, qc);
+    final ElementsOptions options = toOptions(qc);
     if(node.isEmpty()) return Empty.VALUE;
 
     final ElementToMap mapping = new ElementToMap(options, qc.shared, qc, info);
@@ -26,8 +26,8 @@ public final class FnElementToMap extends PlanFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(1, ElementsOptions::new, cc);
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    // plans may skip the root element: element-to-map(<a/>, { 'plan': ... }) → ()
+    return optFirst(!defined(1), false, null);
   }
 }

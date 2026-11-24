@@ -62,7 +62,7 @@ public final class GroupSpec extends Single {
     final SeqType st = expr.seqType();
     final BasicType type = st.type.atomic();
     if(type != null) {
-      var.refineType(SeqType.get(type, st.mayBeWrapped() ? Occ.ZERO_OR_ONE : st.occ), cc);
+      var.refineType(SeqType.get(type, st.atomOcc().intersect(Occ.ZERO_OR_ONE)), cc);
     }
     return this;
   }

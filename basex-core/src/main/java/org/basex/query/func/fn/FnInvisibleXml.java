@@ -81,8 +81,8 @@ public final class FnInvisibleXml extends StandardFunc {
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc) throws QueryException {
-      final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), qc, info);
-      final IxmlOptions options = toOptions(arg(1), new IxmlOptions(), qc);
+      final Item grammar = (Item) coerce(arg(0), ARG_TYPE, qc);
+      final IxmlOptions options = toOptions(qc);
 
       final boolean xml = grammar instanceof XNode;
       final String grmmr;

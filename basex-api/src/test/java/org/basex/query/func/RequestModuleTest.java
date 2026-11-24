@@ -13,6 +13,9 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class RequestModuleTest extends HTTPTest {
+  /** Request attribute with a Java value, assigned by Jetty. */
+  private static final String JETTY_ATTRIBUTE = "org.eclipse.jetty.server.Request.maxFormKeys";
+
   /**
    * Start server.
    * @throws Exception exception
@@ -220,6 +223,8 @@ public final class RequestModuleTest extends HTTPTest {
     final ApiFunction func = _REQUEST_ATTRIBUTE;
     get("", "", "query", func.args("A"));
     get("B", "", "query", "request:set-attribute('A', 'B')," + func.args("A"));
+    // Java values are converted
+    get("1000", "", "query", func.args(JETTY_ATTRIBUTE));
   }
 
   /**
@@ -230,6 +235,8 @@ public final class RequestModuleTest extends HTTPTest {
     final ApiFunction func = _REQUEST_ATTRIBUTE_MAP;
     get("", "", "query", func.args() + "?A");
     get("B", "", "query", "request:set-attribute('A', 'B')," + func.args() + "?A");
+    // Java values are converted
+    get("1000", "", "query", func.args() + "?('" + JETTY_ATTRIBUTE + "')");
   }
 
   /**
@@ -238,8 +245,8 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void attributeNames() throws Exception {
     final ApiFunction func = _REQUEST_ATTRIBUTE_NAMES;
-    get("", "", "query", func.args());
-    get("A", "", "query", "request:set-attribute('A', 1)," + func.args());
+    get("true", "", "query", func.args() + " = '" + JETTY_ATTRIBUTE + "'");
+    get("A", "", "query", "request:set-attribute('A', 1)," + func.args() + "[. = 'A']");
   }
 
   /**

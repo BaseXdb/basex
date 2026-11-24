@@ -35,8 +35,8 @@ public final class ArraySortWith extends SortFn {
     // even single items must be sorted, as the input might be invalid
     final Expr array = arg(0);
     if(array.seqType().type instanceof final ArrayType at) {
-      final SeqType vt = at.valueType();
-      arg(1, arg -> arg.refineFunc(cc, vt, vt));
+      final SeqType mt = at.memberType();
+      arg(1, arg -> arg.refineFunc(cc, mt, mt));
       exprType.assign(at);
     }
     return this;

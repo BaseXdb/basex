@@ -81,7 +81,7 @@ public class FnMin extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
-    if(arg(0).seqType().type.isNumberOrUntyped()) {
+    if(arg(0).seqType().atomType().isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
     // min(distinct-values($values)) → min($values), max(sort($values)) → max($values)
@@ -111,11 +111,12 @@ public class FnMin extends StandardFunc {
       if(monotonic != null) return monotonic;
     }
     final SeqType st = values.seqType();
-    Type type = st.type;
-    if(type.isSortable()) {
+    BasicType type = st.type.atomic();
+    if(type != null) {
       if(type.isUntyped()) {
         type = DOUBLE;
-      } else if(st.one() && noColl) {
+      } else if(st.one() && noColl && type != ANY_ATOMIC_TYPE &&
+          st.type.instanceOf(ANY_ATOMIC_TYPE)) {
         // min($item) → $item, max($item) → $item
         return values;
       }
@@ -123,8 +124,7 @@ public class FnMin extends StandardFunc {
       if(values instanceof final RangeSeq rs && noColl) {
         // min(1 to 10) → 1, max(1 to 10) → 10
         final Item item = rs.itemAt(min ^ rs.ascending() ? rs.size() - 1 : 0);
-        type = item.seqType().type;
-        if(type.isNumber() || type.instanceOf(STRING)) return item;
+        if(item.type.isNumber() || item.type.instanceOf(STRING)) return item;
       }
     }
 

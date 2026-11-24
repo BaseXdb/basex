@@ -10,6 +10,7 @@ import java.util.zip.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -31,6 +32,11 @@ public final class FnHash extends StandardFunc {
     return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));
   }
 
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
+  }
+
   /**
    * Computes the hash value.
    * @param value value to be hashed
@@ -45,21 +51,22 @@ public final class FnHash extends StandardFunc {
     final String alg = algorithm != null ? algorithm.trim().toUpperCase(Locale.ENGLISH) : "MD5";
     if(alg.equals("CRC-32")) {
       final CRC32 crc = new CRC32();
-      crc.update(toBytes(value));
+      crc.update(toBytes(value, arg(0)));
       final byte[] result = new byte[4];
       for(int i = result.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
         result[i] = (byte) c;
       return result;
     }
 
-    if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value));
+    if(alg.equals("BLAKE2B")) return Blake2b.digest(toBytes(value, arg(0)));
+    if(alg.equals("BLAKE3")) return new Blake3().digest(toBytes(value, arg(0)));
 
     final MessageDigest md;
     try {
       md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
       final ArrayList<String> algs = new ArrayList<>(Security.getAlgorithms("MessageDigest"));
-      Collections.addAll(algs, "CRC-32", "BLAKE3");
+      Collections.addAll(algs, "CRC-32", "BLAKE2B", "BLAKE3");
       final String similar = Levenshtein.similar(Token.token(alg), algs.toArray(String[]::new));
       throw HASH_ALGORITHM_X.get(info, similar("'" + algorithm + "'", similar)).cause(ex);
     }
@@ -78,6 +85,6 @@ public final class FnHash extends StandardFunc {
       }
     }
     // non-streaming item, string
-    return md.digest(toBytes(value));
+    return md.digest(toBytes(value, arg(0)));
   }
 }

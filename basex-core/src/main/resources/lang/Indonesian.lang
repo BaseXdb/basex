@@ -320,6 +320,7 @@ results_%            = % Hasil
 revert               = Kembalikan
 revert_file_%        = Kembalikan berkas % dan abaikan perubahan?
 revert_files_%       = % berkas akan dikembalikan, perubahan yang lebih baru akan hilang.
+rt_compilation       = Kompilasi dengan waktu nyata
 rt_execution         = Eksekusi dengan waktu nyata
 rt_filtering         = Penyaringan dengan waktu nyata
 rt_focus             = Fokus tetikus dengan waktu nyata

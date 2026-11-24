@@ -25,14 +25,17 @@ public final class FnXmlToJson extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XNode node = toNodeOrNull(arg(0), qc);
-    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
+    JsonSerialOptions options = toOptions(qc);
     if(node == null) return Empty.VALUE;
 
-    options.set(JsonOptions.FORMAT, JsonFormat.W3_XML);
-    final Boolean indent = options.get(JsonSerialOptions.INDENT);
     // no indentation specified: adopt module indentation
-    if(indent == null) options.set(JsonSerialOptions.INDENT,
-        qc.parameters().get(SerializerOptions.INDENT) == YesNo.YES);
+    final boolean adoptIndent = options.get(JsonSerialOptions.INDENT) == null;
+    if(adoptIndent || options.get(JsonOptions.FORMAT) != JsonFormat.W3_XML) {
+      options = options.copy();
+      options.set(JsonOptions.FORMAT, JsonFormat.W3_XML);
+      if(adoptIndent) options.set(JsonSerialOptions.INDENT,
+          qc.parameters().get(SerializerOptions.INDENT) == YesNo.YES);
+    }
 
     return Str.get(serialize(node.iter(), JsonSerialize.options(options), INVALIDOPTION_X, qc));
   }

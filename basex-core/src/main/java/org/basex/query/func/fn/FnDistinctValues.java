@@ -81,8 +81,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
         if(st.atomOcc().max <= 1)
           return type == st.type ? values : cc.function(DATA, info, exprs);
       }
-      // assign atomic type of argument
-      exprType.assign(type);
+      // assign atomic type of argument; non-empty input yields a non-empty result
+      exprType.assign(type, st.atomOcc().union(Occ.ONE_OR_MORE));
     }
     return this;
   }
@@ -90,8 +90,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // min(distinct-values($values)) → min($values), exists(distinct-values($v)) → exists($v)
-    // arrays are excluded from the existence check: they may be atomized to an empty sequence
-    final boolean drop = mode == Simplify.EXISTENCE && !arg(0).seqType().mayBeWrapped() ||
+    // existence check: items must atomize to single items ([], { 'a': () }/a: empty sequence)
+    final boolean drop = mode == Simplify.EXISTENCE && arg(0).seqType().atomizesToOne() ||
         mode.deduplicating() && !defined(1);
     return cc.simplify(this, drop ? arg(0) : this, mode);
   }

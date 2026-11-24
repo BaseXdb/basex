@@ -19,12 +19,12 @@ public final class SqlExecuteBatch extends SqlExecutePrepared {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final StatementOptions options = toOptions(qc);
 
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       // add one batch per parameter set (array or <sql:parameters/> element)
-      for(final Item params : arg(1).value(qc)) {
+      for(final Item params : arg(1).unwrappedValue(qc)) {
         // clear previous values so an under-specified set cannot inherit stale parameters
         ps.clearParameters();
         bind(params, ps, qc);

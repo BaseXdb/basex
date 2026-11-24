@@ -175,7 +175,7 @@ public final class Constr {
           builder.share(node);
         } else {
           // results of nested direct constructors are fresh nodes: adopt them without copying
-          final boolean keep = direct || !qc.context.options.get(MainOptions.COPYNODE);
+          final boolean keep = direct || !qc.options().get(MainOptions.COPYNODE);
           final XNode copy = node.materialize(n -> keep, info, qc);
           // apply copy-namespaces mode to copied element nodes
           if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem);

@@ -36,24 +36,21 @@ import org.basex.util.options.*;
  * @author Gunther Rademacher
  */
 public final class FnLoadXQueryModule extends StandardFunc {
-  /** The type of the value of the 'variables' and 'vendor-options' option. */
-
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final byte[] modUri = toToken(arg(0), qc);
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
 
-    final XQMap options = toEmptyMap(arg(1), qc);
-    final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
-    final Value hints = opt.get(LOCATION_HINTS);
+    final LoadXQueryModuleOptions opt = toOptions(qc);
+    final Value hints = opt.contains(LOCATION_HINTS) ? opt.get(LOCATION_HINTS) : Empty.VALUE;
     // untrusted modules are restricted to write permissions
-    final boolean trusted = trusted(opt, CommonOptions.TRUSTED, qc);
+    final boolean trusted = trusted(opt, TRUSTED, qc);
     final Perm perm = perm(qc).min(trusted ? Perm.ADMIN : Perm.WRITE);
 
     // check for cached result (callers must not bypass the location check)
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
-    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.ADMIN, null, info)) {
+    if(hints.size() == 1 && hintsOnly(opt) && qc.has(Perm.ADMIN, null, info)) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
       modCache = qcAnc.caches.moduleCache().get();
@@ -112,7 +109,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     mqc.inlineModule = inline;
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
-    final Value ctx = contextValue(options, opt);
+    final Value ctx = contextValue(opt);
     if(ctx != null) {
       mqc.contextValue = new ContextScope(ctx, mqc.contextType, new VarScope(), sc(), null, null);
       mqc.finalContext = true;
@@ -203,26 +200,31 @@ public final class FnLoadXQueryModule extends StandardFunc {
   }
 
   /**
-   * Returns the initial context value of the library module.
-   * @param options options map
+   * Checks if no other option than the location hints was supplied.
    * @param opt options
-   * @return context value, or {@code null} if the context value is absent
-   * @throws QueryException query exception
+   * @return result of check
    */
-  private Value contextValue(final XQMap options, final LoadXQueryModuleOptions opt)
-      throws QueryException {
-    // an empty sequence is a valid context value, so the map entries are checked
-    final boolean value = options.contains(Str.get(CONTEXT_VALUE.name()));
-    final boolean item = options.contains(Str.get(CONTEXT_ITEM.name()));
-    if(value && item) throw MODULE_CONTEXT_OPTIONS.get(info);
-    if(value) return opt.contains(CONTEXT_VALUE) ? opt.get(CONTEXT_VALUE) : Empty.VALUE;
-    // an empty context item indicates the absence of a context value
-    final Value ctx = item ? opt.get(CONTEXT_ITEM) : null;
-    return ctx == null || ctx.isEmpty() ? null : ctx;
+  private static boolean hintsOnly(final LoadXQueryModuleOptions opt) {
+    for(final Option<?> option : opt) {
+      if(option != LOCATION_HINTS && opt.contains(option)) return false;
+    }
+    return true;
   }
 
   /**
-   * Options for fn:load-xquery-module.
+   * Returns the initial context value of the library module.
+   * @param opt options
+   * @return context value (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private Value contextValue(final LoadXQueryModuleOptions opt) throws QueryException {
+    final Value value = opt.get(CONTEXT_VALUE), item = opt.get(CONTEXT_ITEM);
+    if(value != null && item != null) throw MODULE_CONTEXT_OPTIONS.get(info);
+    return value != null ? value : item;
+  }
+
+  /**
+   * Options for fn:load-xquery-module, with values only for supplied options.
    */
   public static final class LoadXQueryModuleOptions extends Options {
     /** load-xquery-module option xquery-version. */
@@ -234,8 +236,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content", null, Types.STRING_ZO);
     /** load-xquery-module option context-value. */
-    public static final ValueOption CONTEXT_VALUE = new ValueOption("context-value", Types.ITEM_ZM,
-        null);
+    public static final ValueOption CONTEXT_VALUE = new ValueOption("context-value", Types.ITEM_ZM);
     /** load-xquery-module option context-item. */
     public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", Types.ITEM_ZO,
         null);
@@ -246,5 +247,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
         Types.MAP_O, null);
     /** load-xquery-module option trusted. */
     public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED, false);
+
+    /**
+     * Constructor.
+     */
+    public LoadXQueryModuleOptions() {
+      super(false);
+    }
   }
 }

@@ -38,11 +38,10 @@ public final class MapGet extends MapFn {
     if(mti.validKey || mti.keyMismatch) {
       return cc.voidAndReturn(map, dflt ? arg(2) : Empty.VALUE, info);
     }
-    // type of result
-    if(mti.mapType != null) {
-      final SeqType st = mti.mapType.valueType();
-      exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
-    }
+    // type of result, also for choices of map types: map:get($r as (R1|R2), 'a')
+    final SeqType st = Lookup.valueType(map.seqType().type, key,
+        dflt ? arg(2).seqType() : Types.EMPTY_SEQUENCE_Z);
+    if(st != null && !st.zero()) exprType.assign(st);
     return this;
   }
 }

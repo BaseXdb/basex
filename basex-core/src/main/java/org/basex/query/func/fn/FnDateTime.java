@@ -21,10 +21,8 @@ public final class FnDateTime extends StandardFunc {
     final Item time = atomItem(arg(1), qc);
     if(date.isEmpty() || time.isEmpty()) return Empty.VALUE;
 
-    final Dat dat = date.type.isUntyped() ? new Dat(date.string(info), info) :
-      (Dat) checkType(date, BasicType.DATE);
-    final Tim tim = time.type.isUntyped() ? new Tim(time.string(info), info) :
-      (Tim) checkType(time, BasicType.TIME);
+    final Dat dat = (Dat) coerce(date, BasicType.DATE, arg(0), qc);
+    final Tim tim = (Tim) coerce(time, BasicType.TIME, arg(1), qc);
     return new Dtm(dat, tim, info);
   }
 

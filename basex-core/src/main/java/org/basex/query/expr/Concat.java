@@ -76,7 +76,7 @@ public final class Concat extends Arr {
     final int ls = list.size();
     if(ls == 1) {
       final Expr arg = list.peek();
-      final boolean single = arg.seqType().atomOcc().max <= 1;
+      final boolean single = arg.seqType().zeroOrOneUnwrapped();
       return cc.replaceWith(this, cc.function(single ? Function.STRING : Function.STRING_JOIN,
           info, arg));
     }

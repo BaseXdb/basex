@@ -33,15 +33,4 @@ abstract class CacheFn extends StandardFunc {
       throws QueryException {
     caches(qc).put(key, compact(value, qc), name);
   }
-
-  /**
-   * Returns a materialized, compact version of the specified value.
-   * @param value value
-   * @param qc query context
-   * @return compact value
-   * @throws QueryException query exception
-   */
-  final Value compact(final Value value, final QueryContext qc) throws QueryException {
-    return value.materialize(n -> false, info, qc).shrink(qc);
-  }
 }

@@ -53,10 +53,11 @@ public enum Calc {
     public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
         final CompileContext cc) throws QueryException {
       // check for neutral number (-0 + 0 → 0)
-      final Type type1 = expr1.seqType().type, type = numType(type1, expr2.seqType().type);
+      final Type type1 = expr1.seqType().atomType();
+      final Type type = numType(type1, expr2.seqType().atomType());
       if(expr2 instanceof final ANum num && num.dbl() == 0 &&
           (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) < 0)) {
-        return cast(expr1, type, num.type == DECIMAL, info, cc);
+        return cast(expr1, type, num.type, info, cc);
       }
       // $x + $x → $x * 2
       if(expr1.equals(expr2)) {
@@ -84,7 +85,7 @@ public enum Calc {
       if(type1 == DATE || type2 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION ||
          type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
-      return numType(type1, type2);
+      return numOperandType(type1, type2);
     }
 
     @Override
@@ -129,10 +130,11 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       // check for neutral number (-0 - -0 → 0)
-      final Type type1 = expr1.seqType().type, type = numType(type1, expr2.seqType().type);
+      final Type type1 = expr1.seqType().atomType();
+      final Type type = numType(type1, expr2.seqType().atomType());
       if(expr2 instanceof final ANum num && num.dbl() == 0 &&
           (type1.instanceOf(DECIMAL) || Double.doubleToRawLongBits(num.dbl()) >= 0)) {
-        return cast(expr1, type, num.type == DECIMAL, info, cc);
+        return cast(expr1, type, num.type, info, cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
       // $x - $x → 0 (no rewrite for decimals, which may be integers at runtime)
@@ -154,7 +156,7 @@ public enum Calc {
       if(type1.instanceOf(DATE_TIME)) return type1;
       if(type1 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
-      return numType(type1, type2);
+      return numOperandType(type1, type2);
     }
 
     @Override
@@ -198,11 +200,11 @@ public enum Calc {
     public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
         final CompileContext cc) throws QueryException {
 
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      final Type type = numType(expr1.seqType().atomType(), expr2.seqType().atomType());
       if(expr2 instanceof final ANum num) {
         final double dbl2 = num.dbl();
         // check for neutral number: $x * 1 → $x
-        if(dbl2 == 1) return cast(expr1, type, num.type == DECIMAL, info, cc);
+        if(dbl2 == 1) return cast(expr1, type, num.type, info, cc);
         // check for absorbing number: $x * 0 → 0
         if(dbl2 == 0) return type == INTEGER ? Itr.ZERO :
           type == DECIMAL && num.type == DECIMAL ? Dec.ZERO : null;
@@ -269,11 +271,11 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       // check for neutral number
-      final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
+      final Type type1 = expr1.seqType().atomType(), type2 = expr2.seqType().atomType();
       final Type type = numType(type1, type2);
       // $x div 1 → xs:decimal($x)
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
-        return cast(expr1, type(type1, type2), true, info, cc);
+        return cast(expr1, type(type1, type2), DECIMAL, info, cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       // $x div $x → 1
@@ -322,10 +324,10 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       // check for neutral number
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      final Type type1 = expr1.seqType().atomType();
+      final Type type = numType(type1, expr2.seqType().atomType());
       // $x idiv 1 → xs:integer($x)
-      if(expr1.seqType().type.instanceOf(INTEGER) && expr2 instanceof final ANum num &&
-          num.dbl() == 1) {
+      if(type1.instanceOf(INTEGER) && expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
@@ -379,7 +381,7 @@ public enum Calc {
         final CompileContext cc) {
 
       // check for neutral number
-      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      final Type type = numType(expr1.seqType().atomType(), expr2.seqType().atomType());
       // $x mod 1 → 0
       if(type == INTEGER && expr2 == Itr.ONE) return Itr.ZERO;
       // $x mod $x → 0; ignore floating numbers (NaN, INF) and decimals (may be integers)
@@ -497,19 +499,35 @@ public enum Calc {
   }
 
   /**
+   * Returns the static type of an addition or subtraction with a possibly unknown operand type.
+   * @param type1 type of first operand
+   * @param type2 type of second operand
+   * @return result type
+   */
+  private static Type numOperandType(final Type type1, final Type type2) {
+    final Type type = numType(type1, type2);
+    if(type != ANY_ATOMIC_TYPE) return type;
+    // untyped operands are cast to doubles, numbers can only be combined with numbers
+    return type1.isUntyped() || type2.isUntyped() ? DOUBLE :
+      type1.isNumber() || type2.isNumber() ? NUMERIC : type;
+  }
+
+  /**
    * Casts the remaining operand of a simplified calculation to the result type.
    * @param expr operand
    * @param type result type
-   * @param decimal indicates if the result is known to be a decimal
+   * @param lit type of the dropped literal ({@code xs:decimal} for divisions)
    * @param info input info (can be {@code null})
    * @param cc compilation context
-   * @return cast expression, or {@code null} if the result type cannot be preserved
+   * @return cast expression (can be {@code null} if the result type cannot be preserved)
    * @throws QueryException query exception
    */
-  static Expr cast(final Expr expr, final Type type, final boolean decimal, final InputInfo info,
+  static Expr cast(final Expr expr, final Type type, final Type lit, final InputInfo info,
       final CompileContext cc) throws QueryException {
+    // $num * xs:float(1): an xs:numeric operand only keeps its type for integer literals
+    if(type == NUMERIC && lit != INTEGER) return null;
     // $dec + 0.0: the cast would be dropped, but $dec may be an integer
-    return decimal && type == DECIMAL && expr.seqType().type == DECIMAL ? null :
+    return lit == DECIMAL && type == DECIMAL && expr.seqType().type == DECIMAL ? null :
       new Cast(info, expr, type.seqType()).optimize(cc);
   }
 

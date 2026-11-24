@@ -67,13 +67,12 @@ public class XQueryEval extends StandardFunc {
 
     // resolve query or function to be invoked
     final Item input = arg(0).unwrappedItem(qc, info);
-    final FuncItem function = toInvocable(input);
-    final IOContent query = function != null ? null : toContent(input, qc);
+    final FuncItem function = toInvocable(input, arg(0));
+    final IOContent query = function != null ? null : toContent(input, arg(0), qc);
 
     // parse options
-    final XQueryOptions options = new XQueryOptions();
+    final XQueryOptions options = toOptions(qc);
     final User user = qc.user;
-    toOptions(arg(2), options, qc);
 
     // a supplied permission also limits the code, including returned function items
     final Perm limit = options.get(XQueryOptions.PERMISSION);

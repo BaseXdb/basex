@@ -9,7 +9,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CsvParserOptions extends CsvOptions {
+public class CsvParserOptions extends CsvOptions {
   /** Option: encoding. */
   public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
 

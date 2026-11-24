@@ -303,11 +303,11 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(SeqType.keptStatic(type, tp, coerce)) return true;
+    if(type.keptStatic(tp, coerce)) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
-      mt = at.valueType();
+      mt = at.memberType();
     } else if(!coerce && tp instanceof final FuncType ft) {
       // without coercion: arrays are functions; with coercion, they are wrapped
       if(!ft.unary(Types.INTEGER_O)) return false;
@@ -321,7 +321,7 @@ public abstract class XQArray extends XQStruct {
         if(!mt.instance(value, coerce)) return false;
       }
       // remember the more specific type to skip subsequent checks
-      if(tp instanceof ArrayType && tp.assignable(coerce)) refineType(tp);
+      if(tp instanceof ArrayType && tp.attachable(coerce)) refineType(tp);
     }
     return true;
   }
@@ -339,8 +339,8 @@ public abstract class XQArray extends XQStruct {
       final CompileContext cc) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : members()) ab.add(at.valueType().coerce(value, qc, ii, null, cc));
-    return ab.array(at);
+    for(final Value value : members()) ab.add(at.memberType().coerce(value, qc, ii, null, cc));
+    return at.attachable() ? ab.array(at) : ab.array();
   }
 
   /**
@@ -355,14 +355,14 @@ public abstract class XQArray extends XQStruct {
   public final XQArray castTo(final ArrayType at, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
     if(at == Types.ARRAY) return this;
-    final SeqType vt = at.valueType();
+    final SeqType mt = at.memberType();
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
     for(final Value value : members()) {
-      final Value cast = vt.convert(value, error, qc, info);
+      final Value cast = mt.convert(value, error, qc, info);
       if(cast == null) return null;
       ab.add(cast);
     }
-    return ab.array(at);
+    return at.attachable() ? ab.array(at) : ab.array();
   }
 
   @Override

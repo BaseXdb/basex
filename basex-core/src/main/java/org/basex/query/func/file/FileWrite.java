@@ -43,8 +43,11 @@ public class FileWrite extends FileWriteFn {
       throws QueryException, IOException {
     final Path path = toTarget(arg(0), qc);
     final Iter input = arg(1).iter(qc);
-    final SerializerOptions options = toSerializerOptions(arg(2), qc);
-    if(!empty(path, append)) options.set(SerializerOptions.BYTE_ORDER_MARK, YesNo.NO);
+    SerializerOptions options = toOptions(qc);
+    if(!empty(path, append)) {
+      options = options.copy();
+      options.set(SerializerOptions.BYTE_ORDER_MARK, YesNo.NO);
+    }
 
     try(PrintOutput out = PrintOutput.get(output(path, append));
         Serializer ser = Serializer.get(out, options)) {

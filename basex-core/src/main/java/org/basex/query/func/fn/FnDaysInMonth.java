@@ -18,7 +18,7 @@ public final class FnDaysInMonth extends DateTimeFn {
     final Item value = atomItem(arg(0), qc);
     if(value.isEmpty()) return Empty.VALUE;
 
-    final ADate date = (ADate) Types.YEAR_MONTH_ZO.coerce(value, qc, info);
+    final ADate date = (ADate) coerce(value, Types.YEAR_MONTH_ZO, arg(0), qc);
     return Itr.get(ADate.daysOfMonth(date.yea(), (int) date.mon()));
   }
 }

@@ -143,22 +143,24 @@ public final class FnTransform extends StandardFunc {
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final TransformOptions options = options(qc);
+    final TransformOptions options = toOptions(qc);
     requestedProperties(options);
     version(options);
-    final boolean trusted = trusted(options, CommonOptions.TRUSTED, qc);
+    final boolean trusted = trusted(options, TRUSTED, qc);
     return saxon() ? new SaxonTransform(this, options, trusted, qc).transform() :
-      jaxp(options, qc);
+      jaxp(options, trusted, qc);
   }
 
   /**
    * Performs a transformation via the JAXP interface.
    * @param options transformation options
+   * @param trusted trusted flag
    * @param qc query context
    * @return result map
    * @throws QueryException query exception
    */
-  private XQMap jaxp(final TransformOptions options, final QueryContext qc) throws QueryException {
+  private XQMap jaxp(final TransformOptions options, final boolean trusted,
+      final QueryContext qc) throws QueryException {
     // reject requests that cannot be served by the JAXP interface
     for(final Option<?> option : UNSUPPORTED) {
       if(options.contains(option))
@@ -182,11 +184,11 @@ public final class FnTransform extends StandardFunc {
     final boolean tree = format == DeliveryFormat.DOCUMENT;
     final ArrayOutput output = tree ? null : new ArrayOutput();
     final XsltResult document = tree ?
-      new XsltResult(uri != null ? token(uri) : EMPTY, qc.context.options) : null;
+      new XsltResult(uri != null ? token(uri) : EMPTY, qc.options()) : null;
 
     final String error = Xslt.transform(stylesheet, source,
         tree ? document : new StreamResult(output),
-        options.get(CACHE), trusted(options, CommonOptions.TRUSTED, qc), qc, tr -> {
+        options.get(CACHE), trusted, qc, tr -> {
           params.forEach(tr::setParameter);
           properties.forEach((name, value) -> {
             if(OUTPUT_KEYS.contains(name)) tr.setOutputProperty(name, value);
@@ -221,19 +223,9 @@ public final class FnTransform extends StandardFunc {
     return functionOption(0) ? Integer.MAX_VALUE : 0;
   }
 
-  /**
-   * Returns the transformation options. Values that are not permitted for an option are
-   * rejected with a function-specific error.
-   * @param qc query context
-   * @return options
-   * @throws QueryException query exception
-   */
-  private TransformOptions options(final QueryContext qc) throws QueryException {
-    try {
-      return toOptions(arg(0), new TransformOptions(), qc);
-    } catch(final QueryException ex) {
-      throw error(ex, ex.error() == INVALIDOPTIONVALUE_X ? TRANSFORM_OPTIONS_X : null);
-    }
+  @Override
+  protected QueryException error(final QueryException ex) {
+    return error(ex, ex.error() == INVALIDOPTIONVALUE_X ? TRANSFORM_OPTIONS_X : null);
   }
 
   /**

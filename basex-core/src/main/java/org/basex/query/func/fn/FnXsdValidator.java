@@ -91,8 +91,9 @@ public final class FnXsdValidator extends StandardFunc {
 
   @Override
   public FuncItem value(final QueryContext qc) throws QueryException {
-    final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
-    final boolean trusted = trustExternal(options, qc);
+    final XsdValidatorOptions options = toOptions(qc);
+    final MainOptions mopts = mainOptions(qc);
+    final boolean trusted = mopts.trustExternal(options);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
     if(xsi && !trusted) throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
     // as in fn:doc, external resources are only retrieved with additional permissions
@@ -101,7 +102,7 @@ public final class FnXsdValidator extends StandardFunc {
 
     final Var var = new VarScope().addNew(new QNm("target"), TARGET_TYPE, qc, info);
     final Var[] params = { var };
-    final Expr validate = new Validate(info, schema(options, trusted, qc),
+    final Expr validate = new Validate(info, schema(options, trusted, mopts),
         options.get(XsdValidatorOptions.RETURN_TYPED_NODE),
         options.get(XsdValidatorOptions.RETURN_ERROR_DETAILS), xsi, new VarRef(info, var));
     return new FuncItem(info, validate, params, AnnList.EMPTY, VALIDATOR_TYPE,
@@ -129,12 +130,12 @@ public final class FnXsdValidator extends StandardFunc {
    * Assembles a schema from the schema documents referenced by the options.
    * @param options validation options
    * @param trusted allow access to external resources
-   * @param qc query context
+   * @param mopts main options
    * @return schema
    * @throws QueryException query exception
    */
   private Schema schema(final XsdValidatorOptions options, final boolean trusted,
-      final QueryContext qc) throws QueryException {
+      final MainOptions mopts) throws QueryException {
 
     final ArrayList<Source> sources = new ArrayList<>();
     try {
@@ -148,7 +149,7 @@ public final class FnXsdValidator extends StandardFunc {
         sources.add(new StreamSource(io.inputStream(), io.url()));
       }
 
-      final SchemaFactory sf = ValidateXsd.factory(mainOptions(qc));
+      final SchemaFactory sf = ValidateXsd.factory(mopts);
       // indirectly referenced schema documents are only retrieved in trusted mode
       if(!trusted) ValidateXsd.restrict(sf);
       return sources.isEmpty() ? sf.newSchema() : sf.newSchema(sources.toArray(Source[]::new));
@@ -220,7 +221,7 @@ public final class FnXsdValidator extends StandardFunc {
         if(typedNode) {
           // the validated input is passed on to a database builder
           typed = new DBNode(MemBuilder.build(new ValidatingParser(input, reader, handler,
-              node.type.instanceOf(NodeType.DOCUMENT), qc.context.options)));
+              node.type.instanceOf(NodeType.DOCUMENT), qc.options())));
         } else {
           handler.setContentHandler(null);
           reader.setProperty(LEXICAL_HANDLER, null);

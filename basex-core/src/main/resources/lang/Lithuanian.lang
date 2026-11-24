@@ -320,6 +320,7 @@ results_%            = % rezultatas (-ai)
 revert               = Atkurti
 revert_file_%        = Atkurti % ir atmesti pakeitimus?
 revert_files_%       = Bus atkurta % failas (-ų), naujesni pakeitimai bus prarasti.
+rt_compilation       = Kompiliavimas realiuoju laiku
 rt_execution         = Vykdymas realiuoju laiku
 rt_filtering         = Filtravimas realiuoju laiku
 rt_focus             = Pelės fokusas realiuoju laiku

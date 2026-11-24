@@ -2,7 +2,6 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -29,10 +28,8 @@ public final class ArrayOfMembers extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = arg(0).seqType().type;
-    if(type instanceof final NodeType nt && nt.test instanceof final JNodeTest jnt) {
-      exprType.assign(ArrayType.get(jnt.valueType.matched()));
-    }
+    final SeqType vt = arg(0).seqType().valueType();
+    if(vt != null) exprType.assign(ArrayType.get(vt.matched()));
     return this;
   }
 

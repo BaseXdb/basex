@@ -43,12 +43,6 @@ public class FnCollection extends Docs {
   }
 
   @Override
-  boolean stable(final QueryContext qc) throws QueryException {
-    return arg(1) instanceof Value && toOptions(arg(1), new CollectionOptions(), qc).
-        get(CollectionOptions.STABLE);
-  }
-
-  @Override
   public final boolean ddo() {
     return true;
   }
@@ -61,7 +55,7 @@ public class FnCollection extends Docs {
    * @throws QueryException query exception
    */
   final Value collection(final boolean uris, final QueryContext qc) throws QueryException {
-    final CollectionOptions options = toOptions(arg(1), new CollectionOptions(), qc);
+    final CollectionOptions options = toOptions(qc);
     final DocOptions docOpts = options.xmlOptions();
     check(docOpts, false);
 

@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
- * XDM types.
+ * XDM item types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -127,7 +127,7 @@ public interface Type {
     }
 
     /**
-     * Returns the type index. Also called by XQJ.
+     * Returns the type index, which is also used by XQJ.
      * @return type index
      */
     public byte asByte() {
@@ -174,7 +174,7 @@ public interface Type {
   /**
    * Casts the specified item to this type.
    * @param item item to be converted
-   * @param qc query context (can be {@code null} if the target type needs no reference)
+   * @param qc query context, required by some target types (can be {@code null})
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
@@ -184,12 +184,15 @@ public interface Type {
   /**
    * Casts the specified Java value to this type.
    * @param value Java value
-   * @param qc query context (can be {@code null} if the target type needs no reference)
+   * @param qc query context, required by some target types (can be {@code null})
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Object value, QueryContext qc, InputInfo info) throws QueryException;
+  default Value cast(final Object value, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    return cast(Str.get(value, info), qc, info);
+  }
 
   /**
    * Reads an item from the input stream.
@@ -199,10 +202,13 @@ public interface Type {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  Item read(DataInput in, QueryContext qc) throws IOException, QueryException;
+  @SuppressWarnings("unused")
+  default Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    throw Util.notExpected();
+  }
 
   /**
-   * Returns a sequence type with a single number of occurrence.
+   * Returns a sequence type for exactly one item of this type.
    * @return sequence type
    */
   default SeqType seqType() {
@@ -210,7 +216,7 @@ public interface Type {
   }
 
   /**
-   * Internal function for creating a sequence type with the specified occurrence indicator.
+   * Creates a sequence type with this item type and the specified occurrence indicator.
    * @param occ occurrence indicator
    * @return sequence type
    * @see SeqType#get(Type, Occ)
@@ -251,8 +257,8 @@ public interface Type {
   }
 
   /**
-   * Returns the function type of this type, if any.
-   * @return function type, or {@code null} if type cannot represent a function
+   * Returns the function type of this type if its items are functions.
+   * @return function type (can be {@code null})
    */
   default FuncType funcType() {
     return null;
@@ -262,14 +268,14 @@ public interface Type {
 
   /**
    * Checks if this type is equal to the given one.
-   * @param type other type
+   * @param type other type (dereferenced by the caller)
    * @return {@code true} if both types are equal, {@code false} otherwise
    */
   boolean eq(Type type);
 
   /**
-   * Checks if the current type is an instance of the specified type.
-   * @param type type to be checked
+   * Checks if this type is an instance of the specified type.
+   * @param type type to be checked (dereferenced by the caller)
    * @return result of check
    */
   boolean instanceOf(Type type);
@@ -285,23 +291,21 @@ public interface Type {
   }
 
   /**
-   * Computes the union between this type and the given one, i.e. the least common ancestor
-   * of both types in the type hierarchy.
-   * @param type other type
+   * Computes the union of this type and the given one, i.e., their least common supertype.
+   * @param type other type (dereferenced by the caller)
    * @return union type
    */
   Type union(Type type);
 
   /**
-   * Computes the intersection between this type and the given one, i.e. the least specific type
-   * that is subtype of both types. If no such type exists, {@code null} is returned.
-   * @param type other type
-   * @return intersection type or {@code null}
+   * Computes the intersection of this type and the given one, i.e., their most general subtype.
+   * @param type other type (dereferenced by the caller)
+   * @return intersection type (can be {@code null})
    */
   Type intersect(Type type);
 
   /**
-   * Checks if items with this type are numbers.
+   * Checks if items of this type are known to atomize to numbers.
    * @return result of check
    */
   default boolean isNumber() {
@@ -309,7 +313,7 @@ public interface Type {
   }
 
   /**
-   * Checks if items with this type are untyped.
+   * Checks if items of this type are known to atomize to untyped values.
    * @return result of check
    */
   default boolean isUntyped() {
@@ -317,7 +321,7 @@ public interface Type {
   }
 
   /**
-   * Checks if items with this type are numbers or untyped.
+   * Checks if items of this type are known to atomize to numbers or untyped values.
    * @return result of check
    */
   default boolean isNumberOrUntyped() {
@@ -325,7 +329,7 @@ public interface Type {
   }
 
   /**
-   * Checks if items of this type are strings, URIs or untyped.
+   * Checks if items of this type are known to atomize to strings, URIs or untyped values.
    * @return result of check
    */
   default boolean isStringOrUntyped() {
@@ -333,48 +337,25 @@ public interface Type {
   }
 
   /**
-   * Checks if items of this type are sortable.
-   * @return result of check
-   */
-  default boolean isSortable() {
-    return false;
-  }
-
-  /**
-   * Returns the atomic type.
-   * @return atomic type (can be {@code null}, e.g. for function types)
+   * Returns the type of the atomized items if the items are atomizable and the type is known.
+   * @return atomic type (can be {@code null})
    */
   BasicType atomic();
 
   /**
-   * Returns the type ID.
-   * @return ID, or {@code null} if the type has no ID
+   * Returns the type of the atomized items, or {@code xs:anyAtomicType} if it is unknown.
+   * @return atomic type
+   */
+  default BasicType atomicOrAny() {
+    final BasicType at = atomic();
+    return at != null ? at : BasicType.ANY_ATOMIC_TYPE;
+  }
+
+  /**
+   * Returns the type ID if the type has one.
+   * @return ID (can be {@code null})
    */
   ID id();
-
-  /**
-   * Returns the type index.
-   * @return index
-   */
-  default byte index() {
-    return id().asByte();
-  }
-
-  /**
-   * Checks if the type is namespace-sensitive.
-   * @return result of check
-   */
-  default boolean nsSensitive() {
-    return false;
-  }
-
-  /**
-   * Checks if the type can possibly be refined, e.g. if it has subtypes.
-   * @return result of check (may also wrongly return {@code false})
-   */
-  default boolean refinable() {
-    return false;
-  }
 
   /**
    * Returns the strongest effect that coercion to this type may have on a matching value.
@@ -385,36 +366,62 @@ public interface Type {
   }
 
   /**
-   * Checks if coercion to this type may rebuild records or wrap functions.
+   * Checks if items of this static type are instances of the target type that are kept.
+   * @param target target type
+   * @param coerce coercion
    * @return result of check
    */
-  default boolean coercive() {
-    return coercion() != Coercion.KEEP;
+  default boolean keptStatic(final Type target, final boolean coerce) {
+    // static function types are upper bounds: functions of the same type may still be wrapped
+    // fn(xs:integer) → fn(xs:integer): false (an fn(xs:decimal) item would be wrapped)
+    return !(coerce && target.coercion() == Coercion.WRAP) && keptExact(target, coerce);
   }
 
   /**
-   * Checks if coercion to this type may wrap functions.
+   * Checks if items of this exact type are instances of the target type that are kept.
+   * @param target target type
+   * @param coerce coercion
    * @return result of check
    */
-  default boolean wraps() {
-    return coercion() == Coercion.WRAP;
+  default boolean keptExact(final Type target, final boolean coerce) {
+    // xs:integer → xs:decimal, R → R: true; fn(xs:decimal) → fn(xs:integer): false (wrapped)
+    final Type tp = deref(), tt = target.deref();
+    return tp == tt || tp.instanceOf(tt) && (!coerce || tp == BasicType.ERROR ||
+      tt.coercion() == Coercion.KEEP || tp.eq(tt) || RecordType.derives(tp, tt));
   }
 
   /**
-   * Checks if this type can be assigned to a sequence as its runtime type.
+   * Checks if this type can be attached to a value.
    * @return result of check
    */
-  default boolean assignable() {
+  default boolean attachable() {
     return true;
   }
 
   /**
-   * Checks if this type can be assigned as runtime type to a value that matches it.
+   * Checks if this type can be attached to a value that matches it.
    * @param coerce item coercion
    * @return result of check
    */
-  default boolean assignable(final boolean coerce) {
-    return assignable() && (coerce || !coercive());
+  default boolean attachable(final boolean coerce) {
+    return attachable() && (coerce || coercion() == Coercion.KEEP);
+  }
+
+  /**
+   * Returns the type that can be attached to values of this type.
+   * @return attachable type
+   */
+  default Type toAttachable() {
+    // (xs:int | xs:string), enum('a') or array((A | B)) are never attached
+    return attachable() ? this : BasicType.ITEM;
+  }
+
+  /**
+   * Dereferences this type.
+   * @return referenced type of a type reference, or this type
+   */
+  default Type deref() {
+    return this;
   }
 
   /**
@@ -426,21 +433,21 @@ public interface Type {
   }
 
   /**
-   * Returns the given type, or the type of the specified expression if it is more specific.
+   * Returns the intersection with the type of the specified expression if it is attachable.
    * @param expr expression (can be {@code null})
    * @return type
    */
   default Type refine(final Expr expr) {
     if(expr != null) {
       final Type tp = expr.seqType().type.intersect(this);
-      if(tp != null) return tp;
+      if(tp != null && tp.attachable()) return tp;
     }
     return this;
   }
 
   /**
-   * Returns an info message for a similar type.
-   * @param qname name of type
+   * Returns an info message that suggests a type with a similar name.
+   * @param qname name of the unknown type
    * @return info string
    */
   static String similar(final QNm qname) {
@@ -453,16 +460,16 @@ public interface Type {
   }
 
   /**
-   * Returns the node kind.
-   * @return node kind or {@code null}
+   * Returns the node kind if this is a node type.
+   * @return node kind (can be {@code null})
    */
   default Kind kind() {
     return null;
   }
 
   /**
-   * Returns the name of the type.
-   * @return name, or {@code null} if the type has no name
+   * Returns the name of the type if it has one.
+   * @return name (can be {@code null})
    */
   Object name();
 

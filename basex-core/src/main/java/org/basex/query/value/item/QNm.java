@@ -314,6 +314,15 @@ public final class QNm extends Item {
   }
 
   /**
+   * Returns a name string with the prefix of this name and the specified local name.
+   * @param lcl local name
+   * @return name as token
+   */
+  public byte[] withLocal(final byte[] lcl) {
+    return prefix == -1 ? lcl : concat(prefix(), cpToken(':'), lcl);
+  }
+
+  /**
    * Returns a unique representation of the QName.
    * <ul>
    * <li> If a URI exists, the EQName notation is used.</li>

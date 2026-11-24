@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -142,7 +143,7 @@ public final class Stores implements Closeable {
    */
   public synchronized void close(final String name, final InputInfo info) throws QueryException {
     try {
-      writeStore(name, false);
+      writeStore(name, false, info);
     } catch(final IOException ex) {
       throw STORE_IO_X.get(info, ex);
     }
@@ -188,12 +189,9 @@ public final class Stores implements Closeable {
         throw STORE_IO_X.get(info, ex);
       }
     }
-    final MapBuilder mb = new MapBuilder();
-    mb.put("entries", Itr.get(entries));
-    mb.put("size", Itr.get(persisted ? file.length() : 0));
-    mb.put("persisted", Bln.get(persisted));
-    if(persisted) mb.put("modified", Dtm.get(file.timeStamp()));
-    return mb.map();
+    return XQMap.get(Records.STORE_INFO.get(), Itr.get(entries),
+        Itr.get(persisted ? file.length() : 0), Bln.get(persisted),
+        persisted ? Dtm.get(file.timeStamp()) : Empty.VALUE);
   }
 
   /**
@@ -220,7 +218,7 @@ public final class Stores implements Closeable {
    */
   public synchronized void write(final String name, final InputInfo info) throws QueryException {
     try {
-      writeStore(name, true);
+      writeStore(name, true, info);
     } catch(final IOException ex) {
       throw STORE_IO_X.get(info, ex);
     }
@@ -240,7 +238,7 @@ public final class Stores implements Closeable {
     if(context.soptions.get(StaticOptions.WRITESTORE)) {
       for(final String name : stores.keySet()) {
         try {
-          writeStore(name, false);
+          writeStore(name, false, null);
         } catch(final IOException | QueryException ex) {
           Util.stack(ex);
         }
@@ -283,7 +281,7 @@ public final class Stores implements Closeable {
     final MapBuilder mb = new MapBuilder();
     try(DataInput in = new DataInput(storeFile(name))) {
       for(int s = in.readNum() - 1; s >= 0; s--) {
-        mb.put(in.readToken(), read(in, qc));
+        mb.put(in.readToken(), read(in, qc, info));
       }
     } catch(final IOException ex) {
       throw STORE_IO_X.get(info, ex);
@@ -295,10 +293,11 @@ public final class Stores implements Closeable {
    * Writes the current store to disk.
    * @param name name of store
    * @param enforce always write store (not only dirty ones)
+   * @param info input info (can be {@code null})
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void writeStore(final String name, final boolean enforce)
+  private void writeStore(final String name, final boolean enforce, final InputInfo info)
       throws IOException, QueryException {
     final Store entry = stores.get(name);
     final IOFile file = storeFile(name);
@@ -315,7 +314,7 @@ public final class Stores implements Closeable {
             out.writeNum((int) size);
             for(final XQMap.Entry e : map.entries()) {
               out.writeToken(e.key().string(null));
-              write(out, e.value());
+              write(out, e.value(), info);
             }
           }
           file.replaceWith(tmp);
@@ -359,6 +358,41 @@ public final class Stores implements Closeable {
   private static final int SEQUENCE = 0x3f;
 
   /**
+   * Writes the specified top-level value to an output stream.
+   * @param out data output
+   * @param value value to write
+   * @param info input info (can be {@code null})
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public static void write(final DataOutput out, final Value value, final InputInfo info)
+      throws IOException, QueryException {
+    try {
+      write(out, value);
+    } catch(final StackOverflowError ex) {
+      throw BASEX_NESTED.get(info).cause(ex);
+    }
+  }
+
+  /**
+   * Reads a top-level value from disk.
+   * @param in input stream
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return value
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public static Value read(final DataInput in, final QueryContext qc, final InputInfo info)
+      throws IOException, QueryException {
+    try {
+      return read(in, qc);
+    } catch(final StackOverflowError ex) {
+      throw BASEX_NESTED.get(info).cause(ex);
+    }
+  }
+
+  /**
    * Writes the specified value to an output stream.
    * @param out data output
    * @param value value to write
@@ -371,7 +405,7 @@ public final class Stores implements Closeable {
     final Format format = size > 1 ? Format.get(value) : null;
     // the type must be refined before it is written
     final boolean same = size > 1 && format == null && value.refineType();
-    out.writeNum(value.seqType().type.index());
+    out.writeNum(value.seqType().type.id().asByte());
     out.writeLong(size);
     if(size == 1) {
       value.write(out);
@@ -382,7 +416,7 @@ public final class Stores implements Closeable {
       out.writeNum(SEQUENCE);
       out.writeBool(same);
       for(final Item item : value) {
-        if(!same) out.writeNum(item.type.index());
+        if(!same) out.writeNum(item.type.id().asByte());
         item.write(out);
       }
     }

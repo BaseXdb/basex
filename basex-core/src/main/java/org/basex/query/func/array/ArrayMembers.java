@@ -32,7 +32,7 @@ public final class ArrayMembers extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     final SeqType st = array.seqType().type instanceof final ArrayType at ?
-      NodeType.get(null, at.valueType()).seqType(Occ.ZERO_OR_MORE) : seqType();
+      NodeType.get(null, at.memberType()).seqType(Occ.ZERO_OR_MORE) : seqType();
     exprType.assign(st, Occ.ZERO_OR_MORE, array.structSize());
     return this;
   }

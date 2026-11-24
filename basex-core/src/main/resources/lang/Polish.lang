@@ -320,6 +320,7 @@ results_%            = % wynik(ów)
 revert               = Przywróć
 revert_file_%        = Przywrócić % i odrzucić zmiany?
 revert_files_%       = Zostanie przywróconych % plików, nowsze zmiany zostaną utracone.
+rt_compilation       = Kompilacja w czasie rzeczywistym
 rt_execution         = Wykonywanie w czasie rzeczywistym
 rt_filtering         = Filtrowanie w czasie rzeczywistym
 rt_focus             = Fokus myszy w czasie rzeczywistym

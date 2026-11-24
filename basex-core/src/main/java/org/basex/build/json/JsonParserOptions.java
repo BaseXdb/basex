@@ -14,7 +14,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class JsonParserOptions extends JsonOptions {
+public class JsonParserOptions extends JsonOptions {
   /** Option: unescape special characters (parse-json, json-to-xml). */
   public static final BooleanOption ESCAPE = new BooleanOption("escape", false);
   /** Option: liberal parsing (parse-json, json-to-xml). */

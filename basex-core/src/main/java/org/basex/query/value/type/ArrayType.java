@@ -13,53 +13,53 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Type for arrays.
+ * XDM array types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayType extends FType {
-  /** Type of the array values. */
-  private final SeqType valueType;
+  /** Type of the array members. */
+  private final SeqType memberType;
 
   /**
    * Constructor.
-   * @param valueType value type
+   * @param memberType member type
    */
-  ArrayType(final SeqType valueType) {
-    this.valueType = valueType;
+  ArrayType(final SeqType memberType) {
+    this.memberType = memberType;
   }
 
   /**
-   * Creates an array type.
-   * @param valueType value type
+   * Returns the array type with the specified member type.
+   * @param memberType member type
    * @return array type
    */
-  public static ArrayType get(final SeqType valueType) {
-    return valueType.arrayType();
+  public static ArrayType get(final SeqType memberType) {
+    return memberType.arrayType();
   }
 
   /**
-   * Getter for the value type.
-   * @return value type
+   * Returns the member type.
+   * @return member type
    */
-  public SeqType valueType() {
-    return valueType;
+  public SeqType memberType() {
+    return memberType;
   }
 
   @Override
   public Coercion coercion() {
-    return valueType.type.coercion();
+    return memberType.type.coercion();
   }
 
   @Override
-  public boolean assignable() {
-    return valueType.type.assignable();
+  public boolean attachable() {
+    return memberType.type.attachable();
   }
 
   @Override
   public boolean global() {
-    return valueType.type.global();
+    return memberType.type.global();
   }
 
   @Override
@@ -80,17 +80,17 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type || type instanceof final ArrayType at && valueType.eq(at.valueType);
+    return this == type || type instanceof final ArrayType at && memberType.eq(at.memberType);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(ARRAY, FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ArrayType at) {
-      return this != ARRAY && valueType.instanceOf(at.valueType);
+      return this != ARRAY && memberType.instanceOf(at.memberType);
     }
     if(type instanceof final FuncType ft) {
-      return valueType.instanceOf(ft.declType) && ft.unary(INTEGER_O);
+      return memberType.instanceOf(ft.declType) && ft.unary(INTEGER_O);
     }
     return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
@@ -98,20 +98,20 @@ public final class ArrayType extends FType {
   @Override
   public Type union(final Type type) {
     return type instanceof ChoiceItemType ? type.union(this) :
-      SeqType.kept(this, type, true) ? type :
-      SeqType.kept(type, this, true) ? this :
-      type instanceof final ArrayType at ? union(at.valueType) :
+      type.keptExact(this, true) ? this :
+      keptExact(type, true) ? type :
+      type instanceof final ArrayType at ? union(at.memberType) :
       type instanceof MapType ? FUNCTION :
       type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   /**
-   * Creates a union of two array types.
-   * @param vt value type
+   * Returns the union of this type and the array type with the specified member type.
+   * @param mt member type of the other array type
    * @return array type
    */
-  public ArrayType union(final SeqType vt) {
-    return valueType.eq(vt) ? this : get(valueType.union(vt));
+  public ArrayType union(final SeqType mt) {
+    return memberType.eq(mt) ? this : get(memberType.union(mt));
   }
 
   @Override
@@ -122,7 +122,7 @@ public final class ArrayType extends FType {
 
     if(type instanceof final ArrayType at) {
       // disjoint member types: the empty array is still an instance of both types
-      final SeqType mt = valueType.intersect(at.valueType);
+      final SeqType mt = memberType.intersect(at.memberType);
       return get(mt != null ? mt : ERROR_O);
     }
     return type instanceof final FuncType ft && ft.unary(INTEGER_O) ? this : null;
@@ -130,12 +130,12 @@ public final class ArrayType extends FType {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(valueType, INTEGER_O);
+    return FuncType.get(memberType, INTEGER_O);
   }
 
   @Override
   public BasicType atomic() {
-    return valueType.type.atomic();
+    return memberType.type.atomic();
   }
 
   @Override
@@ -150,6 +150,6 @@ public final class ArrayType extends FType {
 
   @Override
   public String toString() {
-    return toString(", ", this == ARRAY ? WILDCARD : new Object[] { valueType });
+    return toString(", ", this == ARRAY ? WILDCARD : new Object[] { memberType });
   }
 }

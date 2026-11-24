@@ -132,7 +132,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
             throw VARPRIVATE_X.get(ref.info(), ref);
           }
           throw VARUNDEF_X.get(ref.info(),
-              QueryError.similar(ref, similarName(ref.name, ur.localNames, sc)));
+              QueryError.similar(ref, similarName(ref.name, ur.localNames, sc),
+                  n -> Util.info("$%", n.prefixString())));
         }
         if(!Token.eq(modUri, refUri) && !ur.hasImport) {
           throw INVISIBLEVAR_X.get(ref.info(), ref.name.varString());
@@ -190,22 +191,19 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * Returns a formatted "$name" hint for the variable name most similar to the supplied reference,
-   * or {@code null} if no similar name is found among the in-scope and declared variables.
+   * Returns the in-scope or declared variable name most similar to the supplied reference.
    * @param name unresolved variable name
-   * @param localNames local variables in scope at reference time ({@code null} if not required)
+   * @param localNames local variables in scope at reference time (can be {@code null})
    * @param sc static context of the reference
-   * @return formatted hint or {@code null}
+   * @return similar name (can be {@code null})
    */
-  private String similarName(final QNm name, final QNm[] localNames, final StaticContext sc) {
+  private QNm similarName(final QNm name, final QNm[] localNames, final StaticContext sc) {
     final ArrayList<QNm> candidates = new ArrayList<>();
     if(localNames != null) Collections.addAll(candidates, localNames);
     for(final StaticVar sv : this) {
       if(sv.visible(sc)) candidates.add(sv.name);
     }
-    final QNm similar = Levenshtein.similarOrPrefix(name.local(),
-        candidates.toArray(QNm[]::new), QNm::local);
-    return similar != null ? Util.info("$%", similar.prefixString()) : null;
+    return Levenshtein.similarOrPrefix(name.local(), candidates.toArray(QNm[]::new), QNm::local);
   }
 
   /**

@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.value.type.BasicType.*;
+
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,6 +24,6 @@ public final class FnYearFromDateTime extends DateTimeFn {
 
   @Override
   protected boolean mayBeEmpty() {
-    return true;
+    return !argType(DATE_TIME, DATE, G_YEAR, G_YEAR_MONTH);
   }
 }

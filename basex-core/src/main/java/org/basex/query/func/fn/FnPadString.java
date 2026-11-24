@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -41,7 +40,7 @@ public final class FnPadString extends StandardFunc {
   public Str value(final QueryContext qc) throws QueryException {
     final Item value = atomItem(arg(0), qc);
     final long length = toLong(arg(1), qc);
-    final PadOptions options = options(2, PadOptions::new, qc);
+    final PadOptions options = toOptions(qc);
 
     final byte[] padding = Token.token(options.get(PadOptions.PADDING));
     if(padding.length == 0)
@@ -68,12 +67,6 @@ public final class FnPadString extends StandardFunc {
     // pad-string(<a>{ $x }</a>, 5) → pad-string(xs:string($x), 5)
     arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
     super.simplifyArgs(cc);
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    optOptions(2, PadOptions::new, cc);
-    return this;
   }
 
   /**

@@ -4,14 +4,13 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery union type.
+ * Choice item type, consisting of alternative item types.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -19,7 +18,7 @@ import org.basex.util.*;
 public final class ChoiceItemType implements Type {
   /** Alternative item types. */
   public final List<Type> types;
-  /** Common ancestor type. */
+  /** Union of the dereferenced alternatives. */
   private final Type union;
 
   /** Sequence types. */
@@ -33,15 +32,16 @@ public final class ChoiceItemType implements Type {
     this.types = types;
     Type ut = null;
     for(final Type tp : this.types) {
-      ut = ut == null ? tp : ut.union(tp);
+      final Type dt = tp.deref();
+      ut = ut == null ? dt : ut.union(dt);
     }
     union = ut;
   }
 
   /**
-   * Creates a choice item type.
+   * Returns a choice item type, or the remaining item type if there is only one.
    * @param types alternative item types
-   * @return choice item type
+   * @return item type
    */
   public static Type get(final Type... types) {
     final Builder builder = new Builder();
@@ -57,7 +57,7 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return false;
   }
 
@@ -82,11 +82,6 @@ public final class ChoiceItemType implements Type {
       }
     }
     throw FUNCCAST_X_X.get(info, this, value);
-  }
-
-  @Override
-  public Item read(final DataInput in, final QueryContext qc) {
-    throw Util.notExpected();
   }
 
   @Override
@@ -116,23 +111,14 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    final Type target = TypeRef.deref(type);
-    if(target instanceof final ChoiceItemType ct) {
-      for(final Type tp : types) {
-        if(!ct.hasInstance(tp)) return false;
-      }
-    } else {
-      // shortcut: the common ancestor of all alternatives is an instance of the type
-      if(union.instanceOf(target)) return true;
-      for(final Type tp : types) {
-        if(!tp.instanceOf(target)) return false;
-      }
-    }
-    return true;
+    final Type target = type.deref();
+    if(target instanceof final ChoiceItemType ct) return Checks.all(types, ct::hasInstance);
+    // shortcut: the union of all alternatives is an instance of the type
+    return union.instanceOf(target) || Checks.all(types, tp -> tp.instanceOf(target));
   }
 
   /**
-   * Checks if this choice type is a supertype of the given type.
+   * Checks if the specified type is a subtype of this choice item type.
    * @param type type to be checked
    * @return result of check
    */
@@ -140,19 +126,18 @@ public final class ChoiceItemType implements Type {
     final Type norm = expand(type);
     if(norm instanceof final ChoiceItemType ct) return ct.instanceOf(this);
     for(final Type tp : types) {
-      if(norm.instanceOf(TypeRef.deref(tp))) return true;
+      if(norm.instanceOf(tp.deref())) return true;
     }
     return false;
   }
 
   /**
-   * Expand the given type for comparison with choice item types, if necessary, as specified in the
-   * subtyping rules for choice item types.
+   * Dereferences the specified type and expands it as defined by the choice subtyping rules.
    * @param type type to expand
    * @return expanded type
    */
   private static Type expand(final Type type) {
-    final Type tp = TypeRef.deref(type);
+    final Type tp = type.deref();
     if(tp == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
     if(tp == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
     if(tp == BasicType.ITEM) return Types.ITEM_EXPANSION;
@@ -163,14 +148,15 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type union(final Type type) {
-    return type == BasicType.ERROR ? this : union.union(type);
+    return type == BasicType.ERROR ? this : union.union(type.deref());
   }
 
   @Override
   public Type intersect(final Type type) {
     final Builder builder = new Builder();
+    final Type target = type.deref();
     for(final Type tp : types) {
-      final Type is = type.intersect(tp);
+      final Type is = target.intersect(tp.deref());
       if(is != null) builder.add(is);
     }
     return builder.types.isEmpty() ? null : builder.build();
@@ -178,40 +164,38 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean isNumber() {
-    return union.isNumber();
+    return Checks.all(types, Type::isNumber);
   }
 
   @Override
   public boolean isUntyped() {
-    return union.isUntyped();
+    return Checks.all(types, Type::isUntyped);
+  }
+
+  @Override
+  public boolean isNumberOrUntyped() {
+    return Checks.all(types, Type::isNumberOrUntyped);
   }
 
   @Override
   public boolean isStringOrUntyped() {
-    return union.isStringOrUntyped();
-  }
-
-  @Override
-  public boolean isSortable() {
-    return union.isSortable();
+    return Checks.all(types, Type::isStringOrUntyped);
   }
 
   @Override
   public BasicType atomic() {
-    return union.atomic();
+    BasicType atomic = null;
+    for(final Type tp : types) {
+      final BasicType at = tp.atomic();
+      if(at == null) return null;
+      atomic = atomic == null ? at : (BasicType) atomic.union(at);
+    }
+    return atomic;
   }
 
   @Override
   public ID id() {
     return ID.CIT;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    for(final Type tp : types) {
-      if(tp.nsSensitive()) return true;
-    }
-    return false;
   }
 
   @Override
@@ -225,17 +209,16 @@ public final class ChoiceItemType implements Type {
   }
 
   /**
-   * Builder for choice item types, removing error types if necessary. May create a single item type
-   * if only one type remains. Also merges consecutive enums, as well as any node types of the same
-   * kind by replacing with the union, and flattens nested ChoiceItemTypes.
+   * Builder for choice item types that flattens nested choices, drops duplicates and
+   * {@code xs:error}, and merges enumeration types and node types.
    */
   public static final class Builder {
     /** Alternative item types. */
     private final ArrayList<Type> types = new ArrayList<>();
 
     /**
-     * Builds and returns the resulting choice item type.
-     * @return choice item type, or the single item type if the list contains only one type
+     * Returns the resulting choice item type, or the remaining item type if there is only one.
+     * @return item type
      */
     public Type build() {
       if(types.size() != 1) types.remove(BasicType.ERROR);
@@ -247,9 +230,8 @@ public final class ChoiceItemType implements Type {
     }
 
     /**
-     * Adds the specified type to this builder, merging enum types only if consecutive, and merging
-     * document, element, attribute, and pi types anywhere in the list, ignoring duplicates, and
-     * flattening nested ChoiceItemTypes.
+     * Adds the specified type, merging it with a preceding enumeration type or a node type of the
+     * same kind (document, element, attribute, processing instruction).
      * @param type type to be added
      * @return this builder
      */
@@ -282,7 +264,7 @@ public final class ChoiceItemType implements Type {
         if(tp.id() == Type.ID.ENM) {
           // remove and re-add, for duplicate removal
           types.remove(last);
-          return add(tp.union(type));
+          return add(tp.union(type.deref()));
         }
         // not consecutive: add as-is
         types.add(type);
@@ -292,7 +274,7 @@ public final class ChoiceItemType implements Type {
       for(int i = 0; i < types.size(); i++) {
         final Type existing = types.get(i);
         if(existing.id() == id) {
-          types.set(i, existing.union(type));
+          types.set(i, existing.union(type.deref()));
           return this;
         }
       }

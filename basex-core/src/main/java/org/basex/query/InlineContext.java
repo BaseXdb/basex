@@ -6,7 +6,9 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -36,6 +38,45 @@ public final class InlineContext {
     this.cc = cc;
     this.var = var;
     this.expr = expr;
+  }
+
+  /**
+   * Returns a context for re-optimizing the references to a variable with a refined type.
+   * @param var variable
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return inline context
+   */
+  public static InlineContext refine(final Var var, final InputInfo info,
+      final CompileContext cc) {
+    return new InlineContext(var, new VarRef(info, var), cc);
+  }
+
+  /**
+   * Returns a context for re-optimizing context references after the focus type was refined.
+   * @param info input info (can be {@code null})
+   * @param cc compilation context
+   * @return inline context
+   */
+  public static InlineContext focus(final InputInfo info, final CompileContext cc) {
+    return new InlineContext(null, new ContextValue(info), cc);
+  }
+
+  /**
+   * Checks if inlining has refined the type of a focus expression.
+   * @param focus focus expression before inlining
+   * @param st type of the focus expression before inlining
+   * @param inlined focus expression after inlining
+   * @param items item focus (only the item type is relevant)
+   * @return result of check
+   */
+  public boolean refocus(final Expr focus, final SeqType st, final Expr inlined,
+      final boolean items) {
+    // references to a variable with a refined type (the types of references are not cached)
+    if(focus instanceof final VarRef vr && vr.var == var &&
+        expr instanceof final VarRef ref && ref.var == var) return true;
+    final SeqType nst = inlined.seqType();
+    return items ? !nst.type.eq(st.type) : !nst.eq(st);
   }
 
   /**

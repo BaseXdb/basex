@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.similarity.*;
 
 /**
  * Function implementation.
@@ -42,7 +43,7 @@ public final class FnReplace extends RegExFn {
     final byte[] flags = toZeroToken(arg(3), qc);
 
     final boolean func = rep instanceof FItem;
-    final FItem action = func ? toFunction(rep, 2, qc) : null;
+    final FItem action = func ? toFunction(rep, replacement, 2) : null;
     final byte[] replace = func ? null : rep.isEmpty() ? EMPTY : toToken(rep, replacement);
 
     // shortcut for literal replacements
@@ -113,7 +114,11 @@ public final class FnReplace extends RegExFn {
               i = string.indexOf('>', s);
               if(i == -1) throw REGDOLLAR_X.get(info, replace);
               final String name = string.substring(s + 1, i);
-              if(!names.contains(name)) throw REGGROUP_X.get(info, name);
+              if(!names.contains(name)) {
+                final String similar = Levenshtein.similar(token(name), regExpr.getGroupNames());
+                throw REGGROUP_X.get(info, QueryError.similar("$<" + name + '>', similar,
+                    n -> "$<" + n + '>'));
+              }
               sb.append("${").append(name).append('}');
               s = i + 1;
             } else {

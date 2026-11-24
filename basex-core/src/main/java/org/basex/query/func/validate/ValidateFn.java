@@ -13,13 +13,13 @@ import javax.xml.validation.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.validate.ErrorInfo.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -133,12 +133,13 @@ public abstract class ValidateFn extends StandardFunc {
   /**
    * Returns an input reference (possibly cached) to the first argument.
    * @param item item
+   * @param expr expression that yielded the item
    * @param sopts serializer parameters (can be {@code null})
    * @return item
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected final IO read(final Item item, final SerializerOptions sopts)
+  protected final IO read(final Item item, final Expr expr, final SerializerOptions sopts)
       throws QueryException, IOException {
 
     if(item instanceof final XNode node) {
@@ -148,17 +149,12 @@ public abstract class ValidateFn extends StandardFunc {
       return io;
     }
 
-    final Type type = item.type;
-    if(type.isStringOrUntyped()) {
-      IO io = toIO(toString(item), true);
-      if(sopts != null) {
-        // add doctype declaration if specified
-        io = new IOContent(new DBNode(io).serialize(sopts).finish());
-        io.name(io.path());
-      }
-      return io;
+    IO io = toIO(item, expr);
+    if(sopts != null) {
+      // add doctype declaration if specified
+      io = new IOContent(new DBNode(io).serialize(sopts).finish());
+      io.name(io.path());
     }
-
-    throw STRNOD_X_X.get(info, type, item);
+    return io;
   }
 }

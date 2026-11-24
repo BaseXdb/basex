@@ -257,6 +257,18 @@ public final class TokenBuilder {
   }
 
   /**
+   * Adds a number with leading zeroes.
+   * @param value value to be added
+   * @param digits minimum number of digits
+   * @return self reference
+   */
+  public TokenBuilder addLong(final long value, final int digits) {
+    final byte[] token = token(value);
+    for(int d = token.length; d < digits; d++) add('0');
+    return add(token);
+  }
+
+  /**
    * Adds a token.
    * @param token token to be added
    * @return self reference

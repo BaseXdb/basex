@@ -6,6 +6,7 @@ import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Dummy item (only used at compile time).
+ * Dummy value (only used at compile time).
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -33,6 +34,16 @@ public final class Dummy extends Value {
     super(expr.seqType().type);
     this.expr = expr;
     this.item = item;
+  }
+
+  @Override
+  public boolean parentless() {
+    return expr.parentless();
+  }
+
+  @Override
+  public Occ childOcc(final Test test, final boolean attributes) {
+    return expr.childOcc(test, attributes);
   }
 
   @Override

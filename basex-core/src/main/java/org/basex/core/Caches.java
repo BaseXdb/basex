@@ -6,6 +6,7 @@ import java.util.concurrent.locks.*;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -143,20 +144,19 @@ public final class Caches {
    * Returns statistics of a cache.
    * @param name name of cache
    * @return number of entries, limits, hits, misses, evicted and expired entries
-   * @throws QueryException query exception
    */
-  public synchronized XQMap info(final String name) throws QueryException {
+  public synchronized XQMap info(final String name) {
     final Cache cache = caches.get(name);
     if(cache != null) cache.cleanup();
     final Config config = cache != null ? cache.config : config(name);
-    return new MapBuilder().
-      put("entries", Itr.get(cache != null ? cache.size() : 0)).
-      put("max-entries", Itr.get(config.max)).
-      put("ttl", Itr.get(config.ttl)).
-      put("hits", Itr.get(cache != null ? cache.hits : 0)).
-      put("misses", Itr.get(cache != null ? cache.misses : 0)).
-      put("evictions", Itr.get(cache != null ? cache.evictions : 0)).
-      put("expirations", Itr.get(cache != null ? cache.expirations : 0)).map();
+    return XQMap.get(Records.CACHE_INFO.get(),
+      Itr.get(cache != null ? cache.size() : 0),
+      Itr.get(config.max),
+      Itr.get(config.ttl),
+      Itr.get(cache != null ? cache.hits : 0),
+      Itr.get(cache != null ? cache.misses : 0),
+      Itr.get(cache != null ? cache.evictions : 0),
+      Itr.get(cache != null ? cache.expirations : 0));
   }
 
   /**

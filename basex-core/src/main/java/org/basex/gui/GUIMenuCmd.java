@@ -621,6 +621,9 @@ public enum GUIMenuCmd implements GUICommand {
 
   /* OPTION MENU */
 
+  /** Real-time compilation on/off. */
+  C_RT_COMPILATION(RT_COMPILATION, null, Requires.NOTHING, GUIOptions.COMPILERT),
+
   /** Real-time execution on/off. */
   C_RT_EXECUTION(RT_EXECUCTION, null, Requires.NOTHING, GUIOptions.EXECRT) {
     @Override

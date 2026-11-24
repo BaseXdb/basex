@@ -88,7 +88,7 @@ public final class JNodeTest extends Test {
     if(!valueType.one()) return null;
     final Type type = valueType.type;
     return type instanceof final MapType mt ? mt.valueType() :
-      type instanceof final ArrayType at ? at.valueType() : null;
+      type instanceof final ArrayType at ? at.memberType() : null;
   }
 
   @Override

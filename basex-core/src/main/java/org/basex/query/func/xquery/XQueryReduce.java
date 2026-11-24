@@ -20,7 +20,7 @@ public final class XQueryReduce extends StandardFunc {
     final Value init = arg(1).value(qc);
     final FItem action = toFunction(arg(2), 2, qc);
     final FItem combine = toFunction(arg(3), 2, qc);
-    final TaskOptions options = options(4, TaskOptions::new, qc);
+    final TaskOptions options = toOptions(qc);
 
     if(input.isEmpty()) return init;
 
@@ -34,7 +34,6 @@ public final class XQueryReduce extends StandardFunc {
     final SeqType ist = input.seqType();
     // xquery:reduce((), $init, $action, $combine) → $init
     if(ist.zero()) return init;
-    optOptions(4, TaskOptions::new, cc);
 
     // action: called with the seed value or its own results
     final SeqType zst = init.seqType(), itemType = ist.with(Occ.EXACTLY_ONE);

@@ -25,7 +25,7 @@ public final class FnSort extends FnSortBy {
     if(defined(2)) {
       arg(2, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
-      if(st.zeroOrOne() && st.type.isSortable()) {
+      if(st.zeroOrOne() && st.type.atomic() != null) {
         // sort($sortable) → $sortable  (at most one sortable item)
         return input;
       } else if(input instanceof final Value value) {
@@ -37,7 +37,7 @@ public final class FnSort extends FnSortBy {
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
         // sort(replicate(10, 5)) → replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();
-        if(rst.zeroOrOne() && rst.type.isSortable()) return input;
+        if(rst.zeroOrOne() && rst.type.atomic() != null) return input;
       } else if(_DB_NODE_PRE.is(input) && input.arg(0).ddo()) {
         // sort(db:node-pre(db:text(...))) → db:node-pre(db:text(...))
         return input;
@@ -55,7 +55,7 @@ public final class FnSort extends FnSortBy {
       if(input instanceof final NativeSeq ns && sc().collation == null) return ns.sort();
       // sortable single or singleton values
       final SeqType st = input.seqType();
-      if(st.type.isSortable() && (st.one() || input instanceof final SingletonSeq ss &&
+      if(st.type.atomic() != null && (st.one() || input instanceof final SingletonSeq ss &&
           ss.singleItem())) return input;
     }
     return null;

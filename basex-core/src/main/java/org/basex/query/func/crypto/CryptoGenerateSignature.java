@@ -24,7 +24,7 @@ public final class CryptoGenerateSignature extends StandardFunc {
     final Item ext1 = toNodeOrAtomItem(arg(6), true, qc);
     final XNode ext2 = toNodeOrNull(arg(7), qc);
 
-    final byte[] path = ext1 == null || ext1 instanceof XNode ? Token.EMPTY : toToken(ext1);
+    final byte[] path = ext1 == null || ext1 instanceof XNode ? Token.EMPTY : toToken(ext1, arg(6));
     final XNode cert = ext2 != null ? ext2 : ext1 instanceof final XNode xnode ? xnode : null;
     return new DigitalSignature(info).generate(node, can, dig, sig, ns, tp, path, cert, qc);
   }

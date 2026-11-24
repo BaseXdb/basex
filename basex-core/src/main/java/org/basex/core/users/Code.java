@@ -11,6 +11,8 @@ import org.basex.util.*;
 public enum Code {
   /** Salt. */ SALT,
   /** Iterations. */ ITERATIONS,
+  /** Memory size in KiB. */ MEMORY,
+  /** Parallelism. */ PARALLELISM,
   /** Hash. */ HASH;
 
   @Override

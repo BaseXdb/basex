@@ -105,7 +105,9 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args() + "?entries", 0);
     query(func.args() + "?size", 0);
     query(func.args() + "?persisted", false);
-    query("map:contains(" + func.args() + ", 'modified')", false);
+    query(func.args() + "?modified", "");
+    query("map:size(" + func.args() + ')', 4);
+    query(func.args() + " instance of store:info-record", true);
 
     query(_STORE_PUT.args("key", "INFO"));
     query(func.args() + "?entries", 1);
@@ -188,6 +190,11 @@ public final class StoreModuleTest extends SandboxTest {
     error(func.args("key", " [ fn() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("key", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("key", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
+
+    error(func.args("key", " fold-left(1 to 100_000, [], fn($a, $_) { [ $a ] })"),
+        BASEX_NESTED);
+    error(func.args("key", " fold-left(1 to 100_000, {}, fn($m, $_) { { 'a': $m } })"),
+        BASEX_NESTED);
   }
 
   /** Test method. */
@@ -472,7 +479,7 @@ public final class StoreModuleTest extends SandboxTest {
    */
   @Test public void newerFormat() throws IOException {
     // reserved format ID of versioned values
-    newerFormat(BasicType.STRING.index(), 2, 0x3e);
+    newerFormat(BasicType.STRING.id().asByte(), 2, 0x3e);
     // unknown type index
     newerFormat(100000, 1);
   }

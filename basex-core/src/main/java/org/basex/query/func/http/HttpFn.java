@@ -31,16 +31,15 @@ abstract class HttpFn extends StandardFunc {
    * Sends an HTTP request and returns the response.
    * @param method HTTP method
    * @param body body expression (can be {@code null})
-   * @param options options expression
    * @param qc query context
    * @return response record
    * @throws QueryException query exception
    */
-  final XQMap send(final String method, final Expr body, final Expr options,
-      final QueryContext qc) throws QueryException {
+  final XQMap send(final String method, final Expr body, final QueryContext qc)
+      throws QueryException {
 
     final String href = resolve(toString(arg(0), qc));
-    final RequestOptions ropts = toOptions(options, new RequestOptions(), qc);
+    final RequestOptions ropts = toOptions(qc);
     try {
       final Request request = ropts.request(method, info);
       if(body != null) ropts.body(body.value(qc), request, qc, info);

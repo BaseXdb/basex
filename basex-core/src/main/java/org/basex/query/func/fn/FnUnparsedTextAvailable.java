@@ -11,7 +11,6 @@ import org.basex.query.QueryError.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.options.*;
@@ -33,6 +32,11 @@ public class FnUnparsedTextAvailable extends ParseFn {
         Types.STRING_ZO);
     /** Fallback option. */
     public static final BooleanOption FALLBACK = new BooleanOption(CommonOptions.FALLBACK, false);
+
+    @Override
+    protected StringOption stringOption() {
+      return ENCODING;
+    }
   }
 
   @Override
@@ -77,17 +81,5 @@ public class FnUnparsedTextAvailable extends ParseFn {
   @Override
   public final QueryError error() {
     return QueryError.RESINPUT_X;
-  }
-
-  @Override
-  protected final Options options(final QueryContext qc) throws QueryException {
-    final Item options = arg(1).unwrappedItem(qc, info);
-    final ParseOptions po = new ParseOptions();
-    if(options instanceof final XQMap map) {
-      toOptions(map, po, qc);
-    } else {
-      po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
-    }
-    return po;
   }
 }

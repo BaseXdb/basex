@@ -24,6 +24,9 @@ import org.junit.jupiter.api.Timeout.*;
  * @author Christian Gruen
  */
 public final class ExprTest extends SandboxTest {
+  /** Element with a single child, whose contents are unknown at compile time. */
+  private static final String E = opaque("<_><a/></_>");
+
   /** Checks OR optimizations. */
   @Test public void or() {
     query("<a/> or <a/>", true);
@@ -486,32 +489,32 @@ public final class ExprTest extends SandboxTest {
     // value-based evaluation: operands are not in document order
     query("count((<b/>, <a/>) union <c/>)", 3);
 
-    check("<_><a/></_>/(a union a)", "<a/>",
+    check(E + "/(a union a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a union b)", "<a/>",
+    check(E + "/(a union b)", "<a/>",
         empty(Union.class), type(IterPath.class, "element(a|b)*"));
-    check("<_><a/></_>/(*:a union *:b)", "<a/>",
+    check(E + "/(*:a union *:b)", "<a/>",
         empty(Union.class), type(IterPath.class, "element(*:a|*:b)*"));
-    check("<_><a/></_>/(Q{}a union Q{}b)", "<a/>",
+    check(E + "/(Q{}a union Q{}b)", "<a/>",
         empty(Union.class));
     check("declare namespace a = 'A'; declare namespace b = 'A'; " +
-        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
+        opaque("<_><a:a/></_>") + "/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
         empty(Union.class));
     check("declare namespace a = 'A'; declare namespace b = 'B'; " +
-        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
+        opaque("<_><a:a/></_>") + "/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
         empty(Union.class), type(IterPath.class, "element(a:a|b:a)*"));
     check("declare namespace a = 'A'; declare namespace b = 'B'; " +
-        "<_><b:a/></_>/(a:a union b:a)", "<b:a xmlns:b=\"B\"/>",
+        opaque("<_><b:a/></_>") + "/(a:a union b:a)", "<b:a xmlns:b=\"B\"/>",
         empty(Union.class), type(IterPath.class, "element(a:a|b:a)*"));
-    check("<_><a/></_>/(a union *)", "<a/>",
+    check(E + "/(a union *)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union a)", "<a/>",
+    check(E + "/(* union a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(*:a union *)", "<a/>",
+    check(E + "/(*:a union *)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union *:a)", "<a/>",
+    check(E + "/(* union *:a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union Q{uri}a)", "<a/>",
+    check(E + "/(* union Q{uri}a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element()*"));
   }
 
@@ -526,11 +529,11 @@ public final class ExprTest extends SandboxTest {
     query("<a/> ! (. intersect (., <b/>))/name()", "a");
 
     // merge node tests
-    check("<_><a/></_>/(node() intersect * intersect a)", "<a/>",
+    check(E + "/(node() intersect * intersect a)", "<a/>",
         empty(Intersect.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a intersect * intersect node())", "<a/>",
+    check(E + "/(a intersect * intersect node())", "<a/>",
         empty(Intersect.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a intersect b)", "", empty());
+    check(E + "/(a intersect b)", "", empty());
 
     // GH-2599: operands with combined node tests
     query("let $in := <doc><b/></doc> return $in/(a, b) intersect $in/(b, c)", "<b/>");
@@ -545,13 +548,13 @@ public final class ExprTest extends SandboxTest {
 
   /** Checks {@link Except} optimizations. */
   @Test public void except() {
-    check("<_><a/></_>/(* except text())", "<a/>",
+    check(E + "/(* except text())", "<a/>",
         empty(Except.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(a except b)", "<a/>",
+    check(E + "/(a except b)", "<a/>",
         empty(Except.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(node() except * except a)", "",
+    check(E + "/(node() except * except a)", "",
         count(Except.class, 1), type(MixedPath.class, "xnode()*"));
-    check("<_><a/></_>/(a except *)", "", empty());
+    check(E + "/(a except *)", "", empty());
 
     query("count(<a/> except <b/>)", 1);
     // 'except' and 'intersect' have the same precedence and are evaluated from left to right
@@ -608,7 +611,7 @@ public final class ExprTest extends SandboxTest {
 
     // error values are inlined if the error is known at compile time
     check("try { 1 div 0 } catch * { $err:code }", "#err:FOAR0001", root(QNm.class));
-    check("try { 1 div 0 } catch * { $err:description }", "1 cannot be divided by zero.",
+    check("try { 1 div 0 } catch * { $err:description }", "Division by zero, dividend: 1.",
         root(Str.class));
 
     // error tests must be namespace-qualified
@@ -632,18 +635,19 @@ public final class ExprTest extends SandboxTest {
 
     query("let $n := <n/> where $n[<a><b/><b/></a>/*] return $n", "<n/>");
 
-    check("empty(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("exists(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("boolean(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("not(<a>X</a>[text()])", null, "//@axis = 'child'");
+    final String a = opaque("<a>X</a>");
+    check("empty(" + a + "[text()])", null, "//@axis = 'child'");
+    check("exists(" + a + "[text()])", null, "//@axis = 'child'");
+    check("boolean(" + a + "[text()])", null, "//@axis = 'child'");
+    check("not(" + a + "[text()])", null, "//@axis = 'child'");
 
-    check("if(<a>X</a>[text()]) then 1 else 2", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] and <a/>", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] or <a/>", null, "//Bln = 'true'");
-    check("<a>X</a>[text()] or <a/>[text()]", null, "//@axis = 'child'");
-    check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
+    check("if(" + a + "[text()]) then 1 else 2", null, "//@axis = 'child'");
+    check(a + "[text()] and <a/>", null, "//@axis = 'child'");
+    check(a + "[text()] or <a/>", null, "//Bln = 'true'");
+    check(a + "[text()] or <a/>[text()]", null, "//@axis = 'child'");
+    check("for $a in" + a + " where $a[text()] return $a", null, "//@axis = 'child'");
 
-    check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
+    check("empty(" + a + "/.[text()])", null, "//@axis = 'child'");
   }
 
   /** Checks that operands behind a compile-time error are discarded. */

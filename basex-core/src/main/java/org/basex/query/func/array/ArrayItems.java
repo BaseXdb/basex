@@ -28,8 +28,8 @@ public final class ArrayItems extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     if(array.seqType().type instanceof final ArrayType at) {
-      final SeqType vt = at.valueType();
-      exprType.assign(vt.with(Occ.ZERO_OR_MORE), vt.one() ? array.structSize() : -1);
+      final SeqType mt = at.memberType();
+      exprType.assign(mt.with(Occ.ZERO_OR_MORE), mt.one() ? array.structSize() : -1);
     }
     return this;
   }

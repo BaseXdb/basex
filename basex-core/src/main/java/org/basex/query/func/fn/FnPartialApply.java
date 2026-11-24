@@ -18,12 +18,6 @@ import org.basex.query.value.type.*;
  * @author Gunther Rademacher
  */
 public final class FnPartialApply extends StandardFunc {
-  /** The type of parameter "arguments". */
-  private static final SeqType ARGS_TYPE = MapType.get(BasicType.INTEGER,
-      Types.ITEM_ZM).seqType();
-  /** The name of parameter "arguments". */
-  private static final QNm ARGS_NAME = new QNm("arguments");
-
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate if arguments are values: the resulting function call can be inlined
@@ -44,8 +38,7 @@ public final class FnPartialApply extends StandardFunc {
    */
   private Value value(final QueryContext qc, final CompileContext cc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
-    final XQMap arguments = toMap(ARGS_TYPE.coerce(arg(1).value(qc), qc, info, ARGS_NAME, null),
-        qc);
+    final XQMap arguments = (XQMap) coerce(arg(1), Types.INTEGER_MAP_O, qc);
     final int arity = function.arity();
     if(arity == 0 || arguments == XQMap.empty()) return function;
 
@@ -57,8 +50,7 @@ public final class FnPartialApply extends StandardFunc {
       final long index = toLong(arg.key());
       if(index >= 1 && index <= arity) {
         final int i = (int) index - 1;
-        funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i),
-            null);
+        funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i), null);
         --placeholders;
       }
     }

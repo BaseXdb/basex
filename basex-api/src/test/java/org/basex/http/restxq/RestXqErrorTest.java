@@ -169,7 +169,7 @@ public final class RestXqErrorTest extends RestXqTest {
     final String f = "declare %R:path('') %R:query-param('a', '{$a}') " +
         "function m:f($a as xs:integer) { $a };";
     register(f);
-    assertEquals("Query parameter 'a' must be of type xs:integer, supplied: \"x\".",
+    assertEquals("Query parameter 'a' must be of type xs:integer, found: \"x\".",
         get(400, "", "a", "x"));
     // the application can still handle the error
     get("caught", f + "declare %R:error('*') function m:e() { 'caught' };", "?a=x");

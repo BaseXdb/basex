@@ -68,7 +68,7 @@ public class FtMark extends StandardFunc {
             if(item == null) return null;
 
             // copy node to main memory data instance, prefer positions of the argument
-            final XNode node = toNode(item);
+            final XNode node = toNode(item, arg(0));
             final MemData md = new MemData(qc.context.sharedMeta());
             final DataBuilder db = new DataBuilder(md, qc);
             db.ftpos(m, ftd.size(node) != 0 || tmp == null ? ftd : tmp, l).build(node);

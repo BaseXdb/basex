@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
- * Basic XDM types.
+ * Basic item types: {@code item()} and the built-in XML Schema types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -51,7 +51,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** Untyped Atomic type. */
+  /** Untyped atomic type. */
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, Type.ID.ATM, false, false) {
     @Override
     public Atm cast(final Item item, final QueryContext qc, final InputInfo info)
@@ -82,7 +82,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** Normalized String type. */
+  /** Normalized string type. */
   NORMALIZED_STRING("normalizedString", STRING, Type.ID.NST, false, true) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final InputInfo info)
@@ -373,7 +373,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** Unsigned Short type. */
+  /** Unsigned short type. */
   UNSIGNED_SHORT("unsignedShort", UNSIGNED_INT, Type.ID.USH, true, false) {
     @Override
     public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
@@ -679,7 +679,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** QName Type. */
+  /** QName type. */
   QNAME("QName", ANY_ATOMIC_TYPE, Type.ID.QNM, false, false) {
     @Override
     public QNm cast(final Item item, final QueryContext qc, final InputInfo info)
@@ -706,7 +706,7 @@ public enum BasicType implements Type {
     }
   },
 
-  /** NOTATION Type. */
+  /** NOTATION type. */
   NOTATION("NOTATION", ANY_ATOMIC_TYPE, Type.ID.NOT, false, false);
 
   /** Language pattern. */
@@ -732,7 +732,7 @@ public enum BasicType implements Type {
   private boolean refinable;
   /** Sequence types. */
   private final SeqType[] seqTypes = SeqType.cache(this);
-  /** QName (can be {@code null}; lazy instantiation). */
+  /** QName, created lazily (can be {@code null}). */
   private QNm qnm;
 
   /**
@@ -763,8 +763,8 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Assign pre/post values to types.
-   * @param types child types
+   * Assigns pre/post values to this type and its descendants.
+   * @param types child types of all types
    * @param pp pre/post array
    */
   private void assign(final EnumMap<BasicType, List<BasicType>> types, final byte[] pp) {
@@ -776,10 +776,10 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Finds and returns the specified type.
+   * Returns the XML Schema type with the specified name.
    * @param qname name of type
-   * @param all accept all types (including those without parent type)
-   * @return type or {@code null}
+   * @param all accept all types, including those without parent type
+   * @return type (can be {@code null})
    */
   public static BasicType get(final QNm qname, final boolean all) {
     if(Token.eq(qname.uri(), XS_URI)) {
@@ -818,8 +818,8 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Returns the name of a type.
-   * @return name
+   * Returns the QName of this type.
+   * @return QName
    */
   public final QNm qname() {
     if(qnm == null) qnm = new QNm(name, this == ITEM ? EMPTY : XS_URI);
@@ -827,8 +827,8 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Returns the parent type.
-   * @return parent (can be {@code null})
+   * Returns the parent type in the type hierarchy.
+   * @return parent type (can be {@code null})
    */
   public final BasicType parent() {
     return parent;
@@ -892,11 +892,6 @@ public enum BasicType implements Type {
   }
 
   @Override
-  public final boolean isSortable() {
-    return instanceOf(ANY_ATOMIC_TYPE);
-  }
-
-  @Override
   public final BasicType atomic() {
     return instanceOf(ANY_ATOMIC_TYPE) ? this : null;
   }
@@ -907,10 +902,10 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Throws an exception if the specified item cannot be converted to a number.
-   * @param item item
+   * Checks if the specified item can be converted to a number and returns it.
+   * @param item item to check
    * @param info input info (can be {@code null})
-   * @return item argument
+   * @return item
    * @throws QueryException query exception
    */
   final Item checkNum(final Item item, final InputInfo info) throws QueryException {
@@ -924,7 +919,7 @@ public enum BasicType implements Type {
    * @param min minimum value
    * @param max maximum value (no limit if identical to min)
    * @param info input info (can be {@code null})
-   * @return integer value
+   * @return long value
    * @throws QueryException query exception
    */
   final long checkLong(final Object value, final long min, final long max, final InputInfo info)
@@ -986,7 +981,7 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Checks the validity of the specified object and returns it as item.
+   * Converts the specified object to an item and checks if it can be converted to a number.
    * @param value value to be checked
    * @param info input info (can be {@code null})
    * @return item
@@ -1008,10 +1003,10 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Checks the validity of the specified name.
-   * @param item value to be checked
+   * Checks if the normalized string value of the specified item is a valid NCName.
+   * @param item item to be checked
    * @param info input info (can be {@code null})
-   * @return name
+   * @return normalized name
    * @throws QueryException query exception
    */
   final byte[] checkName(final Item item, final InputInfo info) throws QueryException {
@@ -1041,23 +1036,21 @@ public enum BasicType implements Type {
   }
 
   @Override
-  public final boolean nsSensitive() {
-    return oneOf(QNAME, NOTATION);
-  }
-
-  @Override
   public final boolean global() {
     return true;
   }
 
-  @Override
+  /**
+   * Checks if the type has subtypes.
+   * @return result of check
+   */
   public final boolean refinable() {
     return refinable;
   }
 
   /**
-   * Returns an info message for a similar type.
-   * @param qname name of type
+   * Returns an info message that suggests a type with a similar name.
+   * @param qname name of the unknown type
    * @return info string
    */
   public static String similar(final QNm qname) {
@@ -1067,8 +1060,8 @@ public enum BasicType implements Type {
   }
 
   /**
-   * Checks if the specified item is a string.
-   * @param item item
+   * Checks if the specified item is a string or an untyped atomic value.
+   * @param item item to check
    * @return result of check
    */
   private static boolean isString(final Item item) {

@@ -3,6 +3,8 @@ package org.basex.util.options;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.query.value.type.*;
+
 /**
  * Option containing a list of names, separated by commas or whitespace.
  *
@@ -20,6 +22,11 @@ public final class NamesOption extends StringOption {
    */
   public NamesOption(final String name, final String value) {
     super(name, String.join(",", split(value)));
+  }
+
+  @Override
+  SeqType defaultType() {
+    return Types.STRING_ZM;
   }
 
   @Override

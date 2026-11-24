@@ -26,7 +26,7 @@ public final class JobRemove extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
-    final RemoveOptions options = toOptions(arg(1), new RemoveOptions(), qc);
+    final RemoveOptions options = toOptions(qc);
 
     // remove job
     qc.context.jobs.remove(id);

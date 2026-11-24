@@ -153,6 +153,11 @@ public final class Types {
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
+  /** Single string or xs:base64-binary. */
+  public static final SeqType STRING_OR_BASE64_BINARY_O =
+      ChoiceItemType.get(STRING, BASE64_BINARY).seqType();
+  /** String or node. */
+  public static final Type STRING_OR_NODE = ChoiceItemType.get(STRING, XNODE);
   /** Resource type enum, used by db:add and db:create as a per-path override. */
   public static final EnumType DB_RESOURCE_TYPE = EnumType.get("xml", "binary", "value");
   /** Optional sort order. */
@@ -282,9 +287,10 @@ public final class Types {
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(ZERO_OR_ONE);
   /** Permute function of a random number generator. */
   public static final FuncType PERMUTE_FUNCTION = FuncType.get(ITEM_ZM, ITEM_ZM);
+  /** Single non-negative integer. */
+  public static final SeqType NON_NEGATIVE_INTEGER_O = NON_NEGATIVE_INTEGER.seqType();
   /** Take function of a random number generator. */
-  public static final FuncType TAKE_FUNCTION =
-      FuncType.get(DOUBLE_ZM, NON_NEGATIVE_INTEGER.seqType());
+  public static final FuncType TAKE_FUNCTION = FuncType.get(DOUBLE_ZM, NON_NEGATIVE_INTEGER_O);
   /** Supplier function. */
   public static final SeqType SUPPLIER_O = FuncType.get(ITEM_ZM).seqType();
   /** Java function type. */
@@ -306,6 +312,8 @@ public final class Types {
   public static final MapType STRING_STRING_SEQ_MAP = MapType.get(STRING, STRING_ZM);
   /** Map with string keys and integer values. */
   public static final MapType STRING_INTEGER_MAP = MapType.get(STRING, INTEGER_O);
+  /** Map with string keys and single items as values. */
+  public static final MapType STRING_ITEM_MAP = MapType.get(STRING, ITEM_O);
   /** Map with string keys and arbitrary values. */
   public static final MapType STRING_ITEM_SEQ_MAP = MapType.get(STRING, ITEM_ZM);
   /** Map with QName keys and arbitrary values. */
@@ -320,6 +328,18 @@ public final class Types {
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
+  /** Single string, xs:hex-binary, xs:base64-binary or map. */
+  public static final SeqType STRING_OR_BINARY_OR_MAP_O =
+      ChoiceItemType.get(STRING_OR_BINARY, MAP).seqType();
+  /** Zero or one string or map. */
+  public static final SeqType STRING_OR_MAP_ZO = ChoiceItemType.get(STRING, MAP).seqType(
+      ZERO_OR_ONE);
+  /** Single map with integer keys. */
+  public static final SeqType INTEGER_MAP_O = MapType.get(INTEGER, ITEM_ZM).seqType();
+  /** Single string or integer. */
+  public static final SeqType STRING_OR_INTEGER_O = ChoiceItemType.get(STRING, INTEGER).seqType();
+  /** Function that maps a node to nodes. */
+  public static final SeqType NODE_STEP_O = FuncType.get(NODE_ZM, NODE_O).seqType();
   /** Map or array. */
   public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP, ARRAY);
   /** Zero or one map or array. */
@@ -370,8 +390,8 @@ public final class Types {
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];
 
   static {
-    for(final BasicType type : BasicType.values()) TYPES[type.index()] = type;
-    for(final NodeType type : NodeType.TYPES.values()) TYPES[type.index()] = type;
+    for(final BasicType type : BasicType.values()) TYPES[type.id().asByte()] = type;
+    for(final NodeType type : NodeType.TYPES.values()) TYPES[type.id().asByte()] = type;
     TYPES[Type.ID.FUN.asByte()] = FUNCTION;
     TYPES[Type.ID.MAP.asByte()] = MAP;
     TYPES[Type.ID.ARRAY.asByte()] = ARRAY;

@@ -14,12 +14,18 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.constr.*;
+import org.basex.query.util.list.ExprList;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.similarity.*;
@@ -62,8 +68,10 @@ public class Options implements Iterable<Option<?>> {
    * @param definitions option names to definitions
    * @param offset index of the first option (subtracted from option indexes)
    * @param values default values (cloned per instance)
+   * @param constructor constructor without arguments (can be {@code null})
    */
-  private record Meta(SortedMap<String, Option<?>> definitions, int offset, Object[] values) { }
+  private record Meta(SortedMap<String, Option<?>> definitions, int offset, Object[] values,
+      Constructor<?> constructor) { }
 
   /** Metadata cache, computed once per subclass. */
   private static final ClassValue<Meta> META = new ClassValue<>() {
@@ -89,7 +97,14 @@ public class Options implements Iterable<Option<?>> {
       for(final Option<?> option : definitions.values()) {
         values[option.index() - offset] = option.value();
       }
-      return new Meta(Collections.unmodifiableSortedMap(definitions), offset, values);
+      Constructor<?> constructor;
+      try {
+        constructor = clz.getDeclaredConstructor();
+      } catch(final NoSuchMethodException ex) {
+        constructor = null;
+      }
+      return new Meta(Collections.unmodifiableSortedMap(definitions), offset, values,
+          constructor);
     }
   };
 
@@ -113,7 +128,7 @@ public class Options implements Iterable<Option<?>> {
    * Default constructor.
    */
   public Options() {
-    this((IOFile) null);
+    this(true);
   }
 
   /**
@@ -121,10 +136,18 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file (can be {@code null})
    */
   protected Options(final IOFile opts) {
-    meta = META.get(getClass());
-    values = meta.values.clone();
-    free = new HashMap<>();
+    this(true);
     if(opts != null) read(opts);
+  }
+
+  /**
+   * Constructor with or without default values.
+   * @param defaults assign default values
+   */
+  protected Options(final boolean defaults) {
+    meta = META.get(getClass());
+    values = defaults ? meta.values.clone() : new Object[meta.values.length];
+    free = new HashMap<>();
   }
 
   /**
@@ -341,6 +364,25 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized <E extends Options> E seal() {
     sealed = true;
     return (E) this;
+  }
+
+  /**
+   * Returns a modifiable copy of these options.
+   * @param <E> options type
+   * @return copy
+   */
+  @SuppressWarnings("unchecked")
+  public final synchronized <E extends Options> E copy() {
+    if(meta.constructor == null) throw Util.notExpected("No default constructor: %", getClass());
+    final Options options;
+    try {
+      options = (Options) meta.constructor.newInstance();
+    } catch(final ReflectiveOperationException ex) {
+      throw Util.notExpected(ex);
+    }
+    System.arraycopy(values, 0, options.values, 0, values.length);
+    options.free.putAll(free);
+    return (E) options;
   }
 
   /**
@@ -575,7 +617,7 @@ public class Options implements Iterable<Option<?>> {
    * @return name
    * @throws QueryException query exception
    */
-  public static String name(final Item name, final InputInfo info) throws QueryException {
+  private static String name(final Item name, final InputInfo info) throws QueryException {
     if(name instanceof final QNm qnm) {
       // implementation-defined options must have a non-absent namespace
       if(qnm.uri().length == 0) throw INVALIDOPTION_X.get(info,
@@ -593,7 +635,7 @@ public class Options implements Iterable<Option<?>> {
    * @return string
    * @throws QueryException query exception
    */
-  public static String serialize(final Value value, final InputInfo info) throws QueryException {
+  private static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Item item : value) {
       if(!tb.isEmpty()) tb.add(' ');
@@ -687,22 +729,36 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public final synchronized String similar(final Object option) {
-    return similar(option, meta.definitions);
+    return similar(option, definitions());
   }
 
   /**
    * Returns an error string for an unknown option, excluding the supplied options.
    * @param option option
-   * @param map options map
-   * @param info input info (can be {@code null})
+   * @param names names of the supplied options
    * @return error string
-   * @throws QueryException query exception
    */
-  private synchronized String similar(final Object option, final XQMap map, final InputInfo info)
-      throws QueryException {
-    final TreeMap<String, Option<?>> defs = new TreeMap<>(meta.definitions);
-    for(final Item key : map.keys()) defs.remove(name(key, info));
+  private String similar(final Object option, final StringList names) {
+    final TreeMap<String, Option<?>> defs = new TreeMap<>(definitions());
+    for(final String name : names) defs.remove(name);
     return similar(option, defs);
+  }
+
+  /**
+   * Checks if an option is neither defined nor an implementation-defined option.
+   * @param name name of option
+   * @return result of check
+   */
+  private boolean undefined(final String name) {
+    return !definitions().containsKey(name) && !name.startsWith("Q{");
+  }
+
+  /**
+   * Returns the options that can be assigned by name.
+   * @return options
+   */
+  protected Map<String, Option<?>> definitions() {
+    return meta.definitions;
   }
 
   /**
@@ -711,7 +767,7 @@ public class Options implements Iterable<Option<?>> {
    * @param options options
    * @return error string
    */
-  public static String similar(final Object option, final Map<String, Option<?>> options) {
+  private static String similar(final Object option, final Map<String, Option<?>> options) {
     if(Removed.option(string(token(option))) != null) return unknown(option);
     final String[] names = options.keySet().stream().sorted().toArray(String[]::new);
     final String similar = Levenshtein.similar(token(option), names);
@@ -824,14 +880,103 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void assign(final XQMap map, final QueryContext qc,
       final InputInfo info) throws QueryException {
     // reject unknown options
-    if(!meta.definitions.isEmpty() && map.structSize() != 0) {
+    if(!definitions().isEmpty() && map.structSize() != 0) {
       for(final Item key : map.keys()) {
         final String nm = name(key, info);
-        if(!meta.definitions.containsKey(nm) && !nm.startsWith("Q{"))
-          throw INVALIDOPTION_X.get(info, similar(nm, map, info));
+        if(undefined(nm)) {
+          final StringList names = new StringList();
+          for(final Item k : map.keys()) names.add(name(k, info));
+          throw INVALIDOPTION_X.get(info, similar(nm, names));
+        }
       }
     }
     map.forEach((key, value) -> assign(key, value, qc, info));
+  }
+
+  /**
+   * Returns the item type of arguments that supply these options.
+   * @return item type
+   */
+  public Type type() {
+    return stringOption() != null ? Types.STRING_OR_MAP_ZO.type : Types.MAP;
+  }
+
+  /**
+   * Assigns options from an item that is no map.
+   * @param item item
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void assign(final Item item, final InputInfo info) throws QueryException {
+    final StringOption option = stringOption();
+    if(option == null) throw typeError(item, Types.MAP_O, info);
+    if(!item.type.isStringOrUntyped()) throw typeError(item, Types.STRING_OR_MAP_ZO, info);
+    set(option, string(item.string(info)));
+  }
+
+  /**
+   * Returns the option that can also be supplied as a single string.
+   * @return option (can be {@code null})
+   */
+  protected StringOption stringOption() {
+    return null;
+  }
+
+  /**
+   * Rejects unknown options and invalid constant values in the specified map expression.
+   * @param expr map expression
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public final void check(final Expr expr, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    if(definitions().isEmpty()) return;
+    check(expr.seqType(), info);
+
+    // constant entries of map constructors are assigned as at runtime
+    final ExprList entries = new ExprList();
+    if(!CMap.entries(expr, entries)) return;
+    final int es = entries.size();
+    for(int e = 0; e < es; e += 2) {
+      final Expr value = entries.get(e + 1);
+      if(value == Empty.UNDEFINED || !(entries.get(e) instanceof final Item key)) continue;
+      final String name = name(key, info);
+      final Option<?> option = definitions().get(name);
+      if(option == null) continue;
+      if(value instanceof final Value val) {
+        assign(name, val, qc, info);
+      } else if(option instanceof final OptionsOption<?> oo) {
+        // nested options
+        final Options options = oo.newInstance();
+        options.check(value, qc, info);
+      }
+    }
+  }
+
+  /**
+   * Rejects unknown options in a map of the specified static type.
+   * @param seqType static type of the map
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void check(final SeqType seqType, final InputInfo info) throws QueryException {
+    if(definitions().isEmpty() || !seqType.one() ||
+        !(seqType.type.deref() instanceof final ShapeType shape)) return;
+
+    final TokenObjectMap<ShapeField> fields = shape.fields();
+    final int fs = fields.size();
+    final StringList names = new StringList(fs);
+    for(int f = 1; f <= fs; f++) names.add(string(fields.key(f)));
+    for(int f = 1; f <= fs; f++) {
+      final String name = names.get(f - 1);
+      if(definitions().get(name) instanceof final OptionsOption<?> oo) {
+        final Options options = oo.newInstance();
+        options.check(fields.value(f).seqType(), info);
+      } else if(undefined(name)) {
+        throw INVALIDOPTION_X.get(info, similar(name, names));
+      }
+    }
   }
 
   /**
@@ -905,7 +1050,7 @@ public class Options implements Iterable<Option<?>> {
    * @param options current options (can be {@code null})
    * @return error string or {@code null}
    */
-  public static String assign(final Option<?> option, final String value, final int index,
+  private static String assign(final Option<?> option, final String value, final int index,
       final Consumer<Object> assign, final Options options) {
 
     final String name = option.name();
@@ -1075,7 +1220,7 @@ public class Options implements Iterable<Option<?>> {
   private synchronized void assign(final String name, final Value value, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    final Option<?> option = meta.definitions.get(name);
+    final Option<?> option = definitions().get(name);
     if(option == null) {
       if(getClass() == Options.class || name.startsWith("Q{")) return;
       throw INVALIDOPTION_X.get(info, similar(name));
@@ -1087,7 +1232,7 @@ public class Options implements Iterable<Option<?>> {
       final Boolean bool = type.type == BasicType.BOOLEAN && value instanceof final Item it &&
         it.type.isStringOrUntyped() ? Strings.toBoolean(string(it.string(info))) : null;
       return bool != null ?
-        INVALIDBOOLOPTION_X_X_X_X_X.get(info, name, type, st, value, Bln.get(bool)) :
+        INVALIDBOOLOPTION_X_X_X_X_X.get(info, name, type, Bln.get(bool), st, value) :
         INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
     };
 

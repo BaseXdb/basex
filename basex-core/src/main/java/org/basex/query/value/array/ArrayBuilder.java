@@ -82,7 +82,7 @@ public final class ArrayBuilder {
    * @return array
    */
   public XQArray array(final Expr expr) {
-    return expr.seqType().type instanceof final ArrayType at ? array(at) : array();
+    return expr.seqType().type.toAttachable() instanceof final ArrayType at ? array(at) : array();
   }
 
   /**
@@ -119,7 +119,7 @@ public final class ArrayBuilder {
 
     @Override
     public XQArray array(final ArrayType type) {
-      return new ItemArray(vb.value(type.valueType().type));
+      return new ItemArray(vb.value(type.memberType().type));
     }
   }
 }

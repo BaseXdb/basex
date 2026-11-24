@@ -146,6 +146,8 @@ public final class SerializerOptions extends Options {
   public static final QNm Q_ROOT = new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
   /** Name test. */
   public static final Test T_ROOT = NameTest.get(Q_ROOT);
+  /** Item type of arguments with serialization parameters. */
+  private static final Type TYPE = ChoiceItemType.get(NodeType.get(Q_ROOT), Types.MAP);
   /** Value. */
   private static final QNm Q_VALUE = new QNm("value");
 
@@ -179,11 +181,47 @@ public final class SerializerOptions extends Options {
   }
 
   /**
+   * Returns serialization parameters with the XML output method.
+   * @return serialization parameters
+   */
+  public static SerializerOptions xml() {
+    final SerializerOptions options = new SerializerOptions();
+    options.set(METHOD, SerialMethod.XML);
+    return options;
+  }
+
+  /**
+   * Returns serialization parameters with the text output method.
+   * @return serialization parameters
+   */
+  public static SerializerOptions text() {
+    final SerializerOptions options = new SerializerOptions();
+    options.set(METHOD, SerialMethod.TEXT);
+    return options;
+  }
+
+  /**
+   * Returns serialization parameters for serializing to a string.
+   * @return serialization parameters
+   */
+  public static SerializerOptions xmlString() {
+    final SerializerOptions options = xml();
+    options.set(LINE_ENDING, "\n");
+    return options;
+  }
+
+  @Override
+  public Type type() {
+    return TYPE;
+  }
+
+  /**
    * Converts the specified output parameter item to serializer options.
    * @param item node with serialization parameters
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
+  @Override
   public void assign(final Item item, final InputInfo info) throws QueryException {
     if(!(item instanceof final XNode node) || !T_ROOT.matches(node))
       throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
@@ -236,23 +274,23 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Finalizes the serialization options.
-   * @return self reference
+   * Returns a finalized copy of the serialization options, which may be modified by serializers.
+   * @return finalized copy
    */
   public SerializerOptions finish() {
+    final SerializerOptions so = new SerializerOptions(this);
+    if(!yes(CANONICAL)) return so;
+
     // reset options that are to be ignored for canonicalization
-    if(yes(CANONICAL)) {
-      final SerialMethod m = get(METHOD);
-      if(m.oneOf(SerialMethod.XML, SerialMethod.XHTML, SerialMethod.JSON)) {
-        for(final Option<?> option : this) {
-          if(!CANONICAL_OPTIONS.contains(option)) put(option, option.value());
-        }
-        set(LINE_ENDING, "\n");
-      } else {
-        set(CANONICAL, YesNo.NO);
+    if(get(METHOD).oneOf(SerialMethod.XML, SerialMethod.XHTML, SerialMethod.JSON)) {
+      for(final Option<?> option : so) {
+        if(!CANONICAL_OPTIONS.contains(option)) so.put(option, option.value());
       }
+      so.set(LINE_ENDING, "\n");
+    } else {
+      so.set(CANONICAL, YesNo.NO);
     }
-    return this;
+    return so;
   }
 
   /**

@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Forward reference to a named item type.
+ * Type reference to a named item type, which is resolved in place.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class TypeRef implements Type {
   /** Referenced type name. */
   private final QNm name;
-  /** Input info ({@code null} once this reference has been resolved). */
+  /** Input info, absent once this reference has been resolved (can be {@code null}). */
   private InputInfo info;
   /** Referenced type (initially {@code item()}, may itself be a {@code TypeRef}). */
   private Type type = BasicType.ITEM;
@@ -32,15 +32,6 @@ public final class TypeRef implements Type {
   public TypeRef(final QNm name, final InputInfo info) {
     this.name = name;
     this.info = info;
-  }
-
-  /**
-   * Dereferences a type: returns the referenced type of a {@link TypeRef}, or the type itself.
-   * @param type type
-   * @return dereferenced type
-   */
-  public static Type deref(final Type type) {
-    return type instanceof final TypeRef ref ? ref.deref() : type;
   }
 
   /**
@@ -61,8 +52,8 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Checks if the specified type is a still-unresolved forward reference.
-   * @param type type
+   * Checks if the specified type is an unresolved type reference.
+   * @param type type to check
    * @return result of check
    */
   public static boolean unresolved(final Type type) {
@@ -77,13 +68,13 @@ public final class TypeRef implements Type {
    */
   public static boolean eq(final Type type1, final Type type2) {
     return unresolved(type1) || unresolved(type2) ? type1 == type2 :
-      deref(type1).eq(deref(type2));
+      type1.deref().eq(type2.deref());
   }
 
   /**
-   * Checks if the specified type, its chained references or its choice alternatives contain a
-   * still-unresolved reference.
-   * @param type type
+   * Checks if the specified type, its chained references or its choice alternatives contain an
+   * unresolved type reference.
+   * @param type type to check
    * @return result of check
    */
   public static boolean incomplete(final Type type) {
@@ -96,21 +87,16 @@ public final class TypeRef implements Type {
   }
 
   /**
-   * Returns the input info of an unresolved reference.
-   * @return input info, or {@code null} if resolved
+   * Returns the input info if this reference is unresolved.
+   * @return input info (can be {@code null})
    */
   public InputInfo info() {
     return info;
   }
 
-  /**
-   * Returns the referenced type, following chained references.
-   * @return referenced type
-   */
+  @Override
   public Type deref() {
-    Type tp = type;
-    while(tp instanceof final TypeRef ref) tp = ref.type;
-    return tp;
+    return type.deref();
   }
 
   @Override
@@ -119,8 +105,13 @@ public final class TypeRef implements Type {
   }
 
   @Override
-  public boolean assignable() {
-    return deref().assignable();
+  public boolean attachable() {
+    return deref().attachable();
+  }
+
+  @Override
+  public Type toAttachable() {
+    return deref().toAttachable();
   }
 
   @Override
@@ -158,17 +149,17 @@ public final class TypeRef implements Type {
 
   @Override
   public boolean instanceOf(final Type tp) {
-    return deref().instanceOf(deref(tp));
+    return deref().instanceOf(tp.deref());
   }
 
   @Override
   public Type union(final Type tp) {
-    return deref().union(deref(tp));
+    return deref().union(tp.deref());
   }
 
   @Override
   public Type intersect(final Type tp) {
-    return deref().intersect(deref(tp));
+    return deref().intersect(tp.deref());
   }
 
   @Override
@@ -182,13 +173,13 @@ public final class TypeRef implements Type {
   }
 
   @Override
-  public boolean isStringOrUntyped() {
-    return deref().isStringOrUntyped();
+  public boolean isNumberOrUntyped() {
+    return deref().isNumberOrUntyped();
   }
 
   @Override
-  public boolean isSortable() {
-    return deref().isSortable();
+  public boolean isStringOrUntyped() {
+    return deref().isStringOrUntyped();
   }
 
   @Override
@@ -199,11 +190,6 @@ public final class TypeRef implements Type {
   @Override
   public ID id() {
     return deref().id();
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return deref().nsSensitive();
   }
 
   @Override

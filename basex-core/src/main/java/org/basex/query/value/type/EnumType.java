@@ -2,7 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -11,13 +10,13 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * XQuery enum type.
+ * Enumeration type, consisting of permitted string values.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class EnumType implements Type {
-  /** The enumeration values (at least one). */
+  /** Enumeration values (at least one). */
   private final TokenSet values;
 
   /** Sequence types. */
@@ -35,7 +34,7 @@ public final class EnumType implements Type {
    * Returns an enumeration type.
    * @param <T> type of enumeration values
    * @param values enumeration values (at least one)
-   * @return enum type
+   * @return enumeration type
    */
   @SafeVarargs
   public static <T> EnumType get(final T... values) {
@@ -59,17 +58,6 @@ public final class EnumType implements Type {
     final byte[] string = item.string(info);
     if(!values.contains(string)) throw FUNCCAST_X_X.get(info, this, item);
     return item.type.eq(this) ? item : Str.get(string, new EnumType(new TokenSet(string)));
-  }
-
-  @Override
-  public Value cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-    return cast(Str.get(value, info), qc, info);
-  }
-
-  @Override
-  public Item read(final DataInput in, final QueryContext qc) {
-    throw Util.notExpected();
   }
 
   @Override
@@ -129,17 +117,12 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public boolean assignable() {
+  public boolean attachable() {
     return false;
   }
 
   @Override
   public boolean isStringOrUntyped() {
-    return true;
-  }
-
-  @Override
-  public boolean isSortable() {
     return true;
   }
 

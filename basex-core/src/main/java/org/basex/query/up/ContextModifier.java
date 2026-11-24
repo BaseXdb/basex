@@ -238,7 +238,7 @@ abstract class ContextModifier {
     final Set<Data> datas = new HashSet<>();
     try {
       for(final Data data : dbUpdates.keySet()) {
-        data.startUpdate(ctx.options);
+        data.startUpdate(qc.options());
         datas.add(data);
       }
       // apply node and database update
@@ -250,7 +250,7 @@ abstract class ContextModifier {
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {
-        data.finishUpdate(ctx.options);
+        data.finishUpdate(qc.options());
       }
     }
 

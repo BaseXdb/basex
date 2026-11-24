@@ -73,31 +73,64 @@ public final class Lookup extends Arr {
     // ()?key → ()
     if(is == 0) return cc.replaceWith(this, inputs);
 
-    // skip optimizations if input may yield items other than maps or arrays
+    // skip rewrites if input may yield items other than maps or arrays
     final Type tp = inputs.seqType().type;
-    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
-    if(!(map || array)) return this;
+    final boolean map = tp instanceof MapType;
+    if(map || tp instanceof ArrayType) {
+      // pre-evaluate a lookup with a single input and a single key, or with a map and static keys
+      if(is == 1 && inputs instanceof Value &&
+          (keys instanceof Item || map && keys instanceof Value)) return cc.preEval(this);
 
-    // pre-evaluate a lookup with a single input and a single key, or with a map and static keys
-    if(is == 1 && inputs instanceof Value &&
-        (keys instanceof Item || map && keys instanceof Value)) return cc.preEval(this);
-
-    final Expr expr = opt(tp, cc);
-    if(expr != this) return cc.replaceWith(this, expr);
-
-    // derive type from input expression
-    final SeqType kt = keys.seqType();
-    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
-    Occ occ = st.occ;
-    if(is != 1 || keys == Str.WILDCARD || kt.atomOcc() != Occ.EXACTLY_ONE) {
-      // key is wildcard, or expressions yield no single item
-      occ = occ.union(Occ.ZERO_OR_MORE);
-    } else if(map) {
-      // map lookup may result in empty sequence
-      occ = occ.union(Occ.ZERO);
+      final Expr expr = opt(tp, cc);
+      if(expr != this) return cc.replaceWith(this, expr);
     }
-    exprType.assign(st.type, occ);
+
+    // derive type from input; keep it if only undeclared fields are requested (may raise errors)
+    final SeqType st = valueType(tp, keys, Types.EMPTY_SEQUENCE_Z);
+    if(st == null || st.zero()) return this;
+    // key is wildcard, or expressions yield no single item
+    final boolean multiple = is != 1 || keys == Str.WILDCARD ||
+        keys.seqType().atomOcc() != Occ.EXACTLY_ONE;
+    exprType.assign(st.type, multiple ? st.occ.union(Occ.ZERO_OR_MORE) : st.occ);
     return this;
+  }
+
+  /**
+   * Returns the type of the values that are looked up in an item of the specified type.
+   * @param type item type
+   * @param keys keys
+   * @param missing type of the result for missing keys
+   * @return value type (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public static SeqType valueType(final Type type, final Expr keys, final SeqType missing)
+      throws QueryException {
+    final Type tp = type.deref();
+    if(tp instanceof final ChoiceItemType ct) {
+      SeqType st = null;
+      for(final Type alt : ct.types) {
+        // lookups on atomic items raise errors
+        if(alt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) continue;
+        final SeqType vt = valueType(alt, keys, missing);
+        if(vt == null) return null;
+        st = st == null ? vt : st.union(vt);
+      }
+      return st;
+    }
+    if(tp instanceof final ShapeType sh && !sh.any() && keys instanceof final Value values &&
+        values != Str.WILDCARD && values.size() <= sh.fields().size()) {
+      // undeclared fields are missing (or raise errors)
+      SeqType st = null;
+      for(final Item key : values) {
+        final int i = sh.index(key);
+        final SeqType ft = i == 0 ? missing : sh.fields().value(i).seqType();
+        st = st == null ? ft : st.union(ft);
+      }
+      return st;
+    }
+    // map lookup may yield no result
+    return tp instanceof final MapType mt ? mt.valueType().union(missing) :
+      tp instanceof final ArrayType at ? at.memberType() : null;
   }
 
   /**
@@ -135,8 +168,8 @@ public final class Lookup extends Arr {
       if(is == 1) return rewrite.apply(inputs, keys);
       // focus-dependent key:  INPUTS?KEY → for $item in INPUTS return REWRITE($item, KEY)
       if(keys.has(Flag.CTX)) {
-        final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
-        return flwor.finish(inputs, null, rewrite.apply(flwor.item(), keys));
+        final FLWORBuilder flwor = new FLWORBuilder(inputs, 1, cc, info);
+        return flwor.finish(null, rewrite.apply(flwor.item(), keys));
       }
       // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
       return SimpleMap.get(cc, info, inputs,
@@ -149,11 +182,11 @@ public final class Lookup extends Arr {
       if(is == 1) return SimpleMap.get(cc, info, keys,
           cc.get(keys, true, () -> rewrite.apply(inputs, ContextValue.get(cc, info))));
       // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
-      final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
+      final FLWORBuilder flwor = new FLWORBuilder(inputs, 1, cc, info);
       final Expr next = cc.get(keys, true, () ->
         rewrite.apply(flwor.item(), ContextValue.get(cc, info)));
       final Expr rtrn = SimpleMap.get(cc, info, keys, next);
-      return flwor.finish(inputs, null, rtrn);
+      return flwor.finish(null, rtrn);
     }
     return this;
   }

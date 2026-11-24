@@ -26,7 +26,7 @@ public final class ProfVariables extends StandardFunc {
 
     final StringBuilder sb = new StringBuilder();
     for(final Item binding : bindings) {
-      toMap(binding).forEach((key, value) -> {
+      toMap(binding, arg(0)).forEach((key, value) -> {
         if(value != Empty.UNDEFINED) {
           sb.append(Prop.NL).append("  ").append(key.toJava()).append(" := ").append(value);
         }

@@ -177,7 +177,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // inline all values in the closure
       final Iterator<Entry<Var, Expr>> iter = global.entrySet().iterator();
       Map<Var, Expr> add = null;
-      final int limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
+      final int limit = cc.qc.options().get(MainOptions.INLINELIMIT);
       while(iter.hasNext()) {
         final Entry<Var, Expr> entry = iter.next();
         final Var var = entry.getKey();
@@ -367,7 +367,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // the let clauses of a closure do not change the type of the function body
     final SeqType argType = expr.seqType();
     Expr checked;
-    if(declType == null || argType.coercible(declType)) {
+    if(declType == null || argType.keptBy(declType)) {
       // return type is already correct
       checked = body;
     } else if(body instanceof final Value value) {

@@ -19,7 +19,7 @@ public final class RequestAttributeNames extends ApiFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
     for(final Entry<String, Object> entry : state(qc).attributes().entrySet()) {
-      if(entry.getValue() instanceof Value) tl.add(entry.getKey());
+      if(entry.getValue() != null) tl.add(entry.getKey());
     }
     return StrSeq.get(tl);
   }

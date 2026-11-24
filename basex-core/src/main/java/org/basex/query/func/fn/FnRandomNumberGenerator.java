@@ -132,7 +132,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
     @Override
     public Iter iter(final QueryContext qc) throws QueryException {
-      final long count = toLong(arg(0).atomItem(qc, info), 0);
+      final long count = toLong(arg(0), 0, qc);
 
       return new Iter() {
         // same sequence as ?number, ?next()?number, ...

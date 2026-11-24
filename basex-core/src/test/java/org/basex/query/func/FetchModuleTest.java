@@ -69,8 +69,6 @@ public final class FetchModuleTest extends SandboxTest {
     query("(# db:stripws true #) { " + _XQUERY_EVAL.args(" 'exists(" + func.args(XML) +
         "//text()[not(normalize-space())])'") + " }", false);
     query(COUNT.args(func.args(CSV,
-        " { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
-    query(COUNT.args(func.args(CSV,
         " { 'parser': 'csv', 'csvparser': { 'header': true() } }") + "//City"), 3);
     // nested option with a map value
     query(func.args("src/test/resources/example.json", " { 'parser': 'json', 'jsonparser': " +
@@ -80,6 +78,7 @@ public final class FetchModuleTest extends SandboxTest {
         " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }") + "//City"), 3);
 
     error(func.args(XML, " { 'parser': 'unknown' }"), BASEX_OPTIONS_X);
+    error(func.args(CSV, " { 'parser': 'csv', 'csvparser': 'header=true' }"), BASEX_OPTIONS_X);
     error(func.args(XML + 'x'), RESWHICH_X);
     error(func.args("httttp://x"), FETCH_OPEN_X);
   }

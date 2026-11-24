@@ -22,7 +22,7 @@ public final class XQueryForEach extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final FItem action = toFunction(arg(1), 2, qc);
-    final TaskOptions options = options(2, TaskOptions::new, qc);
+    final TaskOptions options = toOptions(qc);
 
     final long size = input.size();
     if(size == 0) return Empty.VALUE;
@@ -44,11 +44,11 @@ public final class XQueryForEach extends StandardFunc {
     final SeqType st = input.seqType();
     // xquery:for-each((), $action) → ()
     if(st.zero()) return input;
-    optOptions(2, TaskOptions::new, cc);
     final SeqType[] types = { st.with(Occ.EXACTLY_ONE), Types.INTEGER_O };
     arg(1, arg -> action.refineFunc(cc, types));
-    if(arg(2) instanceof Value) {
-      final SeqType type = options(2, TaskOptions::new, cc.qc).type(arg(1).funcType(), st.occ);
+    final TaskOptions options = staticOptions();
+    if(options != null) {
+      final SeqType type = options.type(arg(1).funcType(), st.occ);
       if(type != null) exprType.assign(type);
     }
     return this;

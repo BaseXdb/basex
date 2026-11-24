@@ -28,12 +28,8 @@ public class JsonParse extends ParseJson {
     return null;
   }
 
-  /**
-   * Adapts the error code.
-   * @param ex exception to be adapted
-   * @return new exception
-   */
-  final QueryException error(final QueryException ex) {
+  @Override
+  protected final QueryException error(final QueryException ex) {
     final QueryError error = ex.error();
     return error(ex, error == OPTION_JSON_X ? JSON_OPTIONS_X :
         ex.matches(ErrType.FOJS) ? JSON_PARSE_X : null);

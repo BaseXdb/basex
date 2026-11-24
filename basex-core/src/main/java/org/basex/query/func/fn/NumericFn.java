@@ -55,11 +55,11 @@ public abstract class NumericFn extends StandardFunc {
    */
   protected static SeqType optType(final Expr expr) {
     final SeqType st = expr.seqType();
-    Type type = st.type;
+    Type type = st.type.atomicOrAny();
     // untyped values are treated as doubles, derived integer types are not preserved
     if(type.isUntyped()) type = BasicType.DOUBLE;
     else if(type.instanceOf(BasicType.INTEGER)) type = BasicType.INTEGER;
-    if(type.isNumber()) return type.seqType(st.occ.intersect(Occ.ZERO_OR_ONE));
+    if(type.isNumber()) return type.seqType(st.atomOcc().intersect(Occ.ZERO_OR_ONE));
     return null;
   }
 }

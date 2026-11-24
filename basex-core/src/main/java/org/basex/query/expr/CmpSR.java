@@ -57,7 +57,7 @@ public final class CmpSR extends CmpRange {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.STRING, cc);
 
-    single = expr.seqType().atomOcc().max <= 1;
+    single = expr.seqType().zeroOrOneUnwrapped();
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }

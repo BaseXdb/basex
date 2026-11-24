@@ -28,6 +28,11 @@ public final class ProfType extends StandardFunc {
     return value;
   }
 
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return adoptType(arg(0));
+  }
+
   /**
    * Returns an info string for the specified expression.
    * @param expr expression

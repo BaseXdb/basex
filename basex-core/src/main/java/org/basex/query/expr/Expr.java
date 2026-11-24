@@ -130,9 +130,7 @@ public abstract class Expr extends ExprInfo {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
 
-    long size = iter.size();
-    if(size != -1 && st.mayBeWrapped()) size = -1;
-    return new AtomIter(iter, qc, ii, size);
+    return new AtomIter(iter, qc, ii, st.atomizesToOne() ? iter.size() : -1);
   }
 
   /**
@@ -245,8 +243,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the data reference bound to this expression. This method is currently overridden
-   * by {@link DBNode}, {@link DBNodeSeq}, {@link AxisPath} and {@link VarRef}.
+   * Returns the data reference bound to this expression.
    * @return data reference (can be {@code null})
    */
   public Data data() {
@@ -264,7 +261,7 @@ public abstract class Expr extends ExprInfo {
    * @return size, or {@code -1} if it is unknown
    */
   public final long atomSize() {
-    return seqType().mayBeWrapped() ? -1 : size();
+    return seqType().atomizesToOne() ? size() : -1;
   }
 
   /**
@@ -468,6 +465,26 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Indicates if the nodes returned by this expression have no parent.
+   * @return result of check
+   */
+  public boolean parentless() {
+    return false;
+  }
+
+  /**
+   * Returns the occurrence indicator of the child or attribute nodes of the returned node that
+   * match the specified test.
+   * @param test test
+   * @param attributes attribute or child nodes
+   * @return occurrence indicator (can be {@code null})
+   */
+  public Occ childOcc(@SuppressWarnings("unused") final Test test,
+      @SuppressWarnings("unused") final boolean attributes) {
+    return null;
+  }
+
+  /**
    * Indicates if this expression is <i>navigational</i>: a context reference, an axis step, or a
    * (syntactic) combination thereof. Used by the path operator to decide whether a step navigates
    * to nodes or is rewritten to a dynamic selector for JNode navigation.
@@ -557,7 +574,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared in this expression,
    *         {@code false} otherwise
    */
-  public boolean hasFreeVars() {
+  public final boolean hasFreeVars() {
     final Var[] vars = freeVars();
     return vars == null || vars.length != 0;
   }

@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
 public final class FnCivilTimezone extends DateTimeFn {
   @Override
   public DTDur value(final QueryContext qc) throws QueryException {
-    final Dtm value = (Dtm) checkType(arg(0), BasicType.DATE_TIME, qc);
+    final Dtm value = (Dtm) coerce(arg(0), BasicType.DATE_TIME, qc);
     final String place = toStringOrNull(arg(1), qc);
 
     final Instant instant = value.toInstant(qc);

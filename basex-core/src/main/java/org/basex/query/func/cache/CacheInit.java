@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
 public final class CacheInit extends CacheFn {
   @Override
   public Empty value(final QueryContext qc) throws QueryException {
-    final CacheOptions options = toOptions(arg(0), new CacheOptions(), qc);
+    final CacheOptions options = toOptions(qc);
     final String name = toZeroString(arg(1), qc);
 
     final StaticOptions soptions = qc.context.soptions;

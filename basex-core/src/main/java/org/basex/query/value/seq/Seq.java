@@ -124,8 +124,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final void refineType(final Expr expr) {
-    final Type tp = expr.seqType().type.intersect(type);
-    if(tp != null && tp.assignable()) type = tp;
+    type = type.refine(expr);
   }
 
   @Override
@@ -202,7 +201,7 @@ public abstract class Seq extends Value {
   @Override
   public boolean refineType() {
     boolean same = true;
-    if(type.refinable()) {
+    if(type instanceof final BasicType bt ? bt.refinable() : type == NodeType.XNODE) {
       Type refined = null;
       for(final Item item : this) {
         final Type tp = item.type;

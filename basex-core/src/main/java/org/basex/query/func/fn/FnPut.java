@@ -25,9 +25,9 @@ public final class FnPut extends StandardFunc {
   public Empty value(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final byte[] source = toZeroToken(arg(1), qc);
-    final SerializerOptions options = toSerializerOptions(arg(2), qc);
+    final SerializerOptions options = toOptions(qc);
 
-    if(!node.kind().oneOf(Kind.DOCUMENT, Kind.ELEMENT)) throw UPFOTYPE_X.get(info, arg(0));
+    if(!node.kind().oneOf(Kind.DOCUMENT, Kind.ELEMENT)) throw UPFOTYPE_X.get(info, node.seqType());
 
     final Uri uri = Uri.get(source);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, source);

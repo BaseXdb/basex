@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
+import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -139,6 +140,11 @@ public final class CElem extends CName {
     // namespaces may be required by the content: data(<x xmlns:p='p'>{ xs:QName('p:a') }</x>)
     return nspaces.isEmpty() || exprs.length == 1 && exprs[0] instanceof Value ?
       super.simplifyFor(mode, cc) : simplify(mode, cc);
+  }
+
+  @Override
+  public Occ childOcc(final Test test, final boolean attributes) {
+    return contentOcc(test, attributes);
   }
 
   @Override

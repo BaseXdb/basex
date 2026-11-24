@@ -75,9 +75,9 @@ public final class FileReadTextLines extends FileReadFn {
    */
   private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
     final Path path = toPath(arg(0), qc);
-    final ParseOptions options = options(path, qc);
-    final String encoding = options.get(ParseOptions.ENCODING);
-    final boolean fallback = options.get(ParseOptions.FALLBACK);
+    final ReadTextOptions options = options(path, qc);
+    final String encoding = options.get(ReadTextOptions.ENCODING);
+    final boolean fallback = options.get(ReadTextOptions.FALLBACK) || toBooleanOrFalse(arg(2), qc);
     return new NewlineInput(new IOFile(path), encoding).fallback(fallback);
   }
 

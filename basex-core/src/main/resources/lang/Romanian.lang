@@ -320,6 +320,7 @@ results_%            = Rezultat(e) %
 revert               = Revenire
 revert_file_%        = Revenire la % și renunțare la modificări?
 revert_files_%       = % fișier(e) vor fi restaurate, modificările mai noi se vor pierde.
+rt_compilation       = Compilare în timp real
 rt_execution         = În timp real de executie
 rt_filtering         = Filtrarea in timp real
 rt_focus             = Mouse focus in timp real

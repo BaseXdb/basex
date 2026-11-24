@@ -57,14 +57,14 @@ public class MapMerge extends MapFn {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final Iter maps = arg(0).unwrappedIter(qc);
-    final MapDuplicates dups = duplicates(1, qc, Duplicates.USE_FIRST);
+    final MapDuplicates dups = duplicates(qc, Duplicates.USE_FIRST);
 
     // empty input: return empty map
     final Item first = qc.next(maps);
     if(first == null) return XQMap.empty();
 
     // single input: return single map
-    XQMap mp = toMap(first);
+    XQMap mp = toMap(first, arg(0));
     Item current = qc.next(maps);
     if(current == null) return mp.unannotated();
 
@@ -74,7 +74,7 @@ public class MapMerge extends MapFn {
     if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {
-      for(final Entry entry : toMap(current).entries()) {
+      for(final Entry entry : toMap(current, arg(0)).entries()) {
         final Item key = entry.key();
         final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
         final Value val = dups.merge(key, old, entry.value(), qc);
@@ -91,7 +91,7 @@ public class MapMerge extends MapFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    prepareMerge(1, Duplicates.USE_FIRST, cc);
+    prepareMerge(Duplicates.USE_FIRST, cc);
 
     if(arg(0).seqType().type instanceof MapType) {
       // map:merge(({}, $map, {})) → map:merge($map)
@@ -122,44 +122,39 @@ public class MapMerge extends MapFn {
 
   /**
    * Optimizes merge operations.
-   * @param arg options argument
    * @param dflt default duplicate operation
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  final void prepareMerge(final int arg, final Duplicates dflt, final CompileContext cc)
-      throws QueryException {
+  final void prepareMerge(final Duplicates dflt, final CompileContext cc) throws QueryException {
     // reuse fixed mergers; refinement fixpoint must start from the supplied function
-    if(arg(arg) instanceof Value && (md == null || md instanceof Invoke)) {
-      md = merger(arg, cc.qc, dflt);
+    if(staticOptions() != null && (md == null || md instanceof Invoke)) {
+      md = merger(cc.qc, dflt);
     }
   }
 
   /**
    * Returns the static or a new merger for duplicate values.
-   * @param arg options argument
    * @param qc query context
    * @param dflt default duplicate operation
    * @return merger
    * @throws QueryException query exception
    */
-  final MapDuplicates duplicates(final int arg, final QueryContext qc, final Duplicates dflt)
+  final MapDuplicates duplicates(final QueryContext qc, final Duplicates dflt)
       throws QueryException {
-    return md != null ? md : merger(arg, qc, dflt);
+    return md != null ? md : merger(qc, dflt);
   }
 
   /**
    * Creates a merger for duplicate values.
-   * @param arg options argument
    * @param qc query context
    * @param dflt default duplicate operation
    * @return merger
    * @throws QueryException query exception
    */
-  private MapDuplicates merger(final int arg, final QueryContext qc, final Duplicates dflt)
-      throws QueryException {
+  private MapDuplicates merger(final QueryContext qc, final Duplicates dflt) throws QueryException {
     // function
-    final MergeOptions options = toOptions(arg(arg), new MergeOptions(), qc);
+    final MergeOptions options = toOptions(qc);
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
     if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc));
     // fixed option
@@ -177,7 +172,7 @@ public class MapMerge extends MapFn {
 
   /**
    * Refines the merger and assigns a map type for this expression.
-   * @param kt key type (can be {@code null})
+   * @param kt key type
    * @param vt value type
    * @param cc compilation context
    * @throws QueryException query exception
@@ -185,8 +180,7 @@ public class MapMerge extends MapFn {
   final void assignType(final Type kt, final SeqType vt, final CompileContext cc)
       throws QueryException {
     if(md != null) md = md.refine(vt, cc);
-    exprType.assign(MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE,
-      md != null ? md.type(vt) : Types.ITEM_ZM));
+    exprType.assign(MapType.get(kt, md != null ? md.type(vt) : Types.ITEM_ZM));
   }
 
   @Override
