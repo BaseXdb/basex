@@ -13,7 +13,9 @@ import javax.tools.*;
  * grammar.
  *
  * <ol>
- *   <li>Run this class. It fetches the grammar and regenerates {@code XQuerySyntaxParser} with REx
+ *   <li>Run this class. It fetches the grammar (unless the argument {@code offline} is given: the
+ *     grammar file next to the test resources is then used as it is, so that grammar changes can
+ *     be tested by editing it) and regenerates {@code XQuerySyntaxParser} with REx
  *     ({@link RExRemake}), then {@code Sym} ({@link SymGenerator}) and the syntax tree classes
  *     ({@link NodeGenerator}). It reports the nonterminals that were added, removed or changed
  *     ({@link FoldPolicyTest}) and records them in {@code fold-signatures.properties}: the changes
@@ -62,7 +64,7 @@ public final class GrammarUpdate {
 
   /**
    * Main method.
-   * @param args not used
+   * @param args {@code offline} to use the grammar file as it is, without fetching it
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
@@ -71,8 +73,10 @@ public final class GrammarUpdate {
     }
     final Path core = core();
 
-    System.out.println("...running RExRemake: fetch the grammar, run REx");
-    RExRemake.remake(core);
+    final boolean offline = Arrays.asList(args).contains(RExRemake.OFFLINE);
+    System.out.println("...running RExRemake: " + (offline ? "use the existing grammar" :
+        "fetch the grammar") + ", run REx");
+    RExRemake.remake(core, offline);
     child(core, "sym", "SymGenerator: generate the symbol constants (Sym.java)",
         GEN.resolve("XQuerySyntaxParser.java"), TEST.resolve("SymGenerator.java"));
     final int status = child(core, "check", "NodeGenerator: generate the syntax tree classes " +
