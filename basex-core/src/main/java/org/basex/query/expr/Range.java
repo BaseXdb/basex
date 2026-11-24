@@ -40,7 +40,7 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs = simplifyAll(Simplify.NUMBER, cc);
+    exprs = simplifyAll(Simplify.DATA, cc);
 
     Expr expr = emptyExpr();
     if(expr == this) {

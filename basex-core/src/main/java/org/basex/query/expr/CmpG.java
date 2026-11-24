@@ -68,12 +68,9 @@ public class CmpG extends Cmp {
     if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
       // $node[string() = 'x'] → $node[. = 'x']
       exprs = simplifyAll(Simplify.STRING, cc);
-    } else if(t1.isNumber() && t2.isNumber()) {
-      exprs = simplifyAll(Simplify.NUMBER, cc);
-    } else if(t1.isNumber() && t2.isUntyped() || t1.isUntyped() && t2.isNumber()) {
+    } else if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
       // 1 = <x>1</x> → 1 = xs:untypedAtomic('1')
-      final int u = t1.isUntyped() ? 0 : 1;
-      exprs[u] = exprs[u].simplifyFor(Simplify.NUMBER, cc);
+      exprs = simplifyAll(Simplify.DATA, cc);
     }
 
     // simplify operands

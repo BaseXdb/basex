@@ -770,6 +770,13 @@ public class QueryParser extends InputParser {
       // query-specific options
       if(!name.equals(LOCK)) throw error(BASEX_OPTIONSINV_X, name);
       for(final String lock : Locking.queryLocks(token(value))) qc.locks.add(lock);
+    } else if(eq(uri, XQ_URI) && name.equals(ARITHMETIC_MODE)) {
+      // arithmetic mode of the current module
+      sc.decimal = value.equals("decimal");
+      if(!sc.decimal && !value.equals("double")) {
+        throw error(BASEX_OPTIONS_X,
+            Util.info(Text.OPT_ONEOF_X_X_X, name, value, "decimal, double"));
+      }
     }
     // ignore unknown options
     options.put(qname, value);

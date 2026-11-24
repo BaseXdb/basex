@@ -109,7 +109,7 @@ public final class CmpIR extends CmpRange {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.NUMBER, cc);
+    expr = expr.simplifyFor(Simplify.DATA, cc);
 
     single = expr.seqType().zeroOrOneUnwrapped();
 

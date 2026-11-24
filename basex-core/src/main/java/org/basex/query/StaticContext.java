@@ -79,6 +79,8 @@ public final class StaticContext {
   public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean inheritNS = true;
+  /** Arithmetic mode: decimal (instead of double). */
+  public boolean decimal;
 
   /** Static type of context value. */
   public SeqType contextType;
@@ -131,6 +133,14 @@ public final class StaticContext {
     } else {
       ns.add(prefix1, u, null);
     }
+  }
+
+  /**
+   * Returns the preferred numeric type.
+   * @return {@link BasicType#DECIMAL} or {@link BasicType#DOUBLE}
+   */
+  public BasicType numericType() {
+    return decimal ? BasicType.DECIMAL : BasicType.DOUBLE;
   }
 
   /**

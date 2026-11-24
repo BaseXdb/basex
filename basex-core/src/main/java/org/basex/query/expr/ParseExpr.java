@@ -556,8 +556,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANum toNumber(final Item item, final Expr expr) throws QueryException {
-    if(item.type.isUntyped()) return Dbl.get(item.dbl(info));
     if(item instanceof final ANum num) return num;
+    if(item.type.isUntyped()) return (ANum) sc().numericType().cast(item, null, info);
     throw argTypeError(item, NUMERIC, expr);
   }
 

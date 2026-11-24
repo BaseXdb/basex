@@ -53,7 +53,7 @@ public final class CompileContext {
     /**
      * Atomizations.
      * Requested by {@link FnData}, {@link FnDistinctValues}, {@link GroupSpec}, {@link OrderKey},
-     * {@link Lookup}, {@link TypeCheck}.
+     * {@link Lookup}, {@link TypeCheck}, {@link CmpG}, {@link Range} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData}.
      */
     DATA,
@@ -72,8 +72,8 @@ public final class CompileContext {
      */
     STRING_VALUE,
     /**
-     * Numeric arguments.
-     * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
+     * Double arguments: atomized values that are converted to doubles.
+     * Requested by {@link Arith}, {@link Unary}, {@link FnSum}, {@link StandardFunc} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
      * {@link FnReplicate}.
      */
@@ -118,6 +118,15 @@ public final class CompileContext {
      */
     public boolean oneOf(final Simplify... candidates) {
       return Enums.oneOf(this, candidates);
+    }
+
+    /**
+     * Returns the mode for operands that are converted to the preferred numeric type.
+     * @param sc static context
+     * @return {@link #NUMBER} or {@link #DATA}
+     */
+    public static Simplify numeric(final StaticContext sc) {
+      return sc.numericType() == BasicType.DOUBLE ? NUMBER : DATA;
     }
 
     /**

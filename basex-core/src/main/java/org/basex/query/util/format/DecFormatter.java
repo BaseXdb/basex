@@ -12,6 +12,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -431,7 +432,7 @@ public final class DecFormatter extends FormatUtil {
 
     // Rule 3: percent/permille
     ANum num = item;
-    if(pic.factor != null) num = (ANum) Calc.MULTIPLY.eval(num, pic.factor, info);
+    if(pic.factor != null) num = (ANum) Calc.MULTIPLY.eval(num, pic.factor, BasicType.DOUBLE, info);
 
     final boolean infinite = num.floating() && Double.isInfinite(num.dbl(info));
     if(infinite) {

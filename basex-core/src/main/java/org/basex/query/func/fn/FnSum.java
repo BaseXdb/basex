@@ -95,9 +95,10 @@ public class FnSum extends NumericFn {
       // sum(replicate(2, 5)) → 10, avg(replicate(2, 5)) → 2.0
       final Item item = ss.itemAt(0);
       if(item.type.instanceOf(DECIMAL)) {
-        return avg ? Dec.get(item.dec(info)) : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
+        return avg ? Dec.get(item.dec(info)) :
+          Calc.MULTIPLY.eval(item, Itr.get(ss.size()), sc().numericType(), info);
       }
-    } else if(values instanceof final Path path) {
+    } else if(sc().numericType() == DOUBLE && values instanceof final Path path) {
       // sum(db:get('db')//price) → 1234.5e0
       final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
@@ -129,7 +130,7 @@ public class FnSum extends NumericFn {
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
     if(arg(0).seqType().atomType().isNumberOrUntyped()) {
-      arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
+      arg(0, arg -> arg.simplifyFor(Simplify.numeric(sc()), cc));
     }
   }
 
@@ -189,16 +190,17 @@ public class FnSum extends NumericFn {
    * @param values values
    * @return type (can be {@code null})
    */
-  static Type sumType(final Expr values) {
+  final Type sumType(final Expr values) {
     final SeqType st = optType(values);
     if(st == null) return null;
     if(!(values instanceof final List list)) return st.type;
     // sum(($int, $dbl)) → xs:double: non-empty operands are promoted
+    final BasicType preferred = sc().numericType();
     Type type = null;
     for(final Expr expr : list.args()) {
       final SeqType ost = optType(expr);
       if(ost == null || !ost.oneOrMore()) return st.type;
-      type = type == null ? ost.type : Calc.ADD.type(type, ost.type);
+      type = type == null ? ost.type : Calc.ADD.type(type, ost.type, preferred);
     }
     return type;
   }
@@ -262,7 +264,8 @@ public class FnSum extends NumericFn {
     final Item item = iter.next();
     if(item == null) return null;
 
-    Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
+    final BasicType preferred = sc().numericType();
+    Item result = item.type.isUntyped() ? toNumber(item, null) : item;
     final Type type = result.type;
     final boolean num = result instanceof ANum;
     final boolean dtd = type == DAY_TIME_DURATION, ymd = type == YEAR_MONTH_DURATION;
@@ -283,7 +286,7 @@ public class FnSum extends NumericFn {
       }
       if(t != null) throw ARGTYPE_X_X_X.get(info, t, tp, it);
       itr &= tp.instanceOf(INTEGER);
-      result = itr ? addInt(result, it) : Calc.ADD.eval(result, it, info);
+      result = itr ? addInt(result, it) : Calc.ADD.eval(result, it, preferred, info);
       c++;
     }
     if(itr && !avg && result instanceof Dec) {
@@ -291,7 +294,7 @@ public class FnSum extends NumericFn {
       if(bi.bitLength() < 64) return Itr.get(bi.longValue());
       throw RANGE_X.get(info, bi);
     }
-    return avg ? Calc.DIVIDE.eval(result, Itr.get(c), info) : result;
+    return avg ? Calc.DIVIDE.eval(result, Itr.get(c), preferred, info) : result;
   }
 
   /**

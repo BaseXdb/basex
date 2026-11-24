@@ -7077,7 +7077,7 @@ return
   @Test public void systemProperties() {
     final Function func = SYSTEM_PROPERTIES;
 
-    query("map:size(" + func.args() + ')', 14);
+    query("map:size(" + func.args() + ')', 15);
     query(func.args() + "?#xpath-version", 4);
   }
 

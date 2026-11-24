@@ -530,7 +530,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
-    return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.SET, cc);
+    return simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.SET, cc);
   }
 
   /**

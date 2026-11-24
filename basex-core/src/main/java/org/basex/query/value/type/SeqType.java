@@ -476,6 +476,7 @@ public final class SeqType {
     Item relabel = null;
     if(at == UNTYPED_ATOMIC) {
       if(tp.oneOf(QNAME, NOTATION)) throw NSSENS_X_X.get(info, at, type);
+      if(tp == NUMERIC) return info.sc().numericType().cast(item, qc, info);
       // item will be cast
     } else if(
       tp == DECIMAL && (at == DOUBLE || at == FLOAT) ||

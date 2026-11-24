@@ -100,7 +100,7 @@ public final class FTWords extends FTExpr {
     optimize(cc.qc);
     if(occ != null) {
       final int ol = occ.length;
-      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.NUMBER, cc);
+      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.DATA, cc);
     }
     return this;
   }

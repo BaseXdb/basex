@@ -36,11 +36,11 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.NUMBER, cc);
+    expr = expr.simplifyFor(Simplify.numeric(sc()), cc);
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
-    final BasicType at = st.type.atomicOrAny(), nt = Calc.numType(at, at);
+    final BasicType at = st.type.atomicOrAny(), nt = Calc.numType(at, at, sc().numericType());
     final BasicType type = nt == BasicType.ANY_ATOMIC_TYPE ? BasicType.NUMERIC : nt;
     final Occ occ = st.atomOcc().min >= 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
@@ -57,14 +57,11 @@ public final class Unary extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
+    Item item = expr.atomItem(qc, info);
     if(item == Empty.VALUE) return Empty.VALUE;
 
+    if(item.type.isUntyped()) item = toNumber(item, null);
     final Type type = item.type;
-    if(type.isUntyped()) {
-      final double d = item.dbl(info);
-      return Dbl.get(minus ? -d : d);
-    }
     if(!type.isNumber()) throw numberError(this, item);
 
     if(!minus) return item;
