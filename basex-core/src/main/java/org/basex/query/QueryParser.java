@@ -2911,13 +2911,13 @@ public class QueryParser extends InputParser {
   private Expr methodCall(final Expr expr) throws QueryException {
     skipWs();
     final InputInfo info = info();
-    final Str key = Str.get(ncName(NONCNAME_X, false));
+    final byte[] name = ncName(NONCNAME_X, false);
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
     final FuncBuilder fb = argumentList(false, arg);
-    if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, key);
-    final Lookup func = new Lookup(info, arg, key);
+    if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, name);
+    final Lookup func = new Lookup(info, arg, Str.get(name));
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);
