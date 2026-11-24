@@ -17,9 +17,9 @@ import org.basex.util.list.*;
 public final class FtScore extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final boolean s = qc.scoring;
+    final boolean s = qc.ft.scoring;
     try {
-      qc.scoring = true;
+      qc.ft.scoring = true;
       final Iter input = arg(0).iter(qc);
       final DoubleList values = new DoubleList(Seq.initialCapacity(input.size()));
       for(Item item; (item = qc.next(input)) != null;) {
@@ -27,7 +27,7 @@ public final class FtScore extends StandardFunc {
       }
       return DblSeq.get(values.finish());
     } finally {
-      qc.scoring = s;
+      qc.ft.scoring = s;
     }
   }
 }

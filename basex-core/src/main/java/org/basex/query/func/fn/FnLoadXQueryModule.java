@@ -51,9 +51,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
     if(hints.size() == 1 && hintsOnly(opt) && qc.has(Perm.ADMIN, null, info)) {
-      QueryContext qcAnc = qc;
-      while(qcAnc.parent != null) qcAnc = qcAnc.parent;
-      modCache = qcAnc.caches.moduleCache().get();
+      modCache = qc.globalCaches.loadedModules();
       cacheKey = new TokenBuilder(modUri).add('#').add(toToken(hints.itemAt(0))).add('#').
           add(perm.toString()).toString();
       if(modCache.containsKey(cacheKey)) return modCache.get(cacheKey);
@@ -71,7 +69,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       // modules pre-declared by the caller or installed in the repository require no permissions
       final boolean provided = locs.isEmpty();
       if(provided) {
-        final TokenList files = qc.modDeclared.get(modUri);
+        final TokenList files = qc.modules.declared(modUri);
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
         } else {
@@ -106,8 +104,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final QueryContext mqc = new QueryContext(qc, null);
     mqc.maxPerm = perm;
-    mqc.inlineModule = inline;
-    for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
+    mqc.modules.inlineModule = inline;
+    mqc.modules.declare(qc.modules);
     int nParsed = 0;
     final Value ctx = contextValue(opt);
     if(ctx != null) {
@@ -116,7 +114,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
     for(final IO src : srcs) {
       // skip modules that were imported by a previously loaded module
-      final byte[] parsed = mqc.modParsed.get(Token.token(mqc.modulePath(src)));
+      final byte[] parsed = mqc.modules.uri(mqc.modules.path(src));
       if(parsed != null) {
         if(!Token.eq(modUri, parsed)) throw MODULE_FOUND_OTHER_X_X.get(info, modUri, src.path());
         continue;
@@ -143,15 +141,13 @@ public final class FnLoadXQueryModule extends StandardFunc {
       }
       mqc.compile(true);
       if(mqc.main != null) throw MODULE_FOUND_MAIN_X.get(info, modUri);
-      final Iterator<byte[]> it = mqc.modParsed.values().iterator();
-      for(int i = 0; i < nParsed; i++) it.next();
-      final byte[] uri = it.next();
+      final byte[] uri = mqc.modules.uri(nParsed + 1);
       if(!Token.eq(modUri, uri)) {
         final String path = src.path();
         throw path.isEmpty() ? MODULE_FOUND_OTHER_X.get(info, modUri)
                              : MODULE_FOUND_OTHER_X_X.get(info, modUri, path);
       }
-      nParsed = mqc.modParsed.size();
+      nParsed = mqc.modules.size();
     }
 
     // code of the loaded module refers to its own global context value

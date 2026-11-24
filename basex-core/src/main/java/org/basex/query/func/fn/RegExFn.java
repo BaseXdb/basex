@@ -50,14 +50,7 @@ public abstract class RegExFn extends StandardFunc {
       final InputInfo info) throws QueryException {
 
     final byte[] key = Token.concat(pattern, '\b', flags);
-    synchronized(qc.regex) {
-      RegExpr regExpr = qc.regex.get(key);
-      if(regExpr == null) {
-        regExpr = parse(pattern, flags, info);
-        qc.regex.put(key, regExpr);
-      }
-      return regExpr;
-    }
+    return qc.globalCaches.regex(key, () -> parse(pattern, flags, info));
   }
 
   /**

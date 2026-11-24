@@ -93,6 +93,8 @@ public class QueryParser extends InputParser {
   private final QNmMap<TypeRef> typeRefs = new QNmMap<>();
   /** Declarations of derived record types (declared after the module has been parsed). */
   private final QNmMap<DerivedRecord> extensions = new QNmMap<>();
+  /** Parse state, shared with the parsers of imported modules. */
+  private final ParseState state;
   /** Type names referenced by the item type that is currently parsed; {@code null} otherwise. */
   private QNmSet currentTypeDeps;
   /** Options. */
@@ -163,7 +165,7 @@ public class QueryParser extends InputParser {
    * @param info input info
    * @param funcs functions of the declaring module
    */
-  record TypeCnstr(StaticContext sc, QNm name, SeqType seqType, AnnList anns, String doc,
+  private record TypeCnstr(StaticContext sc, QNm name, SeqType seqType, AnnList anns, String doc,
       InputInfo info, ArrayList<StaticFunc> funcs) { }
 
   /**
@@ -175,11 +177,25 @@ public class QueryParser extends InputParser {
    */
   QueryParser(final String query, final String uri, final QueryContext qctx,
       final StaticContext sctx) {
+    this(query, uri, qctx, sctx, new ParseState());
+  }
+
+  /**
+   * Constructor.
+   * @param query query string
+   * @param uri base URI (can be {@code null}; only passed on if not bound to static context yet)
+   * @param qctx query context
+   * @param sctx static context (can be {@code null})
+   * @param state parse state, shared with the parsers of imported modules
+   */
+  private QueryParser(final String query, final String uri, final QueryContext qctx,
+      final StaticContext sctx, final ParseState state) {
 
     super(query);
     qc = qctx;
     sc = sctx != null ? sctx : new StaticContext(qctx);
     if(uri != null) sc.baseURI(uri);
+    this.state = state;
   }
 
   /**
@@ -241,10 +257,10 @@ public class QueryParser extends InputParser {
       namespaces.put(prefix, uri);
       wsCheck(";");
 
-      final byte[] pth = token(qc.modulePath(sc.baseIO()));
-      qc.modParsed.put(pth, uri);
+      final byte[] pth = qc.modules.path(sc.baseIO());
+      qc.modules.uri(pth, uri);
       // records of modules with a location are identified by their path
-      if(!(root && qc.inlineModule)) recordIdentity = string(pth);
+      if(!(root && qc.modules.inlineModule)) recordIdentity = string(pth);
 
       prolog1();
       importModules();
@@ -361,7 +377,7 @@ public class QueryParser extends InputParser {
       final TypeRef ref = typeRefs.get(nm);
       final Type type = sc.type(nm);
       if(type != null) ref.resolve(type);
-      else qc.deferredTypeRefs.add(ref);
+      else state.typeRefs.add(ref);
     }
   }
 
@@ -371,13 +387,12 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void resolveDeferredTypeRefs() throws QueryException {
-    for(final TypeRef ref : qc.deferredTypeRefs) {
+    for(final TypeRef ref : state.typeRefs) {
       if(ref.resolved()) continue;
       final Type type = ref.info().sc().type(ref.name());
       if(type == null) throw TYPEUNKNOWN_X.get(ref.info(), BasicType.similar(ref.name()));
       ref.resolve(type);
     }
-    qc.deferredTypeRefs.clear();
   }
 
   /**
@@ -387,35 +402,28 @@ public class QueryParser extends InputParser {
    */
   private void check(final MainModule main) throws QueryException {
     // declare derived record types whose base types were declared later (cyclic imports)
-    if(!qc.extensions.isEmpty()) {
-      final QNmMap<DerivedRecord> exts = new QNmMap<>();
-      for(final DerivedRecord dr : qc.extensions) exts.put(dr.decl.name, dr);
-      declareExtensions(exts, false);
-      qc.extensions.clear();
-    }
+    declareExtensions(state.derived, false);
     // reject declarations that clash with imported types
-    for(final TypeDecl td : qc.typeDecls) {
-      final TypeDecl pub = qc.namedTypes.get(td.name);
+    final QNmMap<TypeDecl> publics = qc.modules.publicTypes();
+    for(final TypeDecl td : qc.modules.types()) {
+      final TypeDecl pub = publics.get(td.name);
       if(pub != null && pub != td && td.info.sc().imports.contains(td.name.uri())) {
         throw DUPLTYPE_X.get(td.info, td.name.string());
       }
     }
     // reject item type declarations across modules that depend on themselves
-    checkTypes(qc.namedTypes.values());
+    checkTypes(publics.values());
     // resolve deferred (cross-module) type references
     resolveDeferredTypeRefs();
     // check referenced map key types and cast targets
-    for(final DeferredRef dr : qc.deferredMapKeys) {
+    for(final DeferredRef dr : state.mapKeys) {
       if(!dr.ref.instanceOf(BasicType.ANY_ATOMIC_TYPE)) throw MAPKEYATOMIC_X.get(dr.info, dr.ref);
     }
-    qc.deferredMapKeys.clear();
-    for(final DeferredRef dr : qc.deferredCastTargets) checkCastTarget(dr.ref, false, dr.info);
-    qc.deferredCastTargets.clear();
+    for(final DeferredRef dr : state.castTargets) checkCastTarget(dr.ref, false, dr.info);
     // declare constructor functions for named item types
-    for(final TypeCnstr tc : qc.typeCnstrs) {
+    for(final TypeCnstr tc : state.typeCnstrs) {
       if(cnstrType(tc.seqType().type)) declareTypeCnstr(tc);
     }
-    qc.typeCnstrs.clear();
     // resolve function calls
     qc.functions.resolve();
     // resolve variable references
@@ -525,7 +533,7 @@ public class QueryParser extends InputParser {
           // subsequent assignment required to enable duplicate checks
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          qc.ftOpt().assign(fto);
+          sc.ftOpt().assign(fto);
         } else {
           pos = p;
           return;
@@ -915,7 +923,7 @@ public class QueryParser extends InputParser {
     final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final TokenList pths = qc.modDeclared.get(uri);
+      final TokenList pths = qc.modules.declared(uri);
       if(pths != null) {
         pths.forEach(mi.paths::add);
         mi.declared = true;
@@ -995,14 +1003,14 @@ public class QueryParser extends InputParser {
 
     final IO io = sc.location(pth, uri, info);
     if(io == null) throw error(WHICHMODFILE_X, info, pth);
-    final byte[] tPath = token(qc.modulePath(io));
+    final byte[] tPath = qc.modules.path(io);
 
     // check if module has already been parsed
-    final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
+    final byte[] tUri = token(uri), pUri = qc.modules.uri(tPath);
     if(pUri != null) {
       if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, pUri);
     } else {
-      qc.modParsed.put(tPath, tUri);
+      qc.modules.uri(tPath, tUri);
 
       // read module
       final String query;
@@ -1012,11 +1020,11 @@ public class QueryParser extends InputParser {
         throw error(WHICHMODFILE_X, info, io).cause(ex);
       }
 
-      final QueryParser qp = new QueryParser(query, io.path(), qc, null);
+      final QueryParser qp = new QueryParser(query, io.path(), qc, null, state);
 
       // check if import and declaration URI match
       final LibraryModule lib = qp.parseLibrary(false);
-      qc.libs.put(tPath, lib);
+      qc.modules.library(tPath, lib);
       final byte[] muri = lib.sc.module.uri();
       if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
     }
@@ -1152,7 +1160,7 @@ public class QueryParser extends InputParser {
     final SeqType st = itemType();
     currentTypeDeps = null;
     declareType(qn, st, refs, anns, ii);
-    qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
+    state.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
   }
 
   /**
@@ -1269,7 +1277,7 @@ public class QueryParser extends InputParser {
         names.add(ref.name());) tp = sc.type(ref.name());
     // the base type may be declared by a module that is still being parsed (cyclic imports)
     if(defer && (tp == null || tp instanceof final TypeRef ref && !ref.resolved())) {
-      qc.extensions.add(dr);
+      state.derived.put(rd.name, dr);
       return;
     }
     if(!(tp != null && tp.deref() instanceof final RecordType ext) || ext.any()) {
@@ -1342,14 +1350,30 @@ public class QueryParser extends InputParser {
    * @param parser parser of the declaring module
    * @param decl record declaration
    */
-  record DerivedRecord(QueryParser parser, RecordDecl decl) { }
+  private record DerivedRecord(QueryParser parser, RecordDecl decl) { }
 
   /**
    * Type reference that is checked after all modules have been parsed.
    * @param ref type reference
    * @param info input info of the reference
    */
-  record DeferredRef(TypeRef ref, InputInfo info) { }
+  private record DeferredRef(TypeRef ref, InputInfo info) { }
+
+  /**
+   * Parse state that is processed after all modules have been parsed.
+   */
+  private static final class ParseState {
+    /** Type references that could not be resolved within their module. */
+    private final ArrayList<TypeRef> typeRefs = new ArrayList<>();
+    /** Map key types referencing a named type. */
+    private final ArrayList<DeferredRef> mapKeys = new ArrayList<>();
+    /** Cast target types referencing a named type. */
+    private final ArrayList<DeferredRef> castTargets = new ArrayList<>();
+    /** Data for type constructors. */
+    private final ArrayList<TypeCnstr> typeCnstrs = new ArrayList<>();
+    /** Derived record types whose base types are declared in modules that are still parsed. */
+    private final QNmMap<DerivedRecord> derived = new QNmMap<>();
+  }
 
   /**
    * Declares a named item type.
@@ -1363,13 +1387,12 @@ public class QueryParser extends InputParser {
   private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns,
       final InputInfo ii) throws QueryException {
     final TypeDecl td = new TypeDecl(qn, st, refs, anns, ii);
-    qc.typeDecls.add(td);
+    qc.modules.type(td);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null) {
         if(!qn.eqUri(sc.module)) throw MODULENS_X.get(ii, qn.prefixString());
         // modules with the same URI must not declare the same type
-        if(qc.namedTypes.contains(qn)) throw DUPLTYPE_X.get(ii, qn.string());
-        qc.namedTypes.put(qn, td);
+        if(!qc.modules.publicType(td)) throw DUPLTYPE_X.get(ii, qn.string());
       }
     }
     sc.types.put(qn, td);
@@ -4184,7 +4207,7 @@ public class QueryParser extends InputParser {
               throw error(WHICHCAST_X, name.prefixId(XML));
             } else {
               final TypeRef ref = typeRef(name);
-              qc.deferredCastTargets.add(new DeferredRef(ref, info()));
+              state.castTargets.add(new DeferredRef(ref, info()));
               type = ref;
             }
           }
@@ -4376,7 +4399,7 @@ public class QueryParser extends InputParser {
     if(type instanceof MapType) {
       final Type key = itemType().type;
       if(key instanceof final TypeRef ref && !ref.resolved()) {
-        qc.deferredMapKeys.add(new DeferredRef(ref, info()));
+        state.mapKeys.add(new DeferredRef(ref, info()));
       } else if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
         throw error(MAPTAAT_X, key);
       }

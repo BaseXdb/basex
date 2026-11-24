@@ -74,6 +74,17 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
+   * Tests if full-text options of a prolog only apply to the declaring module.
+   */
+  @Test public void ftOptionScope() {
+    final IOFile file = new IOFile(sandbox(), "ft.xqm");
+    write(file, "module namespace ft = 'ft'; declare ft-option using stemming;"
+        + "declare function ft:f() { 'dogs' contains text 'dog' };");
+    query("import module namespace ft = 'ft' at '" + file.path() + "';"
+        + "ft:f(), 'dogs' contains text 'dog'", "true\nfalse");
+  }
+
+  /**
    * Tests circular dependencies.
    * @throws Exception exception
    */

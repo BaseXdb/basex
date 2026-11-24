@@ -420,7 +420,7 @@ public final class CompileContext {
       result = FnError.get(QueryError.limitError(ex, expr.info()));
     }
     // discard caches of the evaluated expression
-    qc.caches.remove(expr);
+    qc.exprCaches.remove(expr);
     return replaceWith(expr, result, result instanceof Value);
   }
 

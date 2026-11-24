@@ -316,7 +316,7 @@ public final class QueryInfo {
     final MainModule main = qp.qc.main;
     if(main == null) return qp.qc.functions.toString();
     final QueryString qs = new QueryString();
-    for(final TypeDecl td : qp.qc.typeDecls) td.declaration(qs).newline();
+    for(final TypeDecl td : qp.qc.modules.types()) td.declaration(qs).newline();
     return qs.token(main).toString();
   }
 

@@ -2,41 +2,30 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
-import org.basex.build.json.*;
 import org.basex.core.*;
-import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.util.regex.*;
-import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
-import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -44,7 +33,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -79,10 +67,12 @@ public final class QueryContext extends Job implements Closeable {
   /** Query-specific database options. */
   final QueryOptions options = new QueryOptions(this);
 
-  /** Query caches. */
-  public final QueryCaches caches = new QueryCaches();
+  /** Expression caches. */
+  public final ExprCaches exprCaches = new ExprCaches();
   /** Shared data references. */
   public final SharedData shared;
+  /** Caches of the root query (shared with parent context). */
+  public final GlobalCaches globalCaches;
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */
@@ -98,63 +88,22 @@ public final class QueryContext extends Job implements Closeable {
   public boolean parseResources;
   /** Maximum permission of the parsed code. */
   public Perm maxPerm;
-  /** Indicates if the root library module is supplied as string, without location. */
-  public boolean inlineModule;
-  /** Custom URI resolver for parsed modules (can be {@code null}). */
-  public UriResolver resolver;
   /** Indicates if the values of the {@link MainOptions#BINDINGS} option will be bound. */
   public boolean globalBindings;
 
-  /** Cached full-text position data. */
-  public FTPosData ftPosData;
-  /** Current full-text lexer. */
-  public FTLexer ftLexer;
-  /** Full-text options of the prolog (can be {@code null}). */
-  private FTOpt ftOpt;
-  /** Full-text token positions (needed for highlighting full-text results). */
-  public int ftPos;
-  /** Scoring flag. */
-  public boolean scoring;
+  /** Full-text state. */
+  public final FTState ft;
 
-  /** Compiled regular expression cache (shared with parent context). */
-  public final TokenObjectMap<RegExpr> regex;
-  /** Memoized function results (shared with parent context). */
-  public final Map<MemoKey, Value> memo;
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
   public final QueryProfiler profiler = new QueryProfiler(this);
 
-  /** Function for the next tail call. */
-  public XQFunction tcFunc;
-  /** Arguments for the next tail call. */
-  public Value[] tcArgs;
   /** Counter for variable IDs. */
   public int varIDs;
 
-  /** Real paths of module files, indexed by file path (shared with parent context). */
-  public Map<String, String> realPaths;
-  /** Parsed modules, containing the file path and module URI. */
-  public final TokenObjectMap<byte[]> modParsed = new TokenObjectMap<>();
-  /** Parsed modules, containing the file path and library module. */
-  public final TokenObjectMap<LibraryModule> libs = new TokenObjectMap<>();
-  /** Pre-declared modules, containing module URI and their file paths (required for test APIs). */
-  public final TokenObjectMap<TokenList> modDeclared = new TokenObjectMap<>();
-
-  /** Public type declarations of all parsed library modules. */
-  final QNmMap<TypeDecl> namedTypes = new QNmMap<>();
-  /** Type references that could not be resolved within their module (resolved after parsing). */
-  final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
-  /** Map key types referencing a named type (checked after parsing). */
-  final ArrayList<QueryParser.DeferredRef> deferredMapKeys = new ArrayList<>();
-  /** Cast target types referencing a named type (checked after parsing). */
-  final ArrayList<QueryParser.DeferredRef> deferredCastTargets = new ArrayList<>();
-  /** Type declarations of all parsed modules. */
-  public final ArrayList<TypeDecl> typeDecls = new ArrayList<>();
-  /** Data for type constructors. */
-  public final ArrayList<QueryParser.TypeCnstr> typeCnstrs = new ArrayList<>();
-  /** Derived record types whose base types are declared in modules that are still parsed. */
-  final ArrayList<QueryParser.DerivedRecord> extensions = new ArrayList<>();
+  /** Parsed and pre-declared modules. */
+  public final ModuleRegistry modules;
 
   /** Main module (root expression, can be {@code null}). */
   public MainModule main;
@@ -166,7 +115,7 @@ public final class QueryContext extends Job implements Closeable {
   public boolean finalContext;
 
   /** External variables and context to be bound at compile time. */
-  private final QNmMap<Value> bindings = new QNmMap<>();
+  private final QueryBindings bindings = new QueryBindings(this);
 
   /** Serialization options (can be {@code null}). */
   private SerializerOptions sopts;
@@ -215,15 +164,13 @@ public final class QueryContext extends Job implements Closeable {
     this.info = info != null ? info : new QueryInfo(context);
     ns = new NSDynContext(nsContext);
     resources = parent != null ? parent.resources : new QueryResources(this);
-    ftPosData = parent != null ? parent.ftPosData : null;
+    ft = new FTState(parent != null ? parent.ft : null);
     shared = parent != null ? parent.shared : new SharedData();
-    regex = parent != null ? parent.regex : new TokenObjectMap<>();
-    memo = parent != null ? parent.memo : new ConcurrentHashMap<>();
-    realPaths = parent != null ? parent.realPaths : new ConcurrentHashMap<>();
+    globalCaches = parent != null ? parent.globalCaches : new GlobalCaches();
+    modules = new ModuleRegistry(parent != null ? parent.modules : null);
     globals = parent != null ? parent.globals : new GlobalValues();
     user = parent != null ? parent.user : context.user();
     maxPerm = parent != null ? parent.maxPerm : Perm.ADMIN;
-    resolver = parent != null ? parent.resolver : null;
     if(parent != null) options.state(parent.options.state());
   }
 
@@ -249,17 +196,6 @@ public final class QueryContext extends Job implements Closeable {
   public AModule parse(final String query, final String uri, final StaticContext sc)
       throws QueryException {
     return QueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
-  }
-
-  /**
-   * Returns the path that identifies a module, resolving capitalization and symbolic links.
-   * @param io module reference (can be {@code null})
-   * @return path
-   */
-  public String modulePath(final IO io) {
-    return io instanceof final IOFile file ?
-      realPaths.computeIfAbsent(file.path(), p -> file.normalize().path()) :
-      io == null ? "" : io.path();
   }
 
   /**
@@ -362,14 +298,7 @@ public final class QueryContext extends Job implements Closeable {
     run(info.compiling, () -> {
       options.compile();
 
-      // bind external variables
-      if(globalBindings) {
-        final Map<String, String> map = options().toMap(MainOptions.BINDINGS);
-        for(final Entry<String, String> entry : map.entrySet()) {
-          bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
-        }
-      }
-      vars.bindExternal(this, bindings, true);
+      bindings.assign();
 
       compile(false);
       return null;
@@ -388,11 +317,13 @@ public final class QueryContext extends Job implements Closeable {
     run(info.optimizing, () -> {
       // bind opened database if it is locked by the query
       final StaticContext sc = main.sc;
-      if(parent == null && !bindings.contains(QNm.EMPTY)) {
+      if(parent == null && bindings.context() == null) {
         final DBNodes nodes = context.current();
-        if(nodes != null && locked(nodes.data())) bind(null, resources.compile(nodes), null, sc);
+        if(nodes != null && QueryLocking.locked(this, nodes.data())) {
+          bind(null, resources.compile(nodes), null, sc);
+        }
       }
-      final Value value = bindings.get(QNm.EMPTY);
+      final Value value = bindings.context();
       if(value != null) {
         contextValue = new ContextScope(value, sc.contextType, new VarScope(), sc, null, null);
       }
@@ -418,7 +349,7 @@ public final class QueryContext extends Job implements Closeable {
         try {
           contextValue.compile(cc);
           focus.value = contextValue.value(this);
-          for(final LibraryModule lib : libs.values()) {
+          for(final LibraryModule lib : modules.libraries()) {
             if(lib.sc.contextType != null && !lib.sc.contextType.instance(focus.value)) {
               throw VALUETYPES_X_X.get(contextValue.info, lib.sc.contextType, contextType);
             }
@@ -486,50 +417,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void addLocks() {
-    addLocks(jc().locks);
-  }
-
-  /**
-   * Adds the locks of the query.
-   * @param jobLocks locks to be extended
-   */
-  private void addLocks(final Locks jobLocks) {
-    final LockVisitor visitor = new LockVisitor(jobLocks, functions, updating,
-        contextValue == null);
-
-    // locks in main module (can be null if parsing failed)
-    boolean local = main == null || main.visit(visitor);
-    // thesaurus databases of the full-text options in the prolog
-    if(local && ftOpt != null) local = ftOpt.accept(visitor);
-    // locks in context expression
-    if(local && contextValue != null) {
-      // check if scope may still be overwritten by dynamic context
-      if(!finalContext) jobLocks.reads.add(Locking.CONTEXT);
-      visitor.resetFocus();
-      local = contextValue.visit(visitor);
-    }
-    // custom locks of the query
-    final LockList list = updating ? jobLocks.writes : jobLocks.reads;
-    if(local) {
-      list.add(locks);
-    } else {
-      // global locking, referenced databases cannot be determined statically
-      list.addGlobal();
-    }
-    visitor.finish();
-  }
-
-  /**
-   * Checks if the query locks the specified database.
-   * @param data database
-   * @return result of check
-   */
-  private boolean locked(final Data data) {
-    final Locks lcks = new Locks();
-    addLocks(lcks);
-    final String name = data.meta.name;
-    final LockList reads = lcks.finish(context).reads, writes = lcks.writes;
-    return reads.global() || writes.global() || reads.contains(name) || writes.contains(name);
+    QueryLocking.add(this, jc().locks);
   }
 
   /**
@@ -549,8 +437,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void bind(final String name, final Object value, final String type, final StaticContext sc)
       throws QueryException {
-    final QNm qnm = name == null || name.isEmpty() ? QNm.EMPTY : qname(name, sc);
-    if(!bindings.contains(qnm)) bindings.put(qnm, cast(value, type));
+    bindings.bind(name, value, type, sc);
   }
 
   /**
@@ -729,15 +616,6 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns the full-text options of the prolog.
-   * @return full-text options
-   */
-  public FTOpt ftOpt() {
-    if(ftOpt == null) ftOpt = new FTOpt();
-    return ftOpt;
-  }
-
-  /**
    * Creates and returns an XML query plan (expression tree) for this query.
    * @param full include comprehensive information
    * @return query plan
@@ -771,7 +649,8 @@ public final class QueryContext extends Job implements Closeable {
     if(parent == null) {
       // topmost query: close resources (opened by compile step)
       resources.close();
-      caches.close();
+      exprCaches.clear();
+      globalCaches.close();
     } else {
       // otherwise, adopt update reference (may have been initialized by sub query)
       parent.updates = updates;
@@ -879,7 +758,7 @@ public final class QueryContext extends Job implements Closeable {
     final ItemList items = new ItemList();
     final IntList pres = new IntList();
     final Data data = resources.globalData();
-    if(data != null) ftPosData = new FTPosData(data);
+    if(data != null) ft.posData = new FTPosData(data);
     try {
       run(info.evaluating, () -> {
         // evaluates the query
@@ -911,7 +790,7 @@ public final class QueryContext extends Job implements Closeable {
     }
     // collect results
     cmd.result = !items.isEmpty() ? items.value() :
-      !pres.isEmpty() ? new DBNodes(data, pres.finish()).ftpos(ftPosData) : Empty.VALUE;
+      !pres.isEmpty() ? new DBNodes(data, pres.finish()).ftpos(ft.posData) : Empty.VALUE;
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -949,79 +828,6 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Casts a value to the specified type.
-   * @param value value to be cast
-   * @param type type (can be {@code null})
-   * @return cast value
-   * @throws QueryException query exception
-   */
-  private Value cast(final Object value, final String type) throws QueryException {
-    Object object = value;
-    if(object instanceof final String string) {
-      final StringList strings = new StringList(1);
-      // strings containing multiple items (value \1 ...)
-      if(string.indexOf('\1') == -1) {
-        strings.add(string);
-      } else {
-        object = strings.add(string.split("\1")).toArray();
-      }
-
-      // subtypes overriding the global value (value \2 type)
-      if(string.indexOf('\2') != -1) {
-        final ValueBuilder vb = new ValueBuilder(this, strings.size());
-        for(final String str : strings) {
-          final int i = str.indexOf('\2');
-          final String val = i == -1 ? str : str.substring(0, i);
-          final String tp = i == -1 ? type : str.substring(i + 1);
-          vb.add(cast(val, tp));
-        }
-        return vb.value();
-      }
-    }
-
-    // no type specified: return original value or convert as Java object
-    if(type == null || type.isEmpty()) {
-      return object instanceof final Value val ? val : JavaCall.toValue(object, this, null);
-    }
-
-    // convert JSON input
-    if(type.equalsIgnoreCase(MainParser.JSON.name())) {
-      try {
-        final TextInput ti = new TextInput(new IOContent(object.toString()));
-        return JsonConverter.get(W3JsonOptions.w3()).convert(ti, "", null, this);
-      } catch(final IOException ex) {
-        throw BASEX_ERROR_X.get(null, ex);
-      }
-    }
-
-    // parse target type
-    final StaticContext sc = main != null ? main.sc : new StaticContext(this);
-    final SeqType st = new QueryParser(type, null, this, sc).parseSeqType();
-    if(st.eq(Types.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
-    final Type tp = st.type;
-
-    // cast XQuery values
-    if(object instanceof final Value val) {
-      // cast single item
-      if(val.size() == 1) return tp.cast((Item) val, this, null);
-      // cast sequence
-      final ValueBuilder vb = new ValueBuilder(this, val.size());
-      for(final Item item : val) vb.add(tp.cast(item, this, null));
-      return vb.value(tp.toAttachable());
-    }
-
-    // cast sequences
-    if(object instanceof final Object[] array) {
-      final ValueBuilder vb = new ValueBuilder(this, array.length);
-      for(final Object val : array) vb.add(tp.cast(val, this, null));
-      return vb.value(tp.toAttachable());
-    }
-
-    // cast any other object to XDM
-    return tp.cast(object, this, null);
-  }
-
-  /**
    * Runs code and measures its runtime.
    * @param runtime value storing the runtime
    * @param code code to run
@@ -1043,17 +849,6 @@ public final class QueryContext extends Job implements Closeable {
     } finally {
       runtime.addAndGet(perf.nanoRuntime());
     }
-  }
-
-  /**
-   * Converts the specified variable name to a QName.
-   * @param name name of variable
-   * @param sc static context
-   * @return QName
-   * @throws QueryException query exception
-   */
-  private static QNm qname(final String name, final StaticContext sc) throws QueryException {
-    return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), null, sc);
   }
 
   /**

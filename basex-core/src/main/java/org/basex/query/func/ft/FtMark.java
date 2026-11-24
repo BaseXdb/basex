@@ -60,9 +60,9 @@ public class FtMark extends StandardFunc {
             if(item != null) return item;
             iter = null;
           }
-          final FTPosData tmp = qc.ftPosData;
+          final FTPosData tmp = qc.ft.posData;
           try {
-            qc.ftPosData = ftd;
+            qc.ft.posData = ftd;
             if(nodes == null) nodes = arg(0).unwrappedIter(qc);
             final Item item = nodes.next();
             if(item == null) return null;
@@ -78,7 +78,7 @@ public class FtMark extends StandardFunc {
             for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
             iter = DBNodeSeq.get(il.finish(), md, FtMark.this).iter();
           } finally {
-            qc.ftPosData = tmp;
+            qc.ft.posData = tmp;
           }
         }
       }
@@ -88,7 +88,7 @@ public class FtMark extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     // collect positions in the whole query
-    if(cc.qc.ftPosData == null) cc.qc.ftPosData = new FTPosData();
+    if(cc.qc.ft.posData == null) cc.qc.ft.posData = new FTPosData();
     return this;
   }
 }

@@ -2,6 +2,7 @@ package org.basex.query.var;
 
 import java.util.*;
 
+import org.basex.query.func.*;
 import org.basex.query.func.prof.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -22,6 +23,10 @@ public final class QueryStack {
   private int start;
   /** Stack limit, marking the end of the current stack frame. */
   private int end;
+  /** Function of the pending tail call (can be {@code null}). */
+  private XQFunction tcFunc;
+  /** Arguments of the pending tail call (can be {@code null}). */
+  private Value[] tcArgs;
 
   /**
    * Enters a new stack frame.
@@ -73,6 +78,44 @@ public final class QueryStack {
    */
   public boolean tco(final int size) {
     return end + size * 2 > INIT;
+  }
+
+  /**
+   * Registers a tail call.
+   * @param func function to be called
+   * @param args arguments
+   */
+  public void tailCall(final XQFunction func, final Value[] args) {
+    tcFunc = func;
+    tcArgs = args;
+  }
+
+  /**
+   * Checks if a tail call is pending.
+   * @return result of check
+   */
+  public boolean tailCall() {
+    return tcFunc != null;
+  }
+
+  /**
+   * Returns and removes the function of the pending tail call.
+   * @return function (can be {@code null})
+   */
+  public XQFunction tailFunc() {
+    final XQFunction func = tcFunc;
+    tcFunc = null;
+    return func;
+  }
+
+  /**
+   * Returns and removes the arguments of the pending tail call.
+   * @return arguments (can be {@code null})
+   */
+  public Value[] tailArgs() {
+    final Value[] args = tcArgs;
+    tcArgs = null;
+    return args;
   }
 
   /**

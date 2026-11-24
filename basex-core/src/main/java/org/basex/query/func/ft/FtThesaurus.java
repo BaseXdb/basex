@@ -39,6 +39,6 @@ public final class FtThesaurus extends StandardFunc {
       accessor = new ThesAccessor(node, relation, min, max, info);
       recent = accessor;
     }
-    return StrSeq.get(accessor.find(term, new FTOpt().assign(qc.ftOpt()), qc));
+    return StrSeq.get(accessor.find(term, new FTOpt().assign(sc().ftOpt()), qc));
   }
 }

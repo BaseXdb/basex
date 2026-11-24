@@ -13,7 +13,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -152,7 +151,7 @@ final class ProjectFiles {
       if(id != parseId) throw new InterruptedException();
       if(parsed.contains(path)) continue;
 
-      final TokenObjectMap<byte[]> modules = parse(path, ctx, errs);
+      final Iterable<byte[]> modules = parse(path, ctx, errs);
       if(modules != null) {
         for(final byte[] mod : modules) parsed.add(Token.string(mod));
       }
@@ -165,9 +164,9 @@ final class ProjectFiles {
    * @param path file path
    * @param ctx database context
    * @param errors files with errors
-   * @return parsed modules or {@code null}
+   * @return paths of the parsed modules (can be {@code null})
    */
-  static TokenObjectMap<byte[]> parse(final String path, final Context ctx,
+  static Iterable<byte[]> parse(final String path, final Context ctx,
       final TreeMap<String, InputInfo> errors) {
 
     try(TextInput ti = new TextInput(new IOFile(path))) {
@@ -176,7 +175,7 @@ final class ProjectFiles {
       try(QueryContext qc = new QueryContext(ctx)) {
         qc.parse(input, path);
         errors.remove(path);
-        return qc.modParsed;
+        return qc.modules.paths();
       } catch(final QueryException ex) {
         errors.put(path, ex.info());
       }

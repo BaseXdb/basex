@@ -60,8 +60,6 @@ public final class QueryResources {
   private final Map<Data, IO> originals = new IdentityHashMap<>();
   /** External resources. */
   private final Map<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
-  /** Function items. */
-  private final Map<String, Value> functions = new HashMap<>();
   /** Input references. */
   private final ArrayList<InputStream> inputs = new ArrayList<>(1);
 
@@ -168,24 +166,6 @@ public final class QueryResources {
   public synchronized void remove(final InputStream input) throws IOException {
     inputs.remove(input);
     input.close();
-  }
-
-  /**
-   * Returns inspected functions.
-   * @param path path to module
-   * @return inspected functions
-   */
-  public synchronized Value functions(final String path) {
-    return functions.get(path);
-  }
-
-  /**
-   * Adds inspected functions.
-   * @param path path to module
-   * @param funcs functions
-   */
-  public synchronized void addFunctions(final String path, final Value funcs) {
-    functions.put(path, funcs);
   }
 
   /**

@@ -97,7 +97,7 @@ public final class Transform extends Copy {
       updates.prepare(qc);
       updates.apply(qc);
       // cached results may refer to the updated copies
-      if(!updates.isEmpty()) qc.caches.clear();
+      if(!updates.isEmpty()) qc.exprCaches.clear();
     } finally {
       qc.updates = tmp;
     }

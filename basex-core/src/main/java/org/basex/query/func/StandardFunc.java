@@ -784,8 +784,8 @@ public abstract class StandardFunc extends Arr {
       binding.setValue(binding.getValue().materialize(TransferVisitor.SHAREABLE, true, info, qc));
     }
     // services are restarted from disk: they must not depend on the options of the caller
-    return new QueryJobSpec(options, bindings, content, qc.resolver, uri != null ? null : "").
-        queryOptions(service ? null : qc.optionsState());
+    return new QueryJobSpec(options, bindings, content, qc.modules.resolver,
+        uri != null ? null : "").queryOptions(service ? null : qc.optionsState());
   }
 
   /**
