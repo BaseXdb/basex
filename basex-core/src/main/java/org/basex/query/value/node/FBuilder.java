@@ -17,8 +17,6 @@ import org.basex.util.options.*;
 public final class FBuilder {
   /** Empty namespace array. */
   private static final Atts NO_NAMESPACES = new Atts(0);
-  /** Empty node array. */
-  private static final FNode[] NO_NODES = {};
 
   /** Parent node (can be {@code null}). */
   public FNode root;
@@ -173,8 +171,8 @@ public final class FBuilder {
    */
   public FNode finish() {
     final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
-    final GNode[] at = attributes != null ? attributes.finish() : NO_NODES;
-    final GNode[] ch = children != null ? children.finish() : NO_NODES;
+    final GNode[] at = attributes != null ? attributes.finish() : FNode.NO_NODES;
+    final GNode[] ch = children != null ? children.finish() : FNode.NO_NODES;
     return root instanceof final FElem felem ? felem.finish(ns, nsInherited, at, ch) :
       ((FDoc) root).finish(ch);
   }

@@ -168,7 +168,8 @@ public final class FElem extends FNode {
    * Returns the children, materializing a collapsed text child.
    * @return children
    */
-  private GNode[] children() {
+  @Override
+  GNode[] children() {
     final Object cont = content;
     if(cont instanceof final GNode[] nodes) return nodes;
 
@@ -268,11 +269,6 @@ public final class FElem extends FNode {
   @Override
   public BasicNodeIter attributeIter(final Test test) {
     return iter(attributes, test);
-  }
-
-  @Override
-  public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    return iter(children(), descendant ? null : test);
   }
 
   @Override

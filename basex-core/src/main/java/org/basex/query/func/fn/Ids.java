@@ -15,6 +15,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -44,6 +45,7 @@ abstract class Ids extends ContextFn {
         if(XMLToken.isNCName(id)) idSet.put(id);
       }
     }
+    if(idSet.isEmpty()) return Empty.VALUE;
 
     final GNodeBuilder results = new GNodeBuilder();
     final boolean idref = idref();
@@ -65,7 +67,7 @@ abstract class Ids extends ContextFn {
       }
     } else {
       // otherwise, do sequential scan: parse node and its descendants
-      add(idSet, results, root);
+      add(idSet, idSet.size(), results, root);
     }
     return results.value(this);
   }
@@ -99,26 +101,36 @@ abstract class Ids extends ContextFn {
   /**
    * Adds nodes with the specified ID.
    * @param idSet IDs to be found
+   * @param left number of IDs that have not been found yet
    * @param results node cache
    * @param node current node
+   * @return number of IDs that have not been found yet
    */
-  private void add(final TokenSet idSet, final GNodeBuilder results, final GNode node) {
+  private int add(final TokenSet idSet, final int left, final GNodeBuilder results,
+      final GNode node) {
     final boolean idref = idref();
+    int l = left;
     for(final GNode attr : node.attributeIter()) {
       if(isId((XNode) attr, idref)) {
         // ID/IDREF found
         boolean found = false;
         for(final byte[] id : distinctTokens(attr.string())) {
-          if((idref ? idSet.contains(id) : idSet.remove(id) != 0) && !found) {
-            results.add(idref ? attr : node);
-            found = true;
+          if(idref ? idSet.contains(id) : idSet.remove(id) != 0) {
+            if(!idref) l--;
+            if(!found) {
+              results.add(idref ? attr : node);
+              found = true;
+            }
           }
         }
       }
     }
+    // stop traversal if all IDs have been found
     for(final GNode child : node.childIter()) {
-      add(idSet, results, child);
+      if(l == 0) break;
+      l = add(idSet, l, results, child);
     }
+    return l;
   }
 
   /**

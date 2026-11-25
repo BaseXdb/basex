@@ -639,9 +639,9 @@ public abstract class XQMap extends XQStruct {
     // deep = null: ordered comparison at compile time
     final Boolean order = deep == null ? null : deep.options.get(DeepEqualOptions.MAP_ORDER);
     if(deep != null && deep.options.get(DeepEqualOptions.IGNORE_EMPTY_ENTRIES)) {
-      final HashItemSet set1 = new HashItemSet(Mode.DEEP, deep.info);
+      final HashItemSet set1 = new HashItemSet(Mode.ATOMIC, deep.info);
       forEach((k, v) -> { if(v != Empty.VALUE) set1.add(k); });
-      final HashItemSet set2 = new HashItemSet(Mode.DEEP, deep.info);
+      final HashItemSet set2 = new HashItemSet(Mode.ATOMIC, deep.info);
       map.forEach((k, v) -> { if(v != Empty.VALUE) set2.add(k); });
       if(set1.size() != set2.size()) return false;
 

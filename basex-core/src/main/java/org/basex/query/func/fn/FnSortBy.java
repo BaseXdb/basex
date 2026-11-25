@@ -90,8 +90,7 @@ public class FnSortBy extends SortFn {
       final FuncType ft = args[2].funcType();
       type = ft != null ? ft.refinedType.type : null;
     }
-    final BasicType atomic = type != null ? type.atomic() : null;
-    return atomic == null || BasicType.UNTYPED_ATOMIC.instanceOf(atomic) ? null :
+    return type == null || type.mayBeUntyped() ? null :
       cc.function(lowest ? LOWEST : HIGHEST, info, args);
   }
 

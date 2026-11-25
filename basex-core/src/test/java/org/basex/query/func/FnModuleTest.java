@@ -217,6 +217,14 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void apply() {
     final Function func = APPLY;
 
+    // array constructor with known members: apply(F, [ A, B ]) → F(A, B)
+    final String rnd = " " + _RANDOM_INTEGER.args(1);
+    check(func.args(" fn($a, $b) { $a + $b }", " [" + rnd + ", 2 ]"), 2, empty(func));
+    check(func.args(" { 1: 'x' }", " [" + rnd + " + 1 ]"), "x", empty(func));
+    check(func.args(" fn($a) { $a }", " [ (" + rnd + ", 1) ]"), "0\n1", empty(func));
+    check(func.args(" fn($a) { $a }", " [" + rnd + ", 2 ]"), 0, exists(func));
+    check(func.args(" fn($a, $b) { $a }", " array {" + rnd + " to 1 }"), 0, exists(func));
+
     query(func.args(" true#0", " []"), true);
     query(func.args(" count#1", " [ (1, 2, 3) ]"), 3);
     query(func.args(" string-join#1", " [ reverse(1 to 5) ! string() ]"), 54321);
@@ -264,6 +272,15 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(1, " xs:integer(<?_ 1?>)"), true, root(CmpSimpleG.class));
     check(func.args(" xs:byte(<?_ 1?>)", " xs:byte(1)"), true, root(CmpSimpleG.class));
     check(func.args(" xs:byte(1)", " xs:byte(<?_ 1?>)"), true, root(CmpSimpleG.class));
+    // different decimal or string types
+    check(func.args(" xs:byte(<?_ 1?>)", 1), true, root(CmpSimpleG.class));
+    check(func.args(" xs:decimal(<?_ 1?>)", " xs:unsignedLong(<?_ 1?>)"), true,
+        root(CmpSimpleG.class));
+    check(func.args(" xs:decimal(<?_ 1.5?>)", " xs:integer(<?_ 1?>)"), false,
+        root(CmpSimpleG.class));
+    check(func.args(" xs:token(<?_ A?>)", "A"), true, root(CmpSimpleG.class));
+    check(func.args(" <?_ A?>", " xs:NCName(<?_ A?>)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:decimal(<?_ 1?>)", " xs:double(<?_ 1?>)"), true, root(func));
 
     check("declare default collation '?lang=de';" + func.args(wrap(1), "1"), true, root(func));
     check(func.args(" array:build((1 to 10)[. = 1] ! string())", "1"), true, root(func));
@@ -872,6 +889,22 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void containsToken() {
+    final Function func = CONTAINS_TOKEN;
+    query(func.args(" ('a b', ' c\td ')", " ' d\n'"), true);
+    query(func.args(" ('a b', 'c')", "b c"), false);
+    query(func.args("a", " ' '"), false);
+    query(func.args(" ()", "a"), false);
+    query(func.args("A b", "a", " collation({ 'strength': 'primary' })"), true);
+
+    // long input: linear scan, no duplicate removal
+    final String tokens = " string-join((1 to 200_000, 1 to 200_000), ' ')";
+    query(func.args(tokens, "1"), true);
+    query(func.args(tokens, "200000"), true);
+    query(func.args(tokens, "0"), false);
+  }
+
+  /** Test method. */
   @Test public void count() {
     final Function func = COUNT;
 
@@ -1385,6 +1418,22 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" { 'a': 1 }", " { 'a': 1 }", " { 'type-annotations': true() }"), true);
     query(func.args(1e0, 1, " { 'type-annotations': false() }"), true);
     query(func.args(1, 1, " { 'type-variety': false() }"), true);
+    // unordered comparison
+    final String unordered = " { 'ordered': false() }";
+    query("let $a := (1 to 100_000) ! (. * 7 mod 100_000) return "
+        + func.args(" $a", " sort($a)", unordered), true);
+    query(func.args(" (1, 2.0, 3e0, 'a', xs:untypedAtomic('b'))",
+        " (xs:untypedAtomic('a'), 3, 1e0, 'b', 2)", unordered), true);
+    query(func.args(" (xs:hexBinary('0F'), xs:QName('x'), xs:duration('P1D'))",
+        " (xs:dayTimeDuration('PT24H'), xs:base64Binary('Dw=='), xs:QName('x'))", unordered), true);
+    query(func.args(" (xs:dateTime('2026-01-01T00:00:00'), 1)",
+        " (1, adjust-dateTime-to-timezone(xs:dateTime('2026-01-01T00:00:00')))", unordered), true);
+    query(func.args(" (<a/>, [ 1 ], 'x', { 'a': 1 })", " ({ 'a': 1 }, 'x', <a/>, [ 1 ])",
+        unordered), true);
+    query(func.args(" (xs:double('NaN'), 0e0)", " (-0e0, xs:float('NaN'))", unordered), true);
+    query(func.args(" (1, 1, 2)", " (1, 2, 2)", unordered), false);
+    query(func.args(" ('A', 'b')", " ('B', 'a')", " { 'ordered': false(), 'collation': "
+        + "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive' }"), true);
     // diagnostics
     query(func.args(1, 1, " { 'debug': true() }"), true);
     query(func.args(1, 2, " { 'debug': true() }"), false);
@@ -1424,6 +1473,27 @@ public final class FnModuleTest extends SandboxTest {
         "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
 
     error(func.args(1), INVTYPE_X);
+  }
+
+  /** Hashing dates with and without timezone. */
+  @Test public void distinctValuesDates() {
+    final TimeZone tz = TimeZone.getDefault();
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT+05:00"));
+    try {
+      final String a = "xs:dateTime('2020-01-01T00:00:00Z')";
+      final String b = "xs:dateTime('2020-01-01T05:00:00')";
+      final String dates = " ((1 to 100) ! xs:double(.), " + a + ", " + b + ')';
+      query("count(" + DISTINCT_VALUES.args(dates) + ')', 101);
+      query("count(" + DISTINCT_VALUES.args(dates,
+          "http://www.w3.org/2013/collation/UCA?strength=primary") + ')', 101);
+      query(ALL_DIFFERENT.args(dates), false);
+      query(DUPLICATE_VALUES.args(dates), "2020-01-01T05:00:00");
+      query(DEEP_EQUAL.args(" { " + a + ": 1, " + b + ": 2 }", " { " + a + ": 1, " + b + ": 3 }",
+          " { 'ignore-empty-entries': true() }"), false);
+      query(DEEP_EQUAL.args(dates, " reverse(" + dates + ')', " { 'ordered': false() }"), true);
+    } finally {
+      TimeZone.setDefault(tz);
+    }
   }
 
   /** Test method. */
@@ -2037,6 +2107,12 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FILTER;
     query(func.args(" (0, 1)", " boolean#1"), 1);
 
+    // unknown arity: lazy evaluation
+    final String pred = "let $p := (fn($a) { $a > 2 }, fn($a, $p) { $p > 2 })[" +
+        _RANDOM_INTEGER.args(1) + " + 1] return ";
+    check(pred + HEAD.args(func.args(" 1 to 10_000_000_000", " $p")), 3, exists(func));
+    query(pred + func.args(" 1 to 5", " $p"), "3\n4\n5");
+
     query(func.args(" 2 to 7", " op('=')"), "");
     query(func.args(" 1 to 9", " op('=')"), "1\n2\n3\n4\n5\n6\n7\n8\n9");
     query(func.args(" reverse(1 to 9)", " op('=')"), 5);
@@ -2403,6 +2479,12 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void forEach() {
     final Function func = FOR_EACH;
 
+    // unknown arity: lazy evaluation
+    final String action = "let $f := (fn($a) { $a, $a }, fn($a, $p) { $p })[" +
+        _RANDOM_INTEGER.args(1) + " + 1] return ";
+    check(action + HEAD.args(func.args(" 1 to 10_000_000_000", " $f")), 1, exists(func));
+    query(action + func.args(" 1 to 3", " $f"), "1\n1\n2\n2\n3\n3");
+
     query("(1, not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), false);
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
@@ -2613,6 +2695,15 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void formatNumber() {
     final Function func = FORMAT_NUMBER;
+
+    // cached pictures and formatters: static and dynamic options
+    query("for $i in 1 to 4 return " + func.args(" $i * 1000.5",
+        " ('#,##0.00', '0.0', '#', '#,##0.00')[$i]"),
+        "1,000.50\n2001.0\n3002\n4,002.00");
+    query("(1234.5, 1) ! " + func.args(" .", "#.##0,00",
+        " { 'grouping-separator': '.', 'decimal-separator': ',' }"), "1.234,50\n1,00");
+    query("(' ', '_') ! " + func.args(1234, " '#' || . || '##0'", " { 'grouping-separator': . }"),
+        "1 234\n1_234");
 
     // options supplied as JNode
     query(func.args(1, "#", " jtree({ 'o': {} })/o"), 1);
@@ -3069,6 +3160,14 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = ID;
     final String doc = "<foo xml:id=\"a1\" x=\"x\"><bar xml:id=\"a1\" y=\"y\"/></foo>";
     String input = " document { " + doc + " }";
+
+    // no valid IDs, multiple IDs (traversal stops when all IDs have been found)
+    final String ids = " parse-xml('<x><a xml:id=\"a\"/><b xml:id=\"b\"/><c xml:id=\"c\"/></x>')";
+    query(func.args(" ('', '1')", ids), "");
+    query(func.args(" ('b', 'a', 'a b')", ids) + " ! name()", "a\nb");
+    query(func.args(" ('c', 'z')", ids) + " ! name()", "c");
+    query(IDREF.args(" ('a', 'b')", " parse-xml('<x><y idref=\"a\"/><z idref=\"a b\"/></x>')") +
+        " ! ..!name()", "y\nz");
     query(func.args("a1", input), doc);
     query(func.args("a2", input), "");
     query(func.args("a1", input + "/*"), doc);
@@ -3228,6 +3327,12 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void indexWhere() {
     final Function func = INDEX_WHERE;
+
+    // unknown arity: lazy evaluation
+    final String pred = "let $p := (fn($a) { $a mod 3 = 0 }, fn($a, $p) { $p > 2 })[" +
+        _RANDOM_INTEGER.args(1) + " + 1] return ";
+    check(pred + HEAD.args(func.args(" 1 to 10_000_000_000", " $p")), 3, exists(func));
+    query(pred + func.args(" 1 to 10", " $p"), "3\n6\n9");
     query(func.args(" ()", " boolean#1"), "");
     query(func.args(0, " boolean#1"), "");
     query(func.args(1, " boolean#1"), 1);
@@ -4344,7 +4449,15 @@ return
     check(func.args(" ()"), "", empty());
     check(func.args(" void(123)"), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
-    check(func.args(wrap(1)), 1, exists(func));
+    check(func.args(wrap(1)), 1, empty(func), root(Cast.class));
+    check(MAX.args(wrap("NaN")), "NaN", empty(MAX), root(Cast.class));
+    check(func.args(" head((<x>1</x>, <x>2</x>)[. = " + wrap(2) + "])"), 2,
+        empty(func), root(Cast.class));
+    check(func.args(" head((<x>1</x>, <x>2</x>)[. = " + wrap(3) + "])"), "",
+        empty(func), root(Cast.class));
+    check(func.args(wrap(1), " default-collation()"), 1, exists(func));
+    check(MAX.args(" xs:integer(" + wrap(1) + ")[. > 0]"), 1, empty(MAX));
+    check(MAX.args(" xs:integer(" + wrap(1) + ")[. > 1]"), "", empty(MAX));
     check(func.args(" (0 to 99_999_999_999) ! (1 to 10_000_000)"), 1, root(Itr.class));
 
     query(func.args(" #a"), "#a");
@@ -4623,6 +4736,16 @@ return
   @Test public void outermost() {
     final Function func = OUTERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+
+    // leaf nodes in document order: no ancestors among them
+    final String doc = " <a x='1'>{ " + _RANDOM_INTEGER.args(1) + " }<b y='2'>B</b></a>";
+    check(func.args(doc + "//text()"), "0\nB", empty(func));
+    check(INNERMOST.args(doc + "/descendant-or-self::*/@*") + " ! string()", "1\n2",
+        empty(INNERMOST));
+    check(func.args(doc + "/descendant-or-self::*"), "<a x=\"1\">0<b y=\"2\">B</b></a>",
+        exists(func));
+    check(INNERMOST.args(" parse-xml('<a>0<b>B</b></a>')/descendant-or-self::node()") +
+        " ! string()", "0\nB", exists(INNERMOST));
     check(func.args(" (<a><b/></a>, <b/>)[. = '']"), "<a><b/></a>\n<b/>",
         type(func, "element(a|b)*"));
   }
@@ -5270,6 +5393,24 @@ return
     final Function func = PATH;
     query(func.args(" <a><b/></a>/b", " { 'namespaces': () }") + " = " +
         func.args(" <a><b/></a>/b", " { 'namespaces': {} }"), true);
+
+    // sibling indexes: reuse of the last index, in document and reverse order
+    final String sibs = " parse-xml('<r>' || string-join((1 to 4) ! '<e/>t<f/>') || '</r>')/r/node()";
+    final String index = " ! replace(" + func.args() + ", '^.*\\[(\\d+)\\]$', '$1')";
+    query("string-join(" + sibs + index + ", ' ')", "1 1 1 2 2 2 3 3 3 4 4 4");
+    query("string-join(reverse(" + sibs + ')' + index + ", ' ')", "4 4 4 3 3 3 2 2 2 1 1 1");
+    query("string-join((" + sibs + ")[position() mod 3 = 1]" + index + ", ' ')", "1 2 3 4");
+    final String nested = " <a>{ (1 to 3) ! <b>{ <c/>, <c/> }</b> }</a>//c";
+    final String steps = " ! replace(" + func.args() + ", '^.*\\[(\\d+)\\].*\\[(\\d+)\\]$', '$1$2')";
+    query("string-join(" + nested + steps + ", ' ')", "11 12 21 22 31 32");
+    query("string-join(reverse(" + nested + ')' + steps + ", ' ')", "32 31 22 21 12 11");
+
+    // cached steps must be discarded after updates
+    query("declare %basex:inline(0) function p($n) { " + func.args(" $n") + " }; "
+        + "copy $c := <x><a/><b/></x> "
+        + "modify insert node <c>{ p($c/b) }</c> before $c/b "
+        + "return string-join($c/* ! replace(p(.), '^.*/', ''), ' ')",
+        "Q{}a[1] Q{}c[1] Q{}b[1]");
   }
 
   /** Test method. */
@@ -5330,6 +5471,13 @@ return
   /** Test method. */
   @Test public void remove() {
     final Function func = REMOVE;
+
+    // multiple positions: lazy evaluation
+    final String input = " (1 to 10_000_000_000) ! (. * 2)";
+    final String first = " " + _RANDOM_INTEGER.args(1) + " + 1";
+    check(HEAD.args(func.args(input, " (" + first + ", 3)")), 4, exists(func));
+    query(func.args(" (1 to 6) ! (. * " + _RANDOM_INTEGER.args(1) + " + .)",
+        " (" + first + " + 1, 4, 4, -1, 9)"), "1\n3\n5\n6");
 
     // duplicate positions: remove((1, 2, 3), replicate(1, 3)) → remove((1, 2, 3), 1)
     check(func.args(" (1, 2, 3)", REPLICATE.args(" random:integer(1) + 1", 3)), "2\n3",
@@ -6599,6 +6747,15 @@ return
     check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
+
+    // single item: string-join($item) → string($item)
+    check(func.args(" " + _RANDOM_INTEGER.args(1)), 0, root(STRING));
+    check(func.args(" " + _RANDOM_INTEGER.args(1) + "[. > 0]", ","), "", root(STRING));
+    check(func.args(" #a[" + _RANDOM_INTEGER.args(1) + " = 0]"), "a", root(STRING));
+    check(func.args(" <a>{ " + _RANDOM_INTEGER.args(1) + " }</a>"), 0, root(STRING));
+    check(func.args(" [ 1, " + _RANDOM_INTEGER.args(1) + " ]"), 10, root(func));
+    check(func.args(" " + _RANDOM_INTEGER.args(1), " ([ ',' ], ';')[" +
+        _RANDOM_INTEGER.args(1) + " + 1]"), 0, root(func));
 
     query(func.args(" ()", ""), "");
     query(func.args(" ()", "x"), "");

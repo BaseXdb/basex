@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public final class ItemArray extends XQArray {
   /** Members. */
-  private Value members;
+  Value members;
 
   /**
    * Constructor.

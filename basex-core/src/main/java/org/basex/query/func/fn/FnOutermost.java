@@ -61,6 +61,7 @@ public class FnOutermost extends StandardFunc {
    * @return result of check
    */
   static boolean ancestor(final GNode ancestor, final GNode node, final QueryContext qc) {
+    if(ancestor.kind().leaf()) return false;
     final BasicNodeIter iter = node.ancestorIter(false);
     for(GNode nd; (nd = iter.next()) != null;) {
       qc.checkStop();
@@ -71,10 +72,13 @@ public class FnOutermost extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final SeqType st = arg(0).seqType();
-    if(st.type instanceof NodeType) {
+    final Expr nodes = arg(0);
+    final SeqType st = nodes.seqType();
+    if(st.type instanceof final NodeType nt) {
       // outermost($node) → $node, innermost($node) → $node  (at most one node)
-      if(st.zeroOrOne()) return arg(0);
+      if(st.zeroOrOne()) return nodes;
+      // outermost($nodes/@*) → $nodes/@*  (leaf nodes in document order)
+      if(nt.kind().leaf() && nodes.ddo()) return nodes;
       exprType.assign(st.union(Occ.ONE_OR_MORE));
     }
     return this;

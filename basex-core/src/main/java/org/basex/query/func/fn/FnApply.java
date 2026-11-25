@@ -6,6 +6,8 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.util.list.*;
@@ -13,6 +15,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -34,6 +37,13 @@ public class FnApply extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr func = arg(0), args = arg(1);
+
+    // apply(F, [ A, B ]) → F(A, B)
+    final Expr[] members = members(args);
+    if(members != null && arity(func) == members.length) {
+      return new DynFuncCall(info, this instanceof UpdateApply, false, func, members).optimize(cc);
+    }
+
     FuncType ft = func.funcType();
     final Type argsTp = args.seqType().type;
 
@@ -59,6 +69,24 @@ public class FnApply extends StandardFunc {
     ft = arg(0).funcType();
     if(ft != null) exprType.assign(ft.refinedType);
     return this;
+  }
+
+  /**
+   * Returns the member expressions of an array constructor.
+   * @param array array expression
+   * @return member expressions (can be {@code null})
+   */
+  private static Expr[] members(final Expr array) {
+    if(array instanceof final CArray carray) return carray.args();
+    if(Function._UTIL_ARRAY_MEMBER.is(array)) return array.args();
+    if(array instanceof final CItemArray citem) {
+      final Expr expr = citem.expr;
+      if(expr.seqType().one()) return new Expr[] { expr };
+      if(expr instanceof final List list && Checks.all(list.args(), e -> e.seqType().one())) {
+        return list.args();
+      }
+    }
+    return null;
   }
 
   /**

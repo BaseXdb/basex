@@ -65,6 +65,8 @@ public final class DecFormatter extends FormatUtil {
   private Sign percent = new Sign('%');
   /** Per-mille. */
   private Sign permille = new Sign('‰');
+  /** Parsed pictures (cleared when the maximum size is reached). */
+  private final TokenObjectMap<Picture[]> pictures = new TokenObjectMap<>();
 
   /**
    * Constructor.
@@ -247,6 +249,26 @@ public final class DecFormatter extends FormatUtil {
    */
   public byte[] format(final ANum number, final byte[] picture, final InputInfo info)
       throws QueryException {
+    Picture[] pics;
+    synchronized(pictures) {
+      pics = pictures.get(picture);
+      if(pics == null) {
+        if(pictures.size() >= 256) pictures.clear();
+        pics = pictures(picture, info);
+        pictures.put(picture, pics);
+      }
+    }
+    return format(number, pics, info);
+  }
+
+  /**
+   * Parses a picture.
+   * @param picture picture
+   * @param info input info (can be {@code null})
+   * @return sub-pictures
+   * @throws QueryException query exception
+   */
+  private Picture[] pictures(final byte[] picture, final InputInfo info) throws QueryException {
     // "A picture-string consists either of a sub-picture, or of two sub-pictures separated by
     // the pattern-separator"
     final byte[][] patterns = split(picture, cpToken(pattern), true);
@@ -258,7 +280,7 @@ public final class DecFormatter extends FormatUtil {
       pics[p] = analyze(patterns[p]);
       if(pics[p] == null) throw PICNUM_X.get(info, picture);
     }
-    return format(number, pics, info);
+    return pics;
   }
 
   /**

@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -37,9 +36,7 @@ public final class ArrayJoin extends ArrayFn {
     // iterative array building
     final ArrayBuilder ab = new ArrayBuilder(qc);
     do {
-      for(final Value value : toArray(item, arrays).members()) {
-        ab.add(value);
-      }
+      ab.addMembers(toArray(item, arrays));
     } while((item = qc.next(iter)) != null);
 
     return ab.array(this);

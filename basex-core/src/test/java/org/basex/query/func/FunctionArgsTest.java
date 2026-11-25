@@ -33,8 +33,8 @@ public final class FunctionArgsTest extends SandboxTest {
   /** Checks if functions with mutable fields override the copy method. */
   @Test public void copy() {
     // runtime caches that are rebuilt on demand
-    final Set<String> caches = Set.of("Docs.queryInput", "FnInvisibleXml.generator",
-        "FtThesaurus.recent", "ParseFn.input");
+    final Set<String> caches = Set.of("Docs.queryInput", "FnFormatNumber.formatter",
+        "FnInvisibleXml.generator", "FtThesaurus.recent", "ParseFn.input");
     final TreeSet<String> missing = new TreeSet<>();
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
       for(Class<?> c = fd.get(null).getClass(); c != StandardFunc.class; c = c.getSuperclass()) {

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.seq.*;
@@ -49,5 +50,15 @@ abstract class ArrayFn extends StandardFunc {
     long size = -1;
     if(expr.seqType().instanceOf(Types.ARRAY_O)) size = expr.structSize();
     return size == -1 ? -1 : size + offset;
+  }
+
+  /**
+   * Returns the items of an array constructor with single-item members.
+   * @param array array expression
+   * @return items (can be {@code null})
+   */
+  static Expr items(final Expr array) {
+    return array instanceof final CItemArray citem ? citem.expr :
+      Function._UTIL_ARRAY_MEMBER.is(array) ? array.arg(0) : null;
   }
 }

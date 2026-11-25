@@ -10,6 +10,7 @@ import java.util.function.*;
 import org.basex.io.out.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -1112,13 +1113,14 @@ public final class Token {
 
   /**
    * Normalizes the specified input and returns its distinct tokens.
-   * Optimized for small number of tokens.
    * @param token token
    * @return distinct tokens
    */
   public static byte[][] distinctTokens(final byte[] token) {
     final byte[][] tokens = split(normalize(token), ' ');
     int tl = tokens.length;
+    // many tokens: linear instead of quadratic duplicate removal
+    if(tl > 32) return new TokenSet(tokens).keys();
     for(int i = 0; i < tl - 1; i++) {
       for(int j = i + 1; j < tl; j++) {
         if(eq(tokens[i], tokens[j])) {

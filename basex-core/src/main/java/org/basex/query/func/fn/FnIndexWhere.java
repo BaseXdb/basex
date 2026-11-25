@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -17,17 +16,22 @@ import org.basex.query.value.type.*;
  */
 public final class FnIndexWhere extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    final HofArgs args = new HofArgs(2, predicate);
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = input.next()) != null;) {
-      if(test(predicate, args.set(0, item).inc(), qc)) vb.add(args.pos());
-    }
-    return vb.value(BasicType.INTEGER);
+    return new Iter() {
+      final HofArgs args = new HofArgs(2, predicate);
+
+      @Override
+      public Item next() throws QueryException {
+        for(Item item; (item = qc.next(input)) != null;) {
+          if(test(predicate, args.set(0, item).inc(), qc)) return Itr.get(args.pos());
+        }
+        return null;
+      }
+    };
   }
 
   @Override

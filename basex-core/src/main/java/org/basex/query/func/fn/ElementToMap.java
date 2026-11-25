@@ -314,7 +314,7 @@ public final class ElementToMap {
     // attribute values are atomic: an existing array contains combined attribute values
     final ArrayBuilder ab = new ArrayBuilder(job);
     if(old instanceof final XQArray array) {
-      for(final Value member : array.members()) ab.add(member);
+      ab.addMembers(array);
     } else {
       ab.add(old);
     }

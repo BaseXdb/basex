@@ -6,8 +6,6 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.path.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -95,8 +93,8 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    return iter(children, descendant ? null : test);
+  GNode[] children() {
+    return children;
   }
 
   @Override

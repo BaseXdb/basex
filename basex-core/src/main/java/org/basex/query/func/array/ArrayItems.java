@@ -27,6 +27,10 @@ public final class ArrayItems extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
+    // array:items(array { E }) → E, array:items([ E ]) → E
+    final Expr items = items(array);
+    if(items != null) return items;
+
     if(array.seqType().type instanceof final ArrayType at) {
       final SeqType mt = at.memberType();
       exprType.assign(mt.with(Occ.ZERO_OR_MORE), mt.one() ? array.structSize() : -1);

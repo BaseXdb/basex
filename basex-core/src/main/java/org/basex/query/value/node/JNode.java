@@ -295,6 +295,45 @@ public final class JNode extends GNode {
     };
   }
 
+  @Override
+  public BasicNodeIter followingSiblingIter(final boolean self, final Test test) {
+    return parent == null || isItem() ? super.followingSiblingIter(self, test) :
+      siblingIter(self ? index : index + 1L, parent.childCount(), 1, test);
+  }
+
+  @Override
+  public BasicNodeIter precedingSiblingIter(final boolean self, final Test test) {
+    return parent == null || isItem() ? super.precedingSiblingIter(self, test) :
+      siblingIter(self ? index : index - 1L, -1, -1, test);
+  }
+
+  /**
+   * Returns an iterator over this node and its siblings.
+   * @param start child index of the first node
+   * @param end child index after the last node
+   * @param step step (1 or -1)
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  private BasicNodeIter siblingIter(final long start, final long end, final int step,
+      final Test test) {
+    return new BasicNodeIter() {
+      long s = start;
+
+      @Override
+      public GNode next() {
+        for(; s != end; s += step) {
+          final GNode node = s == index ? JNode.this : new JNode(parent, (int) s);
+          if(matches(node, test)) {
+            s += step;
+            return node;
+          }
+        }
+        return null;
+      }
+    };
+  }
+
   /**
    * Returns an item axis iterator: the children of a sequence JNode, nothing for an empty value,
    * or a single item node wrapping a singleton value.

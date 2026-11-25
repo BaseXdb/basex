@@ -261,7 +261,7 @@ public final class RewritingsTest extends SandboxTest {
 
     check("max(" + opaque("<_>1</_>") + " ! string(@a))", "", root(STRING));
     check("max((<_>1</_>, <_>2</_>) ! string(@a))", "", root(MAX));
-    check("min(" + opaque("<_ _='A'/>") + "/@_ ! string())", "A", root(MIN));
+    check("min(" + opaque("<_ _='A'/>") + "/@_ ! string())", "A", empty(MIN), exists(STRING));
 
     check("string(" + wrap(1) + "[.= 1]) =" + wrap(1), true, exists(STRING));
   }

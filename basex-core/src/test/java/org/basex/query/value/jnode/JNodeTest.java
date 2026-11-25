@@ -572,12 +572,30 @@ public final class JNodeTest extends SandboxTest {
   @Test public void axisPrecedingSibling() {
     query(JTREE_STRING + "//y/preceding-sibling::*", "{\"x\":1}");
     query(JTREE_STRING + "//x/preceding-sibling::*", "");
+
+    // array members and map entries, positional access, name test, item node
+    final String array = " jtree(array:build(1 to 5))/*[3]";
+    query(array + "/preceding-sibling::* ! jkey()", "1\n2");
+    query(array + "/preceding-sibling::*[1] ! jkey()", 2);
+    query(" jtree({ 'a': 1, 'b': 2, 'c': 3 })/c/preceding-sibling::a ! jkey()", "a");
+    query(" jtree(1)/item::*/preceding-sibling::*", "");
+    // linear costs
+    query(" count(jtree(array:build(1 to 100_000))/* ! preceding-sibling::*[1])", 99_999);
   }
 
   /** Following-sibling step. */
   @Test public void axisFollowingSibling() {
     query(JTREE_STRING + "//y/following-sibling::*", "");
     query(JTREE_STRING + "//x/following-sibling::*", "{\"y\":{\"z\":2}}");
+
+    // array members and map entries, positional access, name test, item node
+    final String array = " jtree(array:build(1 to 5))/*[3]";
+    query(array + "/following-sibling::* ! jkey()", "4\n5");
+    query(array + "/following-sibling::*[1] ! jkey()", 4);
+    query(" jtree({ 'a': 1, 'b': 2, 'c': 3 })/a/following-sibling::c ! jkey()", "c");
+    query(" jtree(1)/item::*/following-sibling::*", "");
+    // linear costs
+    query(" count(jtree(array:build(1 to 100_000))/* ! following-sibling::*[1])", 99_999);
   }
 
   /** Following step. */

@@ -19,6 +19,9 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public abstract class FNode extends XNode {
+  /** Empty node array. */
+  static final GNode[] NO_NODES = {};
+
   /** Parent node (can be {@code null}). */
   private XNode parent;
 
@@ -91,8 +94,79 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    return BasicNodeIter.EMPTY;
+  public final BasicNodeIter childIter(final Test test, final boolean descendant) {
+    return iter(children(), descendant ? null : test);
+  }
+
+  @Override
+  public BasicNodeIter followingSiblingIter(final boolean self, final Test test) {
+    return siblingIter(self, true, test);
+  }
+
+  @Override
+  public BasicNodeIter precedingSiblingIter(final boolean self, final Test test) {
+    return siblingIter(self, false, test);
+  }
+
+  /**
+   * Returns an iterator over the following or preceding siblings.
+   * @param self include this node
+   * @param following following or preceding siblings
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  private BasicNodeIter siblingIter(final boolean self, final boolean following,
+      final Test test) {
+    final GNode[] nodes = parent instanceof final FNode fnode && isChild() ? fnode.children() :
+      NO_NODES;
+    final int pos = position(nodes);
+    if(pos == -1) {
+      return following ? super.followingSiblingIter(self, test) :
+        super.precedingSiblingIter(self, test);
+    }
+    final int step = following ? 1 : -1, start = self ? pos : pos + step,
+        end = following ? nodes.length : -1;
+    return new BasicNodeIter() {
+      int s = start;
+
+      @Override
+      public GNode next() {
+        while(s != end) {
+          final GNode node = nodes[s];
+          s += step;
+          if(matches(node, test)) return node;
+        }
+        return null;
+      }
+    };
+  }
+
+  /**
+   * Returns the position of this node in the specified sibling array.
+   * @param nodes siblings
+   * @return position, or {@code -1} if the node is not found
+   */
+  private int position(final GNode[] nodes) {
+    // binary search by node ID, linear search if IDs are not in document order
+    for(int l = 0, h = nodes.length - 1; l <= h;) {
+      final int m = l + h >>> 1;
+      final GNode node = nodes[m];
+      if(node == this) return m;
+      if(node.id - id < 0) l = m + 1;
+      else h = m - 1;
+    }
+    for(int n = nodes.length - 1; n >= 0; n--) {
+      if(nodes[n] == this) return n;
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the children.
+   * @return children
+   */
+  GNode[] children() {
+    return NO_NODES;
   }
 
   @Override

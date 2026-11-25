@@ -116,9 +116,9 @@ public class FnMin extends StandardFunc {
     if(type != null) {
       if(type.isUntyped()) {
         type = preferred;
-      } else if(st.one() && noColl && type != ANY_ATOMIC_TYPE &&
+      } else if(st.zeroOrOne() && noColl && type != ANY_ATOMIC_TYPE &&
           st.type.instanceOf(ANY_ATOMIC_TYPE)) {
-        // min($item) → $item, max($item) → $item
+        // min($item) → $item, max($item?) → $item?
         return values;
       }
       exprType.assign(type);
@@ -149,6 +149,11 @@ public class FnMin extends StandardFunc {
         }
         return Dbl.get(v);
       }
+    }
+
+    // min($untyped) → xs:double($untyped)
+    if(noColl && st.type.atomic() == UNTYPED_ATOMIC && st.atomOcc().max <= 1) {
+      return new Cast(info, values, SeqType.get(preferred, st.atomOcc())).optimize(cc);
     }
     return this;
   }

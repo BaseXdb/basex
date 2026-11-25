@@ -29,7 +29,25 @@ public final class FnRemove extends StandardFunc {
     // value-based iterator
     final Value value = iter.eagerValue();
     if(value != null) return value(value, pos, qc).iter();
-    if(pos.size() > 1) return value(iter.value(qc, null), pos, qc).iter();
+    if(pos.size() > 1) {
+      // skip all positions (sorted, duplicate-free)
+      final long[] skip = pos.finish();
+      final int sl = skip.length;
+      return new Iter() {
+        long c;
+        int s;
+
+        @Override
+        public Item next() throws QueryException {
+          for(Item item; (item = qc.next(iter)) != null;) {
+            final long p = c++;
+            while(s < sl && skip[s] < p) s++;
+            if(s == sl || skip[s] != p) return item;
+          }
+          return null;
+        }
+      };
+    }
 
     final long size = iter.size(), p = pos.get(0);
     if(p < 0 || size != -1 && p >= size) return iter;

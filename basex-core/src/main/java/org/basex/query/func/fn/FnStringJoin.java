@@ -67,8 +67,8 @@ public final class FnStringJoin extends StandardFunc {
     if(CHARACTERS.is(values) && separator == Str.EMPTY)
       return cc.function(STRING, info, values.args());
 
-    // string-join($string) → string($string)
-    return values.seqType().stringOrEmpty() && separator.seqType().stringOrEmpty() ?
+    // string-join($item) → string($item)
+    return values.seqType().zeroOrOneUnwrapped() && separator.seqType().stringOrEmpty() ?
       cc.function(STRING, info, values) : this;
   }
 

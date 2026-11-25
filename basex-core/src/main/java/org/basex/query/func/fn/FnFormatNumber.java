@@ -18,6 +18,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class FnFormatNumber extends StandardFunc {
+  /** Formatter for static options (can be {@code null}). */
+  private volatile DecFormatter formatter;
+
   @Override
   public Str value(final QueryContext qc) throws QueryException {
     final Expr value = arg(0);
@@ -28,6 +31,23 @@ public final class FnFormatNumber extends StandardFunc {
     // check input
     number = number.isEmpty() ? Dbl.NAN : toNumber(number, value);
 
+    DecFormatter df = formatter;
+    if(df == null) {
+      df = formatter(options, qc);
+      if(staticOptions() != null) formatter = df;
+    }
+    return Str.get(df.format((ANum) number, picture, info));
+  }
+
+  /**
+   * Creates a formatter.
+   * @param options options
+   * @param qc query context
+   * @return formatter
+   * @throws QueryException query exception
+   */
+  private DecFormatter formatter(final DecFormatOptions options, final QueryContext qc)
+      throws QueryException {
     // create formatter, based on decimal-format name
     final String name = options.get(DecFormatOptions.FORMAT_NAME);
     DecFormatter df = null;
@@ -52,7 +72,6 @@ public final class FnFormatNumber extends StandardFunc {
         throw FORMATINV_X.get(info, ex.getLocalizedMessage()).cause(ex);
       }
     }
-
-    return Str.get(df.format((ANum) number, picture, info));
+    return df;
   }
 }

@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
+
 import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
@@ -493,6 +495,19 @@ public final class GFLWORTest extends SandboxTest {
     query("for $x in " + seq + " group by $k := 1 return ($k, count($x))", "1\n10");
     query("for $x in " + seq + " where $x > 10 group by $k := 1 return count($x)", "");
     query("for $x in " + seq + " let $y := () group by $k := 1 return count($y)", 0);
+  }
+
+  /** Group by dates with and without timezone. */
+  @Test public void groupByDates() {
+    final TimeZone tz = TimeZone.getDefault();
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT+05:00"));
+    try {
+      final String dates = "((1 to 100) ! xs:double(.), xs:dateTime('2020-01-01T00:00:00Z'), "
+          + "xs:dateTime('2020-01-01T05:00:00'))";
+      query("count(for $x in " + dates + " group by $k := $x return count($x))", 101);
+    } finally {
+      TimeZone.setDefault(tz);
+    }
   }
 
   /** Unused count clauses. */

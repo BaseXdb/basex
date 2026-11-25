@@ -32,8 +32,8 @@ public final class FnContainsToken extends StandardFunc {
       final Expr value = arg(0);
       final Iter iter = value.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
-        for(final byte[] distinct : distinctTokens(toToken(item, value))) {
-          if(eq(token, distinct, collation)) return true;
+        for(final byte[] tok : split(normalize(toToken(item, value)), ' ')) {
+          if(eq(token, tok, collation)) return true;
         }
       }
     }

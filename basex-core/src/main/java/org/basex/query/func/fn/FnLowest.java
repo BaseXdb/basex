@@ -2,8 +2,6 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -44,7 +42,7 @@ public class FnLowest extends StandardFunc {
     for(Item item; (item = input.next()) != null;) {
       final Value value = key != null ? invoke(key, args.set(0, item), qc) : item;
       Value low = value.atomValue(qc, info);
-      if(BasicType.UNTYPED_ATOMIC.instanceOf(low.type)) {
+      if(low.type.mayBeUntyped()) {
         final ValueBuilder vb = new ValueBuilder(qc);
         for(final Item it : low) vb.add(it.type.isUntyped() ? toNumber(it, null) : it);
         low = vb.value();
@@ -80,24 +78,19 @@ public class FnLowest extends StandardFunc {
     if(defined(2)) {
       arg(2, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
-      // atomized items must have a known type that is never untyped
-      final Predicate<Type> noCheck = type ->
-        !type.atomicOrAny().oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.UNTYPED_ATOMIC);
-      // lowest($x) → $x
-      if(st.zeroOrOne() && noCheck.test(st.type)) return input;
+      // lowest($x) → $x, lowest((ITEM, ITEM)) → (ITEM, ITEM)
+      if(!st.type.mayBeUntyped() && (st.zeroOrOne() ||
+          input instanceof final SingletonSeq ss && ss.singleItem())) return input;
 
       // lowest(1 to 10) → 1, highest(1 to 10) → 10
       if(input instanceof final RangeSeq rs) {
         return (rs.ascending() ? rs : rs.reverse(null)).itemAt(min ? 0 : rs.size() - 1);
       }
-      // lowest(ITEM) → ITEM
-      if(noCheck.test(st.type) && (st.one() || input instanceof final SingletonSeq ss &&
-          ss.singleItem())) return input;
 
       // lowest(replicate(5, 2)) → replicate(5, 2)
       if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
         final SeqType ast = input.arg(0).seqType();
-        if(ast.zeroOrOne() && noCheck.test(ast.type)) return input;
+        if(ast.zeroOrOne() && !ast.type.mayBeUntyped()) return input;
       }
     }
     exprType.assign(input, new long[] { st.oneOrMore() ? 1 : 0, input.size() });

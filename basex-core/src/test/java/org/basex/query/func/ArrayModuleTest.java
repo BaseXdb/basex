@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -65,6 +66,13 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void flatten() {
     final Function func = _ARRAY_FLATTEN;
+
+    // array:flatten(array { E }) → array:flatten(E), array:flatten([ E ]) → array:flatten(E)
+    final String rnd = " " + _RANDOM_INTEGER.args(1);
+    check(func.args(" array {" + rnd + " to 2 }"), "0\n1\n2", empty(func));
+    check(func.args(" [ (" + rnd + ", 2) ]"), "0\n2", empty(func));
+    check(func.args(" array { [" + rnd + "], 2 }"), "0\n2", empty(CItemArray.class));
+
     query(func.args(" [ 1, 2 ]"), "1\n2");
     query(func.args(" ([ 1 ], [ 2 ])"), "1\n2");
     query(func.args(" for $c in (1, 2) return [ $c ]"), "1\n2");
@@ -306,6 +314,13 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void items() {
     final Function func = _ARRAY_ITEMS;
 
+    // array:items(array { E }) → E, array:items([ E ]) → E
+    final String rnd = " " + _RANDOM_INTEGER.args(1);
+    check(func.args(" [" + rnd + ", 2 ]"), "0\n2", empty(func));
+    check(func.args(" array {" + rnd + " to 2 }"), "0\n1\n2", empty(func));
+    check(func.args(" [ (" + rnd + ", 2) ]"), "0\n2", empty(func));
+    check(func.args(" [ (" + rnd + ", 1), 2 ]"), "0\n1\n2", exists(func));
+
     query(func.args(" []"), "");
     query(func.args(" [ () ]"), "");
     query(func.args(" [ 1 ]"), "1");
@@ -318,6 +333,24 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void join() {
     final Function func = _ARRAY_JOIN;
+
+    // reuse of large arrays (single-item and multi-item members)
+    final String rnd = " " + _RANDOM_INTEGER.args(1);
+    final String items = " array:build(1 to 100, fn { . +" + rnd + " })";
+    final String pairs = " array:build(101 to 200, fn { ., . +" + rnd + " })";
+    query(func.args(" (" + items + ", " + items + ", [ 0 ])") + " ! (array:size(.), .(150), .(201))",
+        "201\n50\n0");
+    query(func.args(" (" + pairs + ", " + pairs + ", [ 0 ])") + " ! (array:size(.), .(150), .(201))",
+        "201\n150\n150\n0");
+    query(func.args(" (" + items + ", " + pairs + ", " + items + ")") +
+        " ! (array:size(.), .(100), .(101), .(300))", "300\n100\n101\n101\n100");
+    query(func.args(" ([ (1, 2) ], " + items + ")") + " ! (array:size(.), .(1), .(101))",
+        "101\n1\n2\n100");
+    query("fold-left(1 to 20_000, [], fn($a, $i) { " + func.args(" ($a, [ $i ])") +
+        " }) ! (array:size(.), .(20_000))", "20000\n20000");
+    query("fold-left(1 to 20_000, [], fn($a, $i) { " + func.args(" ($a, [ ($i, $i) ])") +
+        " }) ! (array:size(.), .(20_000))", "20000\n20000\n20000");
+
     query(func.args(" [ ]"), "[]");
     query(func.args(" [ 1 ]"), "[1]");
     query(func.args(" ([ 1], [ 2 ])"), "[1,2]");

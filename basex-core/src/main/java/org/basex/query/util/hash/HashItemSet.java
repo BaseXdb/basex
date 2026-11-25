@@ -1,6 +1,7 @@
 package org.basex.query.util.hash;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -17,6 +18,8 @@ import org.basex.util.hash.*;
 public class HashItemSet extends ASet implements ItemSet {
   /** Equality function. */
   private final QueryBiPredicate<Item, Item> equal;
+  /** Hash function. */
+  private final ToIntFunction<Item> hash;
   /** Hashed keys. */
   Item[] keys;
 
@@ -42,6 +45,12 @@ public class HashItemSet extends ASet implements ItemSet {
       case EQUAL -> (k1, k2) -> k1.compare(k2, null, false, null, info) == 0;
       default -> new DeepEqual(info)::equal;
     };
+    if(mode == Mode.DEEP) {
+      final int implicit = DateTime.offset(System.currentTimeMillis()) / 60;
+      hash = item -> DeepEqual.hash(item, implicit);
+    } else {
+      hash = Item::hashCode;
+    }
     keys = new Item[capacity()];
   }
 
@@ -89,7 +98,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   public final int index(final Item key) throws QueryException {
-    return index(key, key.hashCode() & capacity() - 1);
+    return index(key, hash.applyAsInt(key) & capacity() - 1);
   }
 
   /**
@@ -100,7 +109,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   private int store(final Item key) throws QueryException {
-    final int h = key.hashCode();
+    final int h = hash.applyAsInt(key);
     int b = h & capacity() - 1;
     final int i = index(key, b);
     if(i > 0) {
@@ -132,7 +141,7 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   protected final int hashCode(final int index) {
-    return keys[index].hashCode();
+    return hash.applyAsInt(keys[index]);
   }
 
   @Override

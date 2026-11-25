@@ -336,6 +336,18 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void merge() {
     // no entry
     final Function func = _MAP_MERGE;
+
+    // large first map, more than two maps: incremental update
+    final String large = " map:build(1 to 100, value := fn { . + " + _RANDOM_INTEGER.args(1) + " })";
+    final String maps = " (" + large + ", { 101: 'x' }, { 1: 'a' }, { 1: 'b' })";
+    query(func.args(maps) + " => map:size()", 101);
+    query(func.args(maps) + " => map:keys() => foot()", 101);
+    query(func.args(maps) + "?1", 1);
+    query(func.args(maps, " { 'duplicates': 'use-last' }") + "?1", "b");
+    query(func.args(maps, " { 'duplicates': 'combine' }") + "?1", "1\na\nb");
+    query("fold-left(1 to 20_000, {}, fn($m, $i) { " +
+        func.args(" ($m, { $i: 1 }, { -$i: 1 })") + " }) => map:size()", 40_000);
+
     query("exists(" + func.args(" ()") + ')', true);
     checkSize(_MAP_ENTRY.args(1, 2), 1);
     checkSize(func.args(" ()"), 0);

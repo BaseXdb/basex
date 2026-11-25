@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Utility class for comparing XQuery values.
@@ -124,26 +125,61 @@ public final class DeepEqual {
       }
     }
 
-    // unordered comparison
-    final ItemList items2 = new ItemList();
+    // unordered comparison: unmatched items of the second input, grouped by hash values if possible
+    final boolean hash = itemsEqual == null && coll == null && normalization == null &&
+        !whitespace;
+    final IntObjectMap<ItemList> hashed = new IntObjectMap<>();
+    int unmatched = 0;
     OUTER: for(Item item1; (item1 = iter1.next()) != null;) {
       if(qc != null) qc.checkStop();
-      for(int i = items2.size(); --i >= 0;) {
-        if(equal(item1, items2.get(i))) {
-          items2.remove(i);
-          continue OUTER;
+      final ItemList items2 = unmatched == 0 ? null : hashed.get(hash ? hash(item1, qc) : 0);
+      if(items2 != null) {
+        for(int i = items2.size(); --i >= 0;) {
+          if(equal(item1, items2.get(i))) {
+            items2.remove(i);
+            unmatched--;
+            continue OUTER;
+          }
         }
       }
       for(Item item2; (item2 = iter2.next()) != null;) {
         if(qc != null) qc.checkStop();
         if(equal(item1, item2)) continue OUTER;
-        items2.add(item2);
+        hashed.computeIfAbsent(hash ? hash(item2, qc) : 0, ItemList::new).add(item2);
+        unmatched++;
       }
       return different(item1, null);
     }
     final Item item2 = iter2.next();
     if(item2 != null) return different(item2, null);
-    return items2.isEmpty() || different(items2.get(0), null);
+    for(final ItemList items2 : hashed.values()) {
+      if(!items2.isEmpty()) return different(items2.get(0), null);
+    }
+    return true;
+  }
+
+  /**
+   * Returns a hash value of an item that is consistent with deep equality with default options.
+   * @param item item
+   * @param implicit implicit timezone in minutes
+   * @return hash value
+   */
+  public static int hash(final Item item, final int implicit) {
+    // non-atomic items (nodes, functions) are not hashed
+    return item instanceof AStr || item instanceof ANum || item instanceof Atm ||
+      item instanceof Bln || item instanceof Bin || item instanceof Dur || item instanceof QNm ?
+      item.hashCode() : item instanceof final ADate date ? date.hash(implicit) : 0;
+  }
+
+  /**
+   * Returns a hash value of an item that is consistent with deep equality with default options.
+   * @param item item
+   * @param qc query context (can be {@code null})
+   * @return hash value
+   * @throws QueryException query exception
+   */
+  public static int hash(final Item item, final QueryContext qc) throws QueryException {
+    return item instanceof final ADate date ? date.hash(ADate.implicitTz(qc)) : hash(item, 0);
   }
 
   /**

@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -68,8 +69,12 @@ public final class ArrayFlatten extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
+    // array:flatten(array { E }) → array:flatten(E), array:flatten([ E ]) → array:flatten(E)
+    final Expr items = items(input);
+    if(items != null) return cc.function(Function._ARRAY_FLATTEN, info, items);
+
     final SeqType st = input.seqType();
     // array:flatten($seq) → $seq  (no nested arrays)
     if(!st.mayBeWrapped()) return input;

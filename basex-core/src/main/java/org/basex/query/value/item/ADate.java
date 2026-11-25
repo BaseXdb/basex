@@ -438,9 +438,18 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final int hashCode() {
-    // the implicit timezone is irrelevant here: items are only equal if both have or lack a
-    // timezone, and if both lack one, it cancels out in the comparison
-    return Long.hashCode(minuteSeconds(0) + (long) seconds().doubleValue());
+    // atomic equality: items are only equal if both have or lack a timezone, and if both lack one,
+    // the implicit timezone cancels out in the comparison (deep equality: see hash(int))
+    return hash(0);
+  }
+
+  /**
+   * Returns a hash value that is consistent with deep equality.
+   * @param implicit implicit timezone in minutes, applied if the item has none
+   * @return hash value
+   */
+  public final int hash(final int implicit) {
+    return Long.hashCode(minuteSeconds(implicit) + (long) seconds().doubleValue());
   }
 
   @Override
@@ -539,7 +548,7 @@ public abstract class ADate extends ADateDur {
    * @return offset
    * @throws QueryException query exception
    */
-  static int implicitTz(final QueryContext qc) throws QueryException {
+  public static int implicitTz(final QueryContext qc) throws QueryException {
     return qc != null ? qc.dateTime().zone : DateTime.offset(System.currentTimeMillis()) / 60;
   }
 

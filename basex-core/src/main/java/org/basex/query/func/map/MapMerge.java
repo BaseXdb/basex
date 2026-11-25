@@ -68,9 +68,10 @@ public class MapMerge extends MapFn {
     Item current = qc.next(maps);
     if(current == null) return mp.unannotated();
 
-    // update first map if 2 maps are supplied, use map builder otherwise
+    // update first map if 2 maps are supplied or if it is large, use map builder otherwise
     Item next = qc.next(maps);
-    final MapBuilder mb = next == null ? null : new MapBuilder(arg(0).size());
+    final MapBuilder mb = next == null || mp.structSize() > 64 ? null :
+      new MapBuilder(arg(0).size());
     if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {

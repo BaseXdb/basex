@@ -134,7 +134,7 @@ public final class GroupBy extends Clause {
             final Item atom = spec.atomItem(qc, info);
             if(!spec.occluded) {
               key[p++] = atom;
-              hash = 31 * hash + hash(atom, spec.coll);
+              hash = 31 * hash + hash(atom, spec.coll, qc);
             }
             qc.set(spec.var, atom);
           }
@@ -179,15 +179,17 @@ public final class GroupBy extends Clause {
        * Computes the hash value of a grouping key.
        * @param atom atomized key
        * @param coll collation (can be {@code null})
+       * @param qc query context
        * @return hash value
        * @throws QueryException query exception
        */
-      private int hash(final Item atom, final Collation coll) throws QueryException {
+      private int hash(final Item atom, final Collation coll, final QueryContext qc)
+          throws QueryException {
         if(atom == Empty.VALUE) return 0;
         final byte[] key = Collation.key(atom, coll, info);
         if(key != null) return Token.hashCode(key);
         // strings without collation keys collide; comparison does the remaining work
-        return coll != null && atom.type.isStringOrUntyped() ? 0 : atom.hashCode();
+        return coll != null && atom.type.isStringOrUntyped() ? 0 : DeepEqual.hash(atom, qc);
       }
 
       /**

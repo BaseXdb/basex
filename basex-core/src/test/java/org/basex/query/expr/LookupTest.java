@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.expr.constr.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -112,7 +113,7 @@ public final class LookupTest extends SandboxTest {
     check("({ 1: <x/> })?1", "<x/>", exists(_MAP_GET), empty(Lookup.class));
     check("({ 'a': <x/> })?*", "<x/>", exists(_MAP_ITEMS), empty(Lookup.class));
     check("[ <x/> ]?1", "<x/>", exists(_ARRAY_GET), empty(Lookup.class));
-    check("[ <x/> ]?*", "<x/>", exists(_ARRAY_ITEMS), empty(Lookup.class));
+    check("[ <x/> ]?*", "<x/>", root(CElem.class));
   }
 
   /** Focus-dependent key: the focus of the lookup expression is used. */

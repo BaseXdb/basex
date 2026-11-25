@@ -4,6 +4,7 @@ import org.basex.core.jobs.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A builder for efficiently creating an {@link XQArray}.
@@ -49,10 +50,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder add(final Value value) {
     job.checkStop();
-    // refine the array type
-    final SeqType vt = value.seqType();
-    if(memberType == null) memberType = vt;
-    else if(!vt.eq(memberType)) memberType = memberType.union(vt);
+    refine(value.seqType());
     if(builder == null) {
       final Value sngl = single;
       if(sngl == null) {
@@ -66,6 +64,49 @@ public final class ArrayBuilder {
     }
     builder = builder.add(value);
     return this;
+  }
+
+  /**
+   * Appends all members of an array.
+   * @param array array
+   * @return reference to this builder for convenience
+   */
+  public ArrayBuilder addMembers(final XQArray array) {
+    final ArrBuilder ab = builder;
+    if(array instanceof final ItemArray ia && capacity != Long.MIN_VALUE &&
+        (ab == null ? single == null || single.size() == 1 : ab instanceof ItemArrayBuilder)) {
+      // single-item members: append the members as sequence
+      job.checkStop();
+      final ItemArrayBuilder iab = ab != null ? (ItemArrayBuilder) ab : new ItemArrayBuilder();
+      if(single != null) iab.vb.add(single);
+      single = null;
+      // large sequences: switch to tree representation, which reuses the appended sequence
+      if(ia.members.size() >= Array.INITIAL_CAPACITY) iab.vb.tree(1);
+      iab.vb.add(ia.members);
+      refine(((ArrayType) ia.type).memberType());
+      builder = iab;
+    } else if(array instanceof final BigArray big && !(ab instanceof ItemArrayBuilder)) {
+      // tree array: reuse its middle tree
+      job.checkStop();
+      final TreeArrayBuilder tab = ab != null ? (TreeArrayBuilder) ab : new TreeArrayBuilder();
+      if(single != null) tab.add(single);
+      single = null;
+      tab.add(big, job);
+      refine(((ArrayType) big.type).memberType());
+      builder = tab;
+    } else {
+      for(final Value member : array.members()) add(member);
+    }
+    return this;
+  }
+
+  /**
+   * Refines the member type.
+   * @param type type of the added member(s)
+   */
+  private void refine(final SeqType type) {
+    if(memberType == null) memberType = type;
+    else if(!type.eq(memberType)) memberType = memberType.union(type);
   }
 
   /**

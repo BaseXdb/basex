@@ -36,6 +36,24 @@ public final class TokenTest {
     }
   }
 
+  /** Returns distinct tokens in the order of their first occurrence. */
+  @Test public void distinctTokens() {
+    for(final int n : new int[] { 0, 1, 2, 32, 33, 100 }) {
+      final StringBuilder sb = new StringBuilder(" ");
+      for(int r = 0; r < 2; r++) {
+        for(int i = n; i > 0; i--) sb.append(i % (n / 2 + 1)).append(" \t\n");
+      }
+      final LinkedHashSet<String> expected = new LinkedHashSet<>(
+          Arrays.asList(sb.toString().trim().split("\\s+")));
+      expected.remove("");
+      final ArrayList<String> actual = new ArrayList<>();
+      for(final byte[] token : Token.distinctTokens(Token.token(sb.toString()))) {
+        actual.add(Token.string(token));
+      }
+      assertEquals(new ArrayList<>(expected), actual, "n=" + n);
+    }
+  }
+
   /** Rejects invalid numeric strings. */
   @Test public void toDoubleInvalid() {
     for(final String string : new String[] {

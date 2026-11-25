@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -36,7 +37,9 @@ public final class FnPath extends ContextFn {
     public static final BooleanOption INDEXES = new BooleanOption("indexes", true);
   }
   /** LRU step cache. */
-  private final Map<Long, byte[]> cachedSteps = Collections.synchronizedMap(new StepCache());
+  private final Map<Long, CachedStep> cachedSteps = Collections.synchronizedMap(new StepCache());
+  /** Last numbered nodes, indexed by a hash of their kind and name. */
+  private final AtomicReferenceArray<NodeIndex> lastIndexes = new AtomicReferenceArray<>(8);
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -56,9 +59,12 @@ public final class FnPath extends ContextFn {
     boolean relative = false;
     while(true) {
       // check if string representation of step was cached
-      final Long cacheKey = cache && node instanceof final DBNode dbnode ?
+      final DBNode dbnode = node instanceof final DBNode dbn ? dbn : null;
+      final Long cacheKey = cache && dbnode != null ?
         (long) dbnode.data().dbid << 32L | dbnode.pre() : null;
-      byte[] step = cacheKey != null ? cachedSteps.get(cacheKey) : null;
+      final int mods = dbnode != null ? dbnode.data().modifications() : 0;
+      final CachedStep cached = cacheKey != null ? cachedSteps.get(cacheKey) : null;
+      byte[] step = cached != null && cached.modifications == mods ? cached.step : null;
 
       final GNode parent = node.parent();
       if(step == null) {
@@ -114,16 +120,31 @@ public final class FnPath extends ContextFn {
         }
         // optional index
         if(indexes && !kind.oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE, Kind.JNODE)) {
-          int index = 1;
-          for(final GNode nd : node.precedingSiblingIter(false)) {
+          // reuse the index of the last numbered sibling (linear costs for sibling sequences)
+          final int slot = kind.ordinal() * 31 +
+            (qname != null ? Token.hashCode(qname.string()) : 0) & lastIndexes.length() - 1;
+          NodeIndex last = lastIndexes.get(slot);
+          if(last != null && last.modifications != mods) last = null;
+          int index = 0;
+          for(final GNode nd : node.precedingSiblingIter(true)) {
             qc.checkStop();
+            if(nd.kind() != kind) continue;
             final QNm qnm = nd.qname();
-            if(nd.kind() == kind && (qnm == null || qnm.eq(qname))) index++;
+            if(qnm == null || qnm.eq(qname)) {
+              if(last != null && nd.is(last.node)) {
+                index += last.index;
+                break;
+              }
+              index++;
+            }
+          }
+          if(last == null || !node.is(last.node)) {
+            lastIndexes.set(slot, new NodeIndex(node, index, mods));
           }
           tb.add('[').addInt(index).add(']');
         }
         step = tb.next();
-        if(cacheKey != null) cachedSteps.put(cacheKey, step);
+        if(cacheKey != null) cachedSteps.put(cacheKey, new CachedStep(step, mods));
       }
       steps.add(step);
       node = parent;
@@ -172,18 +193,33 @@ public final class FnPath extends ContextFn {
   }
 
   /**
+   * Numbered node.
+   * @param node node
+   * @param index index among the preceding siblings of the same kind and name
+   * @param modifications number of database modifications when the index was computed
+   */
+  private record NodeIndex(GNode node, int index, int modifications) { }
+
+  /**
+   * Cached step.
+   * @param step string representation of the step
+   * @param modifications number of database modifications when the step was cached
+   */
+  private record CachedStep(byte[] step, int modifications) { }
+
+  /**
    * Step cache.
    * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
-  private static final class StepCache extends LinkedHashMap<Long, byte[]> {
+  private static final class StepCache extends LinkedHashMap<Long, CachedStep> {
     /** Constructor. */
     private StepCache() {
       super(16, 0.75f, true);
     }
 
     @Override
-    protected boolean removeEldestEntry(final Map.Entry<Long, byte[]> eldest) {
+    protected boolean removeEldestEntry(final Map.Entry<Long, CachedStep> eldest) {
       return size() > 1000;
     }
   }
