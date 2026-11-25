@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -68,10 +67,9 @@ public final class FnStringJoin extends StandardFunc {
     if(CHARACTERS.is(values) && separator == Str.EMPTY)
       return cc.function(STRING, info, values.args());
 
-    final SeqType st = values.seqType(), stSep = separator.seqType();
     // string-join($string) → string($string)
-    return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
-        stSep.type.isStringOrUntyped() ? cc.function(STRING, info, values) : this;
+    return values.seqType().stringOrEmpty() && separator.seqType().stringOrEmpty() ?
+      cc.function(STRING, info, values) : this;
   }
 
   @Override

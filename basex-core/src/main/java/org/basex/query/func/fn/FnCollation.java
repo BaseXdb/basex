@@ -29,6 +29,6 @@ public final class FnCollation extends StandardFunc {
     });
 
     // generate and check collation URI
-    return Str.get(WebFn.createUrl(Collation.UCA, map.map(), ';', info).finish());
+    return Str.get(WebFn.createUrl(Collations.UCA, map.map(), ';', info).finish());
   }
 }

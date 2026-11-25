@@ -1,5 +1,6 @@
 package org.basex.query.util.collation;
 
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -10,40 +11,32 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class HtmlNoCaseCollation extends Collation {
+  /** Collation URI. */
+  static final byte[] URI = Token.concat(QueryText.FN_URI,
+      "/collation/html-ascii-case-insensitive");
   /** Singleton instance. */
   static final HtmlNoCaseCollation INSTANCE = new HtmlNoCaseCollation();
+
+  /** Private constructor. */
+  private HtmlNoCaseCollation() {
+    super(URI);
+  }
 
   @Override
   public int compare(final byte[] string, final byte[] compare) {
     final int sl = string.length, cl = compare.length, l = Math.min(sl, cl);
     for(int i = 0; i < l; i++) {
-      final int d = compare(string[i] & 0xFF, compare[i] & 0xFF);
+      final int d = Integer.signum(lc(string[i] & 0xFF) - lc(compare[i] & 0xFF));
       if(d != 0) return d;
     }
     return Integer.signum(sl - cl);
   }
 
   @Override
-  protected int indexOf(final String string, final String sub, final Mode mode,
-      final InputInfo ii) {
-
-    final int tl = string.length(), sl = sub.length();
-    if(sl == 0) return mode.last() ? tl : 0;
-    int last = -1;
-    if(tl >= sl) {
-      for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; t++) {
-        for(int s = 0; t + s < tl;) {
-          if(compare(string.charAt(t + s), sub.charAt(s)) != 0) break;
-          if(++s == sl) {
-            last = mode.after() ? t + s : t;
-            if(!mode.last()) return last;
-            break;
-          }
-        }
-        if(mode == Mode.STARTS_WITH) return -1;
-      }
-    }
-    return last;
+  CollationElements elements(final String string, final InputInfo info) {
+    final int[] pos = { 0 };
+    return new CollationElements(
+      () -> pos[0] < string.length() ? lc(string.charAt(pos[0]++)) : -1, () -> pos[0]);
   }
 
   @Override
@@ -54,26 +47,11 @@ final class HtmlNoCaseCollation extends Collation {
   }
 
   /**
-   * Compares two codepoints.
-   * @param cp1 first codepoint
-   * @param cp2 second codepoint
-   * @return result of comparison (-1, 0, 1)
-   */
-  private static int compare(final int cp1, final int cp2) {
-    return Integer.signum(lc(cp1) - lc(cp2));
-  }
-
-  /**
    * Converts an ASCII character to lower case.
    * @param cp codepoint
    * @return lower-case representation
    */
   private static int lc(final int cp) {
     return cp >= 'A' && cp <= 'Z' ? cp + 0x20 : cp;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof HtmlNoCaseCollation;
   }
 }

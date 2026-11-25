@@ -26,7 +26,7 @@ public final class DeepEqual {
   public final InputInfo info;
   /** Query context (can be {@code null}). */
   public final QueryContext qc;
-  /** Collation. */
+  /** Collation (can be {@code null}). */
   public final Collation coll;
   /** Options. */
   public final DeepEqualOptions options;
@@ -79,7 +79,7 @@ public final class DeepEqual {
   public DeepEqual(final InputInfo info, final Collation coll, final QueryContext qc,
       final DeepEqualOptions options) {
     this.info = info;
-    this.coll = Collation.get(coll, info);
+    this.coll = coll;
     this.qc = qc;
     this.options = options != null ? options : DEFAULTS;
     normalization = this.options.get(DeepEqualOptions.NORMALIZATION_FORM);

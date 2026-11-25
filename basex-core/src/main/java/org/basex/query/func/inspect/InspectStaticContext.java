@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -57,7 +58,7 @@ public final class InspectStaticContext extends StandardFunc {
       case FUNCTION_NAMESPACE ->
         sctx.funcNS == null ? Str.get(FN_URI) : Uri.get(sctx.funcNS);
       case COLLATION ->
-        Uri.get(sctx.collation == null ? COLLATION_URI : sctx.collation.uri());
+        Uri.get(Collations.uri(sctx.collation));
       case ORDERING ->
         Str.get(sctx.ordered ? ORDERED : UNORDERED);
       case CONSTRUCTION ->

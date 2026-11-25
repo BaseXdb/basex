@@ -53,6 +53,9 @@ public final class CollationTest extends SandboxTest {
     query(prolog + "contains('baa', 'aa')", true);
     query(prolog + "ends-with('baa', 'aa')", true);
     query(prolog + "starts-with('aaa', 'aa')", true);
+
+    query(prolog + "default-collation()",
+        "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
   }
 
   /** Unicode case-insensitive collation. */
@@ -84,6 +87,30 @@ public final class CollationTest extends SandboxTest {
     query(prolog + "contains('" + dotted + "ab', 'AB')", true);
     query(prolog + "ends-with('" + smiley + "ab', 'B')", true);
     query(prolog + "starts-with('" + smiley + "ab', '" + smiley + "A')", true);
+  }
+
+  /** An explicit codepoint collation overrides the default collation. */
+  @Test public void explicitCodepoint() {
+    final String prolog = "declare default collation " +
+        "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'; " +
+        "declare variable $cp := 'http://www.w3.org/2005/xpath-functions/collation/codepoint'; ";
+    final String cp = " collation 'http://www.w3.org/2005/xpath-functions/collation/codepoint'";
+    query(prolog + "compare('a', 'A', $cp)", 1);
+    query(prolog + "deep-equal('a', 'A', { 'collation': $cp })", false);
+    query(prolog + "max(('a', 'B'), $cp)", "a");
+    query(prolog + "count(distinct-values(('a', 'A'), $cp))", 2);
+    query(prolog + "all-equal(('a', 'A'), $cp)", false);
+    query(prolog + "string-join(for $s in ('a', 'B', 'A') order by $s" + cp + " return $s)",
+        "ABa");
+    query(prolog + "count(for $s in ('a', 'A') group by $k := $s" + cp + " return $k)", 2);
+
+    // the default collation applies otherwise
+    query(prolog + "compare('a', 'A')", 0);
+    query(prolog + "deep-equal('a', 'A')", true);
+    query(prolog + "'a' = 'A'", true);
+    query(prolog + "switch('a') case 'A' return 1 default return 2", 1);
+    query(prolog + "count(distinct-values(('a', 'A')))", 1);
+    query(prolog + "contains-subsequence(('a', 'b'), 'A')", true);
   }
 
   /** Tests errors. */

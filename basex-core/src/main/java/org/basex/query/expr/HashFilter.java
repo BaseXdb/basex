@@ -36,8 +36,7 @@ public final class HashFilter extends KeyedFilter<HashFilter.Cache> {
    * @return position of the operand, or {@code -1} if the predicate cannot be hashed
    */
   static int key(final Expr root, final Expr pred) {
-    return key(root, pred, cmp -> cmp.op == CmpOp.EQ && cmp.sc().collation == null,
-      CmpHashG::hashable);
+    return key(root, pred, cmp -> cmp.byCodepoint(CmpOp.EQ), CmpHashG::hashable);
   }
 
   @Override

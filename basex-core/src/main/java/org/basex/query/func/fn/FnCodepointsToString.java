@@ -46,12 +46,10 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    if(!singleInt) {
-      final Expr values = arg(0);
-      final Item item = values.atomIter(qc, info).next();
-      if(item == null) return false;
-      toLong(item, values);
-    }
+    final Expr values = arg(0);
+    final Item item = values.atomIter(qc, info).next();
+    if(item == null) return false;
+    toCodepoint(toLong(item, values), info);
     return true;
   }
 

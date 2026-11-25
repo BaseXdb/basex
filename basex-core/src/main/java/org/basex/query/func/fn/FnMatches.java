@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -36,14 +35,12 @@ public final class FnMatches extends RegExFn {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value = arg(0), pattern = arg(1);
 
-    final SeqType st = value.seqType();
-    if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
-        pattern instanceof final Str str && !defined(2)) {
+    if(value.seqType().stringOrEmpty() && pattern instanceof final Str str && !defined(2)) {
       // matches($string, '') → true()
       if(str == Str.EMPTY) return cc.voidAndReturn(value, Bln.TRUE, info);
       // rewrite literal match to fn:contains (which, unlike fn:matches, respects collations)
       // matches($string, 'abc') → contains($string, 'abc')
-      if(sc().collation == null && literal(str.string(), Token.EMPTY) != null) {
+      if(defaultCollation() == null && literal(str.string(), Token.EMPTY) != null) {
         return cc.function(CONTAINS, info, args());
       }
     }

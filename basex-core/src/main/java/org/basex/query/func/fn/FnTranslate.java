@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -54,10 +53,7 @@ public final class FnTranslate extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value = arg(0), replace = arg(1), with = arg(2);
-    final SeqType st = value.seqType(), withSt = with.seqType();
-
-    if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&
-        withSt.one() && withSt.type.isStringOrUntyped()) {
+    if(value.seqType().stringOrEmpty() && replace == Str.EMPTY && with.seqType().oneString()) {
       // translate($value, '', 'abcde') → string($value)
       return cc.function(Function.STRING, info, value);
     }

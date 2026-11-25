@@ -88,7 +88,7 @@ public final class CmpSR extends CmpRange {
   boolean inRange(final Item item) throws QueryException {
     if(!item.type.isStringOrUntyped()) throw compareError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
-    final Collation coll = sc().collation;
+    final Collation coll = defaultCollation();
     final int mn = min == null ?  1 : Token.compare(s, min, coll);
     final int mx = max == null ? -1 : Token.compare(s, max, coll);
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
@@ -97,23 +97,20 @@ public final class CmpSR extends CmpRange {
   @Override
   Expr merge(final Expr ex, final boolean or, final CompileContext cc) throws QueryException {
 
-    if(or) return null;
-    Collation coll = null;
+    if(or || defaultCollation() != null) return null;
     byte[] newMin = null, newMax = null;
     boolean newMni = true, newMxi = true;
-    if(ex instanceof final CmpSR cmp) {
+    if(ex instanceof final CmpSR cmp && cmp.defaultCollation() == null) {
       newMin = cmp.min;
       newMax = cmp.max;
       newMni = cmp.mni;
       newMxi = cmp.mxi;
-      coll = cmp.sc().collation;
-    } else if(ex instanceof final CmpG cmp && cmp.op == CmpOp.EQ &&
+    } else if(ex instanceof final CmpG cmp && cmp.byCodepoint(CmpOp.EQ) &&
         cmp.exprs[1] instanceof final Str str) {
       newMin = str.string();
       newMax = newMin;
-      coll = cmp.sc().collation;
     }
-    if(newMin == null && newMax == null || coll != null || sc().collation != null) return null;
+    if(newMin == null && newMax == null) return null;
 
     // determine common minimum and maximum value
     if(newMin == null) {
@@ -144,8 +141,8 @@ public final class CmpSR extends CmpRange {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    // only default collation is supported, and min/max values are required
-    if(sc().collation != null || min == null || max == null) return false;
+    // only codepoint collation is supported, and min/max values are required
+    if(defaultCollation() != null || min == null || max == null) return false;
 
     // accept only location path, string and equality expressions
     final Data data = ii.db.data();

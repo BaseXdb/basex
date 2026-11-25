@@ -29,7 +29,7 @@ public final class FnDeepEqual extends StandardFunc {
     final DeepEqualOptions opts = toOptions(qc);
 
     final String collation = opts.get(DeepEqualOptions.COLLATION);
-    final Collation coll = collation != null ? toCollation(Token.token(collation), qc) : null;
+    final Collation coll = toCollation(collation != null ? Token.token(collation) : null, qc);
 
     final DeepEqual deep = new DeepEqual(info, coll, qc, opts);
     final Value ie = opts.get(DeepEqualOptions.ITEMS_EQUAL);

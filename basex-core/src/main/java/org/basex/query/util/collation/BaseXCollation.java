@@ -22,8 +22,10 @@ final class BaseXCollation extends Collation {
   /**
    * Constructor.
    * @param collator collator
+   * @param uri collation URI
    */
-  BaseXCollation(final Comparator<Object> collator) {
+  BaseXCollation(final Comparator<Object> collator, final byte[] uri) {
+    super(uri);
     this.collator = collator;
   }
 
@@ -33,38 +35,10 @@ final class BaseXCollation extends Collation {
   }
 
   @Override
-  protected int indexOf(final String string, final String contains, final Mode mode,
-      final InputInfo info) throws QueryException {
-
+  CollationElements elements(final String string, final InputInfo info) throws QueryException {
     if(!(collator instanceof final RuleBasedCollator rbc)) throw CHARCOLL.get(info);
-    final CollationElementIterator iterS = rbc.getCollationElementIterator(string);
-    final CollationElementIterator iterC = rbc.getCollationElementIterator(contains);
-
-    final int elemC = next(iterC);
-    if(elemC == -1) return mode.last() ? string.length() : 0;
-    final int offC = iterC.getOffset();
-    int last = -1;
-    while(true) {
-      // find first equal character
-      for(int elemS; (elemS = next(iterS)) != elemC;) {
-        if(elemS == -1 || mode == Mode.STARTS_WITH) return last;
-      }
-
-      final int offS = iterS.getOffset();
-      if(startsWith(iterS, iterC)) {
-        if(mode.last()) {
-          last = mode.after() ? iterS.getOffset() : offS - 1;
-        } else if(mode == Mode.INDEX_AFTER) {
-          return iterS.getOffset();
-        } else if(mode == Mode.ENDS_WITH) {
-          if(next(iterS) == -1) return offS - 1;
-        } else {
-          return offS - 1;
-        }
-      }
-      iterS.setOffset(offS);
-      iterC.setOffset(offC);
-    }
+    final CollationElementIterator it = rbc.getCollationElementIterator(string);
+    return new CollationElements(it::next, it::getOffset);
   }
 
   @Override
@@ -76,33 +50,6 @@ final class BaseXCollation extends Collation {
   @Override
   boolean keys() {
     return collator instanceof RuleBasedCollator;
-  }
-
-  /**
-   * Determines whether one string starts with another.
-   * @param string string iterator
-   * @param sub substring iterator
-   * @return result of check
-   */
-  private static boolean startsWith(final CollationElementIterator string,
-      final CollationElementIterator sub) {
-
-    for(int s; (s = next(sub)) != -1;) {
-      if(s != next(string)) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns the next element from an iterator.
-   * @param it iterator
-   * @return next element, or {@code -1}
-   */
-  private static int next(final CollationElementIterator it) {
-    while(true) {
-      final int c = it.next();
-      if(c != 0) return c;
-    }
   }
 
   @Override

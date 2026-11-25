@@ -582,6 +582,22 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type yield at most one string or untyped item.
+   * @return result of check
+   */
+  public boolean stringOrEmpty() {
+    return zero() || zeroOrOne() && type.isStringOrUntyped();
+  }
+
+  /**
+   * Tests if expressions of this type yield exactly one string or untyped item.
+   * @return result of check
+   */
+  public boolean oneString() {
+    return one() && type.isStringOrUntyped();
+  }
+
+  /**
    * Tests if this is a sequence type without instances ({@code xs:error}, {@code xs:error+}).
    * @return result of check
    */

@@ -32,8 +32,10 @@ final class UCACollation extends Collation {
   /**
    * Constructor.
    * @param collator collator
+   * @param uri collation URI
    */
-  UCACollation(final RuleBasedCollator collator) {
+  UCACollation(final RuleBasedCollator collator, final byte[] uri) {
+    super(uri);
     this.collator = collator;
     strength = collator.getStrength();
     strengthMask = mask(strength);
@@ -63,37 +65,12 @@ final class UCACollation extends Collation {
   }
 
   @Override
-  protected int indexOf(final String string, final String contains, final Mode mode,
-      final InputInfo ii) {
-
-    final CollationElementIterator iterS = collator.getCollationElementIterator(string);
-    final CollationElementIterator iterC = collator.getCollationElementIterator(contains);
-
-    final int elemC = next(iterC);
-    if(elemC == NULLORDER) return mode.last() ? string.length() : 0;
-    final int offC = iterC.getOffset();
-    int last = -1;
-    while(true) {
-      // find first equal character
-      for(int elemS; (elemS = next(iterS)) != elemC;) {
-        if(elemS == NULLORDER || mode == Mode.STARTS_WITH) return last;
-      }
-
-      final int offS = iterS.getOffset();
-      if(startsWith(iterS, iterC)) {
-        if(mode.last()) {
-          last = mode.after() ? iterS.getOffset() : offS - 1;
-        } else if(mode == Mode.INDEX_AFTER) {
-          return iterS.getOffset();
-        } else if(mode == Mode.ENDS_WITH) {
-          if(next(iterS) == NULLORDER) return offS - 1;
-        } else {
-          return offS - 1;
-        }
-      }
-      iterS.setOffset(offS);
-      iterC.setOffset(offC);
-    }
+  CollationElements elements(final String string, final InputInfo info) {
+    final CollationElementIterator it = collator.getCollationElementIterator(string);
+    return new CollationElements(() -> {
+      final int element = it.next();
+      return element == NULLORDER ? element : transform(element);
+    }, it::getOffset);
   }
 
   @Override
@@ -102,44 +79,16 @@ final class UCACollation extends Collation {
   }
 
   /**
-   * Determines whether one string starts with another.
-   * @param string string iterator
-   * @param sub substring iterator
-   * @return result of check
+   * Transforms a collation element per the collator's properties, as in {@link StringSearch}.
+   * @param element collation element
+   * @return transformed element, or {@link CollationElementIterator#IGNORABLE}
    */
-  private boolean startsWith(final CollationElementIterator string,
-      final CollationElementIterator sub) {
-    while(true) {
-      final int s = next(sub);
-      if(s == NULLORDER) return true;
-      if(s != next(string)) return false;
+  private int transform(final int element) {
+    final int c = element & strengthMask;
+    if(isShifted) {
+      return variableTop <= c ? c : strength >= QUATERNARY ? c & PRIMARY_ORDER_MASK : IGNORABLE;
     }
-  }
-
-  /**
-   * Returns the next element from an iterator, and transforms it according to the collator's
-   * properties. This was modeled after method getCE in {@link StringSearch}.
-   * @param it iterator
-   * @return next element, or {@link CollationElementIterator#NULLORDER}
-   */
-  private int next(final CollationElementIterator it) {
-    while(true) {
-      int c = it.next();
-      if(c == NULLORDER) return c;
-      c &= strengthMask;
-      if(isShifted) {
-        if(variableTop > c) {
-          if(strength >= QUATERNARY) {
-            c &= PRIMARY_ORDER_MASK;
-          } else {
-            c = IGNORABLE;
-          }
-        }
-      } else if(strength >= QUATERNARY && c == IGNORABLE) {
-        c = 0xFFFF;
-      }
-      if(c != IGNORABLE) return c;
-    }
+    return strength >= QUATERNARY && c == IGNORABLE ? 0xFFFF : c;
   }
 
   @Override

@@ -30,7 +30,7 @@ public final class SwitchGroup extends Arr {
    */
   public SwitchGroup(final InputInfo info, final Expr... exprs) {
     super(info, Types.ITEM_ZM, exprs);
-    deep = new DeepEqual(info);
+    deep = new DeepEqual(info, defaultCollation(), null);
   }
 
   @Override

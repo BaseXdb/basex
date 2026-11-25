@@ -310,8 +310,7 @@ public final class GroupBy extends Clause {
   GroupSpec group() {
     if(specs.length == 1 && post.length == 0) {
       final GroupSpec spec = specs[0];
-      if(spec.coll == null && spec.var.declType == null &&
-          spec.expr.seqType().atomOcc() == Occ.EXACTLY_ONE) {
+      if(spec.var.declType == null && spec.expr.seqType().atomOcc() == Occ.EXACTLY_ONE) {
         return spec;
       }
     }

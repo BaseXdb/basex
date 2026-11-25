@@ -1,165 +1,28 @@
 package org.basex.query.util.collation;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.*;
 
 /**
- * This class organizes collations.
+ * Collation for comparing strings.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Collation {
-  /** HTML-ASCII case-insensitive collation. */
-  private static final byte[] HACI = concat(FN_URI, "/collation/html-ascii-case-insensitive");
-  /** Unicode case-insensitive collation. */
-  private static final byte[] UCI = concat(FN_URI, "/collation/unicode-case-insensitive");
-  /** ICU (UCA) collation URL. */
-  public static final byte[] UCA = concat(W3_URL, "/2013/collation/UCA");
-  /** BaseX collation URI. */
-  public static final byte[] BASEX = token(BASEX_URL + "/collation");
   /** Collation URI. */
-  private byte[] uri = EMPTY;
-
-  /** Search modes. */
-  protected enum Mode {
-    /** Default. */              INDEX_OF,
-    /** End position. */         INDEX_AFTER,
-    /** Starts-with. */          STARTS_WITH,
-    /** Ends-with. */            ENDS_WITH,
-    /** Last position. */        LAST_INDEX_OF,
-    /** Last end position. */    LAST_INDEX_AFTER;
-
-    /**
-     * Indicates if the last occurrence is searched for.
-     * @return result of check
-     */
-    boolean last() {
-      return this == LAST_INDEX_OF || this == LAST_INDEX_AFTER;
-    }
-
-    /**
-     * Indicates if the end position of an occurrence is returned.
-     * @return result of check
-     */
-    boolean after() {
-      return this == INDEX_AFTER || this == LAST_INDEX_AFTER;
-    }
-  }
+  private final byte[] uri;
 
   /**
-   * Returns a collation instance for the specified URI.
-   * @param uri collation URI (can be {@code null})
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @param err error code for unknown collation URIs
-   * @return collation instance or {@code null} for Unicode point collation
-   * @throws QueryException query exception
-   */
-  public static Collation get(final byte[] uri, final QueryContext qc, final InputInfo info,
-      final QueryError err) throws QueryException {
-
-    // return default collation
-    if(uri == null) return info.sc().collation;
-    // return Unicode point collation or cached instance (skips URI parsing)
-    if(eq(COLLATION_URI, uri)) return null;
-
-    if(qc.collations == null) qc.collations = new TokenObjectMap<>();
-    Collation coll = qc.collations.get(uri);
-    if(coll != null) return coll;
-
-    final Uri u = Uri.get(uri);
-    if(!u.isValid()) throw INVURI_X.get(info, uri);
-    // URIs that do not depend on the base URI are cached by their original string
-    byte[] url = uri, key = uri;
-    if(!u.isAbsolute()) {
-      if(Token.startsWith(uri, '?')) {
-        url = concat(BASEX, uri);
-      } else {
-        url = key = info.sc().baseURI().resolve(u).string();
-        if(eq(COLLATION_URI, url)) return null;
-        coll = qc.collations.get(url);
-      }
-    }
-    if(coll == null) {
-      coll = get(url, info, err);
-      qc.collations.put(key, coll);
-    }
-    return coll;
-  }
-
-  /**
-   * Returns a collation instance for the specified URI.
+   * Constructor.
    * @param uri collation URI
-   * @param info input info (can be {@code null})
-   * @param err error code for unknown collation URIs
-   * @return collation instance
-   * @throws QueryException query exception
    */
-  private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)
-      throws QueryException {
-
-    // static collations
-    if(eq(HACI, uri)) return HtmlNoCaseCollation.INSTANCE;
-    if(eq(UCI, uri)) return UnicodeNoCaseCollation.INSTANCE;
-
-    final int q = Token.indexOf(uri, '?');
-    final byte[] base = q == -1 ? uri : substring(uri, 0, q);
-    final HashMap<String, String> args = args(
-        q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';')));
-
-    CollationOptions opts = null;
-    if(eq(BASEX, base)) {
-      opts = new BaseXCollationOptions(false);
-    } else if(eq(UCA, base)) {
-      final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
-      if(ExternalLib.ICU.available()) opts = new UCAOptions(fallback);
-      else if(fallback) opts = new BaseXCollationOptions(fallback);
-    }
-    if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'.", uri));
-
-    try {
-      final Collation coll = opts.get(args);
-      coll.uri = uri;
-      return coll;
-    } catch(final IllegalArgumentException | BaseXException ex) {
-      throw err.get(info, ex.getMessage()).cause(ex);
-    }
-  }
-
-  /**
-   * Returns a collation for the specified collation and input info.
-   * @param coll collation (can be {@code null})
-   * @param info input info (can be {@code null})
-   * @return collation instance, or {@code null} for Unicode point collation
-   */
-  public static Collation get(final Collation coll, final InputInfo info) {
-    return coll != null ? coll : info != null ? info.sc().collation : null;
-  }
-
-  /**
-   * Returns a map with all arguments.
-   * @param args arguments
-   * @return arguments
-   */
-  private static HashMap<String, String> args(final String args) {
-    final HashMap<String, String> map = new HashMap<>();
-    for(final String option : Strings.split(args, ';')) {
-      final String[] kv = Strings.split(option, '=', 2);
-      map.put(kv[0], kv.length == 2 ? kv[1] : "");
-    }
-    return map;
+  Collation(final byte[] uri) {
+    this.uri = uri;
   }
 
   /**
@@ -172,7 +35,7 @@ public abstract class Collation {
    */
   public final boolean contains(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.INDEX_OF, info) != -1;
+    return elements(string(string), info).indexOf(elements(string(sub), info), false) != -1;
   }
 
   /**
@@ -185,7 +48,7 @@ public abstract class Collation {
    */
   public final boolean startsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.STARTS_WITH, info) != -1;
+    return elements(string(string), info).matches(elements(string(sub), info), 0);
   }
 
   /**
@@ -198,7 +61,9 @@ public abstract class Collation {
    */
   public final boolean endsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.ENDS_WITH, info) != -1;
+    final CollationElements ces = elements(string(string), info);
+    final CollationElements subs = elements(string(sub), info);
+    return ces.matches(subs, ces.size() - subs.size());
   }
 
   /**
@@ -215,10 +80,13 @@ public abstract class Collation {
       final boolean last, final InputInfo info) throws QueryException {
 
     final String st = string(string);
-    final Mode mode = last ? before ? Mode.LAST_INDEX_OF : Mode.LAST_INDEX_AFTER :
-      before ? Mode.INDEX_OF : Mode.INDEX_AFTER;
-    final int i = indexOf(st, string(sub), mode, info);
-    return i == -1 ? EMPTY : token(before ? st.substring(0, i) : st.substring(i));
+    final CollationElements ces = elements(st, info), subs = elements(string(sub), info);
+    final int pos = ces.indexOf(subs, last), ss = subs.size();
+    if(pos == -1) return EMPTY;
+    // substrings without elements occur at the start or end
+    final int i = ss == 0 ? last ? st.length() : 0 :
+      before ? ces.start(pos) : ces.end(pos + ss - 1);
+    return token(before ? st.substring(0, i) : st.substring(i));
   }
 
   /**
@@ -289,16 +157,13 @@ public abstract class Collation {
   }
 
   /**
-   * Returns the start or end position of the specified substring.
+   * Returns the collation elements of a string.
    * @param string string
-   * @param sub substring to be found
-   * @param mode search mode
    * @param info input info (can be {@code null})
-   * @return string index
+   * @return collation elements
    * @throws QueryException query exception
    */
-  protected abstract int indexOf(String string, String sub, Mode mode, InputInfo info)
-      throws QueryException;
+  abstract CollationElements elements(String string, InputInfo info) throws QueryException;
 
   /**
    * Returns a standard collation key.

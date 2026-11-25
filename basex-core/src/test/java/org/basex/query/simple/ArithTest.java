@@ -316,14 +316,22 @@ public final class ArithTest extends SandboxTest {
     query("max((" + wrap("NaN") + ", 1) ! xs:double(.) ! (. + 1))", "NaN");
     query("max((1 to " + wrap(0) + ") ! (. + 1))", "");
     check("max((xs:float(" + wrap("1.1") + "), 1e0) ! (. + 1))", 2.1, exists(SimpleMap.class));
+    // infinite constants: no rewrite, as 0 * INF and -INF + INF are NaN
+    check("max(" + e + " ! (. - 1) ! (. * xs:double('INF')))", "NaN", exists(SimpleMap.class));
+    check("max((" + wrap("-INF") + ", 1) ! xs:double(.) ! (. + xs:double('INF')))", "NaN",
+        exists(SimpleMap.class));
 
-    // sum(E ! (. * 2)) → sum(E) * 2, sum(E ! (. + 1)) → sum(E) + count(E)
+    // sum(E ! (. * 2)) → sum(E) * 2
     check("sum(" + e + " ! (. * 2))", 30, empty(SimpleMap.class));
+    // no rewrite for addition and subtraction: sum(E) may overflow
     final String n = "let $n := xs:integer(" + wrap(5) + ") return ";
-    check(n + "sum((1 to $n) ! (. + 1))", 20, empty(SimpleMap.class));
-    check(n + "sum((1 to $n) ! (10 - .))", 35, empty(SimpleMap.class));
-    check(n + "sum((1 to $n) ! (. * 2 + 1))", 35, empty(SimpleMap.class));
+    check(n + "sum((1 to $n) ! (. + 1))", 20, exists(SimpleMap.class));
+    check(n + "sum((1 to $n) ! (10 - .))", 35, exists(SimpleMap.class));
+    check(n + "sum((1 to $n) ! (. * 2 + 1))", 35, exists(SimpleMap.class));
     check("sum(" + e + " ! (. + 1))", 20, exists(SimpleMap.class));
+    query("let $m := xs:integer(" + wrap(Long.MAX_VALUE - 1) + ") "
+        + "let $n := xs:integer(" + wrap(Long.MAX_VALUE) + ") "
+        + "return sum(($m to $n) ! (. - 9223372036854775807))", -1);
     check("sum(" + e + " ! (-.))", -15, empty(SimpleMap.class));
     query("sum((1 to " + wrap(0) + ") ! (. * 2)) instance of xs:integer", true);
     check("sum((" + wrap(1) + ", " + wrap(2) + ") ! (. * 2))", 6, exists(SimpleMap.class));

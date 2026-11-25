@@ -139,7 +139,7 @@ public final class FnReplicate extends StandardFunc {
     // pre-evaluate static multipliers
     long sz = -1, c = -1;
     if(count instanceof Value) {
-      c = toLong(count, cc.qc);
+      c = toLong(count, 0, cc.qc);
       // replicate(<a/>, 0) → ()
       if(c == 0) return Empty.VALUE;
       // replicate(<a/>, 1) → <a/>

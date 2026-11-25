@@ -125,8 +125,7 @@ public class CmpG extends Cmp {
       if(st1.zeroOrOneUnwrapped() && st2.zeroOrOneUnwrapped()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
-      } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() &&
-          CmpHashG.hashable(type2, type1)) {
+      } else if(byCodepoint(CmpOp.EQ) && !st2.zeroOrOne() && CmpHashG.hashable(type2, type1)) {
         // hash-based comparisons
         if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
@@ -482,7 +481,7 @@ public class CmpG extends Cmp {
   final boolean eval(final Item item1, final Item item2, final QueryContext qc)
       throws QueryException {
     if(comparable || item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()) {
-      return op.eval(item1.compare(item2, null, false, qc, info));
+      return op.eval(item1.compare(item2, defaultCollation(), false, qc, info));
     }
     throw compareError(item1, item2, info);
   }
@@ -520,8 +519,8 @@ public class CmpG extends Cmp {
 
     // compare first and second comparison
     final CmpOp cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
-    if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
-      return null;
+    if(op != cmpOp || defaultCollation() != cmp2.defaultCollation() ||
+        !exprs[0].equals(cmp2.exprs[0])) return null;
 
     // inverted order comparisons are only equivalent if no operand can be NaN
     final Expr exprL = exprs[0], exprR1 = exprs[1];
@@ -634,13 +633,13 @@ public class CmpG extends Cmp {
 
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    // only equality expressions on default collation can be rewritten
+    // only equality expressions on codepoint collation can be rewritten
     if(!byCodepoint(CmpOp.EQ)) return false;
 
     Expr expr1 = exprs[0];
     IndexType type = null;
     if(TOKENIZE.is(expr1)) {
-      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespace())) return false;
+      if(!((FnTokenize) expr1).whitespace(exprs[1])) return false;
       expr1 = expr1.arg(0);
       type = IndexType.TOKEN;
     }

@@ -271,7 +271,8 @@ public final class GFLWOR extends ParseExpr {
         clauses.get(g) instanceof Where)) g++;
     if(g > 0 && g < cs && clauses.get(g) instanceof final GroupBy group) {
       final GroupSpec spec = group.group();
-      if(spec != null) {
+      // the rewritten fn:distinct-values call uses the default collation
+      if(spec != null && spec.coll == spec.defaultCollation()) {
         final ArrayList<Clause> prefix = new ArrayList<>(clauses.subList(0, g));
         clauses.subList(0, g).clear();
         final Expr flwor = new GFLWOR(info, prefix, spec.expr).optimize(cc);

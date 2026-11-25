@@ -80,8 +80,8 @@ public final class BaseXCollationOptions extends CollationOptions {
   }
 
   @Override
-  public Collation get(final HashMap<String, String> args) throws BaseXException {
-    return new BaseXCollation(collator(args));
+  Collation get(final byte[] uri, final HashMap<String, String> args) throws BaseXException {
+    return new BaseXCollation(collator(args), uri);
   }
 
   /**

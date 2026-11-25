@@ -20,9 +20,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -44,8 +42,7 @@ public class FnSum extends NumericFn {
 
     final Expr values = arg(0), zero = arg(1);
     final SeqType st = values.seqType(), stZero = zero.seqType();
-    if(zero == Empty.UNDEFINED) {
-      // no default value
+    if(!defined(1)) {
       if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
       // empty input: integer zero
       final Type type = sumType(values);
@@ -53,15 +50,14 @@ public class FnSum extends NumericFn {
         exprType.assign(st.atomOcc().min >= 1 ? type : type.union(INTEGER), Occ.EXACTLY_ONE);
       }
     } else if(st.zero()) {
-      if(zero == Empty.VALUE || stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) {
-        return cc.voidAndReturn(values, zero, info);
-      }
+      if(stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) return cc.voidAndReturn(values, zero, info);
     } else {
       // sum($nonempty, $zero) → sum($nonempty)  (default value unused)
       if(st.atomOcc().min >= 1) return cc.function(Function.SUM, info, values);
-      final SeqType ost = optType(values), zst = optType(zero);
+      // the default value is returned unconverted
+      final SeqType ost = optType(values);
       final Type type = ost == null ? ANY_ATOMIC_TYPE : stZero.zero() ? ost.type :
-        zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
+        ost.type.union(stZero.type.atomicOrAny());
       final Occ occ = stZero.atomOcc().min >= 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
       exprType.assign(type, occ);
     }
@@ -89,9 +85,34 @@ public class FnSum extends NumericFn {
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
     } else if(!avg && !defined(1) && values instanceof final SimpleMap map) {
-      return linear(map, cc);
+      // no addition or subtraction: sum(E ! X) may overflow while sum(E ! (X - 1)) does not
+      final Expr[] ops = map.args();
+      final int ol = ops.length;
+      final Expr last = ops[ol - 1], arg, factor;
+      if(last instanceof final Unary unary && unary.minus) {
+        arg = unary.expr;
+        factor = null;
+      } else if(last instanceof final Arith arith && arith.calc == Calc.MULTIPLY &&
+          arith.arg(1) instanceof Itr) {
+        // integer factor: sum(()) → 0
+        arg = arith.arg(0);
+        factor = arith.arg(1);
+      } else {
+        return null;
+      }
+
+      // exact arithmetic only
+      final SeqType st = arg.seqType();
+      if(!st.zeroOrOne() || !st.type.instanceOf(DECIMAL) || arg.has(Flag.NDT)) return null;
+
+      final Expr[] args = ops.clone();
+      args[ol - 1] = arg;
+      final Expr sum = cc.function(Function.SUM, info, SimpleMap.get(cc, info, args));
+      // sum(E ! -X) → -sum(E ! X), sum(E ! (X * 2)) → sum(E ! X) * 2
+      return (factor == null ? new Unary(info, sum, true) :
+        new Arith(info, sum, factor, Calc.MULTIPLY)).optimize(cc);
     } else if(values instanceof final SingletonSeq ss && ss.singleItem()) {
-      // exact arithmetic only: floating-point results depend on the summation order
+      // exact arithmetic only: repeated addition may differ from multiplication
       // sum(replicate(2, 5)) → 10, avg(replicate(2, 5)) → 2.0
       final Item item = ss.itemAt(0);
       if(item.type.instanceOf(DECIMAL)) {
@@ -111,7 +132,11 @@ public class FnSum extends NumericFn {
           for(final byte[] value : stats.values) {
             final double d = Token.toDouble(value);
             if(!Double.isFinite(d)) return null;
-            if(d != 0) exp = Math.min(exp, lowestBit(d));
+            if(d != 0) {
+              // exponent of the lowest set bit
+              exp = Math.min(exp, Math.max(Math.getExponent(d), Double.MIN_EXPONENT) - 52 +
+                  Long.numberOfTrailingZeros(Double.doubleToRawLongBits(d) | 1L << 52));
+            }
             final long c = stats.values.get(value);
             sum += c * d;
             abs += c * Math.abs(d);
@@ -135,57 +160,6 @@ public class FnSum extends NumericFn {
   }
 
   /**
-   * Moves a linear arithmetic operation out of the summed values.
-   * @param map simple map
-   * @param cc compilation context
-   * @return optimized expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr linear(final SimpleMap map, final CompileContext cc) throws QueryException {
-    final Expr[] ops = map.args();
-    final int ol = ops.length;
-    final Expr last = ops[ol - 1];
-    final Expr[] operands;
-    final Calc calc;
-    int pos = 0;
-    if(last instanceof final Unary unary && unary.minus) {
-      operands = unary.args();
-      calc = null;
-    } else if(last instanceof final Arith arith &&
-        arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT, Calc.MULTIPLY)) {
-      operands = arith.args();
-      calc = arith.calc;
-      if(calc == Calc.SUBTRACT && operands[0] instanceof Itr) pos = 1;
-      if(!(operands[1 - pos] instanceof Itr)) return null;
-    } else {
-      return null;
-    }
-
-    // exact arithmetic only; integer constants: sum(()) → 0
-    final Expr arg = operands[pos];
-    final SeqType st = arg.seqType();
-    if(!st.zeroOrOne() || !st.type.instanceOf(DECIMAL) || arg.has(Flag.NDT)) return null;
-    // sum(E ! (X + 1)) → sum(E ! X) + count(E): only if E can be counted cheaply
-    final Expr input = ops[0];
-    if(calc != null && calc.oneOf(Calc.ADD, Calc.SUBTRACT) && (ol != 2 || !st.one() ||
-        !(input instanceof Value || input instanceof final Range range &&
-        cheap(range.arg(0)) && cheap(range.arg(1))))) return null;
-
-    final Expr[] args = ops.clone();
-    args[ol - 1] = arg;
-    final Expr sum = cc.function(Function.SUM, info, SimpleMap.get(cc, info, args));
-    // sum(E ! -X) → -sum(E ! X)
-    if(calc == null) return new Unary(info, sum, true).optimize(cc);
-    // sum(E ! (X * 2)) → sum(E ! X) * 2
-    final Expr num = operands[1 - pos];
-    if(calc == Calc.MULTIPLY) return new Arith(info, sum, num, calc).optimize(cc);
-    // sum(E ! (X - 1)) → sum(E ! X) - count(E), sum(E ! (1 - X)) → count(E) - sum(E ! X)
-    final Expr count = new Arith(info, cc.function(Function.COUNT, info,
-        input.copy(cc, new IntObjectMap<>())), num, Calc.MULTIPLY).optimize(cc);
-    return new Arith(info, pos == 0 ? sum : count, pos == 0 ? count : sum, calc).optimize(cc);
-  }
-
-  /**
    * Returns the numeric type of the summed values.
    * @param values values
    * @return type (can be {@code null})
@@ -203,25 +177,6 @@ public class FnSum extends NumericFn {
       type = type == null ? ost.type : Calc.ADD.type(type, ost.type, preferred);
     }
     return type;
-  }
-
-  /**
-   * Checks if an expression can be evaluated repeatedly at no cost.
-   * @param expr expression
-   * @return result of check
-   */
-  private static boolean cheap(final Expr expr) {
-    return expr instanceof Value || expr instanceof VarRef;
-  }
-
-  /**
-   * Returns the exponent of the lowest set bit of a finite, non-zero double.
-   * @param d double value
-   * @return exponent
-   */
-  private static int lowestBit(final double d) {
-    return Math.max(Math.getExponent(d), Double.MIN_EXPONENT) - 52 +
-        Long.numberOfTrailingZeros(Double.doubleToRawLongBits(d) | 1L << 52);
   }
 
   /**
@@ -243,10 +198,8 @@ public class FnSum extends NumericFn {
     // Little Gauss computation (the product is even)
     final long size = value.size(), product = Util.multiply(Util.add(first, last), size);
     if(product != Long.MIN_VALUE) return Itr.get(product / 2);
-    final BigInteger bi = BigInteger.valueOf(first).add(BigInteger.valueOf(last)).
-        multiply(BigInteger.valueOf(size)).shiftRight(1);
-    if(bi.bitLength() < 64) return Itr.get(bi.longValue());
-    throw RANGE_X.get(info, bi);
+    return integer(BigInteger.valueOf(first).add(BigInteger.valueOf(last)).
+        multiply(BigInteger.valueOf(size)).shiftRight(1));
   }
 
   /**
@@ -286,29 +239,29 @@ public class FnSum extends NumericFn {
       }
       if(t != null) throw ARGTYPE_X_X_X.get(info, t, tp, it);
       itr &= tp.instanceOf(INTEGER);
-      result = itr ? addInt(result, it) : Calc.ADD.eval(result, it, preferred, info);
+      if(itr) {
+        // integer overflow: switch to decimal
+        final long sum = result instanceof Itr ? Util.add(result.itr(info), it.itr(info)) :
+          Long.MIN_VALUE;
+        result = sum != Long.MIN_VALUE ? Itr.get(sum) : Dec.get(result.dec(info).add(it.dec(info)));
+      } else {
+        result = Calc.ADD.eval(result, it, preferred, info);
+      }
       c++;
     }
-    if(itr && !avg && result instanceof Dec) {
-      final BigInteger bi = result.dec(info).toBigInteger();
-      if(bi.bitLength() < 64) return Itr.get(bi.longValue());
-      throw RANGE_X.get(info, bi);
-    }
-    return avg ? Calc.DIVIDE.eval(result, Itr.get(c), preferred, info) : result;
+    if(itr && !avg && result instanceof Dec) return integer(result.dec(info).toBigInteger());
+    if(avg) return Calc.DIVIDE.eval(result, Itr.get(c), preferred, info);
+    return result;
   }
 
   /**
-   * Adds two integers, switching to a decimal on overflow.
-   * @param result integer or decimal result
-   * @param item integer item
-   * @return integer or decimal sum
+   * Returns an integer item for the specified big integer.
+   * @param bi big integer
+   * @return integer item
    * @throws QueryException query exception
    */
-  private Item addInt(final Item result, final Item item) throws QueryException {
-    if(result instanceof Itr) {
-      final long sum = Util.add(result.itr(info), item.itr(info));
-      if(sum != Long.MIN_VALUE) return Itr.get(sum);
-    }
-    return Dec.get(result.dec(info).add(item.dec(info)));
+  private Itr integer(final BigInteger bi) throws QueryException {
+    if(bi.bitLength() < 64) return Itr.get(bi.longValue());
+    throw RANGE_X.get(info, bi);
   }
 }

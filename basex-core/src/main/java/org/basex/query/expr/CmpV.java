@@ -117,7 +117,9 @@ public final class CmpV extends Cmp {
    */
   private boolean eval(final Item item1, final Item item2, final QueryContext qc)
       throws QueryException {
-    if(item1.comparable(item2)) return op.eval(item1.compare(item2, null, false, qc, info));
+    if(item1.comparable(item2)) {
+      return op.eval(item1.compare(item2, defaultCollation(), false, qc, info));
+    }
     throw compareError(item1, item2, info);
   }
 

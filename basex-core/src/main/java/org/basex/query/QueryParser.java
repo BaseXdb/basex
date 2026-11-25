@@ -864,7 +864,7 @@ public class QueryParser extends InputParser {
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
     if(!decl.add(COLLATION)) throw error(DUPLCOLL);
-    sc.collation = Collation.get(uriLiteral(), qc, info(), WHICHDEFCOLL_X);
+    sc.collation = Collations.get(uriLiteral(), qc, info(), WHICHDEFCOLL_X);
     return true;
   }
 
@@ -1869,7 +1869,7 @@ public class QueryParser extends InputParser {
       if(least) wsCheck(LEAST);
     }
     final Collation coll = wsConsumeWs(COLLATION) ?
-      Collation.get(uriLiteral(), qc, info(), FLWORCOLL_X) : sc.collation;
+      Collations.get(uriLiteral(), qc, info(), FLWORCOLL_X) : sc.collation;
     return new OrderKey(info(), expr, desc, least, coll);
   }
 
@@ -1901,7 +1901,7 @@ public class QueryParser extends InputParser {
         by = ref;
       }
 
-      final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(uriLiteral(),
+      final Collation coll = wsConsumeWs(COLLATION) ? Collations.get(uriLiteral(),
           qc, info(), FLWORCOLL_X) : sc.collation;
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), by, coll);
       curr.put(var.name.unique(), var);

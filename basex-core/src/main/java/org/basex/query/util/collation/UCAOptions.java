@@ -54,7 +54,7 @@ public final class UCAOptions extends CollationOptions {
   }
 
   @Override
-  Collation get(final HashMap<String, String> args) throws BaseXException {
+  Collation get(final byte[] uri, final HashMap<String, String> args) throws BaseXException {
     assign(args);
 
     Locale locale = Locale.US;
@@ -172,7 +172,7 @@ public final class UCAOptions extends CollationOptions {
       if(!list.isEmpty()) rbc.setReorderCodes(list.finish());
     }
 
-    return new UCACollation(rbc);
+    return new UCACollation(rbc, uri);
   }
 
   /**

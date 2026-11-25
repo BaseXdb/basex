@@ -55,10 +55,10 @@ public class FnMin extends StandardFunc {
     if(item == null) return Empty.VALUE;
 
     final Type type = item.type;
-    final boolean string = item instanceof AStr;
+    final boolean string = item instanceof AStr, binary = item instanceof Bin;
     final boolean dateTime = item instanceof Dtm, duration = item instanceof Dur;
-    final boolean numeric = !(string || dateTime || duration || type == BOOLEAN || type == QNAME ||
-        item instanceof ADate || item instanceof Bin);
+    final boolean numeric = !(string || binary || dateTime || duration || type == BOOLEAN ||
+        type == QNAME || item instanceof ADate);
     if(numeric) {
       if(type.isUntyped()) item = toNumber(item, null);
       if(item == Dbl.NAN || item == Flt.NAN) return item;
@@ -69,7 +69,7 @@ public class FnMin extends StandardFunc {
         if(type2.isUntyped()) it = toNumber(it, null);
         if(it == Dbl.NAN || it == Flt.NAN) return it;
       }
-      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr :
+      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr : binary ? it instanceof Bin :
          dateTime ? it instanceof Dtm : duration ? it instanceof Dur : type == type2)) {
         throw ARGTYPE_X_X_X.get(info, type, type2, it);
       }
@@ -183,7 +183,8 @@ public class FnMin extends StandardFunc {
       if(calc == Calc.SUBTRACT && arith.arg(0) instanceof ANum) pos = 1;
       if(!(arith.arg(1 - pos) instanceof final ANum num)) return null;
       final double d = num.dbl();
-      if(Double.isNaN(d) || d == 0 && calc.oneOf(Calc.MULTIPLY, Calc.DIVIDE)) return null;
+      // infinite operands: X * INF and X + INF may be NaN
+      if(!Double.isFinite(d) || d == 0 && calc.oneOf(Calc.MULTIPLY, Calc.DIVIDE)) return null;
       operands = arith.args().clone();
       antitone = pos == 1 || d < 0 && calc.oneOf(Calc.MULTIPLY, Calc.DIVIDE);
     } else {

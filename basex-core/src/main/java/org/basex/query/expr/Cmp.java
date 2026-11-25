@@ -80,7 +80,7 @@ public abstract class Cmp extends Arr {
    * @return result of check
    */
   final boolean byCodepoint(final CmpOp... ops) {
-    return cmpOp().oneOf(ops) && sc().collation == null;
+    return cmpOp().oneOf(ops) && defaultCollation() == null;
   }
 
   /**
@@ -194,10 +194,9 @@ public abstract class Cmp extends Arr {
     // string(@a) = 'x' → @a = 'x'
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(this instanceof CmpG) || op != CmpOp.EQ || !STRING.is(expr1) ||
-        expr1.args().length != 1 || !(expr2 instanceof final Value value)) return this;
+        expr1.args().length != 1 || !expr1.arg(0).seqType().stringOrEmpty() ||
+        !(expr2 instanceof final Value value)) return this;
 
-    final SeqType st = expr1.arg(0).seqType();
-    if(!st.zeroOrOne() || !st.type.isStringOrUntyped()) return this;
     // an absent operand is converted to an empty string, which must still be matched
     for(final Item item : value) {
       if(item.type != BasicType.STRING || item.string(info).length == 0) return this;
@@ -444,8 +443,7 @@ public abstract class Cmp extends Arr {
    */
   private Expr optEmptyString(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType();
-    if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.EMPTY) {
+    if(expr1.seqType().oneString() && expr2 == Str.EMPTY) {
       // $s < '' → false(), $s >= '' → true()
       if(op == CmpOp.LT) return Bln.FALSE;
       if(op == CmpOp.GE) return Bln.TRUE;

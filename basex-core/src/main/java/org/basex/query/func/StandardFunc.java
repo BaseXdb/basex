@@ -364,7 +364,8 @@ public abstract class StandardFunc extends Arr {
   protected final Expr simplifyOrder(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // count(reverse(A)) → count(A), $a = sort(B) → $a = B
-    return cc.simplify(this, mode.unordered() && !has(Flag.NDT) ? arg(0) : this, mode);
+    final Expr input = mode.unordered() ? reordered(this) : null;
+    return cc.simplify(this, input != null ? input : this, mode);
   }
 
   /**
@@ -402,8 +403,9 @@ public abstract class StandardFunc extends Arr {
    * @return input of the expression, or {@code null}
    */
   protected static Expr reordered(final Expr input) {
-    return Function.REVERSE.is(input) || Function.SORT.is(input) ||
-      Function.SORT_BY.is(input) || Function.SORT_WITH.is(input) ? input.arg(0) : null;
+    return (Function.REVERSE.is(input) || Function.SORT.is(input) ||
+      Function.SORT_BY.is(input) || Function.SORT_WITH.is(input)) && !input.has(Flag.NDT) ?
+      input.arg(0) : null;
   }
 
   /**
@@ -594,7 +596,7 @@ public abstract class StandardFunc extends Arr {
    * Evaluates an expression to a collation.
    * @param expr expression
    * @param qc query context
-   * @return collation, or {@code null} for default collation
+   * @return collation (can be {@code null})
    * @throws QueryException query exception
    */
   protected final Collation toCollation(final Expr expr, final QueryContext qc)
@@ -604,14 +606,14 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an item to a collation.
-   * @param collation collation URI or {@code null}
+   * @param collation collation URI (can be {@code null})
    * @param qc query context
-   * @return collation, or {@code null} for default collation
+   * @return collation (can be {@code null})
    * @throws QueryException query exception
    */
   protected final Collation toCollation(final byte[] collation, final QueryContext qc)
       throws QueryException {
-    return Collation.get(collation, qc, info, WHICHCOLL_X);
+    return Collations.get(collation, qc, info, WHICHCOLL_X);
   }
 
   /**

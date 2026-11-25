@@ -21,12 +21,6 @@ public final class FnStartsWithSubsequence extends FnContainsSubsequence {
   boolean match(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
-    final long is = input.size(), ss = subsequence.size();
-    if(is < ss) return false;
-
-    for(long s = 0; s < ss; s++) {
-      if(!cmp.apply(input.itemAt(s), subsequence.itemAt(s))) return false;
-    }
-    return true;
+    return matchAt(input, subsequence, 0, cmp);
   }
 }

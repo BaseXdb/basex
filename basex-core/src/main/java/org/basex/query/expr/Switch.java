@@ -88,7 +88,7 @@ public final class Switch extends ASwitch<SwitchGroup> {
    * @return map from strings to group indexes, or {@code null}
    */
   private TokenIntMap index() {
-    if(info == null || sc().collation != null) return null;
+    if(defaultCollation() != null) return null;
     int size = 0;
     for(final SwitchGroup group : groups) {
       final Expr[] exprs = group.exprs;

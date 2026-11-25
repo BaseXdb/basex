@@ -5,6 +5,7 @@ import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.util.*;
 
 import org.basex.core.users.*;
@@ -15,6 +16,7 @@ import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -177,6 +179,14 @@ public abstract class ParseExpr extends Expr {
    */
   public final StaticContext sc() {
     return info != null ? info.sc() : null;
+  }
+
+  /**
+   * Returns the default collation of the static context.
+   * @return collation (can be {@code null})
+   */
+  public final Collation defaultCollation() {
+    return info != null ? info.sc().collation : null;
   }
 
   // OPTIMIZATIONS ================================================================================
@@ -605,8 +615,10 @@ public abstract class ParseExpr extends Expr {
     final Type type = item.type;
     if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
     if(type == DECIMAL) {
-      final long l = item.itr(info);
-      if(item.dbl(info) == l) return l;
+      // relabel integral decimals (round trip fails for fractional digits and long overflows)
+      final BigDecimal dec = item.dec(info);
+      final long l = dec.longValue();
+      if(dec.compareTo(BigDecimal.valueOf(l)) == 0) return l;
     }
     throw argTypeError(item, INTEGER, expr);
   }

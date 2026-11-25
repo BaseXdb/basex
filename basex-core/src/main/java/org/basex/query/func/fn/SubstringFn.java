@@ -6,10 +6,10 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 
 /**
  * Substring function.
@@ -39,12 +39,10 @@ public abstract class SubstringFn extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr value = arg(0), substring = arg(1);
-    final SeqType st = value.seqType(), stSub = substring.seqType();
-
-    if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
-       (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && !defined(2)) {
+    if(value.seqType().stringOrEmpty() && substring.seqType().stringOrEmpty() && !defined(2)) {
       // substring-before('', $b) → '', substring-before($a, $a) → ''
-      if(value == Empty.VALUE || value == Str.EMPTY || value.equals(substring))
+      if(value == Empty.VALUE || value == Str.EMPTY ||
+          value.equals(substring) && !value.has(Flag.NDT))
         return Str.EMPTY;
       // substring-after($a, '') → string($a), substring-before($a, '') → ''
       if(substring == Empty.VALUE || substring == Str.EMPTY)

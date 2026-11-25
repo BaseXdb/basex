@@ -33,7 +33,7 @@ public class FnContainsSubsequence extends StandardFunc {
       cmp = (item1, item2) -> test(compare, args.set(0, item1).set(1, item2), qc);
     } else {
       // the comparison of single items must be interruptible (quadratic worst case)
-      final DeepEqual deep = new DeepEqual(info, null, qc);
+      final DeepEqual deep = new DeepEqual(info, defaultCollation(), qc);
       cmp = (item1, item2) -> {
         qc.checkStop();
         return deep.equal(item1, item2);
@@ -65,16 +65,30 @@ public class FnContainsSubsequence extends StandardFunc {
   boolean match(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
-    final long is = input.size(), ss = subsequence.size(), ps = is - ss;
-    if(is >= ss) {
-      for(long p = 0; p <= ps; p++) {
-        for(long s = 0; s <= ss; s++) {
-          if(s == ss) return true;
-          if(!cmp.apply(input.itemAt(p + s), subsequence.itemAt(s))) break;
-        }
-      }
+    final long ps = input.size() - subsequence.size();
+    for(long p = 0; p <= ps; p++) {
+      if(matchAt(input, subsequence, p, cmp)) return true;
     }
     return false;
+  }
+
+  /**
+   * Checks if the input matches the subsequence at the specified position.
+   * @param input input sequence
+   * @param subsequence subsequence
+   * @param pos start position in the input
+   * @param cmp comparison function
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  static boolean matchAt(final Value input, final Value subsequence, final long pos,
+      final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
+    final long ss = subsequence.size();
+    if(pos < 0 || pos + ss > input.size()) return false;
+    for(long s = 0; s < ss; s++) {
+      if(!cmp.apply(input.itemAt(pos + s), subsequence.itemAt(s))) return false;
+    }
+    return true;
   }
 
   @Override

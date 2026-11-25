@@ -14,7 +14,6 @@ import org.basex.query.value.item.*;
 public final class FnDefaultCollation extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) {
-    final Collation coll = sc().collation;
-    return Str.get(coll == null ? QueryText.COLLATION_URI : coll.uri());
+    return Str.get(Collations.uri(defaultCollation()));
   }
 }

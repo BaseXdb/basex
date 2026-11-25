@@ -19,7 +19,7 @@ public final class UnitAssertEquals extends UnitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter1 = arg(0).iter(qc), iter2 = arg(1).iter(qc);
-    final DeepEqual deep = new DeepEqual(info, null, qc);
+    final DeepEqual deep = new DeepEqual(info, defaultCollation(), qc);
     Item item1, item2;
     int c = 1;
     while(true) {

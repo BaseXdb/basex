@@ -47,7 +47,7 @@ public class FnContains extends StandardFunc {
   protected final Expr opt(final CompileContext cc) {
     final Expr value = arg(0), substring = arg(1);
     // contains($a, '') → true(), contains($a, $a) → true()
-    if(!defined(2) && value.seqType().type.isStringOrUntyped() && !value.has(Flag.NDT)) {
+    if(!defined(2) && value.seqType().stringOrEmpty() && !value.has(Flag.NDT)) {
       if(substring == Empty.VALUE || substring == Str.EMPTY || value.equals(substring))
         return Bln.TRUE;
     }

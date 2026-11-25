@@ -46,7 +46,7 @@ public final class FnSubstring extends StandardFunc {
         return cc.function(Function.SUBSTRING, info, value, arg(1));
       }
       // substring($string, 1) → string($string)
-      if(start <= 1 && !defined(2) && value.seqType().type.isStringOrUntyped()) {
+      if(start <= 1 && !defined(2) && value.seqType().stringOrEmpty()) {
         return cc.function(Function.STRING, info, value);
       }
     }

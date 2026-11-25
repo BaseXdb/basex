@@ -279,7 +279,8 @@ public final class OrderBy extends Clause {
    */
   boolean merge(final For fr, final CompileContext cc) throws QueryException {
     final OrderKey key = keys[0];
-    if(keys.length != 1 || key.coll != null || !key.least) return false;
+    // the rewritten fn:sort-by call uses the default collation
+    if(keys.length != 1 || key.coll != key.defaultCollation() || !key.least) return false;
 
     final Expr expr = key.expr;
     // keys must atomize to single items (arrays may contain sequences)

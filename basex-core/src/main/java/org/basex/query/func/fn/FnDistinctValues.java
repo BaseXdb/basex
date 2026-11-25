@@ -126,7 +126,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
       final ArrayList<Stats> list = PathNodes.stats(path);
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
-        final ItemSet set = ItemSet.get(null, info);
+        final ItemSet set = ItemSet.get(defaultCollation(), info);
         for(final Stats stats : list) {
           if(!StatsType.isCategory(stats.type)) return null;
           for(final byte[] value : stats.values) {

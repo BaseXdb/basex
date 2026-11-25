@@ -32,7 +32,7 @@ public final class TypedKeys {
       final Collation coll, final boolean least, final InputInfo info) throws QueryException {
 
     // check if all keys have a common type and are mutually comparable
-    boolean itr = size > 0, dbl = size > 0, str = Collation.get(coll, info) == null;
+    boolean itr = size > 0, dbl = size > 0, str = coll == null;
     Item first = null;
     for(int i = 0; i < size && (itr || dbl || str); i++) {
       final Item item = keys.apply(i);

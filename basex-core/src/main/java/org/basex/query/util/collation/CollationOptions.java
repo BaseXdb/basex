@@ -26,11 +26,12 @@ abstract class CollationOptions extends Options {
 
   /**
    * Parses the specified options and returns a collation.
+   * @param uri collation URI
    * @param args arguments
    * @return collation
    * @throws BaseXException database exception
    */
-  abstract Collation get(HashMap<String, String> args) throws BaseXException;
+  abstract Collation get(byte[] uri, HashMap<String, String> args) throws BaseXException;
 
   /**
    * Assigns the specified options.

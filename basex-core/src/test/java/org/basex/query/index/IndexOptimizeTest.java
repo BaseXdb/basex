@@ -1,5 +1,6 @@
 package org.basex.query.index;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -122,6 +123,20 @@ public final class IndexOptimizeTest extends SandboxTest {
     indexCheck("for $s in ('id2', 'id3') return data(//*[contains-token(@idref, $s)])", 1);
     indexCheck("for $s in ('id2', 'id3') return data(//@*[contains-token(., $s)])", "id1 id2");
     indexCheck("for $s in ('   id1  ') return data(//*[contains-token(@idref, $s)])", 1);
+    // no index access for tokens of wrong type
+    error("//*[contains-token(@idref, 1)]", INVTYPE_X);
+    error("//*[contains-token(@idref, 'x'[random:integer(1) = 1])]", INVTYPE_X);
+    // no index access for non-codepoint default collations
+    check("declare default collation " +
+        "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'; " +
+        "data(//*[contains-token(@idref, 'ID1')])", 1, empty(ValueAccess.class));
+    // no index access for literal patterns
+    check("//*[tokenize(@idref, '\\s+', 'q') = 'id1']", "", empty(ValueAccess.class));
+    // no index access for explicit whitespace patterns and empty or dynamic search strings
+    check("<_ a=' x'/>[tokenize(@a, '\\s+') = '']", "<_ a=\" x\"/>");
+    check("//*[tokenize(@idref, '\\s+') = '']", "", empty(ValueAccess.class));
+    check("for $s in ('id1', '') return data(//*[tokenize(@idref, '\\s+') = $s])",
+        1, empty(ValueAccess.class));
   }
 
   /** Checks full-text requests. */

@@ -72,7 +72,7 @@ public final class ArraySort extends ArraySortBy {
           return XQArray.items(rs.ascending() ? rs : rs.reverse(null));
         }
         // integers, strings, etc.
-        if(members instanceof final NativeSeq ns && sc().collation == null) {
+        if(members instanceof final NativeSeq ns && defaultCollation() == null) {
           final Value sorted = ns.sort();
           if(sorted != null) return XQArray.items(sorted);
         }

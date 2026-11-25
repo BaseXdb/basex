@@ -419,10 +419,10 @@ public final class FuncItem extends FItem implements Scope {
         if(!(iff.cond instanceof final CmpG cmp) || cmp.cmpOp() != op) return false;
         final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
         final SeqType st1 = op1.seqType();
-        // strings: restrict to default collation (value equality must imply identity)
+        // strings: restrict to codepoint collation (value equality must imply identity)
         return isResult.test(op1) && op2 instanceof Item && op2.equals(branch) &&
             st1.eq(op2.seqType()) && (st1.instanceOf(Types.DECIMAL_O) ||
-            st1.instanceOf(Types.STRING_O) && cmp.sc().collation == null);
+            st1.instanceOf(Types.STRING_O) && cmp.defaultCollation() == null);
       };
       if(keeps.test(iff.arg(0), CmpOp.EQ)) {
         // if(COND) then $result else ACTION → exit on COND

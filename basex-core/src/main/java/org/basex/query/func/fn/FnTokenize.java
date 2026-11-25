@@ -138,7 +138,7 @@ public final class FnTokenize extends RegExFn {
     final Expr value = arg(0), pattern = arg(1);
 
     // tokenize(normalize-space(A), ' ') → tokenize(A)
-    if(NORMALIZE_SPACE.is(value) && pattern instanceof final Str str &&
+    if(NORMALIZE_SPACE.is(value) && pattern instanceof final Str str && !defined(2) &&
         Token.eq(str.string(), Token.cpToken(' '))) {
       final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
@@ -147,12 +147,21 @@ public final class FnTokenize extends RegExFn {
   }
 
   /**
-   * Indicates if default whitespace tokenization is to be performed.
+   * Indicates if a single string is split at whitespace into tokens that can be found in an index.
+   * @param search search expression
    * @return result of check
+   * @throws QueryException query exception
    */
-  public boolean whitespace() {
+  public boolean whitespace(final Expr search) throws QueryException {
     final Expr pattern = arg(1);
-    return pattern.size() == 0 ||
-        pattern instanceof final Str str && Token.eq(str.string(), WHITESPACE);
+    if(!arg(0).seqType().zeroOrOne()) return false;
+    if(pattern.size() == 0) return true;
+    if(!(pattern instanceof final Str str && !defined(2) && Token.eq(str.string(), WHITESPACE) &&
+        search instanceof final Value value)) return false;
+    // explicit pattern: leading and trailing whitespace yields empty tokens, which are not indexed
+    for(final Item item : value) {
+      if(!item.type.isStringOrUntyped() || item.string(info).length == 0) return false;
+    }
+    return true;
   }
 }

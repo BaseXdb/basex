@@ -135,6 +135,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void allEqual() {
     final Function func = ALL_EQUAL;
 
+    // repeated evaluation of a nondeterministic input is preserved
+    query(func.args(REPLICATE.args(" random:double()", 2, true)), false);
+    check(func.args(REPLICATE.args(wrap(1), 3)), true, empty(REPLICATE));
+
     query(func.args(" ()"), true);
     query(func.args(1), true);
     query(func.args("x"), true);
@@ -635,6 +639,13 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (0x1000 to 0xA000)") + " => boolean()", true);
     query(func.args(" (1 to 1000) ! (0x1000 to 0xA000)") + " => boolean()", true);
     query(func.args(" (1 to 1000)[. > 999]") + " => boolean()", true);
+    error(func.args(" 0") + " => boolean()", INVCODE_X);
+    error(func.args(" (0 to 1)[. < 1]") + " => boolean()", INVCODE_X);
+
+    // integral decimals are relabeled
+    query(func.args(" 65.0"), "A");
+    error(func.args(" 65.5"), INVTYPE_X);
+    error(func.args(" 9007199254740992.5"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -817,6 +828,28 @@ public final class FnModuleTest extends SandboxTest {
 
     // do not optimize if argument may be of wrong type
     check(func.args(" (1, 'a')[. instance of xs:string]", "a"), true, root(CONTAINS));
+
+    // do not optimize if argument may yield multiple items
+    error(func.args(" ('a', 'b')", ""), INVTYPE_X);
+    error("let $s := ('a', 'b') return " + func.args(" $s", " $s"), INVTYPE_X);
+    error(STARTS_WITH.args(" ('a', 'b')", ""), INVTYPE_X);
+    error(ENDS_WITH.args(" ('a', 'b')", ""), INVTYPE_X);
+
+    // collations: only the first position is relevant
+    for(final String coll : new String[] { "?lang=en", "http://www.w3.org/2013/collation/UCA" }) {
+      query(STARTS_WITH.args("aae", "ae", coll), false);
+      query(STARTS_WITH.args("aab", "ab", coll), false);
+      query(STARTS_WITH.args("ab", "ab", coll), true);
+    }
+    // expansions: search must resume inside an expanded character
+    final String uca = "http://www.w3.org/2013/collation/UCA?strength=primary";
+    query(func.args("xﬃ", "fi", uca), true);
+    query(SUBSTRING_AFTER.args("xﬃy", "fi", uca), "y");
+    // case-insensitive collation: strings are lower-cased as a whole, as in fn:compare
+    final String uci = "http://www.w3.org/2005/xpath-functions/collation/unicode-case-insensitive";
+    query(func.args("ΣΑΣ", "ΣΑς", uci), true);
+    query(func.args("xİ", "i̇", uci), true);
+    query(SUBSTRING_BEFORE.args("xİy", "i̇", uci), "x");
   }
 
   /** Test method. */
@@ -4293,6 +4326,9 @@ return
         "2001-01-01");
     query(func.args(" (xs:dayTimeDuration('PT1S'), xs:dayTimeDuration('PT0S'))"), "PT0S");
     query(func.args(" (xs:hexBinary('42'), xs:hexBinary('43'), xs:hexBinary('41'))"), 'A');
+    // binary types are mutually comparable
+    query(func.args(" (xs:hexBinary('42'), xs:base64Binary('QQ=='))"), 'A');
+    query(MAX.args(" (xs:base64Binary('QQ=='), xs:hexBinary('42'))"), 'B');
 
     query("for $n in (1, 2) return " + func.args(" $n"), "1\n2");
     query("for $n in (1, 2) return " + func.args(" ($n, $n)"), "1\n2");
@@ -5538,6 +5574,12 @@ return
   @Test public void replicate() {
     final Function func = REPLICATE;
 
+    // negative static counts are rejected, also if the call is rewritten
+    error(func.args(" (1, 2)", -1), INVTYPE_X);
+    error(HEAD.args(func.args(wrap(1), -1)), INVTYPE_X);
+    error(ALL_EQUAL.args(func.args(wrap(1), -1)), INVTYPE_X);
+    query("if(" + wrap(1) + " = 2) then " + func.args(1, -1) + " else 0", 0);
+
     query(func.args(" ()", 0), "");
     query(func.args(" ()", 1), "");
     query(func.args(1, 0), "");
@@ -6546,6 +6588,7 @@ return
     query(func.args(" ('', 'x')", "x"), "xx");
     query(func.args(" 1 to 6"), "123456");
     query(func.args(" (1 to 6) ! 'x'"), "xxxxxx");
+    error(func.args("a", " ('x', 'y')"), INVTYPE_X);
 
     // GH-2326
     query(func.args(" ()", "") + " => boolean()", false);
@@ -6950,6 +6993,18 @@ return
 
     check(func.args(wrap(12), wrap(13)), "", root(func));
     check(func.args("A", "B", "?lang=de"), "", root(Str.class));
+
+    // do not pre-evaluate non-deterministic arguments
+    check(func.args(" string(random:integer(1))", " string(random:integer(1))"), "",
+        root(func));
+    // supplementary characters
+    final String sub = "𝒜b";
+    for(final String coll : new String[] { "?lang=en", "http://www.w3.org/2013/collation/UCA" }) {
+      query(func.args("x" + sub, sub, coll), "x");
+      query(SUBSTRING_BEFORE_LAST.args("x" + sub + sub, sub, coll), "x𝒜b");
+      query(CONTAINS.args("𝒜x" + sub, sub, coll), true);
+      query(ENDS_WITH.args(sub + sub, sub, coll), true);
+    }
   }
 
   /** Test method. */
@@ -7031,6 +7086,10 @@ return
     query(dbls + func.args(" reverse($s)"), 0);
     query(dbls + func.args(" sort($s)"), 0);
     check(func.args(" reverse((" + wrap(1) + " ! xs:integer(.), 2))"), 3, empty(REVERSE));
+    // non-deterministic sort keys are preserved
+    check(func.args(" sort(1 to 3, (), fn($i) { random:integer(1) + $i })"), 6, exists(SORT));
+    check(func.args(" sort-with(1 to 3, fn($a, $b) { random:integer(1) + $a - $b })"), 6,
+        exists(SORT_WITH));
     query(func.args(" for $i in 1 to " + wrap(10) + " return 3"), 30);
 
     query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");
@@ -7070,6 +7129,12 @@ return
         1, type(SUM, "xs:integer?"));
     check(func.args(" (1, 2)[. = 1]", " ('a', 'b')[. = 'a']"),
         1, type(SUM, "xs:anyAtomicType?"));
+    // untyped default values are returned unconverted
+    query(func.args(" (1, 2)[. = " + wrap(3) + ']', " xs:untypedAtomic('a')")
+        + " instance of xs:untypedAtomic", true);
+    query(func.args(" (1, 2)[. = " + wrap(3) + ']', " <a>1</a>")
+        + " instance of xs:untypedAtomic", true);
+    check(func.args(" (1, 2)[. = 1]", " xs:byte(0)"), 1, type(SUM, "xs:integer"));
   }
 
   /** Test method. */
@@ -7185,6 +7250,10 @@ return
         exists(NORMALIZE_SPACE));
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
+    // flags must be preserved
+    check(func.args(" normalize-space(" + wrap("A B") + ")", " ' '", "x"), "A\n \nB",
+        exists(NORMALIZE_SPACE));
+    error(func.args(" normalize-space(" + wrap("A B") + ")", " ' '", "z"), REGFLAG_X);
 
     query(func.args("a", ""), "a");
   }
