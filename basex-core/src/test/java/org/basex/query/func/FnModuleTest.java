@@ -3776,29 +3776,28 @@ return
 
     // advanced and caching tests
     // run simple HTTP server for module hosting
-    final int port = 62626;
-    final String url = "http://localhost:" + port;
-    final Map<String, String> modules = Map.of(
-      "/m1.xqm",
-        "module namespace m = 'm1';\n" +
-        "declare variable $m:node := <x/>;\n" +
-        "declare function m:id() { 'RANDOM_UUID' };",
-      "/m2.xqm",
-        "module namespace m = 'm2';\n" +
-        "declare function m:id() {\n" +
-        "  let $m := load-xquery-module('m1', { 'location-hints': [ '" + url + "/m1.xqm' ] })\n" +
-        "  return $m?functions?(QName('m1', 'id'))?0()\n" +
-        "};",
-      "/m3.xqm",
-        "module namespace m = 'm';\n" +
-        "declare context item as xs:long external;\n" +
-        "declare variable $m:m3 := .;",
-      "/m4.xqm",
-        "module namespace m = 'm';\n" +
-        "declare context item as xs:short external;\n" +
-        "declare variable $m:m4 := .;"
-    );
-    try(ServerSocket ss = new ServerSocket(port)) {
+    try(ServerSocket ss = new ServerSocket(0)) {
+      final String url = "http://localhost:" + ss.getLocalPort();
+      final Map<String, String> modules = Map.of(
+        "/m1.xqm",
+          "module namespace m = 'm1';\n" +
+          "declare variable $m:node := <x/>;\n" +
+          "declare function m:id() { 'RANDOM_UUID' };",
+        "/m2.xqm",
+          "module namespace m = 'm2';\n" +
+          "declare function m:id() {\n" +
+          "  let $m := load-xquery-module('m1', { 'location-hints': [ '" + url + "/m1.xqm' ] })\n" +
+          "  return $m?functions?(QName('m1', 'id'))?0()\n" +
+          "};",
+        "/m3.xqm",
+          "module namespace m = 'm';\n" +
+          "declare context item as xs:long external;\n" +
+          "declare variable $m:m3 := .;",
+        "/m4.xqm",
+          "module namespace m = 'm';\n" +
+          "declare context item as xs:short external;\n" +
+          "declare variable $m:m4 := .;"
+      );
       new Thread(() -> {
         try {
           while(true) {
