@@ -111,8 +111,9 @@ public final class SharedData {
    * @return shared token
    */
   public byte[] token(final byte[] token) {
+    if(token.length == 0) return Token.EMPTY;
     synchronized(tokens) {
-      return token.length == 0 ? Token.EMPTY : tokens.put(token);
+      return tokens.put(token);
     }
   }
 

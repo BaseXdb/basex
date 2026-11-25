@@ -19,9 +19,9 @@ public class FnName extends FnNodeName {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) throws QueryException {
     // name($text) → ''
-    return empty(cc, false) ? Str.EMPTY : this;
+    return empty(cc, false) ? cc.voidAndReturn(contextArg(cc), Str.EMPTY, info) : this;
   }
 
   /**

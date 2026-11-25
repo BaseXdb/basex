@@ -173,6 +173,11 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
+  public boolean mayBeUntyped() {
+    return Checks.any(types, Type::mayBeUntyped);
+  }
+
+  @Override
   public boolean isNumberOrUntyped() {
     return Checks.all(types, Type::isNumberOrUntyped);
   }

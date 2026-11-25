@@ -29,9 +29,10 @@ public final class MapBuild extends MapMerge {
     for(Item item; (item = qc.next(input)) != null;) {
       args.set(0, item).inc();
       final Iter iter = (keys != null ? invoke(keys, args, qc) : item).atomIter(qc, info);
+      // the value is computed once per item
+      final Value v = value != null ? invoke(value, args, qc) : item;
       for(Item key; (key = qc.next(iter)) != null;) {
-        final Value old = builder.get(key);
-        final Value val = dups.merge(key, old, value != null ? invoke(value, args, qc) : item, qc);
+        final Value val = dups.merge(key, builder.get(key), v, qc);
         if(val != null) builder.put(key, val);
       }
     }

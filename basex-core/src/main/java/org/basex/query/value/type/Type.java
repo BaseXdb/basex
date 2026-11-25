@@ -321,6 +321,15 @@ public interface Type {
   }
 
   /**
+   * Checks if items of this type may atomize to untyped values.
+   * @return result of check
+   */
+  default boolean mayBeUntyped() {
+    final BasicType atomic = atomic();
+    return atomic == null || BasicType.UNTYPED_ATOMIC.instanceOf(atomic);
+  }
+
+  /**
    * Checks if items of this type are known to atomize to numbers or untyped values.
    * @return result of check
    */

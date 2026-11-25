@@ -52,10 +52,7 @@ public final class MathPow extends MathFn {
    */
   private static double power(final double base, final double exp) {
     if(base == 1) return 1;
-    if(base == -1) {
-      if(Double.isNaN(exp)) return -1;
-      if(Double.isInfinite(exp)) return 1;
-    }
+    if(base == -1 && Double.isInfinite(exp)) return 1;
     return exp == 2 ? base * base : pow(base, exp);
   }
 }

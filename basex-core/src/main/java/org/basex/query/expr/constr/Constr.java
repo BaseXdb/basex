@@ -77,6 +77,8 @@ public final class Constr {
       for(final Expr expr : exprs) {
         more = false;
         direct = expr instanceof final CNode cnode && cnode.nested;
+        // nested constructors are adopted with their node IDs: add preceding text first
+        if(direct) flushText();
         final Iter iter = expr.iter(qc);
         // atomic items are separated by spaces: reject texts that exceed the maximum size
         final long is = iter.size();
@@ -85,11 +87,18 @@ public final class Constr {
         }
         for(Item item; (item = qc.next(iter)) != null && add(item, qnames););
       }
-      builder.text(qc.shared.token(text.toArray()));
+      flushText();
       return this;
     } finally {
       ns.size(size);
     }
+  }
+
+  /**
+   * Adds a text node for the cached text.
+   */
+  private void flushText() {
+    if(!text.isEmpty()) builder.text(qc.shared.token(text.next()));
   }
 
   /**
@@ -168,8 +177,7 @@ public final class Constr {
       } else {
         // type: element/comment/processing instruction node
 
-        // add text node
-        builder.text(qc.shared.token(text.next()));
+        flushText();
         // result will only be serialized: share the node, leaving its parent unchanged
         if(skipCopy && !direct) {
           builder.share(node);

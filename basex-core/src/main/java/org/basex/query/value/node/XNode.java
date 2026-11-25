@@ -80,7 +80,7 @@ public abstract class XNode extends GNode {
       throws QueryException {
     Expr expr = this;
     if(mode.stringifying()) {
-      // boolean(<a>A</a>) → boolean('A')
+      // string(<a>A</a>) → string('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       // data(<a>A</a>) → data(xs:untypedAtomic('A'))

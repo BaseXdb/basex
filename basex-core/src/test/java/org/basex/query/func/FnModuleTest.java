@@ -4368,6 +4368,18 @@ return
   }
 
   /** Test method. */
+  @Test public void name() {
+    final String text = " text { 'x' }", ndt = " (" + _RANDOM_DOUBLE.args() + " ! text { . })";
+    check(Function.NAME.args(text), "", root(Str.class));
+    check(LOCAL_NAME.args(text), "", root(Str.class));
+    check(NODE_NAME.args(text), "", empty());
+    // nondeterministic arguments are still evaluated
+    check(Function.NAME.args(ndt), "", exists(VOID));
+    check(LOCAL_NAME.args(ndt), "", exists(VOID));
+    check(NODE_NAME.args(ndt), "", exists(VOID));
+  }
+
+  /** Test method. */
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
@@ -5647,6 +5659,16 @@ return
   @Test public void resolveQName() {
     final Function func = RESOLVE_QNAME;
     query("sort(<e xmlns:p='u'>{" + func.args("p:p", " <e/>") + "}</e>/text()/tokenize(.))", "p:p");
+
+    // only the in-scope namespaces of the element are considered
+    final String elem = " parse-xml('<a xmlns:p=\"u\"/>')/*";
+    query(func.args("p:x", elem) + " => namespace-uri-from-QName()", "u");
+    query(func.args("xml:x", elem) + " => namespace-uri-from-QName()",
+        "http://www.w3.org/XML/1998/namespace");
+    query("declare default element namespace 'd'; " +
+        func.args("x", elem) + " => namespace-uri-from-QName()", "");
+    error(func.args("xs:x", elem), NSDECL_X);
+    error("declare namespace q = 'q'; " + func.args("q:x", elem), NSDECL_X);
   }
 
   /** Test method. */
@@ -6685,6 +6707,12 @@ return
         empty(func), empty(TRUNK));
     check(opaque + '(' + func.args(" $o", 3, " count($o) + 1") + ')', "c\nd\ne", exists(func));
     check(opaque + '(' + func.args(" $o", " count($o)", 0) + ')', "", empty());
+
+    // zero length: nondeterministic arguments are still evaluated
+    final String start = " string-length(" + wrap("ab") + ")";
+    check(func.args(" (1 to 3)", start, 0), "", empty());
+    check(func.args(" " + _RANDOM_DOUBLE.args(), start, 0), "", exists(VOID));
+    check(func.args(" (1 to 3)", " " + _RANDOM_INTEGER.args(2) + " + 1", 0), "", exists(VOID));
 
     // merge nested calls
     check(opaque + func.args(" " + func.args(" $o", 2, 3), 2, 5), "c\nd", count(func, 1));

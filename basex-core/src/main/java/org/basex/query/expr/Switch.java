@@ -38,8 +38,13 @@ public final class Switch extends ASwitch<SwitchGroup> {
   }
 
   @Override
-  Switch rebuild() {
-    return new Switch(info, cond, groups);
+  Switch rebuild(final SwitchGroup[] grps) {
+    return new Switch(info, cond, grps);
+  }
+
+  @Override
+  SwitchGroup copy(final SwitchGroup group, final Expr expr) {
+    return group.copy(expr);
   }
 
   @Override

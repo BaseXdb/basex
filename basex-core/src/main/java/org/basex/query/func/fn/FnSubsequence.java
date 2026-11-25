@@ -352,7 +352,9 @@ public class FnSubsequence extends StandardFunc {
         // subsequence(E, $start, 1) → items-at(E, $start)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
         // subsequence(E, $start, 0) → ()
-        if(length <= 0) return Empty.VALUE;
+        if(length <= 0) {
+          return cc.voidAndReturn(List.get(cc, info, input, first), Empty.VALUE, info);
+        }
       }
     } else if(first.seqType().instanceOf(Types.INTEGER_O) &&
         second.seqType().instanceOf(Types.INTEGER_O)) {

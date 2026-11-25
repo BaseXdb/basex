@@ -116,22 +116,22 @@ public final class Try extends Single {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(try { <a>{ $x }</a> } catch * { }) → data(try { xs:untypedAtomic($x) } catch * { })
-    // only atomizations: other modes may discard errors that the catch clauses would handle
-    Expr ex = expr;
-    boolean changed = false;
-    if(mode.atomizing() || mode == Simplify.STRING_VALUE) {
-      ex = expr.simplifyFor(mode, cc);
-      changed = ex != expr;
-      for(final Catch ctch : catches) {
-        final Expr cx = ctch.expr.simplifyFor(mode, cc);
-        if(cx != ctch.expr) {
-          ctch.expr = cx;
-          ctch.optimize(cc);
-          changed = true;
-        }
+    // only item values: other modes may discard errors that the catch clauses would handle
+    if(!mode.itemValues()) return cc.simplify(this, this, mode);
+
+    final Expr ex = expr.simplifyFor(mode, cc);
+    // the original catch clauses must not be modified: callers may discard the result
+    Catch[] ctchs = catches;
+    final int cl = catches.length;
+    for(int c = 0; c < cl; c++) {
+      final Expr cx = catches[c].expr.simplifyFor(mode, cc);
+      if(cx != catches[c].expr) {
+        if(ctchs == catches) ctchs = catches.clone();
+        ctchs[c] = catches[c].copy(cx, cc);
       }
     }
-    return cc.simplify(this, changed ? new Try(info, ex, fnlly, catches).optimize(cc) : this, mode);
+    return cc.simplify(this, ex != expr || ctchs != catches ?
+      new Try(info, ex, fnlly, ctchs).optimize(cc) : this, mode);
   }
 
   @Override

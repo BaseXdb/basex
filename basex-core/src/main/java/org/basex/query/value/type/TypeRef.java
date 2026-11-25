@@ -173,6 +173,11 @@ public final class TypeRef implements Type {
   }
 
   @Override
+  public boolean mayBeUntyped() {
+    return deref().mayBeUntyped();
+  }
+
+  @Override
   public boolean isNumberOrUntyped() {
     return deref().isNumberOrUntyped();
   }

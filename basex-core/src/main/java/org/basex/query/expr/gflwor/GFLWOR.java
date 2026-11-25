@@ -225,17 +225,25 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // if order is irrelevant: drop order-by clauses, but keep nondeterministic keys
+    // if order is irrelevant: drop order-by clauses not observed by later clauses or return
     // count(for $x in E order by $x/@id return $x) → count(for $x in E return $x)
-    final Checks<Clause> order = clause -> clause instanceof OrderBy && !clause.has(Flag.NDT);
-    final boolean unordered = mode.unordered() && Checks.any(clauses, order);
+    ArrayList<Clause> cls = clauses;
+    final int first = mode.unordered() ? Checks.index(clauses, OrderBy.class::isInstance) : -1;
+    if(first != -1 && !rtrn.has(Flag.NDT)) {
+      for(int c = clauses.size() - 1; c >= first; c--) {
+        final Clause clause = clauses.get(c);
+        if(clause instanceof Count || clause instanceof While || clause instanceof GroupBy ||
+            clause.has(Flag.NDT)) break;
+        if(clause instanceof OrderBy) {
+          if(cls == clauses) cls = new ArrayList<>(clauses);
+          cls.remove(c);
+        }
+      }
+    }
 
     // data(for $x in $s return <a>{ $x }</a>) → data(for $x in $s return xs:untypedAtomic($x))
     final Expr rt = mode.conditional() ? rtrn : rtrn.simplifyFor(mode, cc);
-    if(!unordered && rt == rtrn) return cc.simplify(this, this, mode);
-
-    final ArrayList<Clause> cls = new ArrayList<>(clauses);
-    if(unordered) cls.removeIf(order::ok);
+    if(cls == clauses && rt == rtrn) return cc.simplify(this, this, mode);
     return cc.simplify(this, new GFLWOR(info, cls, rt).optimize(cc), mode);
   }
 

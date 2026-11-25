@@ -154,14 +154,15 @@ public final class SwitchGroup extends Arr {
     return exprs[0];
   }
 
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // varying behavior: return null if return expression has changed
-    final Expr rtrn = rtrn();
-    exprs[0] = rtrn.simplifyFor(mode, cc);
-    if(rtrn == exprs[0]) return this;
-    adoptType(exprs[0]);
-    return null;
+  /**
+   * Creates a copy of this group with a new return expression.
+   * @param rtrn return expression
+   * @return new group
+   */
+  SwitchGroup copy(final Expr rtrn) {
+    final Expr[] ex = exprs.clone();
+    ex[0] = rtrn;
+    return (SwitchGroup) new SwitchGroup(info, ex).adoptType(rtrn);
   }
 
   @Override

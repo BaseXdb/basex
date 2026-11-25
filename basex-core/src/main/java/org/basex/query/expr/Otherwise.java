@@ -116,11 +116,14 @@ public final class Otherwise extends Arr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(<a>{ $x }</a> otherwise <b/>) → data(xs:untypedAtomic($x) otherwise <b/>)
     // EBV: all but the last operand must stay, as their emptiness selects the result
+    // atomization: wrapped values may change emptiness: data(data([]) otherwise 1)
     final int el = exprs.length;
     Expr[] tmp = null;
     for(int e = mode.conditional() ? el - 1 : 0; e < el; e++) {
+      final boolean values = e < el - 1 && mode.itemValues();
+      if(values && exprs[e].seqType().mayBeWrapped()) continue;
       final Expr expr = exprs[e].simplifyFor(mode, cc);
-      if(expr != exprs[e]) {
+      if(expr != exprs[e] && !(values && expr.seqType().mayBeWrapped())) {
         if(tmp == null) tmp = exprs.clone();
         tmp[e] = expr;
       }

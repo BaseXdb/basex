@@ -3219,4 +3219,44 @@ public final class RewritingsTest extends SandboxTest {
     query("declare %basex:inline(0) function f($x as xs:numeric) "
         + "{ ($x * xs:float(1)) instance of xs:float }; f(1)", true);
   }
+
+  /** Simplifications must preserve order-dependent clauses and the emptiness of operands. */
+  @Test public void simplifyFor() {
+    // order by: order is observed by subsequent count, while and group-by clauses
+    final String ints = "declare %%basex:inline(0) function f($n as xs:integer*) { %s }; "
+        + "f((3, 1, 2, 4))";
+    query(String.format(ints, "min(for $x in $n, $y in $n order by $x * 10 + $y "
+        + "count $c where $c = 1 return $x * 10 + $y)"), 11);
+    query(String.format(ints, "exists(for $x in $n, $y in $n order by $x * 10 + $y "
+        + "count $c where $c = 1 and $x = 1 return $x)"), true);
+    query(String.format(ints, "count(for $x in $n, $y in $n order by $x + $y "
+        + "while $x + $y < 3 return $x)"), 1);
+    query(String.format(ints, "min(for $x in $n, $y in $n "
+        + "order by $x + $y descending group by $k := ($x + $y) mod 2 "
+        + "return head($x) + head($y))"), 7);
+    check(String.format(ints, "count(for $x in $n, $y in $n order by $x + $y return $x)"),
+        16, empty(OrderBy.class));
+
+    // otherwise: atomization of wrapped values may change emptiness
+    final String otherwise = "declare %%basex:inline(0) function f($a as item()*, "
+        + "$b as xs:boolean) { %s }; f(([], 'x'), true())";
+    query(String.format(otherwise, "count(data(data($a[1]) otherwise 2))"), 1);
+    query(String.format(otherwise, "string-join(data($a[1]) otherwise 3)"), 3);
+    query(String.format(otherwise, "count(data((switch($b) case true() return [ $a[3] ] "
+        + "default return ()) otherwise 1))"), 0);
+    query(String.format(otherwise, "count(data((typeswitch($b) case xs:boolean return "
+        + "[ $a[3] ] default return ()) otherwise 1))"), 0);
+    query(String.format(otherwise, "count(data((try { error() } catch * { [ $a[3] ] }) "
+        + "otherwise 1))"), 0);
+
+    // value comparisons: untyped operands must not be cast to the type of the other operand
+    error(String.format(ints, "(<a x='1'/>, <a x='2'/>)[@x eq $n[2]]"), CMPTYPES_X_X_X_X);
+    error(String.format(ints, "if(<a x='1'/>/@x eq $n[2]) then 1 else 2"), CMPTYPES_X_X_X_X);
+    error(String.format(ints, "xs:untypedAtomic('3') eq count($n)"), CMPTYPES_X_X_X_X);
+    check(String.format(ints, "(<a x='1'/>, <a x='2'/>)[@x eq string($n[2])]"),
+        "<a x=\"1\"/>", empty(CmpV.class));
+
+    // positional predicates: division by zero must be raised
+    error(String.format(ints, "$n[last() div 0]"), DIVZERO_X);
+  }
 }

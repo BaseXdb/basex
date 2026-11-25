@@ -27,7 +27,8 @@ public final class FnResolveQName extends StandardFunc {
 
     final byte[] prefix = Token.prefix(value);
     byte[] uri = element.uri(prefix);
-    if(uri == null) uri = qc.ns.resolve(prefix, sc());
+    // the xml prefix is implicitly bound on every element
+    if(uri == null && Token.eq(prefix, Token.XML)) uri = XMLToken.XML_URI;
     if(uri == null) throw NSDECL_X.get(info, prefix);
     return qc.shared.qName(value, uri);
   }

@@ -81,18 +81,33 @@ public abstract class ASwitch<G extends ParseExpr> extends ParseExpr {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    boolean changed = false;
-    for(final G group : groups) {
-      changed |= group.simplifyFor(mode, cc) == null;
+    // the original groups must not be modified: callers may discard the result
+    G[] grps = groups;
+    final int gl = groups.length;
+    for(int g = 0; g < gl; g++) {
+      final Expr branch = branch(groups[g]), ex = branch.simplifyFor(mode, cc);
+      if(ex != branch) {
+        if(grps == groups) grps = groups.clone();
+        grps[g] = copy(groups[g], ex);
+      }
     }
-    return changed ? rebuild().optimize(cc) : super.simplifyFor(mode, cc);
+    return grps != groups ? rebuild(grps).optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   /**
-   * Creates a new expression with the current condition and groups.
+   * Creates a new expression with the current condition and the specified groups.
+   * @param grps groups
    * @return new expression
    */
-  abstract ASwitch<G> rebuild();
+  abstract ASwitch<G> rebuild(G[] grps);
+
+  /**
+   * Creates a copy of a group with a new return expression.
+   * @param group group
+   * @param expr return expression
+   * @return new group
+   */
+  abstract G copy(G group, Expr expr);
 
   @Override
   public final boolean vacuous() {

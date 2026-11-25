@@ -146,6 +146,14 @@ public final class CompileContext {
     }
 
     /**
+     * Indicates if items are replaced by their atomized or string values.
+     * @return result of check
+     */
+    public boolean itemValues() {
+      return atomizing() || stringifying();
+    }
+
+    /**
      * Indicates if the value is converted to a string.
      * @return result of check
      */

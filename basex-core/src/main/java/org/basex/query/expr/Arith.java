@@ -138,7 +138,9 @@ public final class Arith extends Arr {
       // E[last() + 1] → E[false()]
       final double d = num.dbl();
       if(calc == Calc.ADD && d > 0 || calc == Calc.SUBTRACT && d < 0 ||
-        calc == Calc.MULTIPLY && d > 1 || calc == Calc.DIVIDE && d < 1) expr = Bln.FALSE;
+        calc == Calc.MULTIPLY && d > 1 || calc == Calc.DIVIDE && d < 1 && d != 0) {
+        expr = Bln.FALSE;
+      }
     }
     return cc.simplify(this, expr, mode);
   }

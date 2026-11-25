@@ -63,6 +63,16 @@ public final class Catch extends Single {
     return (Catch) adoptType(expr);
   }
 
+  /**
+   * Creates a copy of this clause with a new expression.
+   * @param ex expression
+   * @param cc compilation context
+   * @return new clause
+   */
+  Catch copy(final Expr ex, final CompileContext cc) {
+    return new Catch(info, ex, vars, tests).optimize(cc);
+  }
+
   @Override
   public void markTailCalls(final CompileContext cc) {
     expr.markTailCalls(cc);

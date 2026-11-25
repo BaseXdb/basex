@@ -86,7 +86,12 @@ public final class CmpV extends Cmp {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Occ occ = single ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     final Predicate<SeqType> p = st -> st.atomOcc().instanceOf(occ);
-    return p.test(st1) && p.test(st2) ? new CmpG(info, expr1, expr2, op).optimize(cc) : this;
+    if(!p.test(st1) || !p.test(st2)) return this;
+    // untyped values are cast to strings, or to the type of the other operand: @x eq 1
+    final Type t1 = st1.atomType(), t2 = st2.atomType();
+    if(!(t1.isStringOrUntyped() && t2.isStringOrUntyped()) &&
+        (t1.mayBeUntyped() || t2.mayBeUntyped())) return this;
+    return new CmpG(info, expr1, expr2, op).optimize(cc);
   }
 
   @Override

@@ -31,8 +31,13 @@ public final class Typeswitch extends ASwitch<TypeswitchGroup> {
   }
 
   @Override
-  Typeswitch rebuild() {
-    return new Typeswitch(info, cond, groups);
+  Typeswitch rebuild(final TypeswitchGroup[] grps) {
+    return new Typeswitch(info, cond, grps);
+  }
+
+  @Override
+  TypeswitchGroup copy(final TypeswitchGroup group, final Expr expr) {
+    return group.copy(expr);
   }
 
   @Override

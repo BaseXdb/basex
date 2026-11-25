@@ -59,6 +59,11 @@ public final class MathModuleTest extends SandboxTest {
     query(func.args(func.args(wrap(1.1), 3), 2), "1.771561000000001");
     check(func.args(func.args(wrap(-1), 2), 0.5), 1, count(func, 2));
     query(func.args(func.args(wrap(-1), 0.5), 2), "NaN");
+
+    // IEEE 754: only a base of +1 ignores a NaN exponent
+    query(func.args(wrap(1), " xs:double('NaN')"), 1);
+    query(func.args(wrap(-1), " xs:double('NaN')"), "NaN");
+    query(func.args(wrap(-1), " xs:double('INF')"), 1);
   }
 
   /** Test method. */

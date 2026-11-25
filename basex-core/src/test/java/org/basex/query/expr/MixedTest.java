@@ -562,6 +562,14 @@ public final class MixedTest extends SandboxTest {
     error("'&#x110000;'", INVCHARREF_X);
   }
 
+  /** Texts preceding nested direct constructors precede them in document order. */
+  @Test public void constructedTextOrder() {
+    query("let $c := <a>0<b>B</b></a> return (($c//text())[2] | ($c//text())[1]) ! string()",
+        "0\nB");
+    query("let $c := <a>0<b>B</b>1<!--C--></a> "
+        + "return innermost($c/descendant-or-self::node()) ! string()", "0\nB\n1\nC");
+  }
+
   /**
    * Tests the data structure of an expression before and after shrinking it.
    * @param query query

@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -245,14 +244,13 @@ public final class TypeswitchGroup extends Single {
     return expr.exprSize();
   }
 
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // varying behavior: return null if return expression has changed
-    final Expr rtrn = expr;
-    expr = rtrn.simplifyFor(mode, cc);
-    if(rtrn == expr) return this;
-    adoptType(expr);
-    return null;
+  /**
+   * Creates a copy of this group with a new return expression.
+   * @param rtrn return expression
+   * @return new group
+   */
+  TypeswitchGroup copy(final Expr rtrn) {
+    return (TypeswitchGroup) new TypeswitchGroup(info, var, seqTypes, rtrn).adoptType(rtrn);
   }
 
   @Override

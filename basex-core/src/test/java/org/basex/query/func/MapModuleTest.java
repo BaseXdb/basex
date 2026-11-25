@@ -27,6 +27,13 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void build() {
     final Function func = _MAP_BUILD;
 
+    // the value function is called once per item (also if no key is returned)
+    query("let $m := " + func.args(1, " fn { 'a', 'b', 'c' }", " fn { <x/> }") +
+        " return $m?a is $m?c", true);
+    query(func.args(" (1, 2)", " fn { 'a', 'b', . }", " fn { random:double() }",
+        " { 'duplicates': 'use-first' }") + " => map:items() => distinct-values() => count()", 2);
+    error(func.args(1, " fn { () }", " fn { error() }"), FUNERR1);
+
     query(func.args(" ()", " boolean#1"), "{}");
     check(func.args(" (1 to 3)[. > 1]", " (string#1, fn($i) { string($i) }) => items-at(" +
         _RANDOM_INTEGER.args(2) + " + 1)"), "{\"2\":2,\"3\":3}",
