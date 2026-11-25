@@ -49,8 +49,9 @@ public final class FnHash extends StandardFunc {
       throws QueryException {
 
     final String alg = algorithm != null ? algorithm.trim().toUpperCase(Locale.ENGLISH) : "MD5";
-    if(alg.equals("CRC-32")) {
-      final CRC32 crc = new CRC32();
+    final boolean crc32 = alg.equals("CRC-32");
+    if(crc32 || alg.equals("CRC-32C")) {
+      final Checksum crc = crc32 ? new CRC32() : new CRC32C();
       crc.update(toBytes(value, arg(0)));
       final byte[] result = new byte[4];
       for(int i = result.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
@@ -66,7 +67,7 @@ public final class FnHash extends StandardFunc {
       md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
       final ArrayList<String> algs = new ArrayList<>(Security.getAlgorithms("MessageDigest"));
-      Collections.addAll(algs, "CRC-32", "BLAKE2B", "BLAKE3");
+      Collections.addAll(algs, "CRC-32", "CRC-32C", "BLAKE2B", "BLAKE3");
       final String similar = Levenshtein.similar(Token.token(alg), algs.toArray(String[]::new));
       throw HASH_ALGORITHM_X.get(info, similar("'" + algorithm + "'", similar)).cause(ex);
     }

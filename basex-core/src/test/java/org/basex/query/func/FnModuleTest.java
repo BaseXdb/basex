@@ -2842,6 +2842,9 @@ public final class FnModuleTest extends SandboxTest {
     query("string( " + func.args("", "CRC-32") + ')', "00000000");
     query("string( " + func.args("BaseX", "CRC-32") + ')', "4C06FC7F");
     query("string( " + func.args("BaseX", "CRC-32", " {}") + ')', "4C06FC7F");
+    // check value from RFC 3720
+    query("string( " + func.args("", "CRC-32C") + ')', "00000000");
+    query("string( " + func.args("123456789", "crc-32c") + ')', "E3069283");
 
     query("string( " + func.args("X", "BLAKE3") + ')',
         "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
