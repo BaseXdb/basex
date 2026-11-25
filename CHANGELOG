@@ -1,3 +1,26 @@
+VERSION 13.1 (November 25, 2026) ---------------------------------------
+
+  XQUERY
+  - new Bit Module; fn:hash: CRC-32C; admin:close-sessions
+  - Mail Module: Jakarta Mail; SFTP Module: new functions
+  - switch, typeswitch: default is now optional
+  - Unicode scripts in regex functions
+
+  SECURITY
+  - signatures, key generation and derivation, Argon2id passwords
+  - encryption: JWK and X.509 keys, Web Cryptography algorithms
+  - sandboxed functions; untrusted modules cannot import modules
+  - Mail: stricter TLS checks; SFTP: key-based authentication
+
+  GUI & WEB
+  - real-time compilation in the editor
+  - static servlet: precompressed .br/.gz files
+
+  PERFORMANCE
+  - sharper static types, precise types of built-in functions
+  - folds and recursive functions are unfolded into loops
+  - faster date/duration parsing and formatting
+
 VERSION 13.0 (October 30, 2026) ----------------------------------------
 
   STORAGE
