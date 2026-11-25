@@ -1040,6 +1040,9 @@ public enum Function implements AFunction {
   // Admin Module
 
   /** XQuery function. */
+  _ADMIN_CLOSE_SESSIONS(AdminCloseSessions::new, "close-sessions(target)",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), ADMIN_URI, Perm.ADMIN),
+  /** XQuery function. */
   _ADMIN_DELETE_LOGS(AdminDeleteLogs::new, "delete-logs(date)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), ADMIN_URI, Perm.ADMIN),
   /** XQuery function. */
