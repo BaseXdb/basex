@@ -208,6 +208,10 @@ public final class QueryContext extends Job implements Closeable {
    * @return list of suggestions, followed by valid input string
    */
   public StringList suggest(final String query, final Data data) {
+    if(queryParser() == MainOptions.QueryParserType.REX) {
+      return RExQuerySuggest.suggest(query, data);
+    }
+
     final QuerySuggest qs = new QuerySuggest(query, this, data);
     try {
       qs.parseMain();

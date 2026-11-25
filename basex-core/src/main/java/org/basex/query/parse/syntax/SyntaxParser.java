@@ -1,5 +1,7 @@
 package org.basex.query.parse.syntax;
 
+import java.util.*;
+
 import org.basex.query.parse.gen.XQuerySyntaxParser.*;
 import org.basex.query.parse.gen.*;
 
@@ -10,6 +12,9 @@ import org.basex.query.parse.gen.*;
  * @author Gunther Rademacher
  */
 public final class SyntaxParser {
+  /** Code point that is not part of the character set of the grammar. */
+  private static final int STOP = 0x110000;
+
   /** Private constructor. */
   private SyntaxParser() { }
 
@@ -42,6 +47,42 @@ public final class SyntaxParser {
       throw ex;
     }
     return builder.finish();
+  }
+
+  /**
+   * Checks if the generated parser accepts an input.
+   * @param input code points
+   * @param prefix also accept an input that is too short
+   * @param type sequence type, which is followed by the end of the input, or module
+   * @return result of check
+   */
+  public static boolean accepts(final int[] input, final boolean prefix, final boolean type) {
+    try {
+      final XQuerySyntaxParser parser = new XQuerySyntaxParser(input, null);
+      if(type) parser.parse_SequenceTypeEOF();
+      else parser.parse_Module();
+      return true;
+    } catch(final ParseException ex) {
+      return prefix && ex.getBegin() >= input.length;
+    }
+  }
+
+  /**
+   * Parses the start of a module, followed by a code point that stops the parser.
+   * @param input code points of the query, with normalized line endings
+   * @param length number of code points to parse
+   * @return stack of the tree builder, or {@code null} if the parser fails earlier
+   */
+  public static SyntaxStack parseStart(final int[] input, final int length) {
+    final int[] stopped = Arrays.copyOf(input, length + 1);
+    stopped[length] = STOP;
+    final TreeBuilder builder = new TreeBuilder(stopped);
+    try {
+      new XQuerySyntaxParser(stopped, builder).parse_Module();
+    } catch(final ParseException ex) {
+      if(ex.getBegin() == length) return builder.stack();
+    }
+    return null;
   }
 
   /**

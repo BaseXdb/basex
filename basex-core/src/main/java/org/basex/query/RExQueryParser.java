@@ -472,14 +472,7 @@ public final class RExQueryParser extends AQueryParser {
    * @return result of check
    */
   private boolean accepts(final int[] query, final boolean prefix) {
-    try {
-      final XQuerySyntaxParser parser = new XQuerySyntaxParser(query, null);
-      if(typeInput) parser.parse_SequenceTypeEOF();
-      else parser.parse_Module();
-      return true;
-    } catch(final ParseException ex) {
-      return prefix && ex.getBegin() >= query.length;
-    }
+    return SyntaxParser.accepts(query, prefix, typeInput);
   }
 
   /**
@@ -584,8 +577,7 @@ public final class RExQueryParser extends AQueryParser {
    * @return input information
    */
   private InputInfo info(final Node node) {
-    pos = node.begin();
-    return info();
+    return infoAt(node.begin());
   }
 
   /**
@@ -665,8 +657,7 @@ public final class RExQueryParser extends AQueryParser {
    * @return error
    */
   private QueryException error(final Node node, final QueryError error, final Object... arg) {
-    pos = node.begin();
-    return error(error, arg);
+    return error(error, info(node), arg);
   }
 
   /**
@@ -679,8 +670,7 @@ public final class RExQueryParser extends AQueryParser {
    */
   private QueryException errorAtEnd(final Node node, final QueryError error,
       final Object... arg) {
-    pos = node.end();
-    return error(error, arg);
+    return error(error, infoAt(node.end()), arg);
   }
 
   /**
@@ -2814,11 +2804,11 @@ public final class RExQueryParser extends AQueryParser {
     final int s = localVars.openScope();
     final Node[] ch = node.children();
     final int bindings = ch.length - 2;
-    Let[] fl = { };
+    final Let[] fl = new Let[bindings / 2];
     for(int c = 0; c < bindings; c += 2) {
       final Var var = newVar(ch[c], Types.XNODE_O);
       final Expr expr = single(ch[c + 1]);
-      fl = Array.add(fl, new Let(localVars.add(var), expr));
+      fl[c / 2] = new Let(localVars.add(var), expr);
     }
     final InputInfo ii = infoAt(before(ch[bindings].begin()));
     final Expr m = single(ch[bindings]);
@@ -2973,8 +2963,7 @@ public final class RExQueryParser extends AQueryParser {
           filter = f.postfixExpr();
         }
         final Expr expr = single(inner);
-        final Expr[] preds = new Expr[count];
-        for(int p = 0; p < count; p++) preds[p] = single(conditions[p]);
+        final Expr[] preds = operands(conditions);
         yield new CachedFilter(infoAfter(node), expr, preds);
       }
       case Sym.MethodCall -> methodCall((MethodCall) node);
@@ -3016,7 +3005,10 @@ public final class RExQueryParser extends AQueryParser {
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
-    final FuncBuilder fb = argumentList(node.methodArgumentList(), arg);
+    final MethodArgumentList list = node.methodArgumentList();
+    final FuncBuilder fb = new FuncBuilder(info(list));
+    fb.add(arg, null);
+    for(final Node argument : list.children()) fb.add(single(argument), null);
     final Lookup func = new Lookup(info, arg, key);
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
@@ -3275,21 +3267,6 @@ public final class RExQueryParser extends AQueryParser {
   private FuncBuilder argumentList(final PositionalArgumentList node, final Expr expr)
       throws QueryException {
     return argList(node, node.positionalArguments(), null, expr);
-  }
-
-  /**
-   * Parses the "MethodArgumentList" rule.
-   * @param node argument list
-   * @param expr first argument
-   * @return function builder
-   * @throws QueryException query exception
-   */
-  private FuncBuilder argumentList(final MethodArgumentList node, final Expr expr)
-      throws QueryException {
-    final FuncBuilder fb = new FuncBuilder(info(node));
-    fb.add(expr, null);
-    for(final Node argument : node.children()) fb.add(single(argument), null);
-    return fb;
   }
 
   /**
@@ -3729,7 +3706,7 @@ public final class RExQueryParser extends AQueryParser {
    * @throws QueryException query exception
    */
   private FTExpr ftSelection(final Node node) throws QueryException {
-    switch(node) {
+    return switch(node) {
       case final Nodes.FTSelection selection -> {
         FTExpr expr = ftSelection(selection.ftOr()), first = null;
         boolean ordered = false;
@@ -3759,17 +3736,13 @@ public final class RExQueryParser extends AQueryParser {
           // the "ordered" option is applied to the operand of the first other filter
           if(first == null && filter.sym() != Sym.ORDERED) first = expr;
         }
-        if(!ordered) return expr;
-        if(first == null) return new FTOrder(info(node), expr);
+        if(!ordered) yield expr;
+        if(first == null) yield new FTOrder(info(node), expr);
         first.exprs[0] = new FTOrder(info(node), first.exprs[0]);
-        return expr;
+        yield expr;
       }
-      case final Nodes.FTOr or -> {
-        return new FTOr(info(node), ftList(or.children()));
-      }
-      case final Nodes.FTAnd and -> {
-        return new FTAnd(info(node), ftList(and.children()));
-      }
+      case final Nodes.FTOr or -> new FTOr(info(node), ftList(or.children()));
+      case final Nodes.FTAnd and -> new FTAnd(info(node), ftList(and.children()));
       case final Nodes.FTMildNot mild -> {
         final Node[] children = mild.children();
         final FTExpr expr = ftSelection(children[0]);
@@ -3779,11 +3752,11 @@ public final class RExQueryParser extends AQueryParser {
         final InputInfo ii = infoAfter(children[children.length - 1]);
         final FTExpr not = list.length == 1 ? list[0] : new FTOr(ii, list);
         if(expr.usesExclude() || not.usesExclude()) throw error(FTMILD, ii);
-        return new FTMildNot(ii, expr, not);
+        yield new FTMildNot(ii, expr, not);
       }
       case final Nodes.FTUnaryNot not -> {
         final FTExpr expr = ftSelection(not.ftPrimaryWithOptions());
-        return new FTNot(info(node), expr);
+        yield new FTNot(info(node), expr);
       }
       case final Nodes.FTPrimaryWithOptions primary -> {
         FTExpr expr = ftSelection(primary.ftPrimary());
@@ -3804,13 +3777,11 @@ public final class RExQueryParser extends AQueryParser {
           final InputInfo ii = info(weight);
           expr = new FTWeight(ii, expr, single(weight.expr()));
         }
-        return matchOptions != null ? new FTOptions(info(node), expr, fto) : expr;
+        yield matchOptions != null ? new FTOptions(info(node), expr, fto) : expr;
       }
-      case final Nodes.FTPrimary primary -> {
-        return ftPrimary(primary);
-      }
+      case final Nodes.FTPrimary primary -> ftPrimary(primary);
       default -> throw new IllegalStateException("Unexpected node: " + node.sym());
-    }
+    };
   }
 
   /**

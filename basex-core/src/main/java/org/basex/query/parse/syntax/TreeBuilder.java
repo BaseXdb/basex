@@ -10,27 +10,29 @@ import org.basex.query.parse.gen.XQuerySyntaxParser.*;
  * Builds the syntax tree from the bottom-up events of the generated parser, as defined by
  * {@link FoldPolicy}.
  *
+ * <p>Each stack entry stands for one reported symbol, or for several: adjacent content characters
+ * are merged into the entry of the first one, which then has a weight greater than one. The child
+ * counts of the events refer to reported symbols, so they are resolved by adding up the weights of
+ * the entries. The reductions of merged characters leave the tree unchanged and are skipped. The
+ * nodes of the nonterminals are created by {@link NodeFactory}. The tree is shaped as follows:</p>
+ * <ul>
+ *   <li>Whitespace and the end marker are dropped, and delimiters are skipped. Their entries are
+ *     placeholders, so that the child counts of the events remain valid.</li>
+ *   <li>A nonterminal whose children are all dropped vanishes. If some were skipped delimiters,
+ *     the node stays without children, as for {@code ()}, unless the nonterminal is listed in
+ *     {@link FoldPolicy#VANISH}.</li>
+ *   <li>A nonterminal that is listed in {@code NodeFactory.FOLDS} is replaced by its only child.
+ *     This applies to the nonterminals of {@link FoldPolicy#NAMES}, and to all that always have
+ *     exactly one child.</li>
+ *   <li>{@code NCName}, {@code QName} and {@code UnreservedFunctionQName} are wrappers around a
+ *     single token. They are collapsed into a terminal named {@code NCName} or
+ *     {@code QName}.</li>
+ * </ul>
+ *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 final class TreeBuilder implements BottomUpEventHandler {
-  // Each stack entry stands for one reported symbol, or for several: adjacent content characters
-  // are merged into the entry of the first one, which then has a weight greater than one. The
-  // child counts of the events refer to reported symbols, so they are resolved by adding up the
-  // weights of the entries. The reductions of merged characters leave the tree unchanged and are
-  // skipped. The nodes of the nonterminals are created by NodeFactory. The tree is shaped as
-  // follows:
-  // - Whitespace and the end marker are dropped, and delimiters are skipped. Their entries are
-  //   placeholders, so that the child counts of the events remain valid.
-  // - A nonterminal whose children are all dropped vanishes. If some were skipped delimiters, the
-  //   node stays without children, as for (), unless the nonterminal is listed in
-  //   FoldPolicy.VANISH.
-  // - A nonterminal that is listed in NodeFactory.FOLDS is replaced by its only child. This
-  //   applies to the nonterminals of FoldPolicy.NAMES, and to all that always have exactly one
-  //   child.
-  // - NCName, QName and UnreservedFunctionQName are wrappers around a single token. They are
-  //   collapsed into a terminal named NCName or QName.
-
   /** Terminals that are merged if they are adjacent. */
   private static final BitSet MERGE = Sym.set(
       Sym.ELEMENT_CONTENT_CHAR, Sym.QUOT_ATTR_CONTENT_CHAR, Sym.APOS_ATTR_CONTENT_CHAR);
@@ -167,32 +169,27 @@ final class TreeBuilder implements BottomUpEventHandler {
       return;
     }
     pending = 0;
-    // fast path: a node that is replaced by its only child, which is retained as is
-    if(count == 1 && top > 0 && weights[top - 1] == 1) {
-      final int s = Sym.ofNonterminal(id);
-      final int k = s == Sym.UnreservedFunctionEQName ? Sym.EQName : s;
-      if(NONTERMINALS[k] == FOLD && PARENT_DELIMITERS[k] == null && collapsed(k) == -1) {
-        final Node node = nodes[top - 1];
-        if(!(node instanceof Marker || node instanceof ListAcc)) {
-          syms[top - 1] = k;
-          return;
-        }
-      }
-    }
-    int from = top;
-    for(int remaining = count; remaining > 0;) {
-      if(from == 0) {
-        throw new IllegalStateException("Too few symbols for " +
-            Sym.symbol(Sym.ofNonterminal(id)) + ".");
-      }
-      remaining -= weights[--from];
-    }
-    final int entries = top - from;
     // UnreservedFunctionEQName is a technical variant of EQName
     final int sym = Sym.ofNonterminal(id);
     final int kind = sym == Sym.UnreservedFunctionEQName ? Sym.EQName : sym;
     final byte flags = NONTERMINALS[kind];
     final BitSet delimiters = PARENT_DELIMITERS[kind];
+    final int terminal = collapsed(kind);
+    // fast path: a node that is replaced by its only child, which is retained as is
+    if(count == 1 && top > 0 && weights[top - 1] == 1 && flags == FOLD && delimiters == null &&
+        terminal == -1) {
+      final Node node = nodes[top - 1];
+      if(!(node instanceof Marker || node instanceof ListAcc)) {
+        syms[top - 1] = kind;
+        return;
+      }
+    }
+    int from = top;
+    for(int remaining = count; remaining > 0;) {
+      if(from == 0) throw new IllegalStateException("Too few symbols for " + Sym.symbol(sym) + ".");
+      remaining -= weights[--from];
+    }
+    final int entries = top - from;
     final boolean list = (flags & LIST) != 0;
     int retained = 0;
     Node only = null;
@@ -209,11 +206,10 @@ final class TreeBuilder implements BottomUpEventHandler {
       }
     }
     top = from;
+    final Node result;
     if(entries > 0 && retained == 0 && (!skipped || (flags & REMOVE) != 0)) {
-      push(skipped ? Marker.SKIPPED : Marker.DROPPED, kind);
-      return;
-    }
-    if(list) {
+      result = skipped ? Marker.SKIPPED : Marker.DROPPED;
+    } else if(list) {
       // a list is extended by each reduction
       ListAcc acc = null;
       for(int i = from; i < from + entries; i++) {
@@ -228,22 +224,35 @@ final class TreeBuilder implements BottomUpEventHandler {
         final Node node = nodes[i];
         if(node != acc && !(node instanceof Marker)) acc.add(node, end);
       }
-      push(acc, kind);
-      return;
-    }
-    final int terminal = collapsed(kind);
-    if(retained == 1 && terminal != -1 && only instanceof final Terminal t &&
+      result = acc;
+    } else if(retained == 1 && terminal != -1 && only instanceof final Terminal t &&
         t.begin == begin && t.end == end) {
       // the child becomes a terminal named after its parent
-      push(new Terminal(terminal, begin, end), kind);
+      result = new Terminal(terminal, begin, end);
     } else if(retained == 1 && (flags & FOLD) != 0) {
-      push(only, kind);
+      result = only;
     } else {
-      final Node node = NodeFactory.create(kind, begin, end, nodes, syms, from, from + entries);
+      result = NodeFactory.create(kind, begin, end, nodes, syms, from, from + entries);
       if(kind == Sym.DirElemConstructor && mismatch == null &&
-          node instanceof final Nodes.DirElemConstructor elem && !sameTags(elem)) mismatch = elem;
-      push(node, kind);
+          result instanceof final Nodes.DirElemConstructor elem && !sameTags(elem)) mismatch = elem;
     }
+    push(result, kind);
+  }
+
+  /**
+   * Returns the current stack, without dropped whitespace.
+   * @return copy of the stack
+   */
+  SyntaxStack stack() {
+    final Node[] stackNodes = new Node[top];
+    final int[] stackSyms = new int[top];
+    int size = 0;
+    for(int i = 0; i < top; i++) {
+      if(nodes[i] == Marker.DROPPED) continue;
+      stackNodes[size] = nodes[i];
+      stackSyms[size++] = syms[i];
+    }
+    return new SyntaxStack(Arrays.copyOf(stackNodes, size), Arrays.copyOf(stackSyms, size));
   }
 
   /**
@@ -261,13 +270,7 @@ final class TreeBuilder implements BottomUpEventHandler {
    */
   private boolean sameTags(final Nodes.DirElemConstructor elem) {
     final Terminal start = elem.qName(), end = elem.qName2();
-    if(end == null) return true;
-    final int length = start.end - start.begin;
-    if(end.end - end.begin != length) return false;
-    for(int i = 0; i < length; i++) {
-      if(input[start.begin + i] != input[end.begin + i]) return false;
-    }
-    return true;
+    return end == null || Arrays.equals(input, start.begin, start.end, input, end.begin, end.end);
   }
 
   /**
