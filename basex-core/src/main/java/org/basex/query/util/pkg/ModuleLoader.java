@@ -234,6 +234,20 @@ public final class ModuleLoader {
   }
 
   /**
+   * Checks if the specified class was loaded by a class loader that is shared by all queries.
+   * @param clz class
+   * @return result of check
+   */
+  public static boolean global(final Class<?> clz) {
+    final ClassLoader cl = clz.getClassLoader();
+    if(cl == null) return true;
+    for(ClassLoader l = ModuleLoader.class.getClassLoader(); l != null; l = l.getParent()) {
+      if(l == cl) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns a reference to the specified class without initializing it.
    * @param name fully qualified class name
    * @return found class

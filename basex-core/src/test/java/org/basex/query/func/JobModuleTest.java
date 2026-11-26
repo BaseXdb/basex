@@ -607,9 +607,16 @@ public final class JobModuleTest extends SandboxTest {
     // dependencies on the calling query
     error(func.args(" fn() { . }"), BASEX_EVAL_X_X);
     error(func.args(" fn() { position() }"), BASEX_EVAL_X_X);
-    error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
+    final String module =
+        "import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; ";
+    error(module + "declare variable $v := qm:functionNS(); " + func.args(" fn() { $v }"),
         BASEX_EVAL_X_X);
-    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_EVAL_X_X);
+    error(module + func.args(" fn() { qm:functionNS() }"), BASEX_EVAL_X_X);
+    // deterministic calls are pre-evaluated
+    query(module + "declare variable $v := qm:convenient(1); " + func.args(" fn() { $v }"),
+        "Banana");
+    // Java classes of shared class loaders can be called
+    query(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), 1);
     // dependency in a function supplied as argument
     error(func.args(" fn($f) { $f() }", " [ fn() { . } ]"), BASEX_EVAL_X_X);
     // main-memory node in an evaluated static variable

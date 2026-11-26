@@ -9,6 +9,7 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -86,6 +87,11 @@ abstract class DynJavaCall extends JavaCall {
    */
   final QueryException instanceExpected(final Value value, final Exception ex) {
     return JAVANOINSTANCE_X_X.get(info, className(clazz), argType(value)).cause(ex);
+  }
+
+  @Override
+  public final boolean transferable() {
+    return ModuleLoader.global(clazz);
   }
 
   @Override

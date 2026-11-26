@@ -86,6 +86,14 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
+   * Indicates if this call can be evaluated by another query.
+   * @return result of check
+   */
+  public boolean transferable() {
+    return false;
+  }
+
+  /**
    * Returns the result of the evaluated Java function.
    * @param qc query context
    * @param wrap wrap options

@@ -157,7 +157,7 @@ public final class TransferVisitor extends ASTVisitor {
 
   @Override
   public boolean javaCall(final JavaCall call) {
-    return reject("Java code");
+    return call.transferable() || reject("Java code");
   }
 
   /**

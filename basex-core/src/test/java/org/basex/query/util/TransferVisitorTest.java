@@ -16,6 +16,10 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class TransferVisitorTest extends SandboxTest {
+  /** Import of a Java module. */
+  private static final String MODULE =
+      "import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; ";
+
   /** Constant function body. */
   @Test public void constant() {
     assertNull(dependency("fn() { 1 }"));
@@ -59,8 +63,8 @@ public final class TransferVisitorTest extends SandboxTest {
   /** Reference to a static variable: the declaration is visited. */
   @Test public void staticVariable() {
     assertNull(dependency("declare variable $v := random:integer(); fn() { $v }"));
-    assertEquals("Java code in static variable $v",
-        dependency("declare variable $v := Q{java:java.lang.Math}abs(-1); fn() { $v }"));
+    assertEquals("Java code in static variable $v", dependency(MODULE
+        + "declare variable $v := qm:convenient(1); fn() { $v }"));
   }
 
   /** Reference to a static variable that has already been evaluated. */
@@ -80,9 +84,23 @@ public final class TransferVisitorTest extends SandboxTest {
     assertEquals("context value", dependency("fn() { . }"));
   }
 
-  /** Call of Java code. */
+  /** Call of Java code from a shared class loader. */
   @Test public void javaCall() {
-    assertEquals("Java code", dependency("fn() { Q{java:java.lang.Math}abs(-1) }"));
+    assertNull(dependency("fn() { Q{java:java.lang.Math}abs(-1) }"));
+    assertNull(dependency("Q{java:java.lang.Math}abs#1"));
+    assertNull(dependency("fn() { Q{java:java.util.ArrayList}new() }"));
+    assertNull(dependency("fn() { Q{java:org.basex.util.Strings}uri2path('a') }"));
+  }
+
+  /** Call of an imported Java module. */
+  @Test public void javaModule() {
+    assertEquals("Java code", dependency(MODULE + "fn() { qm:convenient(1) }"));
+  }
+
+  /** Captured Java object. */
+  @Test public void javaObject() {
+    assertEquals("Java code", dependency(
+        "let $list := Q{java:java.util.ArrayList}new() return fn() { $list }"));
   }
 
   /** Database access is resolved by the receiving context. */
