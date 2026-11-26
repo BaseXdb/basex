@@ -24,6 +24,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item area(final GNode geometry) throws QueryException {
     return call(GeoArea::new, geometry);
   }
@@ -35,6 +37,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item asBinary(final GNode geometry) throws QueryException {
     return call(GeoAsBinary::new, geometry);
   }
@@ -46,6 +50,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item asText(final GNode geometry) throws QueryException {
     return call(GeoAsText::new, geometry);
   }
@@ -57,6 +63,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item boundary(final GNode geometry) throws QueryException {
     return call(GeoBoundary::new, geometry);
   }
@@ -69,6 +76,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item buffer(final GNode geometry, final Dbl distance) throws QueryException {
     return call(GeoBuffer::new, geometry, distance);
   }
@@ -80,6 +88,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item centroid(final GNode geometry) throws QueryException {
     return call(GeoCentroid::new, geometry);
   }
@@ -92,6 +101,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item contains(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoContains::new, geometry1, geometry2);
   }
@@ -103,6 +114,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item convexHull(final GNode geometry) throws QueryException {
     return call(GeoConvexHull::new, geometry);
   }
@@ -115,6 +127,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item crosses(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoCrosses::new, geometry1, geometry2);
   }
@@ -127,6 +141,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item difference(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoDifference::new, geometry1, geometry2);
   }
@@ -138,6 +153,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item dimension(final GNode geometry) throws QueryException {
     return call(GeoDimension::new, geometry);
   }
@@ -150,6 +167,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item disjoint(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoDisjoint::new, geometry1, geometry2);
   }
@@ -162,6 +181,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item distance(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoDistance::new, geometry1, geometry2);
   }
@@ -173,6 +194,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item endPoint(final GNode line) throws QueryException {
     return call(GeoEndPoint::new, line);
   }
@@ -184,6 +206,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item envelope(final GNode geometry) throws QueryException {
     return call(GeoEnvelope::new, geometry);
   }
@@ -196,6 +219,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item equals(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoEquals::new, geometry1, geometry2);
   }
@@ -207,6 +232,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item exteriorRing(final GNode polygon) throws QueryException {
     return call(GeoExteriorRing::new, polygon);
   }
@@ -219,6 +245,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item geometryN(final GNode geometry, final Itr n) throws QueryException {
     return call(GeoGeometryN::new, geometry, n);
   }
@@ -230,6 +257,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item geometryType(final GNode geometry) throws QueryException {
     return call(GeoGeometryType::new, geometry);
   }
@@ -242,6 +271,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item interiorRingN(final GNode polygon, final Itr n) throws QueryException {
     return call(GeoInteriorRingN::new, polygon, n);
   }
@@ -254,6 +284,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item intersection(final GNode geometry1, final GNode geometry2)
       throws QueryException {
     return call(GeoIntersection::new, geometry1, geometry2);
@@ -267,6 +298,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item intersects(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoIntersects::new, geometry1, geometry2);
   }
@@ -278,6 +311,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item isClosed(final GNode line) throws QueryException {
     return call(GeoIsClosed::new, line);
   }
@@ -289,6 +324,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item isRing(final GNode line) throws QueryException {
     return call(GeoIsRing::new, line);
   }
@@ -300,6 +337,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item isSimple(final GNode geometry) throws QueryException {
     return call(GeoIsSimple::new, geometry);
   }
@@ -311,6 +350,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item length(final GNode geometry) throws QueryException {
     return call(GeoLength::new, geometry);
   }
@@ -322,6 +363,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item numGeometries(final GNode geometry) throws QueryException {
     return call(GeoNumGeometries::new, geometry);
   }
@@ -333,6 +376,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item numInteriorRing(final GNode polygon) throws QueryException {
     return call(GeoNumInteriorRing::new, polygon);
   }
@@ -344,6 +389,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item numPoints(final GNode geometry) throws QueryException {
     return call(GeoNumPoints::new, geometry);
   }
@@ -356,6 +403,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item overlaps(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoOverlaps::new, geometry1, geometry2);
   }
@@ -368,6 +417,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item pointN(final GNode line, final Itr n) throws QueryException {
     return call(GeoPointN::new, line, n);
   }
@@ -379,6 +429,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item pointOnSurface(final GNode geometry) throws QueryException {
     return call(GeoPointOnSurface::new, geometry);
   }
@@ -392,6 +443,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item relate(final GNode geometry1, final GNode geometry2,
       final Str intersectionMatrix) throws QueryException {
     return call(GeoRelate::new, geometry1, geometry2, intersectionMatrix);
@@ -404,6 +457,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item srid(final GNode geometry) throws QueryException {
     return call(GeoSrid::new, geometry);
   }
@@ -415,6 +470,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item startPoint(final GNode line) throws QueryException {
     return call(GeoStartPoint::new, line);
   }
@@ -427,6 +483,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item symDifference(final GNode geometry1, final GNode geometry2)
       throws QueryException {
     return call(GeoSymDifference::new, geometry1, geometry2);
@@ -440,6 +497,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item touches(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoTouches::new, geometry1, geometry2);
   }
@@ -452,6 +511,7 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
   public Item union(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoUnion::new, geometry1, geometry2);
   }
@@ -464,6 +524,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item within(final GNode geometry1, final GNode geometry2) throws QueryException {
     return call(GeoWithin::new, geometry1, geometry2);
   }
@@ -475,6 +537,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item x(final GNode point) throws QueryException {
     return call(GeoX::new, point);
   }
@@ -486,6 +550,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item y(final GNode point) throws QueryException {
     return call(GeoY::new, point);
   }
@@ -497,6 +563,8 @@ public class Geo extends QueryModule {
    * @return function result
    * @throws QueryException query exception
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Item z(final GNode point) throws QueryException {
     return call(GeoZ::new, point);
   }
