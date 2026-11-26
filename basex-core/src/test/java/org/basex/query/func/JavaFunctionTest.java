@@ -323,6 +323,24 @@ public final class JavaFunctionTest extends SandboxTest {
         "  array { (65 to 69) ! xs:unsignedShort(.) }, xs:int(1), xs:int(3)" +
         ")()",
         "BCD");
+
+    // sequences and arrays of Java objects
+    final String loader = "declare namespace URL = 'java:java.net.URL'; " +
+        "declare namespace Loader = 'java:java.net.URLClassLoader'; ";
+    query(loader + "Loader:new((URL:new('file:/a/'), URL:new('file:/b/'))) " +
+        "=> Loader:getURLs() => count()", 2);
+    query(loader + "Loader:new(URL:new('file:/a/')) => Loader:getURLs() => count()", 1);
+    query(loader + "Loader:new([ URL:new('file:/a/'), URL:new('file:/b/') ]) " +
+        "=> Loader:getURLs() => count()", 2);
+    query("Q{java:java.util.Arrays}toString·int...((1, 2) ! xs:int(.))", "[1, 2]");
+    query("Q{java:java.util.Arrays}toString·java.lang.Object...(('a', 'b'))", "[a, b]");
+    error(loader + "Loader:new((URL:new('file:/a/'), 'b'))", JAVAARGS_X_X_X);
+  }
+
+  /** Numbers. */
+  @Test public void numbers() {
+    query("Q{java:java.lang.Math}abs·float(0.9)", 0.9);
+    error("Q{java:java.lang.Math}abs·float(1e300)", JAVAARGS_X_X_X);
   }
 
   /** Wrap options. */

@@ -134,7 +134,8 @@ public abstract class JavaCall extends Arr {
     for(int p = 0; p < pl; p++) {
       final Value arg = args[p + s];
       final Class<?> param = params[p];
-      final Object value = convert(arg, param, p);
+      final Object value = convert(arg, param,
+        xquery != null ? xquery[p] : Value.class.isAssignableFrom(param), true);
       if(value == INVALID) return null;
 
       // check if parameter and argument types match exactly
@@ -148,11 +149,13 @@ public abstract class JavaCall extends Arr {
    * Converts an XQuery value to a Java value.
    * @param arg argument
    * @param param expected parameter
-   * @param p parameter offset
-   * @return value or {@code null}
+   * @param xq indicates if the parameter is an XQuery type
+   * @param narrow indicates if numbers can be converted to other numeric types
+   * @return value or {@link #INVALID} (can be {@code null})
    * @throws QueryException query exception
    */
-  private Object convert(final Value arg, final Class<?> param, final int p) throws QueryException {
+  private static Object convert(final Value arg, final Class<?> param, final boolean xq,
+      final boolean narrow) throws QueryException {
     // XQuery expression: value must not be converted
     if(param == Expr.class) return arg;
 
@@ -164,35 +167,51 @@ public abstract class JavaCall extends Arr {
     final Type type = JavaMapping.type(param, true);
     if(type != null && arg.type.instanceOf(type)) return arg.toJava();
 
-    // convert empty array to target type
-    if(arg instanceof XQArray && arg.structSize() == 0 && param.isArray()) {
-      return Array.newInstance(param.getComponentType(), 0);
-    }
-
     // convert number to the target type
-    if(arg instanceof final ANum num) {
+    if(narrow && arg instanceof final ANum num) {
       final double d = num.dbl();
       if((param == byte.class  || param == Byte.class)      && (byte)  d == d) return (byte)   d;
       if((param == short.class || param == Short.class)     && (short) d == d) return (short)  d;
       if((param == char.class  || param == Character.class) && (char)  d == d) return (char)   d;
       if((param == int.class   || param == Integer.class)   && (int)   d == d) return (int)    d;
-      if((param == float.class || param == Float.class)     && (float) d == d) return (float)  d;
+      if((param == float.class || param == Float.class)     &&
+        Float.isInfinite((float) d) == Double.isInfinite(d))                   return (float)  d;
       if(param == double.class || param == Double.class)                       return d;
     }
 
     // convert to Java object
     // - if argument is a Java object wrapper, or
     // - if function parameter is not a {@link Value} instance
-    final Object value = arg instanceof XQJava ||
-      !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(param)) ? arg.toJava() : arg;
+    final Object value = arg instanceof XQJava || !xq ? arg.toJava() : arg;
 
     // return value
     // - if argument is an instance of the function parameter, or
     // - if value is null and parameter is not primitive
     if(param.isInstance(value) || value == null && !param.isPrimitive()) return value;
 
-    // give up
-    return INVALID;
+    // convert items or array members to a typed array, or give up
+    return param.isArray() ? convertArray(arg, param.getComponentType()) : INVALID;
+  }
+
+  /**
+   * Converts the items of a sequence or the members of an XQuery array to a typed Java array.
+   * @param arg argument
+   * @param component component type of the expected array
+   * @return array or {@link #INVALID}
+   * @throws QueryException query exception
+   */
+  private static Object convertArray(final Value arg, final Class<?> component)
+      throws QueryException {
+    final boolean xq = Value.class.isAssignableFrom(component);
+    final Object array = Array.newInstance(component,
+      (int) (arg instanceof final XQArray a ? a.structSize() : arg.size()));
+    int i = 0;
+    for(final Value value : arg instanceof final XQArray a ? a.members() : arg) {
+      final Object object = convert(value, component, xq, false);
+      if(object == INVALID) return INVALID;
+      Array.set(array, i++, object);
+    }
+    return array;
   }
 
   /**
