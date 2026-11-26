@@ -236,9 +236,23 @@ public abstract class JavaCall extends Arr {
    * @return exception
    */
   final QueryException executionError(final Throwable th, final Object... args) {
+    // class of the invoked code could not be linked or initialized
+    final Throwable thrown = th instanceof InvocationTargetException ? th.getCause() : th;
+    if(thrown instanceof final LinkageError le) return linkageError(le, info);
     final Throwable root = Util.rootException(th);
     return root instanceof final QueryException qe ? qe.info(info) :
       JAVAEXEC_X_X_X.get(info, root, name(), argTypes(args));
+  }
+
+  /**
+   * Returns an error for a class that could not be linked.
+   * @param error linkage error
+   * @param info input info (can be {@code null})
+   * @return exception
+   */
+  static QueryException linkageError(final LinkageError error, final InputInfo info) {
+    final String message = Objects.toString(error.getMessage(), String.valueOf(error.getCause()));
+    return JAVAINIT_X_X.get(info, Util.className(error), message).cause(error);
   }
 
   // STATIC METHODS ===============================================================================
@@ -408,7 +422,7 @@ public abstract class JavaCall extends Arr {
         } catch(final ClassNotFoundException ignore) {
           // class not found
         } catch(final LinkageError ex) {
-          throw JAVAINIT_X_X.get(info, Util.className(ex), ex);
+          throw linkageError(ex, info);
         }
 
         if(clazz == null) {
@@ -520,7 +534,7 @@ public abstract class JavaCall extends Arr {
       }
     } catch(final LinkageError ex) {
       // referenced class could not be linked (e.g. temporarily unavailable during a rebuild)
-      throw JAVAINIT_X_X.get(info, Util.className(ex), ex);
+      throw linkageError(ex, info);
     }
     return list;
   }
