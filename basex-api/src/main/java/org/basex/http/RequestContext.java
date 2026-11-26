@@ -130,10 +130,8 @@ public final class RequestContext implements RequestScope {
    */
   public XQMap queryValues() throws QueryException {
     if(values == null) {
-      final MapBuilder mb = new MapBuilder();
       final String string = state.query();
-      if(string != null) addParams(string, mb);
-      values = mb.map();
+      values = string != null ? params(Token.token(string)) : XQMap.empty();
     }
     return values;
   }
@@ -156,9 +154,7 @@ public final class RequestContext implements RequestScope {
         }
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
-        final MapBuilder mb = new MapBuilder();
-        addParams(Token.string(body().read()), mb);
-        form = mb.map();
+        form = params(body().read());
       } else {
         form = XQMap.empty();
       }
@@ -237,21 +233,22 @@ public final class RequestContext implements RequestScope {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Adds URL-decoded parameters to the specified map.
-   * @param params parameters
-   * @param mb map builder
+   * Returns a map with URL-decoded parameters.
+   * @param params URL-encoded parameters
+   * @return parameters
    * @throws QueryException query exception
    */
-  private static void addParams(final String params, final MapBuilder mb) throws QueryException {
+  private static XQMap params(final byte[] params) throws QueryException {
     final ItemObjectMap<ItemList> map = new ItemObjectMap<>();
-    for(final String param : Strings.split(params, '&')) {
-      final String[] parts = Strings.split(param, '=', 2);
-      if(parts.length == 2) {
-        final ItemList list = map.computeIfAbsent(Str.get(parts[0]), ItemList::new);
-        list.add(Atm.get(XMLToken.decodeUri(parts[1], true)));
-      }
+    for(final byte[] param : Token.split(params, new byte[] { '&' }, false)) {
+      final int eq = Token.indexOf(param, '='), end = eq == -1 ? param.length : eq;
+      final Str name = Str.get(XMLToken.decodeUri(Token.substring(param, 0, end), true));
+      final byte[] value = XMLToken.decodeUri(Token.substring(param, end + 1), true);
+      map.computeIfAbsent(name, ItemList::new).add(Atm.get(value));
     }
     // create final map
+    final MapBuilder mb = new MapBuilder();
     for(final Item key : map) mb.put(key, map.get(key).value());
+    return mb.map();
   }
 }

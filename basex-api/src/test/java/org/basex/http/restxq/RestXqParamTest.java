@@ -42,6 +42,12 @@ public final class RestXqParamTest extends RestXqTest {
     // missing assignment: default value is empty sequence
     get("0", "declare %R:path('') %R:query-param('a', '{$v}') " +
             "function m:f($v) { count($v) };", "");
+
+    // parameters without value, encoded names
+    get("2", "declare %R:path('') %R:query-param('a', '{$v}') " +
+        "function m:f($v as xs:string*) { count($v[. = '']) };", "?a&a=");
+    get("1 2", "declare %R:path('') %R:query-param('a b', '{$v}') " +
+        "function m:f($v) { string-join($v, ' ') };", "?a%20b=1&a+b=2");
   }
 
   /**
@@ -76,6 +82,9 @@ public final class RestXqParamTest extends RestXqTest {
     get("2026-09-10", "declare %R:path('') %R:query-param('a', '{$a}')" + func, "?a=2026-09-09");
     post("2026-09-10", "declare %R:path('') %R:POST %R:form-param('a', '{$a}')" + func, "",
         "a=2026-09-09", MediaType.APPLICATION_X_WWW_FORM_URLENCODED);
+    post("2", "declare %R:path('') %R:POST %R:form-param('a b', '{$a}') " +
+        "function m:f($a as xs:string*) { count($a) };", "",
+        "a+b&a%20b=", MediaType.APPLICATION_X_WWW_FORM_URLENCODED);
 
     register("declare %R:path('') %R:POST %R:form-param('a', '{$a}')" + func);
     final byte[] body = Token.token(
