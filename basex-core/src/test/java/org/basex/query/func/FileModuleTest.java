@@ -752,6 +752,13 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_READ_TEXT_LINES.args(PATH1), "hellohello");
     query(_FILE_WRITE_BINARY.args(PATH1, _FILE_READ_BINARY.args(PATH1)));
     query(_FILE_READ_TEXT_LINES.args(PATH1), "hellohello");
+
+    // leading U+FEFF is string content, not a byte order mark
+    final String hex = " string(xs:hexBinary(" + _FILE_READ_BINARY.args(PATH1) + "))";
+    query(func.args(PATH1, " char(0xFEFF) || 'x'"));
+    query(hex, "EFBBBF78");
+    query(_FILE_APPEND_TEXT.args(PATH1, " char(0xFEFF)"));
+    query(hex, "EFBBBF78EFBBBF");
   }
 
   /** Test method. */

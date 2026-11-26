@@ -9,7 +9,6 @@ import java.util.function.*;
 
 import org.basex.core.jobs.*;
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -226,8 +225,9 @@ public abstract class Item extends Value {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
+  @SuppressWarnings("unused")
   public TextInput stringInput(final InputInfo ii) throws IOException, QueryException {
-    return new TextInput(new IOContent(string(ii)));
+    return TextInput.get(string(ii));
   }
 
   @Override

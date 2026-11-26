@@ -77,6 +77,15 @@ public class TextInput extends BufferInput {
   }
 
   /**
+   * Returns a text input for an already decoded UTF-8 token.
+   * @param token token
+   * @return text input
+   */
+  public static TextInput get(final byte[] token) {
+    return new TextInput(token, new TextDecoder.UTF8());
+  }
+
+  /**
    * Reads the first bytes of the input stream to guess the text encoding.
    * @param encoding encoding (ignored if {@code null})
    * @throws IOException I/O exception
