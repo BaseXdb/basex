@@ -385,17 +385,11 @@ public final class QueryJob extends Job implements Runnable {
             qp = null;
           }
 
-          // write concluding log entry
-          if(log != null) {
-            final LogType type;
-            String msg = null;
-            if(result.exception != null) {
-              type = LogType.ERROR;
-              msg = result.exception.getMessage();
-            } else {
-              type = LogType.OK;
-            }
-            ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
+          // write concluding log entry; errors that cannot be retrieved are always logged
+          final QueryException ex = result.exception;
+          if(log != null || ex != null && !cache && notify == null) {
+            ctx.log.write(ex != null ? LogType.ERROR : LogType.OK,
+                ex != null ? ex.getMessage() : null, perf, "JOB:" + id, ctx);
           }
         } finally {
           // invalidate performance measurements

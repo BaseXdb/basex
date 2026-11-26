@@ -477,6 +477,24 @@ public final class JobModuleTest extends SandboxTest {
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
   }
 
+  /** Errors of uncached jobs are logged without the log option. */
+  @Test public void evalLogError() {
+    final String id = UUID.randomUUID().toString(), date = DateTime.DATE.format(LocalDate.now());
+    query(_JOB_EVAL.args("error(xs:QName('zz'), '" + id + "')", " ()", " { 'id': '" + id + "' }"));
+    query(_JOB_WAIT.args(id));
+    final String entries = _ADMIN_LOGS.args(date) + "[@address = 'JOB:" + id + "']";
+    assertEquals("true", waitUntil("count(" + entries + ") = 1"));
+    query("string(" + entries + "/@type)", "ERROR");
+    query("contains(" + entries + ", '" + id + "')", true);
+
+    // cached errors are not logged
+    final String cid = UUID.randomUUID().toString();
+    query(_JOB_EVAL.args("error()", " ()", " { 'id': '" + cid + "', 'cache': true() }"));
+    query(_JOB_WAIT.args(cid));
+    query("count(" + _ADMIN_LOGS.args(date) + "[@address = 'JOB:" + cid + "'])", 0);
+    error(_JOB_RESULT.args(cid), FUNERR1);
+  }
+
   /** Discarded results are not materialized, but their lazy items are loaded. */
   @Test public void evalDiscarded() {
     // a function item would be rejected when the result is materialized
