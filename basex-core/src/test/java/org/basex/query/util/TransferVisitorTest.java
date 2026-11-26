@@ -64,7 +64,7 @@ public final class TransferVisitorTest extends SandboxTest {
   @Test public void staticVariable() {
     assertNull(dependency("declare variable $v := random:integer(); fn() { $v }"));
     assertEquals("Java code in static variable $v", dependency(MODULE
-        + "declare variable $v := qm:convenient(1); fn() { $v }"));
+        + "declare variable $v := qm:functionNS(); fn() { $v }"));
   }
 
   /** Reference to a static variable that has already been evaluated. */
