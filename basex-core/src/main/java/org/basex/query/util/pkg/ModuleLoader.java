@@ -25,9 +25,9 @@ public final class ModuleLoader {
   /**
    * Parsed package.
    * @param pkg package
-   * @param modDir module directory
+   * @param deps IDs of the packages it depends on
    */
-  private record Parsed(Pkg pkg, IOFile modDir) { }
+  private record Parsed(Pkg pkg, ArrayList<String> deps) { }
 
   /** Database context. */
   private final Context context;
@@ -106,7 +106,7 @@ public final class ModuleLoader {
     // create Java class instance
     final Class<?> clz;
     try {
-      addLoader(jarUrls(context, className));
+      addLoader(jarUrls(context, className), List.of());
       clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
       if(java) throw WHICHMODCLASS_X.get(info, className).cause(ex);
@@ -285,6 +285,17 @@ public final class ModuleLoader {
   }
 
   /**
+   * Returns the directory with the extracted libraries of a jar file.
+   * @param jar jar file
+   * @return directory
+   */
+  static IOFile extDir(final IOFile jar) {
+    return new IOFile(jar.parent(), '.' + jar.name().replaceAll("(?i)\\.jar$", ""));
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
+  /**
    * Calculates jar file URLs that are relevant for class loading in the context of the specified
    * package.
    * @param pkgPath package path
@@ -293,8 +304,8 @@ public final class ModuleLoader {
    * @return list of jar file URLs (may be empty)
    * @throws QueryException query exception
    */
-  static List<String> pkgUrls(final IOFile pkgPath, final IOFile modDir, final InputInfo info)
-      throws QueryException {
+  private static List<String> pkgUrls(final IOFile pkgPath, final IOFile modDir,
+      final InputInfo info) throws QueryException {
 
     final ArrayList<String> urls = new ArrayList<>();
     // check if package contains a jar descriptor
@@ -313,7 +324,7 @@ public final class ModuleLoader {
    * @param className class name
    * @return list of jar file URLs (may be empty)
    */
-  static List<String> jarUrls(final Context context, final String className) {
+  private static List<String> jarUrls(final Context context, final String className) {
     final ArrayList<String> urls = new ArrayList<>();
     final IOFile jar = new IOFile(context.soptions.repoPath(),
         Strings.uri2path(className) + IO.JARSUFFIX);
@@ -321,20 +332,21 @@ public final class ModuleLoader {
     return urls;
   }
 
-  // PRIVATE METHODS ==============================================================================
-
   /**
    * Creates or gets a class loader for the specified URLs from the class loader cache,
    * and adds it to the list of loaders.
    * @param urls URLs
+   * @param deps loaders of the packages the module depends on
+   * @return loader, or {@code null} if no URLs were specified
    * @throws IOException I/O exception
    */
-  private void addLoader(final List<String> urls) throws IOException {
-    if(urls.isEmpty()) return;
+  private Loader addLoader(final List<String> urls, final List<Loader> deps) throws IOException {
+    if(urls.isEmpty()) return null;
     // a cached loader is registered only once
-    final Loader loader = ClassLoaderCache.acquire(urls);
+    final Loader loader = ClassLoaderCache.acquire(urls, deps);
     if(loaders.contains(loader)) loader.release();
     else loaders.add(loader);
+    return loader;
   }
 
   /**
@@ -350,23 +362,14 @@ public final class ModuleLoader {
       final QueryBiConsumer<IOFile, String> module, final InputInfo info) throws QueryException {
 
     final HashMap<String, Parsed> parsed = new HashMap<>();
+    // class loaders visible to the code of a package: its own one, or the ones of its dependencies
+    final HashMap<String, List<Loader>> visible = new HashMap<>();
     new Cycles<String>() {
       @Override
       protected Iterable<String> next(final String pkgId) throws QueryException {
         // find package in package dictionary
         final Pkg pkg = context.repo.pkgDict().get(pkgId);
         if(pkg == null) throw REPO_NOTFOUND_X.get(info, pkgId);
-        final IOFile pkgPath = context.repo.path(pkg.path());
-        final IOFile modDir = pkg.modDir(pkgPath);
-        if(loader != null) {
-          try {
-            loader.addLoader(pkgUrls(pkgPath, modDir, info));
-          } catch(final Throwable th) {
-            final Throwable t = Util.rootException(th);
-            throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
-          }
-        }
-        parsed.put(pkgId, new Parsed(pkg, modDir));
 
         // package dependencies are loaded first; only package dependencies are considered
         final ArrayList<String> deps = new ArrayList<>();
@@ -377,14 +380,29 @@ public final class ModuleLoader {
             deps.add(depId);
           }
         }
+        parsed.put(pkgId, new Parsed(pkg, deps));
         return deps;
       }
 
       @Override
       protected void finish(final String pkgId) throws QueryException {
         final Parsed p = parsed.get(pkgId);
+        final IOFile pkgPath = context.repo.path(p.pkg.path()), modDir = p.pkg.modDir(pkgPath);
+        if(loader != null) {
+          final LinkedHashSet<Loader> set = new LinkedHashSet<>();
+          for(final String dep : p.deps) set.addAll(visible.get(dep));
+          final List<Loader> deps = List.copyOf(set);
+          final Loader own;
+          try {
+            own = loader.addLoader(pkgUrls(pkgPath, modDir, info), deps);
+          } catch(final Throwable th) {
+            final Throwable t = Util.rootException(th);
+            throw MODINIT_X_X_X.get(info, p.pkg.name, t.getMessage(), Util.className(t)).cause(th);
+          }
+          visible.put(pkgId, own != null ? List.of(own) : deps);
+        }
         for(final PkgComponent comp : p.pkg.comps) {
-          module.accept(new IOFile(p.modDir, comp.file), comp.uri);
+          module.accept(new IOFile(modDir, comp.file), comp.uri);
         }
       }
 
@@ -403,7 +421,7 @@ public final class ModuleLoader {
   private static void addURL(final List<String> urls, final IOFile jar) {
     urls.add(jar.url());
     // parse files of extracted subdirectory
-    final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
+    final IOFile extDir = extDir(jar);
     if(extDir.exists()) {
       for(final IOFile file : extDir.children()) urls.add(file.url());
     }

@@ -76,6 +76,8 @@ public final class RepoManager {
       throw REPO_NOTFOUND_X.get(info, source).cause(ex);
     }
 
+    // release cached class loaders, which keep the jar files of the repository open
+    ClassLoaderCache.invalidate(repo());
     try {
       if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, source);
       final byte[] desc = new RepoArchive(content).entry(WEBDESCRIPTOR);
@@ -128,6 +130,7 @@ public final class RepoManager {
    * @throws QueryException query exception
    */
   public void delete(final String name) throws QueryException {
+    ClassLoaderCache.invalidate(repo());
     // find registered packages to be deleted
     boolean deleted = false;
     final EXPathRepo repo = context.repo;
@@ -146,10 +149,6 @@ public final class RepoManager {
 
         final boolean isExpath = pkg.type() == PkgType.EXPATH;
         final IOFile pkgFile = repo.path(pkgPath);
-        ClassLoaderCache.invalidate(isExpath
-            ? ModuleLoader.pkgUrls(pkgFile, pkg.modDir(pkgFile), info)
-            : ModuleLoader.jarUrls(context, Strings.uriToClasspath(pkg.name())));
-
         if(isExpath) {
           // check if package to be deleted participates in a dependency
           final String dep = dependency(pkg);
@@ -469,14 +468,13 @@ public final class RepoManager {
    */
   private void extractJar(final IOFile target, final String pkgPath) throws IOException {
     final IOFile repo = repo();
-    final String pkgName = target.name().replaceAll(IO.JARSUFFIX + '$', "");
     try(JarFile jarFile = new JarFile(target.file())) {
       for(final JarEntry entry : Collections.list(jarFile.entries())) {
         final String name = entry.getName();
         IOFile trg = null;
         if(name.matches("^lib/[^/]+\\.jar")) {
           // extract JARs from a zipped lib/ directory to the repository
-          trg = new IOFile(target.parent().resolve('.' + pkgName), name.replaceAll("^.*?/", ""));
+          trg = new IOFile(ModuleLoader.extDir(target), name.replaceAll("^.*?/", ""));
         } else if(name.equals(pkgPath + IO.XQMSUFFIX)) {
           // extract XQM file
           trg = new IOFile(repo, name);

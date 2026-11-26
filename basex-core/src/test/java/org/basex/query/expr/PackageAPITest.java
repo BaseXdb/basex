@@ -382,6 +382,30 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
+   * Tests the reinstallation of a JAR package whose classes have been loaded before.
+   */
+  @Test public void reinstallJar() {
+    final String query = "import module namespace j='test.GreeterCaller'; j:call('Unit Test')";
+    execute(new RepoInstall(REPO + "testJarInJar.jar", null));
+    query(query, "Hello Unit Test");
+    execute(new RepoInstall(REPO + "testJarInJar.jar", null));
+    query(query, "Hello Unit Test");
+    execute(new RepoDelete("test.GreeterCaller", null));
+  }
+
+  /**
+   * Tests a package whose jar uses classes from the jar of a package it depends on.
+   */
+  @Test public void jarDependency() {
+    execute(new RepoInstall(REPO + "jarDepB.xar", null));
+    execute(new RepoInstall(REPO + "jarDepA.xar", null));
+    query("import module namespace a='jarDepA'; a:call()", "a -> hi from b");
+    query("import module namespace b='jarDepB'; b:hi()", "hi from b");
+    execute(new RepoDelete("jarDepA", null));
+    execute(new RepoDelete("jarDepB", null));
+  }
+
+  /**
    * Tests usage of installed packages.
    * @throws Exception exception
    */

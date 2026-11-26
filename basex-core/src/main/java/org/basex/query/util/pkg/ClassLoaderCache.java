@@ -3,10 +3,12 @@ package org.basex.query.util.pkg;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -26,25 +28,28 @@ final class ClassLoaderCache {
   }
 
   /**
-   * Acquires a cache entry for a module. If the module is not cached, or if any of the files have
-   * changed, a new loader is created. Otherwise, the existing loader is returned and its reference
-   * count is incremented.
+   * Acquires a cache entry for a module, replacing it if its files or dependencies have changed.
    * @param fileUrls URLs
+   * @param deps loaders of the packages the module depends on
    * @return cache entry
    * @throws IOException I/O exception
    */
-  static Loader acquire(final List<String> fileUrls) throws IOException {
-    final List<String> keys = normalize(fileUrls);
+  static Loader acquire(final List<String> fileUrls, final List<Loader> deps) throws IOException {
+    final List<String> keys = new ArrayList<>(fileUrls);
+    keys.sort(null);
     final int n = keys.size();
     final URL[] urls = new URL[n];
-    final long[] lastModified = new long[n];
+    final long[] stamps = new long[n * 2];
 
     try {
-      int i = 0;
+      int i = 0, s = 0;
       for(final String key : keys) {
         final URI uri = new URI(key);
         if(!"file".equals(uri.getScheme())) throw Util.notExpected();
-        lastModified[i] = Files.getLastModifiedTime(Paths.get(uri)).toMillis();
+        final BasicFileAttributes attrs = Files.readAttributes(Paths.get(uri),
+            BasicFileAttributes.class);
+        stamps[s++] = attrs.lastModifiedTime().toMillis();
+        stamps[s++] = attrs.size();
         urls[i++] = uri.toURL();
       }
     } catch(final URISyntaxException | MalformedURLException ex) {
@@ -52,42 +57,89 @@ final class ClassLoaderCache {
     }
     return CACHE.compute(keys, (k, v) -> {
       if(v != null) {
-        if(Arrays.equals(v.lastModified, lastModified)) {
+        if(Arrays.equals(v.stamps, stamps) && v.loader.deps.equals(deps)) {
           v.refs.incrementAndGet();
           return v;
         }
         v.invalidate();
       }
-      return new Loader(new URLClassLoader(urls, LOADER), lastModified);
+      return new Loader(new PkgClassLoader(urls, deps), stamps);
     });
   }
 
   /**
-   * Invalidates a cache entry for the given URLs, if any.
-   * @param fileUrls URLs
+   * Invalidates all cache entries with files in the specified directory.
+   * @param dir directory
    */
-  static void invalidate(final List<String> fileUrls) {
-    final Loader loader = CACHE.remove(normalize(fileUrls));
-    if(loader != null) loader.invalidate();
+  static void invalidate(final IOFile dir) {
+    for(final List<String> key : CACHE.keySet()) {
+      if(Checks.any(key, url -> dir.contains((IOFile) IO.get(url)))) {
+        final Loader loader = CACHE.remove(key);
+        if(loader != null) loader.invalidate();
+      }
+    }
   }
 
-  /**
-   * Normalizes a list of strings by sorting them.
-   * @param strings list of strings
-   * @return normalized list
-   */
-  private static List<String> normalize(final List<String> strings) {
-    final List<String> normalized = new ArrayList<>(strings);
-    normalized.sort(String::compareTo);
-    return normalized;
+  /** Class loader that falls back to the loaders of package dependencies. */
+  private static final class PkgClassLoader extends URLClassLoader {
+    static {
+      registerAsParallelCapable();
+    }
+
+    /** Loaders of the packages this package depends on. */
+    private final List<Loader> deps;
+
+    /**
+     * Constructor.
+     * @param urls URLs
+     * @param deps loaders of the packages this package depends on
+     */
+    private PkgClassLoader(final URL[] urls, final List<Loader> deps) {
+      super(urls, LOADER);
+      this.deps = deps;
+    }
+
+    @Override
+    protected Class<?> findClass(final String name) throws ClassNotFoundException {
+      try {
+        return super.findClass(name);
+      } catch(final ClassNotFoundException ex) {
+        for(final Loader dep : deps) {
+          try {
+            return dep.loader.loadClass(name);
+          } catch(final ClassNotFoundException ignore) {
+            // try next dependency
+          }
+        }
+        throw ex;
+      }
+    }
+
+    @Override
+    public URL findResource(final String name) {
+      final URL url = super.findResource(name);
+      if(url != null) return url;
+      for(final Loader dep : deps) {
+        final URL u = dep.loader.findResource(name);
+        if(u != null) return u;
+      }
+      return null;
+    }
+
+    @Override
+    public Enumeration<URL> findResources(final String name) throws IOException {
+      final ArrayList<URL> urls = Collections.list(super.findResources(name));
+      for(final Loader dep : deps) urls.addAll(Collections.list(dep.loader.findResources(name)));
+      return Collections.enumeration(urls);
+    }
   }
 
   /** Cache entry. */
   static final class Loader {
     /** The class loader. */
-    private final URLClassLoader loader;
-    /** The time stamps collected for the URLs at loader creation time. */
-    private final long[] lastModified;
+    private final PkgClassLoader loader;
+    /** Modification times and sizes of the files, collected at loader creation time. */
+    private final long[] stamps;
     /** Number of references to this instance. */
     private final AtomicInteger refs = new AtomicInteger(1);
     /** Cached classes. */
@@ -98,11 +150,11 @@ final class ClassLoaderCache {
     /**
      * Constructor.
      * @param loader class loader
-     * @param lastModified time stamps collected for the URLs at loader creation time
+     * @param stamps modification times and sizes of the files
      */
-    private Loader(final URLClassLoader loader, final long[] lastModified) {
+    private Loader(final PkgClassLoader loader, final long[] stamps) {
       this.loader = loader;
-      this.lastModified = lastModified;
+      this.stamps = stamps;
     }
 
     /**
