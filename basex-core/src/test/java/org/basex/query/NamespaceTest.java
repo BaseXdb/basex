@@ -90,7 +90,7 @@ public final class NamespaceTest extends SandboxTest {
     query("<_:_ xmlns:_='_'>{ namespace { '' } { 'b' } }</_:_> ! name()", "_:_");
 
     query("declare namespace p = 'A'; <p:l>{ namespace p { 'B' } }</p:l> => in-scope-prefixes()",
-        "p_1\np\nxml");
+        "p\np_1\nxml");
 
     query("<e xmlns='E'/> -> namespace-uri()", "E");
     query("<a:e xmlns:a='A'/> -> namespace-uri()", "A");
@@ -564,19 +564,19 @@ public final class NamespaceTest extends SandboxTest {
     error(transform("<r a=''/>",
         "replace node $input/@a with " +
         "(attribute { QName('x', 'p:a') } {}, attribute { QName('y', 'p:b') } {})"),
-        UPNSCONFL2_X_X);
+        UPNSCONFL2_X_X_X);
     error(transform("<r/>",
         "insert node attribute { QName('x', 'p:a') } {} into $input, " +
         "insert node attribute { QName('y', 'p:b') } {} into $input"),
-        UPNSCONFL2_X_X);
+        UPNSCONFL2_X_X_X);
     // renamed element and inserted attribute
     error(transform("<r/>",
         "rename node $input as QName('w', 'p:r'), " +
         "insert node attribute { QName('u', 'p:x') } {} into $input"),
-        UPNSCONFL2_X_X);
+        UPNSCONFL2_X_X_X);
     // renamed element without namespace, inherited default namespace
     error(transform("<r xmlns='u'><a/></r>", "rename node $input/*:a as QName('', 'a')"),
-        UPNSCONFL_X_X);
+        UPNSCONFL_X_X_X);
   }
 
   /** Test query. */
@@ -806,7 +806,7 @@ public final class NamespaceTest extends SandboxTest {
       "copy $a := <a xmlns:p='A' a='v'/> " +
       "modify rename node $a/@a as QName('uri', 'p:a') " +
       "return $a",
-      UPNSCONFL_X_X);
+      UPNSCONFL_X_X_X);
   }
 
   /**
@@ -827,7 +827,7 @@ public final class NamespaceTest extends SandboxTest {
       "modify for $el in $a/descendant-or-self::element() return " +
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
-      UPNSCONFL_X_X);
+      UPNSCONFL_X_X_X);
   }
 
   /**
@@ -1181,7 +1181,7 @@ public final class NamespaceTest extends SandboxTest {
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y', 'b')," +
         "  insert node attribute c { 'a' } into $c" +
-        ") return $c", UPNSCONFL_X_X);
+        ") return $c", UPNSCONFL_X_X_X);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X', 'b')," +
         "  insert node attribute c { 'a' } into $c" +
@@ -1464,6 +1464,20 @@ public final class NamespaceTest extends SandboxTest {
         "<a xmlns='v'><b xmlns=''><c xmlns='u'/></b></a>");
     query("<a xmlns='v'><b xmlns=''><c/></b></a> update { rename node .//*:b as QName('u', 'b') }",
         "<a xmlns='v'><b xmlns='u'><c xmlns=''/></b></a>");
+  }
+
+  /** Namespace fixup in element constructors. */
+  @Test public void constructorFixup() {
+    // attributes renamed because of a prefix conflict keep their parent
+    query("string-join(element e { <a xmlns:p='u1' p:y=''/>/@*, <a xmlns:p='u2' p:y=''/>/@* }"
+        + "/@* ! count(..))", "11");
+    // namespace nodes for the xml prefix add no binding
+    query("in-scope-prefixes(element e { "
+        + "namespace xml { 'http://www.w3.org/XML/1998/namespace' } })", "xml");
+    // unprefixed attributes do not use the default namespace
+    query("declare copy-namespaces no-preserve, no-inherit; string-join(sort(in-scope-prefixes("
+        + "<w>{ parse-xml(\"<a xmlns='d' xmlns:q='q'><q:b id='1'/></a>\")//*:b }</w>/*)), ',')",
+        "q,xml");
   }
 
   /**

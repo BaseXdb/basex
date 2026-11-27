@@ -329,8 +329,7 @@ public abstract class XNode extends GNode {
     if(kind() != ELEMENT) return BasicNodeIter.EMPTY;
 
     // in-scope namespaces, sorted by prefix (see #compareNSpace)
-    final Atts atts = nsScope(null);
-    if(!atts.contains(Token.XML)) atts.add(Token.XML, QueryText.XML_URI);
+    final Atts atts = nsScopeXML(null);
     final int as = atts.size();
     final GNodeList list = new GNodeList(as);
     for(int a = 0; a < as; a++) {
@@ -360,25 +359,23 @@ public abstract class XNode extends GNode {
     final Atts ns = new Atts();
     for(XNode node = this; node != null; node = node.parent()) {
       final Atts nsp = node.namespaces();
-      if(nsp != null) {
-        for(int a = nsp.size() - 1; a >= 0; a--) {
-          final byte[] name = nsp.name(a);
-          if(!ns.contains(name)) ns.add(name, nsp.value(a));
-        }
-      }
+      if(nsp != null) ns.addMissing(nsp);
       // frozen inherited set: add it and stop ascending (constructed/no-inherit boundary)
       final Atts inherited = node.nsInherited();
-      if(inherited != null) {
-        final int is = inherited.size();
-        for(int a = 0; a < is; a++) {
-          final byte[] name = inherited.name(a);
-          if(!ns.contains(name)) ns.add(name, inherited.value(a));
-        }
-        return ns;
-      }
+      if(inherited != null) return ns.addMissing(inherited);
     }
     if(qc != null) qc.ns.inScope(ns);
     return ns;
+  }
+
+  /**
+   * Returns a copy of the in-scope namespaces, including the binding of the xml prefix.
+   * @param qc query context (can be {@code null})
+   * @return namespaces
+   */
+  public final Atts nsScopeXML(final QueryContext qc) {
+    final Atts ns = nsScope(qc);
+    return ns.contains(Token.XML) ? ns : ns.add(Token.XML, QueryText.XML_URI);
   }
 
   /**
@@ -391,12 +388,35 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Returns the namespaces whose prefixes are used by the name of the element or its attributes.
+   * @param ns namespaces
+   * @return used namespaces (the input if all are used)
+   */
+  public final Atts usedNamespaces(final Atts ns) {
+    Atts used = null;
+    final int size = ns.size();
+    for(int n = 0; n < size; n++) {
+      final byte[] prefix = ns.name(n);
+      if(usesPrefix(prefix)) {
+        if(used != null) used.add(prefix, ns.value(n));
+      } else if(used == null) {
+        // first unused namespace: copy the preceding ones
+        used = new Atts(ns);
+        used.size(n);
+      }
+    }
+    return used != null ? used : ns;
+  }
+
+  /**
    * Indicates if a prefix is used by the name of the element or one of its attributes.
    * @param prefix prefix
    * @return result of check
    */
-  public final boolean usesPrefix(final byte[] prefix) {
+  private boolean usesPrefix(final byte[] prefix) {
     if(qname().eqPrefix(prefix)) return true;
+    // unprefixed attributes are in no namespace
+    if(prefix.length == 0) return false;
     for(final GNode attr : attributeIter()) {
       if(attr.qname().eqPrefix(prefix)) return true;
     }

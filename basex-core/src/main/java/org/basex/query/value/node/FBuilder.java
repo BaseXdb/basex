@@ -80,6 +80,16 @@ public final class FBuilder {
   }
 
   /**
+   * Replaces an attribute or child node and assigns the new parent.
+   * @param index index of the node to be replaced
+   * @param node new node
+   */
+  public void replace(final int index, final GNode node) {
+    (node.kind() == Kind.ATTRIBUTE ? attributes : children).set(index, node);
+    ((XNode) node).parent(root);
+  }
+
+  /**
    * Creates and adds a text node if the specified value is not {@code null} and non-empty.
    * @param value value of text node (can be {@code null})
    * @return self reference
@@ -124,6 +134,8 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder ns(final byte[] prefix, final byte[] uri) {
+    // the xml binding is always in scope
+    if(eq(prefix, XML)) return this;
     if(namespaces == null) namespaces = new Atts();
     namespaces.add(prefix, uri);
     return this;

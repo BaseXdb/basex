@@ -1,7 +1,5 @@
 package org.basex.query.util;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -30,12 +28,8 @@ public final class NSDynContext {
    * @return uri or {@code null} if not found
    */
   public byte[] resolve(final byte[] prefix, final StaticContext sc) {
-    if(stack != null) {
-      for(int s = stack.size() - 1; s >= 0; s--) {
-        if(eq(stack.name(s), prefix)) return stack.value(s);
-      }
-    }
-    return sc.ns.resolveStatic(prefix);
+    final byte[] uri = stack != null ? stack.lastValue(prefix) : null;
+    return uri != null ? uri : sc.ns.resolveStatic(prefix);
   }
 
   /**
@@ -69,11 +63,12 @@ public final class NSDynContext {
    * @param atts namespaces
    */
   public void inScope(final Atts atts) {
-    if(stack != null) {
-      for(int s = stack.size() - 1; s >= 0; s--) {
-        final byte[] nm = stack.name(s);
-        if(!atts.contains(nm)) atts.add(nm, stack.value(s));
-      }
+    if(stack == null) return;
+    final int ss = stack.size();
+    for(int s = 0; s < ss; s++) {
+      // later bindings of a prefix shadow earlier ones
+      final byte[] prefix = stack.name(s);
+      if(!atts.contains(prefix)) atts.add(prefix, stack.lastValue(prefix));
     }
   }
 

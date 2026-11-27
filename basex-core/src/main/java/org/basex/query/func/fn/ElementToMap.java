@@ -347,11 +347,11 @@ public final class ElementToMap {
     final byte[] local = plan.escape ? PlanFn.decode(qnm.local(), info) : qnm.local();
     // attributes in the xml namespace are always output with the prefix 'xml'
     final byte[] name = !element && Token.eq(uri, QueryText.XML_URI) ?
-      Token.concat(Token.XML, Token.cpToken(':'), local) : switch(plan.name) {
+      QNm.name(Token.XML, local) : switch(plan.name) {
       case EQNAME ->
         uri.length != 0 ? QNm.eqName(uri, local) : local;
       case LEXICAL ->
-        qnm.hasPrefix() ? Token.concat(qnm.prefix(), Token.cpToken(':'), local) : local;
+        qnm.withLocal(local);
       case LOCAL ->
         local;
       default ->

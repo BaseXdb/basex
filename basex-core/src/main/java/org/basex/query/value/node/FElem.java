@@ -97,43 +97,31 @@ public final class FElem extends FNode {
     for(int a = 0; a < al; a++) {
       final Attr attr = (Attr) at.item(a);
       final byte[] pref = nsPrefix(attr);
-      if(pref != null) nspaces.add(pref, token(attr.getValue()));
-      else builder.node(new FAttr(attr));
+      if(pref == null) builder.node(new FAttr(attr));
+      else nspaces.add(pref, token(attr.getValue()));
     }
 
     // top-level element: namespaces in scope of the DOM ancestors
     final Atts outer = scope != null ? scope : nsScope(elem.getParentNode());
-    // declare the namespace of the name unless it is declared or inherited
+    // the namespace of the name takes precedence over a conflicting declaration
     final byte[] prefix = name.prefix(), uri = name.uri();
-    final byte[] declared = nspaces.value(prefix);
-    final byte[] bound = declared != null ? declared : outer.value(prefix);
-    if(bound == null || !Token.eq(uri, bound)) nspaces.add(prefix, uri);
+    final int d = nspaces.get(prefix);
+    if(d != -1) nspaces.value(d, uri);
+    else if(!Token.eq(uri, outer.value(prefix))) nspaces.add(prefix, uri);
+    withoutXML(nspaces);
 
     // top-level element: declare inherited namespaces, which are then in scope of the children
     Atts inScope = nspaces;
     if(scope == null) {
-      addMissing(nspaces, outer);
+      nspaces.addMissing(outer);
     } else if(nspaces.isEmpty()) {
       inScope = scope;
     } else {
-      inScope = new Atts(nspaces);
-      addMissing(inScope, scope);
+      inScope = new Atts(nspaces).addMissing(scope);
     }
     if(!nspaces.isEmpty()) builder.namespaces = nspaces;
     children(elem, builder, inScope);
     return builder;
-  }
-
-  /**
-   * Adds namespaces whose prefixes are not contained in the target.
-   * @param target target namespaces
-   * @param source source namespaces
-   */
-  private static void addMissing(final Atts target, final Atts source) {
-    final int ss = source.size();
-    for(int s = 0; s < ss; s++) {
-      if(!target.contains(source.name(s))) target.add(source.name(s), source.value(s));
-    }
   }
 
   /**
@@ -204,7 +192,17 @@ public final class FElem extends FNode {
         if(pref != null && !ns.contains(pref)) ns.add(pref, token(attr.getValue()));
       }
     }
-    return ns;
+    return withoutXML(ns);
+  }
+
+  /**
+   * Removes the binding of the xml prefix, which is always in scope.
+   * @param ns namespaces
+   * @return namespaces
+   */
+  private static Atts withoutXML(final Atts ns) {
+    final int x = ns.get(XML);
+    return x == -1 ? ns : ns.remove(x);
   }
 
   /**
@@ -243,16 +241,13 @@ public final class FElem extends FNode {
   public void preserve(final XNode orig) {
     if(!orig.inherits()) return;
     final Atts scope = orig.nsScope(null);
-    Atts ns = null;
     final int ss = scope.size();
     for(int s = 0; s < ss; s++) {
-      final byte[] prefix = scope.name(s);
-      if(!namespaces.contains(prefix)) {
-        if(ns == null) ns = new Atts(namespaces);
-        ns.add(prefix, scope.value(s));
+      if(!namespaces.contains(scope.name(s))) {
+        namespaces = new Atts(namespaces).addMissing(scope).optimize();
+        return;
       }
     }
-    if(ns != null) namespaces = ns.optimize();
   }
 
   /**
@@ -286,9 +281,8 @@ public final class FElem extends FNode {
    * (copy-namespaces {@code no-preserve} mode).
    */
   public void noPreserve() {
-    for(int n = namespaces.size() - 1; n >= 0; n--) {
-      if(!usesPrefix(namespaces.name(n))) namespaces.remove(n);
-    }
+    final Atts used = usedNamespaces(namespaces);
+    if(used != namespaces) namespaces = used.isEmpty() ? FBuilder.NO_NAMESPACES : used.optimize();
   }
 
   @Override

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.xml.*;
 import javax.xml.parsers.*;
 
 import org.basex.*;
@@ -149,9 +150,7 @@ public final class FNodeTest extends SandboxTest {
   /** Namespaces of elements imported from a DOM without namespace declarations.
    * @throws Exception exception */
   @Test public void domNamespaces() throws Exception {
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    dbf.setNamespaceAware(true);
-    final Document doc = dbf.newDocumentBuilder().newDocument();
+    final Document doc = newDocument();
     final Element root = doc.createElementNS("A", "a:r");
     final Element x1 = doc.createElementNS("B", "b:x"), x2 = doc.createElementNS("B", "b:x");
     root.appendChild(x1);
@@ -166,6 +165,64 @@ public final class FNodeTest extends SandboxTest {
     final XNode y = (XNode) elem.childIter().next().childIter().next();
     assertEquals("C", Token.string(y.uri(Token.token("c"))));
     assertEquals("B", Token.string(y.uri(Token.token("b"))));
+  }
+
+  /** Namespaces of an element imported from a DOM with inherited and redeclared prefixes.
+   * @throws Exception exception */
+  @Test public void domAncestorNamespaces() throws Exception {
+    final Document doc = newDocument();
+    final String xmlns = XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+    final Element root = doc.createElementNS("A", "a:r");
+    root.setAttributeNS(xmlns, "xmlns:p", "P1");
+    root.setAttributeNS(xmlns, "xmlns:q", "Q");
+    final Element x = doc.createElementNS("B", "b:x");
+    x.setAttributeNS(xmlns, "xmlns:p", "P2");
+    root.appendChild(x);
+    x.appendChild(doc.createElementNS("A", "a:y"));
+
+    final XNode elem = FElem.build(x, null).finish();
+    final Atts scope = elem.nsScope(null);
+    assertEquals("A", Token.string(scope.value(Token.token("a"))));
+    assertEquals("B", Token.string(scope.value(Token.token("b"))));
+    assertEquals("P2", Token.string(scope.value(Token.token("p"))));
+    assertEquals("Q", Token.string(scope.value(Token.token("q"))));
+    final XNode y = (XNode) elem.childIter().next();
+    assertEquals("P2", Token.string(y.uri(Token.token("p"))));
+    assertEquals("Q", Token.string(y.uri(Token.token("q"))));
+  }
+
+  /** Namespaces of a DOM element whose declarations conflict with its name or bind xml.
+   * @throws Exception exception */
+  @Test public void domConflictingNamespaces() throws Exception {
+    final Document doc = newDocument();
+    final String xmlns = XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+    final Element x = doc.createElementNS("B", "p:x");
+    x.setAttributeNS(xmlns, "xmlns:p", "P2");
+    x.setAttributeNS(xmlns, "xmlns:xml", XMLConstants.XML_NS_URI);
+    final Element root = doc.createElementNS("A", "a:r");
+    root.setAttributeNS(xmlns, "xmlns:xml", XMLConstants.XML_NS_URI);
+    root.appendChild(x);
+
+    final XNode elem = FElem.build(x, null).finish();
+    // the binding of the element name takes precedence
+    final Atts ns = elem.namespaces();
+    assertEquals(2, ns.size());
+    assertEquals("B", Token.string(ns.value(Token.token("p"))));
+    assertEquals("A", Token.string(ns.value(Token.token("a"))));
+    assertFalse(ns.contains(Token.XML));
+    assertEquals("B", Token.string(elem.nsScope(null).value(Token.token("p"))));
+    assertNull(elem.attributeIter().next());
+  }
+
+  /**
+   * Creates an empty namespace-aware DOM document.
+   * @return document
+   * @throws Exception exception
+   */
+  private static Document newDocument() throws Exception {
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    return dbf.newDocumentBuilder().newDocument();
   }
 
   /**

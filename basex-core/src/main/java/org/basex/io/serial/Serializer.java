@@ -370,10 +370,7 @@ public abstract class Serializer implements Closeable {
    * @return URI if found, {@code null} otherwise
    */
   protected final byte[] nsUri(final byte[] prefix) {
-    for(int n = nspaces.size() - 1; n >= 0; n--) {
-      if(eq(nspaces.name(n), prefix)) return nspaces.value(n);
-    }
-    return null;
+    return nspaces.lastValue(prefix);
   }
 
   /**

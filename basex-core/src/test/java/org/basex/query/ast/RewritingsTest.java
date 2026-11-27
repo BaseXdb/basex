@@ -3161,6 +3161,13 @@ public final class RewritingsTest extends SandboxTest {
         + "return count(($j, $x, $j/a, $x) | ())", 3);
   }
 
+  /** Attribute steps on constructors with flattened content must not be removed. */
+  @Test public void flattenedAttributes() {
+    query("let $a := <a b=''/>/@b return count(element e { [ $a ] }/@*)", 1);
+    query("let $a := <a b=''/>/@b return count(element e { jtree([ $a ])/* }/@*)", 1);
+    error("let $a := <a b=''/>/@b return count(document { [ $a ] }/node())", DOCATTS_X);
+  }
+
   /** Static types of atomized arrays. */
   @Test public void atomizedArrayTypes() {
     final String input = "for $a in ([ 1 ], [ 2 ]) return ";

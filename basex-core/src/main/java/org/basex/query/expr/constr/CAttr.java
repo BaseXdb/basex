@@ -23,9 +23,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CAttr extends CName {
-  /** XML prefix. */
-  private static final byte[] XML0 = token("xml:");
-
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -57,8 +54,8 @@ public final class CAttr extends CName {
     if(computed) {
       // assign the xml prefix to prefix-less names in the XML namespace
       if(nmPrefix.length == 0 && eq(nmUri, XML_URI)) {
-        nm = qc.shared.qName(concat(XML0, nm.string()), nmUri);
-        nmPrefix = nm.prefix();
+        nm = qc.shared.qName(XML, nm.local(), nmUri);
+        nmPrefix = XML;
       }
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CAXML.get(info);
       if(eq(nmUri, XMLNS_URI)) throw CAINV_X.get(info, nmUri);
@@ -67,7 +64,7 @@ public final class CAttr extends CName {
 
       // generate a prefix that is unique for the namespace URI within the query
       if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))
-        nm = qc.shared.qName(concat(qc.shared.prefix(nmUri), cpToken(':'), nm.string()), nmUri);
+        nm = qc.shared.qName(qc.shared.prefix(nmUri), nm.local(), nmUri);
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 

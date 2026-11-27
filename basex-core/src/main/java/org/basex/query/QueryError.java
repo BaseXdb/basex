@@ -1490,9 +1490,9 @@ public enum QueryError {
   /** Error code. */
   UPATTDUPL_X(XUDY, 21, "Duplicate attribute name: %."),
   /** Error code. */
-  UPNSCONFL_X_X(XUDY, 23, "Namespace conflicts: % vs. %."),
+  UPNSCONFL_X_X_X(XUDY, 23, "Namespace conflict for prefix '%': % vs. %."),
   /** Error code. */
-  UPNSCONFL2_X_X(XUDY, 24, "Namespace conflicts: % vs. %."),
+  UPNSCONFL2_X_X_X(XUDY, 24, "Namespace conflict for prefix '%': % vs. %."),
   /** Error code. */
   UPPAREMPTY_X(XUDY, 29, "Target has no parent: %."),
   /** Error code. */

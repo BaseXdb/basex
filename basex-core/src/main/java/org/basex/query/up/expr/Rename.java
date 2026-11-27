@@ -71,7 +71,7 @@ public final class Rename extends Update {
         // undeclarations of the default namespace (empty URI) are no bindings
         final byte[] newPrefix = newName.prefix(), uri = target.nsScope(null).value(newPrefix);
         if(uri != null && uri.length != 0 && !eq(uri, newName.uri()))
-          throw UPNSCONFL_X_X.get(info, newName, new QNm(newPrefix, uri));
+          throw UPNSCONFL_X_X_X.get(info, newPrefix, newName.uri(), uri);
       }
 
       final Updates updates = qc.updates();

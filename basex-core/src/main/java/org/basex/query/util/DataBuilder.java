@@ -252,7 +252,7 @@ public final class DataBuilder {
     // add new namespaces
     final QNm qname = node.qname();
     Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
-    if(noPreserve) ns = used(node, ns);
+    if(noPreserve) ns = node.usedNamespaces(ns);
     data.nspaces.open(last, ns);
 
     // collect node properties
@@ -283,22 +283,6 @@ public final class DataBuilder {
     // update size if additional nodes have been added by the descendants
     if(size != cPre - pre) data.size(last, Data.ELEM, cPre - pre);
     return cPre;
-  }
-
-  /**
-   * Returns the namespaces that are used by the name of an element or its attributes.
-   * @param node element
-   * @param ns namespaces
-   * @return used namespaces
-   */
-  private static Atts used(final XNode node, final Atts ns) {
-    final Atts used = new Atts();
-    final int size = ns.size();
-    for(int n = 0; n < size; n++) {
-      final byte[] prefix = ns.name(n);
-      if(node.usesPrefix(prefix)) used.add(prefix, ns.value(n));
-    }
-    return used;
   }
 
   /**

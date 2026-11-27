@@ -145,7 +145,9 @@ public abstract class CNode extends Arr {
     for(final Expr expr : exprs) {
       final SeqType st = expr.seqType();
       final Type type = st.type;
-      if(st.zero() || (attributes ? type.intersect(NodeType.ATTRIBUTE) == null :
+      // arrays and JNodes are flattened: their members may be attributes
+      if(st.zero() || (attributes ?
+        !st.mayBeWrapped() && type.intersect(NodeType.ATTRIBUTE) == null :
         type.instanceOf(NodeType.ATTRIBUTE) || type.instanceOf(NodeType.NAMESPACE))) continue;
       inputs++;
       if(match == null && st.oneOrMore()) {

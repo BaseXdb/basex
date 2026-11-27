@@ -76,7 +76,7 @@ public final class NamePool {
       final byte[] u = at.value(prefix);
       if(u == null) at.add(prefix, uri);
       // check if only one URI is assigned to a prefix
-      else if(!eq(uri, u)) throw UPNSCONFL2_X_X.get(null, uri, u);
+      else if(!eq(uri, u)) throw UPNSCONFL2_X_X_X.get(null, prefix, uri, u);
     }
   }
 

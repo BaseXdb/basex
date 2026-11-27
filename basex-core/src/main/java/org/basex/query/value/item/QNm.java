@@ -100,7 +100,7 @@ public final class QNm extends Item {
    * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
    */
   public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
-    this(prefix.length > 0 ? concat(prefix, cpToken(':'), token(local)) : local, uri);
+    this(name(prefix, local), uri);
   }
 
   /**
@@ -131,8 +131,7 @@ public final class QNm extends Item {
    * @param name qname
    */
   public QNm(final QName name) {
-    this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
-      concat(name.getPrefix(), cpToken(':'), name.getLocalPart())), token(name.getNamespaceURI()));
+    this(token(name.getPrefix()), name.getLocalPart(), token(name.getNamespaceURI()));
   }
 
   @Override
@@ -319,7 +318,7 @@ public final class QNm extends Item {
    * @return name as token
    */
   public byte[] withLocal(final byte[] lcl) {
-    return prefix == -1 ? lcl : concat(prefix(), cpToken(':'), lcl);
+    return name(prefix(), lcl);
   }
 
   /**
@@ -365,7 +364,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, cpToken(':'), local()) : unique();
+    return p.length != 0 ? name(p, local()) : unique();
   }
 
   /**
@@ -450,19 +449,25 @@ public final class QNm extends Item {
     final byte[][] parsed = parseExpanded(value, false);
     if(parsed != null) return new QNm(parsed[0], parsed[1]);
 
-    byte[] uri = null;
-    final int i = indexOf(value, ':');
-    if(i == -1) {
-      uri = dflt;
-    } else {
-      final byte[] prefix = substring(value, 0, i);
-      if(qc != null) uri = qc.ns.resolve(prefix, sc);
-      else if(sc != null) uri = sc.ns.resolveStatic(prefix);
+    final byte[] prefix = Token.prefix(value);
+    byte[] uri = dflt;
+    if(prefix.length != 0) {
+      uri = qc != null ? qc.ns.resolve(prefix, sc) :
+        sc != null ? sc.ns.resolveStatic(prefix) : null;
       if(uri == null) throw NOURI_X.get(info, prefix);
     }
-    if(XMLToken.isQName(value)) return new QNm(value, uri);
+    if(!XMLToken.isQName(value)) throw INVNAME_X.get(info, value);
+    return new QNm(value, uri);
+  }
 
-    throw INVNAME_X.get(info, value);
+  /**
+   * Returns a name with an optional prefix.
+   * @param prefix prefix (can be empty)
+   * @param local local name
+   * @return name
+   */
+  public static byte[] name(final byte[] prefix, final byte[] local) {
+    return prefix.length > 0 ? concat(prefix, cpToken(':'), local) : local;
   }
 
   /**

@@ -93,7 +93,7 @@ public final class MultiUpdateTest extends SandboxTest {
     error(input + " update { rename nodes 'x' as 'new' }", UPWRTRGTYP_X);
     error(input + " update { rename nodes ./comment() as 'new' }", UPWRTRGTYP_X);
     error(input + " update { rename nodes ./text() as 'new' }", UPWRTRGTYP_X);
-    error(input + " update { rename nodes . as QName('NEW', 'new') }", UPNSCONFL_X_X);
+    error(input + " update { rename nodes . as QName('NEW', 'new') }", UPNSCONFL_X_X_X);
   }
 
   /** Replace elements. */

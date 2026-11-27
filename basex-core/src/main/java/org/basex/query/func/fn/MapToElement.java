@@ -370,10 +370,10 @@ public final class MapToElement {
       if(names != null && !names.add(qnm)) throw MAP_TO_ELEMENT_X.get(info,
           "Duplicate attribute.");
       final byte[] ap = qnm.prefix();
-      if(ap.length != 0 && qnm.hasURI() && !eq(ap, XML)) {
+      if(ap.length != 0 && qnm.hasURI()) {
         // a prefix that is already bound to another URI is replaced
         final byte[] npref = Constr.addNS(inscope, ap, qnm.uri(), shared);
-        if(npref != null) qnm = shared.qName(concat(npref, cpToken(':'), qnm.local()), qnm.uri());
+        if(npref != null) qnm = shared.qName(npref, qnm.local(), qnm.uri());
       }
       atts.add(qnm.string(), attr.string());
     }
@@ -746,7 +746,7 @@ public final class MapToElement {
     final boolean xml = eq(qnm.uri(), QueryText.XML_URI);
     if((!element && qnm.uri().length != 0 || xml) && !qnm.hasPrefix()) {
       final byte[] prefix = xml ? XML : shared.prefix(qnm.uri());
-      qnm = shared.qName(concat(prefix, cpToken(':'), qnm.local()), qnm.uri());
+      qnm = shared.qName(prefix, qnm.local(), qnm.uri());
     }
     return qnm;
   }

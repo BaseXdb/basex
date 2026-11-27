@@ -95,7 +95,7 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
     skip++;
     if(empty) finishOpen();
     level++;
-    startOpen(new QNm(elem.hasPrefix() ? concat(elem.prefix(), ":", META) : META));
+    startOpen(new QNm(elem.withLocal(META)));
     if(html5) {
       attribute(CHARSET, token(encoding), false);
     } else {

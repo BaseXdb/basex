@@ -82,10 +82,10 @@ abstract class Update extends Arr {
   final QNm checkNS(final QNm name, final Atts scope, final QueryContext qc) throws QueryException {
     final byte[] prefix = name.prefix(), uri = name.uri(), bound = scope.value(prefix);
     if(bound == null || eq(bound, uri)) return name;
-    if(!qc.shared.generated(prefix, uri)) throw UPNSCONFL_X_X.get(info, uri, bound);
+    if(!qc.shared.generated(prefix, uri)) throw UPNSCONFL_X_X_X.get(info, prefix, uri, bound);
     // generated prefix: choose another one
     final byte[] npref = Constr.addNS(scope, prefix, uri, qc.shared);
-    return qc.shared.qName(concat(npref, cpToken(':'), name.local()), uri);
+    return qc.shared.qName(npref, name.local(), uri);
   }
 
   /**

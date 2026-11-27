@@ -1,8 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -19,7 +16,7 @@ import org.basex.util.list.*;
 public final class FnInScopePrefixes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Atts atts = toElem(arg(0), qc).nsScope(qc).add(XML, XML_URI);
+    final Atts atts = toElem(arg(0), qc).nsScopeXML(qc);
 
     final int as = atts.size();
     final TokenList tl = new TokenList();

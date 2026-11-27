@@ -390,7 +390,7 @@ public final class FnUpdate extends StandardFunc {
       throw UPNAME_X_X.get(info, kind, qnm);
     // generate a prefix for attribute names in a namespace
     return attribute && prefix.length == 0 && uri.length != 0 ?
-      qc.shared.qName(concat(qc.shared.prefix(uri), cpToken(':'), qnm.local()), uri) : qnm;
+      qc.shared.qName(qc.shared.prefix(uri), qnm.local(), uri) : qnm;
   }
 
   /**

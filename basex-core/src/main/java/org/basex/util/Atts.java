@@ -91,6 +91,20 @@ public final class Atts extends ElementList {
   }
 
   /**
+   * Adds the name/value pairs whose names are not contained yet.
+   * @param atts pairs to be added
+   * @return self reference
+   */
+  public Atts addMissing(final Atts atts) {
+    final int as = atts.size();
+    for(int a = 0; a < as; a++) {
+      final byte[] name = atts.name(a);
+      if(!contains(name)) add(name, atts.value(a));
+    }
+    return this;
+  }
+
+  /**
    * Removes the element at the specified position.
    * @param index entry index
    * @return self reference
@@ -193,6 +207,19 @@ public final class Atts extends ElementList {
   public byte[] value(final byte[] name) {
     final int i = get(name);
     return i == -1 ? null : value(i);
+  }
+
+  /**
+   * Returns the value of the last pair with the specified name.
+   * @param name name to be found
+   * @return value (can be {@code null})
+   */
+  public byte[] lastValue(final byte[] name) {
+    final byte[][] lst = list;
+    for(int p = size - 2; p >= 0; p -= 2) {
+      if(eq(lst[p], name)) return lst[p + 1];
+    }
+    return null;
   }
 
   /**

@@ -155,8 +155,9 @@ public final class Constr {
         }
         // add attribute
         builder.attr(name, qc.shared.token(node.string()));
-        // add new namespace
-        if(name.hasPrefix()) qc.ns.add(name.prefix(), name.uri());
+        // add new namespace (the xml binding is always in scope)
+        final byte[] prefix = name.prefix();
+        if(prefix.length != 0 && !eq(prefix, XML)) qc.ns.add(prefix, name.uri());
       } else if(kind == Kind.NAMESPACE) {
         // type: namespace node
 
@@ -171,7 +172,7 @@ public final class Constr {
         final byte[] knownUri = builder.namespaces == null ? null : builder.namespaces.value(name);
         if(knownUri == null) {
           builder.ns(name, uri);
-        } else if(!Token.eq(uri, knownUri)) {
+        } else if(!eq(uri, knownUri)) {
           // duplicate namespace (ignore duplicates with same URI)
           duplNS = name;
           return false;
@@ -265,7 +266,7 @@ public final class Constr {
     // add static namespaces
     for(int n = 0; n < sNs; n++) add(inscopeNS, staticNs.name(n), staticNs.value(n));
 
-    final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
+    final byte[] nmUri = nm.uri();
     // a default namespace must not be declared for an element in no namespace
     if(nmUri.length == 0 && dNs != 0 && dynamicNs.contains(EMPTY)) throw EMPTYNSCONS.get(info);
 
@@ -281,11 +282,9 @@ public final class Constr {
 
     // bind the prefix of the element name; namespace nodes take precedence, so the element is
     // renamed with a generated prefix if its prefix is already bound to another URI (nscons-011)
-    if(!eq(nmPrefix, XML) && nm.hasURI()) {
-      final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri, qc.shared);
-      if(npref != null) {
-        builder.rename(qc.shared.qName(concat(npref, cpToken(':'), nm.local()), nmUri));
-      }
+    if(nm.hasURI()) {
+      final byte[] npref = addNS(inscopeNS, nm.prefix(), nmUri, qc.shared);
+      if(npref != null) builder.rename(qc.shared.qName(npref, nm.local(), nmUri));
     }
 
     // copied elements in no namespace must not inherit the default namespace
@@ -293,13 +292,10 @@ public final class Constr {
       byte[] dflt = inscopeNS.value(EMPTY);
       if(dflt == null && builder.nsInherited != null) dflt = builder.nsInherited.value(EMPTY);
       if(dflt != null && dflt.length != 0) {
-        final GNodeList children = builder.children;
         final int cs = copies.size();
         for(int c = 0; c < cs; c++) {
           final int i = copies.get(c);
-          final XNode child = (XNode) FElem.undeclare((XNode) children.get(i), dflt);
-          child.parent(builder.root);
-          children.set(i, child);
+          builder.replace(i, FElem.undeclare((XNode) builder.children.get(i), dflt));
         }
       }
     }
@@ -323,18 +319,15 @@ public final class Constr {
     for(int a = 0; a < as; a++) {
       final GNode attr = attributes.get(a);
       final QNm qnm = attr.qname();
-      // skip attributes without prefixes or URIs
-      if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
-
-      // skip XML namespace
-      final byte[] prefix = qnm.prefix();
-      if(eq(prefix, XML)) continue;
+      // skip attributes without prefixes or URIs, and the always bound xml prefix
+      if(!qnm.hasPrefix() || !qnm.hasURI() || qnm.eqPrefix(XML)) continue;
 
       if(builder.namespaces == null) builder.namespaces = new Atts();
-      final byte[] auri = qnm.uri(), npref = addNS(builder.namespaces, prefix, auri, qc.shared);
+      final byte[] auri = qnm.uri();
+      final byte[] npref = addNS(builder.namespaces, qnm.prefix(), auri, qc.shared);
       if(npref != null) {
-        final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
-        attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
+        final QNm aname = qc.shared.qName(npref, qnm.local(), auri);
+        builder.replace(a, new FAttr(aname, qc.shared.token(attr.string())));
       }
     }
   }
@@ -350,6 +343,8 @@ public final class Constr {
    */
   public static byte[] addNS(final Atts inscopeNS, final byte[] prefix, final byte[] uri,
       final SharedData shared) {
+    // the xml binding is always in scope
+    if(eq(prefix, XML)) return null;
     final byte[] u = inscopeNS.value(prefix);
     if(u == null) {
       // add undeclared namespace

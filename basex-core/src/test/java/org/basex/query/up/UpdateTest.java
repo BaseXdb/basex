@@ -1620,7 +1620,7 @@ public final class UpdateTest extends SandboxTest {
     query("<t xmlns:ns0='x' c=''/> update { replace node @c with " + a + " }",
         "<t xmlns:ns0=\"x\" xmlns:ns0_1=\"u\" ns0_1:a=\"\"/>");
     error("<t xmlns:ns0='x'/> update { insert node attribute { QName('u', 'ns0:a') } { } "
-        + "into . }", UPNSCONFL_X_X);
+        + "into . }", UPNSCONFL_X_X_X);
 
     // map-to-element uses the same prefixes
     query("<t/> update { insert node map-to-element({ 'e': { '@Q{u}a': '' } })/@* into . }",
@@ -1716,7 +1716,7 @@ public final class UpdateTest extends SandboxTest {
         UPMULTREN_X);
     error("<a/> update { insert node attribute { QName('u1', 'p:x') } { } into ., try { "
         + "insert node attribute { QName('u2', 'p:y') } { } into . } catch * { } }",
-        UPNSCONFL2_X_X);
+        UPNSCONFL2_X_X_X);
     // targets of transform expressions are checked after the evaluation of the modify clause
     error("let $x := <x/> return <a/> update { try { insert node <b/> into $x } catch * { } }",
         UPNOTCOPIED_X);

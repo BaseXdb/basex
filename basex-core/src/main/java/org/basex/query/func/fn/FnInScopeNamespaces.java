@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -19,7 +17,7 @@ import org.basex.util.hash.*;
 public final class FnInScopeNamespaces extends StandardFunc {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    final Atts atts = toElem(arg(0), qc).nsScope(qc).add(Token.XML, XML_URI);
+    final Atts atts = toElem(arg(0), qc).nsScopeXML(qc);
 
     final MapBuilder mb = new MapBuilder();
     final int as = atts.size();

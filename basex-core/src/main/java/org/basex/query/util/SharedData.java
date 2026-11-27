@@ -69,6 +69,17 @@ public final class SharedData {
 
   /**
    * Returns a shared QName.
+   * @param prefix prefix (can be empty)
+   * @param local local name
+   * @param uri URI
+   * @return QName
+   */
+  public QNm qName(final byte[] prefix, final byte[] local, final byte[] uri) {
+    return qName(QNm.name(prefix, local), uri);
+  }
+
+  /**
+   * Returns a shared QName.
    * @param name local name with optional prefix
    * @param uri URI (can be {@code null})
    * @return QName
