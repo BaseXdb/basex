@@ -526,9 +526,7 @@ public final class WebModules {
       final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old,
       final ArrayList<IOFile> archived) throws IOException {
 
-    // links are followed; the walker skips cyclic links
-    Files.walkFileTree(root.file().toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS),
-        Integer.MAX_VALUE, new SimpleFileVisitor<>() {
+    IOFile.walk(root.file().toPath(), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
       @Override
       public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
         // skip directories with an ignore file

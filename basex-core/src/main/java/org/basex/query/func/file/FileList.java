@@ -113,9 +113,9 @@ public class FileList extends FileFn {
         if(entry.equals(dir)) throw new NotDirectoryException(root.toString());
         qc.checkStop();
         final Path path = dir == root ? entry : root.resolve(entry.getFileName());
-        final boolean isDir = attrs.isDirectory() ||
-            attrs.isSymbolicLink() && Files.isDirectory(entry);
-        if(isDir && IOFile.isLink(attrs)) links.add(path);
+        final boolean link = IOFile.isLink(attrs);
+        final boolean isDir = attrs.isDirectory() || link && Files.isDirectory(entry);
+        if(isDir && link) links.add(path);
         (isDir ? dirs : files).add(path);
         return FileVisitResult.CONTINUE;
       }

@@ -389,12 +389,10 @@ public final class IOFile extends IO {
   private void walk(final int depth, final FileFilter filter, final boolean links,
       final BiConsumer<Path, BasicFileAttributes> visitor) {
     if(!isDir()) return;
-    final Set<FileVisitOption> options = links ? EnumSet.of(FileVisitOption.FOLLOW_LINKS) :
-      EnumSet.noneOf(FileVisitOption.class);
     try {
       // the root is resolved even if links are not followed
       final Path root = links ? file.toPath() : file.toPath().toRealPath();
-      Files.walkFileTree(root, options, depth, new SimpleFileVisitor<>() {
+      final FileVisitor<Path> fv = new SimpleFileVisitor<>() {
         @Override
         public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
           return dir.equals(root) || (links || !isLink(attrs)) &&
@@ -411,10 +409,86 @@ public final class IOFile extends IO {
           Util.debug(ex);
           return FileVisitResult.CONTINUE;
         }
-      });
+      };
+      if(links) walk(root, depth, fv);
+      else Files.walkFileTree(root, Set.of(), depth, fv);
     } catch(final IOException ex) {
       Util.debug(ex);
     }
+  }
+
+  /**
+   * Walks a file tree, following symbolic links and junctions, and skipping cyclic links.
+   * @param root root path
+   * @param depth maximum depth
+   * @param visitor file visitor
+   * @throws IOException I/O exception
+   */
+  public static void walk(final Path root, final int depth, final FileVisitor<Path> visitor)
+      throws IOException {
+    walk(root, depth, visitor, new HashSet<>());
+  }
+
+  /**
+   * Walks a file tree, following symbolic links and junctions, and skipping cyclic links.
+   * @param root root path
+   * @param depth maximum depth
+   * @param visitor file visitor
+   * @param targets real paths of the junctions that are currently walked
+   * @return {@code true} if the visitor terminated the walk
+   * @throws IOException I/O exception
+   */
+  private static boolean walk(final Path root, final int depth, final FileVisitor<Path> visitor,
+      final Set<Path> targets) throws IOException {
+    final boolean[] terminated = { false };
+    Files.walkFileTree(root, EnumSet.of(FileVisitOption.FOLLOW_LINKS), depth,
+        new FileVisitor<>() {
+      @Override
+      public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+          throws IOException {
+        return result(visitor.preVisitDirectory(dir, attrs));
+      }
+      @Override
+      public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs)
+          throws IOException {
+        // JDK 26+ passes on junctions as files (JDK-8364277)
+        if(!isLink(attrs) || !Files.isDirectory(path)) {
+          return result(visitor.visitFile(path, attrs));
+        }
+        final Path target = path.toRealPath();
+        if(path.getParent().toRealPath().startsWith(target) || !targets.add(target)) {
+          final IOException ex = new FileSystemLoopException(path.toString());
+          return result(visitor.visitFileFailed(path, ex));
+        }
+        try {
+          return result(walk(path, depth - root.relativize(path).getNameCount(), visitor, targets) ?
+            FileVisitResult.TERMINATE : FileVisitResult.CONTINUE);
+        } finally {
+          targets.remove(target);
+        }
+      }
+      @Override
+      public FileVisitResult visitFileFailed(final Path path, final IOException ex)
+          throws IOException {
+        return result(visitor.visitFileFailed(path, ex));
+      }
+      @Override
+      public FileVisitResult postVisitDirectory(final Path dir, final IOException ex)
+          throws IOException {
+        return result(visitor.postVisitDirectory(dir, ex));
+      }
+
+      /**
+       * Registers the result of the visitor.
+       * @param result result
+       * @return result
+       */
+      private FileVisitResult result(final FileVisitResult result) {
+        if(result == FileVisitResult.TERMINATE) terminated[0] = true;
+        return result;
+      }
+    });
+    return terminated[0];
   }
 
   /**
@@ -563,7 +637,7 @@ public final class IOFile extends IO {
    * @return result of check
    */
   public static boolean isLink(final BasicFileAttributes attrs) {
-    return attrs.isSymbolicLink() || attrs.isDirectory() && attrs.isOther();
+    return attrs.isSymbolicLink() || Prop.WIN && attrs.isOther();
   }
 
   /**
