@@ -6,10 +6,10 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.w3c.dom.*;
 
 /**
@@ -200,13 +200,46 @@ public abstract class FNode extends XNode {
   }
 
   /**
+   * Copies an element, text, comment or processing instruction and its descendants to a fragment.
+   * @param node node
+   * @return copy
+   */
+  public static FNode fragment(final XNode node) {
+    return switch(node.kind()) {
+      case ELEMENT -> {
+        final FBuilder elem = FElem.build(node.qname()).ns(node.namespaces());
+        bind(elem, node.qname());
+        for(final GNode attr : node.attributeIter()) {
+          elem.node(new FAttr(attr.qname(), attr.string()));
+          bind(elem, attr.qname());
+        }
+        for(final GNode child : node.childIter()) elem.node(fragment((XNode) child));
+        yield elem.finish();
+      }
+      case TEXT -> new FTxt(node.string());
+      case COMMENT -> new FComm(node.string());
+      default -> new FPI(node.qname(), node.string());
+    };
+  }
+
+  /**
+   * Declares the namespace of a name if it may have been inherited from an ancestor.
+   * @param elem element builder
+   * @param name element or attribute name
+   */
+  private static void bind(final FBuilder elem, final QNm name) {
+    final byte[] prefix = name.prefix(), uri = name.uri();
+    if((prefix.length != 0 || uri.length != 0) &&
+        (elem.namespaces == null || !elem.namespaces.contains(prefix))) elem.ns(prefix, uri);
+  }
+
+  /**
    * Adds the children of the specified DOM node.
    * @param node node
    * @param builder parent node
-   * @param nsMap namespace map
+   * @param scope namespaces in scope of the parent
    */
-  static void children(final Node node, final FBuilder builder,
-      final TokenObjectMap<byte[]> nsMap) {
+  static void children(final Node node, final FBuilder builder, final Atts scope) {
     final NodeList ch = node.getChildNodes();
     final int cl = ch.getLength();
     for(int c = 0; c < cl; c++) {
@@ -220,7 +253,7 @@ public abstract class FNode extends XNode {
         case Node.PROCESSING_INSTRUCTION_NODE ->
           builder.node(new FPI((ProcessingInstruction) child));
         case Node.ELEMENT_NODE ->
-          builder.node(FElem.build((Element) child, nsMap).finish());
+          builder.node(FElem.build((Element) child, scope).finish());
         default -> { }
       }
     }

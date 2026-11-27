@@ -5,11 +5,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.xml.parsers.*;
+
 import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
+import org.w3c.dom.*;
 
 /**
  * Tests for constructed nodes.
@@ -141,6 +144,28 @@ public final class FNodeTest extends SandboxTest {
         assertSame(seen[0][e], seen[t][e], "threads saw different text nodes");
       }
     }
+  }
+
+  /** Namespaces of elements imported from a DOM without namespace declarations.
+   * @throws Exception exception */
+  @Test public void domNamespaces() throws Exception {
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    final Document doc = dbf.newDocumentBuilder().newDocument();
+    final Element root = doc.createElementNS("A", "a:r");
+    final Element x1 = doc.createElementNS("B", "b:x"), x2 = doc.createElementNS("B", "b:x");
+    root.appendChild(x1);
+    root.appendChild(x2);
+    x1.appendChild(doc.createElementNS("C", "c:y"));
+
+    final XNode elem = FElem.build(root, null).finish();
+    assertEquals("A", Token.string(elem.uri(Token.token("a"))));
+    for(final GNode child : elem.childIter()) {
+      assertEquals("B", Token.string(((XNode) child).nsScope(null).value(Token.token("b"))));
+    }
+    final XNode y = (XNode) elem.childIter().next().childIter().next();
+    assertEquals("C", Token.string(y.uri(Token.token("c"))));
+    assertEquals("B", Token.string(y.uri(Token.token("b"))));
   }
 
   /**

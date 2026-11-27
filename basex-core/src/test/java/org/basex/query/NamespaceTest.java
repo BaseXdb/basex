@@ -909,6 +909,61 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Serializes and copies namespaces inherited from ancestors.
+   */
+  @Test public void inheritedNamespaces() {
+    query("<a xmlns:p='u'><b/></a>/b", "<b xmlns:p=\"u\"/>");
+    query("<n>{ <a xmlns:p='u'><b/></a>/b }</n>", "<n><b xmlns:p=\"u\"/></n>");
+    query("<n>{ <a xmlns:p='u'><b/></a>/b }</n>/b ! in-scope-prefixes(.) => sort()", "p\nxml");
+    query("declare copy-namespaces no-preserve, inherit;"
+        + "<n>{ <a xmlns:p='u'><b/></a>/b }</n>", "<n><b/></n>");
+    query("declare copy-namespaces preserve, no-inherit;"
+        + "let $b := <a xmlns:p='u'><b/></a>/b\n"
+        + "return <n xmlns:q='v'>{ $b }</n>/b ! in-scope-prefixes(.) => sort()",
+        "p\nxml");
+
+    // database nodes
+    final String doc = "parse-xml('<a xmlns:p=\"u\"><b><p:c/></b></a>')/a/b";
+    query("<n xmlns:q='v'>{ " + doc + " }</n>/b ! in-scope-prefixes(.) => sort()",
+        "p\nq\nxml");
+    query("declare copy-namespaces preserve, no-inherit;"
+        + "<n xmlns:q='v'>{ " + doc + " }</n>/b ! in-scope-prefixes(.) => sort()", "p\nxml");
+    query("declare copy-namespaces no-preserve, inherit;"
+        + "<n xmlns:q='v'>{ " + doc + " }</n>/b ! in-scope-prefixes(.) => sort()", "q\nxml");
+    query("declare copy-namespaces no-preserve, no-inherit;"
+        + "<n xmlns:q='v'>{ " + doc + " }</n>/b ! in-scope-prefixes(.) => sort()", "xml");
+    query("declare copy-namespaces no-preserve, no-inherit;"
+        + "<n xmlns:q='v'>{ " + doc + " }</n>/b/* ! in-scope-prefixes(.) => sort()", "p\nxml");
+  }
+
+  /**
+   * Copies elements without default namespace into elements with default namespace.
+   */
+  @Test public void inheritedDefaultNamespace() {
+    final String doc = "parse-xml('<d/>')/*";
+    query("element Q{u}w { " + doc + " }", "<w xmlns=\"u\"><d xmlns=\"\"/></w>");
+    query("element Q{u}w { " + doc + " }/* ! in-scope-prefixes(.)", "xml");
+    query("<x>{ element Q{u}w { " + doc + " } }</x>",
+        "<x><w xmlns=\"u\"><d xmlns=\"\"/></w></x>");
+    query("let $d := <d/> return <w xmlns='u'>{ $d }</w>/* ! in-scope-prefixes(.)", "xml");
+    query("<w xmlns='u'>{ " + doc + " }</w>/* ! in-scope-prefixes(.)", "xml");
+    query("declare namespace p = 'p'; element p:w { namespace { '' } { 'u' }, " + doc + " }"
+        + "/* ! in-scope-prefixes(.) => sort()", "p\nxml");
+    query("<a xmlns='u'>{ element Q{p}p:w { " + doc + " } }</a>/*/* ! in-scope-prefixes(.)"
+        + " => sort()", "p\nxml");
+    query("declare copy-namespaces no-preserve, inherit;"
+        + "<w xmlns='u'>{ " + doc + " }</w>/* ! in-scope-prefixes(.)", "xml");
+    query("<w xmlns='u'>{ parse-xml('<d xmlns=\"v\"/>')/* }</w>/* ! in-scope-prefixes(.)"
+        + " => sort() => string-join(',')", ",xml");
+    // prefixed elements inherit the default namespace
+    query("<w xmlns='u'>{ parse-xml('<p:d xmlns:p=\"p\"/>')/* }</w>/*"
+        + " ! namespace-uri-for-prefix('', .)", "u");
+    query("declare default element namespace 'u';"
+        + "element w { element { QName('p', 'p:d') } {} }/* ! namespace-uri-for-prefix('', .)",
+        "u");
+  }
+
+  /**
    * Tests with default element namespace set to ##any.
    */
   @Test public void defaultElementNamespaceAny() {
@@ -919,7 +974,8 @@ public final class NamespaceTest extends SandboxTest {
     query(defAny + "element Q{a}a {}/self::a", "<a xmlns=\"a\"/>");
     query(defAny + "element Q{a}a {}/self::Q{}a", "");
     query(defAny + "<r xmlns:x='X' xmlns:y='Y'><a/><x:a/><y:a/></r>/a",
-        "<a/>\n<x:a xmlns:x=\"X\"/>\n<y:a xmlns:y=\"Y\"/>");
+        "<a xmlns:x=\"X\" xmlns:y=\"Y\"/>\n<x:a xmlns:x=\"X\" xmlns:y=\"Y\"/>\n"
+        + "<y:a xmlns:y=\"Y\" xmlns:x=\"X\"/>");
     query(defAny + "<r xmlns:x='X'><x:a/></r>/*[self::a]", "<x:a xmlns:x=\"X\"/>");
 
     // attributes are unaffected
@@ -940,7 +996,7 @@ public final class NamespaceTest extends SandboxTest {
 
     // other contexts fall back to no namespace
     query(defAny + "namespace-uri(element a {})", "");
-    query(defAny + "<r xmlns:x='X'><a/><x:a/></r>/Q{}a", "<a/>");
+    query(defAny + "<r xmlns:x='X'><a/><x:a/></r>/Q{}a", "<a xmlns:x=\"X\"/>");
     query(defAny + "declare option output:method 'text';serialize(<x>42</x>, "
         + "{'cdata-section-elements': xs:QName('x')})", "<x><![CDATA[42]]></x>");
 

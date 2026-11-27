@@ -13,7 +13,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.w3c.dom.*;
 
 /**
@@ -81,10 +80,10 @@ public final class FElem extends FNode {
    * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
-   * @param nsMap namespaces in scope ({@code null} for a top-level element)
+   * @param scope namespaces in scope of the parent ({@code null} for a top-level element)
    * @return element builder
    */
-  public static FBuilder build(final Element elem, final TokenObjectMap<byte[]> nsMap) {
+  public static FBuilder build(final Element elem, final Atts scope) {
     final String nsUri = elem.getNamespaceURI();
     final QNm name = new QNm(elem.getNodeName(), nsUri == null ? Token.EMPTY : token(nsUri));
 
@@ -97,38 +96,44 @@ public final class FElem extends FNode {
 
     for(int a = 0; a < al; a++) {
       final Attr attr = (Attr) at.item(a);
-      final byte[] nm = token(attr.getName()), uri = token(attr.getValue());
-      if(Token.eq(nm, XMLNS)) {
-        nspaces.add(Token.EMPTY, uri);
-      } else if(startsWith(nm, XMLNS_COLON)) {
-        nspaces.add(local(nm), uri);
-      } else {
-        builder.node(new FAttr(attr));
-      }
+      final byte[] pref = nsPrefix(attr);
+      if(pref != null) nspaces.add(pref, token(attr.getValue()));
+      else builder.node(new FAttr(attr));
     }
 
-    // no parent, so we have to add all namespaces in scope
-    TokenObjectMap<byte[]> namespaces = nsMap;
-    if(namespaces == null) {
-      namespaces = new TokenObjectMap<>();
-      nsScope(elem.getParentNode(), namespaces);
-      for(final byte[] prefix : namespaces) {
-        if(!nspaces.contains(prefix)) nspaces.add(prefix, namespaces.get(prefix));
-      }
-    }
+    // top-level element: namespaces in scope of the DOM ancestors
+    final Atts outer = scope != null ? scope : nsScope(elem.getParentNode());
+    // declare the namespace of the name unless it is declared or inherited
+    final byte[] prefix = name.prefix(), uri = name.uri();
+    final byte[] declared = nspaces.value(prefix);
+    final byte[] bound = declared != null ? declared : outer.value(prefix);
+    if(bound == null || !Token.eq(uri, bound)) nspaces.add(prefix, uri);
 
-    // add new namespaces
-    final int ns = nspaces.size();
-    for(int n = 0; n < ns; n++) namespaces.put(nspaces.name(n), nspaces.value(n));
-
-    final byte[] prefix = name.prefix(), uri = name.uri(), old = namespaces.get(prefix);
-    if(old == null || !Token.eq(uri, old)) {
-      nspaces.add(prefix, uri);
-      namespaces.put(prefix, uri);
+    // top-level element: declare inherited namespaces, which are then in scope of the children
+    Atts inScope = nspaces;
+    if(scope == null) {
+      addMissing(nspaces, outer);
+    } else if(nspaces.isEmpty()) {
+      inScope = scope;
+    } else {
+      inScope = new Atts(nspaces);
+      addMissing(inScope, scope);
     }
     if(!nspaces.isEmpty()) builder.namespaces = nspaces;
-    children(elem, builder, new TokenObjectMap<>());
+    children(elem, builder, inScope);
     return builder;
+  }
+
+  /**
+   * Adds namespaces whose prefixes are not contained in the target.
+   * @param target target namespaces
+   * @param source source namespaces
+   */
+  private static void addMissing(final Atts target, final Atts source) {
+    final int ss = source.size();
+    for(int s = 0; s < ss; s++) {
+      if(!target.contains(source.name(s))) target.add(source.name(s), source.value(s));
+    }
   }
 
   /**
@@ -179,35 +184,37 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Gathers all defined namespaces in the scope of the given DOM element.
-   * @param elem DOM element
-   * @param nsMap map
+   * Returns the namespaces in scope of the given DOM node.
+   * @param node DOM node (can be {@code null})
+   * @return namespaces
    */
-  private static void nsScope(final Node elem, final TokenObjectMap<byte[]> nsMap) {
-    Node n = elem;
+  private static Atts nsScope(final Node node) {
+    final Atts ns = new Atts();
     // only elements can declare namespaces
-    while(n instanceof Element) {
-      final NamedNodeMap atts = n.getAttributes();
+    for(Node n = node; n instanceof Element; n = n.getParentNode()) {
       final String prefix = n.getPrefix();
-      if(prefix != null) {
-        final byte[] pref = token(prefix);
-        if(nsMap.get(pref) == null) nsMap.put(pref, token(n.getNamespaceURI()));
+      if(prefix != null && !ns.contains(token(prefix))) {
+        ns.add(token(prefix), token(n.getNamespaceURI()));
       }
-      final int len = atts.getLength();
-      for(int i = 0; i < len; i++) {
-        final Attr a = (Attr) atts.item(i);
-        final byte[] name = token(a.getName()), val = token(a.getValue());
-        if(Token.eq(name, XMLNS)) {
-          // default namespace
-          if(nsMap.get(Token.EMPTY) == null) nsMap.put(Token.EMPTY, val);
-        } else if(startsWith(name, XMLNS_COLON)) {
-          // prefixed namespace
-          final byte[] ln = local(name);
-          if(nsMap.get(ln) == null) nsMap.put(ln, val);
-        }
+      final NamedNodeMap atts = n.getAttributes();
+      final int al = atts.getLength();
+      for(int a = 0; a < al; a++) {
+        final Attr attr = (Attr) atts.item(a);
+        final byte[] pref = nsPrefix(attr);
+        if(pref != null && !ns.contains(pref)) ns.add(pref, token(attr.getValue()));
       }
-      n = n.getParentNode();
     }
+    return ns;
+  }
+
+  /**
+   * Returns the prefix declared by a DOM namespace attribute.
+   * @param attr DOM attribute
+   * @return prefix, or {@code null} if the attribute is no namespace declaration
+   */
+  private static byte[] nsPrefix(final Attr attr) {
+    final byte[] name = token(attr.getName());
+    return Token.eq(name, XMLNS) ? Token.EMPTY : startsWith(name, XMLNS_COLON) ? local(name) : null;
   }
 
   @Override
@@ -229,17 +236,54 @@ public final class FElem extends FNode {
   }
 
   /**
+   * Adds in-scope namespaces of the original element that the copy does not declare
+   * (copy-namespaces {@code preserve} mode).
+   * @param orig original element
+   */
+  public void preserve(final XNode orig) {
+    if(!orig.inherits()) return;
+    // the in-scope namespaces start with the declared ones, which the copy shares
+    final Atts scope = orig.nsScope(null);
+    final int ds = namespaces.size(), ss = scope.size();
+    if(ss == ds) return;
+    final Atts ns = new Atts(namespaces);
+    for(int s = ds; s < ss; s++) ns.add(scope.name(s), scope.value(s));
+    namespaces = ns.optimize();
+  }
+
+  /**
+   * Adds a namespace binding to an unexposed element unless it declares the prefix itself.
+   * @param node node
+   * @param prefix prefix
+   * @param uri namespace URI
+   * @return node with the binding
+   */
+  public static GNode declare(final XNode node, final byte[] prefix, final byte[] uri) {
+    if(node.kind() != Kind.ELEMENT || node.namespaces().contains(prefix)) return node;
+    final FElem elem = (FElem) (node instanceof FElem ? node : fragment(node));
+    elem.namespaces = new Atts(elem.namespaces).add(prefix, uri).optimize();
+    return elem;
+  }
+
+  /**
+   * Undeclares the default namespace of the new parent in an unexposed element in no namespace.
+   * @param node node
+   * @param dflt default namespace of the new parent (can be {@code null})
+   * @return node with the undeclaration
+   */
+  public static GNode undeclare(final XNode node, final byte[] dflt) {
+    if(dflt == null || dflt.length == 0 || node.kind() != Kind.ELEMENT) return node;
+    final QNm qname = node.qname();
+    return qname.hasPrefix() || qname.uri().length != 0 ? node : declare(node, EMPTY, EMPTY);
+  }
+
+  /**
    * Removes namespaces that are used neither by the element nor by its attributes
    * (copy-namespaces {@code no-preserve} mode).
    */
   public void noPreserve() {
     for(int n = namespaces.size() - 1; n >= 0; n--) {
-      final byte[] pref = namespaces.name(n);
-      boolean used = name.eqPrefix(pref);
-      for(int a = 0; !used && a < attributes.length; a++) {
-        used = attributes[a].qname().eqPrefix(pref);
-      }
-      if(!used) namespaces.remove(n);
+      if(!usesPrefix(namespaces.name(n))) namespaces.remove(n);
     }
   }
 

@@ -441,6 +441,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
     query("collection('src/test/resources/dir')!" + func.args(" .")
         + "[ends-with(., '/test.xml')]", cd + "src/test/resources/dir/test.xml");
+    // copied elements adopt the base URI of their new parent
+    final String elem = " doc('src/test/resources/test.xml')/*";
+    query(func.args(" copy $c :=" + elem + " modify () return $c"),
+        cd + "src/test/resources/test.xml");
+    query(func.args(" <w>{" + elem + " }</w>/*"), cd);
+    query(func.args(" <w xmlns='u'>{" + elem + " }</w>/*"), cd);
   }
 
   /** Test method. */
@@ -5171,6 +5177,7 @@ return
     // base URIs are kept
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'file:///x' }") + ")", "file:///x");
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'd://x/' }") + ")", "d://x/");
+    query("base-uri(" + func.args("<a/>", " { 'base-uri': 'http://x' }") + ")", "http://x");
     query("base-uri(" + func.args("<a/>", " { 'base-uri': 'http://x/y.xml' }") + ")",
         "http://x/y.xml");
     // relative URIs are resolved against the static base URI
@@ -6245,8 +6252,8 @@ return
         + "    </output:serialization-parameters>\n"
         + "  return " + func.args(" <x><p:y>abc</p:y><z>def</z></x>", " $params") + "\n"
         + "}</x>",
-          "<x>\n"
-        + "  <p:y xmlns:p=\"P\"><![CDATA[abc]]></p:y>\n"
+          "<x xmlns:p=\"P\">\n"
+        + "  <p:y><![CDATA[abc]]></p:y>\n"
         + "  <z><![CDATA[def]]></z>\n"
         + "</x>");
 
@@ -7900,11 +7907,26 @@ return
     query(func.args(" <a xmlns:p='u'><p:b><p:c/></p:b></a>", " fn { * }",
         " { 'rename': QName('v', 'p:b') }"),
         "<a xmlns:p=\"u\"><p:b xmlns:p=\"v\"><p:c xmlns:p=\"u\"/></p:b></a>");
+    // child elements keep the bindings that are replaced by a new name
+    query(func.args(" <a><b><c/></b></a>", " fn { * }", " { 'rename': QName('u', 'b') }"),
+        "<a><b xmlns=\"u\"><c xmlns=\"\"/></b></a>");
+    query(func.args(" parse-xml('<a><b><c/></b></a>')", " fn { */* }",
+        " { 'rename': QName('u', 'b') }") + "//*:c ! namespace-uri-for-prefix('', .)", "");
+    query(func.args(" <a xmlns='u'><b><c/></b></a>", " fn { * }", " { 'rename': #b }") +
+        "//*:c ! namespace-uri-for-prefix('', .)", "u");
     query(func.args(" <a b='1'/>", " fn { @b }", " { 'rename': QName('urn:x', 'c') }") +
         "/@*/namespace-uri()", "urn:x");
     // in-scope namespaces of the updated node are retained
     query("sort(in-scope-prefixes(" + func.args(" <a xmlns:p='u'><b/></a>/b", " fn {}", delete) +
         "))", "p\nxml");
+    // supplied elements in no namespace do not inherit the default namespace
+    query(func.args(" <a xmlns='u'><b/></a>", " fn { *:b }",
+        " { 'insert-after': parse-xml('<c/>')/* }") + "/*:c ! in-scope-prefixes(.)", "xml");
+    query(func.args(" <a xmlns='u'><b/></a>", " fn { *:b }",
+        " { 'rename': QName('', 'c') }") + "/c ! in-scope-prefixes(.)", "xml");
+    query(func.args(" <a xmlns='u'><b/></a>", " fn { *:b }",
+        " { 'replace': parse-xml('<p:c xmlns:p=\"p\"/>')/* }") +
+        "/* ! namespace-uri-for-prefix('', .)", "u");
     query(func.args(" <a xmlns:p='u'><b><p:c/></b></a>/b", " fn { .//*:c }",
         " { 'replace-value': 'x' }"), "<b xmlns:p=\"u\"><p:c>x</p:c></b>");
     // nodes of the result are in document order

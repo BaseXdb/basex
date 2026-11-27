@@ -460,10 +460,9 @@ public final class SerializerOptions extends Options {
       // skip names in EQName notation
       if(indexOf(name, '{') == -1) {
         final int i = indexOf(name, ':');
-        final byte[] uri = elem.nsScope(null).value(i == -1 ? EMPTY : substring(name, 0, i));
         // unprefixed names: default namespace applies (empty if undeclared)
+        final byte[] uri = elem.uri(i == -1 ? EMPTY : substring(name, 0, i));
         if(uri != null) qname = QNm.eqName(uri, substring(name, i + 1));
-        else if(i == -1) qname = QNm.eqName(EMPTY, name);
       }
       tb.add(qname).add(' ');
     }

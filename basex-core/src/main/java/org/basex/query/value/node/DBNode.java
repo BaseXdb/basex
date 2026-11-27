@@ -196,8 +196,11 @@ public class DBNode extends XNode {
           // file paths are converted to URIs, other absolute URIs (e.g. from fn:parse-xml) are kept
           final IO io = IO.get(path);
           final Uri uri = Uri.get(path);
-          return io instanceof IOFile && io.path().equals(path) || !uri.isAbsolute() ?
-            Token.token(io.merge(base).url()) : uri.resolve(Uri.get(base)).string();
+          if(io instanceof IOFile && io.path().equals(path) || !uri.isAbsolute()) {
+            return Token.token(io.merge(base).url());
+          }
+          // single documents are named after the last segment of the URI, which may be the host
+          return base.equals(io.name()) ? uri.string() : uri.resolve(Uri.get(base)).string();
         }
         // documents without a database (e.g. created via fn:parse-xml) have no base URI
         if(name.isEmpty()) return Token.token(base);
@@ -223,8 +226,8 @@ public class DBNode extends XNode {
    * @return result of check
    */
   private boolean copyRoot() {
-    return !data.meta.original.isEmpty() && kind() == Kind.ELEMENT && data.inMemory() &&
-        data.parent(pre, Data.ELEM) == -1;
+    return root == null && !data.meta.original.isEmpty() && kind() == Kind.ELEMENT &&
+        data.inMemory() && data.parent(pre, Data.ELEM) == -1;
   }
 
   @Override

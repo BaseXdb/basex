@@ -130,22 +130,19 @@ public final class FnUpdate extends StandardFunc {
       children.add(transform(child, targets, ancestors, actions, false, qc));
     }
     final GNode copy = rebuild(node, builder, attributes.value(), children.value(), qc);
-    if(!targets.contains(node.id())) return copy;
-    // the copy has no parent, so the containing structure is taken from the original node
-    final XQStruct container = node instanceof final JNode jnode ? jnode.container() : null;
-    return apply(copy, container, actions, qc);
+    return targets.contains(node.id()) ? apply(copy, node, actions, qc) : copy;
   }
 
   /**
    * Returns the nodes that result from applying the actions to a node.
    * @param node node with updated descendants
-   * @param container map or array that contains the original node (can be {@code null})
+   * @param orig original node
    * @param actions actions
    * @param qc query context
    * @return resulting nodes
    * @throws QueryException query exception
    */
-  private Value apply(final GNode node, final XQStruct container, final XQMap actions,
+  private Value apply(final GNode node, final GNode orig, final XQMap actions,
       final QueryContext qc) throws QueryException {
 
     // all actions are evaluated before the content of the node is moved to its successor
@@ -160,7 +157,7 @@ public final class FnUpdate extends StandardFunc {
     final Value name = action(actions, RENAME, node, qc);
     supply(action(actions, INSERT_AFTER, node, qc), after, qc);
     if(replace != null) supply(replace, vb, qc);
-    else vb.add(change(node, container, value, name, qc));
+    else vb.add(change(node, orig, value, name, qc));
     vb.add(after.value());
     return vb.value(this);
   }
@@ -252,12 +249,14 @@ public final class FnUpdate extends StandardFunc {
     }
     // attributes may be supplied from other trees: bind the prefixes of their names
     Constr.attributeNS(builder, qc);
+    // supplied elements in no namespace must not inherit the default namespace of the node
+    final byte[] dflt = node.kind() == Kind.ELEMENT ? ((XNode) node).uri(EMPTY) : null;
     // the children of a node must not contain two consecutive text nodes
     final TokenBuilder text = new TokenBuilder();
     for(final Item item : children) {
       final XNode child = toXNode(item, false);
       if(child.kind() == Kind.TEXT) text.add(child.string());
-      else builder.text(text.next()).node(child);
+      else builder.text(text.next()).node(FElem.undeclare(child, dflt));
     }
     return builder.text(text.finish()).finish();
   }
@@ -281,21 +280,22 @@ public final class FnUpdate extends StandardFunc {
   /**
    * Returns a node of the same kind as the specified node with a new value and name or key.
    * @param node node with updated descendants
-   * @param container map or array that contains the original node (can be {@code null})
+   * @param orig original node
    * @param value new value (can be {@code null})
    * @param name new name or key (can be {@code null})
    * @param qc query context
    * @return resulting node
    * @throws QueryException query exception
    */
-  private GNode change(final GNode node, final XQStruct container, final Value value,
+  private GNode change(final GNode node, final GNode orig, final Value value,
       final Value name, final QueryContext qc) throws QueryException {
 
     if(value == null && name == null) return node;
     if(node instanceof final JNode jnode) {
       Item key = jnode.key;
       if(name != null) {
-        if(!(container instanceof XQMap)) throw UPRENAME_X.get(info, node);
+        // the copy has no parent, so the containing structure is taken from the original node
+        if(!(((JNode) orig).container() instanceof XQMap)) throw UPRENAME_X.get(info, node);
         if(!(name instanceof final Item item) || !item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE))
           throw typeError(name, BasicType.ANY_ATOMIC_TYPE, info);
         key = item;
@@ -314,8 +314,17 @@ public final class FnUpdate extends StandardFunc {
           namespaces(xnode, qname, qc) : xnode.namespaces());
         // the node is not exposed anymore, so its attributes and children are moved
         for(final GNode attribute : node.attributeIter()) builder.node(attribute);
-        if(string != null) builder.text(string);
-        else for(final GNode child : node.childIter()) builder.node(child);
+        if(string != null) {
+          builder.text(string);
+        } else {
+          // child elements keep a binding that is replaced by the new name
+          final byte[] prefix = qname.prefix();
+          final byte[] old = name != null ? ((XNode) orig).uri(prefix) : null;
+          final boolean keep = old != null && !eq(old, qname.uri());
+          for(final GNode child : node.childIter()) {
+            builder.node(keep ? FElem.declare((XNode) child, prefix, old) : child);
+          }
+        }
         // attributes whose prefixes are bound to another URI are renamed
         if(name != null) Constr.attributeNS(builder, qc);
         return builder.finish();

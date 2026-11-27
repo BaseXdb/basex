@@ -382,6 +382,28 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Indicates if the node may inherit namespaces from ancestors or enclosing constructors.
+   * @return result of check
+   */
+  public final boolean inherits() {
+    final Atts inherited = nsInherited();
+    return parent() != null || inherited != null && !inherited.isEmpty();
+  }
+
+  /**
+   * Indicates if a prefix is used by the name of the element or one of its attributes.
+   * @param prefix prefix
+   * @return result of check
+   */
+  public final boolean usesPrefix(final byte[] prefix) {
+    if(qname().eqPrefix(prefix)) return true;
+    for(final GNode attr : attributeIter()) {
+      if(attr.qname().eqPrefix(prefix)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Recursively finds the URI for the specified prefix.
    * @param prefix prefix
    * @return URI or {@code null}

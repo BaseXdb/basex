@@ -170,8 +170,8 @@ public final class CElem extends CName {
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
 
       // assign namespaces
-      constr.namespaces(nspaces, nm);
       elem.nsInherited = nsInherited;
+      constr.namespaces(nspaces, nm);
 
       // return optimized node
       return elem.finish();

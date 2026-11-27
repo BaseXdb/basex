@@ -8,7 +8,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
 
@@ -73,7 +72,7 @@ public final class FDoc extends FNode {
    */
   public static FBuilder build(final String uri, final DocumentFragment doc) {
     final FBuilder builder = build(Token.token(uri));
-    children(doc, builder, new TokenObjectMap<>());
+    children(doc, builder, new Atts());
     return builder;
   }
 

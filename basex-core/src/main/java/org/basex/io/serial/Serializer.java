@@ -19,7 +19,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -81,6 +80,8 @@ public abstract class Serializer implements Closeable {
   protected int skip;
   /** Indicates if an element is currently being opened. */
   protected boolean opening;
+  /** Element whose children are currently being serialized (can be {@code null}). */
+  private FNode parent;
 
   /**
    * Returns a default serializer.
@@ -572,7 +573,6 @@ public abstract class Serializer implements Closeable {
 
     final FTPosData ftData = node instanceof final FTPosNode ft ? ft.ftpos : null;
     final boolean nsExist = !data.nspaces.isEmpty();
-    final TokenSet nsSet = nsExist ? new TokenSet() : null;
     final IntList parentStack = new IntList();
     final BoolList indentStack = new BoolList();
 
@@ -612,25 +612,10 @@ public abstract class Serializer implements Closeable {
         if(nsUri == null) nsUri = EMPTY;
         addNamespace(nsPrefix, nsUri);
 
-        // database contains namespaces: add declarations
-        if(nsExist) {
-          nsSet.add(nsPrefix);
-          int p = pre;
-          do {
-            final Atts ns = data.namespaces(p);
-            final int nl = ns.size();
-            for(int n = 0; n < nl; n++) {
-              nsPrefix = ns.name(n);
-              if(nsSet.add(nsPrefix)) addNamespace(nsPrefix, ns.value(n));
-            }
-            // check ancestors only for the root of the serialized subtree
-            if(!parentStack.isEmpty()) break;
-
-            p = data.parent(p, data.kind(p));
-          } while(p >= 0 && data.kind(p) == Data.ELEM);
-
-          // reset namespace cache
-          nsSet.clear();
+        // add declared namespaces; root: also inherited ones (database or fragment ancestors)
+        final boolean root = parentStack.isEmpty();
+        if(nsExist || root && node.attached()) {
+          addNamespaces(data.namespaces(pre), nsPrefix, root ? node : null);
         }
 
         // serialize attributes
@@ -654,6 +639,26 @@ public abstract class Serializer implements Closeable {
       closeElement();
       indent = indentStack.pop();
       parentStack.pop();
+    }
+  }
+
+  /**
+   * Adds the namespaces declared by an element and, for detached elements, the inherited ones.
+   * @param declared declared namespaces
+   * @param prefix prefix of the element name
+   * @param detached element whose parent is not serialized (can be {@code null})
+   */
+  private void addNamespaces(final Atts declared, final byte[] prefix, final XNode detached) {
+    final int ds = declared.size();
+    for(int d = 0; d < ds; d++) addNamespace(declared.name(d), declared.value(d));
+    if(detached != null) {
+      // the in-scope namespaces start with the declared ones
+      final Atts scope = detached.nsScope(null);
+      final int ss = scope.size();
+      for(int s = ds; s < ss; s++) {
+        final byte[] pref = scope.name(s);
+        if(!eq(pref, prefix)) addNamespace(pref, scope.value(s));
+      }
     }
   }
 
@@ -691,10 +696,9 @@ public abstract class Serializer implements Closeable {
       final QNm name = elementName(originalName);
       openElement(name);
 
-      // serialize declared namespaces
-      final Atts nsp = node.namespaces();
-      final int ps = nsp.size();
-      for(int p = 0; p < ps; p++) addNamespace(nsp.name(p), nsp.value(p));
+      // detached: root that inherits namespaces, or shared node (skipCopy) with its original parent
+      final boolean detached = parent == null ? node.inherits() : node.parent() != parent;
+      addNamespaces(node.namespaces(), name.prefix(), detached ? node : null);
       // add new or updated namespace
       addNamespace(name.prefix(), name.uri());
 
@@ -715,7 +719,10 @@ public abstract class Serializer implements Closeable {
       if(text != null) {
         prepareText(text, null);
       } else {
+        final FNode par = parent;
+        parent = node;
         for(final GNode n : node.childIter()) node((XNode) n);
+        parent = par;
       }
       closeElement();
       indent = i;

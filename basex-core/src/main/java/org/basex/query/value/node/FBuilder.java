@@ -16,7 +16,7 @@ import org.basex.util.options.*;
  */
 public final class FBuilder {
   /** Empty namespace array. */
-  private static final Atts NO_NAMESPACES = new Atts(0);
+  public static final Atts NO_NAMESPACES = new Atts(0);
 
   /** Parent node (can be {@code null}). */
   public FNode root;

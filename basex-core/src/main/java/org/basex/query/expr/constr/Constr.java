@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Node constructor.
@@ -47,6 +48,9 @@ public final class Constr {
   private final boolean skipCopy;
   /** Current expression is a nested direct constructor. */
   private boolean direct;
+
+  /** Positions of copied child elements that inherit namespaces (can be {@code null}). */
+  private IntList copies;
 
   /**
    * Creates the children of the constructor.
@@ -184,10 +188,19 @@ public final class Constr {
         } else {
           // results of nested direct constructors are fresh nodes: adopt them without copying
           final boolean keep = direct || !qc.options().get(MainOptions.COPYNODE);
-          final XNode copy = node.materialize(n -> keep, info, qc);
+          final boolean inherit = CNode.inheritNS(info);
+          final boolean defaultNS = CNode.preserveNS(info) && inherit;
+          // database nodes are copied to fragments if a non-default copy-namespaces mode applies
+          final XNode copy = keep || defaultNS || !(node instanceof DBNode) ?
+            node.materialize(n -> keep, info, qc) : FNode.fragment(node);
           // apply copy-namespaces mode to copied element nodes
-          if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem);
+          if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem, true);
           builder.node(copy);
+          // remember inheriting copies: the default namespace is known after all children
+          if(!keep && inherit && kind == Kind.ELEMENT) {
+            if(copies == null) copies = new IntList();
+            copies.add(builder.children.size() - 1);
+          }
         }
       }
       more = false;
@@ -204,20 +217,23 @@ public final class Constr {
    * Recursively applies the copy-namespaces mode to a copied element and its descendants.
    * @param orig original element (can be {@code null})
    * @param copy copied element
+   * @param root root of the copy
    */
-  private void copyNamespaces(final XNode orig, final FElem copy) {
+  private void copyNamespaces(final XNode orig, final FElem copy, final boolean root) {
     final boolean preserve = CNode.preserveNS(info), inherit = CNode.inheritNS(info);
+    // the root of the copy declares all namespaces in scope of the original
+    if(root) copy.preserve(orig);
     if(preserve && inherit) return;
 
-    // no-inherit: restore the original frozen set so the copy does not inherit its new parent
-    if(!inherit) copy.nsInherited(orig.nsInherited());
+    // no-inherit: the copy does not inherit its new parent (root: stop at the declared scope)
+    if(!inherit) copy.nsInherited(root ? FBuilder.NO_NAMESPACES : orig.nsInherited());
     // no-preserve: drop namespaces used neither by the element nor by its attributes
     if(!preserve) copy.noPreserve();
     // recurse into child elements, tracking the original in lockstep if it is still needed
     final BasicNodeIter ci = copy.childIter(), oi = inherit ? null : orig.childIter();
     for(GNode c; (c = ci.next()) != null;) {
       final GNode o = oi != null ? oi.next() : null;
-      if(c instanceof final FElem ce) copyNamespaces((XNode) o, ce);
+      if(c instanceof final FElem ce) copyNamespaces((XNode) o, ce, false);
     }
   }
 
@@ -265,6 +281,22 @@ public final class Constr {
       final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri, qc.shared);
       if(npref != null) {
         builder.rename(qc.shared.qName(concat(npref, cpToken(':'), nm.local()), nmUri));
+      }
+    }
+
+    // copied elements in no namespace must not inherit the default namespace
+    if(copies != null) {
+      byte[] dflt = inscopeNS.value(EMPTY);
+      if(dflt == null && builder.nsInherited != null) dflt = builder.nsInherited.value(EMPTY);
+      if(dflt != null && dflt.length != 0) {
+        final GNodeList children = builder.children;
+        final int cs = copies.size();
+        for(int c = 0; c < cs; c++) {
+          final int i = copies.get(c);
+          final XNode child = (XNode) FElem.undeclare((XNode) children.get(i), dflt);
+          child.parent(builder.root);
+          children.set(i, child);
+        }
       }
     }
 
