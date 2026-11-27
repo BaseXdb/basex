@@ -25,6 +25,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Constr {
+  /** Maximum subtree size of database nodes that are copied to fragments. */
+  private static final int FRAGMENT_SIZE = 100;
+
   /** Error: attribute position. */
   public QNm errAtt;
   /** Error: duplicate attribute. */
@@ -190,9 +193,10 @@ public final class Constr {
           final boolean keep = direct || !qc.options().get(MainOptions.COPYNODE);
           final boolean inherit = CNode.inheritNS(info);
           final boolean defaultNS = CNode.preserveNS(info) && inherit;
-          // database nodes are copied to fragments if a non-default copy-namespaces mode applies
-          final XNode copy = keep || defaultNS || !(node instanceof DBNode) ?
-            node.materialize(n -> keep, info, qc) : FNode.fragment(node);
+          // database nodes are copied to fragments if they are small or copy-namespaces is not default
+          final XNode copy = !keep && node instanceof final DBNode db &&
+            (!defaultNS || db.data().size(db.pre(), db.dbKind()) <= FRAGMENT_SIZE) ?
+            FNode.fragment(node) : node.materialize(n -> keep, info, qc);
           // apply copy-namespaces mode to copied element nodes
           if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem, true);
           builder.node(copy);

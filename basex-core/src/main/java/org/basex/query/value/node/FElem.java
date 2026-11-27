@@ -242,13 +242,17 @@ public final class FElem extends FNode {
    */
   public void preserve(final XNode orig) {
     if(!orig.inherits()) return;
-    // the in-scope namespaces start with the declared ones, which the copy shares
     final Atts scope = orig.nsScope(null);
-    final int ds = namespaces.size(), ss = scope.size();
-    if(ss == ds) return;
-    final Atts ns = new Atts(namespaces);
-    for(int s = ds; s < ss; s++) ns.add(scope.name(s), scope.value(s));
-    namespaces = ns.optimize();
+    Atts ns = null;
+    final int ss = scope.size();
+    for(int s = 0; s < ss; s++) {
+      final byte[] prefix = scope.name(s);
+      if(!namespaces.contains(prefix)) {
+        if(ns == null) ns = new Atts(namespaces);
+        ns.add(prefix, scope.value(s));
+      }
+    }
+    if(ns != null) namespaces = ns.optimize();
   }
 
   /**

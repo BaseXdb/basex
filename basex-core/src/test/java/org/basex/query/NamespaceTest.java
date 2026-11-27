@@ -934,6 +934,14 @@ public final class NamespaceTest extends SandboxTest {
         + "<n xmlns:q='v'>{ " + doc + " }</n>/b ! in-scope-prefixes(.) => sort()", "xml");
     query("declare copy-namespaces no-preserve, no-inherit;"
         + "<n xmlns:q='v'>{ " + doc + " }</n>/b/* ! in-scope-prefixes(.) => sort()", "p\nxml");
+
+    // prefixed database nodes, which are copied to fragments that declare the prefix
+    final String pref = "parse-xml('<r xmlns:a=\"A\" xmlns:b=\"B\" xmlns:c=\"C\"><x>"
+        + "<a:y b:z=\"\"/></x></r>')//*:y";
+    query("<n>{ " + pref + " }</n>/* ! in-scope-prefixes(.) => sort()", "a\nb\nc\nxml");
+    query("declare copy-namespaces preserve, no-inherit;"
+        + "<n xmlns:q='v'>{ " + pref + " }</n>/* ! in-scope-prefixes(.) => sort()",
+        "a\nb\nc\nxml");
   }
 
   /**
