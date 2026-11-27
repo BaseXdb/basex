@@ -1135,6 +1135,7 @@ public final class QT4TS extends Main {
 
       // include check for comments, processing instructions and namespaces
       final String options = " { '" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "': " +
+          !ignorePrefixes + "(), '" + DeepEqualOptions.IN_SCOPE_NAMESPACES.name() + "': " +
           !ignorePrefixes + "(), '" + DeepEqualOptions.COMMENTS.name() + "': true(), '" +
           DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "': true() }";
       final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
