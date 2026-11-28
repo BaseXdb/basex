@@ -78,7 +78,7 @@ public final class HtmlParser extends XMLParser {
     if(parser == null) {
       final TokenBuilder xml = new TokenBuilder().add(ELEM_O).add(HTML).add(ELEM_C).add(
           Serializer.value(io.read(), false, true, false)).add(ELEM_OS).add(HTML).add(ELEM_C);
-      return new IOContent(xml.finish(), io.path());
+      return content(xml.finish(), io);
     }
 
     try {
@@ -98,10 +98,22 @@ public final class HtmlParser extends XMLParser {
         if(enc != null) is.setEncoding(enc);
         reader.parse(is);
       }
-      return new IOContent(token(sw.toString()), io.path());
+      return content(token(sw.toString()), io);
     } catch(final SAXException ex) {
       throw INVHTML_X.getIO(ex.getLocalizedMessage());
     }
+  }
+
+  /**
+   * Returns converted content with the path and name of the original input.
+   * @param xml XML content
+   * @param io original input
+   * @return XML input
+   */
+  private static IO content(final byte[] xml, final IO io) {
+    final IO input = new IOContent(xml, io.path());
+    input.name(io.name());
+    return input;
   }
 
   /** SAX filter that retains attributes in the XML namespace, dropped by the XML serializer. */

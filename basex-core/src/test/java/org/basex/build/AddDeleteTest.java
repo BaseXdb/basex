@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -255,6 +257,26 @@ public final class AddDeleteTest extends SandboxTest {
     } catch(final BaseXException ex) {
       Util.debug(ex);
     }
+  }
+
+  /**
+   * Adds HTML documents with target names.
+   */
+  @Test public void addHtml() {
+    final String html = "<html><body><p>x</p></body></html>";
+    try {
+      set(MainOptions.PARSER, MainParser.HTML);
+      execute(new Put("docs/put.htm", html));
+      execute(new Add("docs/add.htm", html));
+      execute(new Put("docs/file.htm", DIR + "input.html"));
+      final Put put = new Put("docs/stream.htm");
+      put.setInput(new ArrayInput(html));
+      execute(put);
+    } finally {
+      set(MainOptions.PARSER, MainParser.XML);
+    }
+    query("sort(db:list('" + NAME + "'))",
+        "docs/add.htm\ndocs/file.htm\ndocs/put.htm\ndocs/stream.htm");
   }
 
   /**

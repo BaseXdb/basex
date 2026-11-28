@@ -37,6 +37,8 @@ public final class DbModuleTest extends SandboxTest {
   private static final String XML = "src/test/resources/input.xml";
   /** Test file. */
   private static final String CSV = "src/test/resources/input.csv";
+  /** Test file. */
+  private static final String HTML = "src/test/resources/input.html";
   /** Test folder. */
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
@@ -1244,6 +1246,16 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME) + "?name", NAME);
     query(func.args(NAME) + "?NAME", "");
     query(func.args(NAME) + "?xyz", "");
+  }
+
+  /** Test method. */
+  @Test public void putHtml() {
+    final String opts = " { 'parser': 'html' }";
+    query(_DB_PUT.args(NAME, HTML, "html/put.htm", opts));
+    query(_DB_ADD.args(NAME, HTML, "html/add.htm", opts));
+    query(_DB_PUT.args(NAME, " '<html/>'", "html/string.htm", opts));
+    query("sort(" + _DB_LIST.args(NAME, "html") + ')',
+        "html/add.htm\nhtml/put.htm\nhtml/string.htm");
   }
 
   /** Test method. */
