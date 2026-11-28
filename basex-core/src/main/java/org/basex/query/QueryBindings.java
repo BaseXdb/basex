@@ -126,7 +126,7 @@ final class QueryBindings {
 
     // parse target type
     final StaticContext sc = qc.main != null ? qc.main.sc : new StaticContext(qc);
-    final SeqType st = new QueryParser(type, null, qc, sc).parseSeqType();
+    final SeqType st = AQueryParser.parseSeqType(type, qc, sc);
     if(st.eq(Types.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
     final Type tp = st.type;
 

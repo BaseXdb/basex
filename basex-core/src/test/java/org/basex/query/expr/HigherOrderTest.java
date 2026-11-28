@@ -103,7 +103,7 @@ public final class HigherOrderTest extends SandboxTest {
 
   /**  Test for name heavy currying. */
   @Test public void placeHolderTest() {
-    error("string-join(('a', 'b'), )(',')", FUNCARG_X);
+    error("string-join(('a', 'b'), )(',')", FUNCARG_X, SYNTAX_X);
   }
 
   /**  Test for invalid function expressions. */

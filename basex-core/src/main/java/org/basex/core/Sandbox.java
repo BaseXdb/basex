@@ -37,6 +37,8 @@ import org.basex.util.options.*;
 public abstract class Sandbox {
   /** Flag for writing queries and results to STDERR; helpful for exporting test cases. */
   private static final boolean OUTPUT = false;
+  /** Project specific system properties that were set when the sandbox was loaded. */
+  private static final Properties PROPERTIES = properties();
 
   /** Database port. */
   protected static final int DB_PORT = Integer.getInteger("org.basex.test.port", 9863);
@@ -575,13 +577,28 @@ public abstract class Sandbox {
   }
 
   /**
+   * Returns a copy of the project specific system properties.
+   * @return properties
+   */
+  private static Properties properties() {
+    final Properties props = new Properties();
+    System.getProperties().forEach((key, value) -> {
+      if(key.toString().startsWith(Prop.DBPREFIX)) props.put(key, value);
+    });
+    return props;
+  }
+
+  /**
    * Removes test databases and closes the database context.
    */
   public static void finishSandbox() {
     context.close();
     Prop.clear();
     // cleanup: remove project specific system properties
-    System.getProperties().keySet().removeIf(key -> key.toString().startsWith(Prop.DBPREFIX));
+    final Properties props = System.getProperties();
+    props.keySet().removeIf(key -> key.toString().startsWith(Prop.DBPREFIX));
+    // restore the properties that were set on startup
+    props.putAll(PROPERTIES);
     if(!sandbox().delete()) fail("Sandbox could not be deleted.");
   }
 

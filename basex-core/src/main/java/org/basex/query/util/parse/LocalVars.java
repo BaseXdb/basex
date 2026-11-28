@@ -19,7 +19,7 @@ public final class LocalVars {
   /** Stack of variable contexts. */
   private final ArrayList<VarContext> vars = new ArrayList<>();
   /** Query parser. */
-  private final QueryParser parser;
+  private final AQueryParser parser;
   /** Names of undeclared static variables for which the local names have been recorded. */
   private final QNmSet recorded = new QNmSet();
 
@@ -27,7 +27,7 @@ public final class LocalVars {
    * Constructor.
    * @param parser query parser
    */
-  public LocalVars(final QueryParser parser) {
+  public LocalVars(final AQueryParser parser) {
     this.parser = parser;
   }
 

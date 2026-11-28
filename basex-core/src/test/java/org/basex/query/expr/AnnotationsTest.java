@@ -32,13 +32,13 @@ public final class AnnotationsTest extends SandboxTest {
     // numeric annotation values
     query("declare %local:x(.1) variable $a := 1; $a", 1);
     query("declare %local:x(1.) variable $a := 1; $a", 1);
-    error("declare %local:x(.) variable $a := 1; $a", NUMBER_X);
+    error("declare %local:x(.) variable $a := 1; $a", NUMBER_X, SYNTAX_X);
   }
 
   /** Parsing errors and conflicts. */
   @Test public void conflicts() {
-    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X);
-    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X);
+    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X, SYNTAX_X);
+    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X, SYNTAX_X);
     error("declare %pfff:public variable $x := 1; $x", NOURI_X);
     error("declare %public %public variable $x := 1; $x", DUPLVARVIS);
     error("declare %public %private variable $x := 1; $x", DUPLVARVIS);

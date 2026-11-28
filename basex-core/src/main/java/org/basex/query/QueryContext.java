@@ -105,6 +105,9 @@ public final class QueryContext extends Job implements Closeable {
   /** Parsed and pre-declared modules. */
   public final ModuleRegistry modules;
 
+  /** Query parser, which overrides the main option (can be {@code null}). */
+  public MainOptions.QueryParserType queryParser;
+
   /** Main module (root expression, can be {@code null}). */
   public MainModule main;
   /** Context value type (can be {@code null}). */
@@ -195,7 +198,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public AModule parse(final String query, final String uri, final StaticContext sc)
       throws QueryException {
-    return QueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
+    return AQueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
   }
 
   /**
@@ -205,6 +208,10 @@ public final class QueryContext extends Job implements Closeable {
    * @return list of suggestions, followed by valid input string
    */
   public StringList suggest(final String query, final Data data) {
+    if(queryParser() == MainOptions.QueryParserType.REX) {
+      return RExQuerySuggest.suggest(query, data);
+    }
+
     final QuerySuggest qs = new QuerySuggest(query, this, data);
     try {
       qs.parseMain();
@@ -212,6 +219,14 @@ public final class QueryContext extends Job implements Closeable {
     } catch(final QueryException ex) {
       return qs.complete(ex.column() - 1);
     }
+  }
+
+  /**
+   * Returns the type of the query parser.
+   * @return query parser: the type that was assigned to this context, or the main option
+   */
+  MainOptions.QueryParserType queryParser() {
+    return queryParser != null ? queryParser : context.options.get(MainOptions.QUERYPARSER);
   }
 
   /**
@@ -227,7 +242,7 @@ public final class QueryContext extends Job implements Closeable {
 
     return run(info.parsing, () -> {
       if(parent == null) info.query = query;
-      main = new QueryParser(query, uri, this, sc).parseMain();
+      main = AQueryParser.get(queryParser(), query, uri, this, sc).parseMain();
       return main;
     });
   }
@@ -244,7 +259,7 @@ public final class QueryContext extends Job implements Closeable {
       throws QueryException {
     return run(info.parsing, () -> {
       if(parent == null) info.query = query;
-      return new QueryParser(query, uri, this, sc).parseLibrary(true);
+      return AQueryParser.get(queryParser(), query, uri, this, sc).parseLibrary(true);
     });
   }
 
